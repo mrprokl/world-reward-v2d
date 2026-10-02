@@ -167,7 +167,7 @@ def test_failed_report_exclusive_before_torch_or_forward(gate, tmp_path, monkeyp
     original = gate.Path.iterdir
     monkeypatch.setattr(gate.Path, "iterdir", lambda self: [Path("lo")] if str(self) == "/sys/class/net" else original(self))
     with pytest.raises(ValueError, match="acquisition"): gate.main([])
-    path = tmp_path / "results/mhr-finger-semantics.json"; report = json.loads(path.read_text())
+    path = tmp_path / "results/mhr-finger-semantics-v2.json"; report = json.loads(path.read_text())
     assert report["status"] == "fail" and report["forward_calls"] == 0 and report["adoption_performed"] is False
     frozen = path.read_bytes()
     with pytest.raises(FileExistsError): gate.main([])
@@ -183,3 +183,19 @@ def test_unknown_arguments_and_offline_remote_readonly_scope(gate):
     assert not any(f"src=$ROOT/{p}" in wrapper for p in ("data", "outputs", "vendor"))
     assert "weights/mhr,readonly" in wrapper and "dinov3,readonly" in wrapper
     assert gate.BODY_SHA != "78ff5cb874dd012a272382e3f2d8bc11226d5b7d0ecc739a60fbb4a97a5a5ba3"
+
+
+@pytest.mark.parametrize("count", [1, 6, 216])
+def test_exact_mhrdemo_identity_rows_not_generic_broadcast(gate, count):
+    shared = np.arange(45, dtype=np.float32)/100
+    rows = gate.identity_rows(shared, count)
+    expression = np.zeros((count, 72), np.float32)
+    assert rows.shape == (count, 45) and len(rows) == len(expression)
+    assert all(row.tobytes() == shared.tobytes() for row in rows)
+    rows[0, 0] = 1
+    assert shared[0] == 0
+
+
+@pytest.mark.parametrize("count", [0, -1, True, 1.5])
+def test_identity_row_count_explicit(gate, count):
+    with pytest.raises(ValueError): gate.identity_rows(np.zeros(45, np.float32), count)

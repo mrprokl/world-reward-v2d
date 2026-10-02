@@ -152,6 +152,15 @@ def regular_hash(path, root, expected, size=None):
         raise ValueError(f"Frozen input missing or altered: {path}")
 
 
+def identity_rows(shared_identity, count):
+    """MHRDemo concatenates rows: explicit identical identity, never broadcast."""
+    value = np.asarray(shared_identity)
+    if (np.ma.isMaskedArray(shared_identity) or value.shape != (45,) or value.dtype.kind != "f"
+            or not np.isfinite(value).all() or type(count) is not int or count < 1):
+        raise ValueError("Require one finite shared identity45 and explicit positive batch size")
+    return np.repeat(value[None], count, axis=0)
+
+
 def main(argv=None):
     argparse.ArgumentParser(description=__doc__, allow_abbrev=False).parse_args(argv)
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
@@ -159,7 +168,7 @@ def main(argv=None):
     root = Path(os.environ["WR_ROOT"]); revision = os.environ.get("WR_CODE_REVISION", ""); image = os.environ.get("WR_IMAGE_ID", "")
     if not re.fullmatch(r"[0-9a-f]{40}", revision) or not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
         raise ValueError("Require immutable source revision/image ID")
-    output = root / "results/mhr-finger-semantics.json"
+    output = root / "results/mhr-finger-semantics-v2.json"
     if output.is_symlink(): raise FileExistsError("Frozen semantic report already exists")
     with output.open("x") as handle:
         started = time.perf_counter()
@@ -231,14 +240,16 @@ def main(argv=None):
                 controls[i*4:(i+1)*4, 68+i] = torch.tensor([-.001, .001, -.002, .002], device="cuda")
             fixed = torch.cat((controls[:, :68], controls[:, 122:]), dim=1)
             if torch.count_nonzero(fixed): raise ValueError("Own nuisance/scales must stay exactly zero")
-            controls_copy = controls.clone(); identity = torch.zeros(1, 45, device="cuda"); expr = torch.zeros(216, 72, device="cuda")
+            controls_copy = controls.clone()
+            identity = torch.as_tensor(identity_rows(np.zeros(45, np.float32), 216), device="cuda")
+            expr = torch.zeros(216, 72, device="cuda")
             deadline = min(started + 300, time.perf_counter() + 120); signal.alarm(max(1, int(deadline-time.perf_counter())))
             previous_skeleton = None
             with torch.inference_mode():
                 for correctives in (False, True):
                     report["active_correctives"] = correctives
                     persist()
-                    neutral_v, neutral_s = model(identity, torch.zeros(1, 204, device="cuda"), expr[:1], correctives); report["forward_calls"] += 1
+                    neutral_v, neutral_s = model(identity[:1], torch.zeros(1, 204, device="cuda"), expr[:1], correctives); report["forward_calls"] += 1
                     persist()
                     v, s = model(identity, controls, expr, correctives); report["forward_calls"] += 1
                     persist()

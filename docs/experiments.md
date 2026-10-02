@@ -765,3 +765,16 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Preserve the failed report; support the actual positional/keyword API without
   changing native models/fixtures/budgets. V2 has distinct report/proposal paths;
   this is infrastructure compatibility, not a multiview numerical result.
+- 2026-10-02 R64 (Azure finger semantics,9421d97): actual named joint/parameter/
+  checkpoint mapping passed phase A. Native216-row forward then failed4.969s:
+  MHRDemo concatenates model controls with zero identity rows and does not
+  broadcast1x45 identity, unlike generic upstream MHR. V2 supplies216 identical
+  zero identity rows explicitly, unchanged controls/gates/budgets; old failure
+  report remains frozen. Neutral forward had completed, no derivative claim.
+- 2026-10-02 R65 (Azure real-object endpoint budget,9421d97): exact source
+  welding/manifold checks and source embedding passed. QEM attained2138vertices/
+  4096faces with46 retained components, but the output embedding check failed.
+  Reject real-mesh proposal; no component/cavity deletion, threshold relaxation,
+  retry or production-route adoption. Procedural endpoint success does not
+  generalize universally. Investigate constrained placement or fresh generated
+  geometry, not mesh repair to evade penetration.
