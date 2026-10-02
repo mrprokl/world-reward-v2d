@@ -1063,3 +1063,11 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Empty legacy target removed; original failure log SHA67404776…035d4 retained.
   J1 source integration full tiny suite3567PASS/1optional-trimeshSKIP33.75s;
   this validates contracts/metric implementations, not actual model outcomes.
+- 2026-10-02 D68: source-backed CPU throughput hypothesis only: compare exact
+  native depth writer framewise against synchronous batches8 on new16-frame
+  procedural1536×1152 depth arrays, same level9 PNG encoding/metadata, complete
+  canonical-byte validation and two paired orders. Require byte/order/metadata
+  parity and≥1.25× median write throughput within240s CPU budget. Temporary H5
+  files remain remote and are removed after retained digest/timing decisions.
+  No active-chain changes, geometry/accuracy claim, compression/gate relaxation
+  or external acquisition. Record concurrent GPU/CPU load if benchmark executes.

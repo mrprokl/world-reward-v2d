@@ -57,6 +57,9 @@ Primary papers, project pages, GitHub source/README and Hugging Face metadata we
   no verified inverse exists here. A surface-quality experiment is possible,
   but adopting it requires an independently checked MHR fit, not renaming arrays.
   Mandatory SAM custom-license source leaves eligibility unresolved.
+  VitPose also constructs a DINOv3 backbone via Torch Hub; DINOv3 code/weights
+  have custom terms, so suppressing SAM image features alone is not an OSI
+  closure fix. Do not recursively install optional SMPL/retargeting assets.
   Pinned `gem_soma.ckpt`541758499bytes, SHA4c1f85ca…ee298e, plus
   VitPose3388483384bytes would be new Azure assets; Body2109129346bytes
   SHA b5a2f9d305dd02626b967aa2e86021fba07065df66ce7a7e00ffb9664f150abf
