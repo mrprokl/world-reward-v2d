@@ -965,3 +965,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   new checkpoint. Separate fixed-anchor generation/tracking/private evaluation
   begins at ec60dd9; spatial reserved-track reprojection is not held-out temporal
   accuracy. Full tiny suite3423PASS33.10s before final tracking tests.
+- 2026-10-02 R82 (Azure motion anchors/tracking,ec60dd9): three actual
+  RGB-derived fixed anchors passed93.342s, peak18.448GB. Tracking stopped8.549s
+  on object0 frame5: depth ICP proposed a whole-mesh camera crossing, caught
+  before raster clipping. Earlier four temporal frames abstained on sparse
+  spatial LK support; no completed trajectory or quality result. Preserve failed
+  tracking/report.json and reuse frozen anchors for tracking-v2. Fix initialization
+  about camera-coordinate anchor pivot (t=current_center-R*anchor_center), reject
+  invalid fitted ICP, retain valid measured-center alternative; thresholds and
+  masks unchanged. Also fix private evaluator loop indentation found by source
+  review, with a tiny eight-frame actual-file regression test before any evaluation.
+  No failed method gate is reclassified; full suite3428PASS34.27s before fixes.

@@ -23,6 +23,45 @@ from world_reward.rgb_pose_tracking import track_rgb_pose
 
 STAGE='public_fixed_mesh_rgb_motion_proposals'
 K=np.array([[640.,0,256.],[0,640.,192.],[0,0,1.]])
+TRACKING_DIRECTORY='tracking-v2'
+
+
+def visible_pose(vertices, rotation, translation):
+    """Reject whole-mesh camera crossings, never clip away predicted triangles."""
+    moved=vertices@rotation.T+translation
+    return bool(np.isfinite(moved).all() and np.all(moved[:,2]>1e-4))
+
+
+def depth_baseline(vertices,faces,samples,observed,anchor_center,previous_r,mask):
+    """Measured centering then ICP; invalid ICP proposals cannot be rasterized.
+
+    Rotation acts on camera-coordinate anchor points, not an origin-centered
+    mesh. The anchor observation center must be rotated when initializing t.
+    If that initialization crosses the camera, retry identity R with the same
+    measured center displacement. Neither alternative uses truth or stasis.
+    """
+    center=np.median(observed,axis=0)
+    initial_r=previous_r.copy();initial_t=center-anchor_center@initial_r.T
+    identity_reinitialization=False
+    if not visible_pose(vertices,initial_r,initial_t):
+        initial_r=np.eye(3);initial_t=center-anchor_center
+        identity_reinitialization=True
+    if not visible_pose(vertices,initial_r,initial_t):
+        raise ValueError('Measured baseline initialization crosses camera; no clipping or static fallback')
+    fit=align_observed_points(samples,observed,initial_r,initial_t)
+    detail={'identity_rotation_reinitialization':identity_reinitialization,
+            'initial_min_camera_z_m':float((vertices@initial_r.T+initial_t)[:,2].min()),
+            'fitted_min_camera_z_m':float((vertices@fit.rotation.T+fit.translation)[:,2].min()),
+            'icp_status':fit.status,'icp_final_residual_m':fit.final_residual}
+    if not visible_pose(vertices,fit.rotation,fit.translation):
+        return initial_r,initial_t,'measured_center_invalid_icp_rejected',detail
+    initial_mask,_=raster_camera_mesh(vertices@initial_r.T+initial_t,faces,K,512,384)
+    fitted_mask,_=raster_camera_mesh(vertices@fit.rotation.T+fit.translation,faces,K,512,384)
+    detail.update(initial_mask_iou=silhouette_iou(initial_mask.cpu().numpy(),mask),
+                  fitted_mask_iou=silhouette_iou(fitted_mask.cpu().numpy(),mask))
+    if detail['fitted_mask_iou']<detail['initial_mask_iou']:
+        return initial_r,initial_t,'measured_center_silhouette_icp_rejected',detail
+    return fit.rotation,fit.translation,'depth_icp',detail
 
 
 def raster_attachments(vertices,faces,pixels,face,bary):
@@ -110,18 +149,18 @@ def run(root,report,path):
                 R,t=np.eye(3),np.zeros(3);status='shared_anchor'
                 detail={'status':'shared_anchor','reason':'no_temporal_pose_fit'}
             else:
-                initial_t=np.median(observed,axis=0)-anchor_center
-                fit=align_observed_points(samples,observed,previous_r,initial_t)
-                R,t=fit.rotation,fit.translation;status='depth_icp'
-                initial_mask,_=raster_camera_mesh(v@previous_r.T+initial_t,f,K,512,384)
-                fitted_mask,_=raster_camera_mesh(v@R.T+t,f,K,512,384)
-                if silhouette_iou(fitted_mask.cpu().numpy(),mask)<silhouette_iou(initial_mask.cpu().numpy(),mask):R,t=previous_r,initial_t
+                R,t,status,baseline_detail=depth_baseline(v,f,samples,observed,anchor_center,previous_r,mask)
                 proposal=track_rgb_pose(anchor_rgb,rgb,anchor_mask,mask,pixels,points,trackingK)
                 detail={k:value for k,value in asdict(proposal).items() if k not in ('rotation','translation')}
-                if proposal.status=='proposal':rotations[1,obj,frame]=proposal.rotation;translations[1,obj,frame]=proposal.translation
+                if proposal.status=='proposal' and visible_pose(v,proposal.rotation,proposal.translation):
+                    rotations[1,obj,frame]=proposal.rotation;translations[1,obj,frame]=proposal.translation
                 else:rotations[1,obj,frame]=R;translations[1,obj,frame]=t
+                if proposal.status=='proposal' and not visible_pose(v,proposal.rotation,proposal.translation):
+                    detail.update(status='abstain',reason='full_predicted_mesh_crosses_camera')
             rotations[0,obj,frame]=R;translations[0,obj,frame]=t;previous_r=R
-            report['frames'].append({'object_index':obj,'frame_index':frame,'baseline_method':status,'rgb_pnp':detail,'anchor_feature_count':len(pixels)})
+            report['frames'].append({'object_index':obj,'frame_index':frame,'baseline_method':status,
+                                    'baseline_diagnostics':{} if frame==0 else baseline_detail,
+                                    'rgb_pnp':detail,'anchor_feature_count':len(pixels)})
             native.persist(path,report)
     artifact=path.parent/'predictions.npz'
     with artifact.open('xb') as stream:np.savez_compressed(stream,rotations=rotations,translations=translations,frame_index=np.arange(8),object_index=np.arange(3))
@@ -133,7 +172,7 @@ def run(root,report,path):
 def main(argv=None):
     argparse.ArgumentParser(description=__doc__,allow_abbrev=False).parse_args(argv)
     if platform.system()!='Linux' or {p.name for p in Path('/sys/class/net').iterdir()}!={'lo'}:raise RuntimeError('Require remote isolated GPU raster')
-    root=Path(os.environ['WR_ROOT']);out=root/'validation/object_motion_v1/tracking';path=out/'report.json'
+    root=Path(os.environ['WR_ROOT']);out=root/'validation/object_motion_v1'/TRACKING_DIRECTORY;path=out/'report.json'
     if out.is_symlink() or not out.is_dir() or any(out.iterdir()):raise FileExistsError('Require reserved fresh motion proposals')
     report={'stage':STAGE,'status':'fail','code_revision':os.environ['WR_CODE_REVISION'],'image_id':os.environ['WR_IMAGE_ID'],
             'script_sha256':sha256(Path(__file__)),'private_truth_read':False,'challenge_inputs_used':False,'adoption_performed':False,

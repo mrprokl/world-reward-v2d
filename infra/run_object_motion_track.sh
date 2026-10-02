@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="${WR_ROOT:?}"
 CODE="${WR_CODE:?}"
 BASE="$ROOT/validation/object_motion_v1"
-OUT="$BASE/tracking"
+OUT="$BASE/tracking-v2"
 [[ ! -L "$BASE" && ! -e "$OUT" && ! -L "$OUT" ]]
 mkdir "$OUT"
 chown "$(id -u scenesmith):$(id -g scenesmith)" "$OUT"

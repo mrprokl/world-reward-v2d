@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="${WR_ROOT:?}"
 CODE="${WR_CODE:?}"
 BASE="$ROOT/validation/object_motion_v1"
-OUT="$BASE/quality"
+OUT="$BASE/quality-v2"
 [[ ! -L "$BASE" && ! -e "$OUT" && ! -L "$OUT" ]]
 mkdir "$OUT"
 chown "$(id -u scenesmith):$(id -g scenesmith)" "$OUT"
@@ -19,6 +19,6 @@ timeout --signal=TERM --kill-after=5s 123s docker run --rm --network none --memo
  --mount "type=bind,src=$BASE/inputs/manifest.json,dst=$BASE/inputs/manifest.json,readonly" \
  --mount "type=bind,src=$BASE/observations/report.json,dst=$BASE/observations/report.json,readonly" \
  --mount "type=bind,src=$BASE/anchors,dst=$BASE/anchors,readonly" \
- --mount "type=bind,src=$BASE/tracking,dst=$BASE/tracking,readonly" \
+ --mount "type=bind,src=$BASE/tracking-v2,dst=$BASE/tracking-v2,readonly" \
  --mount "type=bind,src=$BASE/eval_private,dst=$BASE/eval_private,readonly" \
  --mount "type=bind,src=$OUT,dst=$OUT" "$IMAGE" "$CODE/infra/object_motion_evaluate.py"

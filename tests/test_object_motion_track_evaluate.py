@@ -47,3 +47,44 @@ def test_truth_only_evaluator_no_weights_model_mount(modules):
  assert 'per-frame alignment' in Path(ev.__file__).read_text()
  for module in modules:
   with pytest.raises(SystemExit):module.main(['--oracle'])
+
+def test_private_motion_reads_all_eight_actual_frame_transforms(modules,tmp_path):
+ _,ev=modules;records=[]
+ for frame in range(8):
+  path=tmp_path/f'object_00_frame_{frame:03d}.npz'
+  np.savez(path,camera_R=np.eye(3),camera_t=np.array([frame*.01,0.,2.]))
+  records.append({'object_index':0,'frame_index':frame,'truth_sha256':ev.sha256(path)})
+ known=ev.private_motion(tmp_path,{'cases':records},0)
+ assert len(known)==8 and [x[1][0] for x in known]==pytest.approx(np.arange(8)*.01)
+ records[4]['frame_index']=5
+ with pytest.raises(ValueError,match='identity'):ev.private_motion(tmp_path,{'cases':records},0)
+
+def test_depth_initial_translation_rotates_camera_anchor_pivot(modules,monkeypatch):
+ from types import SimpleNamespace
+ track,_=modules;v=np.array([[-.1,0.,2.],[.1,0.,2.],[0.,.2,2.]])
+ angle=.25;r=np.array([[np.cos(angle),0.,np.sin(angle)],[0.,1.,0.],[-np.sin(angle),0.,np.cos(angle)]])
+ anchor=np.array([0.,0.,2.]);observed=v+[.03,0.,.04]
+ expected=np.median(observed,axis=0)-anchor@r.T
+ seen=[]
+ def fit(s,o,ir,it):
+  seen.append((ir.copy(),it.copy()))
+  # Deliberately invalid fitted transform: must not reach rasterizer.
+  return SimpleNamespace(rotation=ir,translation=np.array([0.,0.,-10.]),status='improved',final_residual=.01)
+ monkeypatch.setattr(track,'align_observed_points',fit)
+ monkeypatch.setattr(track,'raster_camera_mesh',lambda *args:pytest.fail('Invalid ICP was rasterized'))
+ rr,tt,status,detail=track.depth_baseline(v,np.array([[0,1,2]]),v,observed,anchor,r,np.ones((3,3),bool))
+ assert np.allclose(seen[0][1],expected) and np.array_equal(rr,r) and np.array_equal(tt,expected)
+ assert status=='measured_center_invalid_icp_rejected' and detail['fitted_min_camera_z_m']<0
+ assert track.visible_pose(v,rr,tt)
+
+def test_depth_initial_crossing_uses_measured_identity_not_static(modules,monkeypatch):
+ from types import SimpleNamespace
+ track,_=modules;v=np.array([[0.,0.,.1],[.1,0.,.1],[0.,.1,.1]])
+ observed=v+[.08,0.,.03];anchor=np.array([0.,0.,.1]);previous=np.diag([-1.,1.,-1.])
+ # Large x/y extent and known anchor center makes rotated Z offset invalid.
+ v[0,2]=.9;observed=v+[.08,0.,.03]
+ def fit(s,o,r,t):return SimpleNamespace(rotation=r,translation=np.array([0.,0.,-10.]),status='improved',final_residual=.01)
+ monkeypatch.setattr(track,'align_observed_points',fit)
+ rr,tt,status,detail=track.depth_baseline(v,np.array([[0,1,2]]),v,observed,anchor,previous,np.ones((3,3),bool))
+ assert np.array_equal(rr,np.eye(3)) and np.allclose(tt,np.median(observed,axis=0)-anchor)
+ assert detail['identity_rotation_reinitialization'] and not np.array_equal(tt,np.zeros(3))

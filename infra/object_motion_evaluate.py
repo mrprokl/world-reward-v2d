@@ -19,6 +19,26 @@ import object_synthetic_evaluate as surfaces
 from world_reward.data import sha256
 
 STAGE='private_object_motion_fixed_mesh_quality'
+TRACKING_DIRECTORY='tracking-v2'
+QUALITY_DIRECTORY='quality-v2'
+
+
+def private_motion(private,render,obj):
+    """Load every original camera transform; reject missing/reordered identities."""
+    known=[]
+    for frame in range(8):
+        record=render['cases'][obj*8+frame]
+        if (record.get('object_index'),record.get('frame_index'))!=(obj,frame):
+            raise ValueError('Private original frame identity/order differs')
+        artifact=private/f'object_{obj:02d}_frame_{frame:03d}.npz'
+        native.require_hash(artifact,record['truth_sha256'])
+        with np.load(artifact,allow_pickle=False) as data:
+            known.append((data['camera_R'].copy(),data['camera_t'].copy()))
+    if any(tr.shape!=(3,3) or tt.shape!=(3,) or not np.isfinite(np.r_[tr.ravel(),tt]).all()
+           or not np.allclose(tr@tr.T,np.eye(3),atol=1e-12,rtol=0)
+           or not np.isclose(np.linalg.det(tr),1) for tr,tt in known):
+        raise ValueError('Private renderer rigid transforms invalid')
+    return known
 
 
 def cd(a,b):return float((cKDTree(a).query(b)[0].mean()+cKDTree(b).query(a)[0].mean())*100)
@@ -42,10 +62,10 @@ def decision(cases):
 
 
 def run(root,report):
-    base=root/'validation/object_motion_v1';p=base/'tracking/report.json';ph=sha256(p);native.require_hash(p,ph);r=json.loads(p.read_text())
+    base=root/'validation/object_motion_v1';p=base/TRACKING_DIRECTORY/'report.json';ph=sha256(p);native.require_hash(p,ph);r=json.loads(p.read_text())
     if (r.get('stage')!='public_fixed_mesh_rgb_motion_proposals' or r.get('status')!='pass' or r.get('private_truth_read') is not False
             or r.get('original_frame_coverage_verified') is not True or r.get('fixed_shape_preserved') is not True or r.get('fixed_scale_preserved') is not True):raise ValueError('Require frozen actual public trajectory producer')
-    pred=base/'tracking/predictions.npz';native.require_hash(pred,r.get('predictions_sha256'))
+    pred=base/TRACKING_DIRECTORY/'predictions.npz';native.require_hash(pred,r.get('predictions_sha256'))
     with np.load(pred,allow_pickle=False) as d:R,t=d['rotations'].copy(),d['translations'].copy();fi=d['frame_index'];oi=d['object_index']
     if (R.shape!=(2,3,8,3,3) or t.shape!=(2,3,8,3) or not np.isfinite(np.r_[R.ravel(),t.ravel()]).all()
             or not np.allclose(R@R.swapaxes(-1,-2),np.eye(3),atol=1e-5,rtol=0) or not np.allclose(np.linalg.det(R),1,atol=1e-5)
@@ -66,13 +86,7 @@ def run(root,report):
     for obj in range(3):
         mesh=private/f'object_{obj:02d}_mesh.npz';native.require_hash(mesh,render['meshes'][obj]['sha256'])
         with np.load(mesh,allow_pickle=False) as d:truth=surfaces.surface_samples(d['vertices_m'],d['faces'])
-        known=[]
-        for frame in range(8):
-            a=private/f'object_{obj:02d}_frame_{frame:03d}.npz';native.require_hash(a,render['cases'][obj*8+frame]['truth_sha256'])
-        with np.load(a,allow_pickle=False) as d:known.append((d['camera_R'].copy(),d['camera_t'].copy()))
-        if any(tr.shape!=(3,3) or tt.shape!=(3,) or not np.isfinite(np.r_[tr.ravel(),tt]).all()
-               or not np.allclose(tr@tr.T,np.eye(3),atol=1e-12,rtol=0) or not np.isclose(np.linalg.det(tr),1) for tr,tt in known):
-            raise ValueError('Private renderer rigid transforms invalid')
+        known=private_motion(private,render,obj)
         proof=ar['proposals'][obj]
         case={'object_index':obj,'frames':[], 'anchor_closed_oriented_positive_volume':bool(
             proof['watertight'] and proof['winding_consistent'] and proof['signed_volume_camera_m3']>0)}
@@ -96,7 +110,7 @@ def run(root,report):
 def main(argv=None):
     argparse.ArgumentParser(description=__doc__,allow_abbrev=False).parse_args(argv)
     if platform.system()!='Linux' or {p.name for p in Path('/sys/class/net').iterdir()}!={'lo'}:raise RuntimeError('Require isolated remote CPU evaluation')
-    root=Path(os.environ['WR_ROOT']);out=root/'validation/object_motion_v1/quality';path=out/'report.json'
+    root=Path(os.environ['WR_ROOT']);out=root/'validation/object_motion_v1'/QUALITY_DIRECTORY;path=out/'report.json'
     if out.is_symlink() or not out.is_dir() or any(out.iterdir()):raise FileExistsError('Require exclusive motion quality output')
     report={'stage':STAGE,'status':'fail','code_revision':os.environ['WR_CODE_REVISION'],'image_id':os.environ['WR_IMAGE_ID'],
             'script_sha256':sha256(Path(__file__)),'gpu_used':False,'evaluation_truth_used':True,'challenge_inputs_used':False,
