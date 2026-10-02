@@ -1,7 +1,8 @@
 """Select the interacting actor from sparse automatic boxes, not human labels.
 
 Per-class NMS must precede this step. Person identity uses only gated sparse-frame
-IoU; ambiguous associations fail closed instead of silently changing identity.
+IoU; ambiguous association components are permanently marked, never eligible as
+the selected actor, rather than silently changing identity.
 Affinity uses actual observed boxes on unambiguous target-object frames. It is an
 image-evidence engineering gate, not a guarantee of identity under arbitrary
 occlusion, camera cuts or crossings between sampled frames.
@@ -30,6 +31,8 @@ class ActorTrackScore:
     center_distance: float
     observations: int
     coverage: float
+    contaminated: bool = False
+    ambiguous_frame_indices: tuple[int, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -45,6 +48,8 @@ class _Track:
     last_step: int
     last_box: BoxDetection
     observations: dict[int, BoxDetection] = field(default_factory=dict)
+    contaminated: bool = False
+    ambiguous_frames: set[int] = field(default_factory=set)
 
 
 def _unit_interval(value: object, name: str) -> float:
@@ -75,10 +80,10 @@ def _iou(a: BoxDetection, b: BoxDetection) -> float:
 def _associate(
     active: list[_Track], detections: tuple[BoxDetection, ...],
     iou_threshold: float, margin: float,
-) -> dict[int, int]:
-    """Maximum-weight one-to-one assignment with explicit unmatched dummies."""
+) -> tuple[dict[int, int], set[int], set[int]]:
+    """Assign for bookkeeping; flag full uncertain gated-IoU components."""
     if not active or not detections:
-        return {}
+        return {}, {i for i, track in enumerate(active) if track.contaminated}, set()
     count_tracks, count_boxes = len(active), len(detections)
     size = count_tracks + count_boxes
     weights = np.zeros((size, size), dtype=np.float64)
@@ -94,17 +99,29 @@ def _associate(
         int(i): int(j) for i, j in zip(rows, columns)
         if i < count_tracks and j < count_boxes and weights[i, j] > 0
     }
-    # A near-equivalent assignment with an actual identity edge removed is a
-    # crossing/identity ambiguity. Abort globally: restarting those detections as
-    # fresh eligible tracks would launder ambiguous identity through fragmentation.
+    # A near-equivalent assignment with an identity edge removed contaminates
+    # that association component. Existing contamination is permanent and also
+    # propagates through *every* gated-positive edge, not just chosen matches.
+    uncertain_tracks = {i for i, track in enumerate(active) if track.contaminated}
+    uncertain_detections: set[int] = set()
     for i, j in matches.items():
         alternative = weights.copy()
         alternative[i, j] = -1.0
         alt_rows, alt_columns = linear_sum_assignment(alternative, maximize=True)
         difference = optimum - float(alternative[alt_rows, alt_columns].sum())
         if difference <= margin or math.isclose(difference, margin, rel_tol=0, abs_tol=1e-12):
-            raise ValueError("Ambiguous person-track association; no identity flip or restart allowed")
-    return matches
+            uncertain_tracks.add(i)
+            uncertain_detections.add(j)
+    changed = True
+    while changed:
+        before = len(uncertain_tracks), len(uncertain_detections)
+        for i in range(count_tracks):
+            for j in range(count_boxes):
+                if weights[i, j] > 0 and (i in uncertain_tracks or j in uncertain_detections):
+                    uncertain_tracks.add(i)
+                    uncertain_detections.add(j)
+        changed = before != (len(uncertain_tracks), len(uncertain_detections))
+    return matches, uncertain_tracks, uncertain_detections
 
 
 def _affinity(person: BoxDetection, obj: BoxDetection) -> tuple[float, float]:
@@ -133,8 +150,10 @@ def select_interacting_actor(
     and have >= ``min_observations`` plus >= ``min_coverage`` of unambiguous object
     frames. Sparse observations are never interpolated or joined after expiry.
     ``max_missing_observations`` counts missing supplied sparse-frame observations,
-    not elapsed video frames. Ambiguous background crossings also fail this simple
-    implementation rather than guessing which identity remained independent.
+    not elapsed video frames. Ambiguous components are permanently contaminated;
+    their tracks still compete in affinity ranking, but cannot win. An independent
+    actor is usable even if unrelated background tracks cross. Assignments inside
+    contaminated components are bookkeeping only, not claimed identity recovery.
     """
     threshold = _unit_interval(confidence_threshold, "confidence_threshold")
     object_margin = _unit_interval(object_ambiguity_margin, "object_ambiguity_margin")
@@ -182,7 +201,12 @@ def select_interacting_actor(
                 objects[index] = candidates[0]
 
         active = [track for track in tracks if step - track.last_step <= maximum_missing + 1]
-        matches = _associate(active, persons, iou_threshold, match_margin)
+        matches, uncertain_tracks, uncertain_detections = _associate(
+            active, persons, iou_threshold, match_margin
+        )
+        for track_index in uncertain_tracks:
+            active[track_index].contaminated = True
+            active[track_index].ambiguous_frames.add(index)
         matched_detections = set(matches.values())
         for track_index, detection_index in matches.items():
             track = active[track_index]
@@ -191,7 +215,11 @@ def select_interacting_actor(
             track.observations[index] = persons[detection_index]
         for detection_index, person in enumerate(persons):
             if detection_index not in matched_detections:
-                tracks.append(_Track(len(tracks), step, person, {index: person}))
+                contaminated = detection_index in uncertain_detections
+                tracks.append(_Track(
+                    len(tracks), step, person, {index: person}, contaminated,
+                    {index} if contaminated else set(),
+                ))
 
     if len(objects) < minimum_observations:
         raise ValueError("Insufficient unambiguous object frames for actor selection")
@@ -205,16 +233,23 @@ def select_interacting_actor(
             outside, center = zip(*values)
             scores.append(ActorTrackScore(
                 track.track_id, float(median(outside)), float(median(center)),
-                len(values), len(values) / len(objects),
+                len(values), len(values) / len(objects), track.contaminated,
+                tuple(sorted(track.ambiguous_frames)),
             ))
     if not scores:
         raise ValueError("No person track observed on valid object frames")
     scores.sort(key=lambda score: (score.outside_distance, score.center_distance, score.track_id))
     winner = scores[0]
-    # Unsupported close tracks still compete. Never discard them to manufacture
-    # a comfortable margin for a farther, well-observed distractor.
+    # Unsupported and contaminated close tracks still compete. Do not delete a
+    # confounder merely to manufacture a farther, well-observed clean winner.
+    context = f"track_id={winner.track_id}, scores={scores!r}"
+    if winner.contaminated:
+        raise ValueError(
+            "Ambiguous person-track association in selected actor; "
+            f"frame_indices={winner.ambiguous_frame_indices}, {context}"
+        )
     if winner.observations < minimum_observations or winner.coverage < coverage_threshold:
-        raise ValueError("Closest actor track has insufficient observations or coverage")
+        raise ValueError(f"Closest actor track has insufficient observations or coverage; {context}")
     if len(scores) > 1:
         runner = scores[1]
         if math.isclose(winner.outside_distance, runner.outside_distance, rel_tol=0, abs_tol=1e-12):
@@ -222,7 +257,7 @@ def select_interacting_actor(
         else:
             gap = runner.outside_distance - winner.outside_distance
         if gap <= affinity_threshold or math.isclose(gap, affinity_threshold, rel_tol=0, abs_tol=1e-12):
-            raise ValueError("Ambiguous actor affinity; winner lacks clear margin over runner-up")
+            raise ValueError(f"Ambiguous actor affinity; winner lacks clear margin over runner-up; {context}")
 
     observations = tracks[winner.track_id].observations
     filtered = tuple(

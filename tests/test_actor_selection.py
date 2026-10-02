@@ -175,3 +175,74 @@ def test_invalid_or_understrength_gate_settings_fail(kwargs):
 def test_bad_frames_fail_explicitly(frames):
     with pytest.raises(ValueError):
         select_interacting_actor(frames)
+
+
+def background_crossing_frames(*, object_x=30):
+    actor = box(ACTOR, 0.75)
+    a, b = box((100, 10, 150, 90), 0.99), box((130, 10, 180, 90), 0.98)
+    c, d = box((115, 10, 165, 90), 0.99), box((115, 11, 165, 89), 0.98)
+    return [
+        frame(0, (actor, a, b), (target(object_x),)),
+        frame(10, (actor, c, d), (target(object_x),)),
+        frame(20, (actor, c, d), (target(object_x),)),
+        frame(30, (actor, a, b), (target(object_x),)),
+    ]
+
+
+def test_independent_actor_survives_ambiguous_background_component():
+    result = select_interacting_actor(background_crossing_frames())
+    assert result.scores[0].contaminated is False
+    assert result.scores[0].ambiguous_frame_indices == ()
+    assert all(f.persons == (box(ACTOR, 0.75),) for f in result.frames)
+    assert len(result.scores) == 3  # uncertain competitors were not discarded
+    background = result.scores[1:]
+    assert all(score.contaminated for score in background)
+    assert all(10 in score.ambiguous_frame_indices for score in background)
+    json.dumps([asdict(score) for score in result.scores], allow_nan=False)
+
+
+def test_contaminated_closer_track_not_deleted_to_create_independent_actor_win():
+    with pytest.raises(ValueError, match="Ambiguous person-track association in selected actor") as error:
+        select_interacting_actor(background_crossing_frames(object_x=140))
+    message = str(error.value)
+    assert "frame_indices=" in message
+    assert "10" in message
+    assert "track_id=" in message
+    assert "scores=" in message
+    assert "contaminated=True" in message
+
+
+def test_association_contamination_propagates_through_unchosen_gated_edges():
+    from world_reward.actor_selection import _Track, _associate
+
+    contaminated = _Track(0, 0, box((10, 10, 60, 90)), contaminated=True)
+    previously_clean = _Track(1, 0, box((40, 10, 90, 90)))
+    detections = (box((10, 10, 60, 90)), box((40, 10, 90, 90)))
+    matches, tracks, observed = _associate([contaminated, previously_clean], detections, 0.1, 0.05)
+    assert matches == {0: 0, 1: 1}
+    assert tracks == {0, 1}
+    assert observed == {0, 1}  # cross-IoU edges matter even though unused
+
+
+def test_new_unmatched_detection_in_uncertain_component_inherits_contamination():
+    from world_reward.actor_selection import _Track, _associate
+
+    existing = _Track(0, 0, box((10, 10, 60, 90)), contaminated=True)
+    detections = (box((10, 10, 60, 90)), box((15, 10, 65, 90)))
+    matches, tracks, observed = _associate([existing], detections, 0.1, 0.05)
+    assert len(matches) == 1
+    assert tracks == {0}
+    assert observed == {0, 1}  # unmatched detection cannot restart clean
+
+
+def test_component_contamination_is_permanent_after_people_separate():
+    result = select_interacting_actor(background_crossing_frames())
+    for score in result.scores[1:]:
+        assert score.contaminated
+        assert 30 in score.ambiguous_frame_indices
+
+
+def test_selected_actor_component_crossing_fails_with_original_frame_diagnostics():
+    frames = background_crossing_frames(object_x=140)
+    with pytest.raises(ValueError, match="frame_indices=.*10"):
+        select_interacting_actor(frames)
