@@ -34,7 +34,8 @@ def public_inputs(root):
     hashes = {"public_inputs_sha": depth_model.identity(mp)["sha256"], "mask_report_sha": depth_model.identity(rp)["sha256"]}
     manifest, report = json.loads(mp.read_text()), json.loads(rp.read_text())
     expected = {"stage": "public_joint_rgb_automatic_masks", "status": "pass", "private_truth_read": False,
-                "challenge_inputs_used": False, "oracle_modes": [], "frames": CLIPS*FRAMES}
+                "challenge_inputs_used": False, "ground_truth_used": False, "hand_labeled_test": False,
+                "oracle_modes": [], "frames": CLIPS*FRAMES}
     if (not isinstance(manifest, dict) or set(manifest) != {"schema", "images"} or manifest["schema"] != "world-reward-joint-rgb-v1"
             or not isinstance(manifest["images"], list) or len(manifest["images"]) != CLIPS*FRAMES
             or not isinstance(report, dict) or any(type(report.get(k)) is not type(v) or report[k] != v for k, v in expected.items())

@@ -51,6 +51,21 @@ Le module officiel ne contient aucun outil autoscale autonome malgré son averti
 Ne pas importer `scale_mesh_srt.py` tel quel: son contrat CuSFM + FoundationStereo et objet stationnaire/two_stage est faux pour interactions mobiles.
 
 ## Conversion vers soumission
+- Audit2026-10-02: nos premiers artifacts `cari_forward/coconet.pth` puis
+  `cari_conversion` sont **forward-only**, même lorsque leur conversion et leur
+  schéma passent. Ce n'est pas le raffinement final de la baseline publique.
+  Source orchestrateur pin7c0d, `v2d_cari4d/lib/run_inference.py`
+  SHA8ab076459ea7e178ef836806ea33cfbf418c214333af015bed8ea822f14c204e,
+  appelle `learning.training.mhr_opt_refineout`, mode `smplh_parity`,
+  num_steps300/batch_size0. Optimizer SHA84e0e818a3bc0935bb30b75fcd82fd7c5e3730ed812864594cd759697ddb406b.
+  À ce pin, la boucle inclusive effectue301updates; ne pas annoncer300updates
+  ou remplacer le mode par un lissage maison. Pipeline nouveau séparé
+  `cari_refined/refined.pth` → `cari_conversion_refined` → `final_schema_refined`.
+  Les anciens artifacts et jobs restent immuables. Réutiliser les observations
+  automatiques du bundle sansGT; aucun FORM-HOI/GT supplémentaire nécessaire.
+  Deux assets Git LFS officiels sont acquis directement sur Azure, hors vendor:
+  collision_proxy4000v126142bytes SHAa026fe82…edcf7 et hand_surface_spec47140bytes
+  SHA65e467ae…f60c8. Vérifier les vrais octets, pas le hash du pointeur LFS.
 - Artifact final: `/data/results/SEQ/inference/refined.pth`, bloc `pr`, `frames`, metadata; initial CoCoNet dans `coconet.pth`.
 - Clés **NON directement compatibles kit**: globalrot6d6, trans3 mètres, bodycont260, hand108, shape45, scale PCA28, face72. Kit exige pose136, scale68 et shape45 constants.
 - Méthode sûre: `MHRLayer.from_mhr_assets(...).mhr_forward_vertices(pr)` -> vertices `[T,18439,3]` caméra mètres, puis converter kit avec modèle MHR public Apache.

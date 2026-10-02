@@ -29,7 +29,8 @@ def public(gate, tmp_path):
             records.append(record)
     mp = inputs/"manifest.json"; mp.write_text(json.dumps({"schema": "world-reward-joint-rgb-v1", "images": images}))
     rp = masks/"report.json"; rp.write_text(json.dumps({"stage": "public_joint_rgb_automatic_masks", "status": "pass",
-        "private_truth_read": False, "challenge_inputs_used": False, "oracle_modes": [], "frames": 9,
+        "private_truth_read": False, "challenge_inputs_used": False, "ground_truth_used": False,
+        "hand_labeled_test": False, "oracle_modes": [], "frames": 9,
         "input_manifest_sha256": gate.sha256(mp), "records": records}))
     return mp, rp
 
@@ -38,6 +39,16 @@ def test_public_nine_exact_order_hashes_no_private(gate, tmp_path):
     public(gate, tmp_path); records, hashes = gate.public_inputs(tmp_path)
     assert [(r["clip_index"], r["frame_index"]) for r in records] == [(c, f) for c in range(3) for f in range(3)]
     assert set(hashes) == {"public_inputs_sha", "mask_report_sha"} and len(records) == 9
+
+
+@pytest.mark.parametrize("field", ["ground_truth_used", "hand_labeled_test"])
+@pytest.mark.parametrize("bad", [True, 0, None, "False", "missing"])
+def test_explicit_no_gt_no_hand_labels_required_in_mask_receipt(gate, tmp_path, field, bad):
+    _, rp = public(gate, tmp_path); report = json.loads(rp.read_text())
+    if bad == "missing": del report[field]
+    else: report[field] = bad
+    rp.write_text(json.dumps(report))
+    with pytest.raises(ValueError): gate.public_inputs(tmp_path)
 
 
 @pytest.mark.parametrize("fault", ["private", "width_bool", "mask_order", "frames_list", "frames_bool", "wrong_stage", "sha", "mask_file", "missing", "extra", "symlink", "private_flag", "old_manifest"])

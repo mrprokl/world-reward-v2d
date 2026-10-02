@@ -280,3 +280,34 @@ def test_immutable_launcher_import_closure_includes_common_shell_helper_and_pyth
         closure = launcher.runtime_bundle_paths(files, "infra/" + shell)
         assert "infra/cari_wrapper_common.sh" in closure
         assert "infra/" + python in closure
+
+
+@pytest.mark.parametrize("episode", [0, 15, 29])
+def test_refined_converter_uses_only_refined_dependency_and_distinct_explicit_argv(fake_shell, episode):
+    env, run, report, log, state = fake_shell
+    report("converter", episode, "cari_refined")
+    state.write_text("active")
+    result = run("converter", "--episode", str(episode), "--bundle-source", "refined", "--no-wait")
+    assert result.returncode == 0, result.stderr
+    assert docker_arguments(log)[-4:] == ["--episode", str(episode), "--bundle-source", "refined"]
+    assert not Path(env["FAKE_CTL_LOG"]).exists()
+
+
+def test_refined_conversion_never_falls_back_to_forward_report(fake_shell):
+    _, run, report, log, _ = fake_shell
+    report("converter", 15)
+    result = run("converter", "--bundle-source", "refined")
+    assert result.returncode != 0 and "cari_refined" in result.stderr and not log.exists()
+
+
+@pytest.mark.parametrize("args", [("--bundle-source",), ("--bundle-source", "other"),
+                                  ("--bundle-source", "forward", "--bundle-source", "refined")])
+def test_invalid_bundle_routing_rejected_before_docker(fake_shell, args):
+    _, run, _, log, _ = fake_shell
+    assert run("converter", *args).returncode == 2 and not log.exists()
+
+
+@pytest.mark.parametrize("mode", ["prepare", "forward", "adapter"])
+def test_bundle_routing_converter_only(fake_shell, mode):
+    _, run, _, log, _ = fake_shell
+    assert run(mode, "--bundle-source", "refined").returncode == 2 and not log.exists()

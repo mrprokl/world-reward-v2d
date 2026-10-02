@@ -213,12 +213,12 @@ def test_wrapper_enforces_offline_readonly_and_full_forward_wait():
     assert 'source "$CODE/infra/cari_wrapper_common.sh"' in text
     assert "wr_cari_dependency converter" in text
     helper = (root / "infra/cari_wrapper_common.sh").read_text()
-    assert "converter) WR_WAIT_FOR=world-reward-cari-forward.service" in helper
+    assert 'converter) if [[ "$WR_BUNDLE_SOURCE" == forward ]]; then WR_WAIT_FOR=world-reward-cari-forward.service' in helper
     assert "--property=ActiveState --value" in helper
     assert "--network none" in text and "--gpus all" in text
     for directory in ("vendor", "weights", "results"):
         assert f'src=$ROOT/{directory},dst=$ROOT/{directory},readonly' in text
     assert 'src=$CODE,dst=$CODE,readonly' in text
-    assert "converter) stage=cari_forward" in helper
+    assert 'converter) if [[ "$WR_BUNDLE_SOURCE" == forward ]]; then stage=cari_forward; else stage=cari_refined' in helper
     assert 'episode_$WR_EPISODE_PADDED/$stage/report.json' in helper
     assert "--kernel-only" not in text and "--full-video" not in text

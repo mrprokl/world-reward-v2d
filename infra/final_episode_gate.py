@@ -18,6 +18,7 @@ from track1_episode_loader import load_track1_episode
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--episode", type=int, choices=range(30), required=True)
+    parser.add_argument("--bundle-source", choices=("forward", "refined"), default="forward")
     args = parser.parse_args(argv)
     if platform.system() != "Linux" or {path.name for path in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require remote Linux container with network none")
@@ -25,12 +26,15 @@ def main(argv=None):
     if not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise RuntimeError("Require immutable gate source revision")
     root = Path(os.environ["WR_ROOT"])
-    output = root / f"outputs/episode_{args.episode:06d}/final_schema"
+    stage = "final_schema" if args.bundle_source == "forward" else "final_schema_refined"
+    output = root / f"outputs/episode_{args.episode:06d}" / stage
     if output.exists() or output.is_symlink():
         raise FileExistsError("Final schema outputs are frozen; never overwrite")
     started = time.perf_counter()
     inputs = _validate_inputs(root, episode_index=args.episode)
-    loaded = load_track1_episode(root, args.episode, inputs["total_frames"], inputs["video_sha256"])
+    load_args = (root, args.episode, inputs["total_frames"], inputs["video_sha256"])
+    loaded = (load_track1_episode(*load_args) if args.bundle_source == "forward"
+              else load_track1_episode(*load_args, bundle_source="refined"))
     loaded.episode.validate()
     report = {"stage": "world_reward_final_episode_integrity_schema", "status": "pass",
               "episode_index": args.episode, "frames": inputs["total_frames"],
@@ -44,6 +48,7 @@ def main(argv=None):
               "complete_challenge_submission_created": False, "all_stage_producer_revisions_same": False,
               "producer_revision_scope": "this_gate_only_upstream_artifacts_bound_by_report_hashes",
               "gate_code_revision": revision, "network": "none", "execution_device": "CPU",
+              "bundle_source": args.bundle_source,
               "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               "elapsed_seconds": time.perf_counter() - started}
     output.mkdir(exist_ok=False)

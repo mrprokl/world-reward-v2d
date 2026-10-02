@@ -1,4 +1,4 @@
-"""Azure-only conversion of verified CoCoNet output to official Track 1 MHR.
+"""Azure-only conversion of verified native CARI output to Track 1 MHR.
 
 Native parameters are decoded by the original, asset-bound MHRLayer. The
 official converter fits one shared identity; no parameter-layout shortcut,
@@ -242,9 +242,29 @@ def _require_hash(path: Path, expected: str) -> None:
 
 def _argument_parser() -> argparse.ArgumentParser:
     from body_smoke import EPISODE, TRACK1_EPISODE_COUNT
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
+    parser.add_argument("--bundle-source", choices=("forward", "refined"), default="forward")
     return parser
+
+
+def conversion_directory(bundle_source: str) -> str:
+    """Separate immutable forward and final-refinement conversions; no fallback."""
+    if bundle_source not in ("forward", "refined"):
+        raise ValueError("Require explicit forward or refined native bundle source")
+    return "cari_conversion" if bundle_source == "forward" else "cari_conversion_refined"
+
+
+def require_refinement_chain(report, forward, *, forward_hash, inputs_hash, count, episode):
+    from cari_refine import require_full_refinement_report
+    require_full_refinement_report(report)
+    _require_report_episode(report, episode)
+    if (report.get("forward_report_sha256") != forward_hash
+            or report.get("inputs_report_sha256") != inputs_hash
+            or report.get("source_bundle_sha256") != forward.get("bundle_sha256")
+            or type(report.get("frames")) is not int or report["frames"] != count
+            or report.get("inference_source_identity") != forward.get("inference_source_identity")):
+        raise ValueError("Native refinement does not address the exact frozen full forward")
 
 
 def main() -> None:
@@ -266,6 +286,15 @@ def main() -> None:
     if (isinstance(count, bool) or not isinstance(count, int) or count < 1
             or inputs.get("original_frame_coverage_verified") is not True):
         raise RuntimeError("Require full original-frame CARI input provenance")
+    refinement_path = None
+    refinement = None
+    if args.bundle_source == "refined":
+        refinement_path = base / "cari_refined/report.json"
+        refinement = json.loads(refinement_path.read_text())
+        require_refinement_chain(refinement, forward, forward_hash=sha256(forward_path),
+                                 inputs_hash=sha256(inputs_path), count=count, episode=args.episode)
+        bundle_path = base / "cari_refined/refined.pth"
+        _require_hash(bundle_path, refinement.get("bundle_sha256"))
     for field in ("depth_h5", "mhr_init", "object_poses"):
         path = Path(inputs[field])
         if not path.resolve().is_relative_to(base):
@@ -296,11 +325,14 @@ def main() -> None:
     vendor = root / "vendor/video_to_data"
     _pinned_checkout(vendor, UPSTREAM_REVISION)
     source_identity = _source_identity(root)
-    if any(record.get("inference_source_identity") != source_identity for record in (body, adapter, forward)):
+    records = (body, adapter, forward) if refinement is None else (body, adapter, forward, refinement)
+    if any(record.get("inference_source_identity") != source_identity for record in records):
         raise RuntimeError("Original Body and native decoder source identities differ")
     assets, body_hashes = _body_assets(root)
     if body_hashes != body["body_assets"] or (assets / "mhr_buffers.pt").exists():
         raise RuntimeError("Original Body assets changed or an unverified compact buffer override exists")
+    if refinement is not None and refinement.get("body_assets") != body_hashes:
+        raise RuntimeError("Refinement decoder Body assets changed")
     checkpoints = list((root / "weights/cari4d").rglob("step200000.pth"))
     if len(checkpoints) != 1:
         raise RuntimeError("Require one pinned native CoCoNet checkpoint")
@@ -345,7 +377,7 @@ def main() -> None:
         loaded = Path(sys.modules[symbol.__module__].__file__).resolve()
         if not loaded.is_relative_to(native / "lib_mhr"):
             raise RuntimeError("Native MHR import resolved outside the pinned source")
-    output = base / "cari_conversion"
+    output = base / conversion_directory(args.bundle_source)
     if output.exists():
         raise RuntimeError("Frozen native CARI conversion exists")
     absent_buffer = output / "never_use_an_unverified_compact_buffer.pt"
@@ -415,11 +447,14 @@ def main() -> None:
         "input_report_sha256": {"forward": sha256(forward_path), "inputs": sha256(inputs_path),
                                 "body": sha256(body_path), "adapter": sha256(adapter_path), "object": sha256(object_path)},
         "bundle_sha256": sha256(bundle_path), "params_sha256": sha256(output / "params.npz"),
+        "bundle_source": args.bundle_source,
         "episode_sha256": sha256(output / "episode.npz"), "script_sha256": sha256(Path(__file__)),
         "producer_revision": os.environ.get("WR_CODE_REVISION"), "elapsed_seconds": time.perf_counter() - started,
         "submission_eligible": False, "challenge_performance_verified": False,
         "gate_basis": "predeclared_2mm_engineering_fidelity_consistent_with_prior_full_Body_adapter_not_GT_validation",
     }
+    if refinement_path is not None:
+        result["input_report_sha256"]["refinement"] = sha256(refinement_path)
     with (output / "report.json").open("x") as handle:
         handle.write(json.dumps(result, indent=2) + "\n")
     print(json.dumps({"stage": result["stage"], "status": "pass", "frames": count,

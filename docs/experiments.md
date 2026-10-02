@@ -1086,3 +1086,20 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   to relabel failure. Mechanism supported by first pair, but active native
   preparation stays frozen. Future production batch change still needs the
   predeclared complete throughput/parity evidence on a new protocol.
+- 2026-10-02 D69: audit critique confirme l'étape native de raffinement final
+  absente de nos précédentes chaînes. Ne pas présenter l'export501frames déjà
+  validé comme la baseline complète: c'est CoCoNet-forward + conversion propre.
+  Ajouter la vraie optimisation publique `smplh_parity`, full-clip/batch0,
+  300steps demandés/301updates natifs, hyperparamètres par défaut. Body rotations
+  et objet translation seuls optimisés; root/mains/identité/échelle/caméra,
+  translations internes et objet rotation fixes. Pas GT ni contact manuel,
+  pas nouvelle FoundationPose, pas moyenner silencieusement identité native.
+  Deux petits assets officiels hashés directement sur Azure, nouveaux outputs
+  stricts séparés; vérifier couverture/ABI/paramètres fixes bit-identiques et
+  history/finaldiagnostics finis avant conversion officielle2mm inchangée.
+  Budget exploratoire dur7200s sans retry automatique; timing/qualité inconnus.
+  Préparer épisode15 déjà gelé, queue GPU derrière J1 indépendant, aucune
+  modification/reprise du long job épisode0 actuellement450/790 à16:58:51UTC.
+  J1 source audit confirme unités/masques/K corrects; renforcer seulement son
+  reçu masques avec booléens noGT/nohandlabels explicites. Le job J1 gelé ne
+  sera pas remplacé et ses reçus producteurs contiennent déjà ces booléens.

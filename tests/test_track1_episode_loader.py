@@ -114,6 +114,77 @@ def test_roundtrip_native_episode_preserves_arrays_padding_and_manifest(loader, 
     json.dumps(result.manifest)
 
 
+@pytest.fixture
+def refined_frozen(loader, frozen):
+    from cari_refine import REFINEMENT_ASSETS, OPTIMIZER_SHA256, STAGE
+    root, base, reports, paths, arrays, _, _, digest = frozen
+    refined = dict(status="pass", stage=STAGE, input_track="track_1", ground_truth_used=False,
+                   hand_labeled_test=False, oracle_modes=[], ground_truth_read=False, frames=3, network="none",
+                   episode_index=15, checkpoint_sha256=loader.CHECKPOINT_SHA256,
+                   phase="complete", producer_revision="a" * 40, image_id="sha256:" + "b" * 64,
+                   native_refinement_verified=True, optimizer_sha256=OPTIMIZER_SHA256,
+                   refinement_assets=REFINEMENT_ASSETS, body_assets=reports["conversion"]["body_assets"],
+                   inference_source_identity=reports["forward"]["inference_source_identity"],
+                   forward_report_sha256=loader.sha256(paths["forward"]), inputs_report_sha256=loader.sha256(paths["inputs"]),
+                   source_bundle_sha256=reports["forward"]["bundle_sha256"], bundle_sha256="f" * 64,
+                   metadata=dict(native_refinement_verified=True, full_original_frame_coverage_verified=True,
+                                 frozen_parameters_bit_identical=True, requested_steps=300,
+                                 effective_optimizer_updates=301, batch_size=0))
+    path = base / "cari_refined/report.json"
+    path.parent.mkdir()
+    destination = base / "cari_conversion_refined"
+    destination.mkdir()
+    for name in ("episode.npz", "params.npz"):
+        (destination / name).write_bytes((base / "cari_conversion" / name).read_bytes())
+    converted = dict(reports["conversion"], bundle_source="refined", bundle_sha256=refined["bundle_sha256"],
+                     input_report_sha256=dict(reports["conversion"]["input_report_sha256"]))
+    def sync_refined():
+        path.write_text(json.dumps(refined))
+        converted["input_report_sha256"]["refinement"] = loader.sha256(path)
+        (destination / "report.json").write_text(json.dumps(converted))
+    sync_refined()
+    return frozen, refined, converted, sync_refined
+
+
+def test_full_refinement_loader_never_replaces_forward_or_changes_arrays(loader, refined_frozen):
+    frozen, _, _, _ = refined_frozen
+    root, base, _, _, arrays, _, _, digest = frozen
+    old_report = (base / "cari_conversion/report.json").read_bytes()
+    result = loader.load_track1_episode(root, 15, 3, digest, bundle_source="refined")
+    assert result.manifest["bundle_source"] == "refined" and result.manifest["native_final_refinement_verified"] is True
+    assert "refinement" in result.manifest["dependency_report_sha256"]
+    assert result.episode.reconstruction.pose.tobytes() == arrays["pose"].tobytes()
+    assert (base / "cari_conversion/report.json").read_bytes() == old_report
+    assert load(loader, frozen).manifest["bundle_source"] == "forward"
+
+
+@pytest.mark.parametrize("field,value", [
+    ("native_refinement_verified", False), ("ground_truth_read", True), ("frames", 4),
+    ("forward_report_sha256", "0" * 64), ("inputs_report_sha256", "0" * 64),
+    ("source_bundle_sha256", "0" * 64), ("bundle_sha256", "0" * 64),
+    ("inference_source_identity", {"wrong": True}), ("body_assets", {"wrong": True}),
+    ("optimizer_sha256", "0" * 64), ("refinement_assets", {}),
+])
+def test_refinement_producer_links_and_assets_fail_even_when_receipt_sha_updated(loader, refined_frozen, field, value):
+    frozen, refined, _, sync = refined_frozen
+    refined[field] = value; sync()
+    with pytest.raises(ValueError): loader.load_track1_episode(frozen[0], 15, 3, frozen[-1], bundle_source="refined")
+
+
+@pytest.mark.parametrize("field,value", [("requested_steps", 299), ("effective_optimizer_updates", 300),
+                                        ("batch_size", 96), ("frozen_parameters_bit_identical", False),
+                                        ("full_original_frame_coverage_verified", False)])
+def test_incomplete_or_changed_refinement_protocol_fails(loader, refined_frozen, field, value):
+    frozen, refined, _, sync = refined_frozen
+    refined["metadata"][field] = value; sync()
+    with pytest.raises(ValueError): loader.load_track1_episode(frozen[0], 15, 3, frozen[-1], bundle_source="refined")
+
+
+def test_refined_loader_never_falls_back_to_valid_forward(loader, frozen):
+    with pytest.raises(ValueError, match="missing"):
+        loader.load_track1_episode(frozen[0], 15, 3, frozen[-1], bundle_source="refined")
+
+
 @pytest.mark.parametrize("key,bad", [
     ("stage", "native_cari_checkpoint_load_gate"), ("status", "fail"), ("episode_index", True),
     ("episode_index", 0), ("frames", True), ("frames", 3.), ("frames", 4),

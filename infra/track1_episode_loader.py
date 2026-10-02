@@ -18,7 +18,7 @@ import numpy as np
 
 from cari_converter import (
     CHECKPOINT_SHA256, CONVERTER_SHA256, REFERENCE_MODEL_SHA256, UPSTREAM_REVISION,
-    require_full_forward_report, require_report,
+    require_full_forward_report, require_refinement_chain, require_report, conversion_directory,
 )
 from world_reward.contracts import Reconstruction
 from world_reward.data import sha256
@@ -89,6 +89,7 @@ def _float(value, name, shape):
 
 def load_track1_episode(
     root: str | Path, episode_index: int, total_frames: int, input_video_sha256: str,
+    *, bundle_source: str = "forward",
 ) -> LoadedTrack1Episode:
     """Load exact full trajectories/shared identity, preserving all mesh padding.
 
@@ -104,13 +105,16 @@ def load_track1_episode(
     if type(total_frames) is not int or total_frames < 1:
         raise ValueError("Require a positive original frame count")
     _digest(input_video_sha256)
+    conversion = conversion_directory(bundle_source)
     root = Path(root).absolute()
     if ".." in root.parts or root.is_symlink() or not root.is_dir():
         raise ValueError("Require an existing non-symlink artifact root without traversal")
     root = root.resolve()
     base = f"outputs/episode_{episode_index:06d}"
-    final, report_hash = _report(root, f"{base}/cari_conversion/report.json", "world_reward_native_cari_official_conversion", episode_index)
-    legacy_episode_format = legacy_episode15_conversion(final, episode_index)
+    final, report_hash = _report(root, f"{base}/{conversion}/report.json", "world_reward_native_cari_official_conversion", episode_index)
+    legacy_episode_format = bundle_source == "forward" and legacy_episode15_conversion(final, episode_index)
+    if final.get("bundle_source", "forward") != bundle_source:
+        raise ValueError("Final conversion uses a different native bundle source")
     required = {
         "episode_index": episode_index, "frames": total_frames, "input_sha256": input_video_sha256,
         "original_frame_coverage_verified": True, "human_shared_identity_verified": True,
@@ -138,8 +142,18 @@ def load_track1_episode(
         source[name], links[name] = _report(root, f"{base}/{relative}", stage, episode_index,
                                           expected_hash=final["input_report_sha256"][name])
     require_full_forward_report(source["forward"])
+    if bundle_source == "refined":
+        source["refinement"], links["refinement"] = _report(
+            root, f"{base}/cari_refined/report.json", "world_reward_native_cari_full_refinement", episode_index,
+            expected_hash=final["input_report_sha256"]["refinement"],
+        )
+        require_refinement_chain(source["refinement"], source["forward"], forward_hash=links["forward"],
+                                 inputs_hash=links["inputs"], count=total_frames, episode=episode_index)
+        if (source["refinement"].get("bundle_sha256") != _digest(final.get("bundle_sha256"))
+                or source["refinement"].get("body_assets") != final.get("body_assets")):
+            raise ValueError("Final refinement bundle/assets do not match conversion")
     if (source["forward"].get("inputs_report_sha256") != links["inputs"]
-            or source["forward"].get("bundle_sha256") != _digest(final.get("bundle_sha256"))
+            or (bundle_source == "forward" and source["forward"].get("bundle_sha256") != _digest(final.get("bundle_sha256")))
             or source["adapter"].get("body_report_sha256") != links["body"]):
         raise ValueError("Native forward/adapter report chain is inconsistent")
     for name in ("inputs", "body", "object"):
@@ -163,8 +177,8 @@ def load_track1_episode(
             or source["body"].get("body_assets") != final["body_assets"]
             or not final.get("decoder_identity") or source["adapter"].get("decoder_identity") != final["decoder_identity"]):
         raise ValueError("Original source/assets/decoder identities differ")
-    episode_path = _hash_file(root, f"{base}/cari_conversion/episode.npz", final.get("episode_sha256"))
-    _hash_file(root, f"{base}/cari_conversion/params.npz", final.get("params_sha256"))
+    episode_path = _hash_file(root, f"{base}/{conversion}/episode.npz", final.get("episode_sha256"))
+    _hash_file(root, f"{base}/{conversion}/params.npz", final.get("params_sha256"))
     shapes = {"pose": (total_frames, 136), "scales": (68,), "shape": (45,), "expression": (72,),
               "object_rotation": (total_frames, 3, 3), "object_translation": (total_frames, 3), "object_scale": ()}
     with np.load(episode_path, allow_pickle=False) as archive:
@@ -197,6 +211,7 @@ def load_track1_episode(
                 "upstream_revision": UPSTREAM_REVISION, "checkpoint_sha256": CHECKPOINT_SHA256,
                 "reference_model_sha256": REFERENCE_MODEL_SHA256, "official_converter_sha256": CONVERTER_SHA256,
                 "legacy_episode15_conversion_format": legacy_episode_format,
+                "bundle_source": bundle_source, "native_final_refinement_verified": bundle_source == "refined",
                 "episode_identity_basis": "allowlisted_hardwired_episode15_source_and_all_artifact_links" if legacy_episode_format else "explicit_report_field_and_all_artifact_links",
                 "integrity_and_schema_verified": True, "numerical_truth_independently_reverified": False,
                 "submission_eligibility_verified": False, "challenge_performance_verified": False}

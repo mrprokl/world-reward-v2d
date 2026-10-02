@@ -273,3 +273,63 @@ training split. This is not proof of person disjointness or model-training absen
 Current HF concatenated RGB shards total103,867,863,822bytes and V2 motion batches
 39,621,177,728bytes; no audited per-clip URLs/batch mapping. Seek written rights
 and two hashed one-view minibundles before acquisition, not speculative bulk data.
+
+### Camera-gauge audit and next shared-K hypothesis — 2026-10-02
+
+Priority is **RGB-inferred, clip-shared intrinsics with the existing MoGe2 and
+SAMBody weights**, not a new shape fitter or an assumed MoGe3 calibration gain.
+
+1. [MoGe2 native source](https://github.com/microsoft/MoGe/blob/925b8ed835a7a9cdb7578ba15c658a0afc969030/moge/model/v2.py#L195-L297),
+   pin `925b8ed835a7a9cdb7578ba15c658a0afc969030`, MIT; existing
+   `Ruicheng/moge-2-vitl-normal` weights pin
+   `b135031bae30b5ac2ae141a0e68717795ce38340`.
+   `infer(fov_x=None, force_projection=True)` estimates focal and Z-shift from
+   the predicted pointmap, constructs centered square-pixel K, reprojects depth,
+   then multiplies points and depth by the positive predicted `metric_scale`
+   once. Focal recovery solves `min ||f*XY/(Z+d)-UV||²` on a 64×64 sample;
+   returned focal is relative to half the image diagonal, hence
+   `f_pixels = f_normalized*sqrt(W²+H²)/2`. With supplied horizontal FOV it still
+   re-estimates `d` at fixed focal. **Changing K while retaining the old shifted
+   depth is not equivalent to native fixed-FOV inference.** The scale head is
+   independent of this postprocessing; `infer` does not expose its scalar.
+   Geometry helpers assume centered principal point, no distortion and
+   isometric X/Y. Fewer than two valid downsampled samples silently give focal1,
+   shift0: detect that unsupported branch rather than accepting a guessed K.
+   SciPy optimizer status is not exposed, and positive finite focal alone does
+   not prove calibration. The [paper](https://arxiv.org/abs/2507.02546),
+   2025-07-03, explicitly motivates the focal/distance ambiguity.
+2. [SAMBody camera head](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam3d_body/lib/sam_3d_body/models/heads/camera_head.py#L61-L105),
+   official source pin `7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80`.
+   After native weak-camera sign conversion,
+   `bs=bbox_size*s*default_scale_factor+1e-8`, `tz=2*K[0,0]/bs`; bbox-center
+   corrections supply lateral translation. Explicit K also changes normalized
+   bbox conditioning and ray embeddings, not merely this translation formula.
+   Therefore rerun Body with the **same actual K** used by MoGe2; do not rescale
+   saved `pred_cam_t` and call it new inference. The single-image estimator's
+   actual `cam_int` path expects a Torch tensor despite its NumPy annotation.
+   The underlying SAM custom-source licensing question remains unresolved;
+   MoGe's MIT license does not clear the complete runtime.
+3. [MoGe3 paper](https://arxiv.org/html/2607.17967v2), 2026-07-20/21;
+   source pin `74fbce054ebed49800de42d0ad0e83495065719a`, 2026-08-19, MIT.
+   Table1 improves average absolute metric-depth Rel from MoGe2 15.6 to
+   MoGe3-L 15.0, but G is15.8. Appendix metric-point Rel is **8.65 for MoGe2
+   versus9.61 for L and10.4 for G**; absolute metric pointmaps do not universally
+   improve. No separate focal-accuracy result was found in the paper. Local or
+   affine-aligned point improvements are not evidence of a resolved metric
+   gauge. New MoGe3 weights are not required for the first camera experiment.
+
+Proposed **J2**, not implemented/measured here: reuse J1's exact nine RGBs,
+automatic masks, prediction firewall, score definitions and frozen gates. First
+infer MoGe2 focal from RGB alone on each frame; take the median positive pixel
+focal per clip. Then rerun native MoGe2 with
+`fov_x=2*atan(W/(2*f_clip))` in degrees and `force_projection=True`, and rerun
+SAMBody with that identical centered K. Keep one existing human-derived scale
+per clip, applied once to both depth and XYZ; no per-frame scales, GT choice of K,
+offset fitting or private camera feedback. Compare fixed-K1280 and shared-K
+pipelines with all nine frames scored, including hidden true-focal960/1600
+clips. Preserve median clip CD gain≥5% and no clip regression>5%; report raw
+camera CD/Z-bias and shared-scale results separately, with human Sim3 only the
+existing disclosed private diagnostic. Even a fixed-K baseline failure remains
+useful mechanism evidence, not permission to omit difficult clips or retune.
+Clip aggregation reduces jitter, not systematic focal/depth ambiguity: coherent
+projection is testable, **better calibration or metric accuracy is not assumed**.

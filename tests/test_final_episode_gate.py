@@ -137,3 +137,19 @@ def test_immutable_runtime_bundle_includes_loader_contract_not_gpu_entrypoints(g
     selected = launcher.runtime_bundle_paths(files, "infra/run_final_episode_gate.sh")
     assert set(selected) >= {"infra/final_episode_gate.py", "infra/track1_episode_loader.py", "infra/cari_converter.py", "infra/body_smoke.py"}
     assert "infra/run_cari_forward.sh" not in selected and "infra/run_cari_converter.sh" not in selected
+
+
+def test_refined_schema_uses_explicit_loader_source_and_fresh_namespace(gate, fake_runtime, monkeypatch):
+    root, calls = fake_runtime
+    base = root / "outputs/episode_000015"
+    (base / "final_schema").mkdir(parents=True)
+    (base / "final_schema/report.json").write_text("frozen forward")
+    def load(root, episode, frames, digest, *, bundle_source):
+        calls.append(("load_refined", root, episode, frames, digest, bundle_source))
+        return SimpleNamespace(episode=SimpleNamespace(validate=lambda: None), manifest={"bundle_source": bundle_source})
+    monkeypatch.setattr(gate, "load_track1_episode", load)
+    gate.main(["--episode", "15", "--bundle-source", "refined"])
+    assert calls[-1] == ("load_refined", root, 15, 3, "b" * 64, "refined")
+    report = json.loads((base / "final_schema_refined/report.json").read_text())
+    assert report["bundle_source"] == "refined"
+    assert (base / "final_schema/report.json").read_text() == "frozen forward"
