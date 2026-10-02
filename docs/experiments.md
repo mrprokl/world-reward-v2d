@@ -1257,3 +1257,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   que répéter une troisième fois le même budget. Le compact R92PASS prouve
   le mécanisme CPU, pas la procédure complète sur ces profondeurs réelles.
   Native prepare0 reste active600/790 à18:40:51UTC, aucun job GPU relancé.
+- 2026-10-02 D74: optional validated Azure target in immutable launcher,
+  default argv/snapshot unchanged, job name cannot choose VM or remote root.
+  Invalid/injection/abbreviated fields fail before Git/Azure;63tests PASS.04s,
+  full3915PASS/1optional-trimeshSKIP39.39s. Not a compute allocation or experiment.
+- 2026-10-02 D75: independent second H100 for quality research, setup budget≤1h
+  conditional on capacity/import/runtime. Exact confidential VMI and fresh
+  Docker, no user disk/OS/live-state cloning. New resource group/NIC/NSG,
+  temporary private-only SSH VM01→VM02 with host-key verification and revocation;
+  allowlisted image/MoGe/independent-validation TAR transfers Azure-only. Existing
+  queue/readers/output namespaces untouched. Fail allocation/CUDA/import gates
+  without claiming GPU results; cleanup only newly identified task resources.

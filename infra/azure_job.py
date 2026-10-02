@@ -18,6 +18,24 @@ import subprocess
 import tarfile
 
 
+DEFAULT_RESOURCE_GROUP = "SCENESMITH-H100"
+DEFAULT_VM_NAME = "scenesmith-ncc-h100-01"
+
+
+def azure_resource_group(value: str) -> str:
+    """Conservative CLI-safe subset of Azure resource-group names, 1..90."""
+    if not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9_-]{0,88}[A-Za-z0-9])?", value):
+        raise argparse.ArgumentTypeError("Resource group must be 1..90 alphanumeric/underscore/hyphen characters, alphanumeric endpoints")
+    return value
+
+
+def azure_vm_name(value: str) -> str:
+    """Linux VM target, independent of the systemd job --name, 1..64."""
+    if not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?", value):
+        raise argparse.ArgumentTypeError("VM name must be 1..64 alphanumeric/hyphen characters, alphanumeric endpoints")
+    return value
+
+
 def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
     """Select committed entrypoint/import closure, never data or unused tooling.
 
@@ -160,12 +178,15 @@ def runtime_archive(full_archive: bytes, script: str) -> tuple[bytes, list[str]]
     return output.getvalue(), selected
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
+def main(argv=None) -> None:
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--name", required=True)
     parser.add_argument("--script", required=True, help="Committed infra/*.sh entrypoint")
+    parser.add_argument("--resource-group", type=azure_resource_group, default=DEFAULT_RESOURCE_GROUP)
+    parser.add_argument("--vm-name", type=azure_vm_name, default=DEFAULT_VM_NAME,
+                        help="Azure target VM; --name remains only the immutable job name")
     parser.add_argument("arguments", nargs="*")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if not re.fullmatch(r"[a-z][a-z0-9-]{0,50}", args.name):
         raise ValueError("Job name must be a short lowercase slug")
     if not re.fullmatch(r"infra/[a-z0-9_]+\.sh", args.script):
@@ -217,7 +238,7 @@ systemctl show "$UNIT" -p ActiveState -p ExecMainStatus -p MainPID
 """
     print(f"immutable_runtime_bundle_files={len(paths)} encoded_bytes={len(encoded)} revision={revision}", flush=True)
     subprocess.run(["rtk", "proxy", "az", "vm", "run-command", "invoke",
-                    "--resource-group", "SCENESMITH-H100", "--name", "scenesmith-ncc-h100-01",
+                    "--resource-group", args.resource_group, "--name", args.vm_name,
                     "--command-id", "RunShellScript", "--scripts", command,
                     "--query", "value[0].message", "-o", "tsv"], check=True)
 

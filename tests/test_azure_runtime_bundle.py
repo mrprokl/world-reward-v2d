@@ -202,3 +202,66 @@ def test_filtered_archive_keeps_git_metadata_and_exact_bytes_deterministic():
 def test_symlink_runtime_aliases_rejected():
     with pytest.raises(ValueError, match="symlinks"):
         launcher.runtime_archive(full_archive(files(), symlink=True), "infra/run_smoke.sh")
+
+
+def launch_stub(monkeypatch, args):
+    """Capture argv and frozen remote script; no Git/Azure subprocess executes."""
+    calls = []; revision = "a"*40
+    def git(command):
+        assert command[:3] == ["rtk", "proxy", "git"]
+        if command[3] == "status": return b""
+        if command[3] == "rev-parse": return revision.encode()+b"\n"
+        if command[3] == "cat-file": return b""
+        if command[3] == "archive": return full_archive(files())
+        raise AssertionError(command)
+    monkeypatch.setattr(launcher.subprocess, "check_output", git)
+    monkeypatch.setattr(launcher.subprocess, "run", lambda command, **kwargs: calls.append((command, kwargs)))
+    launcher.main(["--name", "unit-test", "--script", "infra/run_smoke.sh", *args])
+    assert len(calls) == 1 and calls[0][1] == {"check": True}
+    return calls[0][0]
+
+
+def test_legacy_defaults_identical_to_explicit_target_and_snapshot(monkeypatch):
+    default = launch_stub(monkeypatch, [])
+    explicit = launch_stub(monkeypatch, ["--resource-group", "SCENESMITH-H100", "--vm-name", "scenesmith-ncc-h100-01"])
+    assert default == explicit
+    assert default[:10] == ["rtk", "proxy", "az", "vm", "run-command", "invoke", "--resource-group", "SCENESMITH-H100", "--name", "scenesmith-ncc-h100-01"]
+
+
+def test_second_target_changes_only_azure_argv_not_remote_root_or_job(monkeypatch):
+    original = launch_stub(monkeypatch, [])
+    second = launch_stub(monkeypatch, ["--resource-group", "WORLD-REWARD-RESEARCH", "--vm-name", "scenesmith-ncc-h100-02"])
+    assert second[7] == "WORLD-REWARD-RESEARCH" and second[9] == "scenesmith-ncc-h100-02"
+    assert second[:7] == original[:7] and second[10:] == original[10:]
+    remote = second[second.index("--scripts")+1]
+    assert "ROOT=/srv/scenesmith/world-reward" in remote and "UNIT=world-reward-unit-test" in remote
+    assert "scenesmith-ncc-h100-02" not in remote and "WORLD-REWARD-RESEARCH" not in remote
+
+
+def test_job_name_does_not_choose_vm_and_script_arguments_remain_quoted(monkeypatch):
+    command = launch_stub(monkeypatch, ["--", "--episode", "0", "literal;not-shell"])
+    assert command[9] == "scenesmith-ncc-h100-01"
+    remote = command[command.index("--scripts")+1]
+    assert "UNIT=world-reward-unit-test" in remote and "--episode 0 'literal;not-shell'" in remote
+
+
+@pytest.mark.parametrize("field,value", [
+    ("--resource-group", ""), ("--resource-group", "--other"), ("--resource-group", "group;echo-secret"),
+    ("--resource-group", "group name"), ("--resource-group", "../group"), ("--resource-group", "-group"),
+    ("--resource-group", "group-"), ("--resource-group", "a"*91), ("--resource-group", "$(cmd)"),
+    ("--vm-name", ""), ("--vm-name", "vm/02"), ("--vm-name", "vm_02"), ("--vm-name", "vm.02"),
+    ("--vm-name", "vm\ncommand"), ("--vm-name", "vm;command"), ("--vm-name", "-vm"),
+    ("--vm-name", "vm-"), ("--vm-name", "a"*65), ("--vm-name", "équipe"),
+])
+def test_invalid_target_rejected_before_git_or_azure(monkeypatch, field, value):
+    def forbidden(*a, **k): raise AssertionError("No subprocess on invalid target")
+    monkeypatch.setattr(launcher.subprocess, "check_output", forbidden)
+    monkeypatch.setattr(launcher.subprocess, "run", forbidden)
+    with pytest.raises(SystemExit): launcher.main(["--name", "test", "--script", "infra/run_smoke.sh", field, value])
+
+
+@pytest.mark.parametrize("args", [["--vm", "vm02"], ["--resource", "group"], ["--root", "/tmp/other"], ["--unknown", "x"]])
+def test_unknown_abbreviated_targets_and_root_override_fail(monkeypatch, args):
+    def forbidden(*a, **k): raise AssertionError("No subprocess on invalid option")
+    monkeypatch.setattr(launcher.subprocess, "check_output", forbidden)
+    with pytest.raises(SystemExit): launcher.main(["--name", "test", "--script", "infra/run_smoke.sh", *args])

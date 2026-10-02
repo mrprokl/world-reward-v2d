@@ -221,8 +221,10 @@ SecondGPU option audited, not provisioned: existing confidential VMI exact
 Do not use vanilla Ubuntu/generic GPU extension or clone/restart running Docker
 state. Future new VM needs independent NIC/NSG/no ingress, same pinned VMI,
 SHA-checked image export/import into a fresh private Docker root, task-only
-artifact transfer within Azure, explicit target support in azure_job.py (currently
-VM01 hardcoded), new unit/output namespace and actual CUDA/replay checks.
+artifact transfer within Azure, explicit target support in azure_job.py, new
+unit/output namespace and actual CUDA/replay checks. The launcher now accepts
+validated `--resource-group` and `--vm-name`; defaults and frozen remote script
+remain identical to VM01. No automatic migration or root override is allowed.
 Quota permits one more40core SKU nominally; capacity/setup duration unverified.
 No snapshot, user-data copy, second VM or reader migration has been performed.
 
@@ -232,3 +234,18 @@ Temp H5 supprimés; **aucune adoption batch dans la préparation native**. R96
 retient timings/digests, pas un median validé. Source active episode0 toujours
 600/790 depth; indépendants J1→native15refine→J2→TUD-L restent en queue GPU.
 Fulltiny suite3889PASS/1optional-trimeshSKIP41.40s; worktree/code propres.
+
+2026-10-02 D74/D75: launcher target tests63PASS and full tiny suite3915PASS/
+1optional-trimeshSKIP39.39s. At18:51UTC prepare0 is700/790; GPU queue unchanged.
+Predeclare a bounded independent H100 VM02 in `WORLD-REWARD-RESEARCH`, same
+confidential VMI/SKU/zone/SecureBoot/vTPM, fresh OS and private Docker state.
+Use a new NIC/NSG on the existing subnet without modifying VM01 policies;
+no VM public IP. Temporary SSH ingress only10.0.0.4/32→VM02 TCP22 for task-only
+TAR/SHA transfer executed on VM01, never laptop remote-to-remote SCP. SSH private
+key stays mode600 on Azure and is revoked/deleted after transfer; host key is
+verified through Run Command, not TOFU. New NSG then denies all ingress.
+No whole SceneSmith disk/OS snapshot or live Docker-state copying. Stage only
+the pinned CARI image, MoGe snapshot/blob/receipt and independent validation
+fixture files; preserve HF symlinks. Budget setup≤1h conditional on allocation,
+agent/egress, image and CUDA gates; failure stops only new resources. No second
+VM result, GPU adoption or migration is claimed before those gates complete.
