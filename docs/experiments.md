@@ -199,3 +199,17 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   rigid ICP with 39/49 synthetic tests; no learned scale truth claim. Analytic CUDA
   camera/depth raster gate must pass before human/object scale consistency smoke.
   Full local suite 597 passed.
+
+- 2026-10-02 D20: audit caught a gauge error before running object alignment: SAM
+  Object inferred pose/scale from MoGe1, whereas the human anchor fits MoGe2.
+  One cannot multiply the independent MoGe1 pose by the MoGe2 scalar, nor change
+  its intrinsic matrix as if this were an exact rigid correction. Split depth
+  alignment from object generation: verify MoGe2 K, Z and pixel-centre rays; fit
+  one clip scalar to predicted human surfaces, export already-aligned pointmaps
+  and regenerate the object with those explicit pointmaps and the same K. No
+  second scale application, manual labeling, GT or score optimization.
+- 2026-10-02 R20 (H100 analytic camera gate): actual PyTorch3D CUDA raster passed
+  in 0.93 s: tilted triangle maximum Z error 6.34e-7 m, occlusion and closed-box
+  error 2.38e-7 m; closed-box silhouette IoU 1, projection error 0 px. Camera Z
+  and perspective/rectangular-image conventions now independently checked.
+  This is numerical geometry validation, not reconstruction accuracy.

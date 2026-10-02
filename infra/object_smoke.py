@@ -22,6 +22,8 @@ def main() -> None:
         raise RuntimeError("Require Azure Linux GPU container with network none")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path("/srv/scenesmith/world-reward"))
+    parser.add_argument("--aligned-pointmap", action="store_true",
+                        help="Use already human-anchored MoGe2 XYZ and identical K, not independent MoGe1")
     args = parser.parse_args()
     root = args.root.resolve()
     os.environ.update(HF_HUB_OFFLINE="1", TRANSFORMERS_OFFLINE="1")
@@ -41,7 +43,7 @@ def main() -> None:
     for record in checkpoints:
         if sha256(hub / "checkpoints" / record["filename"]) != record["sha256"]:
             raise RuntimeError("Objects DINO checkpoint changed after acquisition")
-    output = root / "outputs/episode_000015/object_smoke"
+    output = root / "outputs/episode_000015" / ("object_grounded" if args.aligned_pointmap else "object_smoke")
     if output.exists():
         raise RuntimeError("Frozen object smoke output exists; do not overwrite")
     import cv2
@@ -64,6 +66,39 @@ def main() -> None:
         mask = np.asarray(image)
     if mask.shape != rgb.shape[:2] or not np.isin(mask, [0, 255]).all() or not (mask > 0).any():
         raise RuntimeError("Fixed frame has no valid original-resolution object mask")
+    grounding, grounding_arguments = None, {}
+    if args.aligned_pointmap:
+        alignment_path = root / "outputs/episode_000015/scale_smoke/report.json"
+        alignment = json.loads(alignment_path.read_text())
+        required = {"stage": "predicted_human_anchored_moge2_pointmaps", "status": "pass",
+                    "episode_index": 15, "input_track": "track_1", "input_sha256": inputs["video_sha256"],
+                    "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": [],
+                    "coordinate_frame": "OpenCV_x_right_y_down_z_forward",
+                    "pointmap_scale_application": "one_clip_scalar_to_MoGe2_XYZ_already_applied"}
+        if (any(alignment.get(key) != value for key, value in required.items())
+                or alignment["ground_truth_used"] is not False or alignment["hand_labeled_test"] is not False):
+            raise RuntimeError("Require verified same-video human-anchored pointmap provenance")
+        records = [record for record in alignment["pointmaps"] if record["frame_index"] == 0]
+        evidence = [record for record in alignment["human_evidence"] if record["frame_index"] == 0]
+        if len(records) != 1 or len(evidence) != 1:
+            raise RuntimeError("Require exactly one original-frame-zero alignment record")
+        grounding = dict(records[0], alignment_report_sha256=sha256(alignment_path))
+        if (grounding["decoded_rgb_sha256"] != hashlib.sha256(rgb.tobytes()).hexdigest()
+                or evidence[0]["object_mask_sha256"] != sha256(mask_path)):
+            raise RuntimeError("Pointmap RGB/object mask differs from object-generation frame")
+        for field in ("pointmap", "intrinsics"):
+            path = Path(grounding[field + "_path"])
+            expected_path = alignment_path.parent / ("000000.npy" if field == "pointmap" else "000000_intrinsics.json")
+            if path != expected_path or sha256(path) != grounding[field + "_sha256"]:
+                raise RuntimeError("Aligned grounding path/hash mismatch")
+        points = np.load(grounding["pointmap_path"], allow_pickle=False)
+        if points.shape != (*rgb.shape[:2], 3):
+            raise RuntimeError("Same-camera pointmap original resolution mismatch")
+        valid = np.isfinite(points).all(-1) & (points[..., 2] > 0)
+        if not (valid & (mask > 0)).any():
+            raise RuntimeError("Same-camera pointmap lacks finite visible object observations")
+        grounding_arguments = {"pointmap_path": grounding["pointmap_path"],
+                               "pointmap_intrinsics_path": grounding["intrinsics_path"]}
     original_hub_load = torch.hub.load
     calls = []
     def local_load(repo_or_dir, *arguments, **kwargs):
@@ -89,7 +124,7 @@ def main() -> None:
                       str(output / "transform.json"), str(output / "intrinsics.json"),
                       str(weights), seed=0, with_mesh_postprocess=False,
                       with_texture_baking=False, with_layout_postprocess=False,
-                      use_vertex_color=True)
+                      use_vertex_color=True, **grounding_arguments)
     finally:
         torch.hub.load = original_hub_load
     import trimesh
@@ -106,12 +141,20 @@ def main() -> None:
             or not np.isfinite(np.concatenate((rotation, translation, scale))).all()
             or not np.isclose(np.linalg.norm(rotation), 1., atol=1e-5) or (scale <= 0).any()):
         raise RuntimeError("Generated pose must have finite unit quaternion, translation and positive scale")
-    report = {"stage": "sam3d_objects_fixed_frame_smoke", "status": "pass", "episode_index": 15,
+    if grounding is not None:
+        if json.loads((output / "intrinsics.json").read_text()) != json.loads(Path(grounding["intrinsics_path"]).read_text()):
+            raise RuntimeError("Object output intrinsics must preserve the explicit grounding camera")
+    report = {"stage": "sam3d_objects_grounded_fixed_frame" if args.aligned_pointmap else "sam3d_objects_fixed_frame_smoke",
+              "status": "pass", "execution_verified": True, "candidate_accuracy_validated": False, "episode_index": 15,
               "frame_index": 0, "seed": 0, "elapsed_seconds": time.perf_counter() - started,
               "vertices": len(mesh.vertices), "faces": len(mesh.faces),
               "bounds_generated_units": mesh.bounds.tolist(), "surface_area_generated_units": float(mesh.area),
               "watertight": bool(mesh.is_watertight), "winding_consistent": bool(mesh.is_winding_consistent),
               "transform": transform, "dinov2_revision": DINOV2_REVISION, "hub_calls": calls,
+              "transform_sha256": sha256(output / "transform.json"),
+              "intrinsics_sha256": sha256(output / "intrinsics.json"),
+              "pointmap_grounding": grounding,
+              "scale_source": "already_human_anchored_MoGe2_no_second_scalar" if args.aligned_pointmap else "independent_MoGe1",
               "installed_objects_source_hashes": source_hashes,
               "installed_source_commit_verified": False,
               "object_sha256": sha256(output / "object.glb"), "input_sha256": inputs["video_sha256"],

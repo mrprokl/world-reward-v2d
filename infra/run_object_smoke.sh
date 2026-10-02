@@ -22,4 +22,4 @@ docker run --rm --gpus all --network none \
   --mount "type=bind,src=$ROOT/outputs,dst=$ROOT/outputs" \
   --mount "type=bind,src=$ROOT/results,dst=$ROOT/results,readonly" \
   --mount "type=bind,src=$ROOT/cache,dst=$ROOT/cache" \
-  world-reward/sam3d-runtime:0.1 python "$CODE/infra/object_smoke.py" --root "$ROOT"
+  world-reward/sam3d-runtime:0.1 python "$CODE/infra/object_smoke.py" --root "$ROOT" "$@"
