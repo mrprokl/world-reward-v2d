@@ -41,7 +41,8 @@ if not repo.exists():
 subprocess.run(['git','-C',str(repo),'sparse-checkout','init','--no-cone'],check=True)
 subprocess.run(['git','-C',str(repo),'sparse-checkout','set','--no-cone','/reconstruction/',
                 '!/reconstruction/**/assets/','!/reconstruction/**/data/',
-                '/reconstruction/**/data/**/*.py','/LICENSE'],check=True)
+                '/reconstruction/modules/v2d_sam3d_body/lib/sam_3d_body/data/',
+                '/LICENSE'],check=True)
 subprocess.run(['git','-C',str(repo),'checkout',sources['upstream']['revision']],check=True)
 provenance = {'upstream_revision':sources['upstream']['revision'],
               'kit_sha256':sources['kit']['sha256'], 'dataset_revision':sources['dataset']['revision'],

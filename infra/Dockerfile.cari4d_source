@@ -2,4 +2,5 @@
 # Restore only pinned source code, never challenge datasets or GT assets.
 FROM world-reward/cari4d:7c0d3b9
 COPY v2d_sam3d_body/lib/sam_3d_body/data /workspace/v2d_sam3d_body/lib/sam_3d_body/data
+RUN python -c "from sam_3d_body.data.transforms import Compose; from sam_3d_body.data.utils.prepare_batch import NoCollate; from sam_3d_body.data.utils.io import load_image; print('body_source_imports=pass')"
 ENV PYTHONUNBUFFERED=1
