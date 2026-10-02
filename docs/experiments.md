@@ -1290,3 +1290,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Pair only after baseline frozen and SHA-checked Azure transfer; keep≥5%median
   scene gain/no>5%regression/coverage gates, no challenge victory inferred.
   GeoCalib adaptation rights/newcamera-solver cost defer that alternative.
+- 2026-10-02 R99: actualVM02 private runtime **PASS12s**, source0365d05,
+  zeroimages/containers, ownsocket/overlay2/containerd namespaces/NVIDIA runtime.
+  Task-only export **PASS**, source671d10c: 1337763840byteassets9b876f95…e6027
+  +14565534720byteimage203af62c…21b4e, pinnedimageIDb47e4450…380a7.
+  Private strict-host-key SSH transfer dispatched Azure01→02; no local data
+  transit. VM01 GPU forward active89%/4342MiB at19:14, no validatedfinalchain.
+  No new model inference or GPU-smoke claim onVM02 before import gates.

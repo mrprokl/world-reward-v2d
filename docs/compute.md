@@ -268,3 +268,13 @@ private Docker/containers started. Repair only fresh task-root ownership/results
 directory, keep failed unit untouched, dispatch runtime-v2 separately; don't
 restart or weaken bootstrap checks. Image/assets export runs CPU-only onVM01
 at low scheduling/I/O priority; source queue still750/790, no GPU contention.
+
+19:15UTC fresh private runtime **PASS12s** onVM02: explicit private containerd,
+Docker29.5.3/overlay2/NVIDIA runtime, zero images/containers, no system-daemon
+or network changes. Runtime producing0365d057435e019ebdfb3cdc592c8172c9d01a70;
+receipt/source hashes remote. VM01 export **PASS** producing671d10c:
+assets1337763840bytes SHA9b876f95c80e1b68a9f7695960ee324d97b22d44575047730a017fcdb87e6027,
+image14565534720bytes SHA203af62c8c03931919acd2fab28b1fa53a802be73d0f04d99febf60c26321b4e.
+No whole user-disk/live Docker copy; private SSH transfer initiated only onVM01.
+GPU0 observed89%/4342MiB, full prepare finished writing and native forward active;
+not yet conversion/schema or J1 quality. No model/CUDA import result onVM02 yet.
