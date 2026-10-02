@@ -134,3 +134,9 @@ including native MHR geometry and image-projection checks. Strict loading now
 distinguishes checkpoint network/head state from independently verified explicit
 MHR asset state and deterministic unused tokens/copies. Sparse NPZ remains remote;
 no full trajectory or challenge accuracy established. Local suite 456 passed.
+
+Official shared-identity conversion of the three real Body meshes completed:
+0.3304 mm mean residual to the input predictions, 22.55 s. This measures export
+fidelity, not challenge error. Full 501-frame Body initializer is now running as
+`world-reward-body-full-video`; latest observation active, H100 20% / 4,822 MiB,
+managed disk 589 GB free. Do not restart this job while merely waiting for it.
