@@ -1052,3 +1052,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Human-first-frame shared Sim3, depth bias and permuted-alpha are diagnostics
   only, never inference corrections or main-score alignment. No additional
   generative object model until this cheaper grounding hypothesis survives.
+- 2026-10-02 R87 (native episode0 preflight,3fe357c): launch stopped before
+  any computation because the legacy full-pose failure left an **empty** output
+  directory. No new predictions or receipts were written. Remote inspection
+  confirmed no files, the old failure log remains; remove only with `rmdir`
+  (refuses nonempty directories), then use a fresh unit/log. This is cleanup of
+  disposable failed-run noise, not replacement of frozen predictions or a
+  change to geometry thresholds. J1 research can queue behind the new unit to
+  avoid overlapping H100 jobs; predecessor outputs are not J1 inputs.
+  Empty legacy target removed; original failure log SHA67404776…035d4 retained.
+  J1 source integration full tiny suite3567PASS/1optional-trimeshSKIP33.75s;
+  this validates contracts/metric implementations, not actual model outcomes.
