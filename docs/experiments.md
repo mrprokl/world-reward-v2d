@@ -1745,3 +1745,21 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   No new synthesis or mask inference required, no measured accuracy/gate change.
   Independent133focusedPASS, shellsyntax PASS, finalfull4833PASS/1optional
   trimeshSKIP65.00s. Exactproducer-shaped receipt contract audited independently.
+
+- D87validatev3 actual runtime **PASS**, hypothesis **REJECT**, source
+  c1b75f9b5e8d494aff4f6fec985d51ce8b21098e, VM01. Publicinfer45.303485s,
+  15Body+15MoGe+15shared-head+1official15batch; all30predictions immutable
+  before reference/private scoring. Worstofficialmean.000306584mm; receipt
+  f01674dd2e196b16a7ec0657dbf033414424a324dc6abd5ada62817fc2188df4.
+  CPUquality5.945505s all15retained, noGTalignment; receipt
+  6d598bc7e6f4d0063189f652bef6241ec91a0caa4be281a6c2cc74cee8ee3883.
+  Human relative gains[.0001895584,.0006064028,.0000133744], median
+  **.01895584%** <5%; human nonregression PASS, perhand nonregression FAIL
+  (clip0hand increases[.00578453,.13495487]cm >.0001cm allowance).
+  First-frame identity quality unsupported. No same-cohort retune/medoidretry
+  or adoption; structuralD85/D86passes do not alter this accuracy decision.
+  D87reuse for NEWdepth hypothesis is no longer independent/preregistered
+  after this privatepeek: require a freshD88cohort before DA3vsMoGe private
+  comparison. Prioritize depth (independentD76signal19.416% atsameK800) over
+  speculative identitymedoid; that external result is not fullHOI superiority.
+  Alljobs terminal0/no concurrentGPU; tiny source payload96,336B/23files.
