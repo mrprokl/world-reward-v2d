@@ -1,0 +1,7 @@
+# Correct a detected CPU-only PyTorch3D build; keep the official base image intact.
+FROM world-reward/sam3d:7c0d3b9
+RUN FORCE_CUDA=1 TORCH_CUDA_ARCH_LIST="9.0" MAX_JOBS=8 \
+    pip install --no-deps --no-build-isolation --force-reinstall \
+    "git+https://github.com/facebookresearch/pytorch3d.git@v0.7.9"
+RUN pip freeze > /app/world-reward-sam3d-cuda-pip.txt
+ENV PYTHONUNBUFFERED=1
