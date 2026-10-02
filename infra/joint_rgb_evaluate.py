@@ -19,6 +19,7 @@ from world_reward.data import sha256
 
 STAGE = "private_joint_rgb_shared_grounding_quality"
 WIDTH, HEIGHT, CLIPS, FRAMES, SAMPLES = 1024, 768, 3, 3, 8192
+FOCAL_GEOMETRY_SHA = "2f8d5de7d671af16d25fe13c555fd73855d8447bc086bb23aa42e859b303fb05"
 
 
 def require_hash(path, digest):
@@ -131,7 +132,7 @@ def decision(clip_metrics):
             "adoption_performed": False, "full_v2d_score_verified": False}
 
 
-def validate_predictions(data):
+def validate_predictions(data, camera_source="fixed"):
     expected = {"raw_points", "aligned_points", "human_vertices_camera_m", "human_faces", "object_masks",
                 "moge_validity", "shared_scale", "frame_index", "clip_index", "camera_K"}
     if set(data) != expected:
@@ -152,9 +153,20 @@ def validate_predictions(data):
     scales = data["shared_scale"]
     if scales.shape != (3,) or not np.isfinite(scales).all() or np.any(scales <= 0):
         raise ValueError("One positive finite scale per clip required")
-    K = camera(data["camera_K"])
-    if not np.array_equal(K, [[1280., 0, WIDTH/2], [0, 1280., HEIGHT/2], [0, 0, 1.]]):
-        raise ValueError("Require unchanged RGB-size prior K, not private calibration")
+    if camera_source == "fixed":
+        K = camera(data["camera_K"])
+        if not np.array_equal(K, [[1280., 0, WIDTH/2], [0, 1280., HEIGHT/2], [0, 0, 1.]]):
+            raise ValueError("Require unchanged RGB-size prior K, not private calibration")
+    elif camera_source == "learned":
+        if data["camera_K"].shape != (3, 3, 3):
+            raise ValueError("Require one RGB-learned K per complete clip")
+        for value in data["camera_K"]:
+            K = camera(value)
+            if (K[0, 0] != K[1, 1] or K[0, 2] != WIDTH/2 or K[1, 2] != HEIGHT/2
+                    or K[0, 1] != 0 or K[1, 0] != 0):
+                raise ValueError("Learned camera must be centered square-pixel positive K")
+    else:
+        raise ValueError("Require an explicit fixed or learned camera producer")
     for i in range(9):
         valid = data["moge_validity"][i]; a, b = data["raw_points"][i][valid], data["aligned_points"][i][valid]
         if (not np.isfinite(a).all() or not np.isfinite(b).all() or np.any(a[:, 2] <= 0)
@@ -163,17 +175,45 @@ def validate_predictions(data):
         if not (valid & data["object_masks"][i]).any(): raise ValueError("Missing predicted object coverage")
 
 
-def run(root, report):
-    base = root/"validation/joint_rgb_v1"; public = base/"inputs"; pred = base/"predictions"; private = base/"eval_private"
+def load_public_predictions(base, *, camera_source="fixed"):
+    public = base/"inputs"
+    pred = base/("predictions" if camera_source == "fixed" else "predictions_camera_v1")
     receipt_path = pred/"report.json"; receipt_sha = sha256(receipt_path); require_hash(receipt_path, receipt_sha)
     receipt = json.loads(receipt_path.read_text())
-    expected = {"stage": "public_joint_rgb_shared_grounding_predictions", "status": "pass", "private_truth_read": False,
+    stage = ("public_joint_rgb_shared_grounding_predictions" if camera_source == "fixed"
+             else "public_joint_rgb_learned_camera_shared_grounding_predictions")
+    expected = {"stage": stage, "status": "pass", "private_truth_read": False,
                 "challenge_inputs_used": False, "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": []}
     if any(type(receipt.get(k)) is not type(v) or receipt.get(k) != v for k, v in expected.items()):
         raise ValueError("Require complete frozen RGB-only prediction producer")
     array_path = pred/"arrays.npz"; array_sha = receipt.get("arrays_sha256"); require_hash(array_path, array_sha)
     with np.load(array_path, allow_pickle=False) as archive: data = {k: archive[k].copy() for k in archive.files}
-    validate_predictions(data)  # ALL predictions load and validate before any private truth is opened.
+    validate_predictions(data, camera_source)  # ALL predictions validate before any private truth.
+    if camera_source == "learned":
+        candidates = np.asarray(receipt.get("focal_candidates_pixels"))
+        solver_calls = receipt.get("native_focal_solver_calls")
+        if (receipt.get("camera_source") != "learned" or receipt.get("focal_fitted") is not True
+                or receipt.get("focal_geometry_source_sha256") != FOCAL_GEOMETRY_SHA
+                or candidates.shape != (9,) or candidates.dtype.kind != "f"
+                or not np.isfinite(candidates).all() or np.any(candidates <= 0)
+                or not np.allclose(np.median(candidates.reshape(3, 3), axis=1), data["camera_K"][:, 0, 0], rtol=1e-6, atol=1e-5)
+                or any(receipt.get(k) is not True for k in ("actual_body_inference", "actual_MoGe_inference", "actual_predicted_human_render", "native_camera_support_verified"))
+                or any(type(receipt.get(k)) is not int or receipt[k] != n for k, n in
+                       (("body_calls_completed", 9), ("MoGe_camera_calls_completed", 9),
+                        ("MoGe_fixed_camera_calls_completed", 9), ("MoGe_calls_completed", 18)))
+                or not isinstance(solver_calls, list) or len(solver_calls) != 18):
+            raise ValueError("Learned camera must come from complete RGB-only median focal inference")
+        for i, call in enumerate(solver_calls):
+            row = i % 9; clip, frame = divmod(row, 3)
+            if (not isinstance(call, dict) or call.get("file") != f"clip_{clip:02d}_frame_{frame:03d}.png"
+                    or type(call.get("clip_index")) is not int or call["clip_index"] != clip
+                    or type(call.get("frame_index")) is not int or call["frame_index"] != frame
+                    or call.get("pass") != ("camera_candidate" if i < 9 else "shared_camera")
+                    or call.get("focal_prior_supplied") is not (i >= 9)
+                    or call.get("original_solver_returned") is not True
+                    or type(call.get("native_nearest64_valid_pixels")) is not int
+                    or not 2 <= call["native_nearest64_valid_pixels"] <= 4096):
+                raise ValueError("Learned camera native solver support/call order incomplete")
     manifest_path = public/"manifest.json"; manifest_sha = sha256(manifest_path); require_hash(manifest_path, manifest_sha)
     manifest = json.loads(manifest_path.read_text())
     if set(manifest) != {"schema", "images"} or manifest["schema"] != "world-reward-joint-rgb-v1" or len(manifest["images"]) != 9:
@@ -185,11 +225,38 @@ def run(root, report):
         raise ValueError("Frozen inference/public manifest and mask provenance mismatch")
     for i, rgb in enumerate(manifest["images"]):
         clip, frame = divmod(i, 3); r = consumed[i]
-        if (r.get("file") != rgb.get("file") or r.get("rgb_sha256") != rgb.get("sha256")
+        expected_file = f"clip_{clip:02d}_frame_{frame:03d}.png"
+        if (not isinstance(rgb, dict) or set(rgb) != {"file", "sha256", "width", "height"}
+                or rgb.get("file") != expected_file or type(rgb.get("width")) is not int or type(rgb.get("height")) is not int
+                or (rgb["width"], rgb["height"]) != (WIDTH, HEIGHT) or not isinstance(r, dict)
+                or r.get("file") != rgb.get("file") or r.get("rgb_sha256") != rgb.get("sha256")
                 or type(r.get("clip_index")) is not int or r["clip_index"] != clip
                 or type(r.get("frame_index")) is not int or r["frame_index"] != frame
                 or any(not isinstance(r.get(k), str) or not re.fullmatch(r"[0-9a-f]{64}", r[k]) for k in ("human_mask_sha256", "object_mask_sha256"))):
             raise ValueError("Frozen prediction did not consume the original ordered RGB/masks")
+        require_hash(public/rgb["file"], rgb["sha256"])
+    return {"data": data, "receipt": receipt, "manifest": manifest, "receipt_sha": receipt_sha,
+            "array_sha": array_sha, "manifest_sha": manifest_sha,
+            "files": [(receipt_path, receipt_sha), (array_path, array_sha), (manifest_path, manifest_sha)]}
+
+
+def run(root, report, camera_source="fixed"):
+    base = root/"validation/joint_rgb_v1"; public = base/"inputs"; private = base/"eval_private"
+    selected = load_public_predictions(base, camera_source=camera_source)
+    data, receipt, manifest = selected["data"], selected["receipt"], selected["manifest"]
+    receipt_sha, array_sha, manifest_sha = selected["receipt_sha"], selected["array_sha"], selected["manifest_sha"]
+    baseline = None
+    if camera_source == "learned":
+        # Both prediction sets must freeze and validate before opening private GT.
+        baseline = load_public_predictions(base, camera_source="fixed")
+        if (baseline["manifest_sha"] != manifest_sha
+                or baseline["receipt"].get("mask_report_sha") != receipt.get("mask_report_sha")
+                or baseline["receipt"].get("public_records") != receipt.get("public_records")
+                or not np.array_equal(baseline["data"]["object_masks"], data["object_masks"])
+                or not np.array_equal(baseline["data"]["human_faces"], data["human_faces"])):
+            raise ValueError("Paired camera experiment must consume the exact same ordered RGB/masks/topology")
+        report.update(fixed_camera_prediction_report_sha256=baseline["receipt_sha"],
+                      fixed_camera_arrays_sha256=baseline["array_sha"], paired_camera_predictions_frozen_before_private_truth_read=True)
     render_path = private/"render-report.json"; render_sha = sha256(render_path); require_hash(render_path, render_sha)
     render = json.loads(render_path.read_text())
     if (render.get("stage") != "own_joint_human_object_rgb_render" or render.get("status") != "pass"
@@ -199,6 +266,11 @@ def run(root, report):
     report.update(prediction_report_sha256=receipt_sha, arrays_sha256=array_sha, public_manifest_sha256=manifest_sha,
                   mask_report_sha256=receipt["mask_report_sha"], mask_report_independently_read=False,
                   render_report_sha256=render_sha, predictions_frozen_before_private_truth_read=True, frames=[], clips=[])
+    if camera_source == "learned":
+        report["learned_focal_pixels"] = data["camera_K"][:, 0, 0].tolist()
+        report["private_true_focal_pixels_diagnostic"] = [1280., 960., 1600.]
+        report["relative_focal_error_diagnostic_not_selection"] = (
+            np.abs(data["camera_K"][:, 0, 0] - [1280., 960., 1600.]) / [1280., 960., 1600.]).tolist()
     sim3 = None; truth_hashes = []
     for i in range(9):
         clip, frame = divmod(i, 3); stem = f"clip_{clip:02d}_frame_{frame:03d}"; rgb = manifest["images"][i]; record = render["cases"][i]
@@ -238,19 +310,40 @@ def run(root, report):
             "common_human_sim3_diagnostic": diagnostic, "alpha_permuted_negative_diagnostic": metrics(permuted, true_points, predicted_human, human),
             "true_visible_object_pixels": true_count, "predicted_object_valid_pixels": int(mask.sum()),
             "samples_each_max": SAMPLES, "truth_sha256": record["truth_sha256"]})
+        if baseline is not None:
+            prior = baseline["data"]; prior_mask = prior["object_masks"][i] & prior["moge_validity"][i]
+            if not np.array_equal(truth["human_faces"], prior["human_faces"]):
+                raise ValueError("Fixed and learned human correspondence topology differs")
+            report["frames"][-1]["fixed_camera_baseline"] = {
+                mode: metrics(sample_points(prior[key][i][prior_mask]), true_points,
+                              prior["human_vertices_camera_m"][i], human)
+                for mode, key in (("raw", "raw_points"), ("aligned", "aligned_points"))}
     for clip in range(3):
         entries = report["frames"][clip*3:clip*3+3]
         report["clips"][clip].update({f"{mode}_visible_chamfer_half_cm": float(np.mean([r["raw_camera"][mode]["visible_chamfer_half_cm"] for r in entries])) for mode in ("raw", "aligned")})
         report["clips"][clip]["common_human_sim3_diagnostic"] = {mode: float(np.mean([r["common_human_sim3_diagnostic"][mode]["visible_chamfer_half_cm"] for r in entries])) for mode in ("raw", "aligned")}
+        if baseline is not None:
+            report["clips"][clip]["fixed_camera_baseline"] = {
+                mode: float(np.mean([r["fixed_camera_baseline"][mode]["visible_chamfer_half_cm"] for r in entries]))
+                for mode in ("raw", "aligned")}
     report.update(decision=decision(report["clips"]), original_frame_coverage_verified=True,
                   shared_human_sim3_identical_for_both_methods=True, negative_diagnostic_used_for_selection=False)
-    for path, digest in [(receipt_path, receipt_sha), (array_path, array_sha), (render_path, render_sha), (manifest_path, manifest_sha), *truth_hashes]: require_hash(path, digest)
+    if baseline is not None:
+        paired = [{"raw_visible_chamfer_half_cm": r["fixed_camera_baseline"]["aligned"],
+                   "aligned_visible_chamfer_half_cm": r["aligned_visible_chamfer_half_cm"]} for r in report["clips"]]
+        report["camera_comparison_decision"] = decision(paired)
+        report["camera_comparison_scope"] = "learned_shared_K_aligned_vs_fixed_K1280_aligned_raw_camera_CD_all_nine_frames_no_alignment"
+    for path, digest in [*selected["files"], *((baseline or {}).get("files", [])), (render_path, render_sha), *truth_hashes]:
+        require_hash(path, digest)
 
 
 def main(argv=None):
-    argparse.ArgumentParser(description=__doc__, allow_abbrev=False).parse_args(argv)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    parser.add_argument("--camera-source", choices=("fixed", "learned"), default="fixed")
+    args = parser.parse_args(argv)
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}: raise RuntimeError("Require isolated remote CPU evaluation")
-    root = Path(os.environ["WR_ROOT"]); out = root/"validation/joint_rgb_v1/quality"; path = out/"report.json"
+    root = Path(os.environ["WR_ROOT"])
+    out = root/"validation/joint_rgb_v1"/("quality" if args.camera_source == "fixed" else "quality_camera_v1"); path = out/"report.json"
     if out.is_symlink() or not out.is_dir() or any(out.iterdir()): raise FileExistsError("Require exclusively reserved fresh quality directory")
     revision, image = os.environ.get("WR_CODE_REVISION", ""), os.environ.get("WR_IMAGE_ID", "")
     if not re.fullmatch(r"[0-9a-f]{40}", revision) or not re.fullmatch(r"sha256:[0-9a-f]{64}", image): raise ValueError("Immutable source/image required")
@@ -258,11 +351,12 @@ def main(argv=None):
         "gpu_used": False, "private_truth_read": True, "challenge_inputs_used": False, "adoption_performed": False,
         "main_score_alignment_performed": False, "diagnostic_first_frame_human_sim3_per_clip": True,
         "object_alignment_performed": False, "full_v2d_score_verified": False, "metric_scope": "visible pixel-sampled surfaces, symmetric half means, centimetres",
-        "budget_seconds": 60, "preregistered_gate": {"median_paired_clip_gain": .05, "max_clip_regression": .05, "complete_frames": 9}}
+        "budget_seconds": 60, "camera_source": args.camera_source,
+        "preregistered_gate": {"median_paired_clip_gain": .05, "max_clip_regression": .05, "complete_frames": 9}}
     started = time.perf_counter()
     def expired(*args): raise TimeoutError("Private J1 evaluation exceeded60s")
     signal.signal(signal.SIGALRM, expired); signal.signal(signal.SIGTERM, expired); signal.alarm(60)
-    try: run(root, report); report["status"] = "pass"
+    try: run(root, report, args.camera_source); report["status"] = "pass"
     except Exception as exc: report.update(error_type=type(exc).__name__, error=str(exc)); raise
     finally:
         signal.alarm(0); report["elapsed_seconds"] = time.perf_counter()-started

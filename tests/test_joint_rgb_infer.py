@@ -1,7 +1,9 @@
 """Pure tiny J1 schema/grounding contracts; no model, private truth or GPU."""
 import importlib.util
+from contextlib import nullcontext
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -140,3 +142,125 @@ def test_wrapper_mount_scope_and_unchanged_loaders(gate):
     assert 'inference_type="body"' in source and "cam_int=camera" in source and "apply_mask=False" in source
     assert "fit_shared_depth_scale" in source and "~object_masks" in source
     with pytest.raises(SystemExit): gate.main(["--episode", "0"])
+
+
+@pytest.mark.parametrize("focal", [1280., 960., 1600., 23., 12000.])
+def test_learned_camera_uses_actual_normalized_intrinsics_without_clamp(gate, focal):
+    K = np.array([[focal, 0., 512.], [0., focal, 384.], [0., 0., 1.]])
+    assert np.allclose(gate.camera_candidate(np.diag([1/1024, 1/768, 1.])@K), K)
+
+
+@pytest.mark.parametrize("fault", ["negative", "zero", "nan", "offcenter", "anisotropic", "skew", "projective", "dtype", "shape"])
+def test_native_learned_camera_fail_closed(gate, fault):
+    K = np.diag([1/1024, 1/768, 1.])@gate.CAMERA_K
+    if fault == "negative": K[0, 0] = -1.
+    elif fault == "zero": K[0, 0] = 0.
+    elif fault == "nan": K[0, 0] = np.nan
+    elif fault == "offcenter": K[0, 2] += .01
+    elif fault == "anisotropic": K[1, 1] *= 1.1
+    elif fault == "skew": K[0, 1] = .01
+    elif fault == "projective": K[2, 0] = .01
+    elif fault == "dtype": K = K.astype(int)
+    else: K = K[0]
+    with pytest.raises(ValueError): gate.camera_candidate(K)
+
+
+def test_three_frame_median_shared_clip_camera_no_truth_or_clamp(gate):
+    focals = np.array([2300., 1700., 2100., 15., 11., 16., 900., 750., 800.])
+    K = gate.clip_cameras(focals)
+    assert K.shape == (3, 3, 3) and np.array_equal(K[:, 0, 0], [2100., 15., 800.])
+    assert np.array_equal(K[:, 1, 1], K[:, 0, 0])
+    assert np.array_equal(K[:, :2, 2], [[512., 384.]]*3)
+    assert np.array_equal(focals, [2300., 1700., 2100., 15., 11., 16., 900., 750., 800.])
+    for bad in (focals[:8], focals.astype(int), np.full(9, np.nan), np.zeros(9)):
+        with pytest.raises(ValueError): gate.clip_cameras(bad)
+
+
+class TinyTensor(np.ndarray):
+    def float(self): return self.astype(np.float32)
+    def unsqueeze(self, dim): return np.expand_dims(self, dim)
+    def squeeze(self, dim): return np.ndarray.squeeze(self, axis=dim)
+
+
+def solver_fixture(gate, monkeypatch):
+    monkeypatch.setattr(gate, "WIDTH", 128); monkeypatch.setattr(gate, "HEIGHT", 128)
+    def nearest(x, size, mode):
+        assert size == (64, 64) and mode == "nearest"
+        return x[..., ::2, ::2]
+    torch = SimpleNamespace(is_tensor=lambda x: isinstance(x, TinyTensor), bool=np.bool_,
+        inference_mode=nullcontext, nn=SimpleNamespace(functional=SimpleNamespace(interpolate=nearest)))
+    points = np.ones((1, 128, 128, 3), np.float32).view(TinyTensor)
+    mask = np.zeros((1, 128, 128), bool).view(TinyTensor); mask[0, 0, 0] = mask[0, 2, 2] = True
+    calls = []
+    def original(p, m, *, focal, downsample_size):
+        calls.append((p, m, focal, downsample_size)); return "original_unchanged"
+    module = SimpleNamespace(recover_focal_shift=original)
+    def infer(image, *, fov_x, apply_mask):
+        assert apply_mask is False
+        return module.recover_focal_shift(points, mask, focal=None if fov_x is None else 1.)
+    return torch, module, SimpleNamespace(infer=infer), points, mask, calls, original
+
+
+def test_both_camera_passes_call_original_solver_and_restore(gate, monkeypatch):
+    torch, module, net, points, _, calls, original = solver_fixture(gate, monkeypatch); diagnostics = []
+    for i in range(18):
+        result = gate.checked_depth_infer(torch, module, net, points, None if i < 9 else 45., diagnostics, {"index": i})
+        assert result == "original_unchanged" and module.recover_focal_shift is original
+    assert len(calls) == len(diagnostics) == 18
+    assert all(r["native_nearest64_valid_pixels"] == 2 and r["original_solver_returned"] for r in diagnostics)
+    assert [r["focal_prior_supplied"] for r in diagnostics] == [False]*9+[True]*9
+
+
+def test_unsampled_valid_pixels_do_not_hide_native_fallback(gate, monkeypatch):
+    torch, module, net, points, mask, calls, original = solver_fixture(gate, monkeypatch)
+    mask[:] = False; mask[0, 1::2, 1::2] = True; mask[0, 0, 0] = True; diagnostics = []
+    with pytest.raises(ValueError, match="default-camera fallback"):
+        gate.checked_depth_infer(torch, module, net, points, None, diagnostics, {})
+    assert not calls and module.recover_focal_shift is original
+    assert diagnostics == [{"native_nearest64_valid_pixels": 1, "focal_prior_supplied": False, "original_solver_returned": False}]
+
+
+@pytest.mark.parametrize("fault", ["mask_dtype", "mask_shape", "backend", "no_solver"])
+def test_solver_abi_or_backend_errors_restore_hook(gate, monkeypatch, fault):
+    torch, module, net, points, mask, _, original = solver_fixture(gate, monkeypatch)
+    if fault == "mask_dtype": net.infer = lambda *a, **k: module.recover_focal_shift(points, mask.astype(float))
+    elif fault == "mask_shape": net.infer = lambda *a, **k: module.recover_focal_shift(points, mask[0])
+    elif fault == "backend":
+        def fail(*a, **k): raise RuntimeError("backend failure")
+        net.infer = fail
+    else: net.infer = lambda *a, **k: None
+    with pytest.raises(RuntimeError): gate.checked_depth_infer(torch, module, net, points, None, [], {})
+    assert module.recover_focal_shift is original
+
+
+def test_explicit_learned_K_pointmap_validation(gate, monkeypatch):
+    monkeypatch.setattr(gate, "HEIGHT", 6); monkeypatch.setattr(gate, "WIDTH", 8)
+    K = np.array([[11., 0., 4.], [0., 11., 3.], [0., 0., 1.]])
+    y, x = np.mgrid[:6, :8]; depth = np.full((6, 8), 2., np.float32)
+    p = np.stack(((x+.5-4)/11*depth, (y+.5-3)/11*depth, depth), axis=-1).astype(np.float32)
+    assert gate.pointmap_contract(depth, p, np.ones((6, 8), bool), np.diag([1/8, 1/6, 1.])@K, K)["status"] == "pass"
+    with pytest.raises(ValueError): gate.pointmap_contract(depth, p, np.ones((6, 8), bool), np.diag([1/8, 1/6, 1.])@K, K*2)
+
+
+def test_learned_namespace_failure_never_overwrites_fixed(gate, tmp_path, monkeypatch):
+    base = tmp_path/"validation/joint_rgb_v1"; fixed = base/"predictions"; fixed.mkdir(parents=True)
+    (fixed/"report.json").write_bytes(b"immutable J1")
+    out = base/"predictions_camera_v1"; out.mkdir()
+    monkeypatch.setenv("WR_ROOT", str(tmp_path)); monkeypatch.setenv("WR_CODE_REVISION", "a"*40); monkeypatch.setenv("WR_IMAGE_ID", "sha256:"+"b"*64)
+    monkeypatch.setattr(gate.platform, "system", lambda: "Linux"); iterdir = gate.Path.iterdir
+    monkeypatch.setattr(gate.Path, "iterdir", lambda p: [Path("lo")] if str(p) == "/sys/class/net" else iterdir(p))
+    with pytest.raises(ValueError): gate.main(["--camera-source", "learned"])
+    report = json.loads((out/"report.json").read_text())
+    assert report["stage"] == gate.CAMERA_STAGE and report["budget_seconds"] == 600
+    assert report["camera_source"] == "learned" and report["focal_fitted"] is True and report["camera_prior"] is None
+    assert report["body_calls_completed"] == report["MoGe_calls_completed"] == 0
+    assert (fixed/"report.json").read_bytes() == b"immutable J1"
+
+
+def test_learned_wrapper_scope_and_network_call_contract(gate):
+    source = Path(gate.__file__).read_text(); wrapper = Path(gate.__file__).with_name("run_joint_rgb_camera_infer.sh").read_text()
+    assert "603s docker run" in wrapper and '--camera-source learned' in wrapper and 'OUT="$BASE/predictions_camera_v1"' in wrapper
+    assert '--memory 32g --cpus 4' in wrapper and '--network none' in wrapper and 'eval_private' not in wrapper
+    assert '"camera_K": cameras if learned else CAMERA_K.copy()' in source
+    assert 'camera_candidate(normalized)' in source and 'focal_candidates_pixels=focals.tolist()' in source
+    assert 'chown -R' not in wrapper

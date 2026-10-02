@@ -226,3 +226,98 @@ def test_frozen_hash_rejects_symlink_and_byte_tamper(evaluate, tmp_path):
     with pytest.raises(ValueError): evaluate.require_hash(link, digest)
     p.write_bytes(b"two")
     with pytest.raises(ValueError): evaluate.require_hash(p, digest)
+
+
+@pytest.fixture
+def camera_frozen(evaluate, frozen):
+    root, fixed, receipt = frozen; base = root/"validation/joint_rgb_v1"
+    predicted = base/"predictions_camera_v1"; predicted.mkdir()
+    learned = {k: v.copy() for k, v in fixed.items()}
+    learned["camera_K"] = np.array([[[f, 0., 4.], [0., f, 3.], [0., 0., 1.]] for f in [1200., 1000., 1500.]])
+    # Numerical fixture, not real model accuracy: learned depths are perfect.
+    learned["raw_points"] *= .8
+    learned["aligned_points"] = learned["raw_points"].copy()
+    learned["shared_scale"] = np.ones(3)
+    candidates = [1190., 1200., 1210., 990., 1000., 1010., 1490., 1500., 1510.]
+    learned_receipt = dict(receipt, stage="public_joint_rgb_learned_camera_shared_grounding_predictions",
+                           camera_source="learned", focal_fitted=True, focal_candidates_pixels=candidates,
+                           actual_body_inference=True, actual_MoGe_inference=True, actual_predicted_human_render=True,
+                           focal_geometry_source_sha256=evaluate.FOCAL_GEOMETRY_SHA,
+                           native_camera_support_verified=True, body_calls_completed=9, MoGe_calls_completed=18,
+                           MoGe_camera_calls_completed=9, MoGe_fixed_camera_calls_completed=9,
+                           native_focal_solver_calls=[{"file": f"clip_{(i%9)//3:02d}_frame_{i%3:03d}.png",
+                               "clip_index": (i%9)//3, "frame_index": i%3,
+                               "pass": "camera_candidate" if i < 9 else "shared_camera",
+                               "focal_prior_supplied": i >= 9, "original_solver_returned": True,
+                               "native_nearest64_valid_pixels": 42} for i in range(18)])
+    # Fixed-K aligned result has 10% residual scale to create a paired gate.
+    fixed["shared_scale"] = np.full(3, .88)
+    fixed["aligned_points"] = fixed["raw_points"] * .88
+    np.savez(base/"predictions/arrays.npz", **fixed)
+    receipt["arrays_sha256"] = evaluate.sha256(base/"predictions/arrays.npz")
+    write_json(base/"predictions/report.json", receipt)
+    def sync():
+        np.savez(predicted/"arrays.npz", **learned)
+        learned_receipt["arrays_sha256"] = evaluate.sha256(predicted/"arrays.npz")
+        write_json(predicted/"report.json", learned_receipt)
+    sync()
+    return root, fixed, receipt, learned, learned_receipt, sync
+
+
+def test_actual_paired_numeric_camera_eval_all_frames_and_baseline_freeze(evaluate, camera_frozen):
+    root, _, _, _, _, _ = camera_frozen; report = {}
+    evaluate.run(root, report, "learned")
+    assert report["paired_camera_predictions_frozen_before_private_truth_read"]
+    assert len(report["frames"]) == 9 and len(report["clips"]) == 3
+    assert report["camera_comparison_decision"]["synthetic_hypothesis_supported"]
+    assert report["camera_comparison_decision"]["median_paired_clip_relative_gain"] == pytest.approx(1.)
+    assert not report["decision"]["synthetic_hypothesis_supported"]  # Identity alpha is a separate gate.
+    if not report["decision"]["zero_baseline_gain_undefined"]:
+        assert report["decision"]["median_paired_clip_relative_gain"] == pytest.approx(0.)
+    for frame in report["frames"]:
+        assert frame["fixed_camera_baseline"]["aligned"]["visible_chamfer_half_cm"] > 19
+        assert frame["raw_camera"]["aligned"]["visible_chamfer_half_cm"] < 1e-12
+
+
+@pytest.mark.parametrize("fault", ["fixed_sha", "private_flag", "candidate_median", "missing_candidate", "wrong_stage",
+                                   "extra_arrays", "perframe_K", "offcenter", "nonisotropic", "mask_change", "source_change",
+                                   "partial_calls", "solver_fallback", "solver_order", "body_missing"])
+def test_camera_both_producers_checked_before_any_private_data(evaluate, camera_frozen, monkeypatch, fault):
+    root, _, fixed_receipt, learned, receipt, sync = camera_frozen; base = root/"validation/joint_rgb_v1"
+    if fault == "fixed_sha":
+        fixed_receipt["arrays_sha256"] = "0"*64; write_json(base/"predictions/report.json", fixed_receipt)
+    elif fault == "private_flag": receipt["private_truth_read"] = True
+    elif fault == "candidate_median": receipt["focal_candidates_pixels"][1] = 1300.
+    elif fault == "missing_candidate": receipt["focal_candidates_pixels"] = []
+    elif fault == "wrong_stage": receipt["stage"] = "public_joint_rgb_shared_grounding_predictions"
+    elif fault == "extra_arrays": learned["source_GT_K"] = learned["camera_K"].copy()
+    elif fault == "perframe_K": learned["camera_K"] = np.repeat(learned["camera_K"], 3, axis=0)
+    elif fault == "offcenter": learned["camera_K"][0, 0, 2] += 1.
+    elif fault == "nonisotropic": learned["camera_K"][0, 1, 1] += 1.
+    elif fault == "mask_change": learned["object_masks"][0, 0, 0] = False
+    elif fault == "source_change": receipt["public_records"][0] = dict(receipt["public_records"][0], human_mask_sha256="e"*64)
+    elif fault == "partial_calls": receipt["native_focal_solver_calls"] = receipt["native_focal_solver_calls"][:-1]
+    elif fault == "solver_fallback": receipt["native_focal_solver_calls"][0]["native_nearest64_valid_pixels"] = 1
+    elif fault == "solver_order": receipt["native_focal_solver_calls"][0]["focal_prior_supplied"] = True
+    elif fault == "body_missing": receipt["body_calls_completed"] = 8
+    sync()
+    original = evaluate.require_hash
+    def guard(path, digest):
+        assert "eval_private" not in str(path), "Private data opened before paired producer rejection"
+        return original(path, digest)
+    monkeypatch.setattr(evaluate, "require_hash", guard)
+    with pytest.raises(ValueError): evaluate.run(root, {}, "learned")
+
+
+def test_learned_K_never_accepted_as_fixed_prior(evaluate, camera_frozen):
+    with pytest.raises(ValueError): evaluate.validate_predictions(camera_frozen[3], "fixed")
+    evaluate.validate_predictions(camera_frozen[3], "learned")
+
+
+def test_camera_eval_wrapper_mounts_both_predictions_readonly_but_not_models():
+    source = (Path(__file__).parents[1]/"infra/run_joint_rgb_camera_evaluate.sh").read_text()
+    assert "--gpus" not in source and "src=$ROOT/weights" not in source
+    assert "src=$BASE/predictions,dst=$BASE/predictions,readonly" in source
+    assert "src=$BASE/predictions_camera_v1,dst=$BASE/predictions_camera_v1,readonly" in source
+    assert "--camera-source learned" in source and "quality_camera_v1" in source
+    subprocess.run(["bash", "-n", str(Path(__file__).parents[1]/"infra/run_joint_rgb_camera_evaluate.sh")], check=True)

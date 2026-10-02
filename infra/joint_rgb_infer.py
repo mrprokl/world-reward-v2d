@@ -1,4 +1,4 @@
-"""Public RGB-only predicted-human grounding of MoGe2, with fixed camera prior.
+"""Public RGB-only grounding, with fixed or RGB-learned clip-shared camera.
 
 Nine images/masks are inference inputs. Neither renderer truth nor calibration
 is accessible. Shared alpha aligns two predictions per clip, not metric truth;
@@ -24,8 +24,10 @@ from world_reward.metric_alignment import fit_shared_depth_scale
 from world_reward.pointmap import validate_camera_pointmap
 
 STAGE = "public_joint_rgb_shared_grounding_predictions"
+CAMERA_STAGE = "public_joint_rgb_learned_camera_shared_grounding_predictions"
 WIDTH, HEIGHT, CLIPS, FRAMES, BUDGET = 1024, 768, 3, 3, 300
 CAMERA_K = np.array([[1280., 0., 512.], [0., 1280., 384.], [0., 0., 1.]])
+GEOMETRY_SHA = "2f8d5de7d671af16d25fe13c555fd73855d8447bc086bb23aa42e859b303fb05"
 
 
 def public_inputs(root):
@@ -75,11 +77,61 @@ def read_mask(path, Image):
     return mask
 
 
-def pointmap_contract(depth, points, validity, normalized):
+def pointmap_contract(depth, points, validity, normalized, camera_matrix=None):
     if (depth.shape != (HEIGHT, WIDTH) or points.shape != (HEIGHT, WIDTH, 3) or validity.shape != (HEIGHT, WIDTH)
             or depth.dtype != np.float32 or points.dtype != np.float32 or validity.dtype != np.bool_):
         raise ValueError("Require original float32 MoGe depth/XYZ and boolean validity")
-    return validate_camera_pointmap(depth, points, validity, normalized, CAMERA_K)
+    return validate_camera_pointmap(depth, points, validity, normalized, CAMERA_K if camera_matrix is None else camera_matrix)
+
+
+def camera_candidate(normalized):
+    """Actual MoGe normalized K -> centered, isotropic pixel K; no clamping."""
+    normalized = np.asarray(normalized)
+    if normalized.shape != (3, 3) or normalized.dtype.kind != "f" or not np.isfinite(normalized).all():
+        raise ValueError("Native learned intrinsics must be finite floating3x3")
+    K = np.diag([WIDTH, HEIGHT, 1.]) @ normalized
+    focal = float(K[0, 0]); wanted = np.array([[focal, 0., WIDTH/2], [0., focal, HEIGHT/2], [0., 0., 1.]])
+    if focal <= 0 or not np.allclose(K, wanted, rtol=1e-6, atol=1e-3):
+        raise ValueError("Native learned camera must have positive isotropic focal and centered principal point")
+    return wanted
+
+
+def clip_cameras(focals):
+    values = np.asarray(focals)
+    if values.shape != (CLIPS*FRAMES,) or values.dtype.kind != "f" or not np.isfinite(values).all() or np.any(values <= 0):
+        raise ValueError("Require all nine positive finite RGB-learned focal candidates")
+    shared = np.median(values.reshape(CLIPS, FRAMES), axis=1)
+    cameras = np.repeat(CAMERA_K[None], CLIPS, axis=0)
+    cameras[:, 0, 0] = cameras[:, 1, 1] = shared
+    return cameras
+
+
+def checked_depth_infer(torch, module, network, tensor, fov, diagnostics, context):
+    """Reject native <2 nearest64x64 solver fallback, calling original unchanged.
+
+    The process-local instrumentation is restored even on failure. Its source
+    is SHA-verified before either pass; this is support, not calibration proof.
+    """
+    original = module.recover_focal_shift
+    before = len(diagnostics)
+    def checked(points, mask=None, focal=None, downsample_size=(64, 64)):
+        if (downsample_size != (64, 64) or not torch.is_tensor(mask) or mask.dtype != torch.bool
+                or tuple(mask.shape) != (1, HEIGHT, WIDTH) or tuple(points.shape) != (1, HEIGHT, WIDTH, 3)):
+            raise RuntimeError("Native focal solver boolean mask/shape/sampling ABI changed")
+        sampled = torch.nn.functional.interpolate(mask.float().unsqueeze(1), (64, 64), mode="nearest").squeeze(1) > 0
+        count = int(sampled.sum().item())
+        entry = {**context, "native_nearest64_valid_pixels": count, "focal_prior_supplied": focal is not None,
+                 "original_solver_returned": False}; diagnostics.append(entry)
+        if count < 2: raise ValueError("Native focal solver lacks two sampled valid pixels; reject its default-camera fallback")
+        result = original(points, mask, focal=focal, downsample_size=downsample_size)
+        entry["original_solver_returned"] = True
+        return result
+    module.recover_focal_shift = checked
+    try:
+        with torch.inference_mode(): result = network.infer(tensor[None], fov_x=fov, apply_mask=False)
+        if len(diagnostics) != before+1: raise RuntimeError("Each native MoGe inference must invoke its audited focal solver exactly once")
+        return result
+    finally: module.recover_focal_shift = original
 
 
 def align_clips(raw_points, raw_depths, rendered_depths, render_masks, human_masks, object_masks, validity):
@@ -108,6 +160,7 @@ def run_inference(root, report, path):
     report.update(acquisition_report=acquisition, MoGe_model_asset=asset, MoGe_model_revision=depth_model.MODEL_REVISION, phase="model_load"); human._write(path, report)
     import torch
     import moge
+    from moge.model import v2 as depth_module
     from moge.model.v2 import MoGeModel
     from PIL import Image
     if not torch.cuda.is_available(): raise RuntimeError("CUDA required; no CPU fallback")
@@ -115,8 +168,36 @@ def run_inference(root, report, path):
     report["MoGe_source"] = depth_model.installed_source(Path(moge.__file__).parent, json.loads(direct) if direct else {})
     model, estimator, faces, source = human.load_model(root, torch); report.update(body_model=source, torch=torch.__version__)
     depth_net = MoGeModel.from_pretrained(str(asset_path)).cuda().eval()
-    camera = torch.from_numpy(CAMERA_K.astype(np.float32))[None].cuda()
-    fov = float(np.degrees(2*np.arctan(WIDTH/(2*CAMERA_K[0, 0]))))
+    learned = report.get("camera_source", "fixed") == "learned"
+    cameras = np.repeat(CAMERA_K[None], CLIPS, axis=0)
+    if learned:
+        from moge.utils import geometry_torch
+        if (depth_model.identity(Path(geometry_torch.__file__))["sha256"] != GEOMETRY_SHA
+                or depth_module.recover_focal_shift is not geometry_torch.recover_focal_shift):
+            raise RuntimeError("Require exact pinned native focal solver sampling/source")
+        report.update(focal_geometry_source_sha256=GEOMETRY_SHA, camera_candidates=[], native_focal_solver_calls=[],
+                      MoGe_camera_calls_completed=0, MoGe_fixed_camera_calls_completed=0)
+        for record in records:
+            report.update(phase="learned_camera", active_file=record["file"]); human._write(path, report)
+            with Image.open(record["image_path"]) as png:
+                if png.format != "PNG" or png.mode != "RGB" or png.size != (WIDTH, HEIGHT): raise ValueError("Require original RGB PNG")
+                rgb = np.asarray(png).copy()
+            tensor = torch.from_numpy(rgb).cuda().permute(2, 0, 1).float()/255
+            context = {"file": record["file"], "clip_index": record["clip_index"], "frame_index": record["frame_index"], "pass": "camera_candidate"}
+            predicted = checked_depth_infer(torch, depth_module, depth_net, tensor, None, report["native_focal_solver_calls"], context)
+            torch.cuda.synchronize()
+            depth, points, valid, normalized = [predicted[k][0].detach().cpu().numpy() for k in ("depth", "points", "mask", "intrinsics")]
+            candidate = camera_candidate(normalized); checks = pointmap_contract(depth, points, valid, normalized, candidate)
+            report["camera_candidates"].append({**context, "focal_pixels": float(candidate[0, 0]), "pointmap_checks": checks,
+                                                "decoded_RGB_sha256": hashlib.sha256(rgb.tobytes()).hexdigest()})
+            report.update(MoGe_camera_calls_completed=len(report["camera_candidates"]), MoGe_calls_completed=len(report["camera_candidates"]))
+            human._write(path, report); del predicted, tensor
+        focals = np.array([r["focal_pixels"] for r in report["camera_candidates"]], np.float64)
+        cameras = clip_cameras(focals)
+        report.update(focal_candidates_pixels=focals.tolist(), clip_focal_pixels=cameras[:, 0, 0].tolist(),
+                      camera_K=cameras.tolist(), focal_aggregation="median_all_three_frames_per_clip_no_clamp",
+                      native_camera_support_verified=True, calibration_accuracy_verified=False)
+        human._write(path, report)
     vertices = []; points_all = []; depths = []; validities = []; human_masks = []; object_masks = []; silhouettes = []; renders = []
     for record in records:
         report.update(phase="inference", active_file=record["file"]); human._write(path, report)
@@ -125,17 +206,26 @@ def run_inference(root, report, path):
             rgb = np.asarray(png).copy()
         human_mask = read_mask(record["human_mask_path"], Image); object_mask = read_mask(record["object_mask_path"], Image)
         box, modelmask = human.derived_bbox(rgb, human_mask)
+        camera_matrix = cameras[record["clip_index"]]
+        camera = torch.from_numpy(camera_matrix.astype(np.float32))[None].cuda()
+        fov = float(np.degrees(2*np.arctan(WIDTH/(2*camera_matrix[0, 0]))))
         with torch.inference_mode():
             prediction = estimator.process_one_image(img=rgb, bboxes=box[None], masks=modelmask, cam_int=camera, inference_type="body")
         if not isinstance(prediction, list) or len(prediction) != 1: raise RuntimeError("Exactly one Body prediction required")
         body_values, errors = human.decode_prediction(torch, model, prediction[0], "body")
-        if not np.isclose(float(body_values["focal_length"]), CAMERA_K[0, 0], rtol=1e-6, atol=1e-4): raise RuntimeError("Body ignored explicit fixed camera prior")
+        if not np.isclose(float(body_values["focal_length"]), camera_matrix[0, 0], rtol=1e-6, atol=1e-4): raise RuntimeError("Body ignored explicit shared camera")
         tensor = torch.from_numpy(rgb).cuda().permute(2, 0, 1).float()/255
-        with torch.inference_mode(): predicted = depth_net.infer(tensor[None], fov_x=fov, apply_mask=False)
+        if learned:
+            if hashlib.sha256(rgb.tobytes()).hexdigest() != report["camera_candidates"][len(vertices)]["decoded_RGB_sha256"]:
+                raise ValueError("Both actual camera passes must consume identical decoded RGB")
+            context = {"file": record["file"], "clip_index": record["clip_index"], "frame_index": record["frame_index"], "pass": "shared_camera"}
+            predicted = checked_depth_infer(torch, depth_module, depth_net, tensor, fov, report["native_focal_solver_calls"], context)
+        else:
+            with torch.inference_mode(): predicted = depth_net.infer(tensor[None], fov_x=fov, apply_mask=False)
         torch.cuda.synchronize()
         depth, points, valid, normalized = [predicted[k][0].detach().cpu().numpy() for k in ("depth", "points", "mask", "intrinsics")]
-        checks = pointmap_contract(depth, points, valid, normalized)
-        silhouette, rendered = raster_camera_mesh(body_values["vertices_camera_m"], faces, CAMERA_K, WIDTH, HEIGHT)
+        checks = pointmap_contract(depth, points, valid, normalized, camera_matrix)
+        silhouette, rendered = raster_camera_mesh(body_values["vertices_camera_m"], faces, camera_matrix, WIDTH, HEIGHT)
         silhouette, rendered = silhouette.cpu().numpy(), rendered.cpu().numpy()
         vertices.append(body_values["vertices_camera_m"]); points_all.append(points); depths.append(depth); validities.append(valid)
         human_masks.append(human_mask > 0); object_masks.append(object_mask > 0); silhouettes.append(silhouette); renders.append(rendered)
@@ -143,13 +233,15 @@ def run_inference(root, report, path):
             "decoded_RGB_sha256": hashlib.sha256(rgb.tobytes()).hexdigest(), "bbox_xyxy": box.tolist(), "native_forward_errors": errors,
             "pointmap_checks": checks, "human_silhouette_iou": silhouette_iou(silhouette, human_mask > 0),
             "alignment_pixels": int(np.count_nonzero(silhouette & (human_mask > 0) & ~(object_mask > 0) & valid))})
-        report.update(body_calls_completed=len(vertices), MoGe_calls_completed=len(points_all)); human._write(path, report)
+        report.update(body_calls_completed=len(vertices), MoGe_calls_completed=len(points_all)+(CLIPS*FRAMES if learned else 0))
+        if learned: report["MoGe_fixed_camera_calls_completed"] = len(points_all)
+        human._write(path, report)
         del predicted, tensor, prediction
     raw_points, raw_depths, validity = np.stack(points_all), np.stack(depths), np.stack(validities)
     aligned, scales, diagnostics = align_clips(raw_points, raw_depths, np.stack(renders), np.stack(silhouettes), np.stack(human_masks), np.stack(object_masks), validity)
     arrays = {"raw_points": raw_points, "aligned_points": aligned, "human_vertices_camera_m": np.stack(vertices), "human_faces": faces,
         "object_masks": np.stack(object_masks), "moge_validity": validity, "shared_scale": scales,
-        "frame_index": np.tile(np.arange(FRAMES, dtype=np.int64), CLIPS), "clip_index": np.repeat(np.arange(CLIPS, dtype=np.int64), FRAMES), "camera_K": CAMERA_K.copy()}
+        "frame_index": np.tile(np.arange(FRAMES, dtype=np.int64), CLIPS), "clip_index": np.repeat(np.arange(CLIPS, dtype=np.int64), FRAMES), "camera_K": cameras if learned else CAMERA_K.copy()}
     artifact = path.parent/"arrays.npz"
     with artifact.open("xb") as stream: np.savez_compressed(stream, **arrays)
     report.update(arrays_sha256=sha256(artifact), shared_scale=scales.tolist(), per_clip_scale_diagnostics=diagnostics,
@@ -159,24 +251,27 @@ def run_inference(root, report, path):
 
 
 def main(argv=None):
-    argparse.ArgumentParser(description=__doc__, allow_abbrev=False).parse_args(argv)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    parser.add_argument("--camera-source", choices=("fixed", "learned"), default="fixed")
+    args = parser.parse_args(argv); learned = args.camera_source == "learned"; budget = 600 if learned else BUDGET
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}: raise RuntimeError("Require remote Linux CUDA network-none")
-    root = Path(os.environ["WR_ROOT"]); output = root/"validation/joint_rgb_v1/predictions"; path = output/"report.json"
+    root = Path(os.environ["WR_ROOT"]); output = root/"validation/joint_rgb_v1"/("predictions_camera_v1" if learned else "predictions"); path = output/"report.json"
     if output.is_symlink() or not output.is_dir() or any(output.iterdir()): raise FileExistsError("Require exclusively reserved empty predictions directory")
     revision, image = os.environ["WR_CODE_REVISION"], os.environ["WR_IMAGE_ID"]
     if not re.fullmatch("[0-9a-f]{40}", revision) or not re.fullmatch("sha256:[0-9a-f]{64}", image): raise ValueError("Require immutable inference source/image")
-    report = {"stage": STAGE, "status": "fail", "phase": "integrity", "producer_revision": revision, "image_id": image,
+    report = {"stage": CAMERA_STAGE if learned else STAGE, "status": "fail", "phase": "integrity", "producer_revision": revision, "image_id": image,
         "script_sha256": sha256(Path(__file__)), "body_loader_sha256": sha256(Path(human.__file__)), "body_helper_sha256": sha256(Path(human.body.__file__)),
-        "MoGe_helper_sha256": sha256(Path(depth_model.__file__)), "budget_seconds": BUDGET, "private_truth_read": False,
+        "MoGe_helper_sha256": sha256(Path(depth_model.__file__)), "budget_seconds": budget, "private_truth_read": False,
         "render_helper_sha256": sha256(Path(__file__).with_name("camera_render.py")),
         "challenge_inputs_used": False, "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": [], "adoption_performed": False,
-        "calibration_accuracy_verified": False, "metric_scale_accuracy_verified": False, "camera_prior": CAMERA_K.tolist(), "focal_fitted": False,
+        "calibration_accuracy_verified": False, "metric_scale_accuracy_verified": False, "camera_prior": None if learned else CAMERA_K.tolist(),
+        "camera_source": args.camera_source, "focal_fitted": learned,
         "alpha_source": "rendered_predicted_human_not_ground_truth", "alpha_scope": "one_scalar_per_three_frame_clip_XYZ_once",
         "human_geometry_scaled": False, "pointmap_geometry_filled": False, "apply_mask": False, "body_inference_type": "body",
         "prompt_mode": "automatic_human_mask_and_derived_bbox", "frames": [], "body_calls_completed": 0, "MoGe_calls_completed": 0}
     start = time.perf_counter()
-    def expired(*args): raise TimeoutError("Whole J1 inference exceeded300s")
-    alarm = signal.signal(signal.SIGALRM, expired); term = signal.signal(signal.SIGTERM, expired); signal.alarm(BUDGET)
+    def expired(*args): raise TimeoutError(f"Whole joint RGB inference exceeded{budget}s")
+    alarm = signal.signal(signal.SIGALRM, expired); term = signal.signal(signal.SIGTERM, expired); signal.alarm(budget)
     try: human._write(path, report); run_inference(root, report, path)
     except Exception as error: report.update(error_type=type(error).__name__, error=str(error)); raise
     finally:

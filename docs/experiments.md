@@ -1129,3 +1129,21 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Tests ciblés cache/refine65PASS2.26s et consommateurs529PASS22.81s;
   précédent full-suite3689PASS/1optional-trimeshSKIP33.32s. Aucune adoption,
   dérogation licence ou règle Kaggle acceptée par ce lancement.
+- 2026-10-02 D70: nouvelle hypothèse caméra J2, fondée sur l'ambiguïté
+  focal/Z-shift des modèles, pas sur résultats privés J1 encore inconnus.
+  Même9RGB/mêmes masques automatiques, sans nouveau rendering/modèle/GT.
+  MoGe2(None) neuf fois → medianf trois frames par clip → nouveau MoGe2 avec
+  FOV fixé et nouveau Body avec exactement le même K. Une alpha humaine
+  commune par clip appliquée une seule fois àXYZ, humain inchangé. Aucun
+  rescaling de traduction sauvegardée ou changement de K sans recalcul natif
+  Zshift. Budget600s, nouveau namespace `predictions_camera_v1`; ancien J1
+  fixe1280 immuable. Instrumenter seulement le solveur natif hashé pour refuser
+  fallback<2pixels nearest64 avant solve; appeler l'original inchangé et
+  restaurer enfin, vérifier18calls natifs et9Body. K centré/squarepixel positif,
+  pas clamp/GT/calibration promise. Comparaison principale: CD caméra brut
+  **aligned-learned contre aligned-fixed**, seuils J1 inchangés median gain≥5%
+  et aucun clip régression>5%, tous9frames y compris contrôles960/1600.
+  Les deux bundles/masques/RGB sont vérifiés avant ouverture du GT privé;
+  diagnostiques focal et Sim3 ne sélectionnent rien. Aucun score de cette
+  fixture n'est la métrique complète V2D. Préparer queue derrière raffinement
+  épisode15, sans changer/reprendre jobs actuellement actifs.
