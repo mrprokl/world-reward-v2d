@@ -10,6 +10,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import errno
+import shutil
 from pathlib import Path
 import platform
 import sys
@@ -102,7 +104,14 @@ def main():
     video_link = output / (sequence + ".0.color.mp4")
     # Native prep resolves symlinks before validating its .0.color.mp4 ABI.
     # Same managed disk: a hardlink preserves bytes without duplicating video.
-    os.link(inputs["video"], video_link)
+    try:
+        os.link(inputs["video"], video_link)
+    except OSError as exc:
+        if exc.errno != errno.EXDEV:
+            raise
+        # Docker bind mounts are separate mountpoints even on one disk.
+        # Copy only within Azure, never across the laptop/tethered connection.
+        shutil.copyfile(inputs["video"], video_link)
     if sha256(video_link) != inputs["video_sha256"]:
         raise RuntimeError("Native video alias differs from original Track 1 bytes")
     metric_path = output / "object_metric.glb"
