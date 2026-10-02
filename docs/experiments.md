@@ -1071,3 +1071,7 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   files remain remote and are removed after retained digest/timing decisions.
   No active-chain changes, geometry/accuracy claim, compression/gate relaxation
   or external acquisition. Record concurrent GPU/CPU load if benchmark executes.
+  Native source SHA14297609…5b0c5; source/runtime contracts full tiny suite
+ 3577PASS/1optional-trimeshSKIP33.33s. Benchmark will use CPU4/16g with no
+  GPU visibility; active pose process remains unchanged. Shared-host throughput
+  is explicitly not isolated whole-pipeline timing.
