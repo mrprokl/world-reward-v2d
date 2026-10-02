@@ -1854,6 +1854,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   tuple regression test also rejects numerical1e−12change; preservefailedv1,
   use exclusive diagnostic_centroid_v2. No model runs or prediction changes.
 
+  D89v2 actualPASS11.376439s/source15382d53a28476aee72c3f93a8609ccb0b876469,
+  receiptddaf0a690c94197f33c9b1148308709bf3cf6d39c463928070210f1856642fdf.
+  Original D87 decision/metrics/SHA replay exact in JSON value domain; all15
+  frozen frames unchanged. Raw cameraPVE[96.397263,90.780927,182.034193]cm;
+  meanframecenteredRMS[4.948759,5.279616,5.982611]cm. Meanframecentroid-squared
+  fractions[.997212944,.996489146,.998887970]: global centroid error dominates
+  **this synthetic raw-camera measure**, not a demonstrated Track1 failure or
+  proof of constant gauge over time. Sharedidentity centeredRMS
+  [4.973102,5.303134,5.969669]cm; originalrejection stands. No Sim3, corrections,
+  causalcamera claim or handdominance assumption. CPU-only/modelcalls0,
+  bundle24files98,636B; no heavy local transfer. Finalsource suite5012PASS/
+  1optionaltrimeshSKIP71.91s, diagnostics40PASS including all15NPZ integrity.
+
 - D90 public-only identity-consensus gate predeclared before run: ep000000
   existing790Body predictions,12rounded uniform temporal anchors,11disjoint
   integer midpoint frames. Decode12identities in the SAME native zero-pose,
