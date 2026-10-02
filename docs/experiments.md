@@ -1276,3 +1276,8 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   transfer helpers56tinytests PASS22.48s. CPU/H100/image checks still pending;
   no secondGPU measurement/adoption. Export uses SHA-bound pinned CARI image,
   exact MoGe chain and independent TUD-L subset only, not active containers.
+- 2026-10-02 R98: VM02 provisioning/H100/CC ON/HTTPS egress **PASS**.
+  First runtime dispatch FAIL209/STDOUT before Python/shell: missing new
+  `results` directory in launcher-assumed fresh root. No Docker/config/GPU ran;
+  fix scoped fresh root1000/results only and new v2 unit, retain v1 failure.
+  This is bootstrap integration evidence, not research-model inference.

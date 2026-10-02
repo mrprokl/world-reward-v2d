@@ -259,3 +259,12 @@ new NSG denies ingress except temporary10.0.0.4/32→22. No existing network pol
 modified. Fresh runtime/bootstrap and task-only archive helpers have56 tiny
 tests PASS22.48s; no runtime/GPU success yet. Original prepare0 still750/790 at
 19:06UTC, active without errors; no duplicate GPU job or reader restart.
+
+19:08UTC VM02 provisioning **PASS**, actualH100NVL95830MiB/driver595.71.05,
+CC ON, Docker29.5.3/containerd2.2.4/NVIDIA runtime1.19.1; HF HTTPS200 egress.
+19:11UTC initial runtime launch failed209/STDOUT **before script execution**:
+new immutable launcher creates jobs/root but assumed `results` existed. No
+private Docker/containers started. Repair only fresh task-root ownership/results
+directory, keep failed unit untouched, dispatch runtime-v2 separately; don't
+restart or weaken bootstrap checks. Image/assets export runs CPU-only onVM01
+at low scheduling/I/O priority; source queue still750/790, no GPU contention.
