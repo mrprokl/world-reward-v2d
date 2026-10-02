@@ -12,14 +12,24 @@ native decoded scale explicitly isotropic. SSI/downsample are already applied.
 New public object generation stores actual raw vertices/faces and verifies
 native export, serialization and imported compose_transform against this order.
 
-Next decisive cohort: two new asymmetric closed procedural objects, six rendered
+Completed decisive cohort: two new asymmetric closed procedural objects, six rendered
 RGBs each. Private geometry/cameras/visibility remain isolated. Only RGB views
 0/2/4 enter automatic color-background segmentation and pretrained MoGe2;
 held-out pixels are not mounted. No GT mask, depth, scale or pose is an inference
 input. Single and three-view use equal native50/25 steps and seed42. Predictions
 freeze before private anchor-camera Chamfer evaluation, without GT alignment or
-fitting. No claim about held-out pose tracking, full V2D metrics, photorealism,
-embedding, or final mesh budget follows from that narrow experiment.
+fitting. All four proposals passed139.118s. Camera CD median gain was-0.18784%,
+not the required5%; this RGB-only fusion hypothesis is **rejected**. Large raw
+camera errors combine metric depth, pose and shape; first diagnose those factors,
+not retune the same fixtures. No claim about held-out pose tracking, full V2D
+metrics, photorealism, embedding, or final mesh budget follows.
+
+Next source-backed tracker hypothesis, not yet implemented: own OpenCV LK
+forward/backward correspondences attached to predicted-mesh raster barycentrics,
+PnP/RANSAC plus reserved-track reprojection. Shape/scale frozen; abstain on weak
+support and retain measured baseline. Requires a new adjacent-frame cohort;
+these six wide-baseline views are not a LK validation sequence. Private truth
+scores all frames only after inference freezes, without pose alignment.
 
 Source: [MV-SAM3D abb04b5](https://github.com/devinli123/MV-SAM3D/tree/abb04b5e8af5bc33b0265bdf19937e76bbb6bcdd).
 SAM custom licence/competition eligibility remains unresolved. Detailed useful

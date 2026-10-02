@@ -141,7 +141,10 @@ implicitly restarted/overwritten. Runtime closures are25files/~85KB encoded and
 21files/~63KB respectively, below100KB control-only transfer limit. H100 work
 remains serial, while disjoint source audits/tiny local tests run in parallel.
 Reference cold TorchScript replay requires unoptimized execution; fresh-process
-diagnosis passed17.546s. Strict hand semantic V4 passed8.801s/6calls; public hand validation chain is
-launched separately at immutable d0b9d27.
-No synthetic quality result, new mesh adoption or final submission follows from
-these engineering checks alone. Latest full tiny suite3318PASS30.13s.
+diagnosis passed17.546s. Strict hand semantics V4 passed8.801s/6calls. Six RGB
+hand cases passed automatic paired inference/official conversion; quality gain
+0.8233%<5%, so finger-transfer hypothesis rejected. Four RGB-only object
+single/three-view proposals passed139.118s; median camera CD gain-0.18784%<5%,
+so fusion hypothesis rejected. Both private evaluations execute only after
+prediction hashes freeze; neither establishes challenge accuracy or adoption.
+Latest full tiny suite3323PASS33.34s. No new submission or production mesh.

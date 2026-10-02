@@ -888,3 +888,20 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Preserve decoded artifact and partial failed receipt; cast this diagnostic
   scalar to Pythonfloat only. Distinct proposals-v2 repeats unchanged inputs,
   native steps/seed/gates; no model, observation or quality retuning.
+- 2026-10-02 R76 (Azure independent object quality,9cc6863): all four native
+  single/three-view proposals passed139.118s, peak17.715GB; actual raw/export/
+  imported-camera parity max4.499e-7m. Private no-alignment evaluation passed
+  3.024s. Camera CD: radial275.158→278.349cm, ring766.140→764.904cm;
+  median relative gain-0.18784%, below frozen5% gate, per-object regression
+  +1.1600%/-0.1613%. All four closed/oriented/positive-volume; embedding and
+  final budget remain unverified. Reject this RGB-only fusion hypothesis, no
+  adoption or CARI4D win. Camera CD combines shape/pose/scale; large absolute
+  errors warrant separating predicted depth/centers from shape before another
+  fitter. Source-coordinate parity is not metric calibration or fusion quality.
+- 2026-10-02 D61: CPU-only H1 gauge diagnosis after frozen predictions. Fit
+  one positive human Sim3 on baseline case0, reuse it unchanged for both modes
+  and all six cases. No per-case/wrist alignment, input correction, new acceptance
+  policy or rescoring of the rejected H1 gate. Report raw versus shared-aligned
+  hand/wrist errors; if public kit role assets cannot be source-pinned, clearly
+  label nonhand-vertex proxy rather than official Track1 alignment. H1/O2 are
+  separate camera cohorts and cannot establish relative interaction accuracy.
