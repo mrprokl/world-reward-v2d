@@ -1,5 +1,5 @@
 # GPL-3.0 PyMeshLab is an external CPU tool; no vendored code/relicensing.
-# The build wrapper supplies the exact locally inspected base image sha256 ID.
+# The build wrapper supplies the content-addressed local tag verified against the base image sha256 ID.
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 USER root

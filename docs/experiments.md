@@ -666,3 +666,15 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   SHA d2642f98 and requested15, retaining every source/input/artifact hash check.
   Any present malformed/wrong field or unknown source still fails. Preserve
   original report bytes; record explicit legacy identity basis in loader manifest.
+
+- 2026-10-02 R52 (Azure CPU topology bootstrap,d64f0f6): BuildKit treated the
+  bare local `sha256:<imageID>` FROM argument as `docker.io/library/sha256` and
+  failed source resolution before the pinned wheel or geometry test. No passing
+  build manifest was created. This is an infrastructure naming failure, not a
+  topology result. Retry only with a content-addressed local tag verified against
+  the exact original image ID before/after build; no new base image or apt repair.
+- 2026-10-02 R53 (Azure MV source,d64f0f6): pinned public sparse acquisition
+  `abb04b5e8af5bc33b0265bdf19937e76bbb6bcdd` passed in5.47s. Frozen inventory:
+  115 source/license/readme files,929905 bytes; clean Git and read-only tree.
+  No extra model, challenge asset or local large transfer. This establishes
+  source acquisition only; native preprocessing/conditioner/dynamics untested.
