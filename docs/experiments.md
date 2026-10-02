@@ -1771,3 +1771,27 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   does not establish native human camera/global accuracy; camera-prior/model
   domain bias are plausible, not proved causes. Do not let tiny identity ABI
   residuals conceal large reconstruction error or claim improved fullHOI.
+
+- D88 predeclared before newRGB/predictions/private evaluation: dense metric
+  camera-Z comparison MoGe2 vs DA3METRIC-LARGE, **not** human identity/HOI.
+  Three fresh own identities×five new poses/bottle occlusions, privatefocals
+  [1200,1500,1800], shape2[(-.21,-.09),(.26,.11),(.43,-.12)], legalfree scales
+  [-.03,.025,.06] with model-locked0; separatedepth_rgb_v1 namespace.
+  Protocol helper frozen; oldD87/code/receipts remain unchanged. Fixedpublic
+  K1280 bothbackends,15calls each, noBody/masks/shared/shape fitting.
+  NativeDA3 processed392×518 withf647.5/653.333, metricfactor(actualfmean/300)
+  exactlyonce thenbilinearZ; MoGe originalnativevalidity retained. Allpublic
+  source/model/arrays hashed/frozen BEFORE private CPU scorer. FullGT-visible
+  object support>64everyframe, EVERYnativevalidpositivepixel required: missing
+  support yields None+explicitinvalidcounts+wholecomparisonREJECT, never
+  intersectiondrop/penalty/clipping. Primary uncapped meanabsrelativeZ over
+  allfixedprivatevisibleobjectpixels, equal5frame/clip means; medianpaired
+  clipgain≥5%, no clipregression>5%, all15complete, zero-perfectbaseline
+  relativegainundefinedreject. DiagnosticonlyhumanZ/surfaceCD, noalignment,
+  alpha/beta, GTintrinsics fitting, interaction/contact/rigidmesh/realwin claims.
+  Stop if weak support/geometryinvalid/no measuredgain; no samecohortretune.
+  AllstagesVM01 serial, nativeDA3publicpinned1,336,734,448B model acquisition
+  reusesexistingremote-onlyverifiedsource/model/wheel driver; no localweights
+  norSSH/privatecopy needed. Image remains actualoriginalINDEXb47; no rebuild
+  or config-ID waiver. Render120s, optionalCPUimportgate90s, eachRGBbackend180s
+  thenprivatequality120s, source-only closures<100KB beforedispatch.
