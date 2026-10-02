@@ -822,3 +822,20 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   absolute hand PVE/finger MPJPE and distinct wrist-relative diagnostics over all
   six cases. Frozen>=5% mean nonneutral PVE gain and<=0.01mm neutral-side
   regression are synthetic-only hypothesis gates, never adoption or V2D scores.
+- 2026-10-02 R69 (Azure strict semantics-v3,95d1294): FAIL5.594s after3calls
+  on exact replay despite R68 strict diagnosis passing. Phase A passed again,
+  phase B did not. R68 reused a model after default executions; its replay
+  evidence did not certify cold TorchScript execution. Preserve failure; test
+  four separate fresh processes, neutral1→perturb216→replay216, optimized on/off
+  and both correctives, without warmup or tolerance relaxation. Cause unknown.
+- 2026-10-02 D59: new independent object RGB cohort: two analytically embedded
+  asymmetric surfaces, six physical views each, fixed diffuse textures/cameras.
+  Only training RGB0/2/4 reaches automatic border-color segmentation and MoGe2;
+  apply_mask=False retains genuine full-grid predictions, invalid geometry fails
+  rather than filling. Private meshes/poses/visibility never enter inference.
+  Single/three-view native generation uses equal50/25 steps, seed42 and original
+  predicted depth; actual raw decoder arrays/export/native-camera transform are
+  checked and frozen.300s generation budget. Private anchor-camera surface CD
+  has no GT alignment/fitting:>=5% median gain,<=5% per-object regression and
+  closed oriented positive volume required; this is not full Track1 scoring,
+  embedding proof, novel-view pose validation, photorealism or adoption.
