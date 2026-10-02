@@ -22,5 +22,11 @@ Kaggle authentication and individual competition rule acceptance remain prerequi
 
 VM power is running, GPU confirmed through Azure Run Command. SSH port 22 blocked
 from current connection despite correct /32 NSG allow and healthy daemon; Azure
-Run Command works. A temporary SSH listener on 443 is being tested; remove it and
-its task-created NSG rule if ineffective. Do not alter existing ingress or jobs.
+Run Command works. Temporary SSH-on-443 test failed; listener stopped and its NSG
+rule removed. Keep existing ingress/jobs unchanged; use Azure Run Command control.
+
+Verified bootstrap complete (2026-10-02): systemd service exited 0; 490 MB Track 1
+data and 21 MB pinned sparse reconstruction source/kit on Azure only. Downloader
+validated 30 episodes, 16,563 frames, structural-only Parquet and SHA-256 manifests.
+No video, mesh, weights or rendered frames were transferred back locally. Current
+source code has lightweight tests; GPU inference has **not** been validated yet.
