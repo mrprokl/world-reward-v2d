@@ -1899,3 +1899,15 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   identity estimation is a distinct future hypothesis requiring its own protocol.
   Fullsource suite5084PASS/1optionaltrimeshSKIP73.02s, 72newfocusedPASS;
   immutablebundle8files34,284B, noheavydata onMac or activeGPUafter terminal0.
+
+- D91 next capability gate, **not a candidate-quality experiment**: verify a
+  differentiable PyTorch3D0.7.9 soft silhouette in the same pinned Azure image
+  and OpenCV camera convention as the existing hard renderer. Own closed cube,
+  manufactured translated reference, no video/models/challenge/private labels.
+  Fixed256×192 grid, scaled K, sigma/gamma1e−4 and faces_per_pixel8; preserve
+  all vertices/faces, metric extent and positive depth. Check hard/soft camera
+  projection parity, finite nonzero translationXYZ gradient and a single fixed
+  small negative-gradient step decreasing the SAME loss. No tuning on failure,
+  alignment, morphology shrink or predicted interaction exported. This only
+  enables future shared-identity/pose/camera fitting; it proves no accuracy.
+  Offline Azure GPU180s maximum, scalar/source receipt only on the Mac.
