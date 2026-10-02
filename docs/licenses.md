@@ -179,6 +179,8 @@ source/dependency audit and technical equivalence validation.
 > commercially unrestricted source unless otherwise stated; Specific 2.6 exempts
 > certain third-party software and pretrained models from Apache rerelease. Does
 > that exception cover their inference source, or must it be replaced? Please also
-> confirm the parent Apache-2.0 license covers native `v2d_cari4d/lib/cari4d` despite
-> retained proprietary headers, and that the provided commercial checkpoint
+> confirm whether native CARI4D’s mandatory research-only nvdiffrast runtime is
+> admissible under an explicit source exception, whether parent Apache-2.0 covers
+> native `v2d_cari4d/lib/cari4d` despite retained proprietary headers, and whether
+> the provided commercial checkpoint
 > `2026-08-25-09-35-57` is authorized for Track 1 despite its FORM-HOI training origin.

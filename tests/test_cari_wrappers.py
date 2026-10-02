@@ -89,6 +89,49 @@ def test_nondefault_episode_requires_own_report_without_implicit_episode15_wait(
 
 
 @pytest.mark.parametrize("mode", WRAPPERS)
+@pytest.mark.parametrize("episode", [0, 15, 29])
+def test_explicit_report_only_mode_skips_units_but_never_forwards_flag(fake_shell, mode, episode):
+    env, run, report, log, state = fake_shell
+    report(mode, episode)
+    # Even an active historical unit is irrelevant to an explicitly serial route.
+    state.write_text("active")
+    result = run(mode, "--episode", str(episode), "--no-wait")
+    assert result.returncode == 0, result.stderr
+    assert docker_arguments(log)[-2:] == ["--episode", str(episode)]
+    assert "--no-wait" not in docker_arguments(log)
+    assert not Path(env["FAKE_CTL_LOG"]).exists()
+
+
+@pytest.mark.parametrize("mode", WRAPPERS)
+def test_report_only_mode_still_requires_selected_report(fake_shell, mode):
+    env, run, report, log, _ = fake_shell
+    report(mode, 0)
+    result = run(mode, "--episode", "15", "--no-wait")
+    assert result.returncode != 0 and "episode_000015" in result.stderr
+    assert not log.exists() and not Path(env["FAKE_CTL_LOG"]).exists()
+
+
+@pytest.mark.parametrize("mode", WRAPPERS)
+@pytest.mark.parametrize("arguments", [
+    ("--no-wait", "--no-wait"),
+    ("--no-wait", "--wait-for", "world-reward-x"),
+    ("--wait-for", "world-reward-x", "--no-wait"),
+])
+def test_report_only_duplicate_or_conflicting_wait_fails_before_io(fake_shell, mode, arguments):
+    env, run, _, log, _ = fake_shell
+    result = run(mode, *arguments)
+    assert result.returncode == 2
+    assert not log.exists() and not Path(env["FAKE_CTL_LOG"]).exists()
+
+
+@pytest.mark.parametrize("arguments", [("--kernel-only", "--no-wait"), ("--no-wait", "--kernel-only")])
+def test_checkpoint_only_rejects_redundant_report_only_flag(fake_shell, arguments):
+    env, run, _, log, _ = fake_shell
+    assert run("forward", *arguments).returncode == 2
+    assert not log.exists() and not Path(env["FAKE_CTL_LOG"]).exists()
+
+
+@pytest.mark.parametrize("mode", WRAPPERS)
 def test_other_episode_report_cannot_satisfy_selected_clip(fake_shell, mode):
     env, run, report, log, _ = fake_shell
     report(mode, 15)

@@ -2,7 +2,7 @@
 # Sourced by immutable CARI wrappers. No Docker, artifact mutation or retries.
 
 wr_parse_cari_arguments() {
-  local mode="$1" episode_seen=0 wait_seen=0 kernel_seen=0
+  local mode="$1" episode_seen=0 wait_seen=0 kernel_seen=0 no_wait_seen=0
   shift
   WR_EPISODE=15 WR_WAIT_FOR='' WR_KERNEL_ONLY=0
   while (( $# )); do
@@ -17,6 +17,11 @@ wr_parse_cari_arguments() {
           echo 'Require one --wait-for world-reward-<job>[.service] unit' >&2; return 2
         fi
         WR_WAIT_FOR="${2%.service}.service"; wait_seen=1; shift 2 ;;
+      --no-wait)
+        if (( no_wait_seen )); then
+          echo '--no-wait is a single explicit report-only dependency mode' >&2; return 2
+        fi
+        no_wait_seen=1; shift ;;
       --kernel-only)
         if [[ "$mode" != forward ]] || (( kernel_seen )); then
           echo '--kernel-only is a single forward-only checkpoint gate' >&2; return 2
@@ -25,10 +30,19 @@ wr_parse_cari_arguments() {
       *) echo "Unsupported wrapper argument: $1" >&2; return 2 ;;
     esac
   done
+  if (( no_wait_seen && wait_seen )); then
+    echo '--no-wait and --wait-for are mutually exclusive' >&2; return 2
+  fi
+  if (( no_wait_seen && WR_KERNEL_ONLY )); then
+    echo 'Checkpoint-only mode already uses report-only dependencies' >&2; return 2
+  fi
   if (( WR_KERNEL_ONLY && wait_seen )); then
     echo 'Checkpoint-only mode must not wait for preparation' >&2; return 2
   fi
-  if [[ -z "$WR_WAIT_FOR" && "$WR_EPISODE" == 15 && "$WR_KERNEL_ONLY" == 0 ]]; then
+  # Serial orchestrators validate each producer before invoking its consumer.
+  # Explicit report-only mode avoids historical episode15 units, but does NOT
+  # bypass report presence or the Python consumer's full provenance validation.
+  if [[ -z "$WR_WAIT_FOR" && "$WR_EPISODE" == 15 && "$WR_KERNEL_ONLY" == 0 && "$no_wait_seen" == 0 ]]; then
     case "$mode" in
       prepare) WR_WAIT_FOR=world-reward-object-pose-full.service ;;
       forward) WR_WAIT_FOR=world-reward-cari-prepare-v2.service ;;

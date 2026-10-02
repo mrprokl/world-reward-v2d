@@ -606,3 +606,30 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   no statistical-identification/adoption claim. Views use normalize(-R.T@t),
   anchor quality then greedy max-min angles, invalid/degenerate poses never
   repaired. Actual model/geometry tests must precede use in the final pipeline.
+
+- 2026-10-02 R47 (Azure budget generalization,b6b27d0): episode0 object producer
+  stopped before trajectory fitting because all eight fixed global/componentwise
+  simplification attempts failed topology/orientation/Euler checks. Globals created
+  boundary/nonmanifold edges; componentwise changed sign/Euler. This is a true
+  production failure, not permission to fill holes/delete shells/relax gates.
+  Original grounded mesh and full initializers remain frozen; investigate a
+  link-condition/topology-preserving simplifier on own controls first.
+- 2026-10-02 D49: clean-episode actual shell route composes masks, seven existing
+  initializer stages, original full object tracker, native preparation/forward/
+  conversion. Requires explicit0..29, preflight all twelve targets absent before
+  GPU use, no resume/retry/overwrite. Native wrappers accept explicit --no-wait
+  for serial report-only dependencies, mutually exclusive with unit wait and
+  checkpoint-only; actual Python provenance validation remains mandatory.
+  Frozen historical episode15 job snapshots/defaults unchanged.
+- 2026-10-02 D50: independent nested M0 pose-only/M1 sharedSPD5+per-view rigid
+  nuisance gate: new ellipsoid(.31,.17,.29)/box(.48,.30,.34), three new camera
+  paths, correct/deformed(.035,-.02,.009,-.011,.006), exact/biased supplied poses.
+  Own synthetic pose-oracle disclosure; top-quarter occlusion and disjoint
+  checkerboard128train/128holdout points per view. Same independent pose starts,
+  50objective calls/model, <=100including diagnostics,120s total. Local data
+  Schur uses vector continuous closest-face/region residual FD in normalized
+  shape.05log/rotation.01rad/translation.01m, no priors/damping/pseudoinverse.
+  Fixed-feature Jacobian is not exact nonsmooth/statistical information. Unknown
+  global pose modes force selected M0; raw M1 separately faces original correct
+  canonical0/nonregression and deformed>=5% gates. Default safety cannot conceal
+  raw shape regression; held-out pixels are not independent temporal validation.
