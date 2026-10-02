@@ -633,3 +633,18 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   global pose modes force selected M0; raw M1 separately faces original correct
   canonical0/nonregression and deformed>=5% gates. Default safety cannot conceal
   raw shape regression; held-out pixels are not independent temporal validation.
+
+- 2026-10-02 R48 (Azure actualnative15,5d4f5db→414aac2): complete preparation
+  passed501frames3582.24s, mesh/pose coordinate-change error9.02e-16m; exhaustive
+  original PNG/H5/RGB/mask checks completed. Native CoCoNet then processed all
+  six96frame windows including terminal overlap in68.85s. Official shared
+  identity conversion passed501frames127.96s, worst per-frame mean1.78963mm
+  to native predictions (frozen2mm fidelity gate), object frame error9.02e-16m.
+  This is actual full-network/conversion evidence, NOT challenge accuracy.
+- 2026-10-02 R49 (Azure nestedpose/shape,19a9a86): new8conditions all executed
+ 55.78s; overall hypothesis rejected. Some hard50-call optimizers failed
+ convergence and kept their exact initial controls, including deformed box
+ cases canonicalCD5.894mm unchanged. Full per-condition diagnostics remain
+ remote; these failures do not establish that nuisance-pose shape fitting is
+ impossible. No increased-budget rerun/selection claim; global modes remain
+ unverified and conservative selectedM0 is not an efficacy win.

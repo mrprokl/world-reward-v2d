@@ -84,8 +84,9 @@ trajectory. **Do not restart or overwrite.**
 
 Queued chain: `world-reward-cari-prepare-v2` (`5d4f5db`, remote EXDEV copy fix)
 → `world-reward-cari-forward` → `world-reward-cari-converter` (both`414aac2`).
-Preparation active at12:24UTC, all501depthframes encoded; actual network inference/
-conversion not yet verified. Finger-transfer sparse gate waits for conversion.
+Preparation passed501frames3582.24s; actual native forward68.85s and official
+conversion127.96s passed501frames at12:29UTC. Worst per-frame mean conversion
+fidelity1.78963mm to native predictions, not GT accuracy. Finger-transfer sparse gate waits for conversion.
 A separate `world-reward-masks-episode0` from`a867e23` tests routing/general automatic
 mask initialization; final reporting failed from a shadowed provenance variable.
 Failed outputs quarantined; `masks-episode0-v2` from`c344eb3` passed full coverage
