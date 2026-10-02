@@ -83,3 +83,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   labels/scores/box geometry on three remote RGB frames to distinguish genuine
   distractors from preprocessing/model-query failure, before changing the method.
   Full suite now 231 passed locally and on Azure with official-kit parity enabled.
+- 2026-10-02 R06 (RGB-derived detector diagnostics): on frames 0/250/500, each
+  person query returns three spatially disjoint boxes of similar confidence,
+  while the object query returns one box. Thus ambiguity is genuine multiple
+  detected persons, not duplicated queries. No human instance labeling performed.
+  Next method ranks automatically associated person tracks by video-wide proximity
+  to the detected interaction object, requiring sufficient observations and a
+  clear winning margin; retain failure rather than guess in ties/crossings.

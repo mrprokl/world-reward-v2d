@@ -80,3 +80,9 @@ pruned only the private World Reward builder cache and restarted the exact jobs.
 No shared images/caches pruned. Remote suite: 189 passed, 1 skipped (optional
 local audit-kit parity test); local suite 190 passed. Temporary task SSH NSG rule
 removed and absence verified; control remains Azure Run Command.
+
+GPU synthetic MHR converter passed (14.32 s; mean 0.000051495 mm). GroundingDINO
+forwards work, but segmentation seed was correctly rejected for three distinct
+person detections; NMS does not solve actor identification. Three-frame detector
+diagnostics completed exit 0. CARI Docker build remains active at TensorRT system
+dependencies after PyTorch3D build; no CARI reconstruction result yet.
