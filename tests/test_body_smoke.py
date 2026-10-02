@@ -1010,12 +1010,13 @@ def test_native_forward_encodes_original_blocks_without_raw_pose_or_shape_warp(s
     assert set(forwarded) == {
         "global_trans", "global_rot", "body_pose_params", "hand_pose_params", "scale_params",
         "shape_params", "expr_params", "return_keypoints", "return_joint_coords", "return_model_params",
+        "return_joint_rotations",
     }
     assert forwarded["global_trans"].shape == (1, 3) and not forwarded["global_trans"].any()
     for name in ("global_rot", "body_pose_params", "hand_pose_params", "scale_params", "shape_params", "expr_params"):
         np.testing.assert_array_equal(forwarded[name], before[name][None])
     assert forwarded["scale_params"].shape == (1, 28)  # not expanded physical scales68
     assert forwarded["body_pose_params"].shape == (1, 133) and forwarded["hand_pose_params"].shape == (1, 108)
-    assert all(forwarded[name] is True for name in ("return_keypoints", "return_joint_coords", "return_model_params"))
+    assert all(forwarded[name] is True for name in ("return_keypoints", "return_joint_coords", "return_model_params", "return_joint_rotations"))
     for name in prediction:
         np.testing.assert_array_equal(prediction[name], before[name])

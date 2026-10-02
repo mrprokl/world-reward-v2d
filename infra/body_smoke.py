@@ -307,6 +307,7 @@ def _native_forward_from_blocks(head, prediction):
         shape_params=prediction["shape_params"][None],
         expr_params=prediction["expr_params"][None],
         return_keypoints=True, return_joint_coords=True, return_model_params=True,
+        return_joint_rotations=True,
     )
 
 
@@ -391,6 +392,7 @@ def main() -> None:
         capture.release()
         raise RuntimeError("Video decoder disagrees with official full-frame count")
     arrays = {key: [] for key in PARAMETER_SHAPES}
+    pre_fusion_rotations = []
     frame_records = []
     camera_vertices = []
     try:
@@ -432,14 +434,15 @@ def main() -> None:
             if args.inference_type == "full" and torch.count_nonzero(prediction["pred_pose_raw"]).item() != 0:
                 raise RuntimeError("Pinned full hand fusion must zero invalidated raw pose logits; audit only")
             with torch.inference_mode():
-                native, native_keypoints, native_joints, native_controls = _native_forward_from_blocks(
+                native, native_keypoints, native_joints, native_controls, native_rotations = _native_forward_from_blocks(
                     model.head_pose, prediction)
                 if (native.shape != (1, 18439, 3) or native_joints.shape != (1, 127, 3)
                     or native_keypoints.ndim != 3 or native_keypoints.shape[0] != 1
                     or native_keypoints.shape[1] < 70 or native_keypoints.shape[2] != 3
                     or native_controls.shape != (1, 204)
+                    or native_rotations.shape != (1, 127, 3, 3)
                     or any(not torch.isfinite(value).all() for value in (
-                        native, native_keypoints, native_joints, native_controls))):
+                        native, native_keypoints, native_joints, native_controls, native_rotations))):
                     raise RuntimeError("Native parameter-block forward shape/finite contract failed")
                 camera_flip = torch.tensor([1., -1., -1.], device=native.device, dtype=native.dtype)
                 recovered = native[0] * camera_flip
@@ -451,6 +454,12 @@ def main() -> None:
                 raise RuntimeError("Original MHR parameter-block forward does not reproduce camera-relative vertices in metres")
             if float(joint_error) > 1e-5 or float(keypoint_error) > 1e-5 or float(control_error) > 1e-5:
                 raise RuntimeError("Original MHR parameter-block forward disagrees with joints/keypoints/native controls")
+            if args.inference_type == "full":
+                # Upstream full fusion refreshes geometry but not its cached
+                # joint_global_rots dictionary entry. Preserve it as audit-only,
+                # use only the freshly decoded native rotations downstream.
+                pre_fusion_rotations.append(arrays["pred_global_rots"][-1])
+                arrays["pred_global_rots"][-1] = native_rotations[0].detach().float().cpu().numpy()
             vertices = arrays["pred_vertices"][-1] + arrays["pred_cam_t"][-1][None]
             if arrays["pred_cam_t"][-1][2] <= 0 or not np.isfinite(vertices).all():
                 raise RuntimeError("Invalid camera translation/translated native mesh")
@@ -482,6 +491,8 @@ def main() -> None:
     finally:
         capture.release()
     arrays = {key: np.stack(values) for key, values in arrays.items()}
+    if args.inference_type == "full":
+        arrays["pre_fusion_global_rots_audit_only"] = np.stack(pre_fusion_rotations)
     arrays["vertices_root_camera_m"] = arrays.pop("pred_vertices")
     arrays["vertices_camera_m"] = np.stack(camera_vertices)
     arrays["faces"] = faces.astype(np.int64)
@@ -512,6 +523,7 @@ def main() -> None:
         "raw_pose_logits_role": "audit_only_zeroed_after_full_hand_fusion" if args.inference_type == "full" else "audit_only_not_decoder_input",
         "hand_decoder_proposals": args.inference_type == "full",
         "hand_accuracy_verified": False, "human_identity_fitting_performed": False,
+        "joint_global_rotation_source": "fresh_native_parameter_block_decode" if args.inference_type == "full" else "original_body_prediction",
         "body_revision": BODY_REVISION, "body_assets": asset_hashes,
         "asset_hash_assurance": "recorded_local_hashes_after_pinned_acquisition_not_independent_release_hashes",
         "upstream_revision": UPSTREAM_REVISION, "inference_source_identity": source_hashes,

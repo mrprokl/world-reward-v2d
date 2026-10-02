@@ -372,3 +372,13 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   challenge reconstruction. Source/weight terms remain independently unresolved
   for release eligibility. Second-pass SOTA priorities and falsification tests
   documented in literature.md; no external metric experiment established yet.
+
+- 2026-10-02 D33: source audit found full-mode joint rotations remain cached
+  before hand fusion upstream. Re-decode fresh rotations from original blocks;
+  keep stale source rotations explicitly audit-only, never hand constraints.
+  Full hand geometry/projection source ABI otherwise checked. First compact O1
+  proposal is a shared5DOF trace-free symmetric log-stretch: SPD determinant1,
+  fixed pivot, faces/order/cavity preserved, principal stretch bounded[2/3,1.5],
+  no clipped parameters or uniform metric-scale fitting. Analytic volume and
+  invalid-input tests establish mathematics only, not shape-fit improvement.
+  Exact duplicate padding uses deterministic einsum. Full local suite1251 passes.
