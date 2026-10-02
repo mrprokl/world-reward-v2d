@@ -851,3 +851,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
  corrective skeletons are identical. Disabling JIT optimization follows R70,
  not a numerical threshold change. This verifies the own neutral reference
  rig semantics, not RGB anatomy/quality, SAM/reference shape parity or adoption.
+- 2026-10-02 R72 (Azure hand RGB pipeline,d0b9d27): renderer completed all six
+  cases with anatomical visibility preflight (first neutral hands each886visible
+  pixels, left-bend840/886). Automatic six-person masks passed10.010s. Prediction
+  stopped3.275s before inference: installed Body module parent was missing from
+  PYTHONPATH. Original failure remains frozen; V2 adds the already installed
+  audited package path only and uses a distinct predictions-v2 output. RGB,
+  automatic masks, models and numerical settings are unchanged; no quality claim.
