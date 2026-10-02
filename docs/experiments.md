@@ -1482,3 +1482,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   False evenifthiswarmstartgatepasses. ActualD80maxperframemeandifference
   2.8553522e-7mm; all790poses/residuals/fitaccuracy stillseparatecontracts.
   141focusedtinytestsPASS, nosolver/adoption orquota.
+
+- 2026-10-02 D82 (predeclared): independent GeoCalib frontend engineering
+  gate on VM02, not a camera/accuracy experiment. Acquire only pinned Apache
+  standalone MSCAN/Hamburger module and native four-class slice, retain source,
+  licenses and CC-BY-4.0 publisher weight statement; public 116,074,121-byte
+  checkpoint stays Azure. No PerspectiveFields/full package initializer/LM or
+  challenge inputs. Release supplies no independent digest, record this limit.
+  Strict checkpoint['model'] full parameter/BN-buffer schema, native zero-overlap
+  second-component mapping only; no missing/unexpected-key filtering. Two new
+  own procedural RGB arrays (320x416), native RGB normalization, seeded same-input
+  replay must be byte-exact with finite, correctly-shaped/bounded native fields.
+  Acquisition300s CPU-only; frontend180s H100/offline/32GB, immutable sourceimage.
+  PASS only authorizes designing independent calibration validation, never
+  camera correctness, general eligibility or submission adoption. 136 combined
+  frontend/frozen-target/runtime-bundle tiny tests PASS before execution;
+  independent source/API audit PASS, full4445PASS/1optionaltrimeshSKIP64.06s.
