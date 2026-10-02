@@ -302,3 +302,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Predeclared costs: 1−automatic-mask-IoU; translation weight 1, rotation weight
   0.1, original-frame time units, no speed bounds. This is an initializer
   hypothesis, not an accuracy/acceleration claim or hidden metric tuning.
+
+- 2026-10-02 D25: prepare native CARI inputs only from hashed original RGB,
+  automatic full-frame masks, native-roundtripped Body parameters and our own
+  fixed-scale object trajectory. Native oriented mesh frame A is compensated
+  by P@inv(A), with camera-space geometry equality checked across the clip.
+  Preserve fixed RGB-size K, shared human-anchored MoGe2 depth scalar, no shift,
+  and strict quantized-depth saturation checks. Official H5 export is explicitly
+  marked complete and independently decoded. Source video ABI uses same-disk
+  hardlink, not a resolved symlink or another local download.
+- 2026-10-02 D26: native CoCoNet forward uses our own object-pose pickle via the
+  historical --foundationpose-file ABI, never the FoundationPose executable or
+  oracle modes. Strict pinned checkpoint/config, local pinned DINO Hub loader,
+  offline supervision contract, CUDA/network-none and all original frames.
+  Runner stores GT={}, checked before accepting output. Checkpoint load and
+  actual full network forward are distinct gates. Pure builder tests119 pass,
+  total908; native execution is not yet established by those tests.
