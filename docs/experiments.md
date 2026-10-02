@@ -244,3 +244,9 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   redundant under the strict +0.5 pixel-centre pinhole gate. Reconstruct rays
   downstream on Azure; do not transit heavy arrays locally or duplicate 3×XYZ
   storage. Each decoded frame and output retains SHA-256 provenance.
+
+- 2026-10-02 R23 (fail fast): rigid pose smoke stopped before pose fitting: the
+  official-budget object failed closed/oriented/positive-volume geometry gate.
+  No pose result or quality claim emitted. Diagnose original vs budget raw vs
+  processed mesh edge incidences and signed volume before changing the method.
+  Do not loosen the physical gate or exploit an open/inverted submitted mesh.

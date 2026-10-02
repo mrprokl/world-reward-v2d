@@ -42,7 +42,7 @@ remain intact. No additional VM needed.
 
 Docker storage isolated at `/srv/scenesmith/world-reward/docker`, socket
 `/srv/scenesmith/world-reward/docker.sock`; separate dockerd uses no bridge or
-iptables mutation, builds/runs use host networking. This avoids filling the old
+iptables mutation, builds use host networking; model inference runs with `--network none`. This avoids filling the old
 root disk or deleting prior Docker images. Model acquisition and runtime build
 are systemd jobs; poll those exact units and never restart after mere observation
 timeouts. Initial acquisition exited 127: launcher assumed a private `bin/uv`,
