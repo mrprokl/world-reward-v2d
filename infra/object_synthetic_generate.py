@@ -74,7 +74,8 @@ def export_actual(result, destination, name, torch):
     faces=raw.faces.detach().cpu().numpy()
     mesh=result['glb']
     if (vertices.ndim!=2 or vertices.shape[1]!=3 or not np.isfinite(vertices).all()
-            or faces.ndim!=2 or faces.shape[1]!=3 or faces.dtype.kind not in 'iu'
+            or faces.ndim!=2 or faces.shape[1]!=3 or faces.dtype.kind not in 'iu' or not len(faces)
+            or np.any(faces<0) or np.any(faces>=len(vertices))
             or not np.array_equal(np.asarray(mesh.vertices),vertices@gauge.A)
             or not np.array_equal(np.asarray(mesh.faces),faces)):
         raise ValueError('Actual decoder to GLB parity failed')
@@ -87,6 +88,8 @@ def export_actual(result, destination, name, torch):
         Q=quaternion_to_matrix(q)
         transformed=compose_transform(s,Q,t).transform_points(torch.from_numpy(vertices)[None])[0].numpy()@gauge.N
     analytical=gauge.native_order_points(np.asarray(mesh.vertices),pose)
+    if not np.isfinite(transformed).all() or not np.isfinite(analytical).all():
+        raise ValueError('Actual native camera transformation is nonfinite')
     maximum=float(np.abs(transformed-analytical).max()); tolerance=16*np.finfo(np.float32).eps*max(1.,float(np.abs(transformed).max()))
     if maximum>tolerance:raise ValueError('Actual imported native camera transform differs from source-order bridge')
     serialized=mesh.export(file_type='glb');reload=trimesh.load(io.BytesIO(serialized),file_type='glb',force='mesh',process=False)
