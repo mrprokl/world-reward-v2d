@@ -122,9 +122,12 @@ def main() -> None:
         if not np.isfinite(points[validities[position]]).all():
             raise RuntimeError("Aligned valid points overflowed")
         points[~validities[position]] = np.nan
+        points = points.astype(np.float32)
+        if not np.isfinite(points[validities[position]]).all() or (points[..., 2][validities[position]] <= 0).any():
+            raise RuntimeError("Aligned valid points cannot be represented as positive finite float32 XYZ")
         path = output / f"{index:06d}.npy"
         with path.open("xb") as handle:
-            np.save(handle, points.astype(np.float32), allow_pickle=False)
+            np.save(handle, points, allow_pickle=False)
         intrinsic_path = output / f"{index:06d}_intrinsics.json"
         camera = cameras[position]
         height, width = depths[position].shape

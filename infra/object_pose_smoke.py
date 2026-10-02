@@ -69,6 +69,9 @@ def main() -> None:
     height, width = camera_dict["height"], camera_dict["width"]
     sys.path.insert(0, str(root / "vendor/v2d_submission_kit"))
     from v2dlb.mesh_budget import budget_mesh
+    import inspect
+    import importlib.metadata
+    budget_source_path = Path(inspect.getfile(budget_mesh))
     started = time.perf_counter()
     # The GLB is canonical; pose is stored separately. Keep exact official budget
     # arrays for final packing and derive only a non-padding mesh for raster QA.
@@ -81,7 +84,8 @@ def main() -> None:
     sampled, _ = trimesh.sample.sample_surface(mesh, 8192, seed=0)
     pointmaps = {record["frame_index"]: record for record in alignment["pointmaps"]}
     evidence = {record["frame_index"]: record for record in alignment["human_evidence"]}
-    if sorted(pointmaps) != inputs["indices"] or sorted(evidence) != inputs["indices"]:
+    if (len(pointmaps) != len(alignment["pointmaps"]) or len(evidence) != len(alignment["human_evidence"])
+            or sorted(pointmaps) != inputs["indices"] or sorted(evidence) != inputs["indices"]):
         raise RuntimeError("Sparse evidence must retain exact original frame indices")
     candidate_reports, poses_R, poses_t = [], [], []
     # Finite generic orientation hypotheses, not manually supplied object
@@ -161,6 +165,8 @@ def main() -> None:
               "pose_hypotheses": "24_octahedral_orientations_not_asserted_true_object_symmetries",
               "objective": "maximum_automatic_mask_IoU_then_partial_depth_RMSE; no_GT_or_challenge_metric",
               "frames": candidate_reports, "geometry_and_poses_sha256": sha256(output / "geometry_and_poses.npz"),
+              "budget_source_sha256": sha256(budget_source_path),
+              "geometry_library_versions": {name: importlib.metadata.version(name) for name in ("trimesh", "fast-simplification")},
               "elapsed_seconds": time.perf_counter() - started, "script_sha256": sha256(Path(__file__))}
     (output / "report.json").write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({"stage": result["stage"], "status": "pass", "extent": mesh.extents.tolist(),
