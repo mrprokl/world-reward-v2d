@@ -785,3 +785,16 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   directory; inference public manifest contains only six RGB names/hash/size.
   No generated mask, bbox or calibration given to inference.120s render budget,
   two-case anatomical visibility preflight; failure is not real-data accuracy.
+- 2026-10-02 R66 (Azure finger semantics-v2,f4e64c5): phase A again passed;
+  explicit-batch neutral/perturbation/replay executed, but exact geometry replay
+  failed after three calls5.496s. No derivative or phase-B claim, no renderer
+  launch. Diagnose native CUDA determinism with fixed seeds and deterministic
+  algorithms before changing the numerical contract; preserve this failure.
+- 2026-10-02 D56: synthetic mask/inference stages mount only public RGB and
+  automatic masks, never the evaluation directory or challenge inputs. Frozen
+  detector/SAM2 thresholds, no GT/full-image bbox fallback; actual installed
+  SAM2 VCS and source inventory recorded, not falsely called pre-pinned. Six
+  body/full paired inputs, fresh native204 controls/rotations, identical pixels,
+  120s masks/180s inference budgets. Pending synthesis/semantic gates; no quality
+  result or candidate adoption. New writable output directories owned by runtime
+  user only; no broad permission changes.
