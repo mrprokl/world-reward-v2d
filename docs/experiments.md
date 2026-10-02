@@ -126,3 +126,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   claim. Add strict streaming mask geometry/temporal diagnostics with 53 synthetic
   tests (full local suite 325 passed), reporting occlusion/motion/overlap without
   arbitrary accuracy thresholds or fixes to individual test masks.
+- 2026-10-02 R10: actual SAM3D kernel gate caught a CPU-only PyTorch3D build
+  (`Not compiled with GPU support`), despite successful imports. Kaolin Chamfer,
+  nvdiffrast CUDA raster and FlashAttention passed. EGL context creation failed
+  with 12291; root cause unverified. Source callgraph confirms the official minimal
+  Objects generation and CARI inference use PyTorch3D/CUDA raster, not pyrender EGL.
+  Keep EGL failure as optional visualization evidence, not a core-model blocker.
+  Rebuild only a derivative PyTorch3D layer, FORCE_CUDA=1/SM9.0 with v0.7.9 resolved
+  commit `33824be3cbc87a7dd1db0f6a9a9de9ac81b2d0ba`; require actual GPU KNN to pass.
+- 2026-10-02 R11: DINO auxiliary acquisition exited 0 with pinned clean DINOv2/v3
+  source, validated official vitb/vits SHA-256 and recorded first-observed HTTPS
+  reg4 hashes. No FoundationPose acquired; no complete-baseline readiness claim.

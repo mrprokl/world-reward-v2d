@@ -15,6 +15,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--flash-attention", action="store_true")
+    parser.add_argument("--require-egl", action="store_true",
+                        help="Require optional pyrender visualization, not a core reconstruction dependency")
     args = parser.parse_args()
     import torch
     if not torch.cuda.is_available():
@@ -83,9 +85,12 @@ def main() -> None:
         gate(name, function)
     if args.flash_attention:
         gate("flash_attention", flash_attention)
+    required = [name for name in records if name != "egl_depth" or args.require_egl]
     result = {"stage": "actual_runtime_kernels", "torch": torch.__version__,
               "gpu": torch.cuda.get_device_name(), "gates": records,
-              "status": "pass" if all(record["status"] == "pass" for record in records.values()) else "fail"}
+              "required_gates": required,
+              "optional_egl_reason": "Official minimal Objects and CARI paths use PyTorch3D/CUDA raster; pyrender is visualization only",
+              "status": "pass" if all(records[name]["status"] == "pass" for name in required) else "fail"}
     args.report.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result))
     if result["status"] != "pass":
