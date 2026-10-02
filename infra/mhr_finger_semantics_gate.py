@@ -11,11 +11,13 @@ import os
 from pathlib import Path
 import platform
 import re
+import random
 import signal
 import time
 
 import numpy as np
 from world_reward.data import sha256
+import mhr_determinism_gate as determinism
 
 MODEL_SHA = "352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc"
 BODY_SHA = "b5a2f9d305dd02626b967aa2e86021fba07065df66ce7a7e00ffb9664f150abf"
@@ -161,6 +163,29 @@ def identity_rows(shared_identity, count):
     return np.repeat(value[None], count, axis=0)
 
 
+
+def require_determinism(report):
+    expected = {"stage": "reference_mhr_failed_fixture_determinism_diagnosis", "status": "pass",
+                "model_sha256": MODEL_SHA, "script_sha256": sha256(Path(determinism.__file__)),
+                "strict_replay_bitexact": True, "strict_repair_route_observed": True,
+                "CUBLAS_WORKSPACE_CONFIG": ":4096:8", "TF32": False, "network": "none",
+                "challenge_inputs_used": False, "execution_dtype": "float32", "forward_calls": 20}
+    if (any(type(report.get(k)) is not type(v) or report.get(k) != v for k,v in expected.items())
+            or not determinism.outcome(report.get("groups", []))):
+        raise ValueError("Require actual SHA-bound strict CPU/CUDA replay diagnosis before semantics-v3")
+
+
+def strict_reference_runtime(torch):
+    if os.environ.get("CUBLAS_WORKSPACE_CONFIG") != ":4096:8":
+        raise RuntimeError("Require deterministic CUBLAS workspace configured before torch import")
+    random.seed(0); np.random.seed(0); torch.manual_seed(0); torch.cuda.manual_seed_all(0)
+    torch.set_num_threads(4)
+    torch.use_deterministic_algorithms(True, warn_only=False)
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+
 def main(argv=None):
     argparse.ArgumentParser(description=__doc__, allow_abbrev=False).parse_args(argv)
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
@@ -168,7 +193,7 @@ def main(argv=None):
     root = Path(os.environ["WR_ROOT"]); revision = os.environ.get("WR_CODE_REVISION", ""); image = os.environ.get("WR_IMAGE_ID", "")
     if not re.fullmatch(r"[0-9a-f]{40}", revision) or not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
         raise ValueError("Require immutable source revision/image ID")
-    output = root / "results/mhr-finger-semantics-v2.json"
+    output = root / "results/mhr-finger-semantics-v3.json"
     if output.is_symlink(): raise FileExistsError("Frozen semantic report already exists")
     with output.open("x") as handle:
         started = time.perf_counter()
@@ -200,7 +225,15 @@ def main(argv=None):
             report.update(model_sha256=MODEL_SHA, body_checkpoint_sha256=BODY_SHA, body_revision=BODY_REVISION,
                           acquisition_report_sha256=acquisition_sha, phase="metadata_and_checkpoint")
             persist()
+            diagnosis_path = root / "results/mhr-determinism.json"; diagnosis_sha = sha256(diagnosis_path)
+            regular_hash(diagnosis_path, root, diagnosis_sha)
+            require_determinism(json.loads(diagnosis_path.read_text()))
+            if "torch" in __import__("sys").modules: raise RuntimeError("CUBLAS setup must precede torch import")
+            os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
             import torch
+            strict_reference_runtime(torch)
+            report.update(determinism_report_sha256=diagnosis_sha, deterministic_algorithms=True,
+                          CUBLAS_WORKSPACE_CONFIG=":4096:8", TF32=False, seed=0)
             if not torch.cuda.is_available(): raise RuntimeError("CUDA required; no CPU/local forward fallback")
             payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
             state = payload.get("state_dict", payload) if isinstance(payload, Mapping) else None
@@ -275,6 +308,7 @@ def main(argv=None):
             signal.alarm(max(1, int(started+300-time.perf_counter())))
             regular_hash(model_path, root, MODEL_SHA, 696110248); regular_hash(checkpoint, root, BODY_SHA, 2109129346)
             regular_hash(acquisition_path, root, acquisition_sha)
+            regular_hash(diagnosis_path, root, diagnosis_sha)
             if time.perf_counter() > started+300: raise TimeoutError("Semantic gate exceeded300s")
             report.update(status="pass", phase="complete", phase_B_verified=True,
                           named_finger_joint_partition_verified=True, excluded_joint_invariance_verified=True,

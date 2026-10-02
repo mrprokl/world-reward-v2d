@@ -40,7 +40,8 @@ def require_semantic_report(report):
                 "excluded_joint_invariance_verified": True, "correctives_skeleton_bit_identical": True,
                 "model_sha256": semantics.MODEL_SHA, "body_checkpoint_sha256": semantics.BODY_SHA,
                 "body_revision": semantics.BODY_REVISION, "network": "none", "challenge_inputs_used": False,
-                "script_sha256": sha256(Path(semantics.__file__))}
+                "script_sha256": sha256(Path(semantics.__file__)), "deterministic_algorithms": True,
+                "CUBLAS_WORKSPACE_CONFIG": ":4096:8", "TF32": False}
     if any(type(report.get(k)) is not type(v) or report.get(k) != v for k, v in expected.items()):
         raise ValueError("Require actual passing SHA-bound current semantic producer, not same snapshot path")
 
@@ -213,12 +214,15 @@ def main(argv=None):
         previous_alarm = signal.signal(signal.SIGALRM, expired); previous_term = signal.signal(signal.SIGTERM, expired); signal.alarm(120)
         try:
             persist()
-            prerequisite = root / "results/mhr-finger-semantics-v2.json"; prerequisite_sha = sha256(prerequisite)
+            prerequisite = root / "results/mhr-finger-semantics-v3.json"; prerequisite_sha = sha256(prerequisite)
             semantics.regular_hash(prerequisite, root, prerequisite_sha)
             semantic = json.loads(prerequisite.read_text()); require_semantic_report(semantic)
             model_path = root / "weights/mhr/mhr_model.pt"
             semantics.regular_hash(model_path, root, semantics.MODEL_SHA, 696110248)
+            if "torch" in __import__("sys").modules: raise RuntimeError("Require CUBLAS setup before torch import")
+            os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
             import torch
+            semantics.strict_reference_runtime(torch)
             import pytorch3d
             from PIL import Image
             if not torch.cuda.is_available() or pytorch3d.__version__ != "0.7.9":

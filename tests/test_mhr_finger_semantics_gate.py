@@ -8,7 +8,8 @@ import pytest
 
 
 @pytest.fixture
-def gate():
+def gate(monkeypatch):
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1] / "infra"))
     path = Path(__file__).resolve().parents[1] / "infra/mhr_finger_semantics_gate.py"
     spec = importlib.util.spec_from_file_location("wr_test_finger_semantics", path)
     module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
@@ -167,7 +168,7 @@ def test_failed_report_exclusive_before_torch_or_forward(gate, tmp_path, monkeyp
     original = gate.Path.iterdir
     monkeypatch.setattr(gate.Path, "iterdir", lambda self: [Path("lo")] if str(self) == "/sys/class/net" else original(self))
     with pytest.raises(ValueError, match="acquisition"): gate.main([])
-    path = tmp_path / "results/mhr-finger-semantics-v2.json"; report = json.loads(path.read_text())
+    path = tmp_path / "results/mhr-finger-semantics-v3.json"; report = json.loads(path.read_text())
     assert report["status"] == "fail" and report["forward_calls"] == 0 and report["adoption_performed"] is False
     frozen = path.read_bytes()
     with pytest.raises(FileExistsError): gate.main([])
@@ -199,3 +200,27 @@ def test_exact_mhrdemo_identity_rows_not_generic_broadcast(gate, count):
 @pytest.mark.parametrize("count", [0, -1, True, 1.5])
 def test_identity_row_count_explicit(gate, count):
     with pytest.raises(ValueError): gate.identity_rows(np.zeros(45, np.float32), count)
+
+
+def test_strict_diagnosis_bound_without_tolerance_changes(gate):
+    conditions = [{"apply_correctives":c,"replays":[{"bitexact":True}]*2} for c in (False,True)]
+    report={"stage":"reference_mhr_failed_fixture_determinism_diagnosis","status":"pass",
+            "model_sha256":gate.MODEL_SHA,"script_sha256":gate.sha256(Path(gate.determinism.__file__)),
+            "strict_replay_bitexact":True,"strict_repair_route_observed":True,
+            "CUBLAS_WORKSPACE_CONFIG":":4096:8","TF32":False,"network":"none",
+            "challenge_inputs_used":False,"execution_dtype":"float32","forward_calls":20,
+            "groups":[{"name":name,"status":"complete","conditions":conditions} for name in ("strict_cuda","strict_cpu")]}
+    gate.require_determinism(report)
+    for key,value in (("status","fail"),("strict_replay_bitexact",False),("script_sha256","a"*64),
+                       ("TF32",True),("forward_calls",True),("strict_repair_route_observed",1)):
+        broken=report|{key:value}
+        with pytest.raises(ValueError):gate.require_determinism(broken)
+    assert gate.STATE_ATOL==1e-7 and gate.DERIVATIVE_RTOL==.01
+
+
+def test_strict_environment_source_contract(gate):
+    source=Path(gate.__file__).read_text()
+    assert 'use_deterministic_algorithms(True, warn_only=False)' in source
+    assert 'cudnn.deterministic = True' in source and 'allow_tf32 = False' in source
+    assert source.index('os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"')<source.index('            import torch')
+    assert 'if not torch.equal(v, replay_v)' in source
