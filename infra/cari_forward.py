@@ -8,7 +8,7 @@ import platform
 import sys
 import time
 
-from body_smoke import _pinned_checkout, _source_identity
+from body_smoke import _pinned_checkout, _source_identity, _body_assets
 from cari_runner import build_cari_forward_command, CHECKPOINT_SHA256, UPSTREAM_REVISION
 from world_reward.data import sha256
 
@@ -20,7 +20,7 @@ def main():
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux GPU container with network none")
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--kernel-only", action="store_true", help="Gate model checkpoint forward before whole-video input rendering")
+    parser.add_argument("--kernel-only", action="store_true", help="Gate checkpoint loading only, not actual network forward")
     args = parser.parse_args()
     import torch
     root = Path(os.environ["WR_ROOT"])
@@ -31,6 +31,10 @@ def main():
     source_identity = _source_identity(root)
     native = vendor / "reconstruction/modules/v2d_cari4d/lib/cari4d"
     assets = root / "weights/cari4d/sam3d_body"
+    body_assets, body_hashes = _body_assets(root)
+    body_report = json.loads((root / "outputs/episode_000015/body_full/report.json").read_text())
+    if body_hashes != body_report["body_assets"] or (body_assets / "mhr_buffers.pt").exists():
+        raise RuntimeError("Native CARI decoder must use original verified Body assets, not an unverified compact-buffer override")
     torch_home = assets / "torch_home"
     repository = torch_home / "hub/facebookresearch_dinov2_main"
     _pinned_checkout(repository, DINOV2_REVISION)
