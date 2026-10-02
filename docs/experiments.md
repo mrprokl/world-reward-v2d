@@ -778,3 +778,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   retry or production-route adoption. Procedural endpoint success does not
   generalize universally. Investigate constrained placement or fresh generated
   geometry, not mesh repair to evade penetration.
+- 2026-10-02 D55: independent six-case hand RGB synthesis, prerequisite actual
+  named-semantics V2 pass. Fixed neutral/left/right/bimanual/occlusion/crop cases,
+  actual named controls/limits, shared zero identity/scales, diffuse plain materials.
+  Known generating rig/poses/camera/LBS/visibility stay in a private evaluation
+  directory; inference public manifest contains only six RGB names/hash/size.
+  No generated mask, bbox or calibration given to inference.120s render budget,
+  two-case anatomical visibility preflight; failure is not real-data accuracy.
