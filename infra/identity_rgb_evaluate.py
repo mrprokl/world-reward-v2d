@@ -144,7 +144,7 @@ def public_predictions(root):
     """Complete public byte/ABI audit before any evaluation-private read."""
     import identity_rgb_infer as inference
     records, inputs = inference.public_inputs(root)
-    folder = Path(root)/BASE/"predictions_v1"
+    folder = Path(root)/BASE/"predictions_v2"
     rp = folder/"report.json"; digest = regular_hash(rp)
     report = json.loads(rp.read_text())
     require_fields(report, {"stage": inference.STAGE, "status": "pass", "phase": "complete",
@@ -310,7 +310,7 @@ def run(root, report):
 
 def main(argv=None):
     argparse.ArgumentParser(description=__doc__, allow_abbrev=False).parse_args(argv)
-    root = Path(os.environ["WR_ROOT"]); out = root/BASE/"quality_v1"
+    root = Path(os.environ["WR_ROOT"]); out = root/BASE/"quality_v2"
     if (platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}
             or root != Path("/srv/scenesmith/world-reward") or root.resolve() != root
             or not out.is_dir() or out.resolve() != out.absolute() or any(out.iterdir())):

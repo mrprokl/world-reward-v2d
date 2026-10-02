@@ -120,7 +120,7 @@ def predictions(gate, monkeypatch, tmp_path):
     monkeypatch.setattr(inference, "validate_raw", lambda data, row: None)
     monkeypatch.setattr(inference, "validate_pair", lambda data, row, raw: None)
     monkeypatch.setattr(inference, "validate_producer_bindings", lambda root, report: True)
-    out = tmp_path/gate.BASE/"predictions_v1"; (out/"raw").mkdir(parents=True); (out/"paired").mkdir()
+    out = tmp_path/gate.BASE/"predictions_v2"; (out/"raw").mkdir(parents=True); (out/"paired").mkdir()
     report = dict(stage=inference.STAGE, status="pass", phase="complete", network="none", ground_truth_used=False,
         private_truth_read=False, challenge_inputs_used=False, hand_labeled_test=False, oracle_modes=[],
         raw_frozen_before_shared=True, paired_frozen_before_reference=True, body_calls_completed=15,

@@ -1733,3 +1733,15 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   visible to automaticmasks. Source-only prepare54,432B/15files, validation
   96,216B/23files; no heavy local transit. Native paired inference dispatched
   AFTER both terminalPASS; accuracy still unmeasured.
+
+- D87validatev2 engineering **FAIL.008237s** before model/GPU calls: consumer
+  required truncated{sha,bytes} asset records but original automaticmask producer
+  correctly returns{path,sha,bytes}. Failedreceipt
+  177c40d1bd11b00daf8146632f2fff1f2fa2f7b52bff58985d6b4322896dd27a;
+  Body/MoGe/shared/referencecalls all0, no private read. Fix exact canonical
+  path+all9pinnedSHA/bytes asset inventory (not ignoreextras/dropintegrity),
+  producer-shaped tiny fixture prevents recurrence. Preserve original rendered
+  RGB/masks and failedpredictions_v1; newpredictions_v2/quality_v2 exclusively.
+  No new synthesis or mask inference required, no measured accuracy/gate change.
+  Independent133focusedPASS, shellsyntax PASS, finalfull4833PASS/1optional
+  trimeshSKIP65.00s. Exactproducer-shaped receipt contract audited independently.

@@ -77,7 +77,12 @@ def public_inputs(root):
             or not re.fullmatch("sha256:[0-9a-f]{64}", str(report.get("image_id", "")))):
         raise ValueError("Require current completed automatic masks with no fallback or labels")
     masks.completed(report)
-    if report.get("model_assets") != {name: {"sha256": value[0], "bytes": value[1]} for name, value in masks.masks.ASSETS.items()}:
+    assets = report.get("model_assets")
+    if (not isinstance(assets, dict) or set(assets) != set(masks.masks.ASSETS)
+            or any(not isinstance(assets[name], dict) or set(assets[name]) != {"path", "sha256", "bytes"}
+                   or assets[name]["path"] != str(root/"weights"/name)
+                   or assets[name]["sha256"] != pin[0] or type(assets[name]["bytes"]) is not int
+                   or assets[name]["bytes"] != pin[1] for name, pin in masks.masks.ASSETS.items())):
         raise ValueError("Automatic masks did not bind all exact detector/SAM2 assets")
     names = {"report.json"}
     for record, row in zip(records, report["records"]):
@@ -351,7 +356,7 @@ def run(root, report, path, persist):
 def main(argv=None):
     argparse.ArgumentParser(description=__doc__, allow_abbrev=False).parse_args(argv)
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}: raise RuntimeError("Require remote Linux CUDA network-none")
-    root = Path(os.environ["WR_ROOT"]); output = root/BASE/"predictions_v1"; path = output/"report.json"
+    root = Path(os.environ["WR_ROOT"]); output = root/BASE/"predictions_v2"; path = output/"report.json"
     if root != Path("/srv/scenesmith/world-reward") or output.resolve() != output.absolute() or not output.is_dir() or any(output.iterdir()):
         raise FileExistsError("Require exclusively reserved fresh inference output")
     revision, image = os.environ.get("WR_CODE_REVISION", ""), os.environ.get("WR_IMAGE_ID", "")

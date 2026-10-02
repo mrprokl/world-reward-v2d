@@ -41,7 +41,8 @@ def public(module, tmp_path):
         detector_revision=module.masks.masks.DETECTOR_REVISION, sam2_weights_revision=module.masks.masks.SAM2_REVISION,
         producer_revision="a"*40, image_id="sha256:"+"b"*64, records=rows, actual_detector_calls=30,
         actual_sam2_calls=30, actual_sam2_image_encoder_calls=15,
-        model_assets={name: {"sha256": value[0], "bytes": value[1]} for name, value in module.masks.masks.ASSETS.items()})
+        model_assets={name: {"path": str(tmp_path/"weights"/name), "sha256": value[0], "bytes": value[1]}
+                      for name, value in module.masks.masks.ASSETS.items()})
     def save():
         target = masks/"report.json"; target.chmod(0o644) if target.exists() else None
         target.write_text(json.dumps(report)); target.chmod(0o444)
@@ -53,6 +54,36 @@ def test_public_masks_and_all_fifteen_original_frames(module, public):
     assert len(records) == 15 and records[-1]["frame_index"] == 4
     assert receipt["public_manifest_sha256"] == receipt["public_inputs_sha256"]
     assert "inference" in module.helper_identities()  # importlib alias is intentionally not in sys.modules
+
+
+@pytest.mark.parametrize("fault", [None, "missing", "extra", "path", "hash", "bytes", "boolbytes", "extra_field"])
+def test_actual_asset_producer_receipt_not_oversimplified_mock(module, public, monkeypatch, fault):
+    """Run the unmodified real producer with tiny files, not invented receipts."""
+    root, report, save = public; results = root/"results"; results.mkdir(); pins = {}
+    for name in module.masks.masks.ASSETS:
+        path = root/"weights"/name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(("own_tiny_asset:"+name).encode())
+        actual = module.masks.masks.identity(path); pins[name] = (actual["sha256"], actual["bytes"])
+    monkeypatch.setattr(module.masks.masks, "ASSETS", pins)
+    (results/"image-grounding.json").write_text(json.dumps({"Id": report["image_id"]}))
+    (results/"weights-acquisition.json").write_text(json.dumps({"assets": [
+        {"repo_id": "IDEA-Research/grounding-dino-base", "revision": module.masks.masks.DETECTOR_REVISION, "path": str(root/"weights/grounding_dino")},
+        {"repo_id": "facebook/sam2.1-hiera-large", "revision": module.masks.masks.SAM2_REVISION, "path": str(root/"weights/sam2")},
+    ]}))
+    report["model_assets"] = module.masks.masks.validate_assets(root, report["image_id"])
+    assert len(report["model_assets"]) == 9
+    name = next(iter(pins)); value = report["model_assets"][name]
+    assert set(value) == {"path", "sha256", "bytes"} and value == module.masks.masks.identity(root/"weights"/name)
+    if fault == "missing": report["model_assets"].pop(name)
+    elif fault == "extra": report["model_assets"]["unapproved/file.pt"] = value.copy()
+    elif fault == "path": value["path"] = str(root/"weights/../eval_private/file.pt")
+    elif fault == "hash": value["sha256"] = "0"*64
+    elif fault == "bytes": value["bytes"] += 1
+    elif fault == "boolbytes": value["bytes"] = True
+    elif fault == "extra_field": value["unverified"] = True
+    save()
+    if fault is None: assert len(module.public_inputs(root)[0]) == 15
+    else:
+        with pytest.raises(ValueError, match="exact detector/SAM2 assets"): module.public_inputs(root)
 
 
 @pytest.mark.parametrize("fault", ["calls", "status", "private", "source", "masksha", "rgbsha", "assets", "query", "extra", "writable", "boolframes"])
