@@ -1033,3 +1033,22 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   geometry SHA90579ac5…73380. Engineering-valid mesh proposal, not accuracy
   validation/adoption or CARI4D victory. Proceed to original full-video pose
   and native forward chain, not relaxed geometry tolerances.
+- 2026-10-02 D66: consume the frozen qualified volume mesh in the existing
+  episode0 full-video/native chain. CPU receipt/GLB/NPZ hashes, exact metric
+  oriented triangles, topology and upstream embedding checks are bound; no
+  GPU resimplification, component repair or second grounding scale. Use a
+  compact nonprocessing render view, retaining the official packed arrays.
+  Strengthen full-body video provenance and automatic object-mask coverage;
+  keep the original pose hypotheses, image/ICP/Viterbi and downstream stages.
+  Full tiny suite3484PASS/1optional-trimeshSKIP30.12s. Actual initializers
+  cover790frames; no existing full-object/native targets will be overwritten.
+- 2026-10-02 D67: after native episode0 dispatch, prepare one new independent
+  joint-human/object RGB grounding cohort, three clips×three frames. Actual
+  reference MHR/own asymmetric bottle rendering, true focal1280/960/1600
+  private, inference prior fixed1280; automatic detector/SAM masks, Body and
+  MoGe2 only. Compare raw object observations against one human-anchored
+  positive clip scale. Freeze predictions before private visible-surface CD;
+  median clip gain≥5%, no clip regression>5%, full nine-frame coverage.
+  Human-first-frame shared Sim3, depth bias and permuted-alpha are diagnostics
+  only, never inference corrections or main-score alignment. No additional
+  generative object model until this cheaper grounding hypothesis survives.

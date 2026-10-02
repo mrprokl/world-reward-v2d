@@ -10,5 +10,6 @@ docker run --rm --gpus all --network none \
   --mount "type=bind,src=$ROOT/vendor,dst=$ROOT/vendor,readonly" \
   --mount "type=bind,src=$ROOT/data,dst=$ROOT/data,readonly" \
   --mount "type=bind,src=$ROOT/results,dst=$ROOT/results,readonly" \
+  --mount "type=bind,src=$ROOT/validation,dst=$ROOT/validation,readonly" \
   --mount "type=bind,src=$ROOT/outputs,dst=$ROOT/outputs" \
   world-reward/cari4d-source:0.1 python "$CODE/infra/object_pose_smoke.py" "$@"

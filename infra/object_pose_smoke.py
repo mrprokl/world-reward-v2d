@@ -27,6 +27,7 @@ def _argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
     parser.add_argument("--full-video", action="store_true")
+    parser.add_argument("--mesh-source", choices=('default','volume'), default='default')
     return parser
 
 
@@ -87,17 +88,24 @@ def main() -> None:
     started = time.perf_counter()
     # The GLB is canonical; pose is stored separately. Keep exact official budget
     # arrays for final packing and derive only a non-padding mesh for raster QA.
-    output.mkdir(exist_ok=False)
-    source_raw = trimesh.load(object_dir / "object.glb", force="mesh", process=False)
-    source_mesh = trimesh.Trimesh(source_raw.vertices, source_raw.faces, process=True)
-    fixed_mesh, topology_budget = fit_topology_preserving_budget(source_mesh)
     fixed_mesh_path = output / "object_fixed_canonical.glb"
-    fixed_mesh.export(fixed_mesh_path)
-    # Already <=4096 faces/vertices: official packer now only welds/pads. The
-    # fixed mesh is frozen before pose fit, preserving cavities and true volume.
-    vertices, faces = budget_mesh(str(fixed_mesh_path), faces=4096, vertices=4096)
-    vertices = vertices * scale[0]  # same grounding gauge, applied exactly once
-    active_indices, geometry_cleanup = normalize_degenerate_faces(vertices, faces)
+    if args.mesh_source=='volume':
+        from volume_geometry_loader import load
+        import shutil
+        vertices,faces,active_indices,geometry_cleanup,qualified_glb,topology_budget=load(
+            root,args.episode,inputs['video_sha256'],sha256(object_report_path),sha256(alignment_path),float(scale[0]))
+        output.mkdir(exist_ok=False)
+        shutil.copyfile(qualified_glb,fixed_mesh_path)  # remote only, canonical scale not applied here
+    else:
+        output.mkdir(exist_ok=False)
+        source_raw = trimesh.load(object_dir / "object.glb", force="mesh", process=False)
+        source_mesh = trimesh.Trimesh(source_raw.vertices, source_raw.faces, process=True)
+        fixed_mesh, topology_budget = fit_topology_preserving_budget(source_mesh)
+        fixed_mesh.export(fixed_mesh_path)
+        # Already <=4096 faces/vertices: official packer only welds/pads.
+        vertices, faces = budget_mesh(str(fixed_mesh_path), faces=4096, vertices=4096)
+        vertices = vertices * scale[0]  # same grounding gauge, applied exactly once
+        active_indices, geometry_cleanup = normalize_degenerate_faces(vertices, faces)
     # Official padding is represented by repeated vertex indices. Replacing
     # only numerically collapsed triangles does not change geometric surfaces.
     # Preserve exact 4096 row budget and never drop a real component/cavity.
@@ -105,7 +113,11 @@ def main() -> None:
     inactive[active_indices] = False
     faces = faces.copy()
     faces[inactive] = 0
-    mesh = trimesh.Trimesh(vertices, faces[active_indices], process=True)
+    if args.mesh_source=='volume':
+        ids,inverse=np.unique(faces[active_indices],return_inverse=True)
+        mesh=trimesh.Trimesh(vertices[ids],inverse.reshape(-1,3),process=False)
+    else:
+        mesh = trimesh.Trimesh(vertices, faces[active_indices], process=True)
     if not mesh.is_watertight or not mesh.is_winding_consistent or mesh.volume <= 0:
         raise RuntimeError("Official-budget geometry lost closed oriented volume; do not use for PEN")
     sampled, _ = trimesh.sample.sample_surface(mesh, 8192, seed=0)
@@ -124,15 +136,23 @@ def main() -> None:
         if (any(full_depth.get(key) != value for key, value in required.items())
                 or full_depth["ground_truth_used"] is not False or full_depth["hand_labeled_test"] is not False):
             raise RuntimeError("Full depth original-video provenance mismatch")
+        body_required={**required,'stage':'sam3d_body_full_video_initializer'}
+        if (any(type(full_body.get(key)) is not type(value) or full_body[key]!=value for key,value in body_required.items())):
+            raise RuntimeError("Full body original-video provenance mismatch")
         pointmaps = {record["frame_index"]: record for record in full_depth["frames"]}
         body_frames = {record["frame_index"]: record for record in full_body["frames"]}
         indices = list(range(inputs["total_frames"]))
         if (len(pointmaps) != len(full_depth["frames"]) or sorted(pointmaps) != indices
-                or sorted(body_frames) != indices or full_body["input_sha256"] != inputs["video_sha256"]
+                or len(body_frames) != len(full_body['frames']) or sorted(body_frames) != indices or full_body["input_sha256"] != inputs["video_sha256"]
                 or full_body.get("episode_index") != args.episode):
             raise RuntimeError("Full depth/body do not cover all original video frames")
     else:
         indices = inputs["indices"]
+    object_masks=base/'automatic_masks/masks/1'
+    if ([p.name for p in sorted(object_masks.glob('*.png'))]!=[f'{index:06d}.png' for index in range(inputs['total_frames'])]
+            or any(p.is_symlink() or not p.is_file() for p in object_masks.glob('*.png'))
+            or object_masks.resolve()!=object_masks.absolute()):
+        raise RuntimeError('Automatic object masks must cover every original frame as regular files')
     candidate_reports, poses_R, poses_t = [], [], []
     # Finite generic orientation hypotheses, not manually supplied object
     # symmetries. All can compete by observed silhouette; no symmetry averaging.
@@ -253,6 +273,7 @@ def main() -> None:
               "mesh_watertight": bool(mesh.is_watertight), "mesh_winding_consistent": bool(mesh.is_winding_consistent),
               "metric_gauge_extent": mesh.extents.tolist(), "official_budget_vertices": len(vertices), "official_budget_faces": len(faces),
               "geometry_cleanup": geometry_cleanup,
+              "mesh_source":args.mesh_source,
               "topology_budget": topology_budget, "fixed_canonical_mesh_sha256": sha256(fixed_mesh_path),
               "pose_hypotheses": "24_octahedral_orientations_not_asserted_true_object_symmetries",
               "objective": "maximum_automatic_mask_IoU_then_partial_depth_RMSE; no_GT_or_challenge_metric",

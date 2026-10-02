@@ -20,6 +20,7 @@ def pose(monkeypatch):
 def test_default_sparse_mode_and_all_full_episode_choices(pose):
     parsed = pose._argument_parser().parse_args([])
     assert parsed.episode == 15 and parsed.full_video is False
+    assert parsed.mesh_source=='default'
     for episode in range(30):
         parsed = pose._argument_parser().parse_args(["--episode", str(episode), "--full-video"])
         assert parsed.episode == episode and parsed.full_video is True
@@ -50,6 +51,21 @@ def test_dynamic_full_sparse_indices_and_selected_episode_provenance(pose):
     assert 'indices = inputs["indices"]' in source
     assert '"episode_index": args.episode' in source
     assert 'full_body.get("episode_index") != args.episode' in source
+
+
+def test_volume_consumer_keeps_arrays_and_existing_native_chain(pose):
+    assert pose._argument_parser().parse_args(['--episode','0','--full-video','--mesh-source','volume']).mesh_source=='volume'
+    source=Path(pose.__file__).read_text()
+    branch=source.split("if args.mesh_source=='volume':",1)[1].split('    else:',1)[0]
+    assert 'fit_topology' not in branch and 'vertices * scale' not in branch
+    assert 'shutil.copyfile(qualified_glb,fixed_mesh_path)' in branch
+    assert 'body_required={**required' in source and 'Automatic object masks must cover every original frame' in source
+    chain=Path(pose.__file__).with_name('run_episode0_volume_chain.sh').read_text()
+    assert '--episode 0 --full-video --mesh-source volume' in chain
+    for step in ['cari_prepare','cari_forward','cari_converter','final_episode_gate']:
+        assert f'run_{step}.sh" --episode 0' in chain
+    wrapper=Path(pose.__file__).with_name('run_object_pose_smoke.sh').read_text()
+    assert 'src=$ROOT/validation,dst=$ROOT/validation,readonly' in wrapper
 
 
 @pytest.mark.parametrize("argument", ["--pointmap-directory", "--root", "--manual-mask", "--shape-fit", "--no-gt"])
