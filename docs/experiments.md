@@ -1246,3 +1246,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Fullsuite3889PASS/1optional-trimeshSKIP41.40s avec caches bytecode désactivés;
   anciens caches locaux jetables nettoyés, code/receipts/predictions intacts.
   Prepare0 depth600/790 observée; tous GPU jobs qualité restent séquentiels.
+- 2026-10-02 R96 (actual-depth-v2,f10b1a7): **FAIL240s deadline**,
+  242.711s lors teardown, wrapper137. Première paire complète égale au H5
+  original: single56.011s/validation19.108s, batch8+tail1 18.669s/19.057s.
+  Reverse batch18.641s/validation19.174s, single55.924s mais sa dernière
+  validation n'achève pas avant deadline. Pas full balanced gate, pas median
+  validé/adoption et aucun seuil/budget relâché pour forcer PASS. Tous nouveaux
+  H5 temporaires supprimés vérifiés; échec SHA69f17613cf476e39b8bff170e124f8cf8c1e1dd99f6f7eebdb8f21a768fb8c8e
+  et parités partielles utiles conservés. **Écarter l'adoption active** plutôt
+  que répéter une troisième fois le même budget. Le compact R92PASS prouve
+  le mécanisme CPU, pas la procédure complète sur ces profondeurs réelles.
+  Native prepare0 reste active600/790 à18:40:51UTC, aucun job GPU relancé.

@@ -225,3 +225,10 @@ artifact transfer within Azure, explicit target support in azure_job.py (current
 VM01 hardcoded), new unit/output namespace and actual CUDA/replay checks.
 Quota permits one more40core SKU nominally; capacity/setup duration unverified.
 No snapshot, user-data copy, second VM or reader migration has been performed.
+
+2026-10-02 18:40:51UTC: actual-depth-v2CPU termine en deadlineFAIL240s,
+parité première paire et reversebatch exactes mais dernière validation incomplète.
+Temp H5 supprimés; **aucune adoption batch dans la préparation native**. R96
+retient timings/digests, pas un median validé. Source active episode0 toujours
+600/790 depth; indépendants J1→native15refine→J2→TUD-L restent en queue GPU.
+Fulltiny suite3889PASS/1optional-trimeshSKIP41.40s; worktree/code propres.
