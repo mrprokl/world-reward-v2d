@@ -250,3 +250,12 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   No pose result or quality claim emitted. Diagnose original vs budget raw vs
   processed mesh edge incidences and signed volume before changing the method.
   Do not loosen the physical gate or exploit an open/inverted submitted mesh.
+
+- 2026-10-02 D23: original Body raw blocks are retained for the native CARI
+  initializer: body133 re-encoded with official body260 helper; root Euler ZYX
+  converted by official interleaved-root6D helper (different from body6D layout);
+  hand108/shape45/scale28 unchanged and camera translation applied once. Require
+  native MHR decoder roundtrip on every frame (vertices, joints, 70 keypoints
+  <1e-5 m), exact topology and fixed-K reprojection <0.05 px. Ninety-six tiny
+  adapter regressions pass, full suite 740; real GPU validation is separate.
+  No 204→PCA pseudo-inverse, invented weights or license-eligibility claim.
