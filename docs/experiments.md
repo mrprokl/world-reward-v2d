@@ -1692,3 +1692,16 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Quality uses own minimal equivalent pixel-center unprojection and fixedseed
   8192-point sampling (data-free parity PASS), not an unused prior evaluator
   dependency. Small immutable source closures only; no images/models reach Mac.
+
+- 2026-10-02 D86 actual **PASS18.744309s** on VM01, source
+  f82594ac1f7aa651fee2b7bc0a8de931735e49fc, report
+  13d29416518cea15f932ea4f3508774d663a038966a86ccdc5e43018fec09308.
+  All790 frames: 50direct+50native+50official chunk16/tail6 calls. Frozen full
+  target/controls before replay; native worstmean.001026345mm/maxpoint
+  .002883442mm, official worstmean.000254210mm/maxpoint.001831117mm.
+  Unchanged.01mm native-point/2mm official-mean gates PASS, source bindings
+  checked, unit completed0. This establishes full NEW sharedidentity ABI
+  fidelity only; old failures remain, no accuracy/historical recovery/adoption.
+  Exact committed source payloads: D86 69,912B/18files, D87prepare54,000B/15,
+  D87validation95,740B/23, all beneath100KB. D87 preparation dispatched only
+  after D86 completion; no simultaneous VM01 GPU or heavy local transit.

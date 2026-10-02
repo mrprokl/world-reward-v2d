@@ -487,3 +487,33 @@ onlymeasureconsistency, notaccuracy. Initialfrontendsmoke180s/offline twoNEW
 procedural320×416RGB(noresize), strictload+deterministicreplay; thenpredeclared
 freshcameraablation incluninformativecontrols andlaterfullhuman-objectvalidation
 beforeanyadoption. No fittedcalibration/GT challengeinput orCARIscoreclaim.
+
+## D87 contingency — native clip identity (not measured/adopted)
+
+First test robust **geometric medoid** of uniformly sampled paired native
+shape45/scale28 proposals: decode each in the same neutral pose, select the
+actual candidate minimizing median neutral-surface distance. Keep the pair
+intact; do not average PCA/shape coefficients, animated vertices or poses.
+Equal weights, original validity guards; estimator's supplied-mask score1
+is not identity confidence and its projected keypoints are not independent
+observations. No guarantee against a common systematic bias. Fresh scenes/
+occlusion order, raw/first/medoid paired metrics on all frames, identity
+permutation-invariance control, predeclare before new GPU work. Fifteen neutral
+decodes/no new checkpoint is the cheap gate, not permission to retune D87.
+
+Second, only after evidence of observable morphology: optimize73 native
+shape45/scale28 with poses/hands/K/translations frozen, robust automatic
+visible silhouettes (object-occluded unknown), anchored identity regularizer.
+Frames0/2/4 fit,1/3 excluded from objective; another independent cohort,120s
+ceiling. Stop if silhouette alone improves, camera bias dominates, conditioning
+is poor, or opposite-axis metrics regress. No GT-derived K or same-cohort
+threshold adjustment, no pass directly to96frames.
+
+Evidence: [SAM3D Body §§6.2–6.3](https://arxiv.org/html/2602.15989v1),
+2026-02-17, describes shape/skeleton regularization but is not proof of this
+variant; [native MHRHead at NVIDIA pin7c0d3b94](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam3d_body/lib/sam_3d_body/models/heads/mhr_head.py)
+provides45/28→68; [SLAHMR CVPR2023 MIT source](https://github.com/vye16/slahmr/tree/58518fec991877bc4911e260776589185b828fe9)
+uses shared shape/reprojection, not a license grant for its SMPL stack.
+[CARI4D v3](https://arxiv.org/html/2512.11988v3),2026-04-19, motivates the
+human/object depth-gauge issue; better identity does not guarantee its solution.
+Existing SAM/custom/source-license restrictions remain unresolved.
