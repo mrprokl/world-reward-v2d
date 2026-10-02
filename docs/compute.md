@@ -249,3 +249,13 @@ the pinned CARI image, MoGe snapshot/blob/receipt and independent validation
 fixture files; preserve HF symlinks. Budget setup≤1h conditional on allocation,
 agent/egress, image and CUDA gates; failure stops only new resources. No second
 VM result, GPU adoption or migration is claimed before those gates complete.
+
+19:04UTC user explicitly authorizes community-image terms. CLI previously
+failed before any deployment because its publisher EULA URL is blank; no terms
+were bypassed. Actual creation now accepted with `--accept-term`: deployment
+`vm_deploy_PPKbqHbQ5jcAYWvCSXRhz9kVKKgbo1UE` running, VM
+`world-reward-ncc-h100-02` creating, private10.0.0.9/no publicIP, new OS128GB,
+new NSG denies ingress except temporary10.0.0.4/32→22. No existing network policy
+modified. Fresh runtime/bootstrap and task-only archive helpers have56 tiny
+tests PASS22.48s; no runtime/GPU success yet. Original prepare0 still750/790 at
+19:06UTC, active without errors; no duplicate GPU job or reader restart.

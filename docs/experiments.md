@@ -1268,3 +1268,11 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   allowlisted image/MoGe/independent-validation TAR transfers Azure-only. Existing
   queue/readers/output namespaces untouched. Fail allocation/CUDA/import gates
   without claiming GPU results; cleanup only newly identified task resources.
+- 2026-10-02 R97/D75: VM02 actual creation dispatched19:04 after direct user
+  authorization of image terms. Initial blank-EULA prompt failures happened
+  before deployment and created no VM; new NSG/NIC only. Creating NCC40adsH100
+  zone1/private10.0.0.9, noPIP, fresh OS128GB and no shared-disk clone. Explicit
+  private containerd/Docker bootstrap and whitelist14public/56withprivate
+  transfer helpers56tinytests PASS22.48s. CPU/H100/image checks still pending;
+  no secondGPU measurement/adoption. Export uses SHA-bound pinned CARI image,
+  exact MoGe chain and independent TUD-L subset only, not active containers.
