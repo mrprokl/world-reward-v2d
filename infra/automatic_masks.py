@@ -14,7 +14,9 @@ import platform
 import time
 
 from world_reward.data import sha256
-from world_reward.prompt_selection import BoxDetection, FrameDetections, select_seed_prompts
+from world_reward.prompt_selection import (
+    BoxDetection, FrameDetections, non_maximum_suppression, select_seed_prompts,
+)
 
 
 DETECTOR_REVISION = "12bdfa3120f3e7ec7b434d90674b3396eccf88eb"
@@ -29,6 +31,7 @@ def main() -> None:
     parser.add_argument("--seed-frames", type=int, default=16)
     parser.add_argument("--confidence", type=float, default=0.3)
     parser.add_argument("--ambiguity-margin", type=float, default=0.05)
+    parser.add_argument("--nms-iou", type=float, default=0.7)
     args = parser.parse_args()
     if not 0 <= args.episode < 30 or args.seed_frames < 2:
         raise ValueError("Require a valid episode and at least two seed candidate frames")
@@ -84,9 +87,13 @@ def main() -> None:
                     result, inputs.input_ids, threshold=args.confidence,
                     text_threshold=0.25, target_sizes=[(image.height, image.width)],
                 )[0]
-                groups.append(tuple(
+                raw = tuple(
                     BoxDetection(tuple(box), float(score))
                     for box, score in zip(detected["boxes"].cpu().tolist(), detected["scores"].cpu().tolist())
+                )
+                groups.append(non_maximum_suppression(
+                    raw, image.width, image.height, confidence_threshold=args.confidence,
+                    iou_threshold=args.nms_iou,
                 ))
             candidates.append(FrameDetections(int(frame_index), image.width, image.height, groups[0], groups[1]))
             evidence.append({"frame": int(frame_index), "person_candidates": len(groups[0]), "object_candidates": len(groups[1])})
@@ -117,6 +124,7 @@ def main() -> None:
         "frames": total, "seed_frame": selected.frame_index, "seed_candidates": evidence,
         "seed_confidence": selected.confidence, "rejected_seed_frames": selected.rejected_frames,
         "confidence": args.confidence, "ambiguity_margin": args.ambiguity_margin,
+        "nms_iou": args.nms_iou,
         "detector_revision": DETECTOR_REVISION, "input_sha256": expected["sha256"],
         "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "mask_areas": areas, "elapsed_seconds": time.perf_counter() - started,

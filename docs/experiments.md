@@ -65,3 +65,15 @@ test; parallelize independent hypotheses only after shared contracts are sound.
 - 2026-10-02 D06: source/model licenses separately audited. SAM/custom
   FoundationPose source eligibility and commercial CARI legacy header scope need
   organizer clarification; do not claim an award-eligible final stack yet.
+- 2026-10-02 R03 (H100 synthetic model gate): official Apache MHR forward and
+  unmodified official converter on 3 generated frames: mean vertex residual
+  0.000051495 mm, worst frame mean 0.000065821 mm; gate 0.01 mm passed in 14.32 s.
+  Independent second model forward confirmed frame/unit/shared-identity fidelity.
+  Converter SHA-256 `c799ad612fca19620563fcb93bf61e5a4adad0a04251482358746b5f27f8a52e`;
+  Torch 2.5.1+cu124. Synthetic only, not fitted challenge predictions or a score.
+- 2026-10-02 R04 (automatic segmentation initialization): predeclared episode 15,
+  16 sparse frames, confidence 0.3 / ambiguity margin 0.05. All seed frames rejected
+  due to near-tied person detections; SAM2 propagation did not run. Missing standard
+  detector NMS is a likely cause, not established by counts alone. Next test adds
+  generic class-wise IoU NMS 0.7, while retaining distinct-instance ambiguity
+  rejection and all previous thresholds. No manual per-frame annotations.

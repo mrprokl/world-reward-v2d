@@ -94,12 +94,9 @@ def _validated_detection(
     return BoxDetection(box=box, score=score)
 
 
-def _select_detection(
-    detections: Sequence[BoxDetection], width: int, height: int,
-    threshold: float, ambiguity_margin: float,
-) -> tuple[BoxDetection | None, str | None]:
-    # Exact duplicate boxes are one hypothesis, retaining the best score. Do not
-    # spatially merge, clamp, round or fabricate hypotheses from detector output.
+def _ordered_valid_detections(
+    detections: Sequence[BoxDetection], width: int, height: int, threshold: float,
+) -> list[BoxDetection]:
     if not isinstance(detections, Sequence):
         raise ValueError("detections must be a sequence (empty when missing)")
     valid: dict[tuple[float, float, float, float], BoxDetection] = {}
@@ -109,7 +106,60 @@ def _select_detection(
             previous = valid.get(checked.box)
             if previous is None or checked.score > previous.score:
                 valid[checked.box] = checked
-    ordered = sorted(valid.values(), key=lambda item: (-item.score, item.box))
+    return sorted(valid.values(), key=lambda item: (-item.score, item.box))
+
+
+def _box_iou(a: BoxDetection, b: BoxDetection) -> float:
+    ax0, ay0, ax1, ay1 = a.box
+    bx0, by0, bx1, by1 = b.box
+    intersection_width = max(0.0, min(ax1, bx1) - max(ax0, bx0))
+    intersection_height = max(0.0, min(ay1, by1) - max(ay0, by0))
+    # A common scale leaves IoU unchanged and avoids overflowing area products.
+    scale = max(ax1 - ax0, ay1 - ay0, bx1 - bx0, by1 - by0)
+    intersection = (intersection_width / scale) * (intersection_height / scale)
+    area_a = ((ax1 - ax0) / scale) * ((ay1 - ay0) / scale)
+    area_b = ((bx1 - bx0) / scale) * ((by1 - by0) / scale)
+    union = area_a + area_b - intersection
+    return intersection / union if union > 0 else 0.0
+
+
+def non_maximum_suppression(
+    detections: Sequence[BoxDetection], width: int, height: int,
+    confidence_threshold: float, iou_threshold: float = 0.7,
+) -> tuple[BoxDetection, ...]:
+    """Greedy same-class NMS; run independently for person and object queries.
+
+    Drop invalid/low-confidence boxes, deduplicate exact boxes, then retain the
+    highest-confidence original box and suppress candidates with IoU *strictly*
+    greater than the threshold. Equal scores sort by xyxy coordinates, making
+    results independent of input order. No averaging, clamping or box invention.
+    Threshold 0 suppresses any positive overlap; threshold 1 keeps all distinct
+    boxes. Containment alone is not duplication: a giant enclosing box has low
+    IoU with a small instance and remains available to the ambiguity gate.
+    """
+    width = _integer(width, "width", minimum=1)
+    height = _integer(height, "height", minimum=1)
+    confidence = _real(confidence_threshold)
+    threshold = _real(iou_threshold)
+    if confidence is None or not 0 <= confidence <= 1:
+        raise ValueError("confidence_threshold must be finite in [0, 1]")
+    if threshold is None or not 0 <= threshold <= 1:
+        raise ValueError("iou_threshold must be finite in [0, 1]")
+    ordered = _ordered_valid_detections(detections, width, height, confidence)
+    kept: list[BoxDetection] = []
+    for candidate in ordered:
+        if not any(_box_iou(candidate, previous) > threshold for previous in kept):
+            kept.append(candidate)
+    return tuple(kept)
+
+
+def _select_detection(
+    detections: Sequence[BoxDetection], width: int, height: int,
+    threshold: float, ambiguity_margin: float,
+) -> tuple[BoxDetection | None, str | None]:
+    # NMS is an explicit caller-side preprocessing step; selecting raw near-tied
+    # boxes still fails closed. Exact duplicates remain a single hypothesis.
+    ordered = _ordered_valid_detections(detections, width, height, threshold)
     if not ordered:
         return None, "no valid detection above confidence threshold"
     if len(ordered) > 1:

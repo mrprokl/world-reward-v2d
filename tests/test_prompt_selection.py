@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from world_reward.prompt_selection import (
-    BoxDetection, FrameDetections, select_seed_prompts,
+    BoxDetection, FrameDetections, non_maximum_suppression, select_seed_prompts,
 )
 
 
@@ -197,3 +197,128 @@ def test_missing_sequence_container_has_explicit_schema_error():
     missing = FrameDetections(0, 100, 100, None, [])
     with pytest.raises(ValueError, match="detections must be a sequence"):
         select([missing])
+
+
+def nms(detections, **kwargs):
+    return non_maximum_suppression(detections, 100, 100, 0.3, **kwargs)
+
+
+def test_nms_suppresses_high_iou_duplicate_before_unchanged_ambiguity_gate():
+    near_duplicate = (11.0, 6.0, 74.0, 94.0)
+    candidates = [detection(PERSON, 0.9), detection(near_duplicate, 0.89)]
+    with pytest.raises(ValueError, match="ambiguous"):
+        select([frame(persons=candidates)])
+    kept = nms(candidates)
+    assert kept == (detection(PERSON, 0.9),)
+    assert select([frame(persons=kept)]).person.box == PERSON
+
+
+def test_nms_keeps_genuine_separated_near_tied_instances_ambiguous():
+    candidates = [detection(OBJECT, 0.9), detection(OTHER, 0.89)]
+    kept = nms(candidates)
+    assert len(kept) == 2
+    with pytest.raises(ValueError, match="ambiguous"):
+        select([frame(objects=kept)])
+
+
+def test_nms_does_not_merge_giant_enclosing_box_with_small_instance():
+    enclosing = (0.0, 0.0, 100.0, 100.0)
+    candidates = [detection(enclosing, 0.9), detection(OTHER, 0.89)]
+    assert nms(candidates) == tuple(candidates)
+    with pytest.raises(ValueError, match="ambiguous"):
+        select([frame(objects=nms(candidates))])
+
+
+def test_nms_equal_scores_use_box_tie_break_not_input_order():
+    first = detection((10, 10, 80, 80), 0.9)
+    second = detection((11, 11, 81, 81), 0.9)
+    assert nms([first, second]) == nms([second, first]) == (first,)
+
+
+def test_nms_is_greedy_against_retained_boxes_not_suppressed_boxes():
+    # Adjacent overlaps exceed 0.3; first and last overlap less. The suppressed
+    # middle box must not transitively suppress the third distinct hypothesis.
+    a = detection((0, 0, 40, 40), 0.9)
+    b = detection((20, 0, 60, 40), 0.8)
+    c = detection((40, 0, 80, 40), 0.7)
+    assert nms([c, b, a], iou_threshold=0.3) == (a, c)
+
+
+def test_nms_threshold_zero_keeps_disjoint_and_touching_boxes():
+    a = detection((0, 0, 10, 10), 0.9)
+    overlap = detection((9, 0, 20, 10), 0.8)
+    touching = detection((10, 0, 20, 10), 0.7)
+    separate = detection((50, 50, 60, 60), 0.6)
+    assert nms([separate, overlap, touching, a], iou_threshold=0) == (a, touching, separate)
+
+
+def test_nms_threshold_one_still_exact_deduplicates_but_keeps_distinct_boxes():
+    a = detection(PERSON, 0.9)
+    b = detection((11, 6, 74, 94), 0.89)
+    assert nms([detection(PERSON, 0.8), b, a], iou_threshold=1) == (a, b)
+
+
+def test_nms_equal_iou_threshold_not_suppressed():
+    a = detection((0, 0, 10, 10), 0.9)
+    b = detection((0, 0, 5, 10), 0.8)
+    assert nms([b, a], iou_threshold=0.5) == (a, b)
+
+
+@pytest.mark.parametrize("bad_detection", [
+    detection((-1, 0, 10, 10), 0.99),
+    detection((0, 0, 101, 10), 0.99),
+    detection((0, 0, 10, 101), 0.99),
+    detection((0, 0, 0, 10), 0.99),
+    detection((0, 0, float("nan"), 10), 0.99),
+    detection((0, 0, float("inf"), 10), 0.99),
+    detection((0, 0, 10), 0.99),
+    detection(None, 0.99),
+    detection(score=1.1), detection(score=-1),
+    detection(score=float("nan")), detection(score=float("inf")),
+    detection(score=True), detection(score=0.29),
+])
+def test_nms_invalids_are_dropped_without_shadowing_good_box(bad_detection):
+    good = detection(OTHER, 0.8)
+    assert nms([bad_detection, good]) == (good,)
+
+
+def test_nms_empty_or_all_invalid_returns_no_invented_boxes():
+    assert nms([]) == ()
+    assert nms([detection(score=0.2)]) == ()
+
+
+@pytest.mark.parametrize("threshold", [-0.1, 1.1, float("nan"), float("inf"), True, "0.7"])
+def test_nms_invalid_iou_threshold_is_explicit_error(threshold):
+    with pytest.raises(ValueError, match="iou_threshold"):
+        nms([detection()], iou_threshold=threshold)
+
+
+@pytest.mark.parametrize("threshold", [-0.1, 1.1, float("nan"), float("inf"), True])
+def test_nms_invalid_confidence_threshold_is_explicit_error(threshold):
+    with pytest.raises(ValueError, match="confidence_threshold"):
+        non_maximum_suppression([], 100, 100, threshold)
+
+
+@pytest.mark.parametrize("dimensions", [(0, 100), (100, -1), (100.0, 100), (True, 100)])
+def test_nms_invalid_image_dimensions_are_explicit_error(dimensions):
+    with pytest.raises(ValueError):
+        non_maximum_suppression([], *dimensions, 0.3)
+
+
+def test_nms_bad_schema_is_explicit_error():
+    with pytest.raises(ValueError, match="sequence"):
+        nms(None)
+    with pytest.raises(ValueError, match="BoxDetection"):
+        nms([{"box": OTHER, "score": 0.9}])
+
+
+def test_nms_returns_native_json_numbers_for_numpy_detector_scalars():
+    kept = nms([detection(tuple(np.float32(x) for x in PERSON), np.float32(0.9))])
+    assert type(kept[0].score) is float
+    assert all(type(x) is float for x in kept[0].box)
+
+
+def test_nms_finite_large_coordinates_do_not_overflow_iou_area():
+    a = detection((0.0, 0.0, 1e200, 1e200), 0.9)
+    b = detection((0.0, 0.0, 9e199, 9e199), 0.8)
+    assert non_maximum_suppression([a, b], 10**201, 10**201, 0.3) == (a,)
