@@ -14,7 +14,7 @@ from pathlib import Path, PurePosixPath
 import platform
 import re
 
-DEFAULT_CONFIG = Path(__file__).resolve().parents[3] / "configs" / "sources.json"
+DEFAULT_CONFIG = Path(__file__).resolve().parents[2] / "configs" / "sources.json"
 
 
 def allowed_path(path: str) -> bool:

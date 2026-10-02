@@ -39,4 +39,3 @@ def require_video_only_provenance(provenance: dict) -> None:
         raise ValueError("Reconstruction must derive from Track 1")
     if provenance.get("oracle_modes") != []:
         raise ValueError("All oracle modes must be disabled explicitly")
-

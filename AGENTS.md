@@ -32,4 +32,3 @@ on the local host; remote commands may use the remote runtime directly.
 - Submit one frozen Parquet to all five competitions under **World Reward**;
   Thomas Gomez only where registration requires a personal name. Check rule
   acceptance, GitHub commit accessibility and weekly quota before upload.
-
