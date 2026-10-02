@@ -1339,3 +1339,13 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   continuation repeats extractedtaskassetinventory/SHA, realGPUtorchsmoke only
   aftergraphPASS. DA3CPUimport alias binds that newimportreceipt; no modelresult
   before gates. TinyownOCIgraph11testsPASS, noactualimportproofyet.
+
+- 2026-10-02 R103: importv2 actualCUDA**PASS**, sealedTAR→OCIindex→AMD64platform
+  →classicconfig and44rootfs identical. Native15converter**PASS132.557s**,
+  independentmean.826410mm/worst1.787483397thframe, referencepointmax10.1643mm
+  diagnosticnotgate; schema501PASS. Noheld-outquality/CARIvictoryclaim.
+  Frozenreportsrefine22b3c20a…891c/conversion63d7d549…236b/schema18d0b18e…8d8f.
+  TemporarySSHauthorization+VM01privatekey+newallowrule revoked afteralltransfers;
+  onlynewdeny-ingressrule remains. DA3pairedchain9735385 dispatchedunderD76;
+  readonlyaudit112testsPASS, fulltinysuite4148PASS/1optionalSKIP61.97s before
+  diagnosticruntimeintegration, no numericalGPUprooffromtests.

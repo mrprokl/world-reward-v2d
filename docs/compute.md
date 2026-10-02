@@ -311,3 +311,17 @@ continuation verifies full TAR SHA203af62c…21b4e, each small graph digest/size
 exact pinned config, legacy manifest and every ordered rootfs diff-ID before
 CUDA smoke and a fresh import receipt. Failedv1 log/unit and old snapshots stay
 unchanged. GPU runtime/inference still unverified onVM02.
+
+19:40UTC VM02 import continuation **PASS**: sealedindex/platform/config graph
+and all44orderedrootfs layers identical, actualCUDAeye-matmulPASS/H100NVL.
+Effective classicimageconfig7ebfff18…c6d3 explicitlyrecorded vsoriginalOCIindex
+b47e4450…380a7; no rebuild/reimport. Native501refinementreceiptSHA
+22b3c20a2f8b948630e2f5cbc30dbb4ef9d713501037a2796475ab9bffd1891c,
+conversion63d7d54974dc2bcae0bae285bb0de651b20de894283810a70d120eb27d7c236b,
+finalschema18d0b18e7c68e4244b70c2bd337ced5bd6faf5d168b3e0458a6a72aba12e8d8f.
+Conversion132.557s/mean.826410/worst1.787483mm all501PASS2mm unchanged.
+TemporaryprivateSSHkey/authorizedkey removed and newNSGallowrule deleted;
+newVM02 nowonlyexplicitdeny-all-inbound4096, unrelatedkeys/networkuntouched.
+DA3chain9735385 dispatched(runtimeCPU→frozenbaselineimport→9actualGPUcalls→
+pairedCPUprivatequality). Native0dispatch initiallyConflict whileVM01keycleanup
+RunCommandpending: nojobstarted, inspectabsence beforeexplicitnewdispatch.
