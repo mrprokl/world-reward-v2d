@@ -35,8 +35,11 @@ def main() -> None:
     repository = hub / "facebookresearch_dinov2_main"
     _pinned_checkout(repository, DINOV2_REVISION)
     aux = json.loads((root / "results/auxiliary-assets.json").read_text())
-    for record in aux["checkpoints"]:
-        if "_reg4_" in record["filename"] and sha256(hub / "checkpoints" / record["filename"]) != record["sha256"]:
+    checkpoints = [r for r in aux["checkpoints"] if "_reg4_" in r["filename"]]
+    if {r["filename"] for r in checkpoints} != {"dinov2_vitl14_reg4_pretrain.pth", "dinov2_vitb14_reg4_pretrain.pth"} or len(checkpoints) != 2:
+        raise RuntimeError("Require both explicitly acquired Objects DINO register checkpoints")
+    for record in checkpoints:
+        if sha256(hub / "checkpoints" / record["filename"]) != record["sha256"]:
             raise RuntimeError("Objects DINO checkpoint changed after acquisition")
     output = root / "outputs/episode_000015/object_smoke"
     if output.exists():
@@ -67,7 +70,7 @@ def main() -> None:
         if repo_or_dir not in ("facebookresearch/dinov2", "facebookresearch/dinov2:main"):
             raise RuntimeError(f"Unexpected Torch Hub request: {repo_or_dir}")
         model = kwargs.get("model", arguments[0] if arguments else None)
-        if model not in ("dinov2_vitl14_reg", "dinov2_vitb14_reg", "dinov2_vitl14", "dinov2_vitb14"):
+        if model not in ("dinov2_vitl14_reg", "dinov2_vitb14_reg"):
             raise RuntimeError(f"Unexpected Objects backbone model: {model}")
         calls.append(model)
         kwargs["source"] = "local"
@@ -96,6 +99,13 @@ def main() -> None:
             or (mesh.faces >= len(mesh.vertices)).any() or not np.isfinite(mesh.area) or mesh.area <= 0):
         raise RuntimeError("Generated object mesh is nonfinite/empty/invalid")
     transform = json.loads((output / "transform.json").read_text())
+    rotation = np.asarray(transform["rotation"], dtype=float)
+    translation = np.asarray(transform["translation"], dtype=float)
+    scale = np.asarray(transform["scale"], dtype=float)
+    if (rotation.shape != (4,) or translation.shape != (3,) or scale.shape != (3,)
+            or not np.isfinite(np.concatenate((rotation, translation, scale))).all()
+            or not np.isclose(np.linalg.norm(rotation), 1., atol=1e-5) or (scale <= 0).any()):
+        raise RuntimeError("Generated pose must have finite unit quaternion, translation and positive scale")
     report = {"stage": "sam3d_objects_fixed_frame_smoke", "status": "pass", "episode_index": 15,
               "frame_index": 0, "seed": 0, "elapsed_seconds": time.perf_counter() - started,
               "vertices": len(mesh.vertices), "faces": len(mesh.faces),
