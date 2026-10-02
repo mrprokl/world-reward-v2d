@@ -189,3 +189,13 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Native input forward max residual ~2.5e-7 m; keypoint reprojection <0.000066 px.
   Next extend the verified initializer to all 501 original frames, preserving
   full indices; do not present framewise estimates as CARI temporal refinement.
+- 2026-10-02 R18: full 501-frame Body initialization passed in 172.99 s, then
+  full official conversion with one shared identity passed in 106.61 s: 0.9719 mm
+  mean / 1.4861 mm worst-frame mean residual to predicted meshes, no invalid input
+  frames. Frame count/pinhole/native model checks cover the entire clip. Still
+  framewise initialization, not a final CARI refinement or GT benchmark.
+- 2026-10-02 R19: three fixed MoGe2 depth predictions passed in 8.06 s with only
+  RGB-size FOV prior. Added equal-frame robust single depth-scale and partial
+  rigid ICP with 39/49 synthetic tests; no learned scale truth claim. Analytic CUDA
+  camera/depth raster gate must pass before human/object scale consistency smoke.
+  Full local suite 597 passed.

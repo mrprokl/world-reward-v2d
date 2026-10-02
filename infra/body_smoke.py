@@ -455,10 +455,10 @@ def main() -> None:
     }
     with (output_directory / "report.json").open("x") as handle:
         handle.write(json.dumps(report, indent=2) + "\n")
-    print(json.dumps({key: report[key] for key in (
-        "stage", "status", "episode_index", "frame_indices", "geometry_units",
+    print(json.dumps({**{key: report[key] for key in (
+        "stage", "status", "episode_index", "geometry_units",
         "mhr_geometry_forward_verified", "submission_eligible", "elapsed_seconds",
-    )}))
+    )}, "frames": len(inputs["indices"]), "frame_index_range": [inputs["indices"][0], inputs["indices"][-1]]}))
 
 
 if __name__ == "__main__":

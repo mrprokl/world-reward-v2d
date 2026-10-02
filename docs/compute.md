@@ -140,3 +140,11 @@ Official shared-identity conversion of the three real Body meshes completed:
 fidelity, not challenge error. Full 501-frame Body initializer is now running as
 `world-reward-body-full-video`; latest observation active, H100 20% / 4,822 MiB,
 managed disk 589 GB free. Do not restart this job while merely waiting for it.
+
+Full Body initializer completed exit 0: 501 frames in 172.99 s. Loaded model
+decoder mask settings ENABLE=True, MASK_EMBED_TYPE=v2, MASK_PROMPT=v1; automatic
+masks are externally supplied. Full official shared-identity conversion then
+completed in 106.61 s, no invalid input frames; independent mean mesh residual
+0.9719 mm, worst frame mean 1.4861 mm. These are prediction-to-export residuals,
+not challenge error. Three-frame MoGe2 depth smoke passed in 8.06 s, offline with
+RGB-size FOV prior only. CUDA camera/depth analytic gate precedes scale fitting.
