@@ -805,3 +805,20 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   proposals from disclosed synthetic oracle observations, not accuracy evidence.
   Native decoder-to-GLB axis rotation and anchor pose need a verified gauge
   bridge before any scoring/real-video use; neither mesh is adopted.
+- 2026-10-02 D57: diagnose the frozen failed216-row reference fixture without
+  loosening replay/support tolerances.20 forwards maximum: default CUDA, strict
+  CUDA and strict CPU, both corrective modes with three repeats. Actual scripted
+  source hashed; kernel identity/causal mechanism remain unverified.120s budget.
+- 2026-10-02 R68 (Azure reference determinism,aa2ba21): PASS10.319s/20calls.
+  Default CUDA changed vertices up to4.57764e-5 model-cm and skeleton elements
+  up to3.81470e-6; strict CUDA and strict CPU each replayed raw-bit identically
+  in both corrective modes. This supports a strict execution route, not hand
+  accuracy, CPU/GPU cross-device bit equality or a proven kernel cause. V3 uses
+  deterministic algorithms, CUBLAS workspace, disabled TF32 and fixed seeds;
+  frozen V1/V2 failures and numerical thresholds are unchanged.
+- 2026-10-02 D58: reserve/chown only the new renderer dataset, not the shared
+  validation parent, and mount that dataset only. Separate private CPU evaluation
+  can read truth only after frozen public inference/official proposals; report
+  absolute hand PVE/finger MPJPE and distinct wrist-relative diagnostics over all
+  six cases. Frozen>=5% mean nonneutral PVE gain and<=0.01mm neutral-side
+  regression are synthetic-only hypothesis gates, never adoption or V2D scores.
