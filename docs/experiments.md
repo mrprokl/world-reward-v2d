@@ -1417,3 +1417,15 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Inference/fit/publicfreeze/privatefirewall areengineeringPASS, distinctfrom
   hypothesisFAIL. Preservefrozenresults; investigatebetterdepth/camera/human
   anchoring onnewvalidation, notreselectbetausingprivategroundtruth.
+
+- 2026-10-02 R108: native refined0 sealedconverterdiagnostic **PASS311.155s**
+  runtime/provenance, **fidelityFAIL**. ActualF64LM60 fd1e-6 withunchanged
+  sharedidentity onprobes[0,535,1], then separateexactF32replays: beforemm
+  [6.09732674,1.91778015,6.28012083]→[6.09670672,1.91576035,6.27935987].
+  Worstnativeofficialframe1=6.28013468mm. Thisdoesnotrepair2mm; nofullpose-only
+  rerun/adoption or gatewaiver. Fulloriginalerrors+parameters sealedbefore
+  anygate; runtimeactual1LM+2replays, source/model/inputs unchanged.
+  Diagnosticreceipt dbcb2177c20c213ee68cf026a89b8f493dc4851930907af0d6753992a5ccdce2.
+  Nextcandidateonlyifjustified: predeclaredsmall constrainedsharedidentity
+  inversefit plus reservedframefidelity, never averageperframeidentities or
+  altertargetgeometry toclaimconversionPASS. GTaccuracyremainunverified.
