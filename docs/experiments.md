@@ -1802,3 +1802,16 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   sameupstreamgeometrySHA; thirteen support/restore/ABI tests PASS. OldD87/
   modeldrivers unchanged. Initial101.4KBsourceclosure too large rejected before
   dispatch; newclosure~79.7KB, no100KBbudget relaxation or data inclusion.
+
+- D88assets+prepare actual **PASS**, VM01 sourced691578c89db3f218afd4b1293f1e8f6957ca18b:
+  pinnedDA3acquisition30.956223s, original1,336,734,448B/model/sourceverified,
+  receipt68fccf6a856d1809c146f75fcab1fb58b2fb07dbca024ba3b5f9d0bf82636a9b.
+  Addict3832Bunchangedzip/noinstall, receipt
+  b3c7cc468641137485d6ca3a99a1665444a56a630b5d87eb16303d93465cd6b9.
+  Fresh15RGB render7.099678s/twoofficialcalls, receipt
+  929cd1ad072324f67ab85cc8015f737a96959810523a65c5cc1c3b76c7d3a166;
+  publicmanifest0329fa8616e6a19b2bc3f945b097720eacc93384e4ae3987ae72cfa7c12ed2b4.
+  SeparateCPU/networkacquisition overlaps GPUrender only, notbackendGPU.
+  NoheavyMac/SSH transfer, sourcepayloadassets12,632B/7files, prepare48,168B/14,
+  validation80,112B/24. Bothterminal0 before serialMoGe→DA3→privateCPUdispatch.
+  All15newtruths remainprivate; no depthaccuracyresult yet.
