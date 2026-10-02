@@ -80,8 +80,9 @@ def main():
         environment = plan["environment"]
     os.environ.update(environment)
     os.environ["MPLCONFIGDIR"] = "/tmp/world-reward-matplotlib"
-    sys.path.insert(0, str(native))
-    sys.path.insert(0, "/workspace/v2d_sam3d_body/lib")
+    # Insertion order matters: SAM Body also exports a top-level tools package.
+    # Use the already-tested native-first child ordering in one operation.
+    sys.path[:0] = environment["PYTHONPATH"].split(":")
     # Tensor cache completeness cannot stop Hub querying GitHub. Enforce the
     # pinned local checkout explicitly, and reject any unexpected hub source.
     original_hub = torch.hub.load
@@ -99,7 +100,10 @@ def main():
     output.mkdir(exist_ok=False)
     started = time.perf_counter()
     try:
-        from tools.run_mhr_wild_inference import run_mhr_wild_inference
+        from tools import run_mhr_wild_inference as native_inference
+        if Path(native_inference.__file__).resolve() != (native / "tools/run_mhr_wild_inference.py").resolve():
+            raise RuntimeError("Native CoCoNet import resolved to an unrelated tools package")
+        run_mhr_wild_inference = native_inference.run_mhr_wild_inference
         if args.kernel_only:
             from tools.run_mhr_wild_inference import _load_config, _load_checkpoint_model
             cfg = _load_config(native / "learning/configs/mhr-daniel-commercial-moge2-behave79-val-fp16.yml")

@@ -188,6 +188,118 @@ def raster_camera_mesh(vertices_camera_m, faces, camera_matrix, width=1536, heig
     return mask, depth
 
 
+def _mesh_batch_inputs(vertices_camera_m, faces, camera_matrix, width, height, near_clip_m):
+    vertices = _finite_array(vertices_camera_m, "vertices_camera_m")
+    if vertices.ndim != 3 or vertices.shape[0] < 1 or vertices.shape[1] < 3 or vertices.shape[2] != 3:
+        raise ValueError("Require a nonempty [B,V,3] batch sharing one fixed mesh topology")
+    # Apply exactly the scalar contracts to every supplied candidate. Batched
+    # execution is not permission to skip a failed candidate or alter topology.
+    checked = [_mesh_inputs(value, faces, camera_matrix, width, height, near_clip_m) for value in vertices]
+    return np.stack([record[0] for record in checked]), checked[0][1], checked[0][2]
+
+
+def raster_camera_mesh_batch(vertices_camera_m, faces, camera_matrix, width=1536, height=1152,
+                             *, near_clip_m=1e-4):
+    """Same exact CUDA raster contracts, batching independent fixed-mesh poses.
+
+    Caller controls batch size/memory; no downsampling, evidence filtering,
+    clipping or approximate projection is introduced to gain throughput.
+    Returns bool mask and camera-Z depth CUDA [B,H,W], NaN off the mesh.
+    """
+    vertices, indices, matrix = _mesh_batch_inputs(
+        vertices_camera_m, faces, camera_matrix, width, height, near_clip_m,
+    )
+    if platform.system() != "Linux":
+        raise RuntimeError("Rendering is restricted to the Azure Linux CUDA runtime")
+    import torch
+    import pytorch3d
+    from pytorch3d.renderer import MeshRasterizer, RasterizationSettings
+    from pytorch3d.structures import Meshes
+
+    if not torch.cuda.is_available():
+        raise RuntimeError("CUDA unavailable; no CPU rendering fallback")
+    if pytorch3d.__version__ != "0.7.9":
+        raise RuntimeError("Require audited PyTorch3D 0.7.9 camera/depth contracts")
+    count = len(vertices)
+    with torch.inference_mode():
+        camera = _opencv_camera(torch, matrix, width, height).extend(count)
+        verts_gpu = torch.as_tensor(vertices, device="cuda")
+        faces_gpu = torch.as_tensor(indices, device="cuda")
+        mesh = Meshes(verts=list(verts_gpu.unbind(0)), faces=[faces_gpu] * count)
+        settings = RasterizationSettings(
+            image_size=(int(height), int(width)), blur_radius=0., faces_per_pixel=1,
+            perspective_correct=True, clip_barycentric_coords=False,
+            cull_backfaces=False, cull_to_frustum=False, z_clip_value=None,
+            max_faces_per_bin=len(indices),
+        )
+        fragments = MeshRasterizer(cameras=camera, raster_settings=settings)(mesh)
+        mask, depth = fragments.pix_to_face[..., 0] >= 0, fragments.zbuf[..., 0]
+        if mask.shape != (count, height, width) or depth.shape != mask.shape or not mask.is_cuda or not depth.is_cuda:
+            raise RuntimeError("Batched raster output violated original-resolution/CUDA contract")
+        if not torch.isfinite(depth[mask]).all() or (depth[mask] <= near_clip_m).any():
+            raise RuntimeError("Batched raster camera depth is nonfinite or behind the near plane")
+        depth = torch.where(mask, depth, torch.full_like(depth, float("nan")))
+    return mask, depth
+
+
+def _run_batch_parity(torch):
+    """Own procedural mesh/poses only, exact parity before a speed claim.
+
+    Benchmark full original image grid, 8 independent poses, median of 3
+    synchronized trials. No challenge image, inferred mesh, or hidden GT.
+    This tests computation parity, not pose reconstruction accuracy.
+    """
+    from scipy.spatial.transform import Rotation
+    import trimesh
+    mesh = trimesh.creation.icosphere(subdivisions=3, radius=1.)
+    # Deliberately anisotropic, tilted object to test perspective and ordering.
+    vertices = np.asarray(mesh.vertices) * [.4, .23, .31]
+    rotations = Rotation.from_rotvec(np.arange(24).reshape(8, 3) * .03).as_matrix()
+    translations = np.column_stack((np.linspace(-.9, .9, 8), np.linspace(.2, -.2, 8), np.linspace(3., 4., 8)))
+    posed = vertices[None] @ rotations.transpose(0, 2, 1) + translations[:, None]
+    K = np.array([[1920., 0., 768.], [0., 1920., 576.], [0., 0., 1.]])
+    # Scalar and batch use identical topology, no shortcuts to a mask score.
+    scalar_masks, scalar_depths = [], []
+    for value in posed:
+        mask, depth = raster_camera_mesh(value, mesh.faces, K)
+        scalar_masks.append(mask)
+        scalar_depths.append(depth)
+    scalar_masks, scalar_depths = torch.stack(scalar_masks), torch.stack(scalar_depths)
+    batch_mask, batch_depth = raster_camera_mesh_batch(posed, mesh.faces, K)
+    if not torch.equal(scalar_masks, batch_mask):
+        raise RuntimeError("Batched CUDA raster changed exact silhouette pixels")
+    error_m = float(torch.abs(scalar_depths[scalar_masks] - batch_depth[scalar_masks]).max())
+    if not np.isfinite(error_m) or error_m > 1e-5:
+        raise RuntimeError("Batched CUDA raster changed camera-Z beyond float32 tolerance")
+    singleton_mask, singleton_depth = raster_camera_mesh_batch(posed[:1], mesh.faces, K)
+    if not torch.equal(singleton_mask[0], scalar_masks[0]) or not torch.allclose(
+        singleton_depth[0], scalar_depths[0], atol=1e-5, rtol=0, equal_nan=True,
+    ):
+        raise RuntimeError("Batched singleton differs from exact scalar raster")
+    del scalar_masks, scalar_depths, batch_mask, batch_depth, singleton_mask, singleton_depth
+    durations = {"scalar": [], "batch": []}
+    for trial in range(3):
+        for mode in (("scalar", "batch") if trial % 2 == 0 else ("batch", "scalar")):
+            torch.cuda.synchronize()
+            started = time.perf_counter()
+            if mode == "scalar":
+                for value in posed:
+                    result = raster_camera_mesh(value, mesh.faces, K)
+            else:
+                result = raster_camera_mesh_batch(posed, mesh.faces, K)
+            torch.cuda.synchronize()
+            durations[mode].append(time.perf_counter() - started)
+            del result
+    speedup = float(np.median(durations["scalar"]) / np.median(durations["batch"]))
+    return {"own_procedural_reference": True, "challenge_inputs_used": False,
+            "batch_size": len(posed), "mesh_vertices": len(vertices), "mesh_faces": len(mesh.faces),
+            "exact_mask_parity": True, "singleton_parity": True, "camera_z_max_error_m": error_m,
+            "image_size_hw": [1152, 1536], "synchronized_trials_seconds": durations,
+            "median_speedup": speedup, "predeclared_minimum_useful_speedup": 1.3,
+            "throughput_hypothesis_accepted": bool(speedup >= 1.3),
+            "peak_gpu_allocated_bytes": torch.cuda.max_memory_allocated()}
+
+
 def _smoke_reference():
     """Synthetic CPU arrays only; CUDA raster results must match these references."""
     width, height = 128, 96
@@ -277,8 +389,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path("/srv/scenesmith/world-reward"))
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--batch-parity", action="store_true")
     args = parser.parse_args()
-    report_path = args.report or args.root / "results/camera-render.json"
+    report_path = args.report or args.root / "results" / ("camera-render-batch.json" if args.batch_parity else "camera-render.json")
     if report_path.exists():
         raise FileExistsError("Renderer smoke reports are frozen; do not overwrite")
     import torch
@@ -286,7 +399,7 @@ def main() -> None:
 
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA unavailable; no CPU rendering fallback")
-    report = {"stage": "opencv_camera_cuda_raster_smoke", "status": "fail",
+    report = {"stage": "opencv_camera_cuda_batch_parity" if args.batch_parity else "opencv_camera_cuda_raster_smoke", "status": "fail",
               "torch": torch.__version__, "pytorch3d": pytorch3d.__version__,
               "expected_pytorch3d_revision": PYTORCH3D_REVISION,
               "gpu": torch.cuda.get_device_name(), "backend": "pytorch3d_cuda_no_egl",
@@ -298,7 +411,7 @@ def main() -> None:
               "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
     started = time.perf_counter()
     try:
-        report["gates"] = _run_smoke(torch)
+        report["gates"] = _run_batch_parity(torch) if args.batch_parity else _run_smoke(torch)
         report["status"] = "pass"
     except Exception as exc:
         report["error_type"], report["error"] = type(exc).__name__, str(exc)

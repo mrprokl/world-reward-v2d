@@ -332,3 +332,18 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   timeline binding. New automatic-mask entrypoint uses existing immutable
   source and offline image, without builds/downloads. Full local suite999 passes;
   tests use tiny synthetic inputs, not extra challenge labels or heavy assets.
+
+- 2026-10-02 R30 (native gate fail-fast): checkpoint-only job exited1 before
+  loading CoCoNet because Body's top-level tools package won parent sys.path.
+  Azure confirms pinned native tools/__init__.py and entrypoint both exist.
+  Fix import ordering to the already-tested native-first PYTHONPATH and assert
+  resolved entrypoint identity. No vendor code, model or live object job changed;
+  no checkpoint-forward success claimed from this failed gate.
+- 2026-10-02 D29: throughput branch batches independent raster poses at the
+  unchanged 1536×1152 camera/grid, with exactly scalar topology/near-plane gates.
+  Require exact silhouette and <=1e-5m camera-Z parity on our own procedural
+  anisotropic mesh; median of3 synchronized alternating trials at batch8,
+  accept optimization only if speedup>=1.3. This does not modify the live
+  object trajectory job or tune to challenge labels. Full local suite1104 passes.
+  Automatic masks now also hash both public metadata files and reject ambiguous
+  episode records before reading prompts; immutable offline launch unchanged.

@@ -14,7 +14,7 @@ from pathlib import Path
 import platform
 import time
 
-from world_reward.data import sha256
+from body_smoke import DATASET_REVISION, TRACK1_EPISODE_COUNT, _manifest_file
 from world_reward.actor_selection import select_interacting_actor
 from world_reward.prompt_selection import (
     BoxDetection, FrameDetections, non_maximum_suppression, select_seed_prompts,
@@ -24,9 +24,56 @@ from world_reward.prompt_selection import (
 DETECTOR_REVISION = "12bdfa3120f3e7ec7b434d90674b3396eccf88eb"
 
 
+def _episode_record(path: Path, episode_index: int, label: str) -> dict:
+    records = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    if any(not isinstance(record, dict) or type(record.get("episode_index")) is not int
+           or not 0 <= record["episode_index"] < TRACK1_EPISODE_COUNT for record in records):
+        raise ValueError(f"{label} requires integer Track 1 episode identities")
+    matches = [record for record in records if record["episode_index"] == episode_index]
+    if len(matches) != 1:
+        raise ValueError(f"{label} requires exactly one record for episode {episode_index}")
+    return matches[0]
+
+
+def _validate_inputs(root: Path, episode_index: int) -> dict:
+    """Verify only the chosen Track1 RGB and public metadata, never decode media.
+
+    Metadata is integrity-checked *before* its prompt/frame count is read.
+    Duplicate episode records cannot silently overwrite each other. The only
+    video path is constructed from the bounded integer index, not metadata.
+    """
+    if type(episode_index) is not int or not 0 <= episode_index < TRACK1_EPISODE_COUNT:
+        raise ValueError("Require an integer Track 1 episode index in 0..29")
+    manifest = json.loads((root / "results/input-manifest.json").read_text())
+    if not isinstance(manifest, dict) or (manifest.get("track"), manifest.get("repo_id"), manifest.get("revision")) != (
+        "track_1", "nvidia/video_to_data_challenge", DATASET_REVISION,
+    ):
+        raise ValueError("Require the audited, pinned official Track 1 input manifest")
+    episodes_path, episodes_sha = _manifest_file(root, manifest, "track_1/meta/episodes.jsonl")
+    metadata_path, metadata_sha = _manifest_file(root, manifest, "track_1/meta/episodes_metadata.jsonl")
+    episode = _episode_record(episodes_path, episode_index, "Official episodes metadata")
+    metadata = _episode_record(metadata_path, episode_index, "Official object prompt metadata")
+    total = episode.get("length")
+    if type(total) is not int or total < 3:
+        raise ValueError("Official episode frame count must be an integer >=3")
+    prompt = metadata.get("object_prompt")
+    if not isinstance(prompt, str) or not prompt.strip():
+        raise ValueError("Official object_prompt must be a nonempty string")
+    relative = f"track_1/videos/chunk-000/observation.images.exo_camera/episode_{episode_index:06d}.mp4"
+    video, video_sha = _manifest_file(root, manifest, relative)
+    return {
+        "episode_index": episode_index, "video": video, "video_sha256": video_sha,
+        "object_prompt": prompt.strip(), "total_frames": total,
+        "dataset_revision": DATASET_REVISION,
+        "metadata_sha256": {"episodes.jsonl": episodes_sha, "episodes_metadata.jsonl": metadata_sha},
+    }
+
+
 def main() -> None:
     if platform.system() != "Linux":
         raise RuntimeError("Video/model processing is restricted to Azure Linux")
+    if {path.name for path in Path("/sys/class/net").iterdir()} != {"lo"}:
+        raise RuntimeError("Require an isolated container launched with docker --network none")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path("/srv/scenesmith/world-reward"))
     parser.add_argument("--episode", type=int, required=True)
@@ -40,17 +87,9 @@ def main() -> None:
     if not 0 <= args.episode < 30 or args.seed_frames < 3 or not 3 <= args.actor_seed_observations <= args.seed_frames:
         raise ValueError("Require a valid episode and at least three actor seed observations")
     root = args.root.resolve()
-    track = root / "data/track_1"
-    episodes = {x["episode_index"]: x for x in map(json.loads, (track / "meta/episodes.jsonl").read_text().splitlines())}
-    metadata = {x["episode_index"]: x for x in map(json.loads, (track / "meta/episodes_metadata.jsonl").read_text().splitlines())}
-    record = metadata[args.episode]
-    total = episodes[args.episode]["length"]
-    relative = f"track_1/videos/chunk-000/observation.images.exo_camera/episode_{args.episode:06d}.mp4"
-    video = root / "data" / relative
-    manifest = json.loads((root / "results/input-manifest.json").read_text())
-    expected = next(x for x in manifest["files"] if x["path"] == relative)
-    if manifest["track"] != "track_1" or sha256(video) != expected["sha256"]:
-        raise ValueError("Video does not match the audited Track 1 input manifest")
+    inputs = _validate_inputs(root, episode_index=args.episode)
+    record = {"object_prompt": inputs["object_prompt"]}
+    total, video = inputs["total_frames"], inputs["video"]
     output = root / f"outputs/episode_{args.episode:06d}/automatic_masks"
     output.mkdir(parents=True, exist_ok=False)
     import cv2
@@ -153,7 +192,8 @@ def main() -> None:
         "actor_seed_observations": args.actor_seed_observations,
         "confidence": args.confidence, "ambiguity_margin": args.ambiguity_margin,
         "nms_iou": args.nms_iou,
-        "detector_revision": DETECTOR_REVISION, "input_sha256": expected["sha256"],
+        "detector_revision": DETECTOR_REVISION, "input_sha256": inputs["video_sha256"],
+        "input_dataset_revision": inputs["dataset_revision"], "input_metadata_sha256": inputs["metadata_sha256"],
         "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "mask_areas": areas, "elapsed_seconds": time.perf_counter() - started,
         "input_track": "track_1", "ground_truth_used": False, "oracle_modes": [],
