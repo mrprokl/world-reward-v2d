@@ -1297,3 +1297,17 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Private strict-host-key SSH transfer dispatched Azure01→02; no local data
   transit. VM01 GPU forward active89%/4342MiB at19:14, no validatedfinalchain.
   No new model inference or GPU-smoke claim onVM02 before import gates.
+- 2026-10-02 R100: original queue ends, no TUD migration/duplicate inference.
+  Episode0 fullforward finishes but official converter per-frame mean>2mm gate
+  FAIL; do not relax fidelity or emit invalid submission. Empty conversion output
+  and useful failure trace retained. J1 shared-human scale quality PASSmedian
+  clipgain30.2626%, clips+84.9365/+30.2626/−3.0973%; independent syntheticonly,
+  noadopt/CARIclaim. J2 completes; retrieve paired camera comparison separately.
+  TUD-L actual27callsPASS13.539s/evalPASS1.919s: fixedCDhalf81.2699/93.4758/
+  74.2677cm versuslearned15.7115/4.2393/6.2498cm, mediangain91.5848%, allcoverage
+  gatesPASS. Actualcamera hypothesis supported on independent object-onlyreal
+  cohort, not human/V2D score. Transfer these frozen predictions Azure01→02,
+  don't rerunMoGe. Native501refinement FAILbeforeGPU 'predecessor unit not loaded'
+  after completed transientJ1 collected; no refinement outputs produced. Explicit
+  continuation newunit/newoutputs rechecks source/assets without reacquisition;
+  all other GPU readers already finished, no restart of old unit or gate waiver.

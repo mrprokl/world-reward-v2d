@@ -278,3 +278,13 @@ image14565534720bytes SHA203af62c8c03931919acd2fab28b1fa53a802be73d0f04d99febf60
 No whole user-disk/live Docker copy; private SSH transfer initiated only onVM01.
 GPU0 observed89%/4342MiB, full prepare finished writing and native forward active;
 not yet conversion/schema or J1 quality. No model/CUDA import result onVM02 yet.
+
+19:23UTC original GPUqueue idle. Episode0forward complete→conversionFAIL2mm
+fidelity (not adopted). J1/J2/TUD quality complete; externalTUD27nativeMoGe calls
+13.539s and CPU1.919s pass91.5848%median scene gain/no regressions/coveragePASS.
+No waitingTUD job remains to migrate and no duplicate inference will be launched.
+Freeze/transfers existingTUDpredictions for DA3 comparison. Native15refinement
+had pre-GPU queueFAIL because completedJ1 transientunit collected; no optimizer
+or output ran. Explicit newcontinuation source/assets checks without reacquisition
+or oldunitrestart. VM02import active, DA3publicacquisition dispatched; all data
+remain Azure. Full tiny suite4093PASS/1optional-trimeshSKIP65.55s.
