@@ -933,3 +933,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   nonhand complement is explicitly not official role_alignment. No inference
   correction, object interaction evaluation, transformed export or new selection;
   original H1 rejection remains frozen. Full tiny suite3353PASS34.46s.
+- 2026-10-02 R79 (Azure guarded QEM build/controls,c1d461d→7d0e1d0):
+  source+compiler+native binary build passed13.585s; image20dd08fe…69d26f,
+  binary SHA3bd9ba61…b3dff, source pins/no apt preserved. New two-control
+  geometry gate passed2.107s. Each2052vertices/4096faces, independent0intersections;
+  sampled diagonal CD0.7134%/0.3757%, net volume0.0655%/0.1243%, max matched
+  shell-volume0.1551%/0.2690%, close-shell containment passed. Native birthmaps
+  retain original shells; no repairs or scale fitting. This permits one separate
+  episode0 proposal, not universal simplifier/embedding proof or adoption.
+- 2026-10-02 D63: new adjacent-frame RGB motion cohort (three objects×eight
+  frames), two fresh textured surfaces and a weak-texture control. Only public
+  RGB/automatic masks/MoGe reach inference; meshes, R/t, depth and visibility stay
+  private. Stateless own OpenCV LK→mesh-PnP tests fixed shape/scale, forward/back
+  consistency, disjoint spatial reprojection tracks and explicit abstention.
+  No new checkpoints or challenge labels; moderate and fast-step motion frozen
+  before render. Inherited anchor depth/shape error is separated from relative
+  tracking diagnosis, never canceled using GT during inference.
