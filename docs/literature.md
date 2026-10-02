@@ -1,0 +1,94 @@
+# Track 1 literature audit — cutoff 2026-09-30
+
+Primary papers, project pages, GitHub source/README and Hugging Face metadata were inspected on 2026-10-02. No Track2/3 assets, FORM-HOI GT, or challenge multiview data were accessed. Paper benchmark numbers are not challenge numbers. This is a targeted, not exhaustive, SOTA survey.
+
+## Priority order
+
+1. Reproduce frozen CARI4D baseline. It is a full-body category-agnostic metric 4D reference, not just a per-image PA-aligned method. It explicitly lacks detailed finger articulation and cannot fix major FoundationPose flips; first-frame object visibility is assumed.
+2. Body branch: compare GEM-X/SOMA temporal output and SAM3D Body/MHR framewise output against original NLF on permitted non-overlapping external validation. Native SOMA reduces challenge export impedance. Couple a fixed sequence identity and image reprojected evidence; do not replace metric/global evaluation by PA-only.
+3. Object branch: multi-keyframe/seed shape candidates, SAM3D vs Hunyuan, score on withheld *same monocular video* frames for visible silhouette, photometry and robust inferred depth. Shared shape+scale. Do-as-I-Do guided SAM3D shape-fixed tracking is a deployable alternate to FP initialization failures.
+4. Symmetry-aware multi-hypothesis sequence optimization: include 180° hypotheses explicitly, scoring visible evidence + short-term continuity + hand contact. Select global sequence paths rather than greedy top1. Do not average symmetry-equivalent rotations or smooth through genuine fast motion. AgentSTAR is a useful difficult-case procedural shape/pose teacher.
+5. Fine hands: use SAM3D Body hand decoder and/or HaMeR/WiLoR/Dyn-HaMR as proposals; fuse local wrist+finger estimates into full-body chain via optimization. C2Dex supplies canonical-contact stabilization ideas; its implementation is not released.
+6. Metric depth: MoGe2 for stable global scale, compare MoGe3 detail as alternate; its fine detail gains do not guarantee better metric calibration. Cross-frame shared scale and focal consensus, calibrating from RGB/allowed priors only.
+7. Physics RL refinement RePHO only after above, not default: original results trade worse 3D accuracy for physics and score successful rollout frames only. All challenge frames must remain reconstructed.
+
+## Primary references and evidence
+
+### CARI4D
+- Paper https://arxiv.org/abs/2512.11988 (v1 2025-12-12; camera-ready v3 2026-04-19), https://arxiv.org/html/2512.11988v3
+- Code https://github.com/NVlabs/CARI4D ; cutoff HEAD 71fa7cbe46081467edadd11ab534b0c14aa9d913 (2026-08-17)
+- README announces inference release 2026-02-28 and custom-video/training 2026-04-04.
+- CoCoNet weights https://huggingface.co/nvidia/CARI4D step031397.pth ; model revision 75e6f3d47123f7808afedcf83720911fada8bf27, nongated, lastModified 2026-04-05.
+- Hunyuan3D first-frame mesh + UniDepthV2 metric depth + coarse-to-fine FP scale search + RGB/RGBD pose hypothesis IoU filtering, forward/backward jumps + NLF human depth alignment + render/compare CoCoNet temporal attention + joint contact/2D joints/mask/penetration/acceleration optimization.
+- v3 BEHAVE metrics: CD-human 7.74cm, CD-object 12.05cm, CD-combined 9.23cm, Acc-human 1.14, Acc-object .35. First-frame human alignment applied to full clip. InterCap full-video combined CD 12.88 vs 20.17 VisTracker. Not directly comparable with PA methods.
+- 96-frame network window; reported 45min/300 frames A100-80GB; training 38h/8 A100-80GB. Fingers are not explicitly regressed. CoCoNet cannot repair large 180° initialization flips.
+- Camera-ready HTML says 35% BEHAVE improvement; website/abstract metadata say 38%. Cite version and exact table, not stale marketing number.
+
+### SAM3D Body / Objects
+- Body paper https://arxiv.org/abs/2602.15989 (2026-02-17); code+checkpoint announcement 2025-11-19.
+- https://github.com/facebookresearch/sam-3d-body HEAD b5c765a0d89d789985e186d396315e7590887b94 (2026-02-19).
+- Body/feet/hands, promptable mask/keypoints, MHR representation; framewise model, no temporal/world claim by itself.
+- https://huggingface.co/facebook/sam-3d-body-dinov3 manually gated, revision 11aaa346c7204874a1cbafe3d39a979080b2c55a, model.ckpt and assets/mhr_model.pt; license/access acceptance required.
+- Objects paper https://arxiv.org/abs/2511.16624 v1 2025-11-20 / v2 2026-06-02; release announcement 2025-11-19.
+- https://github.com/facebookresearch/sam-3d-objects HEAD f91db411c50efee93d8db7aeb323885650f6f722 (2026-06-02).
+- https://huggingface.co/facebook/sam-3d-objects manually gated, revision 2e73555018d2741ccd486e56c24fac41155a1dc6 (2026-06-12). Strong in-context shape/layout prior but inferred back surfaces/thickness remain hallucinations; no metric correctness guarantee.
+- Official body/object alignment example: https://github.com/facebookresearch/sam-3d-objects/blob/main/notebook/demo_3db_mesh_alignment.ipynb
+- MHR https://github.com/facebookresearch/MHR and tools/mhr_smpl_conversion provide conversion routines; conversion can add error and requires target model licences.
+
+### GEM / GEM-X and GVHMR
+- GENMO paper https://arxiv.org/abs/2505.01425 (2025-05-02), ICCV2025; renamed GEM December2025; GEM-SMPL demo release March2026.
+- https://github.com/NVlabs/GENMO HEAD 16bebf402d8893184249ee206d957b8248cd8310 (2026-06-23), research noncommercial license.
+- https://github.com/NVlabs/GEM-X HEAD 32992550dba114c62243fb55e361311972dce8f9 (2026-04-27); repo creation 2026-03-03. README news dates May/June2025 are inconsistent with repository creation; use verified March/April2026 availability instead.
+- GEM-X temporal regression architecture ~520M, SAM3D Body features, 77 SOMA 2D joints, body/hands/face, camera/global output. Code Apache2.0, model NVIDIA Open Model license; no independent same-protocol challenge superiority demonstrated.
+- https://huggingface.co/nvidia/GEM-X nongated, created 2026-03-11, revision 5ccf5ca3746c3620aa4016114f069a5f6ae399cd (2026-06-23), gem_soma.ckpt / gem_smpl.ckpt and supporting model assets.
+- GVHMR https://arxiv.org/abs/2409.06662 (2024-09-10), https://github.com/zju3dv/GVHMR ; gravity-view coordinates, temporal world body recovery, static-camera mode; useful alternate prior, not detailed hands/objects.
+
+### Do as I Do — deployable alternate object tracker
+- https://arxiv.org/abs/2606.19333 (2026-06-17), https://github.com/malik-group/do-as-i-do ; HEAD 824591b808c342b20079c3b4198a8c2bdf88c74e (2026-08-02), MIT first-party code, upstream licenses remain.
+- Complete reconstruction pipeline public: SAM3 segmentation -> SAM3D shape -> MoGe pointmap -> HaWoR hand -> BootsTAPIR -> shape-fixed guided SAM3D pose diffusion -> translation/scale optimization.
+- Adaptive pose prior guided by 20 point tracks; sample candidate poses, clustering selection comparable to likelihood 30x faster. Reported DexYCB CD .66 vs FP .89, HOI4D .49 tied FP .49; controlled shared remaining pipeline. 150-video human preference 67% vs FP18%,15% ties. These are hand/object metrics, not full-body/world challenge.
+- Requires >=32GB GPU, SAM3/SAM3D licensed gated access and MANO; current segmentation code click GUI can be replaced with automatic prompts. HaWoR fork CC-BY-NC-ND requires careful license review before modifying/redistributing.
+- Assumes rigid object and semi-accurate monocular metric depth; only hand+object, not full-body/environment.
+
+### AgentSTAR — deployable hard-case teacher
+- https://arxiv.org/abs/2609.24487 (2026-09-21), https://agenticstar.github.io/, https://github.com/makezur/agenticSTAR ; HEAD a8eac9b1a4e8423bc148839e88a930f5f6aab1e5 (2026-09-23), MIT code.
+- Coding VLM generates Blender primitive/kinematic shape, global shared scale; VLM picks bounded pose search, numerical renderer optimizes hand-occlusion-aware IoU; mandatory temporal diagnostics with selective smoothing. Cameras from Pi3X, not privileged calibration.
+- HOT3D 93 trajectories/15 keyframes each: mean translation 3.04cm vs SAM3D Tracker6.41 and FP+VGGT7.56, mean rotation37.6deg. Evaluation uses global pose gauge alignment and GT depth *for scale alignment*. That alignment must never become challenge inference. High compute hours/tokens; not whole-body.
+
+### MoGe2 / MoGe3, ViPE / Pi3X
+- MoGe2 https://arxiv.org/abs/2507.02546 (2025-07-03); https://github.com/microsoft/MoGe ; HF Ruicheng/moge-2-vitl nongated 39c4d5e957afe587e04eec59dc2bcc3be5ecd968.
+- MoGe3 paper https://arxiv.org/abs/2607.17967 v1 2026-07-20, v2 2026-07-21; release announcement 2026-08-18; code HEAD 74fbce054ebed49800de42d0ad0e83495065719a (2026-08-19).
+- HF Ruicheng/moge-3-vitg revision 6ef26c5a4b4148dab5ccaacdb08b72dc66380475, vitl184008f877d7ad1ad4c2cd2182a9bd1f63d0e5be, both nongated created2026-08-18.
+- Sparse volumetric refinement helps fine/edge geometry; metric point-map global results can be worse than MoGe2 despite finer local geometry. Boundary pixel ambiguity/fly-points persist. Do not replace every global scale estimate by V3 blindly.
+- ViPE https://arxiv.org/abs/2508.10934 (2025-08-12), https://github.com/nv-tlabs/vipe HEAD8c9f36144e08d8f8c8cf60d20ad70c100d9cff07 (2026-09-10), Aug2025 release, near-metric depth+intrinsics+camera, Sept2026 memory-bounded long sequence mode. For dynamic camera only if RGB evidence indicates motion; static challenge views should not induce artificial motion.
+- Pi3X engineering release2025-12-28 https://github.com/yyfz/Pi3 ; RGB feedforward geometry+camera, approximate metric scale, confidence, optional conditions. Weights CC-BY-NC4, code BSD3. Never inject Track2 camera/depth.
+
+### C2Dex / GraspHOI — ideas, not available full implementations
+- C2Dex https://arxiv.org/abs/2608.07045 v1 2026-08-07 /v2 2026-09-06; https://github.com/K-Jie/C2Dex_code is README/assets only, TODO reconstruction/retargeting source.
+- Canonical object contacts from hand/object silhouette overlap -> raycast surface -> opposite normals filtering -> locally stable phases -> DBSCAN dominant cluster/medoid per hand vertex -> sequence hand articulation/global fit, object motion fixed, penetration SDF+regularization. Good hypothesis, not contact proof: overlap can be occlusion; allow uncertain/noncontact/slip/regrasp states.
+- GraspHOI https://arxiv.org/abs/2608.28386 v1 2026-08-28 /v2 2026-08-31; full code only promised, no GitHub GraspHOI repo found.
+- SAM3D Body->SMPLH + WiLoR + Hunyuan2.1 + depth registration + palmar correspondence + finger/arm optimization. Thin thickness/shape hallucination is explicitly a failure. Static grasp-centric only; fixed body can penetrate large objects. Ablation reports some SAM3D non-watertight failures and Hunyuan mesh distortions, not universal winner.
+- RRTrack https://arxiv.org/abs/2607.23669 (2026-07-26), https://github.com/7kevin24/RRTrack README/demo-only with source TODO. Useful VOS + 6D geometric memory verification and offline/online DINO recovery idea; RGBD reported results not monocular proof.
+
+### RePHO — deferred physics branch
+- https://arxiv.org/abs/2606.05359 (2026-06-03), CVPR2026 Highlight, https://github.com/dingbang777/RePHO source MIT; needs IsaacGym and InterMimic checkpoint, per-clip RL.
+- Noisy kinematics -> adaptive reliable-frame sampling + independent forward/backward policies updating kinematic target; reconstructs physical trajectories.
+- BEHAVE VisTracker CDh5.39/CDo8.73 -> RePHO6.82/11.06; penetration6.64->3.91, object float .30->.10. These are 10-frame PA-aligned CD, successful rollout frames only; full-sequence success51.4%. Not directly comparable with CARI4D numbers or a complete challenge submission.
+
+### Other screened
+- MILO https://arxiv.org/abs/2608.27407 (2026-08-27), https://github.com/ac5113/MILO HEADf58643f0a9b5967b7eb2142f5c7a759a00fd6e98 (2026-08-28), MIT complete code. Combined LRM human/object scaffold, virtual renders+triangulated body/hands, SMPLH fitting + object segmentation. Metric is PA-CD; single-frame generative human/object shape error coupled. Optional object template path must not use challenge Track2 GT meshes. Candidate initialization/scaffold only.
+- EgoInfinity https://arxiv.org/abs/2606.17385 (v1 2026-06-16 UTC), https://github.com/Rice-RobotPI-Lab/EgoInfinity HEADde59610531c08010d63d0493d6a72973eabd402e (2026-06-18); deployable static-camera hand/object pipeline using MoGe2/WiLoR/MEMFOF/SAM3D/flow+PnP and contact refinement, useful source implementation reference. Mixed licensing WiLoR NC-ND, MANO NC, YOLO AGPL.
+- HAT4D https://arxiv.org/abs/2606.28215 (June26 /Sept5); annotation toolkit released Sept4 but required special SV4D2 encoder checkpoint pending public release. Not reproducible complete branch.
+- CoGS https://arxiv.org/abs/2606.28820 (June27): compositional Gaussian human/object/scene photometry, code promised upon publication. Rendering-oriented no verified full-code availability.
+- InfiniHand https://arxiv.org/abs/2609.35743 (Sept28), https://github.com/infinihand/InfiniHand README/assets only, no released inference/weights verified. Egocentric, not priority Track1.
+- Guiding Image-to-3D Generation with Test-Time Partial Observations https://arxiv.org/abs/2609.10531 (Sept9): occupancy + free-space posterior guidance into SAM3D, code not located. Useful future RGB-derived multiframe geometry guidance; paper real partial geometry may be unavailable/noisy from RGB.
+
+## Fail-fast gates (proposed, not measured results)
+
+- Lock a small external development set with object/subject-disjoint held-out subset and all-frame metric evaluation. Keep challenge clips unsupervised. Do not use leaderboard as hyperparameter validation.
+- 2-4 representative clips smoke: normal object, thin/symmetric object, fast motion, bimanual occlusion. Reject stack if it cannot produce correct canonical pose+units+timestamps and valid all-frame outputs in first budgeted test.
+- Require >=5% paired external metric improvement with no >5% mean regression on the opposite axis before full-dataset investment; report per-sequence failures not just mean/success cases. Threshold is a planning choice.
+- Body/hands adoption: require reprojection gain plus metric/world/acceleration/penetration not worsened. Stop if only PA-only gain or neutral fingers artifacts moved to elbows.
+- Shape adoption: reject scale/thickness candidates that win single-frame IoU but worsen heldout-view/time residuals or contact feasibility. Mask erosion for inferred-depth boundary bias; no mesh shrink solely to reduce penetration.
+- Tracker adoption: measure catastrophic flip/reacquisition count, metric translation, surface CD and true acceleration error where external GT exists. Stop fixed smoothing if acceleration goes down but accuracy/dynamic fidelity worsens.
+- Physics adoption: discard if coverage <100%, visual/CD regression overwhelms physics gain, or mass/friction tuning invents unsupported motion. Preserve measured base trajectory fallback for all frames.

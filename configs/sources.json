@@ -1,0 +1,32 @@
+{
+  "audited_on": "2026-10-02",
+  "dataset": {
+    "repo_id": "nvidia/video_to_data_challenge",
+    "revision": "5f68335f3acc802033d1e80728c1633197521de8",
+    "prefix": "track_1/",
+    "episodes": 30,
+    "frames": 16563,
+    "fps": 30,
+    "bytes": 513185564
+  },
+  "kit": {
+    "url": "https://nvidia-isaac.github.io/video_to_data/v2d_challenge/assets/v2d_submission_kit.zip",
+    "sha256": "b1f8f703c2e772684a57d048cf28f40c7b9b54cf7a61aff6917b46d826915e1f",
+    "sample_sha256": "1db56c5ec7267cdb7a68d42928f85c092c6b8e9bfbc0dc98a2b020d7a48bc621"
+  },
+  "upstream": {
+    "url": "https://github.com/nvidia-isaac/video_to_data.git",
+    "revision": "7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80"
+  },
+  "mhr": {
+    "url": "https://github.com/facebookresearch/MHR/releases/download/v1.0.1/assets.zip",
+    "model_sha256": "352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc",
+    "license": "Apache-2.0"
+  },
+  "baseline": {
+    "retrieved_at": "2026-10-02T02:27:08Z",
+    "source": "https://raw.githubusercontent.com/MVerghese/v2d-leaderboard-data/main/leaderboard.json",
+    "team_label": "CARI4D Basline",
+    "scores": {"cd_h_cm": 15.57527, "cd_o_cm": 23.16246, "acc_h_cm": 1.97387, "acc_o_cm": 0.72622, "interpenetration_cm": 0.00423}
+  }
+}
