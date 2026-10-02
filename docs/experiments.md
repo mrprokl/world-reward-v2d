@@ -42,3 +42,6 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   conversion are separate validated stages.
 - 2026-10-02 D04: Use pretrained models only after access/license/provenance audit;
   paper novelty or demo images alone do not establish a deployable SOTA method.
+- 2026-10-02 D05: Full Kaggle Foundational 4.b forbids manual test labeling.
+  Automatic object-prompt grounding + SAM propagation replaces manual SAM2 GUI.
+  Procedural shapes must be selected/fitted algorithmically from RGB, not hand-labeled.

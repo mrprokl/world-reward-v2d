@@ -14,6 +14,9 @@ on the local host; remote commands may use the remote runtime directly.
   videos/checkpoints/renders back to the user's tethered connection.
 - External pretrained models/data are allowed, but verify source, license and
   challenge overlap. Never claim an unverified checkpoint is leakage-free.
+- Kaggle Foundational 4.b forbids hand-labeling/human prediction of test records:
+  use automatic masks/keypoints/geometry, no per-episode manual prompts or fitting.
+  Inspect outputs for QA, but fix general algorithms, not individual test labels.
 - Explicitly disable any upstream GT/oracle mode. Validate provenance before run.
 - No score gaming: no object deletion/shrinking to evade penetration, no static
   trajectories to evade acceleration, no sample values used as predictions, no

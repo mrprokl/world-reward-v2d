@@ -70,3 +70,27 @@
 - Heavy runtime/downloads only on Azure; do not clone heavy repos or datasets on
   the local tether. Local official kit audit was small; disposable archive/data
   samples will be removed after the constraints/hashes are retained.
+
+## Kaggle full rules audit (read-only browser, 2026-10-02)
+
+[Rules](https://www.kaggle.com/competitions/v2d-challenge-track1-cd-h/rules):
+max team size 10; 5/week controls despite platform 5/day cap; up to **two** final
+submissions; identical file across metrics; all scored rows public leaderboard,
+confidential references remain hidden and later broader evaluation is off-platform.
+Single-command reproducibility, actual producing commit and weights required on
+verification. Register separately once for the whole challenge. No registration
+or rule acceptance was performed by the agent.
+
+**Foundational 4.b prohibits hand labeling/human prediction of validation/test
+records.** Therefore official example's SAM2 manual prompt GUI is **not adopted**:
+all masks/keypoints/geometries must be generated automatically, with global
+algorithmic fixes only. Manually reading test frames is not a labeling pipeline.
+
+Foundational 6.c requires OSI-approved source licenses permitting commercial use;
+specific 2.6 allows pretrained data/model licenses not to be rereleased Apache.
+Use Apache/MIT/BSD code where possible; do not copy original NC CARI4D, HaWoR,
+WiLoR or MANO code into the submission. SAM inference source/model terms need
+specific compatibility review; access approval alone does not resolve license.
+If source license exceptions remain ambiguous, ask organizers before final use.
+Foundational rules declare precedence over competition-specific text, and public
+code sharing must also benefit participants through Kaggle forums/notebooks.
