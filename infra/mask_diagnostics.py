@@ -23,6 +23,8 @@ def main() -> None:
     if mask_report["status"] != "pass" or mask_report["ground_truth_used"] is not False or mask_report["hand_labeled_test"] is not False:
         raise RuntimeError("Require audited automatic masks, no GT/manual labels")
     total = mask_report["frames"]
+    with Image.open(directory / "masks/0/000000.png") as image:
+        width, height = image.size
     frame_indices = list(range(total))
     def stream(entity: int):
         for index in frame_indices:
@@ -39,7 +41,7 @@ def main() -> None:
         groups = tuple(tuple(BoxDetection(tuple(box["box"]), box["score"])
                              for box in query["retained"])
                        for query in observation["detector_observations"])
-        detections.append(FrameDetections(observation["frame"], 1536, 1152, groups[0], groups[1]))
+        detections.append(FrameDetections(observation["frame"], width, height, groups[0], groups[1]))
     report = analyze_mask_sequence(stream(0), stream(1), frame_indices,
                                    detections=detections, total_frames=total)
     report["mask_report_sha256"] = sha256(directory / "report.json")
