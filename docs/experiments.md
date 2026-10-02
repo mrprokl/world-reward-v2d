@@ -271,3 +271,11 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   1.1161e-6 / 9.5554e-7 / 9.8483e-7 m. Fixed-K projection maximum 8.6317e-5 px;
   8.42 s. This proves canonical input compatibility, not CoCoNet inference or
   challenge accuracy. Shared-identity conversion remains separately verified.
+
+- 2026-10-02 R26: complete MoGe2 inference passed on all 501 original frames
+  in 258.30 s; full camera/Z/ray gates and per-frame hashes recorded. Dense
+  outputs remain Azure-only and store depth/K/validity without redundant XYZ.
+- 2026-10-02 R27: machine-level collapsed-triangle exclusion did not restore
+  budget topology; second pose run correctly stopped before fitting. This
+  falsifies a simple collapsed-area explanation. Do not relax machine thresholds;
+  inspect the specific non-manifold component and simplification implementation.
