@@ -222,7 +222,7 @@ def _load_checkpoint_with_asset_buffers(module, state_dict, original_loader, tor
     if hasattr(state_dict, "_metadata"):
         merged._metadata = state_dict._metadata
     for name in allowed:
-        merged[name] = asset_buffers[name]
+        merged[name] = asset_buffers[name].clone()
     original_loader(module, merged, strict=True)
     after = module.state_dict()
     if any(not torch.equal(after[name], value) for name, value in asset_buffers.items()):

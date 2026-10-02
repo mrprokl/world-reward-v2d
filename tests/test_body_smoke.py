@@ -1,11 +1,13 @@
 """Offline, data-free regressions for the Body smoke's input/source/Hub guards."""
 
+from collections import OrderedDict
 import hashlib
 import importlib.util
 import json
 from pathlib import Path
 from types import SimpleNamespace
 
+import numpy as np
 import pytest
 
 
@@ -356,3 +358,239 @@ def test_source_identity_partial_inventory_rejects_without_installed_tree_or_git
     monkeypatch.setattr(smoke, "_pinned_checkout", lambda *_: None)
     with pytest.raises(RuntimeError, match="source inventory is incomplete"):
         smoke._source_identity(tmp_path)
+
+
+class StubTensor:
+    """Only the tensor operations required by the checkpoint guard; no Torch."""
+
+    def __init__(self, values, *, requires_grad=False):
+        self.values = np.asarray(values).copy()
+        self.requires_grad = requires_grad
+
+    def detach(self):
+        return StubTensor(self.values, requires_grad=False)
+
+    def clone(self):
+        return StubTensor(self.values, requires_grad=self.requires_grad)
+
+
+class StubModule:
+    def __init__(self, parameters, buffers):
+        self.parameters = dict(parameters)
+        self.buffers = dict(buffers)
+        self.state = OrderedDict({**self.parameters, **self.buffers})
+        self.parameter_enumeration_args = []
+        self.buffer_enumeration_args = []
+
+    def state_dict(self):
+        return self.state.copy()
+
+    def named_parameters(self, **kwargs):
+        self.parameter_enumeration_args.append(kwargs)
+        return self.parameters.items()
+
+    def named_buffers(self, **kwargs):
+        self.buffer_enumeration_args.append(kwargs)
+        return self.buffers.items()
+
+
+@pytest.fixture
+def asset_checkpoint():
+    parameters = {
+        "backbone.weight": StubTensor([1.0, 2.0], requires_grad=True),
+        "backbone.frozen_weight": StubTensor([3.0], requires_grad=False),
+    }
+    buffers = {
+        "head_pose.mhr.character_torch.rest_vertices": StubTensor([[1.0, 2.0, 3.0]]),
+        "head_pose_hand.mhr.character_torch.skinning_weights": StubTensor([0.4, 0.6]),
+        "head_pose.faces": StubTensor([[0, 1, 2]]),
+        "head_pose.scale_params": StubTensor([0.0]),
+        "head_pose.keypoint_mapping": StubTensor([0, 2]),
+    }
+    module = StubModule(parameters, buffers)
+    state = OrderedDict((name, tensor.clone()) for name, tensor in module.state.items())
+    state._metadata = OrderedDict({"": {"version": 1}, "head_pose": {"version": 2}})
+    torch = SimpleNamespace(
+        isfinite=lambda tensor: np.isfinite(tensor.values),
+        equal=lambda a, b: np.array_equal(a.values, b.values),
+    )
+    calls = []
+
+    def loader(target, merged, *, strict):
+        calls.append((target, merged, strict))
+        assert strict is True
+        assert set(merged) == set(target.state)
+        target.state = OrderedDict((name, tensor.clone()) for name, tensor in merged.items())
+
+    return SimpleNamespace(module=module, state=state, torch=torch, loader=loader, calls=calls)
+
+
+def load_assets(smoke, fixture):
+    return smoke._load_checkpoint_with_asset_buffers(
+        fixture.module, fixture.state, fixture.loader, fixture.torch
+    )
+
+
+def test_asset_checkpoint_calls_original_loader_strict_preserves_metadata_and_input_state(smoke, asset_checkpoint):
+    fixture = asset_checkpoint
+    before = {name: tensor.values.copy() for name, tensor in fixture.state.items()}
+    original_keys = list(fixture.state)
+    metadata = fixture.state._metadata
+    result = load_assets(smoke, fixture)
+    assert len(fixture.calls) == 1
+    target, merged, strict = fixture.calls[0]
+    assert target is fixture.module and strict is True
+    assert merged is not fixture.state
+    assert merged._metadata is metadata
+    assert list(fixture.state) == original_keys
+    assert fixture.state._metadata is metadata
+    assert all(np.array_equal(fixture.state[name].values, value) for name, value in before.items())
+    assert fixture.module.parameter_enumeration_args == [{"remove_duplicate": False}]
+    assert fixture.module.buffer_enumeration_args == [{"remove_duplicate": False}]
+    assert result == {
+        "mode": "strict_network_and_head_state_with_explicit_asset_buffer_retention",
+        "retained_mhr_asset_buffer_names": [], "parameter_tensors_loaded": 2,
+        "unexpected_keys": [],
+    }
+
+
+def test_asset_checkpoint_retains_only_two_exact_character_torch_buffer_namespaces(smoke, asset_checkpoint):
+    fixture = asset_checkpoint
+    names = [name for name in fixture.state if ".character_torch." in name]
+    for name in names:
+        del fixture.state[name]
+    keys_before = set(fixture.state)
+    result = load_assets(smoke, fixture)
+    assert result["retained_mhr_asset_buffer_names"] == sorted(names)
+    assert set(fixture.state) == keys_before  # merged dictionary, not checkpoint mutation
+    merged = fixture.calls[0][1]
+    for name in names:
+        assert fixture.torch.equal(merged[name], fixture.module.buffers[name])
+        assert merged[name] is not fixture.module.buffers[name]
+        assert merged[name].requires_grad is False
+        assert not np.shares_memory(merged[name].values, fixture.module.buffers[name].values)
+
+
+@pytest.mark.parametrize("name", ["backbone.weight", "backbone.frozen_weight"])
+def test_every_parameter_including_frozen_is_required(smoke, asset_checkpoint, name):
+    del asset_checkpoint.state[name]
+    with pytest.raises(RuntimeError, match="Required model state missing"):
+        load_assets(smoke, asset_checkpoint)
+    assert asset_checkpoint.calls == []
+
+
+@pytest.mark.parametrize("name", ["backbone.weight", "backbone.frozen_weight"])
+@pytest.mark.parametrize("nonfinite", [np.nan, np.inf, -np.inf])
+def test_every_parameter_including_frozen_must_be_finite(smoke, asset_checkpoint, name, nonfinite):
+    asset_checkpoint.state[name] = StubTensor([nonfinite])
+    with pytest.raises(RuntimeError, match="parameter missing or nonfinite"):
+        load_assets(smoke, asset_checkpoint)
+    assert asset_checkpoint.calls == []
+
+
+@pytest.mark.parametrize("prefix", ["head_pose.mhr.character_torch.", "head_pose_hand.mhr.character_torch."])
+def test_parameter_cannot_use_asset_buffer_exception_even_when_frozen_and_in_both_enumerations(smoke, asset_checkpoint, prefix):
+    fixture = asset_checkpoint
+    name = prefix + "frozen_learned_parameter"
+    value = StubTensor([7.0], requires_grad=False)
+    fixture.module.parameters[name] = value
+    fixture.module.buffers[name] = value
+    fixture.module.state[name] = value
+    with pytest.raises(RuntimeError, match="Required model state missing"):
+        load_assets(smoke, fixture)
+    assert fixture.calls == []
+
+
+@pytest.mark.parametrize("prefix", ["head_pose.mhr.character_torch.", "head_pose_hand.mhr.character_torch."])
+def test_requires_grad_buffer_cannot_be_retained_when_missing(smoke, asset_checkpoint, prefix):
+    fixture = asset_checkpoint
+    name = prefix + "gradient_buffer"
+    value = StubTensor([1.0], requires_grad=True)
+    fixture.module.buffers[name] = value
+    fixture.module.state[name] = value
+    with pytest.raises(RuntimeError, match="Required model state missing"):
+        load_assets(smoke, fixture)
+    assert fixture.calls == []
+
+
+@pytest.mark.parametrize("name", [
+    "head_pose.faces", "head_pose.scale_params", "head_pose.keypoint_mapping",
+    "head_pose.mhr.character_torch_extra.buffer", "head_pose.mhr.character_torch",
+    "head_pose_hand.mhr.character_torch_extra.buffer",
+    "head_pose_other.mhr.character_torch.buffer",
+])
+def test_nonwhitelisted_head_topology_scale_keypoint_or_lookalike_buffer_must_be_in_checkpoint(smoke, asset_checkpoint, name):
+    fixture = asset_checkpoint
+    if name not in fixture.module.state:
+        value = StubTensor([1.0])
+        fixture.module.state[name] = value
+        fixture.module.buffers[name] = value
+    fixture.state.pop(name, None)
+    with pytest.raises(RuntimeError, match="Required model state missing"):
+        load_assets(smoke, fixture)
+    assert fixture.calls == []
+
+
+@pytest.mark.parametrize("name", [
+    "head_pose.mhr.character_torch.rest_vertices",
+    "head_pose_hand.mhr.character_torch.skinning_weights",
+])
+def test_checkpoint_asset_buffer_must_exactly_equal_explicit_asset(smoke, asset_checkpoint, name):
+    asset_checkpoint.state[name].values.flat[0] += 0.00001
+    with pytest.raises(RuntimeError, match="contradicts explicit immutable MHR asset"):
+        load_assets(smoke, asset_checkpoint)
+    assert asset_checkpoint.calls == []
+
+
+@pytest.mark.parametrize("name", [
+    "backbone.unexpected_weight", "head_pose.mhr.character_torch.unexpected_buffer",
+])
+def test_unexpected_checkpoint_keys_fail_even_in_allowed_namespace(smoke, asset_checkpoint, name):
+    asset_checkpoint.state[name] = StubTensor([1.0])
+    with pytest.raises(RuntimeError, match="Unexpected checkpoint keys"):
+        load_assets(smoke, asset_checkpoint)
+    assert asset_checkpoint.calls == []
+
+
+@pytest.mark.parametrize("mutation", ["inplace", "replace"])
+def test_loader_cannot_mutate_immutable_asset_buffer_after_load(smoke, asset_checkpoint, mutation):
+    fixture = asset_checkpoint
+    original = fixture.loader
+    name = "head_pose.mhr.character_torch.rest_vertices"
+
+    def mutating_loader(module, merged, *, strict):
+        original(module, merged, strict=strict)
+        if mutation == "inplace":
+            module.state[name].values.flat[0] += 1
+        else:
+            module.state[name] = StubTensor([[9.0, 9.0, 9.0]])
+
+    fixture.loader = mutating_loader
+    with pytest.raises(RuntimeError, match="buffers changed during checkpoint loading"):
+        load_assets(smoke, fixture)
+    assert fixture.calls[0][2] is True
+
+
+def test_retained_buffer_snapshot_is_independent_of_loader_inplace_mutation(smoke, asset_checkpoint):
+    fixture = asset_checkpoint
+    name = "head_pose_hand.mhr.character_torch.skinning_weights"
+    del fixture.state[name]
+
+    def bad_loader(module, merged, *, strict):
+        assert strict is True
+        # Mutate the supplied retained tensor and the module alike. The expected
+        # reference must not alias loader input, or this corruption goes unseen.
+        merged[name].values.flat[0] += 1
+        module.state = OrderedDict(merged)
+
+    fixture.loader = bad_loader
+    with pytest.raises(RuntimeError, match="buffers changed during checkpoint loading"):
+        load_assets(smoke, fixture)
+
+
+def test_checkpoint_without_metadata_loads_without_inventing_metadata(smoke, asset_checkpoint):
+    fixture = asset_checkpoint
+    fixture.state = dict(fixture.state)
+    result = load_assets(smoke, fixture)
+    assert result["parameter_tensors_loaded"] == 2
+    assert not hasattr(fixture.calls[0][1], "_metadata")
