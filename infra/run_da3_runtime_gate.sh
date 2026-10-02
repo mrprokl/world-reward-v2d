@@ -6,9 +6,17 @@ ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"
 OUT="$ROOT/results/da3-runtime-v1.json"
 [[ ! -e "$OUT" && ! -L "$OUT" ]]
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-EXPECTED=sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7
+EXPECTED=sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3
 [[ "$(docker image inspect world-reward/cari4d-source:0.1 --format '{{.Id}}')" == "$EXPECTED" ]]
 [[ -f "$ROOT/transfer/vm02-v1/import.json" ]]
+python3 - "$ROOT/transfer/vm02-v1/import.json" "$EXPECTED" <<'PY'
+import json,sys
+r=json.load(open(sys.argv[1]))
+assert r['stage']=='world_reward_research_import' and r['status']=='pass'
+assert r['image_id']==sys.argv[2] and r['CUDA_execution_verified'] is True
+assert r['source_OCI_index_id']=='sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7'
+assert r['image_content_changed'] is False and r['image_rebuilt'] is False
+PY
 SOURCE="$ROOT/vendor/research/da3_metric_v1"
 REPORT_DIR="$ROOT/results/da3-runtime-v1"
 [[ ! -e "$REPORT_DIR" && ! -L "$REPORT_DIR" ]]

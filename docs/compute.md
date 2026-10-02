@@ -299,3 +299,15 @@ its raw→scaled gain51.09% is a different question, not a camera improvement.
 Opposite realTUD gain91.5848% supports domain-dependent calibration, not global
 replacement. Launcher now sanitizes failed dispatch exceptions (no base64
 payload echo/no automaticretry); legacytarget/sourcecommands unchanged.
+
+19:34UTC native501refinement v3 **PASS258.872s**, 301 effective nativeupdates
+for300steps; conversion and finalschema501 alsoPASS. No held-out HOI score.
+VM02image import v1 terminated **FAIL after image load, before CUDA**: source
+containerd image store reports OCI-index b47e4450…380a7, whereas fresh classic
+Docker overlay2 reports platform-config 7ebfff18…c6d3. The sealed TAR explicitly
+contains that OCI-index→linux/amd64 platform→config graph; it is not an image
+change. Do not relax arbitrary image IDs or reimport/rebuild/re-extract. New
+continuation verifies full TAR SHA203af62c…21b4e, each small graph digest/size,
+exact pinned config, legacy manifest and every ordered rootfs diff-ID before
+CUDA smoke and a fresh import receipt. Failedv1 log/unit and old snapshots stay
+unchanged. GPU runtime/inference still unverified onVM02.

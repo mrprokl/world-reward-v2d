@@ -1324,3 +1324,18 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Import image/GPU/runtime gates still pending, not inference. Explicit native
   continuationv3 source2286fbd dispatched no active01GPU predecessor; oldfailed
   unit/readers untouched and original sourceoptimizer protocol unchanged.
+
+- 2026-10-02 R102: nativeepisode15 actualfull501refinement **PASS258.872s**,
+  300requestedsteps/301nativeupdates, forward/assets unchanged. Officialconverter
+  and fullfinalschema501PASS afterwards; quality againstGT remains unverified.
+  Episode0forward790conversion2mmFAIL remains unresolved; new sealednumerical
+  diagnostic predeclares first/lower-median-error/worst probes, F64pose-only
+  LM60/fd1e-6/tol1e-5 then exactF32replay gate2mm. No identityfit/adoption,
+  raworiginalarchive/errorreceipt saved even onFAIL;40tinyNumPytestsPASS only.
+- 2026-10-02 D77: VM02 import failure identifies OCI-index vs classicconfig-ID
+  representation mismatch, not broken image contents. Bind exactsealed14.6GBTAR
+  SHA and OCIgraph/index→amd64platform→config7ebfff18…c6d3, then fullorderedrootfs
+  diff-IDs; no arbitraryimageIDwaiver/rebuild/reimport/oldunitrestart. Explicit
+  continuation repeats extractedtaskassetinventory/SHA, realGPUtorchsmoke only
+  aftergraphPASS. DA3CPUimport alias binds that newimportreceipt; no modelresult
+  before gates. TinyownOCIgraph11testsPASS, noactualimportproofyet.

@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"
 [[ -f "$ROOT/transfer/vm02-v1/import.json" ]]
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-IMAGE=sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7
+IMAGE=sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3
 timeout 90s runuser -u scenesmith -- env WR_ROOT="$ROOT" PYTHONDONTWRITEBYTECODE=1 python3 - "$2" <<'PY'
 import hashlib,json,os,pathlib,tarfile,sys
 root=pathlib.Path(os.environ['WR_ROOT']);base=root/'validation/tudl_rgb_v1'
