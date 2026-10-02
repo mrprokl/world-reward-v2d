@@ -120,3 +120,9 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   and coverage, **not** correct segmentation, mesh reconstruction or CARI4D victory.
   Validate multi-frame silhouette/rigidity/contact and independent detector agreement
   before trusting masks. Latest full suite 272 passed locally and on Azure.
+- 2026-10-02 D08: prevent mutable-job source races using read-only committed
+  job snapshots, rather than editing a running launcher. Official runtime image
+  export and independent CARI Torch CUDA/import smoke passed; no reconstruction
+  claim. Add strict streaming mask geometry/temporal diagnostics with 53 synthetic
+  tests (full local suite 325 passed), reporting occlusion/motion/overlap without
+  arbitrary accuracy thresholds or fixes to individual test masks.

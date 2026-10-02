@@ -31,11 +31,12 @@ Verified bootstrap complete (2026-10-02): systemd service exited 0; 490 MB Track
 data and 21 MB pinned sparse reconstruction source/kit on Azure only. Downloader
 validated 30 episodes, 16,563 frames, structural-only Parquet and SHA-256 manifests.
 No video, mesh, weights or rendered frames were transferred back locally. Current
-source code has lightweight tests; GPU inference has **not** been validated yet.
+source code then had lightweight tests only; subsequent GPU smoke results are
+recorded below.
 
 Existing VM was externally deallocated at 07:32 UTC. User confirmed other work
 stopped and re-authorized exclusive H100 use; VM restarted, H100 reverified. Extra
-VM attempts failed before compute creation; task-created RG/network resources are
+VM attempts failed before compute creation; task-created RG/network resources
 were deleted (resource-group existence check: false). Existing user resources
 remain intact. No additional VM needed.
 
@@ -92,5 +93,19 @@ First complete GPU automatic-mask engineering smoke succeeded: episode 15,
 Uses fixed 3-observation actor seed prefix followed by full SAM2 tracking, not
 sparse bbox motion as reconstruction. Report/PNGs stay remote under
 `outputs/episode_000015/automatic_masks`; only compact scalars returned locally.
-CARI image is built; SAM3D image finishing dependency install. No full
-human-object reconstruction/submission or held-out performance verified yet.
+CARI and SAM3D images are built. No full human-object reconstruction/submission
+or held-out performance verified yet.
+
+All three official images exported successfully. The enclosing mutable build
+shell script subsequently exited 2 at EOF: it had been overwritten during the
+active job, invalidating its reader offset. This is a launcher fault, not a model
+or image failure. Do not rebuild successful images or edit scripts an active job
+is reading. Image inspect and `pip freeze` were saved separately; independent
+CARI CUDA matmul/import smoke exited 0 (`cuda_runtime_imports=pass`). This still
+does not prove CUDA extension kernels, EGL, FlashAttention or model forwards.
+
+New jobs use `infra/azure_job.py`: clean committed small code-only Git archive,
+SHA-256 verified on Azure, extracted read-only under `jobs/<commit>/code`; unique
+systemd unit/log, no implicit replacement/restart. Dataset/model downloads remain
+direct-to-Azure. DINO auxiliary acquisition is explicitly separate from the
+unresolved FoundationPose eligibility question.
