@@ -510,3 +510,25 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   explicitly disclosed. Status/inlier/iteration and NN/trim indices must match
   exactly, pose/residual<=1e-6, median>=1.3× and<=60s. Failures retain partial
   diagnostics; neither test measures challenge accuracy or authorizes adoption.
+
+- 2026-10-02 R41 (Azure throughput fail-fast,dc6d5d2): cached canonical-tree
+  ICP passed all72exact status/inlier/iteration and NN/trim comparisons, then
+  exceeded frozen60s total at60.013s during timing trial1 (34alignments into
+  original mode). Whole candidate scalar/batch8 passed all3complete JSON/
+  rejection/selection comparisons, then exceeded120s at125.486s in timing.
+  Neither completed all3alternating trials or established useful median speedup;
+  preserve partial timings, do not claim failure of parity or proven acceleration.
+  Both remain unadopted; no increased budget retry of these frozen tests.
+- 2026-10-02 R42 (Azure Kaolin analytic kernel,dc6d5d2): infrastructure-only
+  cache retry passed original fixture/contracts in2.874s, distance error
+ 1.28988e-11m², point gradient0, triangle gradient4.04e-9 and rigid error
+ 2.53e-9m². Standard import noncommercial closure and release binary identity
+  remain unverified. Numerical pass alone does not authorize final stack/fitter.
+- 2026-10-02 D42: independent own continuous triangle primitive uses float64
+  signed cross-product containment and nearest closed segments, no epsilon,
+  geometry rescaling or vendor code. Chunk64no-grad nearest-face search then
+  selected-face autograd; float64 squared metre output on original device.
+  Predeclare same original10mm analytic/gradient gates, exact chunk/duplicate
+  checks, thin nondegenerate triangle, then2048points against5120own faces,
+ 3finite forward/backward trials<=3s each and total<=30s. Tiny local tests are
+  mathematics/schema only; no GPU/fitter adoption until actual remote gate.

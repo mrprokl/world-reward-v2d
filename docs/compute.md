@@ -84,7 +84,7 @@ trajectory. **Do not restart or overwrite.**
 
 Queued chain: `world-reward-cari-prepare-v2` (`5d4f5db`, remote EXDEV copy fix)
 → `world-reward-cari-forward` → `world-reward-cari-converter` (both`414aac2`).
-Preparation active at11:36UTC, encoded100depthframes; actual network inference/
+Preparation active at11:49UTC, encoded200depthframes; actual network inference/
 conversion not yet verified. Finger-transfer sparse gate waits for conversion.
 A separate `world-reward-masks-episode0` from`a867e23` tests routing/general automatic
 mask initialization; final reporting failed from a shadowed provenance variable.
@@ -93,15 +93,18 @@ in72.67s with zero empty masks. No manual labels or hyperparameter adjustments.
 
 Continuous small-triangle PyTorch3D gate failed in.816s; backend not adopted.
 Alternative Kaolin import failed before numerical evaluation (unwritable `/.cache`).
-Retry is restricted to that exact frozen infrastructure failure, with task-isolated
-writable HOME/cache and a distinct report; no fixture or tolerance change. Explicit
-transitive noncommercial-import uncertainty remains; no fitter adoption from QA.
+Exact infrastructure-only retry passed in2.874s after task-isolated HOME/cache fix:
+distance error1.2899e-11m², gradients and rigid/duplicate/singleton contracts pass.
+Frozen original failure remains; no fixture or tolerance change. Explicit transitive
+noncommercial-import uncertainty remains; no fitter adoption from QA.
 
-Two immutable procedural throughput gates are ready: whole24-candidate scalar/
-batch8 CUDA scheduling with exact JSON parity and>=1.3× speedup, and canonical
-KDtree ICP with exact discrete/NN/trim parity,1e-6 numerical gate and>=1.3× speedup.
-Their own synthetic inputs are not challenge validation; cached-ICP seeds are
-explicitly synthetic-oracle-derived. Neither solver/schedule is adopted yet.
+Two immutable procedural throughput gates failed their total elapsed budgets:
+whole24-candidate scalar/batch8 passed exact JSON parity but exceeded120s;
+canonical KDtree passed all72discrete/NN/trim/1e-6 comparisons but exceeded60s.
+Neither finished3timing trials or proved>=1.3× median speedup. Own synthetic inputs
+are not challenge validation; cached-ICP seeds are synthetic-oracle-derived.
+Neither solver/schedule is adopted. Independent own float64 continuous geometry
+is next tested against the same analytic fixture plus a fixed runtime budget.
 
 Results/decisions and useful failure causes are retained in experiments.md.
 Temporary redundant masks/download archives may be cleaned **after** validated
