@@ -25,6 +25,20 @@ from world_reward.data import sha256
 from world_reward.submission import Track1Episode
 
 
+# This older converter was hard-wired to outputs/episode_000015. Its passing
+# report omitted episode_index; the source digest
+# and all selected report/file links still bind the exact original artifact.
+LEGACY_CONVERSION_REVISION = "414aac2a988f444eb166494c9d0d6aca5872ad0c"
+LEGACY_CONVERSION_SCRIPT_SHA256 = "d2642f9816a6c7d6146b550a4b6500e108a33ff48ce55f54dec9bd7deddd1bc3"
+
+
+def legacy_episode15_conversion(report, episode_index):
+    return (type(episode_index) is int and episode_index == 15
+            and "episode_index" not in report
+            and report.get("producer_revision") == LEGACY_CONVERSION_REVISION
+            and report.get("script_sha256") == LEGACY_CONVERSION_SCRIPT_SHA256)
+
+
 @dataclass(frozen=True)
 class LoadedTrack1Episode:
     episode: Track1Episode
@@ -80,7 +94,8 @@ def load_track1_episode(
 
     Paths are fixed to the selected episode. All five upstream report links are
     SHA-bound, including the actual full-forward gate. Missing report fields,
-    invalid dtypes/frames and malformed geometry fail; no interpolation, pose
+    invalid dtypes/frames and malformed geometry fail (only the exact allowlisted
+    hard-wired episode15 converter may omit its episode field); no interpolation, pose
     repair, unit inference or alternative source is used. The params archive
     is verified by SHA, not decompressed redundantly. Returned arrays are copies.
     """
@@ -95,6 +110,7 @@ def load_track1_episode(
     root = root.resolve()
     base = f"outputs/episode_{episode_index:06d}"
     final, report_hash = _report(root, f"{base}/cari_conversion/report.json", "world_reward_native_cari_official_conversion", episode_index)
+    legacy_episode_format = legacy_episode15_conversion(final, episode_index)
     required = {
         "episode_index": episode_index, "frames": total_frames, "input_sha256": input_video_sha256,
         "original_frame_coverage_verified": True, "human_shared_identity_verified": True,
@@ -105,6 +121,8 @@ def load_track1_episode(
         "network": "none",
     }
     for key, expected in required.items():
+        if key == "episode_index" and legacy_episode_format:
+            continue  # No mutation/invented field; exact legacy source only.
         actual = final.get(key)
         if actual != expected or (type(expected) in (bool, int) and type(actual) is not type(expected)):
             raise ValueError(f"Final native conversion contract mismatch: {key}")
@@ -178,6 +196,8 @@ def load_track1_episode(
                 "params_sha256": final["params_sha256"], "dependency_report_sha256": links,
                 "upstream_revision": UPSTREAM_REVISION, "checkpoint_sha256": CHECKPOINT_SHA256,
                 "reference_model_sha256": REFERENCE_MODEL_SHA256, "official_converter_sha256": CONVERTER_SHA256,
+                "legacy_episode15_conversion_format": legacy_episode_format,
+                "episode_identity_basis": "allowlisted_hardwired_episode15_source_and_all_artifact_links" if legacy_episode_format else "explicit_report_field_and_all_artifact_links",
                 "integrity_and_schema_verified": True, "numerical_truth_independently_reverified": False,
                 "submission_eligibility_verified": False, "challenge_performance_verified": False}
     return LoadedTrack1Episode(episode, manifest)

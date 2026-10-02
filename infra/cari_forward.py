@@ -155,7 +155,7 @@ def main():
     result = {"stage": "native_cari_checkpoint_load_gate" if args.kernel_only else "world_reward_native_cari_full_forward",
               "status": "pass", "episode_index": args.episode, "input_track": "track_1",
               "ground_truth_used": False, "hand_labeled_test": False,
-              "oracle_modes": [], "metadata": metadata, "hub_calls": hub_calls, "dinov2_revision": DINOV2_REVISION,
+              "oracle_modes": [], "network": "none", "metadata": metadata, "hub_calls": hub_calls, "dinov2_revision": DINOV2_REVISION,
               "inference_source_identity": source_identity, "checkpoint_sha256": sha256(checkpoint),
               "inputs_report_sha256": None if inputs_path is None else sha256(inputs_path),
               "episode_inputs_used": not args.kernel_only,

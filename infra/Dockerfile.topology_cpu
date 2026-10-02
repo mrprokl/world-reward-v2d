@@ -1,0 +1,11 @@
+# GPL-3.0 PyMeshLab is an external CPU tool; no vendored code/relicensing.
+# The build wrapper supplies the exact locally inspected base image sha256 ID.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+USER root
+RUN python -c "import sys; assert sys.version_info[:2] == (3,11); import numpy, scipy, trimesh"
+RUN python -c "import hashlib,pathlib,urllib.request; p=pathlib.Path('/tmp/pymeshlab-2025.7.post1-cp311-cp311-manylinux_2_35_x86_64.whl'); urllib.request.urlretrieve('https://files.pythonhosted.org/packages/c0/20/5b18072334280015899fce0a514a8455619421dfb122d37c1fd7166507db/pymeshlab-2025.7.post1-cp311-cp311-manylinux_2_35_x86_64.whl',p); assert hashlib.sha256(p.read_bytes()).hexdigest() == 'c3c1b01f101334b14469ace3b004382cd313b80a128f551a1da77e3053f09c30'"
+RUN python -m pip install --no-deps --no-index /tmp/pymeshlab-2025.7.post1-cp311-cp311-manylinux_2_35_x86_64.whl && rm /tmp/pymeshlab-2025.7.post1-cp311-cp311-manylinux_2_35_x86_64.whl
+# A missing GL/plugin dependency is a real build failure, never hidden apt repair.
+RUN python -c "import importlib.metadata as m, numpy as n, pymeshlab as p; assert m.version('pymeshlab') == '2025.7.post1'; s=p.MeshSet(); s.add_mesh(p.Mesh(vertex_matrix=n.array([[0.,0.,0.],[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]]),face_matrix=n.array([[0,2,1],[0,1,3],[1,2,3],[2,0,3]],dtype=n.int32))); s.meshing_decimation_quadric_edge_collapse(targetfacenum=4,preservetopology=True,preservenormal=True,autoclean=False); s.current_mesh().compact(); s.compute_selection_by_self_intersections_per_face(); assert s.current_mesh().selected_face_number() == 0; print('cpu_link_condition_import_and_filter=pass')"
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1

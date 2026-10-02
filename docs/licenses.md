@@ -142,6 +142,15 @@ source/dependency audit and technical equivalence validation.
 
 ## 3. Release decision and minimal organizer question
 
+- Experimental topology tool: PyMeshLab `2025.7.post1` is GPL-3.0, an
+  OSI-approved license permitting commercial use, but with copyleft obligations
+  on redistribution. It is an external CPU dependency, not World Reward Apache
+  source. Pin its wheel SHA-256
+  `c3c1b01f101334b14469ace3b004382cd313b80a128f551a1da77e3053f09c30`;
+  do not publish a combined image without its required notices/source offer and
+  an actual dependency/release audit. License compatibility alone is neither a
+  successful geometry gate nor a final competition-eligibility determination.
+
 - First-party World Reward code should be Apache-2.0; root maintainer adds the
   license. Preserve third-party notices and identify their actual licenses.
 - Separate own code, dependency pins, and externally obtained weights; document

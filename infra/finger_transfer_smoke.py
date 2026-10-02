@@ -50,8 +50,12 @@ def _require_report(report: Mapping, stage: str, episode: int) -> None:
     require_video_only_provenance(dict(report))
     if report.get("hand_labeled_test") is not False or report.get("network") != "none":
         raise ValueError("Require explicit no-hand-label and offline provenance")
-    # Legacy final reports are still bound to the selected path and all file SHAs.
-    selected = report.get("episode_index", episode)
+    if "episode_index" not in report:
+        from track1_episode_loader import legacy_episode15_conversion
+        if stage != FINAL_STAGE or not legacy_episode15_conversion(report, episode):
+            raise ValueError("Only the exact hard-wired legacy final converter may omit episode_index")
+        return
+    selected = report["episode_index"]
     if type(selected) is not int or selected != episode:
         raise ValueError("Producer report belongs to another episode")
 
@@ -61,6 +65,21 @@ def _require_hash(path: Path, expected: str) -> None:
             or any(character not in "0123456789abcdef" for character in expected)
             or path.is_symlink() or not path.is_file() or sha256(path) != expected):
         raise RuntimeError(f"Frozen artifact missing or altered: {path}")
+
+
+def require_forward_network(forward, report_hash, bundle_hash, episode, proof_path):
+    """Explicit offline field or exact frozen audit, never an implicit default."""
+    if "network" in forward:
+        _require_report(forward, "world_reward_native_cari_full_forward", episode)
+        return None
+    from forward_network_proof import validate_proof
+    from cari_converter import require_full_forward_report
+    require_full_forward_report(forward)
+    if proof_path.is_symlink() or not proof_path.is_file():
+        raise ValueError("Missing forward offline field requires the exact legacy network proof")
+    digest = sha256(proof_path)
+    validate_proof(json.loads(proof_path.read_text()), forward, report_hash, bundle_hash, episode)
+    return digest
 
 
 def validate_producer_reports(final: Mapping, hands: Mapping, episode: int) -> tuple[int, np.ndarray]:
@@ -262,7 +281,9 @@ def main() -> None:
     _require_hash(forward_path, final["input_report_sha256"]["forward"])
     report_hashes["forward"] = final["input_report_sha256"]["forward"]
     forward = json.loads(forward_path.read_text())
-    _require_report(forward, "world_reward_native_cari_full_forward", args.episode)
+    # A separate audit binds legacy guard/wrapper source; no launch attestation.
+    proof_path = base / "cari_forward/network_proof.json"
+    network_proof_hash = require_forward_network(forward, report_hashes["forward"], final.get("bundle_sha256"), args.episode, proof_path)
     metadata = forward.get("metadata")
     if (not isinstance(metadata, Mapping) or metadata.get("actual_network_forward_verified") is not True
             or metadata.get("full_original_frame_coverage_verified") is not True
@@ -323,6 +344,8 @@ def main() -> None:
                            (final_path, report_hashes["final"]), (hands_path, report_hashes["hands"]),
                            (forward_path, report_hashes["forward"])):
         _require_hash(path, expected)
+    if network_proof_hash is not None:
+        _require_hash(proof_path, network_proof_hash)
     output.mkdir(exist_ok=False)
     with (output / "proposals.npz").open("xb") as handle:
         np.savez_compressed(handle, frame_index=indices, baseline_pose=fixed["pose"][indices],
@@ -330,6 +353,8 @@ def main() -> None:
                             expression=fixed["expression"], hand_indices_left=left, hand_indices_right=right)
     report = {
         "stage": STAGE, "status": "pass", "episode_index": args.episode,
+        "forward_network_proof_sha256": network_proof_hash,
+        "forward_network_provenance_basis": "explicit_report" if network_proof_hash is None else "audited_legacy_runtime_guard_contract_not_security_attestation",
         "input_track": "track_1", "input_sha256": final["input_sha256"], "ground_truth_used": False,
         "hand_labeled_test": False, "oracle_modes": [], "network": "none",
         "total_video_frames": count, "frame_indices": indices.tolist(), "exported_candidate_frames": 3,

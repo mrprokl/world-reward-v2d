@@ -648,3 +648,21 @@ test; parallelize independent hypotheses only after shared contracts are sound.
  remote; these failures do not establish that nuisance-pose shape fitting is
  impossible. No increased-budget rerun/selection claim; global modes remain
  unverified and conservative selectedM0 is not an efficacy win.
+
+- 2026-10-02 R50 (H1reportformat fail-fast): the finger-transfer consumer
+  stopped before output because the frozen actual-forward report omitted its
+  top-level network field. The producer did enforce a Linux loopback-only guard
+  and immutable Docker network-none wrapper. Do not rewrite it or treat all
+  missing fields as offline: separately verify exact legacy source/wrapper,
+  SHA-bound report/bundle; original transient systemd ExecStart is no longer
+  available, so do not claim launch binding. Sidecar is only the source-bound
+  mandatory loopback-guard contract, never security namespace attestation. Future forward
+  reports explicitly record the enforced field; invalid present fields still fail.
+
+- 2026-10-02 R51 (finalarchive gate fail-fast,9d489bf): consumer found that the
+  original hard-wired episode15 converter report omitted episode_index. The
+  conversion itself passed all501frames; this is format compatibility, not failed
+  native geometry. Accept absence only for the exact producing414aac2 source
+  SHA d2642f98 and requested15, retaining every source/input/artifact hash check.
+  Any present malformed/wrong field or unknown source still fails. Preserve
+  original report bytes; record explicit legacy identity basis in loader manifest.

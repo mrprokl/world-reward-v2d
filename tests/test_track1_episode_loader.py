@@ -257,3 +257,45 @@ def test_pure_loader_import_does_not_require_torch_or_remote_linux(loader, froze
     assert result.episode.provenance["ground_truth_used"] is False
     assert not (frozen[1] / "cari_forward/coconet.pth").exists()
     assert not (frozen[0] / "data").exists()
+
+
+def test_exact_historical_converter_format_preserves_report_bytes(loader, frozen):
+    root, _, reports, paths, _, sync, _, _ = frozen
+    final = reports["conversion"]
+    del final["episode_index"]
+    final.update(producer_revision=loader.LEGACY_CONVERSION_REVISION,
+                 script_sha256=loader.LEGACY_CONVERSION_SCRIPT_SHA256)
+    sync()
+    before = paths["conversion"].read_bytes()
+    result = load(loader, frozen)
+    assert result.manifest["legacy_episode15_conversion_format"] is True
+    assert paths["conversion"].read_bytes() == before
+    assert "episode_index" not in final
+
+
+@pytest.mark.parametrize("kind", ["unknown_source", "wrong_revision", "no_identity", "present_null", "present_other"])
+def test_missing_episode_never_generically_assumed_from_selected_directory(loader, frozen, kind):
+    final = frozen[2]["conversion"]
+    del final["episode_index"]
+    final.update(producer_revision=loader.LEGACY_CONVERSION_REVISION,
+                 script_sha256=loader.LEGACY_CONVERSION_SCRIPT_SHA256)
+    if kind == "unknown_source": final["script_sha256"] = "0" * 64
+    elif kind == "wrong_revision": final["producer_revision"] = "0" * 40
+    elif kind == "no_identity": final.pop("script_sha256")
+    elif kind == "present_null": final["episode_index"] = None
+    else: final["episode_index"] = 0
+    frozen[5]()
+    with pytest.raises(ValueError): load(loader, frozen)
+
+
+def test_legacy_converter_source_is_exact_and_hardwired_episode15(loader):
+    import hashlib, subprocess
+    repository = Path(loader.__file__).parents[1]
+    source = subprocess.check_output(["rtk", "proxy", "git", "show",
+        loader.LEGACY_CONVERSION_REVISION + ":infra/cari_converter.py"], cwd=repository)
+    assert hashlib.sha256(source).hexdigest() == loader.LEGACY_CONVERSION_SCRIPT_SHA256
+    assert b'base = root / "outputs/episode_000015"' in source
+    report = {"producer_revision": loader.LEGACY_CONVERSION_REVISION,
+              "script_sha256": loader.LEGACY_CONVERSION_SCRIPT_SHA256}
+    for bad in (0, 29, True, "15", 15.):
+        assert loader.legacy_episode15_conversion(report, bad) is False

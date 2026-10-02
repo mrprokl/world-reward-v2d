@@ -62,7 +62,75 @@ def test_matching_producer_provenance_and_legacy_final_episode(smoke, reports):
     np.testing.assert_array_equal(indices, [0, 2, 4])
     assert reports == before
     del final["episode_index"]
+    final["producer_revision"] = "414aac2a988f444eb166494c9d0d6aca5872ad0c"
+    final["script_sha256"] = "d2642f9816a6c7d6146b550a4b6500e108a33ff48ce55f54dec9bd7deddd1bc3"
     smoke.validate_producer_reports(final, hands, 15)
+
+
+@pytest.mark.parametrize("stage", ["final", "hands", "forward"])
+def test_missing_episode_rejected_for_unknown_final_or_other_producers(smoke, reports, stage):
+    record = reports[0] if stage == "final" else reports[1] if stage == "hands" else dict(forward_report(smoke), network="none")
+    record.pop("episode_index", None)
+    label = smoke.FINAL_STAGE if stage == "final" else smoke.HANDS_STAGE if stage == "hands" else "world_reward_native_cari_full_forward"
+    with pytest.raises(ValueError, match="omit episode_index"):
+        smoke._require_report(record, label, 15)
+
+
+@pytest.mark.parametrize("episode", [0, 29])
+def test_legacy_missing_final_episode_only_hardwired_15(smoke, reports, episode):
+    final = reports[0]; del final["episode_index"]
+    final["producer_revision"] = "414aac2a988f444eb166494c9d0d6aca5872ad0c"
+    final["script_sha256"] = "d2642f9816a6c7d6146b550a4b6500e108a33ff48ce55f54dec9bd7deddd1bc3"
+    with pytest.raises(ValueError): smoke._require_report(final, smoke.FINAL_STAGE, episode)
+
+
+def forward_report(smoke):
+    return {"stage": "world_reward_native_cari_full_forward", "status": "pass", "input_track": "track_1",
+            "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": [],
+            "metadata": {"actual_network_forward_verified": True, "full_original_frame_coverage_verified": True},
+            "episode_inputs_used": True, "checkpoint_sha256": smoke.CHECKPOINT_SHA256}
+
+
+def test_forward_explicit_none_never_needs_legacy_proof(smoke, tmp_path):
+    forward = dict(forward_report(smoke), network="none", episode_index=0)
+    assert smoke.require_forward_network(forward, "a" * 64, "b" * 64, 0, tmp_path / "absent") is None
+
+
+@pytest.mark.parametrize("network", [None, "default", "host", "", 0])
+def test_present_bad_forward_network_can_never_fall_back_to_proof(smoke, tmp_path, network):
+    forward = dict(forward_report(smoke), network=network, episode_index=15)
+    proof = tmp_path / "network_proof.json"; proof.write_text("{}")
+    with pytest.raises(ValueError, match="offline"):
+        smoke.require_forward_network(forward, "a" * 64, "b" * 64, 15, proof)
+
+
+def test_missing_forward_network_without_sidecar_or_with_symlink_fails(smoke, tmp_path):
+    forward = forward_report(smoke)
+    path = tmp_path / "network_proof.json"
+    with pytest.raises(ValueError, match="exact legacy"):
+        smoke.require_forward_network(forward, "a" * 64, "b" * 64, 15, path)
+    target = tmp_path / "actual"; target.write_text("{}"); path.symlink_to(target)
+    with pytest.raises(ValueError, match="exact legacy"):
+        smoke.require_forward_network(forward, "a" * 64, "b" * 64, 15, path)
+
+
+def test_missing_field_legacy_sidecar_binds_exact_source_episode_report_bundle(smoke, tmp_path):
+    import forward_network_proof as proof
+    forward = dict(forward_report(smoke), script_sha256=proof.LEGACY_SCRIPT_SHA256, bundle_sha256=proof.LEGACY_BUNDLE_SHA256)
+    sidecar = {"stage": proof.PROOF_STAGE, "status": "pass", "episode_index": 15,
+               "legacy_revision": proof.LEGACY_REVISION, "producer_script_sha256": proof.LEGACY_SCRIPT_SHA256,
+               "wrapper_sha256": proof.LEGACY_WRAPPER_SHA256, "forward_report_sha256": proof.LEGACY_REPORT_SHA256,
+               "bundle_sha256": proof.LEGACY_BUNDLE_SHA256, "basis": proof.PROOF_BASIS, "runtime_guard_source_verified": True,
+               "immutable_wrapper_source_verified": True, "immutable_wrapper_launch_bound": False, "network_security_attestation": False,
+               "producer_report_modified": False, "source_archive_sha256": proof.LEGACY_ARCHIVE_SHA256, "source_archive_rehashed": False}
+    path = tmp_path / "network_proof.json"; path.write_text(json.dumps(sidecar))
+    before = copy.deepcopy(forward)
+    assert smoke.require_forward_network(forward, proof.LEGACY_REPORT_SHA256, proof.LEGACY_BUNDLE_SHA256, 15, path) == smoke.sha256(path)
+    assert forward == before and "network" not in forward
+    for episode in (0, 29):
+        with pytest.raises(ValueError): smoke.require_forward_network(forward, proof.LEGACY_REPORT_SHA256, proof.LEGACY_BUNDLE_SHA256, episode, path)
+    for report_hash, bundle_hash in (("0" * 64, proof.LEGACY_BUNDLE_SHA256), (proof.LEGACY_REPORT_SHA256, "0" * 64)):
+        with pytest.raises(ValueError): smoke.require_forward_network(forward, report_hash, bundle_hash, 15, path)
 
 
 @pytest.mark.parametrize("record,key,value", [

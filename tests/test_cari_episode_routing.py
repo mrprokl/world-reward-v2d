@@ -146,3 +146,18 @@ def test_legacy_native_report_stage_and_provenance_not_relaxed_for_episode(monke
     report["ground_truth_used"] = True
     path.write_text(json.dumps(report))
     with pytest.raises(ValueError): module._read_report(path, report["stage"], episode_index=15)
+
+
+def test_forward_pass_report_records_enforced_network_namespace_contract():
+    import ast
+    tree = ast.parse((Path(__file__).resolve().parents[1] / "infra/cari_forward.py").read_text())
+    result = next(node.value for node in ast.walk(tree) if isinstance(node, ast.Assign)
+                  and any(isinstance(t, ast.Name) and t.id == "result" for t in node.targets))
+    fields = {key.value: value for key, value in zip(result.keys, result.values) if isinstance(key, ast.Constant)}
+    assert isinstance(fields["network"], ast.Constant) and fields["network"].value == "none"
+    # The producer guard is before imports/model/forward and no report can be
+    # written by the non-loopback branch. This is a contract, not attestation.
+    main = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main")
+    assert isinstance(main.body[0], ast.If)
+    assert "/sys/class/net" in ast.unparse(main.body[0].test)
+    assert isinstance(main.body[0].body[0], ast.Raise)
