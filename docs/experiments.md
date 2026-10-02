@@ -1557,3 +1557,33 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   tests PASS (including anisotropic resize/crop, unidentifiable fields and
   concentrated/infinitesimal confidence); not actual camera accuracy. Fresh
   room/MHR RGB cohort and later fresh complete HOI validation remain required.
+
+- 2026-10-02 D83 actual runtime **PASS12.929974s**, representation **REJECT**.
+  Exactly one joint40, one reserved-pose60 and two F32 replays, D81 bindings
+  unchanged. Probe frames[0,197,394,592,789,98,296,493,690,1]; beforemm
+  [6.09733,1.20092,1.31454,2.50279,1.65158,1.38154,2.09534,1.97096,1.61542,6.28012],
+  after[5.62512,1.43520,.57670,2.94117,1.84514,1.32795,2.89512,2.47170,1.83885,5.81397].
+  Five still exceed2mm and six regress beyond1e-4mm; shared-identity updateL2
+  3.07041. Receipt8ddca5be3de229cd1364b97cb4aee07715e72c6275d128d6d6ac79ab361cd333.
+  No full790 joint retry/tolerance change/adoption. Need a structurally faithful
+  clipconstant identity source, not further retuning this failed inverse probe.
+  Full tiny4518PASS/1optionaltrimeshSKIP63.48s at source37dbd16.
+
+- 2026-10-02 D84 fresh camera-only RGB hypothesis (predeclared): six newly
+  manufactured open-front textured rooms, MHR actors/bottles, three focals×two
+  pitch/roll pairs; three weak uniform-background controls. Public nine RGBs only;
+  camera/gravity calibration private until all native predictions are frozen.
+  No claim of photorealism/independent real-world generalization. Exact audited
+  GeoCalib frontend nine seeded calls + frozen own CPU field solver. Reproduce
+  all public field-fit/camera results before private read. Strong acceptance≥5/6,
+  median focal error≤5%/worst≤15%, gravity median≤5°/worst≤10°; weak acceptance0/3;
+  all9 focal errors include explicit abstention1280 fallback and require≥5%
+  median relative gain over fixed diagonal. PASS only supports this synthetic
+  camera hypothesis, never full HOI or adoption. Render120s VM01; only the13
+  exact tiny cohort/semantic files transfer Azure→Azure, SHA/exclusive/private
+  permissions checked, no models/challenge/predictions. Infer180s H100 VM02,
+  private quality60s CPU/offline. No image-ID substitution: renderer OCI index
+  and frontend config-ID are bound to their own separate stage receipts.
+  Full4633PASS/1optionaltrimeshSKIP67.93s before five extra transfer source/closure
+  tests (22transferPASS); private archive0600 at creation, stdlib-only transfer,
+  current renderer/semantic source and model hashes checked before extraction.
