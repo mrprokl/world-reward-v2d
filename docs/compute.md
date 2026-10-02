@@ -192,3 +192,14 @@ preflight passed without GPU/context; expensive refinement not yet executed.
 Whole refinement bound7200s is exploratory budget, not a measured ETA.
 First preflight failure/cache fix retained as concise R89/R90; cache changes
 use writable container `/tmp`, no persistent vendor or dependency mutation.
+
+2026-10-02 17:39:33UTC: épisode0 pose complète790frames en3712.869s;
+préparation CPU native100/790 observée, pas fin de chaîne. File GPU exacte:
+`episode0-volume-native-v2` → `joint-rgb-grounding` →
+`cari-native-final-refinement-v2` → `joint-rgb-learned-camera`.
+J2 producteur `20714cf21436259ab8e6abc1993a90f97da1c2d5`,15files54864bytes,
+réutilise les9RGB/masques publics J1, sorties neuves; comparaison privée CPU
+des deux bundles complets seulement après gel des prédictions. Aucun résultat
+J1/J2 ou raffinement observé. Benchmark compactCPU distinct D71 peut coexister
+sans GPU; charge hôte partagée explicitement exclue d'une conclusion de débit
+préparation isolé. Ni les sources ni les budgets des lecteurs gelés ne changent.

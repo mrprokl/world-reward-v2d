@@ -1147,3 +1147,24 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   diagnostiques focal et Sim3 ne sélectionnent rien. Aucun score de cette
   fixture n'est la métrique complète V2D. Préparer queue derrière raffinement
   épisode15, sans changer/reprendre jobs actuellement actifs.
+- 2026-10-02 R91 (17:39:33UTC): épisode0 full-object pose **PASS790frames**,
+  3712.869s, producteurbaba81b; son reçu SHA8a0c8cef…436bb et bundle
+  SHA942d1286…995 conservés sur Azure. La chaîne native continue en CPU
+  préparation depth100/790, pas encore forward/conversion/schema. IoU greedy
+  median.390973 est diagnostique image, pas score GT ni trajectoire Viterbi
+  finale. J1, raffinement15 et J2 toujours en queue GPU séquentielle. Nouveau
+  producteur J2 `20714cf21436259ab8e6abc1993a90f97da1c2d5`, fermeture15files/
+  54864bytes encodés; full-suite3732PASS/1optional-trimeshSKIP37.92s. Rien ne
+  prouve encore un gain caméra, une baseline raffinée complète ou une victoire.
+- 2026-10-02 D71: tester un **nouveau protocole CPU compact distinct**, pas
+  requalifier l'échec R88:8frames/une batch8 complète, même1536×1152,
+  nouveau seed1711, ellipse/occludeur et vrais zéros invalides; valid_count
+  égale exactement count(depth>0), scale.83/shift0. Garder240s, warmup2frames
+  chacun, deux paires AB/BA, source/encodeur PNG natif exact, validation
+  exhaustive et égalité payload-byte/ordre/métadonnées; seuil median≥1.25×.
+  Namespace `depth-batch-compact-v1`, ancien16frames/seed1709/default/wrapper
+  et échec immuables. Scope write/encode/close uniquement, pas débit complet
+  préparation, pas validation réduite, pas adoption active; tailbatch2frames
+  couvert au warmup mais pas chronométré. CPU4/16g/noGPU/networknone, charge
+  CPU concurrente possible pendant préparation0: ne pas annoncer mesure
+  isolée. Tests18PASS.24s; tester réellement sur Azure après gel du source.

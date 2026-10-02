@@ -22,6 +22,7 @@ import numpy as np
 from world_reward.data import sha256
 
 STAGE = "own_native_depth_batch_write_parity_and_throughput"
+COMPACT_STAGE = "own_native_depth_batch_compact_write_parity_and_throughput"
 REVISION = "7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80"
 SOURCE_RELATIVE = "reconstruction/modules/v2d_cari4d/lib/cari4d/prep/mhr_depth_h5.py"
 SOURCE_SHA = "1429760952205d35c87157c05941defa20dc450f2b014441ca7cd5d39b45b0c5"
@@ -51,22 +52,29 @@ def load_native(root):
     return module
 
 
-def procedural_depths(width=WIDTH, height=HEIGHT, frames=FRAMES):
+def procedural_depths(width=WIDTH, height=HEIGHT, frames=FRAMES, *, seed=1709, invalid_background=False):
     """Seeded smooth depth with correlated texture; fixed positive metre range."""
     from scipy.ndimage import zoom
-    rng = np.random.default_rng(1709)
+    rng = np.random.default_rng(seed)
     coarse = rng.standard_normal((48, 64)).astype(np.float32)
     texture = zoom(coarse, (height/48, width/64), order=1, prefilter=False)
     y, x = np.mgrid[:height, :width].astype(np.float32); x /= width; y /= height
     base = 2.1+.45*x+.22*y+.11*np.sin(13*x+9*y)+.008*texture
     depths = [(base+.025*i+.004*np.sin(31*x-17*y+i*.13)).astype(np.float32) for i in range(frames)]
-    if any(not np.isfinite(d).all() or np.min(d) <= 0 or np.max(d) >= 65.535 for d in depths):
-        raise ValueError("Procedural raw depth must fit positive native uint16-mm range")
+    if invalid_background:
+        for i, depth in enumerate(depths):
+            support = ((x-(.50+.015*np.sin(i*.4)))/.36)**2+((y-.52)/.42)**2 <= 1
+            support &= ~((x > .57+.012*np.sin(i*.3)) & (y > .61))
+            depth[~support] = 0.
+    if any(not np.isfinite(d).all() or np.min(d) < 0 or (not invalid_background and np.min(d) == 0)
+            or not np.any(d > 0) or np.max(d) >= 65.535 for d in depths):
+        raise ValueError("Procedural raw depth must fit native nonnegative uint16-mm range with positive support")
     return depths
 
 
-def records_for(native, depths):
-    return [native.DepthFrameRecord(i, depth, depth*np.float32(SCALE), SCALE, 0., int(depth.size)) for i, depth in enumerate(depths)]
+def records_for(native, depths, *, count_positive=False):
+    return [native.DepthFrameRecord(i, depth, depth*np.float32(SCALE), SCALE, 0.,
+        int(np.count_nonzero(depth > 0)) if count_positive else int(depth.size)) for i, depth in enumerate(depths)]
 
 
 def run_write(native, path, records, mode):
@@ -120,9 +128,13 @@ def validate_and_receipt(native, path, records):
         "validation_mode": validation["validation_mode"], "frame_counts": validation["frame_counts"], "frame_shapes": validation["frame_shapes"]}
 
 
-def run_gate(native, output, report, path):
-    depths = procedural_depths(); records = records_for(native, depths)
+def run_gate(native, output, report, path, *, depths=None, count_positive=False):
+    depths = procedural_depths() if depths is None else depths
+    records = records_for(native, depths, count_positive=count_positive)
     report["source_array_sha256"] = [hashlib.sha256(d.tobytes()).hexdigest() for d in depths]
+    if count_positive:
+        report.update(valid_count_per_frame=[r.valid_count for r in records],
+                      invalid_zero_count_per_frame=[int(np.count_nonzero(d == 0)) for d in depths])
     with tempfile.TemporaryDirectory(prefix="depth-batch-", dir=output) as temporary:
         temporary = Path(temporary)
         for mode in ("single", "batch8"):
@@ -155,25 +167,36 @@ def run_gate(native, output, report, path):
 
 
 def main(argv=None):
-    argparse.ArgumentParser(description=__doc__, allow_abbrev=False).parse_args(argv)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    parser.add_argument("--protocol", choices=("original", "compact"), default="original")
+    args = parser.parse_args(argv); compact = args.protocol == "compact"
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}: raise RuntimeError("Require isolated remote CPU network-none")
-    root = Path(os.environ["WR_ROOT"]); output = root/"results/depth-batch-v1"; path = output/"report.json"
+    root = Path(os.environ["WR_ROOT"]); output = root/"results"/("depth-batch-compact-v1" if compact else "depth-batch-v1"); path = output/"report.json"
     if output.is_symlink() or not output.is_dir() or any(output.iterdir()): raise FileExistsError("Require exclusively reserved benchmark output")
     revision, image = os.environ["WR_CODE_REVISION"], os.environ["WR_IMAGE_ID"]
     if not re.fullmatch("[0-9a-f]{40}", revision) or not re.fullmatch("sha256:[0-9a-f]{64}", image): raise ValueError("Immutable benchmark source/image required")
-    report = {"stage": STAGE, "status": "fail", "phase": "integrity", "producer_revision": revision, "image_id": image,
+    report = {"stage": COMPACT_STAGE if compact else STAGE, "protocol": args.protocol,
+        "status": "fail", "phase": "integrity", "producer_revision": revision, "image_id": image,
         "script_sha256": sha256(Path(__file__)), "native_source_revision": REVISION, "native_source_sha256": SOURCE_SHA,
         "challenge_inputs_used": False, "ground_truth_used": False, "adoption_performed": False,
-        "device": "cpu", "budget_seconds": BUDGET, "frames_per_trial": FRAMES, "original_grid": [HEIGHT, WIDTH],
+        "device": "cpu", "budget_seconds": BUDGET, "frames_per_trial": BATCH if compact else FRAMES, "original_grid": [HEIGHT, WIDTH],
         "batch_size": BATCH, "encoding_workers": WORKERS, "validation_workers": WORKERS, "trials": [],
         "scale": SCALE, "shift": 0., "depth_quantization": "uint16 millimetres native truncation; not accuracy",
         "compression_or_validation_changed": False, "concurrent_host_CPU_load_measured": False,
         "timing_caveat": "Shared host load may affect throughput; this is not isolated whole-pipeline performance",
-        "min_median_write_speedup": 1.25, "warmup_frames_per_mode": 2}
+        "min_median_write_speedup": 1.25, "warmup_frames_per_mode": 2,
+        "procedural_seed": 1711 if compact else 1709, "procedural_invalid_zero_background": compact,
+        "performance_scope": "paired native write/encode/close only; validation timings separate",
+        "whole_preparation_throughput_verified": False, "timed_partial_tail_batch_tested": False}
     start = time.perf_counter()
     def expired(*args): raise TimeoutError("Whole depth-batch gate exceeded240s")
     alarm = signal.signal(signal.SIGALRM, expired); term = signal.signal(signal.SIGTERM, expired); signal.alarm(BUDGET)
-    try: write_report(path, report); native = load_native(root); run_gate(native, output, report, path)
+    try:
+        write_report(path, report); native = load_native(root)
+        if compact:
+            depths = procedural_depths(width=WIDTH, height=HEIGHT, frames=BATCH, seed=1711, invalid_background=True)
+            run_gate(native, output, report, path, depths=depths, count_positive=True)
+        else: run_gate(native, output, report, path)
     except Exception as error: report.update(error_type=type(error).__name__, error=str(error)); raise
     finally:
         signal.alarm(0); signal.signal(signal.SIGALRM, alarm); signal.signal(signal.SIGTERM, term)
