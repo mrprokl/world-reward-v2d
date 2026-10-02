@@ -85,7 +85,7 @@ def component_labels(vertices,faces):
     return labels[faces[:,0]]
 
 
-def mapped_geometry(source,candidate,mapping):
+def mapped_geometry(source,candidate,mapping,diagnostics=None):
     """Birthface provenance matches actual shells, never volume-sorted pairing."""
     sv,sf=source;cv,cf=candidate;before=mesh_topology(sv,sf);after=mesh_topology(cv,cf)
     expected={'source_vertices':len(sv),'source_faces':len(sf),'output_vertices':len(cv),'output_faces':len(cf),
@@ -121,6 +121,7 @@ def mapped_geometry(source,candidate,mapping):
     av=sum(x['source_volume'] for x in matched);bv=sum(x['candidate_volume'] for x in matched);net=abs(bv-av)/av
     result={'sampled_bidirectional_chamfer_diagonal_ratio':cd,'net_volume_relative_error':net,'birthface_matched_shells':matched,
             'source_topology':before,'candidate_topology':after,'scale_or_pose_fitted':False}
+    if diagnostics is not None:diagnostics.update(result)
     if cd>.01 or net>.05 or any(x['relative_volume_error']>.05 for x in matched):raise ValueError('Frozen1% geometry/5% net and per-shell volume gates failed')
     return result
 
@@ -151,11 +152,13 @@ def main(argv=None):
             hashes=[_array_hash(x) for x in source];mesh_topology(*source)
             if source_intersections(*source):raise ValueError('Source embedding failed; no healing')
             candidate,mapping=simplify(source,120)
-            record={'fixture':name,'geometry':mapped_geometry(source,candidate,mapping),'independent_intersecting_faces':source_intersections(*candidate)}
+            record={'fixture':name,'geometry':{},'independent_intersecting_faces':source_intersections(*candidate)}
+            report['fixtures'].append(record)
+            mapped_geometry(source,candidate,mapping,record['geometry'])
             if record['independent_intersecting_faces']:raise ValueError('Independent embedding gate failed')
             if name=='new_close_asymmetric_shells':record['containment']=true_hollow_containment(*candidate,self_intersecting_faces=0)
             if hashes!=[_array_hash(x) for x in source]:raise ValueError('Source arrays changed')
-            record['source_arrays_unchanged']=True;report['fixtures'].append(record);_write(path,report)
+            record['source_arrays_unchanged']=True;_write(path,report)
         report['status']='pass'
     except Exception as exc:report.update(error_type=type(exc).__name__,error=str(exc));raise
     finally:signal.alarm(0);report['elapsed_seconds']=time.perf_counter()-started;_write(path,report)

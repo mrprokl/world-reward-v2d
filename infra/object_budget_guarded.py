@@ -63,7 +63,9 @@ def produce(root,episode,report,path):
     candidate,mapping=guarded.simplify(source,840)
     report['candidate_topology']=mesh_topology(*candidate);report['independent_candidate_intersecting_faces']=source_intersections(*candidate);_write(path,report)
     if report['independent_candidate_intersecting_faces']:raise ValueError('Independent final embedding failed')
-    report['candidate_geometry']=guarded.mapped_geometry(source,candidate,mapping);_write(path,report)
+    report['candidate_geometry']={}
+    try:guarded.mapped_geometry(source,candidate,mapping,report['candidate_geometry'])
+    finally:_write(path,report)
     import trimesh
     fixed=path.parent/'object_fixed_canonical.glb'
     trimesh.Trimesh(*candidate,process=False).export(fixed)

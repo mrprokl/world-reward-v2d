@@ -949,3 +949,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   No new checkpoints or challenge labels; moderate and fast-step motion frozen
   before render. Inherited anchor depth/shape error is separated from relative
   tracking diagnosis, never canceled using GT during inference.
+- 2026-10-02 R80 (Azure episode0 guarded proposal,8cdad20): native global
+  intersection-blocking QEM reached2138vertices/4096faces with independent zero
+  intersections. Proposal failed6.252s at unchanged1% sampled diagonal CD /5%
+  net and birthface-matched shell-volume gate; reject, no export/adoption.
+  Numerical measurements were lost by a raise-before-assignment reporting flaw,
+  so the exact failing axis remains unknown. Future calls retain metrics before
+  rejecting; original report stays frozen and no threshold is changed.
+  This improves embedding over endpoint-QEM's six intersecting faces, but is
+  not sufficient fidelity. Do not claim success or starvation of small shells
+  without the missing measured evidence.
+- 2026-10-02 R81 (Azure new public motion cohort,3698a35): render-only24RGB
+  passed4.163s; automatic masks and unchanged MoGe2 observations passed13.174s,
+  all24original frames. No private GT reaches inference, no downloaded CAD or
+  new checkpoint. Separate fixed-anchor generation/tracking/private evaluation
+  begins at ec60dd9; spatial reserved-track reprojection is not held-out temporal
+  accuracy. Full tiny suite3423PASS33.10s before final tracking tests.

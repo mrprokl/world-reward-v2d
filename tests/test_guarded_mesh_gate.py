@@ -32,6 +32,14 @@ def test_identity_mapped_geometry_zero_error(gate):
     assert r['sampled_bidirectional_chamfer_diagonal_ratio']==0 and r['net_volume_relative_error']==0
     assert len(r['birthface_matched_shells'])==1 and not r['scale_or_pose_fitted']
 
+
+def test_failed_numerical_gate_retains_actual_diagnostic_measurements(gate):
+    v,f=tetra();r={}
+    with pytest.raises(ValueError,match='gates failed'):
+        gate.mapped_geometry((v,f),(v*.9,f),mapping(v,f),r)
+    assert r['net_volume_relative_error']==pytest.approx(1-.9**3)
+    assert r['birthface_matched_shells'][0]['relative_volume_error']>.05
+
 @pytest.mark.parametrize('fault',['missing','bool_count','bad_J','bad_I','incomplete','target','reverse','scale'])
 def test_bad_mapping_or_geometry_fail_closed(gate,fault):
     v,f=tetra();r=mapping(v,f);cv,cf=v.copy(),f.copy()
