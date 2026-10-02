@@ -406,3 +406,11 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   noiseless procedural partial-view test verifies implementation (>85% fitting
   residual gain), not RGB-inferred pose robustness or challenge shape accuracy.
   Full local suite1292 passes. Synthetic rendered/occluded tests still required.
+
+- 2026-10-02 D35: shared depth gauge, grounded object generation and rigid
+  trajectory initializers generalized to episodes0..29, default15 preserved.
+  Sparse frame indices now derive from each original clip length; producing
+  masks/body/depth/shape reports must bind the selected episode and video hash.
+  No camera/gauge, generic simplification budget, pose hypotheses, ICP objective
+  or Viterbi hyperparameter changes. Wrapper passes selected episode explicitly.
+  Local suite1334 passes; actual other-episode execution is a separate gate.

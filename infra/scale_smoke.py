@@ -6,31 +6,39 @@ independently calibrated metric scale. MoGe1 object outputs are not consumed.
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 from pathlib import Path
 import platform
 import time
 
-from body_smoke import _validate_inputs
+from body_smoke import EPISODE, TRACK1_EPISODE_COUNT, _validate_inputs
 from camera_render import raster_camera_mesh, silhouette_iou
 from world_reward.data import sha256
 from world_reward.metric_alignment import fit_shared_depth_scale
 from world_reward.pointmap import validate_camera_pointmap
 
 
+def _argument_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
+    return parser
+
+
 def main() -> None:
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux GPU container with network none")
+    args = _argument_parser().parse_args()
+    root = Path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"))
+    inputs = _validate_inputs(root, episode_index=args.episode)
     import numpy as np
     from PIL import Image
-    root = Path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"))
-    inputs = _validate_inputs(root)
     gate_path = root / "results/camera-render.json"
     gate = json.loads(gate_path.read_text())
     if gate["status"] != "pass":
         raise RuntimeError("Analytic CUDA camera/depth gate must pass first")
-    base = root / "outputs/episode_000015"
+    base = root / f"outputs/episode_{args.episode:06d}"
     output = base / "scale_smoke"
     if output.exists():
         raise RuntimeError("Frozen alignment output exists; do not overwrite")
@@ -38,7 +46,7 @@ def main() -> None:
     body_report, depth_report = [json.loads(path.read_text()) for path in (body_path, depth_path)]
     for report, stage in ((body_report, "sam3d_body_three_frame_smoke"),
                           (depth_report, "monocular_moge2_three_frame")):
-        expected = {"stage": stage, "status": "pass", "input_track": "track_1",
+        expected = {"stage": stage, "status": "pass", "episode_index": args.episode, "input_track": "track_1",
                     "input_sha256": inputs["video_sha256"], "ground_truth_used": False,
                     "hand_labeled_test": False}
         if any(report.get(key) != value for key, value in expected.items()):
@@ -57,7 +65,7 @@ def main() -> None:
         human_faces = data["faces"].copy()
         indices = data["frame_index"].tolist()
         focals = data["focal_length"].copy()
-    if indices != inputs["indices"] or indices != [0, 250, 500] or body_report["frame_indices"] != indices:
+    if indices != inputs["indices"] or body_report["frame_indices"] != indices:
         raise RuntimeError("Fixed original-frame scale smoke indices changed")
     body_frames = {r["frame_index"]: r for r in body_report["frames"]}
     depth_frames = {r["frame_index"]: r for r in depth_report["frames"]}
@@ -139,7 +147,7 @@ def main() -> None:
                                  "decoded_rgb_sha256": evidence[position]["decoded_rgb_sha256"]})
     report = {"stage": "predicted_human_anchored_moge2_pointmaps", "status": "pass",
               "execution_verified": True, "candidate_accuracy_validated": False,
-              "episode_index": 15, "frame_indices": indices, "depth_alignment": aligned.to_dict(),
+              "episode_index": args.episode, "frame_indices": indices, "depth_alignment": aligned.to_dict(),
               "human_evidence": evidence, "pointmaps": pointmap_records,
               "coordinate_frame": "OpenCV_x_right_y_down_z_forward",
               "pointmap_scale_application": "one_clip_scalar_to_MoGe2_XYZ_already_applied",

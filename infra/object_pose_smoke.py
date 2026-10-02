@@ -14,7 +14,7 @@ import platform
 import sys
 import time
 
-from body_smoke import _validate_inputs
+from body_smoke import EPISODE, TRACK1_EPISODE_COUNT, _validate_inputs
 from camera_render import raster_camera_mesh, silhouette_iou
 from world_reward.data import sha256
 from world_reward.rigid_alignment import align_observed_points
@@ -23,19 +23,24 @@ from world_reward.mesh_budget import fit_topology_preserving_budget
 from world_reward.pose_selection import select_pose_path
 
 
+def _argument_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
+    parser.add_argument("--full-video", action="store_true")
+    return parser
+
+
 def main() -> None:
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux GPU container with network none")
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--full-video", action="store_true")
-    args = parser.parse_args()
+    args = _argument_parser().parse_args()
+    root = Path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"))
+    inputs = _validate_inputs(root, episode_index=args.episode)
     import numpy as np
     from PIL import Image
     from scipy.spatial.transform import Rotation
     import trimesh
-    root = Path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"))
-    inputs = _validate_inputs(root)
-    base = root / "outputs/episode_000015"
+    base = root / f"outputs/episode_{args.episode:06d}"
     output = base / ("object_pose_full" if args.full_video else "object_pose_smoke")
     if output.exists():
         raise RuntimeError("Frozen object pose smoke already exists")
@@ -45,7 +50,7 @@ def main() -> None:
     alignment = json.loads(alignment_path.read_text())
     for record, stage in ((report, "sam3d_objects_grounded_fixed_frame"),
                           (alignment, "predicted_human_anchored_moge2_pointmaps")):
-        expected = {"stage": stage, "status": "pass", "input_track": "track_1",
+        expected = {"stage": stage, "status": "pass", "episode_index": args.episode, "input_track": "track_1",
                     "input_sha256": inputs["video_sha256"], "ground_truth_used": False,
                     "hand_labeled_test": False, "oracle_modes": []}
         if (any(record.get(key) != value for key, value in expected.items())
@@ -113,7 +118,7 @@ def main() -> None:
     if args.full_video:
         full_depth = json.loads(full_depth_report_path.read_text())
         full_body = json.loads((base / "body_full/report.json").read_text())
-        required = {"stage": "monocular_moge2_full_video", "status": "pass", "input_track": "track_1",
+        required = {"stage": "monocular_moge2_full_video", "status": "pass", "episode_index": args.episode, "input_track": "track_1",
                     "input_sha256": inputs["video_sha256"], "ground_truth_used": False, "hand_labeled_test": False,
                     "oracle_modes": [], "total_video_frames": inputs["total_frames"]}
         if (any(full_depth.get(key) != value for key, value in required.items())
@@ -123,7 +128,8 @@ def main() -> None:
         body_frames = {record["frame_index"]: record for record in full_body["frames"]}
         indices = list(range(inputs["total_frames"]))
         if (len(pointmaps) != len(full_depth["frames"]) or sorted(pointmaps) != indices
-                or sorted(body_frames) != indices or full_body["input_sha256"] != inputs["video_sha256"]):
+                or sorted(body_frames) != indices or full_body["input_sha256"] != inputs["video_sha256"]
+                or full_body.get("episode_index") != args.episode):
             raise RuntimeError("Full depth/body do not cover all original video frames")
     else:
         indices = inputs["indices"]
@@ -237,7 +243,7 @@ def main() -> None:
         np.savez_compressed(handle, vertices=vertices, faces=faces, frame_index=np.asarray(indices),
                             rotation=np.asarray(poses_R), translation=np.asarray(poses_t), object_scale=np.array(1.))
     result = {"stage": "fixed_scale_full_object_pose_initializer" if args.full_video else "fixed_scale_sparse_object_pose_consistency",
-              "status": "pass", "execution_verified": True, "original_frame_coverage_verified": args.full_video,
+              "status": "pass", "episode_index": args.episode, "execution_verified": True, "original_frame_coverage_verified": args.full_video,
               "candidate_accuracy_validated": False, "full_trajectory_accuracy_verified": False,
               "input_track": "track_1", "input_sha256": inputs["video_sha256"], "ground_truth_used": False,
               "hand_labeled_test": False, "oracle_modes": [], "submission_eligible": False,

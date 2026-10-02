@@ -10,24 +10,30 @@ from pathlib import Path
 import platform
 import time
 
-from body_smoke import _pinned_checkout, _validate_inputs
+from body_smoke import EPISODE, TRACK1_EPISODE_COUNT, _pinned_checkout, _validate_inputs
 from world_reward.data import sha256
 
 
 DINOV2_REVISION = "7764ea0f912e53c92e82eb78a2a1631e92725fc8"
 
 
-def main() -> None:
-    if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
-        raise RuntimeError("Require Azure Linux GPU container with network none")
+def _argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
     parser.add_argument("--root", type=Path, default=Path("/srv/scenesmith/world-reward"))
     parser.add_argument("--aligned-pointmap", action="store_true",
                         help="Use already human-anchored MoGe2 XYZ and identical K, not independent MoGe1")
-    args = parser.parse_args()
+    return parser
+
+
+def main() -> None:
+    if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
+        raise RuntimeError("Require Azure Linux GPU container with network none")
+    args = _argument_parser().parse_args()
     root = args.root.resolve()
     os.environ.update(HF_HUB_OFFLINE="1", TRANSFORMERS_OFFLINE="1")
-    inputs = _validate_inputs(root)
+    inputs = _validate_inputs(root, episode_index=args.episode)
+    base = root / f"outputs/episode_{args.episode:06d}"
     acquisition = json.loads((root / "results/weights-acquisition.json").read_text())
     principal = [r for r in acquisition["assets"] if r["repo_id"] == "facebook/sam-3d-objects"]
     if len(principal) != 1 or principal[0]["revision"] != "2e73555018d2741ccd486e56c24fac41155a1dc6":
@@ -43,7 +49,7 @@ def main() -> None:
     for record in checkpoints:
         if sha256(hub / "checkpoints" / record["filename"]) != record["sha256"]:
             raise RuntimeError("Objects DINO checkpoint changed after acquisition")
-    output = root / "outputs/episode_000015" / ("object_grounded" if args.aligned_pointmap else "object_smoke")
+    output = base / ("object_grounded" if args.aligned_pointmap else "object_smoke")
     if output.exists():
         raise RuntimeError("Frozen object smoke output exists; do not overwrite")
     import cv2
@@ -61,17 +67,17 @@ def main() -> None:
     finally:
         cap.release()
     rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
-    mask_path = root / "outputs/episode_000015/automatic_masks/masks/1/000000.png"
+    mask_path = base / "automatic_masks/masks/1/000000.png"
     with Image.open(mask_path) as image:
         mask = np.asarray(image)
     if mask.shape != rgb.shape[:2] or not np.isin(mask, [0, 255]).all() or not (mask > 0).any():
         raise RuntimeError("Fixed frame has no valid original-resolution object mask")
     grounding, grounding_arguments = None, {}
     if args.aligned_pointmap:
-        alignment_path = root / "outputs/episode_000015/scale_smoke/report.json"
+        alignment_path = base / "scale_smoke/report.json"
         alignment = json.loads(alignment_path.read_text())
         required = {"stage": "predicted_human_anchored_moge2_pointmaps", "status": "pass",
-                    "episode_index": 15, "input_track": "track_1", "input_sha256": inputs["video_sha256"],
+                    "episode_index": args.episode, "input_track": "track_1", "input_sha256": inputs["video_sha256"],
                     "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": [],
                     "coordinate_frame": "OpenCV_x_right_y_down_z_forward",
                     "pointmap_scale_application": "one_clip_scalar_to_MoGe2_XYZ_already_applied"}
@@ -145,7 +151,7 @@ def main() -> None:
         if json.loads((output / "intrinsics.json").read_text()) != json.loads(Path(grounding["intrinsics_path"]).read_text()):
             raise RuntimeError("Object output intrinsics must preserve the explicit grounding camera")
     report = {"stage": "sam3d_objects_grounded_fixed_frame" if args.aligned_pointmap else "sam3d_objects_fixed_frame_smoke",
-              "status": "pass", "execution_verified": True, "candidate_accuracy_validated": False, "episode_index": 15,
+              "status": "pass", "execution_verified": True, "candidate_accuracy_validated": False, "episode_index": args.episode,
               "frame_index": 0, "seed": 0, "elapsed_seconds": time.perf_counter() - started,
               "vertices": len(mesh.vertices), "faces": len(mesh.faces),
               "bounds_generated_units": mesh.bounds.tolist(), "surface_area_generated_units": float(mesh.area),
