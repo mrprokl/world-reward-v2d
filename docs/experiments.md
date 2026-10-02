@@ -286,3 +286,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   topology-valid approximation using fixed generic simplification budgets, with
   componentwise signed-shell preservation as fallback. Validate each candidate
   and the official repacked result, without filling holes or inverting cavities.
+
+- 2026-10-02 R29 (H100 sparse rigid pose consistency): global target 4096
+  retained the known non-manifold defect; fixed generic next target 4080 passed
+  closure, both signed shells/Euler, and official 4096 repacking. No positive-area
+  artifact was manually deleted, cavity inverted or hole filled. Fixed extent
+  in the predicted human gauge: 0.2324×0.2349×0.2332 m. Three-frame rigid
+  hypotheses passed in 30.49 s; automatic-mask IoU 0.8249/0.7982/0.8707 and
+  inferred-depth residual 0.0064/0.0339/0.0290 m. Image/depth consistency only,
+  not verified physical shape/pose accuracy.
+- 2026-10-02 D24: extend fixed geometry and scale to all 501 original frames.
+  Use 24 generic orientation seeds plus the previous image-selected rotation,
+  deterministic partial-depth ICP with non-worse image gate, then select a full
+  Viterbi path without asserting object symmetries or averaging rotations.
+  Predeclared costs: 1−automatic-mask-IoU; translation weight 1, rotation weight
+  0.1, original-frame time units, no speed bounds. This is an initializer
+  hypothesis, not an accuracy/acceleration claim or hidden metric tuning.

@@ -7,6 +7,7 @@ full trajectory nor claims accuracy, calibrated scale or challenge eligibility.
 from __future__ import annotations
 
 import json
+import argparse
 import os
 from pathlib import Path
 import platform
@@ -19,11 +20,15 @@ from world_reward.data import sha256
 from world_reward.rigid_alignment import align_observed_points
 from world_reward.mesh_geometry import normalize_degenerate_faces
 from world_reward.mesh_budget import fit_topology_preserving_budget
+from world_reward.pose_selection import select_pose_path
 
 
 def main() -> None:
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux GPU container with network none")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--full-video", action="store_true")
+    args = parser.parse_args()
     import numpy as np
     from PIL import Image
     from scipy.spatial.transform import Rotation
@@ -31,7 +36,7 @@ def main() -> None:
     root = Path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"))
     inputs = _validate_inputs(root)
     base = root / "outputs/episode_000015"
-    output = base / "object_pose_smoke"
+    output = base / ("object_pose_full" if args.full_video else "object_pose_smoke")
     if output.exists():
         raise RuntimeError("Frozen object pose smoke already exists")
     object_dir = base / "object_grounded"
@@ -104,25 +109,62 @@ def main() -> None:
     if (len(pointmaps) != len(alignment["pointmaps"]) or len(evidence) != len(alignment["human_evidence"])
             or sorted(pointmaps) != inputs["indices"] or sorted(evidence) != inputs["indices"]):
         raise RuntimeError("Sparse evidence must retain exact original frame indices")
+    full_depth_report_path = base / "depth_full/report.json"
+    if args.full_video:
+        full_depth = json.loads(full_depth_report_path.read_text())
+        full_body = json.loads((base / "body_full/report.json").read_text())
+        required = {"stage": "monocular_moge2_full_video", "status": "pass", "input_track": "track_1",
+                    "input_sha256": inputs["video_sha256"], "ground_truth_used": False, "hand_labeled_test": False,
+                    "oracle_modes": [], "total_video_frames": inputs["total_frames"]}
+        if (any(full_depth.get(key) != value for key, value in required.items())
+                or full_depth["ground_truth_used"] is not False or full_depth["hand_labeled_test"] is not False):
+            raise RuntimeError("Full depth original-video provenance mismatch")
+        pointmaps = {record["frame_index"]: record for record in full_depth["frames"]}
+        body_frames = {record["frame_index"]: record for record in full_body["frames"]}
+        indices = list(range(inputs["total_frames"]))
+        if (len(pointmaps) != len(full_depth["frames"]) or sorted(pointmaps) != indices
+                or sorted(body_frames) != indices or full_body["input_sha256"] != inputs["video_sha256"]):
+            raise RuntimeError("Full depth/body do not cover all original video frames")
+    else:
+        indices = inputs["indices"]
     candidate_reports, poses_R, poses_t = [], [], []
     # Finite generic orientation hypotheses, not manually supplied object
     # symmetries. All can compete by observed silhouette; no symmetry averaging.
     orientation_hypotheses = Rotation.create_group("O").as_matrix()
-    for index in inputs["indices"]:
+    previous_rotation = rotation.copy()
+    for index in indices:
         point_record = pointmaps[index]
-        point_path = Path(point_record["pointmap_path"])
-        if point_path != alignment_path.parent / f"{index:06d}.npy" or sha256(point_path) != point_record["pointmap_sha256"]:
-            raise RuntimeError("Pointmap path/hash mismatch")
-        if sha256(Path(point_record["intrinsics_path"])) != point_record["intrinsics_sha256"]:
-            raise RuntimeError("Pointmap camera hash mismatch")
-        if json.loads(Path(point_record["intrinsics_path"]).read_text()) != camera_dict:
-            raise RuntimeError("One fixed RGB-size camera must agree across object and human pointmaps")
         mask_path = base / f"automatic_masks/masks/1/{index:06d}.png"
-        if sha256(mask_path) != evidence[index]["object_mask_sha256"]:
-            raise RuntimeError("Automatic object mask changed after alignment")
         with Image.open(mask_path) as image:
             mask = np.asarray(image) > 0
-        points = np.load(point_path, allow_pickle=False)
+        if args.full_video:
+            point_path = base / f"depth_full/{index:06d}.npz"
+            if (sha256(point_path) != point_record["output_sha256"]
+                    or point_record["decoded_rgb_sha256"] != body_frames[index]["decoded_rgb_sha256"]):
+                raise RuntimeError("Full depth SHA or decoded RGB mismatch")
+            with np.load(point_path, allow_pickle=False) as arrays:
+                depth, valid_depth, intrinsic = arrays["depth"], arrays["mask"], arrays["intrinsics"]
+                if arrays["frame_index"].ndim != 0 or int(arrays["frame_index"]) != index:
+                    raise RuntimeError("Full depth stored original frame index mismatch")
+                pixel_K = np.diag([width, height, 1]) @ intrinsic
+                if not np.allclose(pixel_K, camera, atol=1e-3, rtol=1e-6) or depth.shape != (height, width):
+                    raise RuntimeError("Full depth and object must use identical fixed original camera")
+                yy, xx = np.mgrid[:height, :width]
+                points = np.stack(((xx + .5 - pixel_K[0, 2]) * depth / pixel_K[0, 0],
+                                   (yy + .5 - pixel_K[1, 2]) * depth / pixel_K[1, 1], depth), axis=-1)
+                points *= alignment["depth_alignment"]["shared_scale"]
+                points[~valid_depth] = np.nan
+        else:
+            point_path = Path(point_record["pointmap_path"])
+            if point_path != alignment_path.parent / f"{index:06d}.npy" or sha256(point_path) != point_record["pointmap_sha256"]:
+                raise RuntimeError("Pointmap path/hash mismatch")
+            if sha256(Path(point_record["intrinsics_path"])) != point_record["intrinsics_sha256"]:
+                raise RuntimeError("Pointmap camera hash mismatch")
+            if json.loads(Path(point_record["intrinsics_path"]).read_text()) != camera_dict:
+                raise RuntimeError("One fixed RGB-size camera must agree across object and human pointmaps")
+            if sha256(mask_path) != evidence[index]["object_mask_sha256"]:
+                raise RuntimeError("Automatic object mask changed after alignment")
+            points = np.load(point_path, allow_pickle=False)
         if mask.shape != (height, width) or points.shape != (height, width, 3):
             raise RuntimeError("Object mask/pointmap original camera grid mismatch")
         visible = mask & np.isfinite(points).all(-1) & (points[..., 2] > 0)
@@ -133,8 +175,10 @@ def main() -> None:
         if len(observed) > 2048:
             observed = observed[rng.choice(len(observed), 2048, replace=False)]
         candidates, rejected = [], []
-        for number, hypothesis in enumerate(orientation_hypotheses):
-            initial_R = rotation @ hypothesis
+        seed_rotations = [rotation @ hypothesis for hypothesis in orientation_hypotheses]
+        if args.full_video:
+            seed_rotations.append(previous_rotation)
+        for number, initial_R in enumerate(seed_rotations):
             # Keep the generative translation at frame zero; otherwise seed
             # the surface centre from automatic observed depth, never hand pose.
             initial_t = translation if index == 0 else np.median(observed, axis=0) - mesh.centroid @ initial_R.T
@@ -163,14 +207,38 @@ def main() -> None:
         best = max(candidates, key=lambda c: (c["selected_silhouette_iou"], -c["selected_depth_residual_m"], -c["hypothesis_index"]))
         poses_R.append(best["rotation"])
         poses_t.append(best["translation"])
+        previous_rotation = np.asarray(best["rotation"])
         candidate_reports.append({"frame_index": index, "visible_point_pixels": int(visible.sum()),
                                   "sampled_observations": len(observed), "selected": best, "candidates": candidates,
-                                  "rejected_candidates": rejected})
+                                  "rejected_candidates": rejected, "object_mask_sha256": sha256(mask_path)})
+        if args.full_video and (index + 1) % 50 == 0:
+            print(json.dumps({"stage": "object_pose_full_progress", "frames_complete": index + 1,
+                              "elapsed_seconds": time.perf_counter() - started}), flush=True)
+    temporal_report = None
+    if args.full_video:
+        hypothesis_count = len(orientation_hypotheses) + 1
+        rotations = np.broadcast_to(np.eye(3), (len(indices), hypothesis_count, 3, 3)).copy()
+        translations = np.zeros((len(indices), hypothesis_count, 3))
+        costs, valid_candidates = np.zeros((len(indices), hypothesis_count)), np.zeros((len(indices), hypothesis_count), bool)
+        for frame, frame_report in enumerate(candidate_reports):
+            for candidate in frame_report["candidates"]:
+                slot = candidate["hypothesis_index"]
+                rotations[frame, slot], translations[frame, slot] = candidate["rotation"], candidate["translation"]
+                costs[frame, slot], valid_candidates[frame, slot] = 1 - candidate["selected_silhouette_iou"], True
+        path = select_pose_path(rotations, translations, costs, valid_candidates=valid_candidates,
+                                translation_weight=1., rotation_weight=.1, frame_times=np.asarray(indices))
+        poses_R, poses_t = path.rotations, path.translations
+        temporal_report = {"method": "Viterbi_without_symmetry_equivalence_or_pose_averaging",
+                           "image_cost": "1 - automatic_mask_IoU", "translation_weight": 1., "rotation_weight": .1,
+                           "time_units": "original_frame_indices", "candidate_indices": path.candidate_indices.tolist(),
+                           "unary_cost": path.unary_cost, "transition_cost": path.transition_cost,
+                           "total_cost": path.total_cost, "quality_verified": False}
     with (output / "geometry_and_poses.npz").open("xb") as handle:
-        np.savez_compressed(handle, vertices=vertices, faces=faces, frame_index=np.asarray(inputs["indices"]),
+        np.savez_compressed(handle, vertices=vertices, faces=faces, frame_index=np.asarray(indices),
                             rotation=np.asarray(poses_R), translation=np.asarray(poses_t), object_scale=np.array(1.))
-    result = {"stage": "fixed_scale_sparse_object_pose_consistency", "status": "pass", "execution_verified": True,
-              "candidate_accuracy_validated": False, "full_trajectory_verified": False,
+    result = {"stage": "fixed_scale_full_object_pose_initializer" if args.full_video else "fixed_scale_sparse_object_pose_consistency",
+              "status": "pass", "execution_verified": True, "original_frame_coverage_verified": args.full_video,
+              "candidate_accuracy_validated": False, "full_trajectory_accuracy_verified": False,
               "input_track": "track_1", "input_sha256": inputs["video_sha256"], "ground_truth_used": False,
               "hand_labeled_test": False, "oracle_modes": [], "submission_eligible": False,
               "challenge_performance_verified": False, "metric_scale_accuracy_verified": False,
@@ -183,12 +251,14 @@ def main() -> None:
               "pose_hypotheses": "24_octahedral_orientations_not_asserted_true_object_symmetries",
               "objective": "maximum_automatic_mask_IoU_then_partial_depth_RMSE; no_GT_or_challenge_metric",
               "frames": candidate_reports, "geometry_and_poses_sha256": sha256(output / "geometry_and_poses.npz"),
+              "temporal_selection": temporal_report,
+              "full_depth_report_sha256": sha256(full_depth_report_path) if args.full_video else None,
               "budget_source_sha256": sha256(budget_source_path),
               "geometry_library_versions": {name: importlib.metadata.version(name) for name in ("trimesh", "fast-simplification")},
               "elapsed_seconds": time.perf_counter() - started, "script_sha256": sha256(Path(__file__))}
     (output / "report.json").write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({"stage": result["stage"], "status": "pass", "extent": mesh.extents.tolist(),
-                      "selected_iou": [frame["selected"]["selected_silhouette_iou"] for frame in candidate_reports],
+                      "frames": len(indices), "greedy_silhouette_iou_median": float(np.median([frame["selected"]["selected_silhouette_iou"] for frame in candidate_reports])),
                       "elapsed_seconds": result["elapsed_seconds"], "challenge_performance_verified": False}))
 
 
