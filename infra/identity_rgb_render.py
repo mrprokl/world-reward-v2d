@@ -21,10 +21,11 @@ from world_reward.data import sha256
 
 WIDTH,HEIGHT,CLIPS,FRAMES,BUDGET=1024,768,3,5,120
 SCHEMA="world-reward-identity-rgb-v1"
-BASE="validation/identity_rgb_v1"
+BASE="validation/identity_rgb_v2"
 FOCALS=(1160.,1480.,1720.)
 SHAPES=((-0.27,.12),(.32,-.15),(.49,.08))
 SCALES=(-.04,.03,.07)
+SCALE_PATTERN_RULE="fixed_scalar_on_all_nonlocked_controls_exact_zero_for_native_zero_locked_controls"
 
 
 def public_manifest(digests):
@@ -34,6 +35,23 @@ def public_manifest(digests):
         for c in range(CLIPS) for f in range(FRAMES)]}
 
 
+def scale_pattern(limits):
+    """Keep the frozen scalars; only native [0,0] controls remain exactly zero."""
+    bounds=np.asarray(limits)
+    if (np.ma.isMaskedArray(limits) or bounds.shape!=(68,2) or bounds.dtype.kind!="f" or np.isnan(bounds).any()
+            or np.any(bounds[:,0]>bounds[:,1]) or np.any(bounds[:,0]>0) or np.any(bounds[:,1]<0)):
+        raise ValueError("Actual68 scale bounds must permit exact neutral zero")
+    locked=(bounds[:,0]==0)&(bounds[:,1]==0)
+    if locked.all():raise ValueError("Native scales have no free control for three distinct identities")
+    pattern=np.broadcast_to(np.asarray(SCALES,np.float32)[:,None],(CLIPS,68)).copy()
+    pattern[:,locked]=0
+    if np.any(pattern<bounds[:,0]) or np.any(pattern>bounds[:,1]):
+        raise ValueError("Frozen nonlocked native scale pattern exceeds actual bounds; no clipping")
+    if len({row.tobytes() for row in pattern})!=CLIPS:
+        raise ValueError("Three distinct legal native scale identities required")
+    return pattern
+
+
 def named_controls(names,limits):
     """Frozen named articulation, shape45 and native documented last68 scales."""
     bounds=np.asarray(limits)
@@ -41,15 +59,14 @@ def named_controls(names,limits):
             or np.ma.isMaskedArray(limits) or bounds.shape!=(249,2) or bounds.dtype.kind!="f" or np.isnan(bounds).any()
             or np.any(bounds[:,0]>bounds[:,1]) or np.any(bounds[:204,0]>0) or np.any(bounds[:204,1]<0)):
         raise ValueError("Actual unique249 parameter names/legal bounds required")
+    patterns=scale_pattern(bounds[136:204])
     controls=np.zeros((CLIPS*FRAMES,204),np.float32);identity=np.zeros((CLIPS*FRAMES,45),np.float32);changes=[]
     for clip in range(CLIPS):
-        if np.any(SCALES[clip]<bounds[136:204,0]) or np.any(SCALES[clip]>bounds[136:204,1]):
-            raise ValueError("Frozen complete native scale pattern exceeds actual bounds")
         if np.any(np.asarray(SHAPES[clip])<bounds[204:206,0]) or np.any(np.asarray(SHAPES[clip])>bounds[204:206,1]):
             raise ValueError("Frozen shape coefficients exceed actual bounds")
         side="r" if clip==1 else "l"
         for frame in range(FRAMES):
-            row=clip*FRAMES+frame;controls[row,136:204]=SCALES[clip];identity[row,:2]=SHAPES[clip]
+            row=clip*FRAMES+frame;controls[row,136:204]=patterns[clip];identity[row,:2]=SHAPES[clip]
             other="l" if side=="r" else "r"
             recipe=[(f"{side}_uparm_ry",.18+.055*frame),(f"{side}_elbow_bend",.27+.055*frame),
                     (f"{side}_wrist_ry",-.045+.02*frame),(f"{other}_uparm_ry",.025*(frame-2))]
@@ -141,7 +158,8 @@ def main(argv=None):
         joint_helper_sha256=sha256(Path(__file__).with_name("joint_rgb_render.py")),camera_helper_sha256=sha256(Path(__file__).with_name("camera_render.py")),
         challenge_inputs_used=False,synthetic_truth_used_for_rendering_only=True,inference_performed=False,accuracy_verified=False,
         photorealism_verified=False,all_truth_private=True,true_focals=list(FOCALS),inference_fixed_focal=1280.,
-        shape_first_two_coefficients=SHAPES,scale68_patterns=SCALES,identity_clip_constant=True,truth_keys=sorted(TRUTH_KEYS),
+        shape_first_two_coefficients=SHAPES,scale68_scalar_candidates=SCALES,scale68_pattern_rule=SCALE_PATTERN_RULE,
+        scale68_patterns=[],identity_clip_constant=True,truth_keys=sorted(TRUTH_KEYS),
         scene_depth_scope="human/object visible foreground only; background IDs=-1/depth=NaN",background_face_ids_removed_from_truth=True,
         truth_array_contract={"human_vertices_camera_m":"float64[18439,3]","human_faces":"integer[36874,3]",
             "object_vertices_camera_m":"float64[194,3]","object_faces":"int64[384,3]","camera_K":"float64[3,3]",
@@ -171,6 +189,10 @@ def main(argv=None):
             with torch.jit.optimized_execution(False):model=torch.jit.load(str(model_path),map_location="cuda").float().eval()
             names,joints=model.get_parameter_names(),model.get_joint_names();limits=model.get_parameter_limits().cpu().numpy()
             controls,identity,changes=named_controls(names,limits);faces=model.character_torch.mesh.faces.cpu().numpy()
+            report.update(scale68_patterns=controls[::FRAMES,136:204].tolist(),scale_control_names=names[136:204],
+                scale_control_bounds=limits[136:204].tolist(),
+                zero_locked_scale_indices=np.flatnonzero(np.all(limits[136:204]==0,axis=1)).tolist())
+            persist()
             if (faces.shape!=(36874,3) or faces.dtype.kind not in "iu" or np.any(faces<0) or np.any(faces>=18439) or joints!=semantic["joint_names"]
                     or (model.get_num_identity_blendshapes(),model.get_num_face_expression_blendshapes())!=(45,72)):
                 raise ValueError("Actual reference topology/joint ABI differs")

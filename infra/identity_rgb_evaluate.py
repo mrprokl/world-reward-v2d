@@ -18,7 +18,7 @@ import numpy as np
 from world_reward.data import sha256
 from world_reward.metric_alignment import fit_shared_depth_scale
 
-BASE = "validation/identity_rgb_v1"
+BASE = "validation/identity_rgb_v2"
 STAGE = "private_paired_clip_identity_rgb_quality"
 CLIPS, FRAMES, VERTICES, BUDGET = 3, 5, 18439, 120
 GATES = {"median_human_relative_gain_min": .05, "worst_clip_human_regression_max": .05,

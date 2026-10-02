@@ -47,6 +47,39 @@ def test_clip_fixed_nonzero_native_shape_and_all68scale_controls(render):
     assert len(set(controls[:,136:].tobytes()[i*68*4:(i+1)*68*4] for i in (0,5,10)))==3
 
 
+def test_actual_native_seven_zero_locked_scales_keep_frozen_free_values(render):
+    names,bounds=metadata();bounds[136:204]=[-.1,.1]
+    locked=np.array([0,1,2,11,12,15,16]);bounds[136+locked]=[0.,0.]
+    pattern=render.scale_pattern(bounds[136:204]);controls,identity,_=render.named_controls(names,bounds)
+    free=np.ones(68,bool);free[locked]=False
+    assert pattern.shape==(3,68) and pattern.dtype==np.float32
+    assert np.array_equal(pattern[:,locked],np.zeros((3,7),np.float32))
+    for clip in range(3):
+        assert np.all(pattern[clip,free]==np.float32(render.SCALES[clip]))
+        assert np.array_equal(controls[clip*5:(clip+1)*5,136:204],np.broadcast_to(pattern[clip],(5,68)))
+    assert len({row.tobytes() for row in pattern})==3
+    full=np.c_[controls,identity];neutral=full[::5].copy();neutral[:,:136]=0
+    assert np.all(full>=bounds[:,0]) and np.all(full<=bounds[:,1])
+    assert np.all(neutral>=bounds[:,0]) and np.all(neutral<=bounds[:,1])
+
+
+def test_narrow_free_scale_is_not_clipped_or_misclassified_as_locked(render):
+    names,bounds=metadata();bounds[136:139]=[0.,0.];bounds[153]=[-.02,.02]
+    with pytest.raises(ValueError,match="no clipping"):
+        render.named_controls(names,bounds)
+
+
+@pytest.mark.parametrize("bad",["all_locked","positive_only","nan","masked","wrong_shape"])
+def test_scale_pattern_invalid_metadata_fails_before_forward(render,bad):
+    bounds=np.tile([-.1,.1],(68,1))
+    if bad=="all_locked":bounds[:]=0
+    elif bad=="positive_only":bounds[0]=[.01,.1]
+    elif bad=="nan":bounds[0,0]=np.nan
+    elif bad=="masked":bounds=np.ma.array(bounds,mask=False)
+    else:bounds=bounds[:67]
+    with pytest.raises(ValueError):render.scale_pattern(bounds)
+
+
 @pytest.mark.parametrize("bad",["duplicate","empty","missing","shape","nan","neutral","scale","identity","unused_identity_zero","pose"])
 def test_bad_native_metadata_abstains_no_clipping(render,bad):
     names,limits=metadata()

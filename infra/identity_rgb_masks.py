@@ -17,7 +17,7 @@ import time
 import hand_synthetic_masks as masks
 from world_reward.prompt_selection import BoxDetection
 
-BASE = "validation/identity_rgb_v1"
+BASE = "validation/identity_rgb_v2"
 SCHEMA = "world-reward-identity-rgb-v1"
 STAGE = "public_identity_rgb_automatic_masks"
 CLIPS, FRAMES, WIDTH, HEIGHT, BUDGET = 3, 5, 1024, 768, 180

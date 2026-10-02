@@ -1705,3 +1705,20 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Exact committed source payloads: D86 69,912B/18files, D87prepare54,000B/15,
   D87validation95,740B/23, all beneath100KB. D87 preparation dispatched only
   after D86 completion; no simultaneous VM01 GPU or heavy local transit.
+
+- D87preparev1 engineering **FAIL2.503965s** BEFORE any forward/RGB/mask: all68
+  scale scalar pattern violates seven native getter-locked zero controls.
+  Receipt e69236dd756883e80a730198073e4d9403ba3c30e9976cee944a5df347de6daf,
+  sourcef82594a; actualreferencecalls0. Preserve failedv1; no accuracy result
+  or threshold tuning. Independent bounded CPU model-getter diagnostic confirms
+  eyes136–138, hipheight/depth147–148, kneeknock151 and ankleheight152 locked0;
+  remaining native scale bounds symmetric with minimum+.1/-.1, shape204/205±10.
+  New engineeringv2 namespace: locked[0,0]→exactzero, every remaining scale
+  same predeclared(-.04,.03,.07); reject other illegal bounds, retain full249
+  animated/neutral guards. No clipping, name-selected exception, pose/shape/K/
+  scene/gate/budget change or post-render repair. No challenge/validation truth
+  consulted for this model ABI fix. Inference/mask/privatequality namespacev2
+  consistent; producing revisions/helper source and hashes bound independently.
+  Independent v2 audit125focusedPASS, finalfull4825PASS/1optionaltrimeshSKIP
+  64.88s, shellsyntax PASS. Producer receipt records all3x68 actual vectors and
+  locked native indices before first forward; privatequality recreates exactrig.

@@ -4,7 +4,7 @@ set -euo pipefail
 (( $# == 0 )) || { echo 'Identity RGB prepare accepts no arguments' >&2; exit 2; }
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$(uname -s)" == Linux && "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ ]]
-BASE="$ROOT/validation/identity_rgb_v1"
+BASE="$ROOT/validation/identity_rgb_v2"
 [[ -d "$ROOT" && ! -L "$ROOT" && ! -L "$ROOT/validation" && ! -e "$BASE" && ! -L "$BASE" ]]
 export DOCKER_HOST="unix://$ROOT/docker.sock"
 IMAGE="$(docker image inspect world-reward/cari4d-source:0.1 --format '{{.Id}}')"

@@ -27,7 +27,7 @@ from camera_render import raster_camera_mesh
 from world_reward.data import sha256
 from world_reward.pointmap import validate_camera_pointmap
 
-BASE = "validation/identity_rgb_v1"
+BASE = "validation/identity_rgb_v2"
 # The same immutable official tool/model as native conversion, without loading
 # the inverse-fitting driver merely to obtain two data-independent file pins.
 CONVERTER_SHA256 = "c799ad612fca19620563fcb93bf61e5a4adad0a04251482358746b5f27f8a52e"

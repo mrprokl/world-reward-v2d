@@ -5,7 +5,7 @@ ROOT="${WR_ROOT:-/srv/scenesmith/world-reward}"
 CODE="${WR_CODE:?Require immutable committed source}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$CODE" == /* && "${WR_CODE_REVISION:?}" =~ ^[0-9a-f]{40}$ ]]
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-BASE="$ROOT/validation/identity_rgb_v1"
+BASE="$ROOT/validation/identity_rgb_v2"
 OUT="$BASE/predictions_v1"; QUALITY="$BASE/quality_v1"
 [[ ! -L "$ROOT" && ! -L "$ROOT/validation" && ! -L "$BASE" && -d "$BASE/inputs" && -d "$BASE/automatic_masks" ]]
 [[ ! -e "$OUT" && ! -L "$OUT" && ! -e "$QUALITY" && ! -L "$QUALITY" ]]
