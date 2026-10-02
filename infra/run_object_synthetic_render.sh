@@ -8,7 +8,8 @@ REVISION="${WR_CODE_REVISION:?Require immutable source revision}"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
 IMAGE=$(docker image inspect world-reward/cari4d-source:0.1 --format '{{.Id}}')
 [[ "$IMAGE" =~ ^sha256:[0-9a-f]{64}$ ]] || exit 2
-test -d "$ROOT/validation"
+[[ ! -L "$ROOT" && ! -L "$ROOT/validation" ]]
+mkdir -p "$ROOT/validation"
 DEST="$ROOT/validation/objects_rgb_v1"
 mkdir "$DEST"
 chown scenesmith:scenesmith "$DEST"
