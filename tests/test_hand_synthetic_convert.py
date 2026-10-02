@@ -198,7 +198,7 @@ def test_stubbed_exact_official_convert_forward_and_proposal_archive(convert,mon
 
 
 def test_no_symlink_public_receipt_is_opened(convert,monkeypatch,tmp_path):
-    base=tmp_path/'validation/hands_rgb_v1/predictions'; base.mkdir(parents=True)
+    base=tmp_path/'validation/hands_rgb_v1/predictions-v2'; base.mkdir(parents=True)
     private=tmp_path/'private.json'; private.write_text('must not read')
     (base/'report.json').symlink_to(private)
     monkeypatch.setattr(convert.infer,'public_inputs',lambda root:([],{}))
@@ -245,7 +245,7 @@ def test_unreserved_empty_output_is_not_resume(convert,monkeypatch,tmp_path):
 
 def test_wrapper_public_mounts_scoped_chown_fidelity_not_private_quality():
     root=Path(__file__).resolve().parents[1];p=root/'infra/run_hand_synthetic_convert.sh';s=p.read_text()
-    for name in ('inputs','automatic_masks','predictions'):
+    for name in ('inputs','automatic_masks','predictions-v2'):
         assert f'src=$BASE/{name},dst=$BASE/{name},readonly' in s
     assert 'src=$BASE/official_proposals,dst=$BASE/official_proposals"' in s
     assert 'src=$ROOT/validation,dst=' not in s and 'eval_private' not in s

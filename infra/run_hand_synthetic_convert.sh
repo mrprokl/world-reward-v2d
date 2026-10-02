@@ -24,6 +24,6 @@ timeout --signal=TERM --kill-after=10s 190s docker run --rm --gpus all --network
   --mount "type=bind,src=$ROOT/results/weights-acquisition.json,dst=$ROOT/results/weights-acquisition.json,readonly" \
   --mount "type=bind,src=$BASE/inputs,dst=$BASE/inputs,readonly" \
   --mount "type=bind,src=$BASE/automatic_masks,dst=$BASE/automatic_masks,readonly" \
-  --mount "type=bind,src=$BASE/predictions,dst=$BASE/predictions,readonly" \
+  --mount "type=bind,src=$BASE/predictions-v2,dst=$BASE/predictions-v2,readonly" \
   --mount "type=bind,src=$BASE/official_proposals,dst=$BASE/official_proposals" \
   "$IMAGE" python "$CODE/infra/hand_synthetic_convert.py"

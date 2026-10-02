@@ -249,7 +249,7 @@ def main():
     if platform.system()!='Linux' or {p.name for p in Path('/sys/class/net').iterdir()}!={'lo'}:
         raise RuntimeError('Require isolated Linux GPU inference with network none')
     os.environ.update(HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',MOMENTUM_ENABLED='0',WANDB_MODE='disabled')
-    root=Path(os.environ['WR_ROOT']);output=root/'validation/hands_rgb_v1/predictions';path=output/'report.json'
+    root=Path(os.environ['WR_ROOT']);output=root/'validation/hands_rgb_v1/predictions-v2';path=output/'report.json'
     if args.worker:
         report=json.loads(path.read_text());nonce=os.environ.get('WR_HAND_INFER_NONCE','')
         if (report.get('status')!='running' or report.get('stage')!=STAGE or report.get('script_sha256')!=sha256(Path(__file__))

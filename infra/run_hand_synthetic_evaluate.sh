@@ -17,7 +17,7 @@ timeout --signal=TERM --kill-after=5s 60s docker run --rm --network none --memor
   --mount "type=bind,src=$CODE,dst=$CODE,readonly" \
   --mount "type=bind,src=$BASE/inputs,dst=$BASE/inputs,readonly" \
   --mount "type=bind,src=$BASE/automatic_masks,dst=$BASE/automatic_masks,readonly" \
-  --mount "type=bind,src=$BASE/predictions,dst=$BASE/predictions,readonly" \
+  --mount "type=bind,src=$BASE/predictions-v2,dst=$BASE/predictions-v2,readonly" \
   --mount "type=bind,src=$BASE/official_proposals,dst=$BASE/official_proposals,readonly" \
   --mount "type=bind,src=$BASE/eval_private,dst=$BASE/eval_private,readonly" \
   --mount "type=bind,src=$OUT,dst=$OUT" \

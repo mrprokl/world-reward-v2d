@@ -121,7 +121,7 @@ def prediction_arrays(archive):
 
 def public_predictions(root):
     records, hashes = infer.public_inputs(root)
-    base = root/'validation/hands_rgb_v1/predictions'; path = base/'report.json'
+    base = root/'validation/hands_rgb_v1/predictions-v2'; path = base/'report.json'
     if path.is_symlink() or not path.is_file() or path.resolve() != path.absolute():
         raise ValueError('Require regular in-place public prediction receipt')
     digest = sha256(path); require_hash(path, digest)

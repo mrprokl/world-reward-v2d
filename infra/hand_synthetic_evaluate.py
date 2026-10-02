@@ -106,14 +106,14 @@ def run(root, report):
     receipt_path = proposal/'report.json'; receipt_sha = sha256(receipt_path)
     require_hash(receipt_path, receipt_sha); receipt = json.loads(receipt_path.read_text()); proposal_contract(receipt)
     npz_path = proposal/'proposals.npz'; require_hash(npz_path, receipt.get('proposals_sha256'))
-    infer_path = base/'predictions/report.json'; require_hash(infer_path, receipt.get('inference_report_sha256'))
+    infer_path = base/'predictions-v2/report.json'; require_hash(infer_path, receipt.get('inference_report_sha256'))
     infer = json.loads(infer_path.read_text())
     if infer.get('status') != 'pass' or infer.get('private_truth_read') is not False:
         raise ValueError('Original public inference must pass with no private truth access')
     for mode in ('body', 'full'):
         digest = receipt.get('inference_prediction_sha256', {}).get(mode)
         if infer.get('prediction_sha256', {}).get(mode) != digest: raise ValueError('Inference artifact chain mismatch')
-        require_hash(base/f'predictions/predictions_{mode}.npz', digest)
+        require_hash(base/f'predictions-v2/predictions_{mode}.npz', digest)
     public_hashes = receipt.get('public_hashes', {})
     for key, relative in (('input_manifest', 'inputs/manifest.json'), ('mask_report', 'automatic_masks/report.json')):
         require_hash(base/relative, public_hashes.get(key))

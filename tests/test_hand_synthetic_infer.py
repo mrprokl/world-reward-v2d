@@ -82,7 +82,7 @@ def offline_main(infer,monkeypatch,tmp_path,reserved=False):
     original=Path.iterdir
     monkeypatch.setattr(Path,'iterdir',lambda p:iter([Path('lo')]) if str(p)=='/sys/class/net' else original(p))
     monkeypatch.setattr(sys,'argv',[infer.__file__])
-    path=tmp_path/'validation/hands_rgb_v1/predictions/report.json'
+    path=tmp_path/'validation/hands_rgb_v1/predictions-v2/report.json'
     if reserved:path.parent.mkdir();monkeypatch.setenv('WR_HAND_OUTPUT_RESERVED','1')
     return path
 
@@ -113,14 +113,14 @@ def test_wrapper_mounts_exact_public_inputs_and_prediction_only_no_groundtruth()
     p=Path(__file__).resolve().parents[1]/'infra/run_hand_synthetic_infer.sh';s=p.read_text()
     assert 'src=$BASE/inputs,dst=$BASE/inputs,readonly' in s
     assert 'src=$BASE/automatic_masks,dst=$BASE/automatic_masks,readonly' in s
-    assert 'src=$BASE/predictions,dst=$BASE/predictions"' in s
+    assert 'src=$BASE/predictions-v2,dst=$BASE/predictions-v2"' in s
     assert 'src=$ROOT/validation,dst=' not in s and 'eval_private' not in s
     assert 'src=$ROOT/data' not in s and 'src=$ROOT/outputs' not in s
     assert 'weights-acquisition.json' in s and '--network none' in s and '--gpus all' in s
     assert 'timeout --signal=TERM --kill-after=10s 190s' in s
-    assert 'chown "$(id -u scenesmith):$(id -g scenesmith)" "$BASE/predictions"' in s
+    assert 'chown "$(id -u scenesmith):$(id -g scenesmith)" "$BASE/predictions-v2"' in s
     assert 'chown -R' not in s
-    assert s.index('mkdir "$BASE/predictions"') < s.index('chown ') < s.index('docker run')
+    assert s.index('mkdir "$BASE/predictions-v2"') < s.index('chown ') < s.index('docker run')
 
 
 def test_strict_helper_no266_or_cached_joint_rotation_decoder(infer):
