@@ -9,13 +9,17 @@ OUT="$BASE/da3_predictions_v1"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
 IMAGE="$(docker image inspect world-reward/da3-metric:0.1 --format '{{.Id}}')"
 [[ "$IMAGE" =~ ^sha256:[0-9a-f]{64}$ ]]
+WHEEL="$ROOT/vendor/research/da3_dependencies_v1/addict-2.4.0-py3-none-any.whl"
+[[ -f "$WHEEL" && ! -L "$WHEEL" ]]
+[[ "$(sha256sum "$WHEEL" | cut -d ' ' -f1)" == 249bb56bbfd3cdc2a004ea0ff4c2b6ddc84d53bc2194761636eb314d5cfa5dfc ]]
 mkdir "$OUT"; chmod 755 "$OUT"; chown "$(id -u scenesmith):$(id -g scenesmith)" "$OUT"
 timeout --signal=TERM --kill-after=10s 603s docker run --rm --gpus all --network none --memory 32g --cpus 4 \
  --user "$(id -u scenesmith):$(id -g scenesmith)" --entrypoint python \
  --env WR_ROOT="$ROOT" --env WR_CODE_REVISION="${WR_CODE_REVISION:?}" --env WR_IMAGE_ID="$IMAGE" \
- --env PYTHONPATH="$CODE/src" --env PYTHONDONTWRITEBYTECODE=1 --env HF_HUB_OFFLINE=1 --env TRANSFORMERS_OFFLINE=1 \
+ --env PYTHONPATH="$CODE/src:$WHEEL" --env PYTHONDONTWRITEBYTECODE=1 --env HF_HUB_OFFLINE=1 --env TRANSFORMERS_OFFLINE=1 \
  --env HOME=/tmp --env XDG_CACHE_HOME=/tmp/world-reward-cache --env OMP_NUM_THREADS=4 --env OPENBLAS_NUM_THREADS=4 --env MKL_NUM_THREADS=4 \
  --mount "type=bind,src=$CODE,dst=$CODE,readonly" \
+ --mount "type=bind,src=$WHEEL,dst=$WHEEL,readonly" \
  --mount "type=bind,src=$ROOT/vendor/research/da3_metric_v1,dst=$ROOT/vendor/research/da3_metric_v1,readonly" \
  --mount "type=bind,src=$ROOT/weights/research/da3_metric_v1,dst=$ROOT/weights/research/da3_metric_v1,readonly" \
  --mount "type=bind,src=$ROOT/results/da3-metric-acquisition-v1.json,dst=$ROOT/results/da3-metric-acquisition-v1.json,readonly" \

@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 # Import-only CPU gate; alias unchanged CARI image only after actual imports PASS.
 set -euo pipefail
-(( $# == 0 )) || exit 2
+VERSION=1
+if (( $# )); then
+ [[ $# == 2 && "$1" == --runtime-version && "$2" == 2 ]] || exit 2
+ VERSION=2
+fi
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"
-OUT="$ROOT/results/da3-runtime-v1.json"
+OUT="$ROOT/results/da3-runtime-v$VERSION.json"
 [[ ! -e "$OUT" && ! -L "$OUT" ]]
 export DOCKER_HOST="unix://$ROOT/docker.sock"
 EXPECTED=sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3
@@ -18,16 +22,23 @@ assert r['source_OCI_index_id']=='sha256:b47e4450b24219c2a746f4795e27bde8c436f5c
 assert r['image_content_changed'] is False and r['image_rebuilt'] is False
 PY
 SOURCE="$ROOT/vendor/research/da3_metric_v1"
-REPORT_DIR="$ROOT/results/da3-runtime-v1"
+REPORT_DIR="$ROOT/results/da3-runtime-v$VERSION"
+EXTRA_PATH=''; EXTRA_MOUNTS=()
+if [[ "$VERSION" == 2 ]]; then
+ WHEEL="$ROOT/vendor/research/da3_dependencies_v1/addict-2.4.0-py3-none-any.whl"
+ [[ -f "$WHEEL" && ! -L "$WHEEL" ]]
+ [[ "$(sha256sum "$WHEEL" | cut -d ' ' -f1)" == 249bb56bbfd3cdc2a004ea0ff4c2b6ddc84d53bc2194761636eb314d5cfa5dfc ]]
+ EXTRA_PATH=":$WHEEL"; EXTRA_MOUNTS=(--mount "type=bind,src=$WHEEL,dst=$WHEEL,readonly")
+fi
 [[ ! -e "$REPORT_DIR" && ! -L "$REPORT_DIR" ]]
 mkdir "$REPORT_DIR"; chown 1000:1000 "$REPORT_DIR"
 timeout --signal=TERM --kill-after=5s 90s docker run --rm --network none --memory 4g --cpus 2 \
  --user 1000:1000 --entrypoint python --env HOME=/tmp --env PYTHONDONTWRITEBYTECODE=1 \
- --env PYTHONPATH="$SOURCE/src" --env SOURCE_ROOT="$SOURCE" --env WR_ROOT="$ROOT" \
+ --env PYTHONPATH="$SOURCE/src$EXTRA_PATH" --env SOURCE_ROOT="$SOURCE" --env WR_ROOT="$ROOT" \
  --env PRODUCER_REVISION="${WR_CODE_REVISION:?}" --env IMAGE_ID="$EXPECTED" \
  --mount "type=bind,src=$SOURCE,dst=$SOURCE,readonly" \
  --mount "type=bind,src=$ROOT/results/da3-metric-acquisition-v1.json,dst=$ROOT/results/da3-metric-acquisition-v1.json,readonly" \
- --mount "type=bind,src=$REPORT_DIR,dst=/reports" "$EXPECTED" -c '
+ --mount "type=bind,src=$REPORT_DIR,dst=/reports" "${EXTRA_MOUNTS[@]}" "$EXPECTED" -c '
 import hashlib,importlib,importlib.metadata as m,json,os,pathlib,sys
 source=pathlib.Path(os.environ["SOURCE_ROOT"]);root=pathlib.Path(os.environ["WR_ROOT"])
 receipt=json.loads((root/"results/da3-metric-acquisition-v1.json").read_text())
@@ -40,7 +51,7 @@ names=["depth_anything_3.cfg","depth_anything_3.utils.io.input_processor","depth
 paths={n:importlib.import_module(n).__file__ for n in names}
 assert all(pathlib.Path(p).resolve().is_relative_to(source/"src") for p in paths.values())
 assert "depth_anything_3.api" not in sys.modules and not any(n=="evo" or n.startswith("evo.") for n in sys.modules)
-report={"stage":"da3_minimal_runtime_import_gate","status":"pass","producer_revision":os.environ["PRODUCER_REVISION"],"image_id":os.environ["IMAGE_ID"],"base_image_id":os.environ["IMAGE_ID"],"source_manifest_sha256":receipt["source_manifest_sha256"],"imports":paths,"versions":{p:m.version(p) for p in ["torch","torchvision","omegaconf","einops","addict","imageio","Pillow","tqdm","safetensors"]},"model_instantiated":False,"GPU_forward_performed":False,"dependency_install_performed":False}
+report={"stage":"da3_minimal_runtime_import_gate","status":"pass","producer_revision":os.environ["PRODUCER_REVISION"],"image_id":os.environ["IMAGE_ID"],"base_image_id":os.environ["IMAGE_ID"],"source_manifest_sha256":receipt["source_manifest_sha256"],"imports":paths,"versions":{p:m.version(p) for p in ["torch","torchvision","omegaconf","einops","addict","imageio","Pillow","tqdm","safetensors"]},"model_instantiated":False,"GPU_forward_performed":False,"dependency_install_performed":False,"pure_python_dependency_path":importlib.import_module("addict").__file__}
 with open("/reports/report.json","x") as f:json.dump(report,f);f.write("\n")
 print(json.dumps(report),flush=True)
 '

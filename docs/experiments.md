@@ -1349,3 +1349,13 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   onlynewdeny-ingressrule remains. DA3pairedchain9735385 dispatchedunderD76;
   readonlyaudit112testsPASS, fulltinysuite4148PASS/1optionalSKIP61.97s before
   diagnosticruntimeintegration, no numericalGPUprooffromtests.
+
+- 2026-10-02 R104: DA3chainv1 **FAILCPUimport** beforeGPU/baselineextract/private
+  truth: realCARIimage lacksaddict. No randomfallback/fakeDict/installallrequirements.
+  Minimalrepair pinnedaddict2.4.0 actualPyPIwheel3832bytes SHA
+  249bb56bbfd3cdc2a004ea0ff4c2b6ddc84d53bc2194761636eb314d5cfa5dfc,
+  embeddedMITlicenseSHAca488d33c512d0b226142090af90e89ae266a901a293f89fd642dfec931e22c1,
+  exact7fileZIP/noRequires-Dist. DirectAzureacquisition, read-onlyzipimportpath;
+  unchangedbaseimage/DA3source, noresolver/install/rebuild. NewCPUgateoutputv2,
+  oldv1reservedfailure retained; sameD76camera/seeds/depth/quality gates.
+  Fulltiny4171PASS/1optionalSKIP60.53s beforeminimalwheelrepair;79focusedPASS.

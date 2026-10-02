@@ -325,3 +325,9 @@ newVM02 nowonlyexplicitdeny-all-inbound4096, unrelatedkeys/networkuntouched.
 DA3chain9735385 dispatched(runtimeCPU→frozenbaselineimport→9actualGPUcalls→
 pairedCPUprivatequality). Native0dispatch initiallyConflict whileVM01keycleanup
 RunCommandpending: nojobstarted, inspectabsence beforeexplicitnewdispatch.
+
+19:43UTC DA3validationv1 terminates beforeGPU atactualimportmissingaddict,
+expectedfail-fastCPUgate. AddexactauditedMITwheelzipimportRO, noimagechange/
+sourcepatch/requirementsresolver. OldCPUgatev1 remains; v2newnamespace. Native0
+notstarted verifiedunitnot-found/logabsent afterRunCommandConflict; nextexplicit
+launch legitimate afterserialization. No duplicatedinference/GPU reader.

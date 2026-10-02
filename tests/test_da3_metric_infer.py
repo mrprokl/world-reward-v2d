@@ -190,7 +190,7 @@ def test_bad_native_depth_abstains_whole_image(gate, monkeypatch, value):
 def test_wrapper_only_public_and_pinned_assets_no_private_parent(gate):
     wrapper = Path(gate.__file__).with_name("run_da3_metric_infer.sh").read_text()
     mounts = [line for line in wrapper.splitlines() if "--mount" in line]
-    assert len(mounts) == 6 and sum("readonly" in line for line in mounts) == 5
+    assert len(mounts) == 7 and sum("readonly" in line for line in mounts) == 6
     assert all("eval_private" not in line and "predictions_v1" not in line and "src=$BASE,dst=" not in line for line in mounts)
     assert "world-reward/da3-metric:0.1" in wrapper and "--network none --memory 32g --cpus 4" in wrapper
     assert 'mkdir "$OUT"; chmod 755 "$OUT"; chown' in wrapper and "chown -R" not in wrapper
