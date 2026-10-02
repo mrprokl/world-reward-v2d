@@ -34,10 +34,11 @@ def main() -> None:
     parser.add_argument("--confidence", type=float, default=0.3)
     parser.add_argument("--ambiguity-margin", type=float, default=0.05)
     parser.add_argument("--nms-iou", type=float, default=0.7)
+    parser.add_argument("--actor-seed-observations", type=int, default=3)
     parser.add_argument("--diagnose-only", action="store_true")
     args = parser.parse_args()
-    if not 0 <= args.episode < 30 or args.seed_frames < 2:
-        raise ValueError("Require a valid episode and at least two seed candidate frames")
+    if not 0 <= args.episode < 30 or args.seed_frames < 3 or not 3 <= args.actor_seed_observations <= args.seed_frames:
+        raise ValueError("Require a valid episode and at least three actor seed observations")
     root = args.root.resolve()
     track = root / "data/track_1"
     episodes = {x["episode_index"]: x for x in map(json.loads, (track / "meta/episodes.jsonl").read_text().splitlines())}
@@ -119,7 +120,10 @@ def main() -> None:
     if args.diagnose_only:
         print(json.dumps({"status":"diagnostics_saved", "episode":args.episode}))
         return
-    actor = select_interacting_actor(candidates, confidence_threshold=args.confidence,
+    # This is only a SAM2 initializer, not a reconstructed person trajectory.
+    # Establish identity on a fixed short prefix; full-resolution SAM2 then tracks
+    # every video frame. Never emit the sparse bbox associations as final motion.
+    actor = select_interacting_actor(candidates[:args.actor_seed_observations], confidence_threshold=args.confidence,
                                      object_ambiguity_margin=args.ambiguity_margin)
     selected = select_seed_prompts(
         actor.frames, object_prompt=record["object_prompt"], confidence_threshold=args.confidence,
@@ -146,6 +150,7 @@ def main() -> None:
         "frames": total, "seed_frame": selected.frame_index, "seed_candidates": evidence,
         "seed_confidence": selected.confidence, "rejected_seed_frames": selected.rejected_frames,
         "actor_track_id": actor.track_id, "actor_scores": [asdict(score) for score in actor.scores],
+        "actor_seed_observations": args.actor_seed_observations,
         "confidence": args.confidence, "ambiguity_margin": args.ambiguity_margin,
         "nms_iou": args.nms_iou,
         "detector_revision": DETECTOR_REVISION, "input_sha256": expected["sha256"],

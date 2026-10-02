@@ -102,3 +102,12 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   margins. Next localizes ambiguity to association components and propagates
   contamination, allowing only an independent unambiguous winner. Contaminated
   close tracks must still compete; they cannot be deleted to manufacture a winner.
+- 2026-10-02 R08: component-aware association also rejected the winning actor
+  (ambiguities at sparse frames 333/366; no identity fix accepted). Full-clip sparse
+  bbox identity is an unnecessarily strong prerequisite for a segmentation seed.
+  Next initializer uses a fixed first-three-sparse-observation prefix with the
+  same actor-affinity/support/margin rules, then SAM2 handles full-frame temporal
+  propagation. No sparse association is emitted as final human/object motion.
+  This is a general architecture change, not a manual actor label or threshold
+  relaxation. Final actor tests: 272 passed locally; latest remote suite 271 passed
+  before the additional expired-uncertainty test was mirrored.
