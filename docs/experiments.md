@@ -1498,3 +1498,62 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   camera correctness, general eligibility or submission adoption. 136 combined
   frontend/frozen-target/runtime-bundle tiny tests PASS before execution;
   independent source/API audit PASS, full4445PASS/1optionaltrimeshSKIP64.06s.
+
+- 2026-10-02 D81 actual **PASS8.499485s**: one unchanged official-reference
+  replay on all790 first-worker frozen targets, historical-error agreement at
+  unchanged rtol1e-5/atol1e-4mm; maximum absolute drift4.2438507e-5mm.
+  No native decoding/solver/cold conversion. Source e1e8e92a63c690174f5bc40733939235fe46d04a;
+  receipt2c0269f5eb02f07e8d9791b059527059cb8d592b521a0abd9edf3cfae8432280,
+  errors50b9595422ab2c596e317e6aa6996e79189939c742ea428b28c1df04a5851910,
+  targetfilefcb86e264525ca7c6b93a6878061c3523a71af1385d5a05aef8bd017bc76f7d1.
+  This validates a numerical warmstart for the NEW inverse target only;
+  D79/D80FAIL and historical recovery/strict reproducibility False remain.
+  Next bounded shared-identity probe keeps original indices, solvers and gates.
+
+- 2026-10-02 D82 acquisition **PASS2.650749s**, VM02 CPU-only. All exact
+  source bytes/licenses retained, disposable streams removed; weight SHA256
+  86d6aeacd8bbd974c59ce39f61854e00d36911c732ad89be471476fd708722ac,
+  receipt77ed2ed2e65f7011eb930425f37020f57f226c25d1bca5be381119bcbf79b83c.
+  Publisher-independent weight digest/header remain unverified at acquisition.
+
+- 2026-10-02 D82 nativefrontend **PASS2.863132s** on VM02 H100: strict889
+  stateentries (748parameters/141buffers), no mapping/missing/unexpected keys;
+  28,951,604 stateelements finite. Two seeded batched calls on new own RGB
+  arrays bit-exact, native field shapes/bounds/unit checks PASS, peakCUDA
+  684,662,784bytes. Receipt056f2d84882b301a4e8410e3672ffa5b5c646e5f3b030d9d1621f4b9a3f6eb30.
+  Asset rehash PASS; no camera solver/calibration/GT or accuracy/adoption claim.
+  Low procedural latitude confidence is not calibrated uncertainty and motivates
+  explicit effective-support/conditioning gates, not a correctness claim.
+
+- 2026-10-02 D83 (predeclared): constrained shared-identity probe using ONLY
+  D81's exact first-worker frozen target and verified historical warmstart.
+  Pinned D81 receipt/source/script/full790 error archive are revalidated before
+  Torch; original error vector still selects worst1, never substitute new errors.
+  Same D79 five-fit/four-reserved-plus-worst frames, joint40/F64 FD1e-6/prior0,
+  reserved pose60, two independent F32 replays, every probe≤2mm and no individual
+  regression>1e-4mm; total900s/32GB/offline on VM01. No new decode/cold conversion,
+  old D79/D80 failures unmodified. Runtime completion and representation verdict
+  recorded separately. Even PASS does not authorize fulltrajectory fidelity,
+  strict determinism/historical recovery, GT accuracy or adoption. 203 focused
+  tiny contract tests PASS before execution.
+
+- 2026-10-02 full30 route audit (source-only): current generic episode chain
+  is forward-only; final path must include native refine→refined conversion→
+  refined schema and all30/16,563frames packing/official preflight. Keep whole
+  episodes on one VM; per-VM one sequential GPU lane plus a bounded CPU native
+  prepare worker can overlap without changing prediction algorithms. VM02 needs
+  Azure→Azure SHA-verified immutable Track1/assets/images, not local transfers.
+  Volume mesh wrapper is currently episode0-only; generic meshes still need
+  topology/budget gates. No claimed30episode availability/accuracy or speedup;
+  representation fidelity and source-license eligibility remain distinct gates.
+
+- 2026-10-02 D84 camera-solver contracts: own SciPy pinhole/gravity math only,
+  fixed geometric principal center and exact integer-grid resize/crop transport;
+  no restricted GeoCalib/PF/LM optimizer imports. Three focal starts,100nfev,
+  soft-L1 2degrees, confidence ESS≥256/cellESS≥8/mean≥1e-6 on train/holdout/two
+  train subgrids; rank3/condition≤1e5, heldout up≤10°/latitude≤5°, focal within
+  .15..4×image diagonal, half-grid focal disagreement≤10%. Otherwise explicit
+  image-diagonal fallback and no estimated gravity. 35 own analytic contract
+  tests PASS (including anisotropic resize/crop, unidentifiable fields and
+  concentrated/infinitesimal confidence); not actual camera accuracy. Fresh
+  room/MHR RGB cohort and later fresh complete HOI validation remain required.

@@ -232,6 +232,10 @@ SBOM clearance. NC DA3Nested/Giant checkpoints excluded. Exact training/backbone
 frame provenance remains unverified, so training_overlap_excludedFalse.
 
 GeoCalib top-levelApache2/weightCCBY4 declarations do not settle the provenance
-of imported PerspectiveFields-adapted camera code (upstreamAdobeNC). No new
-GeoCalib acquisition or commercial adoption; independent source-separated
-frontend/analytic calibration would need its own checks and rights review.
+of imported PerspectiveFields-adapted camera code (upstreamAdobeNC). No
+full-package acquisition or commercial adoption. D82 acquired only the
+audited standalone Apache module/four-class slice, exact retained Apache
+GeoCalib/SegNeXt licenses and publisher README CC-BY-4.0 statement. This does
+not clear PerspectiveFields/LM/full-package code or prove weight-training
+overlap exclusion. Runtime excludes those imports; native strict load and
+independent analytic calibration require separate engineering checks.
