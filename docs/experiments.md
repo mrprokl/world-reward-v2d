@@ -532,3 +532,32 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   checks, thin nondegenerate triangle, then2048points against5120own faces,
  3finite forward/backward trials<=3s each and total<=30s. Tiny local tests are
   mathematics/schema only; no GPU/fitter adoption until actual remote gate.
+
+- 2026-10-02 R43 (Azure own continuous geometry,f5feba2): all original analytic
+  distance/gradient, rigid, chunk, duplicate/lowest-face and thin-triangle gates
+  passed in1.554s. Distance error5.421e-20m²; point/interior triangle gradient
+  error0. Three2048point/5120face forward/backward trials.06399/.05682/.05666s,
+ 90,553,856bytes peak allocation. No vendor metric primitive used. This establishes
+  numerical/feasibility evidence, not shape estimation or challenge improvement.
+- 2026-10-02 D43: independent fixed-pose continuous/isotropic shape proposal
+  isolates a new measurement-model hypothesis. Same5DOF shared determinant-one
+  model, conservative box, prior.01,10mm robust transition and hard<=100calls;
+  unlike the old fitter, continuous face distance and isotropic pseudo-Huber.
+  Supplied poses remain fixed and uncertainty unmodeled. Training convergence/
+  residual improvement only marks a proposal; no mesh application/adoption.
+  New untouched rendered falsification is required; no retuning old18controls.
+- 2026-10-02 D44: clean-episode serial initializers bundle preflights all seven
+  outputs absent, waits only explicit selected mask producer, and stops on first
+  failed original stage. Episode0 queued under6b0020c; no individual duplicate GPU
+  jobs, no generic report reuse or overwrite. Declarative12stage full-route planner
+  and final native-conversion loader now test provenance/schema only; they do not
+  replace original stage-specific numerical verification or license clearance.
+
+- 2026-10-02 D45: new whole-candidate cached-ICP scheduling gate evaluates only
+  one frozen procedural view (24generic, non-oracle seeds). Same candidate
+  bytecode/private globals except solver binding, scalar rendering unchanged.
+  Require exact image/slot/rejection/decision/status/inlier/iteration/best-index
+  parity; pose/residual absolute error<=1e-6, not exact numerical JSON. Three
+  alternating synchronized full-candidate timings,>=1.3× median and<=60s total.
+  This is a new end-to-end experiment, not a relaxed repeat of the failed72-
+  alignment budget. Full-video image parity remains a separate adoption gate.

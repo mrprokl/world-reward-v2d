@@ -164,6 +164,13 @@ source/dependency audit and technical equivalence validation.
   actual-image SBOM; prefer BSD PyTorch3D for our own commercially unrestricted
   synthetic renderer. Current runtime use is research, not an asserted waiver.
 
+  Full native CARI inference does require this kernel, not merely visualization:
+  pinned `tools/run_mhr_wild_inference.py` imports nvdiffrast, constructs
+  RasterizeCudaContext and renders object geometry/texture through `Utils`.
+  Switching World Reward's QA renderer to PyTorch3D does **not** eliminate that
+  dependency from the native forward path. A separate source-compatible path
+  or written eligibility clarification is still needed for final release.
+
 **Draft only — not sent** to `v2d_challenge@nvidia.com` / the public Kaggle forum:
 
 > For Track 1, can an award-eligible solution use the official baseline's SAM 3D

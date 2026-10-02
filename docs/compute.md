@@ -104,7 +104,15 @@ canonical KDtree passed all72discrete/NN/trim/1e-6 comparisons but exceeded60s.
 Neither finished3timing trials or proved>=1.3× median speedup. Own synthetic inputs
 are not challenge validation; cached-ICP seeds are synthetic-oracle-derived.
 Neither solver/schedule is adopted. Independent own float64 continuous geometry
-is next tested against the same analytic fixture plus a fixed runtime budget.
+passed the same analytic fixture plus its fixed runtime budget (f5feba2):1.554s
+total, median.05682s forward/backward on2048points/5120faces,90.55MB peak allocated.
+Distance error5.42e-20m², point/interior triangle gradients0error. This validates
+the primitive only, not any new fitter or challenge shape accuracy.
+
+New serial bundle `world-reward-episode0-initializers` (`6b0020c`) started11:58UTC:
+sparse body/depth→scale→grounded object→full body/depth→native adapter. Requires
+all seven target outputs absent; no automatic reuse/overwrite. Full object poses
+and native forward are deliberately not part of this short generalization bundle.
 
 Results/decisions and useful failure causes are retained in experiments.md.
 Temporary redundant masks/download archives may be cleaned **after** validated
