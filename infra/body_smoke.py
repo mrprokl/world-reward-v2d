@@ -77,7 +77,7 @@ def _manifest_file(root: Path, manifest: dict, relative: str) -> tuple[Path, str
     return path, record["sha256"]
 
 
-def _source_identity(root: Path) -> dict[str, str]:
+def _source_identity(root: Path) -> dict:
     """Bind the installed inference package to the audited, clean upstream tree."""
     vendor = root / "vendor/video_to_data"
     _pinned_checkout(vendor, UPSTREAM_REVISION)
