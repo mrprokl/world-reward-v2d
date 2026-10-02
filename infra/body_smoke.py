@@ -83,6 +83,13 @@ def _source_identity(root: Path) -> dict:
     _pinned_checkout(vendor, UPSTREAM_REVISION)
     expected = vendor / BODY_PACKAGE
     installed = Path("/workspace/v2d_sam3d_body/lib/sam_3d_body")
+    required_data_sources = {
+        "data/__init__.py", "data/transforms/__init__.py",
+        "data/transforms/bbox_utils.py", "data/transforms/common.py",
+        "data/utils/io.py", "data/utils/prepare_batch.py",
+    }
+    if {str(path.relative_to(expected)) for path in (expected / "data").rglob("*.py")} != required_data_sources:
+        raise RuntimeError("Pinned Body source inventory is incomplete; data here means Python source")
     relative_paths = sorted(path.relative_to(expected) for path in expected.rglob("*.py"))
     if not relative_paths or relative_paths != sorted(
         path.relative_to(installed) for path in installed.rglob("*.py")

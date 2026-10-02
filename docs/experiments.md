@@ -148,3 +148,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   forward because bootstrap had excluded six source Python files named `data/`.
   Diagnose/fix the infrastructure whitelist, not model hyperparameters. Original
   images are preserved; small source-only derivative will be independently tested.
+- 2026-10-02 D09 (external validation rights audit): BEHAVE and InterCap data/source
+  are non-commercial research-only; InterCap also requires account approval.
+  Do not advertise commercially unrestricted validation data. CARI paper trained
+  on BEHAVE, commercial MHR repeatedly validated on 79 BEHAVE clips, and overlap of
+  all SAM/DINO/MoGe components is unverified. Use independent procedural MHR/rigid
+  geometry with BSD PyTorch3D for numerical/development validation first, explicitly
+  not a real-world SOTA proof. Real InterCap comparison requires lawful access and
+  rights clarification. Separate identities/objects/recordings, never random frames.
+  Sources: https://virtualhumans.mpi-inf.mpg.de/behave/license.html ;
+  https://intercap.is.tue.mpg.de/license.html ;
+  https://github.com/facebookresearch/pytorch3d/blob/main/LICENSE .
