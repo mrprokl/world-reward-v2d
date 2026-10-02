@@ -730,3 +730,17 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   tests containment, not convexity. Sampled boundary distance is explicitly NOT
   continuous minimum shell separation. Old convex-control rejection remains
   frozen; no production simplifier or challenge mesh is changed.
+- 2026-10-02 R62 (Azure independent endpoint-QEM,b977218): four new controls,
+  two deterministic runs each, passed26.505s.4096faces,2048–2052vertices;
+  sampled CD/source-diagonal0.00352–0.00723<0.01; net-volume errors0.00069–
+  0.00414<0.05. All three hollow cases retained outer-only winding containment
+  and zero detected pair intersections. Endpoint placement configuration may
+  now be tested as a separate real-mesh budget proposal; no challenge accuracy
+  or universal exact embedding guarantee, no production-route adoption yet.
+- 2026-10-02 D52: existing SHA-bound MHRDemo/Body checkpoint only; own neutral
+  204 controls,45 identity and72 zero expressions,54 finger columns. Validate
+  actual127 names/parents/889x249 transform and Body side indices. Six native
+  forwards: corrective off/on, each neutral,216 central perturbations and exact
+  replay. Frozen±0.001/0.002rad, finite nonzero vertex/orientation derivatives,
+  excluded-joint/scales invariance,300s total/120s forward phase. No challenge
+  inputs or full H1 adoption; neutral semantics is not RGB or hand accuracy.
