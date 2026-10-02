@@ -60,7 +60,11 @@ def load_observations(root):
             raise ValueError('Public training observation order differs')
         require_hash(folder/filename,record.get('sha256'))
         with np.load(folder/filename,allow_pickle=False) as data:
-            result[obj].append(observation_arrays(data,obj,view))
+            arrays = observation_arrays(data,obj,view)
+        for key,array in zip(('decoded_RGB_sha256','mask_sha256','pointmap_sha256'),arrays):
+            if hashlib.sha256(np.ascontiguousarray(array).tobytes()).hexdigest() != record.get(key):
+                raise ValueError('Public decoded RGB/mask/pointmap integrity differs')
+        result[obj].append(arrays)
     return result,report,digest
 
 
