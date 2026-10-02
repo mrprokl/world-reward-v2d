@@ -80,10 +80,11 @@ def _iou(a: BoxDetection, b: BoxDetection) -> float:
 def _associate(
     active: list[_Track], detections: tuple[BoxDetection, ...],
     iou_threshold: float, margin: float,
+    contaminated_detections: set[int] | None = None,
 ) -> tuple[dict[int, int], set[int], set[int]]:
     """Assign for bookkeeping; flag full uncertain gated-IoU components."""
     if not active or not detections:
-        return {}, {i for i, track in enumerate(active) if track.contaminated}, set()
+        return {}, {i for i, track in enumerate(active) if track.contaminated}, set(contaminated_detections or ())
     count_tracks, count_boxes = len(active), len(detections)
     size = count_tracks + count_boxes
     weights = np.zeros((size, size), dtype=np.float64)
@@ -103,7 +104,7 @@ def _associate(
     # that association component. Existing contamination is permanent and also
     # propagates through *every* gated-positive edge, not just chosen matches.
     uncertain_tracks = {i for i, track in enumerate(active) if track.contaminated}
-    uncertain_detections: set[int] = set()
+    uncertain_detections: set[int] = set(contaminated_detections or ())
     for i, j in matches.items():
         alternative = weights.copy()
         alternative[i, j] = -1.0
@@ -154,6 +155,9 @@ def select_interacting_actor(
     their tracks still compete in affinity ranking, but cannot win. An independent
     actor is usable even if unrelated background tracks cross. Assignments inside
     contaminated components are bookkeeping only, not claimed identity recovery.
+    Expired uncertain box regions also remain exclusion evidence, so a missing
+    contaminated track cannot restart clean merely by waiting out the gap gate.
+    This conservatively rejects later occupancy of that same uncertain region.
     """
     threshold = _unit_interval(confidence_threshold, "confidence_threshold")
     object_margin = _unit_interval(object_ambiguity_margin, "object_ambiguity_margin")
@@ -201,8 +205,16 @@ def select_interacting_actor(
                 objects[index] = candidates[0]
 
         active = [track for track in tracks if step - track.last_step <= maximum_missing + 1]
+        expired_uncertain = [
+            track for track in tracks
+            if track.contaminated and step - track.last_step > maximum_missing + 1
+        ]
+        contaminated_detections = {
+            j for j, person in enumerate(persons)
+            if any(_iou(track.last_box, person) > iou_threshold for track in expired_uncertain)
+        }
         matches, uncertain_tracks, uncertain_detections = _associate(
-            active, persons, iou_threshold, match_margin
+            active, persons, iou_threshold, match_margin, contaminated_detections
         )
         for track_index in uncertain_tracks:
             active[track_index].contaminated = True

@@ -246,3 +246,16 @@ def test_selected_actor_component_crossing_fails_with_original_frame_diagnostics
     frames = background_crossing_frames(object_x=140)
     with pytest.raises(ValueError, match="frame_indices=.*10"):
         select_interacting_actor(frames)
+
+
+def test_expired_contaminated_identity_cannot_restart_clean_after_missing_gap():
+    inputs = background_crossing_frames()
+    actor = box(ACTOR, 0.75)
+    inputs[2] = frame(20, (actor,))
+    inputs[3] = frame(30, (actor,))
+    inputs.append(frame(40, (actor, box((100, 10, 150, 90)), box((130, 10, 180, 90)))))
+    result = select_interacting_actor(inputs)
+    restarted = [score for score in result.scores if score.track_id >= 3]
+    assert restarted
+    assert all(score.contaminated for score in restarted)
+    assert all(40 in score.ambiguous_frame_indices for score in restarted)
