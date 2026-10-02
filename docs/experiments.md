@@ -1075,3 +1075,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
  3577PASS/1optional-trimeshSKIP33.33s. Benchmark will use CPU4/16g with no
   GPU visibility; active pose process remains unchanged. Shared-host throughput
   is explicitly not isolated whole-pipeline timing.
+- 2026-10-02 R88 (Azure CPU batching,772ae1c): whole240s gate failed
+  (242.702s recorded during executor teardown; wrapper124). First balanced
+  pair completed exact encoded byte/order/metadata parity and exhaustive
+  validation: single write80.213s vs batch8 20.057s (~4.0×), validation
+ 20.193s/20.216s. Reverse pair batch8 write20.053s/validation20.224s;
+  final single writer did not complete before deadline. Temporary H5 directories
+  confirmed removed, partial receipts retained. **Not** a complete balanced
+  throughput gate/adoption, no median reported, deadline unchanged and no rerun
+  to relabel failure. Mechanism supported by first pair, but active native
+  preparation stays frozen. Future production batch change still needs the
+  predeclared complete throughput/parity evidence on a new protocol.
