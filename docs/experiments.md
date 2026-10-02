@@ -694,3 +694,23 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   ran. Preserve the failed report; verify all original content hashes and change
   only public source access modes to0555 directories/0444 files before a unique
   v2 report. Future acquisition must not retain tempfile-private permissions.
+
+- 2026-10-02 R57 (Azure mesh-link,cb3865c): sphere and torus each passed two
+  deterministic global4096 QEM runs. Thin hollow control failed on its first
+  run at strict convex-support/containment validation, after topology, volume,
+  sampled-distance and self-intersection checks. The combined error does not
+  establish shell escape specifically. Reject this backend configuration for
+  production; no threshold relaxation or repeat on the old cohort. Original
+  episode0 failure remains frozen. Test a constrained-placement alternative on
+  new controls before touching production meshes.
+- 2026-10-02 R58 (Azure MV preprocessing-v2,cb3865c): source-only access repair
+  passed without content/manifest changes. Native checkpoint preprocessing
+  passed10.054s; exact single XY flip error0m, SSI inverse max1.39e-7m, actual
+  SS pointmap/RGB/mask518x518 grids registered. No conditioner/dynamics or shape
+  accuracy claim. Proceed to the frozen partial SS embedding/fusion gate only.
+- 2026-10-02 R59 (Azure MHR metadata,cb3865c): CPU inventory passed1.510s,
+  no forward. Existing official696MB TorchScript already exposes127 joint names,
+  249 parameter names,889x249 transform and127 parents. No200MB metadata download
+  needed. Its MHRDemo graph is distinct from generic upstream MHR:204 controls
+  plus45 identity names, with separate facial-expression module. Audit actual
+  exported methods/graph; do not assume generic321 columns or117 padding.
