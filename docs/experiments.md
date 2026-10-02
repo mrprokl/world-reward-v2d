@@ -1311,3 +1311,16 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   after completed transientJ1 collected; no refinement outputs produced. Explicit
   continuation newunit/newoutputs rechecks source/assets without reacquisition;
   all other GPU readers already finished, no restart of old unit or gate waiver.
+- 2026-10-02 R101: pairedJ2 camera comparison **REJECT**median−22.8774%,
+  clips−541.0395/−22.8774/+39.8150% againstfixed-K sharedscale; J2 vsownraw
+  depth gains51.0897% do NOT prove it beats J1. Opposite TUD-L outcome exposes
+  domain/camera-estimator bias; no universal learned-K adoption or cherry-pick.
+  J1qualitySHA03d7445b…209ef;J2qualitye1b6fcd9…b05bd;
+  TUDqualitye3cb111e…2d2c;predictiona1879591…682a. TUDlearnedf546.1106/
+  527.2065/542.1047px are RGB-only, not inferred from privateK. Frozen prediction
+  TAR68085760bytes SHA81e3226c43c6311f98c7a43f704b80a9dc69ce4bb0d233d971ffc6c88f281881
+  transferredAzure01→02 withnoMoGerun. DA3 acquisition actualPASS35.157s,
+  allpins/source/1.337GBweightverified; source_manifestSHA3faa74f9b1b22fe076fd37833f1227da94c27256a06e1e8ebc27ce8b2367ede5.
+  Import image/GPU/runtime gates still pending, not inference. Explicit native
+  continuationv3 source2286fbd dispatched no active01GPU predecessor; oldfailed
+  unit/readers untouched and original sourceoptimizer protocol unchanged.
