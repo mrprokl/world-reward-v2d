@@ -1787,7 +1787,7 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   intersectiondrop/penalty/clipping. Primary uncapped meanabsrelativeZ over
   allfixedprivatevisibleobjectpixels, equal5frame/clip means; medianpaired
   clipgain≥5%, no clipregression>5%, all15complete, zero-perfectbaseline
-  relativegainundefinedreject. DiagnosticonlyhumanZ/surfaceCD, noalignment,
+  relativegainundefinedreject. DiagnosticonlyhumanZ (surfaceCD deferred), noalignment,
   alpha/beta, GTintrinsics fitting, interaction/contact/rigidmesh/realwin claims.
   Stop if weak support/geometryinvalid/no measuredgain; no samecohortretune.
   AllstagesVM01 serial, nativeDA3publicpinned1,336,734,448B model acquisition
@@ -1795,3 +1795,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   norSSH/privatecopy needed. Image remains actualoriginalINDEXb47; no rebuild
   or config-ID waiver. Render120s, optionalCPUimportgate90s, eachRGBbackend180s
   thenprivatequality120s, source-only closures<100KB beforedispatch.
+  D88 sourcefreeze independent139focusedPASS, newprimary/privatequality66PASS,
+  finalfull4972PASS/1optionaltrimeshSKIP66.06s; fiveentrypointbashsyntax PASS.
+  Removed irrelevantBody dependencies from NEWproducer only with standalone
+  MoGefocal-support helper: callable AST exactly originaljointproducer and
+  sameupstreamgeometrySHA; thirteen support/restore/ABI tests PASS. OldD87/
+  modeldrivers unchanged. Initial101.4KBsourceclosure too large rejected before
+  dispatch; newclosure~79.7KB, no100KBbudget relaxation or data inclusion.
