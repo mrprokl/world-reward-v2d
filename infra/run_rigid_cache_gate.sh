@@ -2,14 +2,13 @@
 set -euo pipefail
 ROOT="${WR_ROOT:-/srv/scenesmith/world-reward}"
 CODE="${WR_CODE:?Require immutable committed source}"
-REVISION="${WR_CODE_REVISION:?Require immutable source revision}"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-docker run --rm --gpus all --network none \
+(( $# == 0 )) || { echo 'Procedural CPU gate accepts no configurable controls' >&2; exit 2; }
+docker run --rm --cpus 4 --network none \
   --user "$(id -u scenesmith):$(id -g scenesmith)" \
-  --env WR_ROOT="$ROOT" --env WR_CODE_REVISION="$REVISION" \
-  --env HOME="$ROOT/cache" \
+  --env WR_ROOT="$ROOT" --env WR_CODE_REVISION="${WR_CODE_REVISION:?}" \
   --env PYTHONPATH="$CODE/src" --env PYTHONDONTWRITEBYTECODE=1 \
+  --env OMP_NUM_THREADS=1 --env OPENBLAS_NUM_THREADS=1 --env MKL_NUM_THREADS=1 \
   --mount "type=bind,src=$CODE,dst=$CODE,readonly" \
   --mount "type=bind,src=$ROOT/results,dst=$ROOT/results" \
-  --mount "type=bind,src=$ROOT/cache,dst=$ROOT/cache" \
-  world-reward/cari4d-source:0.1 python "$CODE/infra/point_triangle_gate.py" "$@"
+  world-reward/cari4d-source:0.1 python "$CODE/infra/rigid_cache_gate.py"

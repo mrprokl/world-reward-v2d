@@ -7,9 +7,7 @@ export DOCKER_HOST="unix://$ROOT/docker.sock"
 docker run --rm --gpus all --network none \
   --user "$(id -u scenesmith):$(id -g scenesmith)" \
   --env WR_ROOT="$ROOT" --env WR_CODE_REVISION="$REVISION" \
-  --env HOME="$ROOT/cache" \
   --env PYTHONPATH="$CODE/src" --env PYTHONDONTWRITEBYTECODE=1 \
   --mount "type=bind,src=$CODE,dst=$CODE,readonly" \
   --mount "type=bind,src=$ROOT/results,dst=$ROOT/results" \
-  --mount "type=bind,src=$ROOT/cache,dst=$ROOT/cache" \
-  world-reward/cari4d-source:0.1 python "$CODE/infra/point_triangle_gate.py" "$@"
+  world-reward/cari4d-source:0.1 python "$CODE/infra/pose_batch_gate.py" "$@"

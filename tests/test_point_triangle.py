@@ -151,6 +151,8 @@ def test_wrapper_has_immutable_source_no_data_models_or_network(gate):
     assert "src=$ROOT/data" not in wrapper and "src=$ROOT/weights" not in wrapper
     assert "world-reward/cari4d-source:0.1" in wrapper
     assert '"$CODE/infra/point_triangle_gate.py" "$@"' in wrapper
+    assert '--env HOME="$ROOT/cache"' in wrapper
+    assert 'src=$ROOT/cache,dst=$ROOT/cache' in wrapper
 
 
 @pytest.mark.parametrize("backend", [None, False, [], "", "Kaolin", "kaolin0.17", "numpy"])
@@ -232,3 +234,43 @@ def test_missing_or_duplicate_kaolin_metadata_inventory_fails(gate, kaolin_inven
     distribution.files = distribution.files * count
     with pytest.raises(RuntimeError, match="exactly one"):
         gate._kaolin_identity(module)
+
+
+def frozen_cache_failure(gate):
+    return {"stage": "analytic_continuous_point_triangle_cuda", "status": "fail",
+            "backend": "kaolin", "code_revision": gate.CACHE_FAILURE_REVISION,
+            "error_type": "PermissionError", "error": "[Errno 13] Permission denied: '/.cache'"}
+
+
+def test_cache_retry_preserves_original_and_binds_exact_infrastructure_failure(gate, tmp_path):
+    import json
+    original = gate.report_path(tmp_path, "kaolin")
+    original.parent.mkdir()
+    original.write_text(json.dumps(frozen_cache_failure(gate)))
+    before = original.read_bytes()
+    identity = gate.validate_cache_failure(tmp_path)
+    assert identity["sha256"] == hashlib.sha256(before).hexdigest()
+    assert original.read_bytes() == before
+    retry = gate.report_path(tmp_path, "kaolin", retry_cache_failure=True)
+    assert retry.name == "point-triangle-kaolin-cache-v2.json" and retry != original
+    assert gate.parse_args(["--backend", "kaolin", "--retry-cache-failure"]).retry_cache_failure
+
+
+@pytest.mark.parametrize("change", [{"gates": {}}, {"gates": None}, {"status": "pass"},
+                                    {"code_revision": "a" * 40}, {"backend": "pytorch3d"},
+                                    {"error_type": "RuntimeError"}, {"error": "Numerical test failed"}])
+def test_cache_retry_never_approves_numeric_or_other_failed_result(gate, tmp_path, change):
+    import json
+    original = gate.report_path(tmp_path, "kaolin")
+    original.parent.mkdir()
+    original.write_text(json.dumps(frozen_cache_failure(gate) | change))
+    with pytest.raises(RuntimeError, match="exact frozen"):
+        gate.validate_cache_failure(tmp_path)
+
+
+@pytest.mark.parametrize("argv", [["--retry-cache-failure"],
+                                    ["--backend", "kaolin", "--retry-cache-failure", "--retry-cache-failure"],
+                                    ["--backend", "kaolin", "--retry-cache-failure=true"]])
+def test_retry_selector_strict_and_kaolin_only(gate, argv):
+    with pytest.raises(SystemExit):
+        gate.parse_args(argv)

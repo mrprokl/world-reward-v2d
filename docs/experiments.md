@@ -494,3 +494,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Greedy mask-IoU median.86233 is only a fitting diagnostic, not the final path's
   score or a GT metric. Native preparation automatically started afterward;
   actual CoCoNet inference/conversion still awaits its validated input report.
+
+- 2026-10-02 R40 (Kaolin infrastructure fail-fast,58825d2): standard import
+  failed before numerical tests in2.03s: Warp tried writing `/.cache` under the
+  nonroot offline container user. This says nothing about distance correctness.
+  Preserve report; retry only that exact source-bound PermissionError with
+  task-isolated writable HOME/cache and a distinct report. Frozen10mm triangle,
+ 1e-9m²/1e-6 gradient gates and unresolved import-license status unchanged.
+- 2026-10-02 D41: predeclare whole-candidate batch8 scheduling test: our own
+ 642v/1280f anisotropic mesh,3full-size rendered views,24generic (not truth)
+  orientation seeds,8192surface/2048visible samples, unchanged ICP and selection.
+  Exact complete candidate/rejection/best JSON parity, then3alternating CUDA-
+  synchronized trials; median>=1.3×, elapsed<=120s. Independently test canonical
+  KDtree ICP on72own noisy partial-view hypotheses; synthetic-oracle seeds are
+  explicitly disclosed. Status/inlier/iteration and NN/trim indices must match
+  exactly, pose/residual<=1e-6, median>=1.3× and<=60s. Failures retain partial
+  diagnostics; neither test measures challenge accuracy or authorizes adoption.

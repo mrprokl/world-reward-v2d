@@ -20,20 +20,43 @@ from world_reward.point_triangle import observed_to_triangle_distance_squared
 
 PYTORCH3D_REVISION = "33824be3cbc87a7dd1db0f6a9a9de9ac81b2d0ba"
 KAOLIN_REVISION = "06ffb7d955ca26b608c60a9e862327c56b226921"
+CACHE_FAILURE_REVISION = "58825d2ca2e97278af01d06f655567f80f6d6b04"
 
 
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--backend", choices=("pytorch3d", "kaolin"), default="pytorch3d")
+    parser.add_argument("--retry-cache-failure", action="store_true")
     values = list(sys.argv[1:] if argv is None else argv)
     if sum(value == "--backend" or value.startswith("--backend=") for value in values) > 1:
         parser.error("--backend cannot be repeated")
-    return parser.parse_args(values)
+    if values.count("--retry-cache-failure") > 1:
+        parser.error("--retry-cache-failure cannot be repeated")
+    args = parser.parse_args(values)
+    if args.retry_cache_failure and args.backend != "kaolin":
+        parser.error("Only the frozen Kaolin cache-permission failure has a retry")
+    return args
 
 
-def report_path(root, backend):
+def report_path(root, backend, *, retry_cache_failure=False):
     name = "point-triangle-gate.json" if backend == "pytorch3d" else "point-triangle-kaolin-gate.json"
+    if retry_cache_failure:
+        if backend != "kaolin":
+            raise ValueError("Only Kaolin has a frozen cache-permission failure")
+        name = "point-triangle-kaolin-cache-v2.json"
     return Path(root) / "results" / name
+
+
+def validate_cache_failure(root):
+    """Retry infrastructure only; never rerun a failed numerical gate."""
+    path = report_path(root, "kaolin")
+    report = json.loads(path.read_text())
+    expected = {"stage": "analytic_continuous_point_triangle_cuda", "status": "fail",
+                "backend": "kaolin", "code_revision": CACHE_FAILURE_REVISION,
+                "error_type": "PermissionError", "error": "[Errno 13] Permission denied: '/.cache'"}
+    if any(report.get(key) != value for key, value in expected.items()) or "gates" in report:
+        raise RuntimeError("Retry requires the exact frozen pre-numerical cache-permission failure")
+    return _file_identity(path)
 
 
 def _file_identity(path):
@@ -152,9 +175,11 @@ def main(argv=None):
     revision = os.environ.get("WR_CODE_REVISION", "")
     if not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise RuntimeError("Require immutable WR_CODE_REVISION")
-    output = report_path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"), args.backend)
+    root = os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward")
+    output = report_path(root, args.backend, retry_cache_failure=args.retry_cache_failure)
     if output.exists():
         raise FileExistsError("Point/triangle gate reports are frozen")
+    previous_failure = validate_cache_failure(root) if args.retry_cache_failure else None
     import torch
     if not torch.cuda.is_available():
         raise RuntimeError("Require CUDA")
@@ -166,6 +191,9 @@ def main(argv=None):
               "fitter_adoption_authorized": False, "full_import_closure_commercial_eligibility_verified": False,
               "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               "primitive_source": _file_identity(Path(__file__).resolve().parents[1] / "src/world_reward/point_triangle.py")}
+    if previous_failure is not None:
+        report["previous_infrastructure_failure"] = previous_failure
+        report["retry_changes"] = "writable task-isolated HOME/cache mount only; fixture/tolerances/backend unchanged"
     started = time.perf_counter()
     try:
         if args.backend == "pytorch3d":

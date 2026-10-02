@@ -75,16 +75,16 @@ All results below are execution/representation checks, not challenge accuracy.
 | Raster batch parity | Exact masks/Z, batch8 median1.7832×; not wholeICP speed |
 | O1 rendered shape test |18conditions,27.45s;6controls fail, **adoption rejected** |
 
-Live producer `world-reward-object-pose-full`, revision
+Completed producer `world-reward-object-pose-full`, revision
 `ca6b23464bed6b2dbced81f13123c620d64d487c`, output
-`outputs/episode_000015/object_pose_full`; observation11:18UTC450/501,
+`outputs/episode_000015/object_pose_full`;
 completed501frames in3929.56s (verified11:26UTC). Final Viterbi poses are in
 `geometry_and_poses.npz`; per-frame `selected` is a greedy diagnostic, not final
 trajectory. **Do not restart or overwrite.**
 
 Queued chain: `world-reward-cari-prepare-v2` (`5d4f5db`, remote EXDEV copy fix)
 → `world-reward-cari-forward` → `world-reward-cari-converter` (both`414aac2`).
-Preparation active at11:32UTC, encoded50depthframes; actual network inference/
+Preparation active at11:36UTC, encoded100depthframes; actual network inference/
 conversion not yet verified. Finger-transfer sparse gate waits for conversion.
 A separate `world-reward-masks-episode0` from`a867e23` tests routing/general automatic
 mask initialization; final reporting failed from a shadowed provenance variable.
@@ -92,8 +92,16 @@ Failed outputs quarantined; `masks-episode0-v2` from`c344eb3` passed full covera
 in72.67s with zero empty masks. No manual labels or hyperparameter adjustments.
 
 Continuous small-triangle PyTorch3D gate failed in.816s; backend not adopted.
-An alternative existing Kaolin kernel is being audited separately, with explicit
-transitive noncommercial-import uncertainty; no fitter adoption from kernel QA.
+Alternative Kaolin import failed before numerical evaluation (unwritable `/.cache`).
+Retry is restricted to that exact frozen infrastructure failure, with task-isolated
+writable HOME/cache and a distinct report; no fixture or tolerance change. Explicit
+transitive noncommercial-import uncertainty remains; no fitter adoption from QA.
+
+Two immutable procedural throughput gates are ready: whole24-candidate scalar/
+batch8 CUDA scheduling with exact JSON parity and>=1.3× speedup, and canonical
+KDtree ICP with exact discrete/NN/trim parity,1e-6 numerical gate and>=1.3× speedup.
+Their own synthetic inputs are not challenge validation; cached-ICP seeds are
+explicitly synthetic-oracle-derived. Neither solver/schedule is adopted yet.
 
 Results/decisions and useful failure causes are retained in experiments.md.
 Temporary redundant masks/download archives may be cleaned **after** validated
