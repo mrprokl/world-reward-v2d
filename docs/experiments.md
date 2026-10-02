@@ -279,3 +279,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   budget topology; second pose run correctly stopped before fitting. This
   falsifies a simple collapsed-area explanation. Do not relax machine thresholds;
   inspect the specific non-manifold component and simplification implementation.
+
+- 2026-10-02 R28: detailed budget diagnostics found two opposite copies of one
+  positive-area triangle (area 7.48e-6 model-units² each), not collapsed triangles.
+  Do not remove real surfaces based on near-zero component volume. Regenerate a
+  topology-valid approximation using fixed generic simplification budgets, with
+  componentwise signed-shell preservation as fallback. Validate each candidate
+  and the official repacked result, without filling holes or inverting cavities.

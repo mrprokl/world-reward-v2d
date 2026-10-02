@@ -18,6 +18,7 @@ from camera_render import raster_camera_mesh, silhouette_iou
 from world_reward.data import sha256
 from world_reward.rigid_alignment import align_observed_points
 from world_reward.mesh_geometry import normalize_degenerate_faces
+from world_reward.mesh_budget import fit_topology_preserving_budget
 
 
 def main() -> None:
@@ -76,7 +77,15 @@ def main() -> None:
     started = time.perf_counter()
     # The GLB is canonical; pose is stored separately. Keep exact official budget
     # arrays for final packing and derive only a non-padding mesh for raster QA.
-    vertices, faces = budget_mesh(str(object_dir / "object.glb"), faces=4096, vertices=4096)
+    output.mkdir(exist_ok=False)
+    source_raw = trimesh.load(object_dir / "object.glb", force="mesh", process=False)
+    source_mesh = trimesh.Trimesh(source_raw.vertices, source_raw.faces, process=True)
+    fixed_mesh, topology_budget = fit_topology_preserving_budget(source_mesh)
+    fixed_mesh_path = output / "object_fixed_canonical.glb"
+    fixed_mesh.export(fixed_mesh_path)
+    # Already <=4096 faces/vertices: official packer now only welds/pads. The
+    # fixed mesh is frozen before pose fit, preserving cavities and true volume.
+    vertices, faces = budget_mesh(str(fixed_mesh_path), faces=4096, vertices=4096)
     vertices = vertices * scale[0]  # same grounding gauge, applied exactly once
     active_indices, geometry_cleanup = normalize_degenerate_faces(vertices, faces)
     # Official padding is represented by repeated vertex indices. Replacing
@@ -157,7 +166,6 @@ def main() -> None:
         candidate_reports.append({"frame_index": index, "visible_point_pixels": int(visible.sum()),
                                   "sampled_observations": len(observed), "selected": best, "candidates": candidates,
                                   "rejected_candidates": rejected})
-    output.mkdir(exist_ok=False)
     with (output / "geometry_and_poses.npz").open("xb") as handle:
         np.savez_compressed(handle, vertices=vertices, faces=faces, frame_index=np.asarray(inputs["indices"]),
                             rotation=np.asarray(poses_R), translation=np.asarray(poses_t), object_scale=np.array(1.))
@@ -171,6 +179,7 @@ def main() -> None:
               "mesh_watertight": bool(mesh.is_watertight), "mesh_winding_consistent": bool(mesh.is_winding_consistent),
               "metric_gauge_extent": mesh.extents.tolist(), "official_budget_vertices": len(vertices), "official_budget_faces": len(faces),
               "geometry_cleanup": geometry_cleanup,
+              "topology_budget": topology_budget, "fixed_canonical_mesh_sha256": sha256(fixed_mesh_path),
               "pose_hypotheses": "24_octahedral_orientations_not_asserted_true_object_symmetries",
               "objective": "maximum_automatic_mask_IoU_then_partial_depth_RMSE; no_GT_or_challenge_metric",
               "frames": candidate_reports, "geometry_and_poses_sha256": sha256(output / "geometry_and_poses.npz"),

@@ -29,13 +29,13 @@ def main():
               "meshes": {}, "ground_truth_used": False, "challenge_performance_verified": False}
     for name, mesh in meshes.items():
         incidence = np.bincount(mesh.edges_unique_inverse)
-        components = mesh.split(only_watertight=False)
+        components = mesh.split(only_watertight=False, repair=False)
         result["meshes"][name] = {"vertices": len(mesh.vertices), "faces": len(mesh.faces),
                                   "watertight": bool(mesh.is_watertight), "winding_consistent": bool(mesh.is_winding_consistent),
                                   "signed_volume": float(mesh.volume), "extents": mesh.extents.tolist(),
                                   "boundary_edges": int((incidence == 1).sum()), "nonmanifold_edges": int((incidence > 2).sum()),
                                   "components": len(components), "component_volumes": [float(m.volume) for m in components[:10]]}
-    small_components = meshes["budget_unprocessed"].split(only_watertight=False)
+    small_components = meshes["budget_unprocessed"].split(only_watertight=False, repair=False)
     result["small_budget_components"] = []
     for component in small_components:
         if len(component.faces) <= 10:
