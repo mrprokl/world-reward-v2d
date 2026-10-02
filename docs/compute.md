@@ -337,3 +337,15 @@ VM02D76chainactualimports+frozenbaseline9numeric+DA39callsPASS11.290s, paired
 CPU2.339sPASS19.4160%medianindependentscene gain atidenticalK800. Human/camera
 accuracyandV2Dscoreunverified. Source8632e50 sameoriginalprotocol/codepins.
 4172tinytestsPASS/1optionalSKIP64.23s beforenewaffinecoreimplementation.
+
+20:11UTC J3prepare actualPASS: independent18RGB reference synthesis7.533s,
+36automaticDINO/SAM2masks17.367s; source2867ab1. Privatecamera/GT nevermounted
+for masks. Renderreceiptf594c4b24e857c3b42836bf6e03d6ef6540a03d88ccd198caa7e5b0a8807cf78,
+maskreceipt51fc4b61113520728c39e80a489f1a85e8e3af32462892e99376595496e35a7e.
+Exactcommittedbundleprepare51788B/validation68192B/diagnostic52700B allunder
+100KBcode-onlycontrol, no localheavytransit. Fullsuite4297PASS/1optionalSKIP.
+VM02verifiedcompletedimage/assets/TUDpredictionTARs removed15,971,384,320B
+ONLYaftersealedimport/CUDA/sourceimage/frozenbaseline/DA3prediction/quality
+receiptscheckedPASS; sourceassetmodels/privateeval/frozenoutputs unchanged.
+Cleanupreceipt65659f3f0707f47dc6e2137194c181a7d994c8aa5a1ea3299578519e92fd5791,
+VM02disknow35Gused89Gfree. Receiptsretained; originaltransferSSHauthrevoked.
