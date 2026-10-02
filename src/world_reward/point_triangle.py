@@ -36,22 +36,24 @@ def validate_numpy_point_triangles(points, triangles):
     return tuple(converted)
 
 
-def observed_to_triangle_distance_squared(points, triangles):
+def observed_to_triangle_distance_squared(points, triangles, *, backend="pytorch3d"):
     """Return CUDA float32 [P] squared metres while retaining input autograd.
 
     Direct ``point_face_distance`` is one-sided; do not replace with the
     high-level symmetric point/mesh loss. Points/triangles must be floating
     CUDA tensors on exactly the same device. Only first-order gradients are
-    supported by the pinned PyTorch3D operation. No tensor-to-NumPy detachment.
+    supported. Kaolin is an engineering-only candidate: its standard import
+    also imports non-commercial components; full-closure eligibility is not
+    established. No tensor-to-NumPy detachment or geometry rescaling.
     """
+    if not isinstance(backend, str) or backend not in ("pytorch3d", "kaolin"):
+        raise ValueError("backend must be pytorch3d or kaolin")
     if platform.system() != "Linux":
         raise RuntimeError("Continuous surface distance requires Azure Linux CUDA")
     import torch
-    import pytorch3d
-    from pytorch3d.loss.point_mesh_distance import point_face_distance
 
-    if not torch.cuda.is_available() or pytorch3d.__version__ != "0.7.9":
-        raise RuntimeError("Require CUDA and audited PyTorch3D 0.7.9")
+    if not torch.cuda.is_available():
+        raise RuntimeError("Require CUDA")
     for value, name, rank, suffix in ((points, "points", 2, (3,)), (triangles, "triangles", 3, (3, 3))):
         if (not torch.is_tensor(value) or value.dtype != torch.float32 or not value.is_cuda
                 or value.ndim != rank or tuple(value.shape[1:]) != suffix or len(value) < 1
@@ -63,8 +65,19 @@ def observed_to_triangle_distance_squared(points, triangles):
     area_squared = torch.sum(normals * normals, dim=-1)
     if not torch.isfinite(area_squared).all() or (area_squared <= 0).any():
         raise ValueError("Every triangle must retain finite positive area in float32")
-    first = torch.zeros(1, device=points.device, dtype=torch.int64)
-    distance = point_face_distance(points.contiguous(), first, triangles.contiguous(), first, len(points), 0.)
+    if backend == "pytorch3d":
+        import pytorch3d
+        from pytorch3d.loss.point_mesh_distance import point_face_distance
+        if pytorch3d.__version__ != "0.7.9":
+            raise RuntimeError("Require audited PyTorch3D 0.7.9")
+        first = torch.zeros(1, device=points.device, dtype=torch.int64)
+        distance = point_face_distance(points.contiguous(), first, triangles.contiguous(), first, len(points), 0.)
+    else:
+        import kaolin
+        from kaolin.metrics.trianglemesh import point_to_mesh_distance
+        if kaolin.__version__ != "0.18.0":
+            raise RuntimeError("Require audited Kaolin 0.18.0")
+        distance = point_to_mesh_distance(points.contiguous()[None], triangles.contiguous()[None])[0][0]
     if distance.shape != (len(points),) or not torch.isfinite(distance).all() or (distance < 0).any():
         raise RuntimeError("Continuous point-to-face output is invalid")
     return distance

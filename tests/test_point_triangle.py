@@ -1,12 +1,17 @@
 """NumPy contracts and analytic fixtures only; CUDA proof is the remote gate."""
 
 import importlib.util
+import builtins
+import hashlib
+import inspect
 from pathlib import Path
+import sys
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
 
-from world_reward.point_triangle import validate_numpy_point_triangles
+from world_reward.point_triangle import observed_to_triangle_distance_squared, validate_numpy_point_triangles
 
 
 @pytest.fixture
@@ -124,8 +129,9 @@ def test_analytic_point_and_triangle_gradient_finite_difference_independent_of_c
             assert fd == pytest.approx(expected[vertex, axis], abs=1e-8)
 
 
-def test_frozen_report_fail_before_heavy_import_or_cuda(gate, monkeypatch, tmp_path):
-    output = tmp_path / "results/point-triangle-gate.json"
+@pytest.mark.parametrize("backend", ["pytorch3d", "kaolin"])
+def test_frozen_report_fail_before_heavy_import_or_cuda(gate, monkeypatch, tmp_path, backend):
+    output = gate.report_path(tmp_path, backend)
     output.parent.mkdir()
     output.write_text("frozen")
     monkeypatch.setattr(gate.platform, "system", lambda: "Linux")
@@ -134,7 +140,7 @@ def test_frozen_report_fail_before_heavy_import_or_cuda(gate, monkeypatch, tmp_p
     monkeypatch.setenv("WR_ROOT", str(tmp_path))
     monkeypatch.setenv("WR_CODE_REVISION", "a" * 40)
     with pytest.raises(FileExistsError, match="frozen"):
-        gate.main()
+        gate.main(["--backend", backend])
     assert output.read_text() == "frozen"
 
 
@@ -144,3 +150,85 @@ def test_wrapper_has_immutable_source_no_data_models_or_network(gate):
     assert "src=$CODE,dst=$CODE,readonly" in wrapper and "WR_CODE_REVISION" in wrapper
     assert "src=$ROOT/data" not in wrapper and "src=$ROOT/weights" not in wrapper
     assert "world-reward/cari4d-source:0.1" in wrapper
+    assert '"$CODE/infra/point_triangle_gate.py" "$@"' in wrapper
+
+
+@pytest.mark.parametrize("backend", [None, False, [], "", "Kaolin", "kaolin0.17", "numpy"])
+def test_bad_backend_rejected_before_torch_import_or_platform(backend, monkeypatch):
+    original = builtins.__import__
+    def reject_torch(name, *args, **kwargs):
+        if name in ("torch", "pytorch3d", "kaolin"):
+            pytest.fail("Heavy backend must not be imported for an invalid selector")
+        return original(name, *args, **kwargs)
+    monkeypatch.setattr(builtins, "__import__", reject_torch)
+    with pytest.raises(ValueError, match="backend"):
+        observed_to_triangle_distance_squared(None, None, backend=backend)
+
+
+def test_backend_default_and_explicit_cli_leave_existing_output_unchanged(gate, tmp_path):
+    assert inspect.signature(observed_to_triangle_distance_squared).parameters["backend"].default == "pytorch3d"
+    assert gate.parse_args([]).backend == "pytorch3d"
+    assert gate.parse_args(["--backend", "kaolin"]).backend == "kaolin"
+    assert gate.report_path(tmp_path, "pytorch3d") == tmp_path / "results/point-triangle-gate.json"
+    assert gate.report_path(tmp_path, "kaolin") == tmp_path / "results/point-triangle-kaolin-gate.json"
+
+
+@pytest.mark.parametrize("argv", [["--backend", "0"], ["--backend", "true"], ["--backend"],
+                                    ["--back", "kaolin"], ["--unknown"], ["kaolin"],
+                                    ["--backend", "kaolin", "--backend", "pytorch3d"],
+                                    ["--backend=kaolin", "--backend=kaolin"]])
+def test_cli_backend_strict_invalid_duplicate_or_abbreviated_selector_fails(gate, argv):
+    with pytest.raises(SystemExit):
+        gate.parse_args(argv)
+
+
+@pytest.fixture
+def kaolin_inventory(monkeypatch, tmp_path, gate):
+    root = tmp_path / "kaolin"
+    (root / "metrics").mkdir(parents=True)
+    files = {root / "__init__.py": b"standard initializer",
+             root / "metrics/trianglemesh.py": b"metric source", root / "_C.so": b"tiny fake binary"}
+    meta = tmp_path / "kaolin-0.18.0.dist-info/METADATA"
+    meta.parent.mkdir()
+    files[meta] = b"Name: kaolin\nVersion: 0.18.0\n"
+    for path, contents in files.items():
+        path.write_bytes(contents)
+    module = SimpleNamespace(__file__=str(root / "__init__.py"), __version__="0.18.0",
+                             _C=SimpleNamespace(__file__=str(root / "_C.so")))
+    relative_meta = meta.relative_to(tmp_path)
+    distribution = SimpleNamespace(version="0.18.0", files=[relative_meta], locate_file=lambda p: tmp_path / p)
+    monkeypatch.setitem(sys.modules, "kaolin", module)
+    monkeypatch.setitem(sys.modules, "kaolin.non_commercial", SimpleNamespace())
+    monkeypatch.setattr(gate.metadata, "distribution", lambda name: distribution if name == "kaolin" else pytest.fail(name))
+    return module, distribution, files
+
+
+def test_installed_kaolin_identity_hashes_actual_bytes_never_claims_release_or_license(gate, kaolin_inventory):
+    module, _, files = kaolin_inventory
+    report = gate._kaolin_identity(module)
+    assert report["version"] == "0.18.0"
+    assert report["expected_source_revision"] == "06ffb7d955ca26b608c60a9e862327c56b226921"
+    for key in ("installed_distribution_metadata", "triangle_metric_source", "cuda_extension_binary", "root_initializer"):
+        identity = report[key]
+        assert identity["sha256"] == hashlib.sha256(files[Path(identity["path"])]).hexdigest()
+        assert identity["bytes"] == len(files[Path(identity["path"])])
+    assert report["upstream_release_binary_identity_verified"] is False
+    assert report["full_import_closure_commercial_eligibility_verified"] is False
+    assert report["standard_import_noncommercial_components_present"] is True
+    assert "unresolved" in report["license_status"]
+
+
+@pytest.mark.parametrize("module_version,dist_version", [("0.17.0", "0.18.0"), ("0.18.0", "0.17.0")])
+def test_kaolin_wrong_module_or_distribution_version_rejected(gate, kaolin_inventory, module_version, dist_version):
+    module, distribution, _ = kaolin_inventory
+    module.__version__, distribution.version = module_version, dist_version
+    with pytest.raises(RuntimeError, match="0.18.0"):
+        gate._kaolin_identity(module)
+
+
+@pytest.mark.parametrize("count", [0, 2])
+def test_missing_or_duplicate_kaolin_metadata_inventory_fails(gate, kaolin_inventory, count):
+    module, distribution, _ = kaolin_inventory
+    distribution.files = distribution.files * count
+    with pytest.raises(RuntimeError, match="exactly one"):
+        gate._kaolin_identity(module)

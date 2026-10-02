@@ -477,3 +477,20 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Source audit found a fixed1e-8 barycentric denominator may misclassify tiny
   triangles. Keep original metric fixture and1e-9m² tolerance; no rescaling,
   vendor patch or loose tolerance to hide a failure. Not adopted before GPU gate.
+
+- 2026-10-02 R37 (Azure continuous-distance fail-fast, c344eb3): PyTorch3D
+  point-face primitive failed analytic small-triangle containment in.816s.
+  Outside-edge squared distance expected.000412499982m², actual.000399920042m²,
+  error1.25799e-5m² vs frozen1e-9 gate. This is an actual kernel-scale failure,
+  not evidence against all continuous-distance fitting. Do not build a fitter
+  on this backend or rescale geometry to conceal it. Keep failed report.
+- 2026-10-02 R38 (Azure automatic episode0, c344eb3): after the detector-variable
+  fix, full mask provenance/coverage report passed in72.67s; both entities have
+  zero empty frames, median23584.5human/2859.5object pixels. Frozen failed output
+  remains quarantined; no threshold/manual-label change. This is general routing
+  and execution evidence, not segmentation accuracy or challenge validation.
+- 2026-10-02 R39 (Azure full object producer, ca6b234):501original frames passed
+  in3929.56s with fixed packed geometry/proper rigid poses and final Viterbi path.
+  Greedy mask-IoU median.86233 is only a fitting diagnostic, not the final path's
+  score or a GT metric. Native preparation automatically started afterward;
+  actual CoCoNet inference/conversion still awaits its validated input report.

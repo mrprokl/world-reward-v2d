@@ -10,4 +10,4 @@ docker run --rm --gpus all --network none \
   --env PYTHONPATH="$CODE/src" --env PYTHONDONTWRITEBYTECODE=1 \
   --mount "type=bind,src=$CODE,dst=$CODE,readonly" \
   --mount "type=bind,src=$ROOT/results,dst=$ROOT/results" \
-  world-reward/cari4d-source:0.1 python "$CODE/infra/point_triangle_gate.py"
+  world-reward/cari4d-source:0.1 python "$CODE/infra/point_triangle_gate.py" "$@"

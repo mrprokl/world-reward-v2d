@@ -78,14 +78,22 @@ All results below are execution/representation checks, not challenge accuracy.
 Live producer `world-reward-object-pose-full`, revision
 `ca6b23464bed6b2dbced81f13123c620d64d487c`, output
 `outputs/episode_000015/object_pose_full`; observation11:18UTC450/501,
-active. Final Viterbi poses will be `geometry_and_poses.npz`; per-frame `selected`
-is a greedy diagnostic, not final trajectory. **Do not restart.**
+completed501frames in3929.56s (verified11:26UTC). Final Viterbi poses are in
+`geometry_and_poses.npz`; per-frame `selected` is a greedy diagnostic, not final
+trajectory. **Do not restart or overwrite.**
 
 Queued chain: `world-reward-cari-prepare-v2` (`5d4f5db`, remote EXDEV copy fix)
 → `world-reward-cari-forward` → `world-reward-cari-converter` (both`414aac2`).
-Waiters active at11:18UTC; actual network inference/conversion not yet verified.
+Preparation active at11:32UTC, encoded50depthframes; actual network inference/
+conversion not yet verified. Finger-transfer sparse gate waits for conversion.
 A separate `world-reward-masks-episode0` from`a867e23` tests routing/general automatic
-mask initialization; no per-clip manual labels or hyperparameter adjustments.
+mask initialization; final reporting failed from a shadowed provenance variable.
+Failed outputs quarantined; `masks-episode0-v2` from`c344eb3` passed full coverage
+in72.67s with zero empty masks. No manual labels or hyperparameter adjustments.
+
+Continuous small-triangle PyTorch3D gate failed in.816s; backend not adopted.
+An alternative existing Kaolin kernel is being audited separately, with explicit
+transitive noncommercial-import uncertainty; no fitter adoption from kernel QA.
 
 Results/decisions and useful failure causes are retained in experiments.md.
 Temporary redundant masks/download archives may be cleaned **after** validated
