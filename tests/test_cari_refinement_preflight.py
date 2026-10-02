@@ -10,6 +10,7 @@ def test_preflight_exposes_no_models_outputs_gpu_or_private_inputs():
     source = (root / "infra/cari_refinement_preflight.py").read_text()
     assert "--network none --memory 8g --cpus 4" in wrapper and "--gpus" not in wrapper
     assert "--env CUDA_VISIBLE_DEVICES=''" in wrapper and "60s docker run" in wrapper
+    assert '--env HOME=/tmp --env XDG_CACHE_HOME=/tmp/world-reward-cache' in wrapper
     assert "src=$ROOT/outputs" not in wrapper and "src=$ROOT/data" not in wrapper and "src=$ROOT/weights" not in wrapper
     assert "actual_refinement_verified" in source and "torch.cuda.is_initialized()" in source
     assert "MHRLayer.from_mhr_assets" not in source and "torch.load" not in source

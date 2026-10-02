@@ -6,6 +6,7 @@ timeout --signal=TERM --kill-after=10s 60s docker run --rm --network none --memo
  --user "$(id -u scenesmith):$(id -g scenesmith)" --entrypoint python \
  --env WR_ROOT="$ROOT" --env PYTHONPATH="$CODE/src" --env PYTHONDONTWRITEBYTECODE=1 \
  --env CUDA_VISIBLE_DEVICES='' --env HF_HUB_OFFLINE=1 --env TRANSFORMERS_OFFLINE=1 --env MOMENTUM_ENABLED=0 \
+ --env HOME=/tmp --env XDG_CACHE_HOME=/tmp/world-reward-cache --env MPLCONFIGDIR=/tmp/world-reward-matplotlib \
  --env OMP_NUM_THREADS=4 --env OPENBLAS_NUM_THREADS=4 --env MKL_NUM_THREADS=4 \
  --mount "type=bind,src=$CODE,dst=$CODE,readonly" \
  --mount "type=bind,src=$ROOT/vendor/video_to_data,dst=$ROOT/vendor/video_to_data,readonly" \

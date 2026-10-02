@@ -190,6 +190,7 @@ def test_wrapper_only_new_output_writable_and_scoped_chown(tmp_path):
     assert all("eval_private" not in mount and "/data" not in mount for mount in mounts)
     assert args[-2:] == ["--episode", "15"]
     assert args[args.index("--network") + 1] == "none"
+    assert "HOME=/tmp" in args and "XDG_CACHE_HOME=/tmp/world-reward-cache" in args
     log = Path(environment["LOG"]).read_text()
     assert f"chown 123:123 {base}/cari_refined" in log
     assert "7203s" in log and "64g" in args

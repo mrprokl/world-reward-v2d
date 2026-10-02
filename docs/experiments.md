@@ -1103,3 +1103,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   J1 source audit confirme unités/masques/K corrects; renforcer seulement son
   reçu masques avec booléens noGT/nohandlabels explicites. Le job J1 gelé ne
   sera pas remplacé et ses reçus producteurs contiennent déjà ces booléens.
+- 2026-10-02 R89 (native refinement CPU preflight,0b55102): acquisition réelle
+  des deux assets officiels PASS, total173282bytes directementAzure; receipt
+  SHA5f7816b2e47773a1320370bffbc41cb04d055f0edf79af42ccd231769d01c41a.
+  CPU import gate échoue honnêtement avant réservation de sortie/GPU: Kaolin
+  importe Warp, qui initialise son cache dans `/.cache` non writable pour le
+  UID scenesmith. Aucun résultat refined ni conversion n'a été produit. Corriger
+  seulement HOME/XDG_CACHE_HOME vers `/tmp` dans les deux containers, sans
+  modification vendor/dependencies/pertes/budgets. Nouvelle unité/log et source
+  immuables, assets hashés réutilisables; ancien échec conservé. Premier full
+  suite intégration3689PASS/1optional-trimeshSKIP33.32s, pas preuve GPU/qualité.
+  Pose épisode0 toujours active600/790 à17:08:40UTC; J1 demeure en queue.
