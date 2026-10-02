@@ -356,3 +356,47 @@ Structured3D and Objaverse overlap at domain/object level may still matter.
 Exact normal checkpoint card b135031 contains only MIT terms, no frame-level
 attestation; retain `training_overlap_excluded=False`. A paired RGB-only native
 focal-vs-fixed test is useful real mechanism evidence, not verified Track1 gain.
+
+### D76: isolate metric depth instead of rebuilding a camera solver
+
+Primary source audit through2026-09-30: UniDepthV2/UniK3D and Pi3X weights
+are noncommercial; PerspectiveFields uses Adobe noncommercial terms. GeoCalib
+advertises Apache2 code/CC-BY4 weights and reports FoV errors3.21/4.90/4.46/3.03
+degrees, not metric-depth gains ([paper](https://arxiv.org/html/2409.06704v2)).
+Its actually imported `perspective_fields.py` attributes an adaptation from
+PerspectiveFields; a specific commercial grant was not found. Do not claim
+full source eligibility or acquire/adopt that path. A source-separated learned
+frontend plus independently derived pinhole solver is technically possible,
+but would require new solver validation; defer until calibration failure is
+measured, rather than assume it. Random Hamburger bases even in eval also need
+seed/replay checks. Primary training OpenPano lists HDRMaps/PolyHaven/Laval,
+not TUD-L, but this does not establish checkpoint/backbone non-overlap.
+
+Prioritize [DA3METRIC-LARGE](https://huggingface.co/depth-anything/DA3METRIC-LARGE/tree/4010e39f3634a45bc60553321fb49fb760bd594e),
+HFpin4010e39f3634a45bc60553321fb49fb760bd594e, source
+[3d835ec1a5802d64a8b8b15f817a1ab54809bfe4](https://github.com/ByteDance-Seed/Depth-Anything-3/tree/3d835ec1a5802d64a8b8b15f817a1ab54809bfe4),
+both primaryApache2. Weight1336734448bytes/SHA
+bbea5b0b3ee389849cffa7ddae89de064a90abd2b055fc5aa99aac68db324776;
+config847bytes/SHAa336f3e76fe375aaae17a9aed9130c9f2aa061535d317ec57dcb2f1f02e1dd53.
+Paper table11 reports metric AbsRel.070NYUv2/.086KITTI/.104ETH3D/.105SUNRGBD/
+.128DIODE; neither proves RGB-only camera estimation or superiority to MoGe2.
+General API imports GPL `evo` and unused exporters: use native minimal config,
+model and input/output processors only. Audited closure27Python192452bytes,
+no high-level API/evo/COLMAP/GS execution. DA3Nested/Giant NC weights excluded.
+
+Nine D76 single-image forwards use the **same frozen original K800** as the
+existing fixed MoGe branch, not another MoGe inference or private calibration.
+Native resize518 upper_bound_resize maps640x480→518x388→518x392. Actual float32
+processedK approximately fx647.5/fy653.3333, cx259/cy196; canonicalZ is multiplied
+once by its **actual processed mean focal/300**, nominal2.1680555556, not800/300.
+OutputProcessor does not resize/scale. Our declared bilinearalign_cornersFalse
+upsamples metricZ only to640x480; reconstruct XYZ with originalK800 and+.5 rays
+to compare depth methods on identical cameras. Not a native DA3 pointmap (native
+unprojection uses integer pixels), no GTK/oracle rays/median scale fitting.
+Preserve native sky correction.3/quantile.99, seed CPU/CUDA before each call;
+allpositive finite pixels and allnine images required. SFcheckpoint header only
+was inspected via48864byteHTTPRange:406F32 keys all `model.`; full tensors are
+not acquired yet. Strict fullstate inclbuffers after one prefix removal, no
+partial matching. Paired independent quality gates stay≥5% median scene CD gain,
+no scene regression>5%, coverage≥95%; original MoGe queue unchanged. No accuracy
+or model inference claimed until actual receipts and paired evaluation complete.

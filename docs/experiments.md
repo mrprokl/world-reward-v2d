@@ -1281,3 +1281,12 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   `results` directory in launcher-assumed fresh root. No Docker/config/GPU ran;
   fix scoped fresh root1000/results only and new v2 unit, retain v1 failure.
   This is bootstrap integration evidence, not research-model inference.
+- 2026-10-02 D76: isolate DA3METRIC-LARGE against frozen MoGe2 fixed camera
+  on existing nine TUD-L RGB, no duplicate MoGe GPU run. Same originalK800,
+  native canonicalZ×processedmeanf/300 once then declared bilinearZ/.5XYZ.
+  GPU600s32g4CPU/newVM02/newoutput, strict406F32 fullstate inclbuffers and
+  native sky correction/seed, no confidence drops/private K/body/calibration.
+  Primary source/weightsApache2; GPLAPI excluded via27filedepth closure.
+  Pair only after baseline frozen and SHA-checked Azure transfer; keep≥5%median
+  scene gain/no>5%regression/coverage gates, no challenge victory inferred.
+  GeoCalib adaptation rights/newcamera-solver cost defer that alternative.

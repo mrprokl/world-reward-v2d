@@ -217,3 +217,20 @@ HOPE/HANDAL author sites retain NC contrary to HF/BOP cards; HOT3D hand labels
 are NC with extra model restrictions. ContactPose nonmesh data/code MIT is
 promising, but individual mesh terms and useful hashed minibundle remain
 unaudited; do not import MANO fits or pretend it supplies full-body MHR truth.
+
+## 5. D76 metric-depth candidate (source audit, acquisition not yet executed)
+
+DA3METRIC-LARGE pin4010e39f3634a45bc60553321fb49fb760bd594e card declares
+Apache2; matching source3d835ec1a5802d64a8b8b15f817a1ab54809bfe4 Apache2.
+HF has no separate LICENSE file: retain its primary card and sourceLICENSE,
+not an invented embedded grant. Minimal native depth runtime excludes API's
+`evo` GPL and unused exporters; addon addict/einops MIT, OmegaConfBSD3 with
+ANTLRBSD3/PyYAMLMIT, imageioBSD2, PillowMIT-CMU and tqdm MIT/MPL2 OSI file-level
+terms. Record effective dependency versions and notices; this is not full image
+SBOM clearance. NC DA3Nested/Giant checkpoints excluded. Exact training/backbone
+frame provenance remains unverified, so training_overlap_excludedFalse.
+
+GeoCalib top-levelApache2/weightCCBY4 declarations do not settle the provenance
+of imported PerspectiveFields-adapted camera code (upstreamAdobeNC). No new
+GeoCalib acquisition or commercial adoption; independent source-separated
+frontend/analytic calibration would need its own checks and rights review.
