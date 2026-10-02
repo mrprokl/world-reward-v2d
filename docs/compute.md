@@ -129,3 +129,18 @@ but both correct/biased-pose controls failed; fitter remains rejected.
 Results/decisions and useful failure causes are retained in experiments.md.
 Temporary redundant masks/download archives may be cleaned **after** validated
 export; preserve immutable reports/source hashes and never prune shared user data.
+
+
+## Independent RGB validation (2026-10-02)
+
+All RGB/meshes/checkpoints remain Azure-resident. Two immutable serial entrypoints
+now separate render-only private truth, public inference and private evaluation:
+`infra/run_hand_synthetic_pipeline.sh` and `infra/run_object_synthetic_pipeline.sh`.
+Each stage reserves its own output; failures stop the chain and are never
+implicitly restarted/overwritten. Runtime closures are25files/~85KB encoded and
+21files/~63KB respectively, below100KB control-only transfer limit. H100 work
+remains serial, while disjoint source audits/tiny local tests run in parallel.
+Reference cold TorchScript replay requires unoptimized execution; fresh-process
+diagnosis passed17.546s. Strict hand semantic V4 is a separate pending prerequisite.
+No synthetic quality result, new mesh adoption or final submission follows from
+these engineering checks alone. Latest full tiny suite3318PASS30.13s.
