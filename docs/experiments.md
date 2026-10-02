@@ -1114,3 +1114,18 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   immuables, assets hashés réutilisables; ancien échec conservé. Premier full
   suite intégration3689PASS/1optional-trimeshSKIP33.32s, pas preuve GPU/qualité.
   Pose épisode0 toujours active600/790 à17:08:40UTC; J1 demeure en queue.
+- 2026-10-02 R90 (native refinement preflight-v2,9f2a4ec): vraie importation
+  CPU offline du module pin7c0d, PyTorch3D, nvdiffrast, transformers, Kaolin et
+  Utils **PASS**. Configuration native complète vérifiée:300steps/batch0,
+  lr.001, contact200, silhouette.002, penetration2, temporal100,
+  object-translation-prior100; aucun contexte CUDA initialisé. L'avertissement
+  Warp «GPU unavailable» est normal dans ce container sans accèsGPU, pas une
+  validation des kernels. Caches éphémères `/tmp`, vendor toujours readonly.
+  Deux assets réutilisés avec hashes exacts. Unité
+  `world-reward-cari-native-final-refinement-v2` active et en attente du job
+  J1 à17:12:33UTC, aucun répertoire de raffinement GPU encore réservé.
+  Pose épisode0 active650/790, sans changement à sa source. Hypothèse J1 et
+  raffinement restent **non mesurés**, ne pas annoncer de gain/qualité/soumission.
+  Tests ciblés cache/refine65PASS2.26s et consommateurs529PASS22.81s;
+  précédent full-suite3689PASS/1optional-trimeshSKIP33.32s. Aucune adoption,
+  dérogation licence ou règle Kaggle acceptée par ce lancement.

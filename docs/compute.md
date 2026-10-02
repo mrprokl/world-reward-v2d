@@ -180,3 +180,15 @@ Fixed-anchor RGB motion tracking completed24frames but quality gain0.131468%<5%
 rejects adoption. CPU guarded-QEM replay identifies39of46 cavity volume errors
 over5%, while global CD/net volume/embedding pass. Frozen failures are retained;
 no thresholds, source scale or camera trajectories are changed for mesh QA.
+
+2026-10-02 17:12:33UTC: H100 exclusive, sequential GPU queue remains
+`episode0-volume-native-v2` → `joint-rgb-grounding` →
+`cari-native-final-refinement-v2`. First unit's full-object pose is650/790;
+J1 is independent research, final refinement reuses already-frozen episode15
+inputs. None restarts or mutates existing predictions. New producing revision
+`9f2a4ec4cf8980364262c2b1ee62fad06b4cfc85`, immutable22-file closure54432encoded
+bytes; acquisition of173282bytes directly on Azure only. CPU native-import
+preflight passed without GPU/context; expensive refinement not yet executed.
+Whole refinement bound7200s is exploratory budget, not a measured ETA.
+First preflight failure/cache fix retained as concise R89/R90; cache changes
+use writable container `/tmp`, no persistent vendor or dependency mutation.
