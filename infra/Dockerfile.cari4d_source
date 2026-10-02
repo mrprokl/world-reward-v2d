@@ -1,0 +1,5 @@
+# The original sparse bootstrap excluded a Python source directory named data.
+# Restore only pinned source code, never challenge datasets or GT assets.
+FROM world-reward/cari4d:7c0d3b9
+COPY v2d_sam3d_body/lib/sam_3d_body/data /workspace/v2d_sam3d_body/lib/sam_3d_body/data
+ENV PYTHONUNBUFFERED=1

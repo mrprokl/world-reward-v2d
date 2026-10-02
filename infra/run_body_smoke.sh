@@ -16,4 +16,4 @@ docker run --rm --gpus all --network none \
   --mount "type=bind,src=$ROOT/outputs,dst=$ROOT/outputs" \
   --mount "type=bind,src=$ROOT/results,dst=$ROOT/results,readonly" \
   --mount "type=bind,src=$ROOT/cache,dst=$ROOT/cache" \
-  world-reward/cari4d:7c0d3b9 python "$CODE/infra/body_smoke.py" --root "$ROOT"
+  world-reward/cari4d-source:0.1 python "$CODE/infra/body_smoke.py" --root "$ROOT"
