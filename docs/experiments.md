@@ -714,3 +714,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   needed. Its MHRDemo graph is distinct from generic upstream MHR:204 controls
   plus45 identity names, with separate facial-expression module. Audit actual
   exported methods/graph; do not assume generic321 columns or117 padding.
+- 2026-10-02 R60 (Azure partial SS,cb3865c): actual native six-modality
+  conditioner and Stage1 fixed-latent dynamics passed33.941s, including replay,
+  single-view/duplicate fusion, arithmetic mean and nonanchor permutation.
+  Existing pinned weights only; no SLAT, entropy verification or decoded shape.
+- 2026-10-02 R61 (Azure sparse H1,4ea44ea): finger-only proposal passed1.833s
+  reference-forward phase for0/250/500, frozen136-pose/shared68+45 identity.
+  Native decoded hand controls54 retained, other82 pose columns unchanged.
+  Vertex/joint displacement is diagnostic, not accuracy; semantic invariance
+  and independent synthetic RGB accuracy remain required before adoption.
+- 2026-10-02 D51: new independent endpoint-QEM hypothesis fixes placement to
+  surviving source edge endpoints, same4096/CD1%/volume5%/two-run/120s gates.
+  Four new radial-star/torus/offcentre-hollow/disconnected controls. Global
+  intersection selection plus outer-only float64 winding of all inward vertices
+  tests containment, not convexity. Sampled boundary distance is explicitly NOT
+  continuous minimum shell separation. Old convex-control rejection remains
+  frozen; no production simplifier or challenge mesh is changed.
