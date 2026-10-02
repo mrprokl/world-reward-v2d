@@ -839,3 +839,9 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   has no GT alignment/fitting:>=5% median gain,<=5% per-object regression and
   closed oriented positive volume required; this is not full Track1 scoring,
   embedding proof, novel-view pose validation, photorealism or adoption.
+- 2026-10-02 R70 (Azure fresh reference replay,b70ee6a): PASS17.546s/12calls,
+  four distinct worker processes, no warmup. Both optimized fresh conditions
+  changed geometry (max4.57764e-5 model-cm vertices,3.81470e-6 skeleton elements);
+  both unoptimized conditions replayed bit-identically. This supports disabling
+  TorchScript optimization for reference validation, not a proven causal graph
+  pass/kernel diagnosis. V4 preserves strict algorithms and every prior tolerance.
