@@ -1,0 +1,8 @@
+# Inherit existing frozen libigl/Eigen headers and retained MPL-2.0 notices.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+USER root
+ARG BASE_CPP_SHA256
+COPY mesh_volume_qem.cpp build_volume_qem.sh /opt/world-reward/volume-qem/
+RUN WR_BASE_CPP_SHA256="${BASE_CPP_SHA256}" bash /opt/world-reward/volume-qem/build_volume_qem.sh
+ENV PATH="/opt/world-reward/volume-qem:${PATH}"

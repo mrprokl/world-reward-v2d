@@ -51,8 +51,9 @@ def prerequisites(root,episode):
     return inputs,sources,scale,{'guarded_gate_sha256':sha256(p),**build}
 
 
-def produce(root,episode,report,path):
-    inputs,sources,scale,control=prerequisites(root,episode)
+def produce(root,episode,report,path,*,check_prerequisites=prerequisites,simplify=guarded.simplify):
+    """Shared unchanged export/packing checks; new backends supply own controls."""
+    inputs,sources,scale,control=check_prerequisites(root,episode)
     report.update(source_hashes=sources,control_evidence=control,input_sha256=inputs['video_sha256'])
     helper=endpoint.regular(root,root/'vendor/v2d_submission_kit/v2dlb/mesh_budget.py')
     if sha256(helper)!=endpoint.BUDGET_HELPER_SHA:raise ValueError('Official budget helper changed')
@@ -60,7 +61,7 @@ def produce(root,episode,report,path):
     v,f,weld=endpoint.exact_weld(*raw);source=v,f;hashes=[_array_hash(x) for x in source]
     report.update(exact_source_welding=weld,source_topology=mesh_topology(*source),source_intersecting_faces=source_intersections(*source));_write(path,report)
     if report['source_intersecting_faces']:raise ValueError('Source intersects; no healing')
-    candidate,mapping=guarded.simplify(source,840)
+    candidate,mapping=simplify(source,840)
     report['candidate_topology']=mesh_topology(*candidate);report['independent_candidate_intersecting_faces']=source_intersections(*candidate);_write(path,report)
     if report['independent_candidate_intersecting_faces']:raise ValueError('Independent final embedding failed')
     report['candidate_geometry']={}
@@ -87,7 +88,7 @@ def produce(root,episode,report,path):
     geometry=path.parent/'geometry.npz'
     with geometry.open('xb') as h:np.savez_compressed(h,vertices=metric,faces=pf,episode_index=np.array(episode),object_scale=np.array(1.),grounded_scale_baked=np.array(scale))
     if hashes!=[_array_hash(x) for x in source]:raise ValueError('Source changed')
-    if prerequisites(root,episode)[1:]!=(sources,scale,control):raise ValueError('Frozen provenance changed during proposal')
+    if check_prerequisites(root,episode)[1:]!=(sources,scale,control):raise ValueError('Frozen provenance changed during proposal')
     report.update(status='pass',geometry_sha256=sha256(geometry),canonical_glb_sha256=sha256(fixed),
                   metric_scale_baked_once=scale,source_arrays_unchanged=True,official_helper_sha256=sha256(helper))
 
