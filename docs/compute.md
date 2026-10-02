@@ -153,3 +153,13 @@ Code-only immutable snapshots now use Python stdlib XZ compression plus SHA-256
 verification and remote tar extraction, keeping the base64 Run Command payload
 below 100 KB as the implementation grows. Models/data/predictions remain remote.
 No active jobs or immutable snapshots are replaced by this transport change.
+
+Current full object-pose initializer launched from immutable revision
+`ca6b23464bed6b2dbced81f13123c620d64d487c`: systemd unit
+`world-reward-object-pose-full`, log `results/object-pose-full.log`, output
+`outputs/episode_000015/object_pose_full`. Last observation: active, exit status
+0 while running; final result not yet observed. Poll the exact unit, never
+restart it because an Azure observation times out. The final Viterbi trajectory
+will be in `geometry_and_poses.npz`; per-frame `selected` diagnostics are greedy
+initializer comparisons, not the final selected path. No challenge submission
+or benchmark-win claim has been made.
