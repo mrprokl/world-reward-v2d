@@ -202,8 +202,8 @@ def main(argv=None):
     if not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise RuntimeError("Require immutable source revision")
     root = Path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"))
-    output = root / "results/multiview-native-preprocess-gate.json"
-    if output.exists():
+    output = root / "results/multiview-native-preprocess-gate-v2.json"
+    if output.exists() or output.is_symlink():
         raise FileExistsError("Native gate report is frozen")
     report = {"stage": "native_mv_sam3d_import_config_preprocess", "status": "fail", "code_revision": revision,
               "vendor_revision": PIN, "image_id": os.environ.get("WR_IMAGE_ID"), "script": _identity(Path(__file__)),

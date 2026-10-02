@@ -678,3 +678,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   115 source/license/readme files,929905 bytes; clean Git and read-only tree.
   No extra model, challenge asset or local large transfer. This establishes
   source acquisition only; native preprocessing/conditioner/dynamics untested.
+- 2026-10-02 R54 (Azure CPU topology build-v2,3d87d50): content-addressed local
+  base reference passed before/after image-ID binding. Exact wheel imported and
+  native tetra QEM/self-intersection smoke passed. Frozen image:
+  `sha256:a34cdf72b862f97a7177be0b920842d637e812e0fe5b98c56fe940ffd8d67d81`.
+  This is bootstrap only; larger sphere/torus/cavity/budget gate still required.
+- 2026-10-02 R55 (Azure final integrity,3d87d50): episode15 full501-frame final
+  archive/schema and upstream SHA-chain passed0.242s. Exact legacy conversion
+  format retained without rewriting reports. Separate forward source-contract
+  audit passed0.304s; launch binding and network-security attestation remain
+  explicitly false. Neither result is challenge accuracy or licence eligibility.
+- 2026-10-02 R56 (Azure MV preprocessing,3d87d50): failed before imports because
+  root-created tempfile0700 became0500 when write bits were removed; non-root
+  inference could not traverse the public source tree. No model/numerical test
+  ran. Preserve the failed report; verify all original content hashes and change
+  only public source access modes to0555 directories/0444 files before a unique
+  v2 report. Future acquisition must not retain tempfile-private permissions.

@@ -41,8 +41,10 @@ try:
         raise RuntimeError('Incomplete source inventory')
     staging.rename(destination)  # Same filesystem, complete tree before publication.
     for path in sorted(destination.rglob('*'), key=lambda p: len(p.parts), reverse=True):
-        path.chmod(path.stat().st_mode & ~0o222)
-    destination.chmod(destination.stat().st_mode & ~0o222)
+        # tempfile creates0700 staging. Removing write alone would retain0500,
+        # blocking the non-root inference user even though source is public.
+        path.chmod(0o555 if path.is_dir() else (path.stat().st_mode & 0o111) | 0o444)
+    destination.chmod(0o555)
     report = {'stage': 'pinned_mv_sam3d_source_acquisition', 'status': 'pass', 'revision': pin,
               'repository': 'https://github.com/devinli123/MV-SAM3D.git', 'path': str(destination),
               'code_revision': os.environ['WR_CODE_REVISION'], 'files': records,

@@ -5,6 +5,7 @@ import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import os
 
 import numpy as np
 import pytest
@@ -120,6 +121,42 @@ def test_default_argument_parser_is_empty_and_no_model_constructor_code():
     assert '"native_constructor_verified": False' in text
     assert '"native_dynamics_verified": False' in text
     assert "torch.hub.load = original_hub" in text
+    assert "multiview-native-preprocess-gate-v2.json" in text
+
+
+def test_acquisition_public_readonly_modes_do_not_keep_tempfile0700():
+    source = (Path(SPEC.origin).parent / "acquire_multiview_source.sh").read_text()
+    assert 'destination.chmod(0o555)' in source
+    assert '0o555 if path.is_dir()' in source and '| 0o444' in source
+
+
+def test_access_repair_changes_modes_not_manifest_or_source_bytes(tmp_path):
+    source, manifest, _ = source_fixture(tmp_path)
+    before = manifest.read_bytes()
+    source.chmod(0o700)
+    wrapper = Path(SPEC.origin).parent / "repair_multiview_source_access.sh"
+    inline = wrapper.read_text().split("<<'PY'\n", 1)[1].rsplit("\nPY", 1)[0]
+    env = os.environ | {"WR_ROOT": str(tmp_path), "WR_CODE_REVISION": "a" * 40}
+    import sys
+    result = subprocess.run([sys.executable, "-c", inline], env=env, capture_output=True)
+    assert result.returncode == 0, result.stderr.decode()
+    assert manifest.read_bytes() == before and source.stat().st_mode & 0o777 == 0o555
+    assert (source / "LICENSE").stat().st_mode & 0o777 == 0o444
+    gate.validate_source(tmp_path)
+    report = json.loads((tmp_path / "results/multiview-source-access.json").read_text())
+    assert report["source_bytes_modified"] is False and report["content_hashes_unchanged"] is True
+    again = subprocess.run([sys.executable, "-c", inline], env=env, capture_output=True)
+    assert again.returncode != 0
+
+
+def test_access_repair_refuses_altered_frozen_content(tmp_path):
+    source, manifest, _ = source_fixture(tmp_path)
+    (source / "LICENSE").write_text("altered")
+    inline = (Path(SPEC.origin).parent / "repair_multiview_source_access.sh").read_text().split("<<'PY'\n", 1)[1].rsplit("\nPY", 1)[0]
+    import sys
+    result = subprocess.run([sys.executable, "-c", inline], capture_output=True,
+                            env=os.environ | {"WR_ROOT": str(tmp_path), "WR_CODE_REVISION": "a" * 40})
+    assert result.returncode != 0 and not (tmp_path / "results/multiview-source-access.json").exists()
 
 
 @pytest.mark.parametrize("script", ["acquire_multiview_source.sh", "run_multiview_native_gate.sh"])
@@ -140,5 +177,5 @@ def test_wrapper_pins_source_image_digest_and_network_none_no_challenge_data():
 def test_acquisition_is_pinned_public_source_only_and_no_overwrite():
     text = (Path(__file__).parents[1] / "infra/acquire_multiview_source.sh").read_text()
     assert gate.PIN in text and "--depth=1" in text and "staging.rename(destination)" in text
-    assert "manifest.open('x')" in text and "~0o222" in text
+    assert "manifest.open('x')" in text and "destination.chmod(0o555)" in text
     assert "huggingface" not in text and "snapshot_download" not in text and "pip install" not in text
