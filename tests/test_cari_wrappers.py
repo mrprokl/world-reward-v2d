@@ -229,7 +229,10 @@ def test_immutable_launcher_import_closure_includes_common_shell_helper_and_pyth
     spec = importlib.util.spec_from_file_location("world_reward_test_wrapper_launcher", ROOT / "infra/azure_job.py")
     launcher = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(launcher)
-    files = {str(path.relative_to(ROOT)): path.read_bytes() for path in (ROOT / "infra").glob("*") if path.is_file()}
+    files = {str(path.relative_to(ROOT)): path.read_bytes()
+             for base in ("infra", "src", "configs") for path in (ROOT / base).rglob("*")
+             if path.is_file() and "__pycache__" not in path.parts}
+    files["pyproject.toml"] = (ROOT / "pyproject.toml").read_bytes()
     for shell, python, _, _ in WRAPPERS.values():
         closure = launcher.runtime_bundle_paths(files, "infra/" + shell)
         assert "infra/cari_wrapper_common.sh" in closure

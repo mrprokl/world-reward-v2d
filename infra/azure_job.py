@@ -21,15 +21,40 @@ import tarfile
 def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
     """Select committed entrypoint/import closure, never data or unused tooling.
 
-    Include the whole lightweight project package and config. Infra dependencies
-    are direct shell file references and static Python imports; dynamic infra
-    plugins are not supported. Each entrypoint gets its own immutable directory
-    so different closures at the same commit cannot alias.
+    Follow all static imports, including inside functions, for infra and the
+    world_reward package. Keep package initializers, config and pyproject; omit
+    unrelated experiments. Literal own-package dynamic imports are supported;
+    computed own-package names and dynamic infra plugins are unsupported. This
+    is not a general Python dependency resolver: external/vendor imports stay
+    in the audited image. Each entrypoint retains its own immutable directory.
     """
     if not re.fullmatch(r"infra/[a-z0-9_]+\.sh", script) or script not in files:
         raise ValueError("Require a committed infra shell entrypoint")
-    selected = {path for path in files if path.startswith(("src/", "configs/")) or path == "pyproject.toml"}
+    selected = {path for path in files if path.startswith("configs/") or path == "pyproject.toml"}
     pending = [script]
+    if "src/world_reward/__init__.py" in files:
+        pending.append("src/world_reward/__init__.py")
+
+    def module_paths(module: str, *, required: bool = True) -> set[str]:
+        if module != "world_reward" and not module.startswith("world_reward."):
+            path = f"infra/{module.split('.')[0]}.py"
+            return {path} if path in files else set()
+        if not all(part.isidentifier() for part in module.split(".")):
+            raise ValueError(f"Invalid own-package module: {module}")
+        stem = "src/" + module.replace(".", "/")
+        matches = {path for path in (stem + ".py", stem + "/__init__.py") if path in files}
+        if not matches and not required:
+            return set()  # A from-import name may be a symbol, not a submodule.
+        if len(matches) != 1:
+            raise ValueError(f"Own-package dependency is missing or ambiguous: {module}")
+        parents = module.split(".")[:-1]
+        for length in range(1, len(parents) + 1):
+            initializer = "src/" + "/".join(parents[:length]) + "/__init__.py"
+            if initializer not in files:
+                raise ValueError(f"Own-package initializer is not committed: {initializer}")
+            matches.add(initializer)
+        return matches
+
     while pending:
         path = pending.pop()
         if path in selected:
@@ -38,17 +63,77 @@ def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
         source = files[path].decode("utf-8")
         dependencies = set()
         if path.endswith(".py"):
-            for node in ast.walk(ast.parse(source)):
+            tree = ast.parse(source)
+            package = ""
+            if path.startswith("src/"):
+                module = path[4:-3].replace("/", ".")
+                package = module.removesuffix(".__init__") if path.endswith("/__init__.py") else module.rpartition(".")[0]
+            dynamic_names = {"__import__"}
+            own_names = set()
+            package_aliases = set()
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ImportFrom) and node.module == "importlib":
+                    dynamic_names.update(alias.asname or alias.name for alias in node.names if alias.name == "import_module")
+                if isinstance(node, ast.Assign) and any(
+                    isinstance(value, ast.Constant) and isinstance(value.value, str)
+                    and "world_reward" in value.value for value in ast.walk(node.value)
+                ):
+                    own_names.update(target.id for target in node.targets if isinstance(target, ast.Name))
                 if isinstance(node, ast.Import):
-                    modules = [alias.name.split(".")[0] for alias in node.names]
+                    package_aliases.update(alias.asname or alias.name for alias in node.names if alias.name == "world_reward")
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        dependencies.update(module_paths(alias.name))
                 elif isinstance(node, ast.ImportFrom):
-                    modules = [(node.module or "").split(".")[0]]
-                else:
-                    continue
-                dependencies.update(f"infra/{module}.py" for module in modules if f"infra/{module}.py" in files)
+                    module = node.module or ""
+                    if node.level:
+                        parts = package.split(".") if package else []
+                        if node.level > len(parts):
+                            raise ValueError(f"Unresolved relative runtime import in {path}")
+                        module = ".".join(parts[:len(parts) - node.level + 1] + ([module] if module else []))
+                    dependencies.update(module_paths(module))
+                    if module == "world_reward" or module.startswith("world_reward."):
+                        for alias in node.names:
+                            if alias.name != "*":
+                                dependencies.update(module_paths(module + "." + alias.name, required=False))
+                elif isinstance(node, ast.Call) and (
+                    (isinstance(node.func, ast.Name) and node.func.id in dynamic_names)
+                    or (isinstance(node.func, ast.Attribute) and node.func.attr == "import_module")
+                ):
+                    argument = node.args[0] if node.args else next((value.value for value in node.keywords if value.arg == "name"), None)
+                    dynamic_package = node.args[1] if len(node.args) > 1 else next((value.value for value in node.keywords if value.arg == "package"), None)
+                    own_dynamic_package = (isinstance(dynamic_package, ast.Constant) and isinstance(dynamic_package.value, str)
+                                           and (dynamic_package.value == "world_reward" or dynamic_package.value.startswith("world_reward.")))
+                    if isinstance(argument, ast.Constant) and isinstance(argument.value, str):
+                        module = argument.value
+                        if own_dynamic_package and module.startswith("."):
+                            level = len(module) - len(module.lstrip("."))
+                            parts = dynamic_package.value.split(".")
+                            if level > len(parts):
+                                raise ValueError(f"Unresolved relative dynamic runtime import in {path}")
+                            module = ".".join(parts[:len(parts) - level + 1] + ([module[level:]] if module[level:] else []))
+                        if module == "world_reward" or module.startswith("world_reward."):
+                            dependencies.update(module_paths(module))
+                    elif argument is not None and (own_dynamic_package or package or any(
+                        (isinstance(value, ast.Constant) and isinstance(value.value, str) and "world_reward" in value.value)
+                        or (isinstance(value, ast.Name) and value.id in own_names) for value in ast.walk(argument)
+                    )):
+                        raise ValueError(f"Computed own-package dynamic imports are unsupported: {path}")
+                elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "getattr" and node.args:
+                    if isinstance(node.args[0], ast.Name) and node.args[0].id in package_aliases:
+                        name = node.args[1] if len(node.args) > 1 else None
+                        if not isinstance(name, ast.Constant) or not isinstance(name.value, str):
+                            raise ValueError(f"Computed own-package attribute imports are unsupported: {path}")
+                        dependencies.update(module_paths("world_reward." + name.value, required=False))
+                elif isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name) and node.value.id in package_aliases:
+                    dependencies.update(module_paths("world_reward." + node.attr, required=False))
         # Literal $CODE/infra/foo, including Python subprocess child entrypoints.
         dependencies.update("infra/" + name for name in re.findall(
             r"/infra/([a-z0-9_]+\.(?:py|sh)|Dockerfile\.[a-z0-9_]+)", source,
+        ))
+        dependencies.update("src/world_reward/" + name for name in re.findall(
+            r"/src/world_reward/([a-zA-Z0-9_/]+\.py)", source,
         ))
         for dependency in sorted(dependencies):
             if dependency not in files:

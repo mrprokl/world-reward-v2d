@@ -84,7 +84,7 @@ trajectory. **Do not restart or overwrite.**
 
 Queued chain: `world-reward-cari-prepare-v2` (`5d4f5db`, remote EXDEV copy fix)
 → `world-reward-cari-forward` → `world-reward-cari-converter` (both`414aac2`).
-Preparation active at12:02UTC, encoded350depthframes; actual network inference/
+Preparation active at12:12UTC, encoded400depthframes; actual network inference/
 conversion not yet verified. Finger-transfer sparse gate waits for conversion.
 A separate `world-reward-masks-episode0` from`a867e23` tests routing/general automatic
 mask initialization; final reporting failed from a shadowed provenance variable.
@@ -114,7 +114,11 @@ sparse body/depth→scale→grounded object→full body/depth→native adapter. 
 all seven target outputs absent; no automatic reuse/overwrite. Full object poses
 and native forward are deliberately not part of this short generalization bundle.
 Sparse body31.12s/depth11.14s/scale3.61s/grounded object36.19s passed on episode0;
-full body790frames is active. These are execution/representation checks only.
+full body790frames passed302.89s, full depth407.27s and native adapter8.97s;
+the complete initializer bundle passed at12:11UTC. These are representation
+checks only. New cached whole-candidate gate passed parity but median1.2794× is
+below1.3; not adopted. Continuous fixed-pose shape8condition test executed15.12s
+but both correct/biased-pose controls failed; fitter remains rejected.
 
 Results/decisions and useful failure causes are retained in experiments.md.
 Temporary redundant masks/download archives may be cleaned **after** validated

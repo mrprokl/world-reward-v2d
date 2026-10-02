@@ -572,3 +572,37 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   synthetic oracle initialization: this is measurement-model falsification,
   not non-oracle RGB or joint pose/shape validation. Two changed loss components
   prohibit a causal claim about discretization alone. Old18cases stay failed.
+
+- 2026-10-02 R44 (Azure cached full-candidate gate,8ee3029): all candidate/image/
+  branch/best-index comparisons passed; maximum pose/residual error1.11e-16.
+  Three synchronized trials original6.313/6.162/6.186s, cached4.835/4.833/4.924s;
+  median speedup1.2794 below frozen1.3 useful threshold, total45.84s. Reject
+  adoption as this scheduling experiment; do not lower the threshold. Numerical
+  parity is not bit-identical JSON and has not been tested on complete videos.
+- 2026-10-02 R45 (Azure continuous shape falsification,5d45a5c): all8new
+  conditions executed15.117s. Exact-pose correct controls abstained and retained
+  zero canonical CD. Both **biased-pose correct controls failed**: canonical CD
+  increased0→1.4681mm ellipsoid and0→1.2592mm box, despite improved held-out IoU.
+  Four deformed cases improved canonical CD from6.963/7.437mm to4.041–4.559mm
+  and passed. Reject fixed-pose continuous fitter adoption. Continuous geometry
+  did not remove pose/shape confounding in these cases; this is not proof of one
+  universal causal mechanism. Next shape work requires pose nuisance handling,
+  identifiability and default-abstention selection, not another relaxed threshold.
+
+- 2026-10-02 R46 (Azure general routing,6b0020c): episode0 full initializers
+  completed at12:11UTC: body790frames302.89s, depth790frames407.27s, native
+  adapter8.97s. Decoder errors vertices1.3345e-6m/joints9.8708e-7m/keypoints
+  1.1071e-6m; projection8.6317e-5px. All seven serial stages passed, no duplicate
+  GPU jobs or changed thresholds. No full object poses/native forward yet on0.
+- 2026-10-02 D47: runtime archive now retains only transitive static/literal
+  imports of the selected committed shell entrypoint, package initializers,
+  configs and pyproject. All29wrapper closures validated without Azure launch;
+  initializer estimated91.8→43.9KB encoded. Dynamic computed own imports fail
+  where detectable; arbitrary unknown dynamic infra plugins remain unsupported.
+  Existing live source snapshots are not changed.
+- 2026-10-02 D48: experimental M0/M1 conservative shape-selection and automatic
+  angular-view helpers are pure proposal/schema policies only. One paired-SE and
+  normalized Schur conditioning are uncalibrated heuristics; default abstention,
+  no statistical-identification/adoption claim. Views use normalize(-R.T@t),
+  anchor quality then greedy max-min angles, invalid/degenerate poses never
+  repaired. Actual model/geometry tests must precede use in the final pipeline.
