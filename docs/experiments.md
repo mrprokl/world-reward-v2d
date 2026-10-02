@@ -438,3 +438,26 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Checkpoint-only gate stays independent of prepared inputs. Full timeline,
   units, source assets and fidelity gates unchanged. Local suite1443 passes;
   generalized wrappers and actual other-episode execution remain separate gates.
+
+- 2026-10-02 R35 (Azure O1 falsification, d3b87cb): all18 rendered conditions
+  executed in27.45s. Twelve asymmetric/thin cases passed the predeclared5% CD
+  improvement/held-out silhouette gate, including pose bias and50% occlusion.
+  **All6 unchanged symmetric controls failed nonregression**: exact-pose CD
+  increased from0 to.1203/.2575/.1558mm; biased-pose CD5.5220mm increased to
+  5.5627/5.6220/5.6396mm. Lower visible fitting loss did not imply true shape
+  improvement. Reject adoption of this fitter; keep only its frozen experiment
+  and reusable mathematical primitive. Do not loosen gates or tune to these
+  controls. Discrete nearest-surface sampling and pose/shape confounding are
+  hypotheses for investigation, not established causal diagnoses.
+- 2026-10-02 D38: native wrappers now forward strict selected episodes and
+  optional exact producer units. Default15 dependency names preserved;
+  non15 never implicitly waits for an episode15 job. Missing/failed producers
+  or missing selected reports fail; waits bounded12h. Checkpoint-only reads
+  Body assets/report but never waits for preparation. Tiny fake-shell tests
+  exercise routing without Docker, Azure or data. Active snapshots unchanged.
+- 2026-10-02 D39: H1 next minimal experiment transfers only54 decoded finger
+  controls into final officially converted136D pose. Keep root, wrists, body,
+  shared identity and object unchanged; use full-mode original204D controls
+  verified against the source decoder, not raw266 or pre-fusion rotations.
+  No reconversion or automatic adoption. Sparse ABI/projection/visible-image
+  falsification precedes full-video testing; no hand-accuracy claim.

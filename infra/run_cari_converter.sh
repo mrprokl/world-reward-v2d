@@ -3,14 +3,9 @@ set -euo pipefail
 ROOT="${WR_ROOT:-/srv/scenesmith/world-reward}"
 CODE="${WR_CODE:?Require immutable committed source}"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-if [[ "$#" != 0 ]]; then
-  echo 'Full native conversion accepts no fallback or partial-video arguments' >&2
-  exit 2
-fi
-while [[ "$(systemctl show world-reward-cari-forward -p ActiveState --value)" == active ]]; do
-  sleep 30
-done
-test -f "$ROOT/outputs/episode_000015/cari_forward/report.json"
+source "$CODE/infra/cari_wrapper_common.sh"
+wr_parse_cari_arguments converter "$@"
+wr_cari_dependency converter
 docker run --rm --gpus all --network none \
   --user "$(id -u scenesmith):$(id -g scenesmith)" \
   --env WR_ROOT="$ROOT" --env WR_CODE_REVISION="${WR_CODE_REVISION:?}" --env PYTHONPATH="$CODE/src" \
@@ -20,4 +15,4 @@ docker run --rm --gpus all --network none \
   --mount "type=bind,src=$ROOT/weights,dst=$ROOT/weights,readonly" \
   --mount "type=bind,src=$ROOT/results,dst=$ROOT/results,readonly" \
   --mount "type=bind,src=$ROOT/outputs,dst=$ROOT/outputs" \
-  world-reward/cari4d-source:0.1 python "$CODE/infra/cari_converter.py"
+  world-reward/cari4d-source:0.1 python "$CODE/infra/cari_converter.py" --episode "$WR_EPISODE"

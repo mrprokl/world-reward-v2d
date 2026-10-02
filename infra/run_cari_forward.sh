@@ -3,15 +3,11 @@ set -euo pipefail
 ROOT="${WR_ROOT:-/srv/scenesmith/world-reward}"
 CODE="${WR_CODE:?Require immutable committed source}"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-if [[ "$#" == 0 ]]; then
-  while [[ "$(systemctl show world-reward-cari-prepare-v2 -p ActiveState --value)" == active ]]; do
-    sleep 30
-  done
-  test -f "$ROOT/outputs/episode_000015/cari_inputs/report.json"
-elif [[ "$#" != 1 || "$1" != --kernel-only ]]; then
-  echo 'Only default full forward or --kernel-only is supported' >&2
-  exit 2
-fi
+source "$CODE/infra/cari_wrapper_common.sh"
+wr_parse_cari_arguments forward "$@"
+wr_cari_dependency forward
+PYTHON_ARGUMENTS=(--episode "$WR_EPISODE")
+if (( WR_KERNEL_ONLY )); then PYTHON_ARGUMENTS+=(--kernel-only); fi
 docker run --rm --gpus all --network none \
   --user "$(id -u scenesmith):$(id -g scenesmith)" \
   --env WR_ROOT="$ROOT" --env WR_CODE_REVISION="${WR_CODE_REVISION:?}" --env PYTHONPATH="$CODE/src" \
@@ -21,4 +17,4 @@ docker run --rm --gpus all --network none \
   --mount "type=bind,src=$ROOT/weights,dst=$ROOT/weights,readonly" \
   --mount "type=bind,src=$ROOT/results,dst=$ROOT/results,readonly" \
   --mount "type=bind,src=$ROOT/outputs,dst=$ROOT/outputs" \
-  world-reward/cari4d-source:0.1 python "$CODE/infra/cari_forward.py" "$@"
+  world-reward/cari4d-source:0.1 python "$CODE/infra/cari_forward.py" "${PYTHON_ARGUMENTS[@]}"
