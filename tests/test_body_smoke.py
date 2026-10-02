@@ -363,15 +363,31 @@ def test_source_identity_partial_inventory_rejects_without_installed_tree_or_git
 class StubTensor:
     """Only the tensor operations required by the checkpoint guard; no Torch."""
 
-    def __init__(self, values, *, requires_grad=False):
+    def __init__(self, values, *, requires_grad=False, device="cpu"):
         self.values = np.asarray(values).copy()
         self.requires_grad = requires_grad
+        self.device = device
+
+    @property
+    def shape(self):
+        return self.values.shape
+
+    @property
+    def ndim(self):
+        return self.values.ndim
+
+    @property
+    def dtype(self):
+        return self.values.dtype
 
     def detach(self):
-        return StubTensor(self.values, requires_grad=False)
+        return StubTensor(self.values, requires_grad=False, device=self.device)
 
     def clone(self):
-        return StubTensor(self.values, requires_grad=self.requires_grad)
+        return StubTensor(self.values, requires_grad=self.requires_grad, device=self.device)
+
+    def cpu(self):
+        return StubTensor(self.values, requires_grad=self.requires_grad, device="cpu")
 
 
 class StubModule:
@@ -594,3 +610,194 @@ def test_checkpoint_without_metadata_loads_without_inventing_metadata(smoke, ass
     result = load_assets(smoke, fixture)
     assert result["parameter_tensors_loaded"] == 2
     assert not hasattr(fixture.calls[0][1], "_metadata")
+
+
+@pytest.fixture
+def explicit_asset_checkpoint(asset_checkpoint):
+    fixture = asset_checkpoint
+    fixture.explicit = OrderedDict({
+        "character_torch.rest_vertices": StubTensor([[1.0, 2.0, 3.0]]),
+        "network.weight": StubTensor([[0.1, 0.2], [0.3, 0.4]]),
+        "network.bias": StubTensor([0.5, 0.6]),
+    })
+    for prefix in ("head_pose.mhr.", "head_pose_hand.mhr."):
+        # Replace the two model-local inventories with exact independent copies.
+        for container in (fixture.module.state, fixture.module.parameters, fixture.module.buffers, fixture.state):
+            for name in list(container):
+                if name.startswith(prefix):
+                    del container[name]
+        for relative, independent in fixture.explicit.items():
+            name = prefix + relative
+            constructed = StubTensor(independent.values, device="cuda:0")
+            fixture.module.state[name] = constructed
+            if relative.startswith("network."):
+                fixture.module.parameters[name] = constructed  # frozen asset parameters
+            else:
+                fixture.module.buffers[name] = constructed
+            fixture.state[name] = independent.clone()  # checkpoints conventionally on CPU
+    for prefix in ("head_pose.", "head_pose_hand."):
+        name = prefix + "hand_pose_comps_ori"
+        value = StubTensor(np.eye(54), device="cuda:0")
+        fixture.module.state[name] = value
+        fixture.module.buffers[name] = value
+        fixture.state[name] = value.cpu()
+    name = "backbone.encoder.mask_token"
+    value = StubTensor(np.zeros((1, 4)), requires_grad=False, device="cuda:0")
+    fixture.module.state[name] = value
+    fixture.module.parameters[name] = value
+    fixture.state[name] = value.cpu()
+    fixture.module.backbone = SimpleNamespace(encoder=SimpleNamespace(embed_dim=4))
+
+    def same_device_equal(a, b):
+        if a.device != b.device:
+            raise RuntimeError("Stub equal requires canonical same-device comparison")
+        return np.array_equal(a.values, b.values)
+
+    fixture.torch.equal = same_device_equal
+    fixture.torch.eye = lambda size, *, device, dtype: StubTensor(np.eye(size, dtype=dtype), device=device)
+    fixture.torch.count_nonzero = lambda tensor: SimpleNamespace(item=lambda: int(np.count_nonzero(tensor.values)))
+    return fixture
+
+
+def load_explicit(smoke, fixture):
+    return smoke._load_checkpoint_with_asset_buffers(
+        fixture.module, fixture.state, fixture.loader, fixture.torch,
+        explicit_asset_state=fixture.explicit,
+    )
+
+
+def test_explicit_complete_two_mhr_inventories_cpu_asset_gpu_model_verified_then_strict(smoke, explicit_asset_checkpoint):
+    fixture = explicit_asset_checkpoint
+    result = load_explicit(smoke, fixture)
+    assert len(fixture.calls) == 1 and fixture.calls[0][2] is True
+    assert result["retained_mhr_asset_buffer_names"] == []
+    assert result["parameter_tensors_loaded"] == 7
+    assert fixture.calls[0][1]._metadata is fixture.state._metadata
+
+
+def test_explicit_verified_frozen_asset_parameters_and_unused_states_can_be_retained(smoke, explicit_asset_checkpoint):
+    fixture = explicit_asset_checkpoint
+    names = [name for name in fixture.state if name.startswith(("head_pose.mhr.", "head_pose_hand.mhr."))]
+    names += ["head_pose.hand_pose_comps_ori", "head_pose_hand.hand_pose_comps_ori", "backbone.encoder.mask_token"]
+    for name in names:
+        del fixture.state[name]
+    before = set(fixture.state)
+    result = load_explicit(smoke, fixture)
+    assert result["retained_mhr_asset_buffer_names"] == sorted(names)
+    assert set(fixture.state) == before
+    for name in names:
+        retained = fixture.calls[0][1][name]
+        assert retained.requires_grad is False
+        assert not np.shares_memory(retained.values, fixture.module.state[name].values)
+    assert fixture.calls[0][1]._metadata is fixture.state._metadata
+
+
+@pytest.mark.parametrize("prefix", ["head_pose.mhr.", "head_pose_hand.mhr."])
+def test_independent_asset_verification_includes_frozen_network_parameters(smoke, explicit_asset_checkpoint, prefix):
+    fixture = explicit_asset_checkpoint
+    name = prefix + "network.weight"
+    fixture.module.state[name].values.flat[0] += 0.001
+    with pytest.raises(RuntimeError, match="differs from independent explicit asset"):
+        load_explicit(smoke, fixture)
+    assert fixture.calls == []
+
+
+@pytest.mark.parametrize("kind", ["missing_constructed", "extra_constructed", "missing_independent", "extra_independent"])
+def test_exact_full_mhr_asset_inventory_required_not_partial_character_buffers(smoke, explicit_asset_checkpoint, kind):
+    fixture = explicit_asset_checkpoint
+    if kind == "missing_constructed":
+        del fixture.module.state["head_pose_hand.mhr.network.bias"]
+    elif kind == "extra_constructed":
+        fixture.module.state["head_pose.mhr.extra"] = StubTensor([1.0])
+    elif kind == "missing_independent":
+        del fixture.explicit["network.bias"]
+    else:
+        fixture.explicit["extra"] = StubTensor([1.0])
+    with pytest.raises(RuntimeError, match="explicit asset inventory"):
+        load_explicit(smoke, fixture)
+    assert fixture.calls == []
+
+
+@pytest.mark.parametrize("prefix", ["head_pose.", "head_pose_hand."])
+@pytest.mark.parametrize("kind", ["shape", "nonidentity", "requires_grad", "nonfinite"])
+def test_original_hand_pca_requires_exact_nonlearned_identity_54(smoke, explicit_asset_checkpoint, prefix, kind):
+    fixture = explicit_asset_checkpoint
+    name = prefix + "hand_pose_comps_ori"
+    values = np.eye(53) if kind == "shape" else np.eye(54)
+    if kind == "nonidentity":
+        values[0, 1] = 1e-8
+    elif kind == "nonfinite":
+        values[0, 0] = np.nan
+    fixture.module.state[name] = StubTensor(values, requires_grad=kind == "requires_grad", device="cuda:0")
+    with pytest.raises(RuntimeError, match="deterministic identity"):
+        load_explicit(smoke, fixture)
+    assert fixture.calls == []
+
+
+@pytest.mark.parametrize("values", [
+    np.zeros((4,)), np.zeros((2, 4)), np.zeros((1, 3)),
+    np.full((1, 4), np.nan), np.full((1, 4), np.inf), np.ones((1, 4)),
+])
+def test_dino_mask_token_must_have_exact_shape_finite_zero_initialization(smoke, explicit_asset_checkpoint, values):
+    fixture = explicit_asset_checkpoint
+    fixture.module.state["backbone.encoder.mask_token"] = StubTensor(values, device="cuda:0")
+    with pytest.raises(RuntimeError, match="pinned zero initialization"):
+        load_explicit(smoke, fixture)
+    assert fixture.calls == []
+
+
+@pytest.mark.parametrize("name", [
+    "head_pose.mhr.network.weight", "head_pose_hand.mhr.network.bias",
+    "head_pose.hand_pose_comps_ori", "head_pose_hand.hand_pose_comps_ori",
+    "backbone.encoder.mask_token",
+])
+def test_checkpoint_cannot_contradict_independent_frozen_asset_or_deterministic_unused_state(smoke, explicit_asset_checkpoint, name):
+    fixture = explicit_asset_checkpoint
+    fixture.state[name].values.flat[0] += 0.001
+    with pytest.raises(RuntimeError, match="contradicts explicit immutable MHR asset"):
+        load_explicit(smoke, fixture)
+    assert fixture.calls == []
+
+
+@pytest.mark.parametrize("name", ["backbone.weight", "backbone.frozen_weight"])
+def test_explicit_asset_branch_still_requires_all_nonasset_network_parameters(smoke, explicit_asset_checkpoint, name):
+    fixture = explicit_asset_checkpoint
+    del fixture.state[name]
+    with pytest.raises(RuntimeError, match="Required model state missing"):
+        load_explicit(smoke, fixture)
+    assert fixture.calls == []
+
+
+@pytest.mark.parametrize("name", ["backbone.weight", "backbone.frozen_weight"])
+def test_explicit_asset_branch_still_rejects_nonfinite_network_parameters(smoke, explicit_asset_checkpoint, name):
+    fixture = explicit_asset_checkpoint
+    fixture.state[name] = StubTensor([np.nan])
+    with pytest.raises(RuntimeError, match="parameter missing or nonfinite"):
+        load_explicit(smoke, fixture)
+    assert fixture.calls == []
+
+
+def test_lookalike_third_mhr_prefix_is_not_independent_asset_allowlist(smoke, explicit_asset_checkpoint):
+    fixture = explicit_asset_checkpoint
+    name = "head_pose_other.mhr.network.weight"
+    value = StubTensor([1.0], requires_grad=False)
+    fixture.module.state[name] = value
+    fixture.module.parameters[name] = value
+    with pytest.raises(RuntimeError, match="Required model state missing"):
+        load_explicit(smoke, fixture)
+    assert fixture.calls == []
+
+
+def test_explicit_retained_parameter_snapshot_cannot_mutate_during_loading(smoke, explicit_asset_checkpoint):
+    fixture = explicit_asset_checkpoint
+    name = "head_pose.mhr.network.weight"
+    del fixture.state[name]
+
+    def bad_loader(module, merged, *, strict):
+        assert strict is True
+        merged[name].values.flat[0] += 1
+        module.state = OrderedDict(merged)
+
+    fixture.loader = bad_loader
+    with pytest.raises(RuntimeError, match="buffers changed during checkpoint loading"):
+        load_explicit(smoke, fixture)

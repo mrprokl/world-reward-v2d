@@ -241,7 +241,7 @@ def _load_checkpoint_with_asset_buffers(module, state_dict, original_loader, tor
                      if name.startswith(prefixes) and name in buffers and name not in parameters}
     asset_buffers.update(explicit)
     for name, asset_value in asset_buffers.items():
-        if name in state_dict and not torch.equal(state_dict[name], asset_value):
+        if name in state_dict and not torch.equal(state_dict[name].cpu(), asset_value.cpu()):
             raise RuntimeError(f"Checkpoint contradicts explicit immutable MHR asset: {name}")
     merged = state_dict.copy()
     if hasattr(state_dict, "_metadata"):
@@ -250,7 +250,7 @@ def _load_checkpoint_with_asset_buffers(module, state_dict, original_loader, tor
         merged[name] = asset_buffers[name].clone()
     original_loader(module, merged, strict=True)
     after = module.state_dict()
-    if any(not torch.equal(after[name], value) for name, value in asset_buffers.items()):
+    if any(not torch.equal(after[name].cpu(), value.cpu()) for name, value in asset_buffers.items()):
         raise RuntimeError("Immutable MHR asset buffers changed during checkpoint loading")
     return {"mode": "strict_network_and_head_state_with_explicit_asset_buffer_retention",
             "retained_mhr_asset_buffer_names": sorted(allowed),
