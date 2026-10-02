@@ -1845,6 +1845,15 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   cause or a score. Reuse frozen assets RO on VM01, separate new diagnostic
   receipt RW, CPU-only120s; no RGB/models/data downloaded locally.
 
+  D89v1 engineeringFAIL5.881702s, source d2fc62852e9a481ca8abd618db30cee8c2a9d355,
+  receipt4c77b1653f9cf2bb0feaa43130541be263ce19b369d4186bd021f745ce09e20b:
+  actual depthsupport dataclass returns tuples, JSON historical receipt lists.
+  Originaldecision/frame/clip/hash comparisons passed; tuple/list structural
+  mismatch stopped before the new decomposition. Fix by exact JSON-roundtrip
+  comparison, no floating tolerance or historical rewrite. Real depth-support
+  tuple regression test also rejects numerical1e−12change; preservefailedv1,
+  use exclusive diagnostic_centroid_v2. No model runs or prediction changes.
+
 - D90 public-only identity-consensus gate predeclared before run: ep000000
   existing790Body predictions,12rounded uniform temporal anchors,11disjoint
   integer midpoint frames. Decode12identities in the SAME native zero-pose,

@@ -71,7 +71,9 @@ def historical_rejection(root):
     evaluate.run(root, replay)
     for key in ("decision", "frame_metrics", "clip_metrics", "prediction_report_sha256",
                 "private_render_report_sha256", "common_object_scale_diagnostics"):
-        if replay.get(key) != original.get(key):
+        # Historical reports are JSON: native dataclass tuples serialize to
+        # lists. Compare identical JSON values, with NO numerical tolerance.
+        if json.loads(json.dumps(replay.get(key), allow_nan=False)) != original.get(key):
             raise ValueError("Original frozen D87 rejection replay differs: "+key)
     evaluate.regular_hash(path, ORIGINAL_SHA)
     return original, path
@@ -130,7 +132,7 @@ def diagnose(root, report):
 
 def main(argv=None):
     argparse.ArgumentParser(description=__doc__, allow_abbrev=False).parse_args(argv)
-    root = Path(os.environ["WR_ROOT"]); out = root/evaluate.BASE/"diagnostic_centroid_v1"
+    root = Path(os.environ["WR_ROOT"]); out = root/evaluate.BASE/"diagnostic_centroid_v2"
     revision, image = os.environ["WR_CODE_REVISION"], os.environ["WR_IMAGE_ID"]
     if (platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}
             or root != Path("/srv/scenesmith/world-reward") or root.resolve() != root

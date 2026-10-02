@@ -98,6 +98,26 @@ def test_original_rejection_replayed_in_memory_unchanged(gate, historical, monke
     assert frozen == (path.read_bytes(), path.stat().st_mode)
 
 
+@pytest.mark.parametrize("numerical_tamper", [False, True])
+def test_real_depth_support_tuple_matches_json_lists_without_numeric_relaxation(gate, historical, monkeypatch, numerical_tamper):
+    from world_reward.metric_alignment import fit_shared_depth_scale
+    root, path, original, save = historical
+    z = np.full((8, 8), 2.); masks = np.ones((8, 8), bool)
+    support = fit_shared_depth_scale([z]*5, [z*1.5]*5, [masks]*5, list(range(5))).to_dict()
+    assert isinstance(support["frames"], tuple)
+    original["common_object_scale_diagnostics"] = json.loads(json.dumps([support])); save()
+    frozen = path.read_bytes()
+    if numerical_tamper: support["shared_scale"] += 1e-12
+    def replay(root, report):
+        report.update(original); report["common_object_scale_diagnostics"] = [support]
+    monkeypatch.setattr(gate.evaluate, "run", replay)
+    if numerical_tamper:
+        with pytest.raises(ValueError, match="common_object_scale"): gate.historical_rejection(root)
+    else:
+        assert gate.historical_rejection(root)[0] == original
+    assert frozen == path.read_bytes()
+
+
 @pytest.mark.parametrize("fault", ["adopt", "gate", "prediction", "aligned", "missingframes", "hash", "writable"])
 def test_false_historical_contract_blocks_before_replay(gate, historical, monkeypatch, fault):
     root, path, report, save = historical
