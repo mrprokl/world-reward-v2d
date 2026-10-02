@@ -1,0 +1,8 @@
+# External libigl/Eigen MPL-2.0 headers and notices are retained in the image.
+# The wrapper supplies a local tag verified against the frozen topology image ID.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+USER root
+COPY mesh_guarded_qem.cpp build_guarded_qem.sh /opt/world-reward/guarded-qem/
+RUN bash /opt/world-reward/guarded-qem/build_guarded_qem.sh
+ENV PATH="/opt/world-reward/guarded-qem:${PATH}"

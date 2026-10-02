@@ -905,3 +905,23 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   hand/wrist errors; if public kit role assets cannot be source-pinned, clearly
   label nonhand-vertex proxy rather than official Track1 alignment. H1/O2 are
   separate camera cohorts and cannot establish relative interaction accuracy.
+- 2026-10-02 R77 (O2 frozen-factor diagnosis,CPU only): predicted anchor
+  foreground median MoGe2 depth3.171m versus own rendered1.414m (radial),
+  5.606m versus1.571m (ring). Single predicted centers Z3.145/5.742m versus
+  truth1.600m; inferred XY extents also much larger. No GT-derived scale or pose
+  correction applied. These diffuse object-only RGBs lack human/scene scale
+  cues; their raw metric failure cannot isolate fusion shape quality. Preserve
+  R76 rejection and prioritize supported shared gauge / motion measurements,
+  not adjusting the failed fixture to force a better metric.
+- 2026-10-02 D62: new CPU libigl intersection-blocking QEM, not retrying
+  endpoint-QEM or deleting its intersecting faces. Pin libigl2.6.0 commit
+  40e7900ccbd767f1f360e0eb10f0f1a6432e0993 and Eigen3.4.0 headers; compile
+ 600s deadline on Azure, no apt/dependency fallback. Native qslim target4096,
+  block_intersections=True rejects collisions before collapse. Two new close-
+  shell/disconnected nonconvex procedural controls,180s total; independent
+  topology, embedding,<=1% sampled diagonal CD and<=5% per-shell/net volume.
+  Match original shells by native birthface maps, not sorted-volume proximity.
+  Floating predicates and skipped one-ring checks are not universal proof;
+  independent final embedding is mandatory. Only if controls pass, propose one
+  separate episode0 budgeted mesh, with unchanged metric scale/poses and no
+  component/cavity removal or numerical threshold relaxation.

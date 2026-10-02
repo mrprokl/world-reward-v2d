@@ -142,6 +142,16 @@ def test_shell_dockerfile_and_child_references_included():
     assert "infra/run_child.sh" in selected and "infra/Dockerfile.runtime" in selected
 
 
+def test_literal_cpp_build_input_is_frozen_without_parsing_cpp_as_python():
+    source = files()
+    source["infra/run_smoke.sh"] += b'c++ "$CODE/infra/kernel.cpp" -o /tmp/kernel\n'
+    source["infra/kernel.cpp"] = b'int main() { return 0; }\n'
+    assert "infra/kernel.cpp" in launcher.runtime_bundle_paths(source, "infra/run_smoke.sh")
+    source.pop("infra/kernel.cpp")
+    with pytest.raises(ValueError, match="not committed"):
+        launcher.runtime_bundle_paths(source, "infra/run_smoke.sh")
+
+
 def test_import_cycles_do_not_duplicate_paths():
     source = files()
     source["infra/nested.py"] = b"import smoke\n"

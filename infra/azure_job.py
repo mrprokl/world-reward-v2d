@@ -130,7 +130,7 @@ def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
                     dependencies.update(module_paths("world_reward." + node.attr, required=False))
         # Literal $CODE/infra/foo, including Python subprocess child entrypoints.
         dependencies.update("infra/" + name for name in re.findall(
-            r"/infra/([a-z0-9_]+\.(?:py|sh)|Dockerfile\.[a-z0-9_]+)", source,
+            r"/infra/([a-z0-9_]+\.(?:py|sh|cpp)|Dockerfile\.[a-z0-9_]+)", source,
         ))
         dependencies.update("src/world_reward/" + name for name in re.findall(
             r"/src/world_reward/([a-zA-Z0-9_/]+\.py)", source,
