@@ -96,3 +96,9 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   only for equal outside distance), ≥3 observations/≥50% support, margin >0.05.
   Ambiguous associations or affinities fail. Synthetic actor+distractor/crossing/
   missing tests pass; full suite 265 passed. Real smoke retry remains to verify.
+- 2026-10-02 R07: initial object-affinity actor gate rejected the real smoke for
+  ambiguous person-track association. Its documented global rejection means an
+  unrelated distractor crossing can reject the entire clip; do not relax identity
+  margins. Next localizes ambiguity to association components and propagates
+  contamination, allowing only an independent unambiguous winner. Contaminated
+  close tracks must still compete; they cannot be deleted to manufacture a winner.
