@@ -1832,3 +1832,32 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   No gate adjustment, depthrescaling, GTcamera adaptation, candidate adoption
   or human/HOI superiority claim. Freshcohort+allsource receipts preserved;
   no networkauth/NSG modifications or heavy local transit, unitterminal0.
+
+- D89 is a **posthoc CPU diagnostic**, not a new quality experiment: preserve
+  D87 rejection and hard-pinned original quality/prediction receipts, replay
+  historical metrics/decision unchanged in memory after full public SHA audit,
+  then decompose all18439human correspondences on all15frames in float64.
+  Report camera PVE, centroidXYZ/norm, cameraRMS and centeredRMS with exact
+  RMS²=centroidnorm²+centeredRMS². No alignment, human scale/K fitting,
+  prediction correction/export, new selection or adoption. One global initial
+  Sim3 in the official judge means D87 absolute cameraPVE is **not Track1 CD-H**;
+  this diagnostic can suggest global versus articulated error, not establish
+  cause or a score. Reuse frozen assets RO on VM01, separate new diagnostic
+  receipt RW, CPU-only120s; no RGB/models/data downloaded locally.
+
+- D90 public-only identity-consensus gate predeclared before run: ep000000
+  existing790Body predictions,12rounded uniform temporal anchors,11disjoint
+  integer midpoint frames. Decode12identities in the SAME native zero-pose,
+  zero-translation frame; choose the geometric all-vertex RMS medoid, retain
+  the exact raw shape45/PCA28 of that single anchor. No coefficient averaging
+  or selection by silhouette. Hash-freeze identity before all paired renders;
+  native raw redecoding must reproduce existing geometry/controls≤1e−5.
+  Raw/candidate keep root/body/hands/camera/translation frozen, candidate only
+  identity changes. Same raster/grid and automatic masks, comparison region
+  is predetermined complement of automatic object mask for both modes and
+  human target; every11midpoint has positive supportedhuman pixels, no missing
+  frames or candidate-dependent support. Gates eachmidpointΔIoU≥−1e−4 and
+  meanmidpointΔIoU≥0, finitegeometry/fullcoverage; anchors diagnostic only.
+  Failure stops this policy without trying other medoids on the same outputs.
+  Passing permits a structural pipeline pilot BEFORE neutralheight/cache,
+  not accuracy adoption, fullHOI validation or verified CARI4D victory.
