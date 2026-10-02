@@ -1621,3 +1621,74 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   remain unchanged. SHA validated before any work, no extra predictions/calls;
   105 associated tests PASS, independent2wrappertests PASS. This avoids serial
   control-plane wait overhead, not an asserted inference speedup.
+
+- 2026-10-02 D84 actual: Azure-only665,600byte cohort transfer/import13files
+  **PASS**, SHA55a21e5046a969fefedf0adebedc51a0de8e19414e727f5028c587ac9040a198;
+  importreceipt190490176a15d8a10886eb767d9bf6c274c8a4af3cf59ed44500d19c923e2e13.
+  Nine frontend calls **PASS4.324657s**, peakCUDA414,652,416bytes, receipt
+  bb3211c94ea7931676299fd2a42ab11ab72cbe0774bee4618b1ee55a687ec270.
+  Exact public CPU replay/privatequality **PASS.250362s**, receipt
+  07d83f65a881209bb4cb70ee29b7ea7b5213c264b2cf85d634275dd65f31943e;
+  camera hypothesis **REJECT**: all9 abstain from insufficient effective support,
+  strong0/6 and weak0/3, median focal error25% unchanged, gain0. No threshold
+  retuning/adoption. Strong train upESS~39–52/latitude~60–92 in shown cases,
+  below256; means~.025/.002 do not establish reliable spatial evidence.
+  Source audit confirms RGB/BGR/strict889 state; our declared Torch antialias
+  differs from official Kornia Gaussian-preblur resize. Thus frontend weights/
+  architecture are native, preprocessing is NOT pixel-identical; causal link
+  to abstention unproven. Preserve rejected cohort and use a fresh validation
+  with audited native preprocessing only if that new hypothesis merits priority.
+  Temporary SSH sourcekey removed, destination authorizedline removed preserving
+  unrelated keys, NSG allow deleted (deny4096 remains), both parents restored700.
+  Verified destination transientTAR removed; originalRGB/truth/fields/receipts kept.
+  Final source suite4664PASS/1optionaltrimeshSKIP65.16s at0c0e547.
+
+- 2026-10-02 D85 actual **PASS14.369049s** on VM01, source0c0e547db14c6f82717754c2146cbc19adbd3ddf,
+  receipt d22d052a8a631dda57e3b60a0790d4eaf963f808496a806326e3a3e68a14ec67.
+  Exactly12direct-head+1native12batch+1official12batch; native maxpoint
+  .001930491mm and official worstframe mean.000214798mm/maxpoint.001583769mm.
+  All bound gates PASS, frame0expanded68 bitconstant, artifacts frozen before
+  independent replays. This resolves a NEW sharedidentity ABI structurally;
+  it does not validate identity accuracy or restore the historical target.
+  Next standalone790 ABI pass and fresh15RGB paired identity-quality test use
+  separate new namespaces; no new inverse LM/adoption or GT-derived identity.
+
+- 2026-10-02 D84 cleanup completed: source665,600byte transientTAR also removed
+  after independent completed13fileimport/quality/SSHrevocation proof and exact
+  SHA/byte check; total1,331,200 transientbytes removed across Azure. All frozen
+  RGB/truth/fields/rig/source receipts preserved; no data downloaded to Mac.
+
+- D86 (predeclared after D85PASS): full790 new frame0identity direct controls,
+  original522 native source blocks/poses untouched. Fiftychunk16+tail6 direct
+  head calls, freeze ENTIRE F32target+pose136/scale68/shape45 before fifty native
+  and fifty official-reference calls. All790 native maxpoint≤.01mm and official
+  every-frame mean≤2mm; fixed300s/32GB/offline VM01. SourceD85 receipt/script/
+  settings/model identity checked beforeTorch; preserve D79/D80 failures.
+  Independent source audit36tests PASS; no inversefit/GT/accuracy/adoption claim.
+
+- D87 (predeclared): three fresh own MHR identities×five moving/bottle-occlusion
+  RGBs, shape45/all68scale controls verified against actual249 getter bounds.
+  Manufacture varied private focals1160/1480/1720, never expose them to inference.
+  Render120s then automatic person./bottle. masks180s, separate offline mounts.
+  Native Body15/MoGe15 at fixed RGB-sizeK1280; freeze all raw blocks/observations
+  before frame0sharedshape45/scale28 branch, original pose/root/hands unchanged.
+  Freeze both15predictions before one official-reference15batch fidelity replay;
+  each≤2mm, no solver. GPU600s/32GB then CPUprivatequality120s/8GB. All15 cases
+  scored rawcamera PVE without GTalignment, with same visible-object-depth proxy
+  and one baseline-human-derived sharedalpha perclip. Require all5frames human/
+  object support; no fill/drop/GTcontact/privateobjectmesh inference. Human median
+  pairedclip improvement≥5%, no human clipregression>5%; EACH hand's clipmean
+  relative-visible-object vector error increase≤1e-4cm (numeric allowance), not
+  an average that hides one hand. Weak/missing/zero-baseline human gains reject.
+  These proxy/identity metrics do not verify rigid object/contact/penetration,
+  full temporal HOI, photorealism or real-domain victory. No adoption from ABI
+  alone; reject candidate if quality gates fail, no same-cohort thresholdretune.
+
+- D86/D87 source freeze: final full tiny suite **4818PASS/1optionaltrimeshSKIP
+  64.14s**, all three shell entrypoints syntax PASS and whitespace audit PASS.
+  Independent native204/rootflip/reference and renderer/mask audits READY.
+  Public producer freezes all30 raw/paired artifacts before reference/private
+  evaluation; original model/source/semantic/LBS bindings rechecked CPU-only.
+  Quality uses own minimal equivalent pixel-center unprojection and fixedseed
+  8192-point sampling (data-free parity PASS), not an unused prior evaluator
+  dependency. Small immutable source closures only; no images/models reach Mac.
