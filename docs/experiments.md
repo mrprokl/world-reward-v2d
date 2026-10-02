@@ -867,3 +867,9 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   or CARI4D win claim. Absolute errors include wrist/body camera error; private
   wrist-relative and per-case metrics are retained for diagnosis. This diffuse
   procedural cohort is not photorealistic/external real-data validation.
+- 2026-10-02 D60: H1 diagnostic separates pivot and articulation. Across observed
+  cases, wrist-position errors75–203mm dominate camera hand PVE; wrist-relative
+  baseline errors mostly7–11mm and finger transfer often worsens them. FULL also
+  re-predicts body/IK wrists/shape, so local wrist-angle copying under a different
+  parent is not a justified fix. Deprioritize wider hand-transfer scaffolding;
+  investigate global/body evidence after the independent object experiment.
