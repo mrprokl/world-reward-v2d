@@ -203,3 +203,15 @@ des deux bundles complets seulement après gel des prédictions. Aucun résultat
 J1/J2 ou raffinement observé. Benchmark compactCPU distinct D71 peut coexister
 sans GPU; charge hôte partagée explicitement exclue d'une conclusion de débit
 préparation isolé. Ni les sources ni les budgets des lecteurs gelés ne changent.
+
+2026-10-02 18:22UTC: préparation0 depth450/790 activeCPU; J1/refinement/J2
+restent en queue, suivis du nouveau `world-reward-tudl-real-camera`.
+Ce dernier producteur `2a18859543b3538d755c8a47c1961ac125b4e7ff`,11files25580bytes,
+attend le prédécesseur exact J2; il ne lit aucune prédiction challenge. Son
+acquisition indépendanteCPU est terminée en15.318s: troisZIP374952356bytes
+directAzure→neufRGB publics et41files privés/licences hashés, ZIP supprimés.
+Pas encore qualité réelle ni nouveau modèle acquis. Benchmark compactCPU R92
+PASS3.963827× writer-only, validation inchangée; ancien R88FAIL conservé,
+aucune mutation du prepare0 actif. AssetsBody15/MHRreference hash identiques
+352e271a…7377bc vérifiés. Réserve GPU Azure familleNCCads2023:40cores utilisés
+sur80; pas quota de la familleNCadsH100 (0/0), ni secondeVM provisionnée.

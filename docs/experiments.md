@@ -1200,3 +1200,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   diagnostiques seulement. TUD-L absent des24datasets train/10eval MoGe2
   publiés, mais training_overlap_excludedFalse reste obligatoire: pas preuve
   entièrement unseen, victoire CARI ou clairance du stack SAM/CARI entier.
+- 2026-10-02 R93 (Azure TUD-L acquisition,2a18859): **PASS15.318s**,
+  374952356bytes acquis directementAzure,9RGB/noms préchoisis conservés,
+  41fichiers privés hashés, licences primaires concordantes; ZIP temporaires
+  supprimés. Reçu SHA d096f1eddbca90c8d037ba85e323aa826974c97ba2fd658b0c9cdd76de2dd6ea,
+  public manifest SHA171e89b563520bb9311220b0ddbce068a63d43f843815edf139cb74b61352ecc.
+  `world-reward-tudl-real-camera` source2a18859,11files25580bytes, queue
+  derrière J2; **aucune inférence réelle TUD-L ou qualité observée**. Fullsuite
+  3856PASS/1optional-trimeshSKIP37.36s. Épisode0préparation450/790 à18:22UTC,
+  source gelée intacte. Quota Azure vérifié: SKU NCC40adsH100 famille
+  StandardNCCads2023Family40/80cores (NCads/H100 autre famille0/0), pas nouvelle
+  VM créée; ne pas confondre les noms SKU pour un futur secondGPU.
