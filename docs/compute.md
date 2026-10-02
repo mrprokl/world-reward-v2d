@@ -86,3 +86,11 @@ forwards work, but segmentation seed was correctly rejected for three distinct
 person detections; NMS does not solve actor identification. Three-frame detector
 diagnostics completed exit 0. CARI Docker build remains active at TensorRT system
 dependencies after PyTorch3D build; no CARI reconstruction result yet.
+
+First complete GPU automatic-mask engineering smoke succeeded: episode 15,
+501 frames, person/object full coverage, zero empty masks, 52.00 s on H100.
+Uses fixed 3-observation actor seed prefix followed by full SAM2 tracking, not
+sparse bbox motion as reconstruction. Report/PNGs stay remote under
+`outputs/episode_000015/automatic_masks`; only compact scalars returned locally.
+CARI image is built; SAM3D image finishing dependency install. No full
+human-object reconstruction/submission or held-out performance verified yet.

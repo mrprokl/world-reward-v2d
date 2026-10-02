@@ -111,3 +111,12 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   This is a general architecture change, not a manual actor label or threshold
   relaxation. Final actor tests: 272 passed locally; latest remote suite 271 passed
   before the additional expired-uncertainty test was mirrored.
+- 2026-10-02 R09 (H100 engineering smoke, not accuracy validation): the fixed-prefix
+  automatic initializer chose actor track 0 with 3/3 object observations, no
+  identity contamination; object-affinity runner-up distance 1.23 vs winner 0.
+  SAM2 then produced person and object masks for all 501 original frames of
+  episode 15; no missing/empty masks, median areas 27,797/4,154 pixels. End-to-end
+  automatic masks 52.00 s, without GT/manual prompts/oracles. This proves runtime
+  and coverage, **not** correct segmentation, mesh reconstruction or CARI4D victory.
+  Validate multi-frame silhouette/rigidity/contact and independent detector agreement
+  before trusting masks. Latest full suite 272 passed locally and on Azure.
