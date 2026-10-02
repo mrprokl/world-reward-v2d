@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import argparse
 import json
 import os
 from pathlib import Path
@@ -11,11 +12,15 @@ import time
 
 from body_smoke import _validate_inputs
 from world_reward.data import sha256
+from world_reward.pointmap import validate_camera_pointmap
 
 
 def main() -> None:
-    if platform.system() != "Linux":
-        raise RuntimeError("Depth inference stays on Azure")
+    if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
+        raise RuntimeError("Require Azure Linux GPU container with network none")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--full-video", action="store_true")
+    args = parser.parse_args()
     import cv2
     import numpy as np
     import torch
@@ -26,15 +31,16 @@ def main() -> None:
     path = root / f"weights/cari4d/hf_home/hub/models--Ruicheng--moge-2-vitl-normal/snapshots/{revision}/model.pt"
     if not path.is_file() or not torch.cuda.is_available():
         raise RuntimeError("Pinned local MoGe2/CUDA missing")
-    output = root / "outputs/episode_000015/depth_smoke"
+    output = root / "outputs/episode_000015" / ("depth_full" if args.full_video else "depth_smoke")
     output.mkdir(exist_ok=False)
     started = time.perf_counter()
     model = MoGeModel.from_pretrained(str(path)).cuda().eval()
     cap = cv2.VideoCapture(str(inputs["video"]))
     records = []
+    indices = range(inputs["total_frames"]) if args.full_video else inputs["indices"]
     try:
-        for index in inputs["indices"]:
-            if not cap.set(cv2.CAP_PROP_POS_FRAMES, index):
+        for index in indices:
+            if not args.full_video and not cap.set(cv2.CAP_PROP_POS_FRAMES, index):
                 raise RuntimeError("Video seek failed")
             ok, bgr = cap.read()
             if not ok or int(round(cap.get(cv2.CAP_PROP_POS_FRAMES))) != index + 1:
@@ -56,21 +62,32 @@ def main() -> None:
                 raise RuntimeError("Invalid inferred valid-region depth/points")
             if not np.isfinite(intrinsic).all() or intrinsic.shape != (3, 3):
                 raise RuntimeError("Invalid inferred normalized intrinsics")
+            camera = np.array([[focal, 0, w / 2], [0, focal, h / 2], [0, 0, 1]])
+            camera_checks = validate_camera_pointmap(depth, points, mask, intrinsic, camera)
             target = output / f"{index:06d}.npz"
             with target.open("xb") as handle:
-                np.savez_compressed(handle, depth=depth, points=points, mask=mask, intrinsics=intrinsic,
-                                    frame_index=np.array(index))
+                # Full-video XYZ is redundant under the verified pinhole gate.
+                # Store only camera Z/validity/K; reconstruct rays exactly at +.5
+                # downstream. Never stream dense arrays back to the laptop.
+                arrays = {"depth": depth, "mask": mask, "intrinsics": intrinsic, "frame_index": np.array(index)}
+                if not args.full_video:
+                    arrays["points"] = points
+                np.savez_compressed(handle, **arrays)
             records.append({"frame_index": index, "valid_pixels": int(mask.sum()), "median_depth_model_units": float(np.median(depth[mask])),
                             "fov_x_prior_degrees": fov, "intrinsics_normalized": intrinsic.tolist(),
                             "decoded_rgb_sha256": hashlib.sha256(rgb.tobytes()).hexdigest(),
+                            "camera_checks": camera_checks,
                             "output_sha256": sha256(target)})
     finally:
         cap.release()
-    report = {"stage": "monocular_moge2_three_frame", "status": "pass", "frames": records,
+    report = {"stage": "monocular_moge2_full_video" if args.full_video else "monocular_moge2_three_frame",
+              "status": "pass", "frames": records, "total_video_frames": inputs["total_frames"],
+              "array_storage": "verified_camera_Z_K_mask_no_redundant_XYZ" if args.full_video else "depth_points_K_mask",
               "elapsed_seconds": time.perf_counter() - started, "model_revision": revision,
               "model_sha256": sha256(path), "input_sha256": inputs["video_sha256"],
               "intrinsics_source": "RGB_size_only_default_FOV_prior_not_calibration",
               "input_track": "track_1", "ground_truth_used": False, "hand_labeled_test": False,
+              "oracle_modes": [], "network": "none", "challenge_performance_verified": False,
               "metric_scale_accuracy_verified": False, "script_sha256": sha256(Path(__file__))}
     (output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({"stage": report["stage"], "status": "pass", "frames": len(records),

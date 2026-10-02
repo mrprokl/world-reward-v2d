@@ -229,3 +229,18 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   mask IoU do not worsen; report rejected underconstrained/near-plane candidates.
   Three-frame hypotheses are an engineering smoke, not a full trajectory or
   score. No depth-only residual masquerades as unseen-surface pose accuracy.
+
+- 2026-10-02 R22 (H100 grounded object generation): explicit human-anchored
+  MoGe2 frame-zero pointmap produced a new SAM Object in 46.99 s: 753,476
+  vertices / 1,506,944 faces, watertight. Pose now belongs to the same predicted
+  human gauge (translation Z 7.3492, uniform canonical scale 0.23643665), with
+  explicit K preserved. This illustrates why the independent MoGe1 output
+  (translation Z 1.0680, scale 0.07596754) could not receive the MoGe2 scalar.
+  Geometry/scale accuracy and challenge performance remain unverified. The
+  upstream reestimated internal K is not used by the disabled layout optimizer;
+  only the verified caller K is used for output projection diagnostics.
+- 2026-10-02 D22: extend already-verified MoGe2/K/ray inference to every original
+  frame. Save only camera-Z depth, validity and K for full videos: dense XYZ is
+  redundant under the strict +0.5 pixel-centre pinhole gate. Reconstruct rays
+  downstream on Azure; do not transit heavy arrays locally or duplicate 3×XYZ
+  storage. Each decoded frame and output retains SHA-256 provenance.

@@ -12,4 +12,4 @@ docker run --rm --gpus all --network none \
   --mount "type=bind,src=$ROOT/data,dst=$ROOT/data,readonly" \
   --mount "type=bind,src=$ROOT/outputs,dst=$ROOT/outputs" \
   --mount "type=bind,src=$ROOT/results,dst=$ROOT/results,readonly" \
-  world-reward/cari4d-source:0.1 python "$CODE/infra/depth_smoke.py"
+  world-reward/cari4d-source:0.1 python "$CODE/infra/depth_smoke.py" "$@"
