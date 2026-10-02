@@ -72,6 +72,18 @@ then scores frozen predictions against private synthesis truth. No native
 challenge predictions are J1 inputs. GPU steps remain serial; quality evaluation
 is CPU-only. No success/adoption follows from dispatch.
 
+Source-only throughput audit (not a measured speedup): the current native
+`MHRDepthH5Writer.write_frame` waits for a single encoding future despite
+`encoding_workers=8`, then flushes HDF5 twice. Raw/aligned PNGs use level9+
+optimize; exhaustive validation decodes/reencodes their canonical bytes.
+See [pinned writer](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_cari4d/lib/cari4d/prep/mhr_depth_h5.py#L817-L903).
+Future minimal test: profile phases, then synchronous `write_frames` batches8
+of unchanged `DepthFrameRecord(index,raw,aligned,scale,shift,valid_count)`;
+one future per frame, same byte encoding, two flushes per batch. Keep complete
+canonical-byte validation, ordering and metadata. Active frozen chain unchanged.
+Preparation uses CPU-only PyAV/OpenCV/Pillow/HDF5; its immediate GPU forward
+handoff means background GPU research still requires explicit serialization.
+
 Episode15 is a predeclared engineering clip, **not a labeled validation split**.
 All results below are execution/representation checks, not challenge accuracy.
 
