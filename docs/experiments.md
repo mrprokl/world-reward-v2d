@@ -1722,3 +1722,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Independent v2 audit125focusedPASS, finalfull4825PASS/1optionaltrimeshSKIP
   64.88s, shellsyntax PASS. Producer receipt records all3x68 actual vectors and
   locked native indices before first forward; privatequality recreates exactrig.
+
+- D87preparev2 actual **PASS** source0236b0bd99d4c15054e7bdd88e8839cd0591e02a:
+  render7.127171s/two official15moving+3neutralcalls, all15RGB distinct, receipt
+  bf21e238e23a386334d0cfb48ae606635625d38db4c2ea54ee7349dde5b2af62.
+  Public manifest2c584ea633a958c737520d53c68c12b1429b8358f182c07bf46e53627b8f8267.
+  Automaticmasks16.283815s:30DINO+15SAMencodes+30SAMpredictions, all30immutable
+  masks, receiptaa1c8346cfd7609a58d055f71762060aca238c216100bd8aa990ca1de79ea909.
+  Model-locked scales zero exactly; full249legal, no synthetic private fields
+  visible to automaticmasks. Source-only prepare54,432B/15files, validation
+  96,216B/23files; no heavy local transit. Native paired inference dispatched
+  AFTER both terminalPASS; accuracy still unmeasured.
