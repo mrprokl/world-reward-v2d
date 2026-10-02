@@ -561,3 +561,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   alternating synchronized full-candidate timings,>=1.3× median and<=60s total.
   This is a new end-to-end experiment, not a relaxed repeat of the failed72-
   alignment budget. Full-video image parity remains a separate adoption gate.
+
+- 2026-10-02 D46: freeze eight new continuous/isotropic fixed-pose conditions:
+  ellipsoid(.33,.19,.27) and closed box(.52,.26,.38), correct/deformedSPD5,
+  known/biased fixed poses, bottom35% horizontal occlusion. Six new camera paths,
+  fit0/2/4, held1/3/5,8192coupled samples seed19, original1536×1152 camera rays.
+  Correct canonical CD must remain<=1e-12m; deformed canonical CD gain>=5%,
+  held-out IoU relative loss<=5%, topology/volume preserved. All8conditions
+  execute within120s or retain partial failure. Both pose conditions disclose
+  synthetic oracle initialization: this is measurement-model falsification,
+  not non-oracle RGB or joint pose/shape validation. Two changed loss components
+  prohibit a causal claim about discretization alone. Old18cases stay failed.
