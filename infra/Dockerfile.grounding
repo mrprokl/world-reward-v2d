@@ -1,0 +1,5 @@
+FROM world-reward/sam2:7c0d3b9
+RUN pip install "transformers==4.53.3" "tokenizers==0.21.4" "safetensors==0.6.2"
+RUN pip freeze > /app/world-reward-grounding-pip.txt
+ENV HF_HUB_OFFLINE=1
+ENV PYTHONUNBUFFERED=1

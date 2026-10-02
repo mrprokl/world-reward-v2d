@@ -4,7 +4,8 @@ set -euo pipefail
 ROOT="${WR_ROOT:-/srv/scenesmith/world-reward}"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
 MODULES="$ROOT/vendor/video_to_data/reconstruction/modules"
-test "$(git -C "$ROOT/vendor/video_to_data" rev-parse HEAD)" = \
+test "$(git -c safe.directory="$ROOT/vendor/video_to_data" \
+  -C "$ROOT/vendor/video_to_data" rev-parse HEAD)" = \
   7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80
 for MODULE in sam2 cari4d sam3d; do
   docker build --network host --tag "world-reward/$MODULE:7c0d3b9" \

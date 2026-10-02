@@ -55,3 +55,13 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   real fast 170°/1 m motion with strong evidence, exact-zero speed, missing states,
   invalid rotations, overflow and time/shape contracts. Full suite 68 passed.
   This verifies selection logic, **not** real tracking or challenge performance.
+- 2026-10-02 R02 (synthetic/schema only): exact Track 1 row-key slicing, full-video
+  coverage, constant identity, padding and frozen Parquet roundtrip tested against
+  official helper contracts. Converter validation refuses nonfinite input and
+  non-native formats; it does not invent a CARI4D-PCA mapping. Automatic detector
+  seed selection rejects invalid/ambiguous boxes and emits the official SAM2 JSON,
+  without manual annotations. Full lightweight suite: 190 passed. Actual GPU
+  model forward, masks and reconstruction quality remain separate gates.
+- 2026-10-02 D06: source/model licenses separately audited. SAM/custom
+  FoundationPose source eligibility and commercial CARI legacy header scope need
+  organizer clarification; do not claim an award-eligible final stack yet.
