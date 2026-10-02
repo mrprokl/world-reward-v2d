@@ -434,3 +434,24 @@ constrained backgroundvanishingpoints, with mandatoryweak-sceneabstention and
 freshnonchallengequality validation. GeoCalibwholepackage remainsuncleared
 because PerspectiveFieldsadaptedsource; audit commerciallycompatible frontend
 subset before acquisition and derive ownpinholemath ratherthancopyrestrictedLM.
+
+### Independent geometric calibration fallback audit (2026-10-02)
+OpenCV4.12.0 (2025-07-02), commit49486f61fb25722cbcf586b7f4320921d46fb38e,
+LSDcodeSHA54e8d04a4da08d787c1beaba4cff6f3711a982746847f084fae3004d6184732d;
+Apache2repo/BSDLSDheader and restoredMITNFA50807c32233ecbd584fb17afaa475d81c7d67ee7.
+[VP-Estimation-with-Prior-Gravity](https://github.com/cvg/VP-Estimation-with-Prior-Gravity/tree/fc154dd36e82b5ef8cc8a75d4d7e0b7ae2e2392c)
+MIT/ICCV2023 is a geometryreference, notlatestSOTA. UseNO suppliedgravity;
+its 220solver obeys f²=−(v1−c)·(v2−c) fororthogonalfiniteVPs andfixedc.
+Homogeneousgeneralform divides by w1w2; nearinfiniteVPs lackfocalinformation
+andmustabstain, notclamporpickpositivef. TwoVPs imposeorthogonality ratherthan
+proveManhattan: require3independentfamilies, heldoutsegments, agreementbetween
+all3pairfocals and groupededgebootstrap uncertainty; weak/nonManhattan scene
+acceptance explicitly tested. This remainsa conditionalproposal, notcameraGT.
+LSDOpenCVpixelcoordinates needcare: usec=(W/2−.5,H/2−.5), thentranslateboth
+VPs andc +.5 toWorldRewardcellcentres; verifywithownsteprasterbeforeuse.
+Nocrop/anisotropicresize unless exactH/K/VP transformtracked. Bootstraprelative
+focalCI>10%, missing3families, rankfailure orf²≤0 ->abstain. Proposedfresh36RGB
+12strong/12rotated/12weak camera-onlycohort: strongcoverage≥90%, medianferror≤3%,
+worst≤10%, weakfalseaccept≤5%. SubsequentfreshcoupledBody+depth+human/object
+pairedvalidation stillrequired; camera-onlygain insufficientforadoption.
+NoVPcode/model/benchmark acquired/executed/adopted atthisaudit.
