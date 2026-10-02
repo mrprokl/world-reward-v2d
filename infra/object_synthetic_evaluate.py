@@ -77,7 +77,7 @@ def run(root,report):
         if r.get('file')!=name:raise ValueError('Proposal file identity differs')
         require_hash(proposal/name,r['sha256'])
         with np.load(proposal/name,allow_pickle=False) as data:frozen[r['object_index'],r['mode']]={k:data[k].copy() for k in data.files}
-    observations=base/'observations/report.json';require_hash(observations,receipt.get('observation_report_sha256'))
+    observations=base/'observations-v2/report.json';require_hash(observations,receipt.get('observation_report_sha256'))
     observer=json.loads(observations.read_text());require_hash(base/'inputs/manifest.json',observer.get('input_manifest',{}).get('sha256'))
     render_path=private/'render-report.json';render_sha=sha256(render_path);require_hash(render_path,render_sha)
     render=json.loads(render_path.read_text())

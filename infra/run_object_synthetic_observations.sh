@@ -4,7 +4,7 @@ ROOT="${WR_ROOT:-/srv/scenesmith/world-reward}"
 CODE="${WR_CODE:?Require immutable committed source}"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
 BASE="$ROOT/validation/objects_rgb_v1"
-OUT="$BASE/observations"
+OUT="$BASE/observations-v2"
 [[ ! -L "$ROOT" && ! -L "$ROOT/validation" && ! -L "$BASE" && ! -e "$OUT" && ! -L "$OUT" ]]
 mkdir "$OUT"
 chown "$(id -u scenesmith):$(id -g scenesmith)" "$OUT"
@@ -24,6 +24,7 @@ timeout --signal=TERM --kill-after=10s 123s docker run --rm --gpus all --network
   --env OMP_NUM_THREADS=4 --env OPENBLAS_NUM_THREADS=4 --env MKL_NUM_THREADS=4 \
   --mount "type=bind,src=$CODE,dst=$CODE,readonly" \
   --mount "type=bind,src=$ROOT/weights/cari4d/hf_home/hub/models--Ruicheng--moge-2-vitl-normal,dst=$ROOT/weights/cari4d/hf_home/hub/models--Ruicheng--moge-2-vitl-normal,readonly" \
+  --mount "type=bind,src=$ROOT/weights/cari4d/hf_home/hub/blobs/9f/9f4c4857a8203605fd29a80f0e81e9ed52fc1654c1e657d437ab29b73d8db37c,dst=$ROOT/weights/cari4d/hf_home/hub/blobs/9f/9f4c4857a8203605fd29a80f0e81e9ed52fc1654c1e657d437ab29b73d8db37c,readonly" \
   --mount "type=bind,src=$ROOT/results/weights-acquisition.json,dst=$ROOT/results/weights-acquisition.json,readonly" \
   "${INPUTS[@]}" --mount "type=bind,src=$OUT,dst=$OUT" \
   "$IMAGE" python "$CODE/infra/object_synthetic_observations.py" "$@"

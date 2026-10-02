@@ -25,6 +25,7 @@ SCHEMA = "world-reward-objects-rgb-inputs-v1"
 MODEL_REVISION = "b135031bae30b5ac2ae141a0e68717795ce38340"
 MODEL_SHA = "280741fd09bc3f403ccff9967784c2a391b52d2c0742ae3efdb21d9f90cc1a01"
 MODEL_BYTES = 1323815904
+XET_SHA = "9f4c4857a8203605fd29a80f0e81e9ed52fc1654c1e657d437ab29b73d8db37c"
 SOURCE_REVISION = "925b8ed835a7a9cdb7578ba15c658a0afc969030"
 SOURCE_V2_SHA = "e736ed59fdb8ad89ec0c29ddfeeccd6a4246c387b3f423b922708366b69758fd"
 RGB_DISTANCE, MIN_PIXELS = .08, 64
@@ -114,8 +115,13 @@ def model_asset(root):
     snapshot = cache / f"models--Ruicheng--moge-2-vitl-normal/snapshots/{MODEL_REVISION}/model.pt"
     # HF snapshots intentionally link their frozen blob. Reject any other link.
     blob = cache / f"models--Ruicheng--moge-2-vitl-normal/blobs/{MODEL_SHA}"
-    path = blob if snapshot.is_symlink() else snapshot
-    if snapshot.is_symlink() and snapshot.resolve() != blob.absolute(): raise ValueError("HF snapshot link is not exact pinned blob")
+    # Audited cache deduplication may link the repo SHA blob to one global Xet
+    # blob; the Xet storage identifier is not the file's required content SHA.
+    xet_blob = cache / "blobs" / XET_SHA[:2] / XET_SHA
+    target = snapshot.resolve()
+    allowed = {blob.absolute(), xet_blob.absolute()}
+    if target not in allowed: raise ValueError("HF snapshot link is not an audited SHA/Xet blob")
+    path = target
     record = identity(path)
     if record != {"sha256": MODEL_SHA, "bytes": MODEL_BYTES}: raise ValueError("Independent pinned MoGe2 model SHA/size mismatch")
     return path, receipt, record
@@ -140,7 +146,7 @@ def main(argv=None):
     root = Path(os.environ["WR_ROOT"]); revision = os.environ.get("WR_CODE_REVISION", ""); image = os.environ.get("WR_IMAGE_ID", "")
     if not re.fullmatch(r"[0-9a-f]{40}", revision) or not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
         raise ValueError("Require immutable source revision/image ID")
-    base = root / "validation/objects_rgb_v1"; output = base / "observations"
+    base = root / "validation/objects_rgb_v1"; output = base / "observations-v2"
     if output.is_symlink() or not output.is_dir() or any(output.iterdir()): raise FileExistsError("Require exclusively reserved empty observations directory")
     with (output / "report.json").open("x") as handle:
         started = time.perf_counter()

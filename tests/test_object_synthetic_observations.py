@@ -119,7 +119,7 @@ def test_snapshot_only_exact_hf_sha_blob_link_permitted(gate, tmp_path, monkeypa
 
 
 def test_failed_prerequisite_preserves_exclusive_partial(gate, tmp_path, monkeypatch):
-    output = tmp_path/"validation/objects_rgb_v1/observations"; output.mkdir(parents=True)
+    output = tmp_path/"validation/objects_rgb_v1/observations-v2"; output.mkdir(parents=True)
     monkeypatch.setenv("WR_ROOT", str(tmp_path)); monkeypatch.setenv("WR_CODE_REVISION", "a"*40)
     monkeypatch.setenv("WR_IMAGE_ID", "sha256:"+"b"*64); monkeypatch.setattr(gate.platform, "system", lambda: "Linux")
     original = gate.Path.iterdir
@@ -140,3 +140,19 @@ def test_wrapper_no_heldout_private_parent_or_challenge_mounts(gate):
     assert not any(f"src=$ROOT/{p}" in wrapper for p in ("data", "outputs", "vendor", "validation,dst"))
     assert "eval_private" not in wrapper and "chown -R" not in wrapper
     assert "123s docker run" in wrapper and "--network none" in wrapper and "--memory 16g" in wrapper
+
+
+def test_sha_blob_can_link_to_exact_verified_global_xet(gate,tmp_path,monkeypatch):
+    cache=tmp_path/'weights/cari4d/hf_home/hub'
+    repo=cache/'models--Ruicheng--moge-2-vitl-normal'
+    actual=cache/'blobs'/gate.XET_SHA[:2]/gate.XET_SHA
+    actual.parent.mkdir(parents=True);actual.write_bytes(b'tinyweightfixture')
+    blob=repo/'blobs'/gate.MODEL_SHA;blob.parent.mkdir(parents=True);blob.symlink_to(actual)
+    snapshot=repo/f'snapshots/{gate.MODEL_REVISION}/model.pt';snapshot.parent.mkdir(parents=True);snapshot.symlink_to(blob)
+    receipt=tmp_path/'results/weights-acquisition.json';receipt.parent.mkdir();receipt.write_text(json.dumps({'assets':[
+        {'repo_id':'Ruicheng/moge-2-vitl-normal','revision':gate.MODEL_REVISION,'cache_dir':str(cache)}]}))
+    old=gate.identity
+    monkeypatch.setattr(gate,'identity',lambda p:{'sha256':gate.MODEL_SHA,'bytes':gate.MODEL_BYTES} if Path(p)==actual else old(p))
+    assert gate.model_asset(tmp_path)[0]==actual
+    monkeypatch.setattr(gate,'identity',lambda p:{'sha256':'a'*64,'bytes':gate.MODEL_BYTES} if Path(p)==actual else old(p))
+    with pytest.raises(ValueError,match='SHA/size'):gate.model_asset(tmp_path)

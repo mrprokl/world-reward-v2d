@@ -21,6 +21,6 @@ timeout --signal=TERM --kill-after=10s 303s docker run --rm --gpus all --network
   --mount "type=bind,src=$ROOT/vendor/mv-sam3d/$PIN,dst=$ROOT/vendor/mv-sam3d/$PIN,readonly" \
   --mount "type=bind,src=$ROOT/weights,dst=$ROOT/weights,readonly" \
   --mount "type=bind,src=$ROOT/results,dst=$ROOT/results,readonly" \
-  --mount "type=bind,src=$BASE/observations,dst=$BASE/observations,readonly" \
+  --mount "type=bind,src=$BASE/observations-v2,dst=$BASE/observations-v2,readonly" \
   --mount "type=bind,src=$OUT,dst=$OUT" --mount "type=bind,src=$ROOT/cache,dst=$ROOT/cache" \
   "$IMAGE" python "$CODE/infra/object_synthetic_generate.py" "$@"

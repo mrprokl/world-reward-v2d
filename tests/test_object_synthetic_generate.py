@@ -40,4 +40,4 @@ def test_exact_generation_configuration_and_actual_raw_parity_no_tautology(gener
     assert 'with_layout_postprocess=False' in source and 'for mode in (\'single\',\'three_view\')' in source
     wrapper=Path(generate.__file__).with_name('run_object_synthetic_generate.sh').read_text()
     assert 'eval_private' not in wrapper and 'src=$BASE/inputs' not in wrapper
-    assert 'src=$BASE/observations,dst=$BASE/observations,readonly' in wrapper and '--network none' in wrapper
+    assert 'src=$BASE/observations-v2,dst=$BASE/observations-v2,readonly' in wrapper and '--network none' in wrapper

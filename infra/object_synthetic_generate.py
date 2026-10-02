@@ -45,7 +45,7 @@ def observation_arrays(values, obj, view):
 
 
 def load_observations(root):
-    folder=root/'validation/objects_rgb_v1/observations';path=folder/'report.json';digest=sha256(path)
+    folder=root/'validation/objects_rgb_v1/observations-v2';path=folder/'report.json';digest=sha256(path)
     require_hash(path,digest);report=json.loads(path.read_text())
     expected={'stage':'public_object_rgb_automatic_observations','status':'pass','object_cases':2,
               'train_views':[0,2,4],'private_truth_read':False,'challenge_inputs_used':False}
@@ -163,7 +163,7 @@ def run(root,report,path):
             report['proposals'].append({'object_index':obj,'mode':mode,**proof});del result
             torch.cuda.synchronize();persist(path,report)
             if torch.cuda.max_memory_allocated()>80*1024**3:raise RuntimeError('Frozen80GiB allocation budget exceeded')
-    require_hash(root/'validation/objects_rgb_v1/observations/report.json',digest)
+    require_hash(root/'validation/objects_rgb_v1/observations-v2/report.json',digest)
     imported={name:full.ss._identity(Path(module.__file__)) for name,module in sys.modules.copy().items()
               if (name=='sam3d_objects' or name.startswith('sam3d_objects.')) and getattr(module,'__file__',None)}
     if any(not Path(r['path']).resolve().is_relative_to(source.resolve()) for r in imported.values()):

@@ -16,7 +16,7 @@ timeout --signal=TERM --kill-after=5s 60s docker run --rm --network none --memor
   --env PYTHONPATH="$CODE/src" --env PYTHONDONTWRITEBYTECODE=1 --env OPENBLAS_NUM_THREADS=4 \
   --mount "type=bind,src=$CODE,dst=$CODE,readonly" \
   --mount "type=bind,src=$BASE/inputs/manifest.json,dst=$BASE/inputs/manifest.json,readonly" \
-  --mount "type=bind,src=$BASE/observations/report.json,dst=$BASE/observations/report.json,readonly" \
+  --mount "type=bind,src=$BASE/observations-v2/report.json,dst=$BASE/observations-v2/report.json,readonly" \
   --mount "type=bind,src=$BASE/proposals,dst=$BASE/proposals,readonly" \
   --mount "type=bind,src=$BASE/eval_private,dst=$BASE/eval_private,readonly" \
   --mount "type=bind,src=$OUT,dst=$OUT" "$IMAGE" python "$CODE/infra/object_synthetic_evaluate.py" "$@"
