@@ -17,7 +17,7 @@
 4. [Submission kit](https://nvidia-isaac.github.io/video_to_data/v2d_challenge/assets/v2d_submission_kit.zip),
    SHA-256 pinned in config. Use its unmodified packer, exact sample row IDs and
    code commit URL. One Parquet for five Kaggle competitions; code shared with
-   `Nvidia-V2D-Challenge`. Account/rules acceptance requires participant interaction.
+   `Nvidia-V2D-Challenge`. Rules acceptance is verified below; final code access still required.
 
 ## Evaluation contract inspected in code
 
@@ -78,8 +78,8 @@ max team size 10; 5/week controls despite platform 5/day cap; up to **two** fina
 submissions; identical file across metrics; all scored rows public leaderboard,
 confidential references remain hidden and later broader evaluation is off-platform.
 Single-command reproducibility, actual producing commit and weights required on
-verification. Register separately once for the whole challenge. No registration
-or rule acceptance was performed by the agent.
+verification. Register separately once for the whole challenge. See the later
+entry receipt below; the separate NVIDIA registration is not yet verified.
 
 **Foundational 4.b prohibits hand labeling/human prediction of validation/test
 records.** Therefore official example's SAM2 manual prompt GUI is **not adopted**:
@@ -94,3 +94,18 @@ specific compatibility review; access approval alone does not resolve license.
 If source license exceptions remain ambiguous, ask organizers before final use.
 Foundational rules declare precedence over competition-specific text, and public
 code sharing must also benefit participants through Kaggle forums/notebooks.
+
+## Kaggle entry receipt — 2026-10-02
+
+User explicitly authorized acceptance and signed in using their existing account.
+The authenticated browser confirmed **“You have accepted the rules for this
+competition. Good luck!”**, plus Submit Prediction, on each Track1 rules page:
+CD-H, CD-O, ACC-H, ACC-O and PEN. Each acceptance was read again after page load
+(or reload); no prediction/file upload and no quota consumption. No account
+creation, token disclosure, other-track entry or license exception.
+
+The PEN Team page currently says Thomas GOMEZ; rename to **World Reward** is
+prepared but requires the final public-name change confirmation. NVIDIA's separate
+once-per-team registration, producing Git commit accessibility and source-license
+compatibility remain independent prerequisites; Kaggle acceptance does not prove
+any of them.

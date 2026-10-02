@@ -1445,3 +1445,17 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   frames_per_chunk1, pose_batch4, replaychunk16 are disclosedmemorychoices.
   88focusedcontracttestsPASS, full4345PASS/1optionalSKIP65.16s BEFOREexecution;
   no submission/adoption evenifprobePASS, fulltrajectoryfidelitystillrequired.
+
+- 2026-10-02 D79 actual **FAIL13.489s before solvers**: full790native target
+  replay has different canonicalbytes from sealedoldSHA8856755a…25fdeb, despite
+  identicalparams/assets/source/decoder/chunk16. Failure report
+  05a558bc7dee69553d6b34ddc83ab9ff0f3361b7c648d99a75d9b942836602c3.
+  Nojoint/pose/referencecalls, nohashwaiver/adoption. Theoldtargetarray wasnot
+  saved, so noold/newnumericalgeometrycomparison is possible.
+  Nextbounded standalone reseal: TWO freshstrict nativeworkers (seed0, TF32off,
+  deterministicCUBLAS, unoptimizedTorchScript) must decodebitexact; savecanonical
+  full790F32 .npy onAzure. Oneunchangedhistoricalfull790referenceF32replay must
+  agreewitholdperframeerrors at existingrtol1e-5/atol1e-4mm BEFOREanyjointsolve.
+  Exactofficial targetunitconversion follows pinnedsource (F64castbefore×1000).
+  Newtargetrequires explicitnewlineage; oldFAIL/oldSHAremain. If either gatefails,
+  STOP withoutcoldconverterretry or loosenedtolerance. Noaccuracy/submissionclaim.
