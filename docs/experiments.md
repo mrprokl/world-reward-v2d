@@ -1359,3 +1359,15 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   unchangedbaseimage/DA3source, noresolver/install/rebuild. NewCPUgateoutputv2,
   oldv1reservedfailure retained; sameD76camera/seeds/depth/quality gates.
   Fulltiny4171PASS/1optionalSKIP60.53s beforeminimalwheelrepair;79focusedPASS.
+
+- 2026-10-02 R105/D76: DA3Metric sameK800 **PASS9actualcalls11.290s**,
+  strict406FP32states nativepreprocess392×518/canonicalfactoractual once;
+  CPUpairedquality**PASS2.339s**. MoGefixedCDhalfcm[81.26989554,93.47578099,
+  74.26773488] vsDA3[70.57089420,75.32652457,58.95176918], gains
+  [13.1648%,19.4160%,20.6226%], median19.4160%, allcoveragePASS/no regressions.
+  Supports a real-object depth improvement at the SAME prior camera, not
+  correctcalibration/human/V2Dvictory. Errorsremainlarge andlearnedcameraMoGe
+  previouslymuchbetterbuthumanregressed, so don'tgloballyreplacefrontend.
+  Newpriority: independentlytestaffineZhuman-grounding andDA3human/newRGBcohort,
+  notfitGTK800orclaimcalibrationfromthisobject-onlycohort. Onlyactualpinned
+  addictMIT3832bytezipimportwasadded; baseimage/DA3sourceunchanged.

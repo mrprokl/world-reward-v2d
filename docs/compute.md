@@ -331,3 +331,9 @@ expectedfail-fastCPUgate. AddexactauditedMITwheelzipimportRO, noimagechange/
 sourcepatch/requirementsresolver. OldCPUgatev1 remains; v2newnamespace. Native0
 notstarted verifiedunitnot-found/logabsent afterRunCommandConflict; nextexplicit
 launch legitimate afterserialization. No duplicatedinference/GPU reader.
+
+19:47:52UTC native0v1 actualGPU100%17738MiB/100of300steps, noforwardduplication.
+VM02D76chainactualimports+frozenbaseline9numeric+DA39callsPASS11.290s, paired
+CPU2.339sPASS19.4160%medianindependentscene gain atidenticalK800. Human/camera
+accuracyandV2Dscoreunverified. Source8632e50 sameoriginalprotocol/codepins.
+4172tinytestsPASS/1optionalSKIP64.23s beforenewaffinecoreimplementation.
