@@ -182,3 +182,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   This verifies sparse model geometry/units, not full trajectory/shared identity
   or reconstruction accuracy. Latest local suite 456 passed. Official shared-
   identity converter is the next separate real-output gate.
+- 2026-10-02 R17: official converter on the real sparse Body output completed in
+  22.55 s, with shared shape/scales and zero expression. Independent reforward
+  mean residual 0.3304 mm; per-frame means 0.2721/0.4512/0.2679 mm. This is the
+  conversion loss relative to predicted meshes, **not error against challenge GT**.
+  Native input forward max residual ~2.5e-7 m; keypoint reprojection <0.000066 px.
+  Next extend the verified initializer to all 501 original frames, preserving
+  full indices; do not present framewise estimates as CARI temporal refinement.

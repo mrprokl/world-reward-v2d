@@ -265,6 +265,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path("/srv/scenesmith/world-reward"))
     parser.add_argument("--episode", type=int, choices=[EPISODE], default=EPISODE)
+    parser.add_argument("--full-video", action="store_true",
+                        help="Apply the verified initializer to every original frame; not CARI temporal reconstruction")
     args = parser.parse_args()
     root = args.root.resolve()
     sys.dont_write_bytecode = True
@@ -273,9 +275,11 @@ def main() -> None:
         "MOMENTUM_ENABLED": "0", "WANDB_MODE": "disabled",
     })
     inputs = _validate_inputs(root)
+    if args.full_video:
+        inputs["indices"] = list(range(inputs["total_frames"]))
     source_hashes = _source_identity(root)
     body_directory, asset_hashes = _body_assets(root)
-    output_directory = root / f"outputs/episode_{EPISODE:06d}/body_smoke"
+    output_directory = root / f"outputs/episode_{EPISODE:06d}" / ("body_full" if args.full_video else "body_smoke")
     if output_directory.exists():
         raise FileExistsError("Body smoke outputs are frozen; use a clean run directory, not overwrite")
     import cv2
@@ -323,6 +327,10 @@ def main() -> None:
     if len(hub_calls) != 1 or config.MODEL.BACKBONE.TYPE != hub_calls[0]:
         raise RuntimeError("The audited single DINOv3 backbone load contract changed")
     estimator = sam_3d_body.SAM3DBodyEstimator(model, config)
+    prompt_config = config.MODEL.PROMPT_ENCODER
+    mask_conditioning = {"enabled": bool(prompt_config.ENABLE),
+                         "mask_embed_type": prompt_config.MASK_EMBED_TYPE,
+                         "mask_prompt": prompt_config.get("MASK_PROMPT", "v1")}
     faces = np.asarray(estimator.faces)
     if (faces.shape != (36874, 3) or not np.issubdtype(faces.dtype, np.integer)
         or faces.min() < 0 or faces.max() >= 18439
@@ -418,12 +426,14 @@ def main() -> None:
     with predictions_path.open("xb") as handle:
         np.savez_compressed(handle, **arrays)
     report = {
-        "stage": "sam3d_body_three_frame_smoke", "status": "pass", "episode_index": EPISODE,
+        "stage": "sam3d_body_full_video_initializer" if args.full_video else "sam3d_body_three_frame_smoke",
+        "status": "pass", "episode_index": EPISODE,
         "total_video_frames": inputs["total_frames"], "frame_indices": inputs["indices"],
         "input_track": "track_1", "input_sha256": inputs["video_sha256"],
         "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": [],
         "network": "none", "inference_type": "body", "camera_intrinsics": "RGB_size_default_FOV",
         "human_mask_id": 0, "prompt_mode": "automatic_mask_and_derived_bbox_no_fallback",
+        "decoder_mask_config": mask_conditioning,
         "model_mask_range": "uint8_0_1_matches_CARI_prepare_batch",
         "vertices": 18439, "faces": 36874, "geometry_units": "metres",
         "geometry_frame": "SAM3D_camera_x_right_y_down_z_forward",
@@ -440,6 +450,7 @@ def main() -> None:
         "frames": frame_records, "predictions_sha256": sha256(predictions_path),
         "script_sha256": sha256(Path(__file__)), "torch_version": torch.__version__,
         "gpu": torch.cuda.get_device_name(), "elapsed_seconds": time.perf_counter() - started,
+        "frame_independent_initializer_only": True,
         "license": "SAM_3D_Body_Materials_license_not_Apache_wrapper_license",
     }
     with (output_directory / "report.json").open("x") as handle:
