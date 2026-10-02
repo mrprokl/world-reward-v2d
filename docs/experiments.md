@@ -1911,3 +1911,17 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   alignment, morphology shrink or predicted interaction exported. This only
   enables future shared-identity/pose/camera fitting; it proves no accuracy.
   Offline Azure GPU180s maximum, scalar/source receipt only on the Mac.
+
+  D91actualFAIL2.171658s/source35ce1a6c39fe8655a0a4ca46d406b7435d49f82e,
+  receipt1ba7780830bcc96269c615e1b5dd03e20e1e0dddc0f4dc2a6ade5ed7cb6995a3.
+  HardmaskbyteparityPASS, projectionmax3.231e−6px and Kscaleerror0. NativeCUDA
+  raster backward explicitly lacks a deterministic implementation and rejects
+  torch.use_deterministic_algorithms(True): 4rasters, completedbackwards0,
+  translationsteps0. Strictautogradcapability remainsFAIL, no globaldeterminism
+  waiver or completedgradient claim. New numerical-reproducibility or alternate
+  derivative contract would require separate preregistration/namespace; not
+  silently rerun this failedv1 with settings changed. No challenge data/models.
+  Fullsource suite5120PASS/1optionaltrimeshSKIP73.63s, 36probeCPUtestsPASS;
+  actualimagePython3.11.10/Torch2.5.1+cu124. ORTabsent verifiedCPUimportgate,
+  so futureDWPose requires pinned isolated runtime acquisition, not an assumed
+  installedGPUprovider. No model checkpoint/keypoint inference acquired yet.
