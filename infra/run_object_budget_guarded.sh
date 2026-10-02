@@ -25,6 +25,6 @@ timeout --signal=TERM --kill-after=5s 903s docker run --rm --network none --memo
  --mount "type=bind,src=$ROOT/results,dst=$ROOT/results,readonly" \
  --mount "type=bind,src=$ROOT/vendor/v2d_submission_kit,dst=$ROOT/vendor/v2d_submission_kit,readonly" \
  --mount "type=bind,src=$ROOT/data,dst=$ROOT/data,readonly" \
- --mount "type=bind,src=$ROOT/outputs,dst=$ROOT/outputs,readonly" \
+ --mount "type=bind,src=$BASE,dst=$BASE,readonly" \
  --mount "type=bind,src=$ROOT/validation/guarded_qem_v1,dst=$ROOT/validation/guarded_qem_v1,readonly" \
  --mount "type=bind,src=$OUT,dst=$OUT" "$IMAGE" python "$CODE/infra/object_budget_guarded.py" "$@"

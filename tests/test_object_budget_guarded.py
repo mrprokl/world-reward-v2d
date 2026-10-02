@@ -39,6 +39,7 @@ def test_selected_episode_requires_guarded_control_and_no_endpoint_gate_call(dri
 def test_wrapper_only_output_writable_oldproposal_immutable(driver):
     s=Path(driver.__file__).with_name('run_object_budget_guarded.sh').read_text()
     assert '--gpus' not in s and '903s docker run' in s
-    assert 'src=$ROOT/outputs,dst=$ROOT/outputs,readonly' in s
+    assert 'src=$BASE,dst=$BASE,readonly' in s
+    assert 'src=$ROOT/outputs,dst=$ROOT/outputs' not in s
     assert 'src=$OUT,dst=$OUT"' in s and 'chown -R' not in s
     assert 'object_budget_endpoint' not in s and 'mesh_guarded_qem.cpp' in s

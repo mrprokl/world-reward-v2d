@@ -925,3 +925,11 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   independent final embedding is mandatory. Only if controls pass, propose one
   separate episode0 budgeted mesh, with unchanged metric scale/poses and no
   component/cavity removal or numerical threshold relaxation.
+- 2026-10-02 R78 (Azure H1 common-gauge proxy,a30e5b3): CPU diagnosis
+  passed0.319s. One baseline-case0 nonhand Sim3 (scale0.973535), reused for
+  both modes/all cases, changes cases1..5 mean hand PVE baseline133.978→63.852mm,
+  candidate132.875→63.065mm. Heldcase aligned wrist errors28.686–96.811mm
+  remain; a common gauge explains part, not all, of raw error. Private LBS
+  nonhand complement is explicitly not official role_alignment. No inference
+  correction, object interaction evaluation, transformed export or new selection;
+  original H1 rejection remains frozen. Full tiny suite3353PASS34.46s.
