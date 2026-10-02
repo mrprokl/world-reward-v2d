@@ -10,4 +10,4 @@ docker run --rm --gpus all --network none \
   --mount "type=bind,src=$ROOT/vendor,dst=$ROOT/vendor,readonly" \
   --mount "type=bind,src=$ROOT/weights,dst=$ROOT/weights,readonly" \
   --mount "type=bind,src=$ROOT/outputs,dst=$ROOT/outputs" \
-  world-reward/sam2:7c0d3b9 python "$CODE/infra/body_converter.py"
+  world-reward/sam2:7c0d3b9 python "$CODE/infra/body_converter.py" "$@"

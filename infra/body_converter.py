@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import argparse
 import json
 import os
 from pathlib import Path
@@ -17,8 +18,11 @@ def main() -> None:
         raise RuntimeError("Real model/mesh fitting stays on Azure")
     import numpy as np
     import torch
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--full-video", action="store_true")
+    args = parser.parse_args()
     root = Path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"))
-    directory = root / "outputs/episode_000015/body_smoke"
+    directory = root / "outputs/episode_000015" / ("body_full" if args.full_video else "body_smoke")
     report = json.loads((directory / "report.json").read_text())
     if report["status"] != "pass" or report["ground_truth_used"] is not False or not report["mhr_geometry_forward_verified"]:
         raise RuntimeError("Require verified real Body geometry and video-only provenance")
@@ -35,7 +39,8 @@ def main() -> None:
     with np.load(directory / "predictions.npz", allow_pickle=False) as predictions:
         vertices = predictions["vertices_camera_m"].copy()
         indices = predictions["frame_index"].tolist()
-    if indices != [0, 250, 500] or vertices.shape != (3, 18439, 3):
+    expected_indices = list(range(report["total_video_frames"])) if args.full_video else [0, 250, 500]
+    if indices != expected_indices or vertices.shape != (len(expected_indices), 18439, 3):
         raise RuntimeError("Predeclared sparse frame gate changed")
     spec = importlib.util.spec_from_file_location("official_converter", tool)
     converter = importlib.util.module_from_spec(spec)
@@ -58,10 +63,14 @@ def main() -> None:
               "geometry_forward_verified": True, "original_units": "metres",
               "input_sha256": report["predictions_sha256"], "model_sha256": sha256(model),
               "converter_sha256": sha256(tool), "script_sha256": sha256(Path(__file__)),
-              "scope": "sparse_engineering_conversion_only_not_full_video_submission",
+              "scope": "full_video_initializer_conversion_not_final_reconstruction" if args.full_video else "sparse_engineering_conversion_only_not_full_video_submission",
               "challenge_accuracy_verified": False, "submission_eligible": False}
     (output / "report.json").write_text(json.dumps(result, indent=2) + "\n")
-    print(json.dumps({key: result[key] for key in ("stage", "mean_vertex_error_mm", "per_frame_mean_mm", "elapsed_seconds")}))
+    print(json.dumps({"stage": result["stage"], "frames": len(indices),
+                      "mean_vertex_error_mm": result["mean_vertex_error_mm"],
+                      "worst_frame_mean_mm": float(residual_mm.max()),
+                      "invalid_input_frames": converted["report"]["invalid_input_frames"],
+                      "elapsed_seconds": result["elapsed_seconds"]}))
 
 
 if __name__ == "__main__":
