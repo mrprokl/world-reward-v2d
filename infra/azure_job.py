@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import base64
 import hashlib
+import lzma
 import re
 import shlex
 import subprocess
@@ -31,8 +32,8 @@ def main() -> None:
         raise RuntimeError("Commit/clean the worktree before launching a reproducible job")
     revision = git("rev-parse", "HEAD").decode().strip()
     git("cat-file", "-e", f"{revision}:{args.script}")
-    archive = git("archive", "--format=tar.gz", revision,
-                  "infra", "src", "configs", "pyproject.toml")
+    archive = lzma.compress(git("archive", "--format=tar", revision,
+                               "infra", "src", "configs", "pyproject.toml"), preset=6)
     if len(archive) > 2_000_000:
         raise RuntimeError("Code archive unexpectedly large; no heavy artifacts may transit locally")
     archive_hash = hashlib.sha256(archive).hexdigest()
@@ -49,11 +50,11 @@ JOB="$ROOT/jobs/{revision}"
 test ! -e "$ROOT/results/{args.name}.log"
 if test ! -d "$JOB"; then
   mkdir -p "$JOB"
-  printf '%s' '{encoded}' | base64 -d > "$JOB/source.tar.gz"
-  echo '{archive_hash}  '"$JOB/source.tar.gz" | sha256sum -c - >/dev/null
+  printf '%s' '{encoded}' | base64 -d > "$JOB/source.tar.xz"
+  echo '{archive_hash}  '"$JOB/source.tar.xz" | sha256sum -c - >/dev/null
   mkdir "$JOB/code"
-  tar -xzf "$JOB/source.tar.gz" -C "$JOB/code"
-  rm "$JOB/source.tar.gz"
+  tar -xJf "$JOB/source.tar.xz" -C "$JOB/code"
+  rm "$JOB/source.tar.xz"
   printf '%s\\n' '{revision}' > "$JOB/revision"
   chmod -R a-w "$JOB/code"
 fi

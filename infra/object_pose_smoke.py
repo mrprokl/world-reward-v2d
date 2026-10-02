@@ -17,6 +17,7 @@ from body_smoke import _validate_inputs
 from camera_render import raster_camera_mesh, silhouette_iou
 from world_reward.data import sha256
 from world_reward.rigid_alignment import align_observed_points
+from world_reward.mesh_geometry import normalize_degenerate_faces
 
 
 def main() -> None:
@@ -77,8 +78,15 @@ def main() -> None:
     # arrays for final packing and derive only a non-padding mesh for raster QA.
     vertices, faces = budget_mesh(str(object_dir / "object.glb"), faces=4096, vertices=4096)
     vertices = vertices * scale[0]  # same grounding gauge, applied exactly once
-    active = (faces[:, 0] != faces[:, 1]) & (faces[:, 0] != faces[:, 2]) & (faces[:, 1] != faces[:, 2])
-    mesh = trimesh.Trimesh(vertices, faces[active], process=True)
+    active_indices, geometry_cleanup = normalize_degenerate_faces(vertices, faces)
+    # Official padding is represented by repeated vertex indices. Replacing
+    # only numerically collapsed triangles does not change geometric surfaces.
+    # Preserve exact 4096 row budget and never drop a real component/cavity.
+    inactive = np.ones(len(faces), dtype=bool)
+    inactive[active_indices] = False
+    faces = faces.copy()
+    faces[inactive] = 0
+    mesh = trimesh.Trimesh(vertices, faces[active_indices], process=True)
     if not mesh.is_watertight or not mesh.is_winding_consistent or mesh.volume <= 0:
         raise RuntimeError("Official-budget geometry lost closed oriented volume; do not use for PEN")
     sampled, _ = trimesh.sample.sample_surface(mesh, 8192, seed=0)
@@ -162,6 +170,7 @@ def main() -> None:
               "fixed_shape": True, "scale": "generative_grounded_scale_baked_once_into_fixed_vertices; submission_scale=1",
               "mesh_watertight": bool(mesh.is_watertight), "mesh_winding_consistent": bool(mesh.is_winding_consistent),
               "metric_gauge_extent": mesh.extents.tolist(), "official_budget_vertices": len(vertices), "official_budget_faces": len(faces),
+              "geometry_cleanup": geometry_cleanup,
               "pose_hypotheses": "24_octahedral_orientations_not_asserted_true_object_symmetries",
               "objective": "maximum_automatic_mask_IoU_then_partial_depth_RMSE; no_GT_or_challenge_metric",
               "frames": candidate_reports, "geometry_and_poses_sha256": sha256(output / "geometry_and_poses.npz"),

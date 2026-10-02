@@ -259,3 +259,15 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   <1e-5 m), exact topology and fixed-K reprojection <0.05 px. Ninety-six tiny
   adapter regressions pass, full suite 740; real GPU validation is separate.
   No 204→PCA pseudo-inverse, invented weights or license-eligibility claim.
+
+- 2026-10-02 R24: topology diagnosis localized the budget failure: original
+  closed mesh has two correctly oriented components (outer positive, cavity
+  negative); budget keeps them and adds a near-zero-volume third component
+  causing one non-manifold edge, with no boundary edges. Preserve the cavity;
+  measure triangle area before removing anything. A tiny component volume alone
+  is not permission to delete meaningful geometry or raise thresholds.
+- 2026-10-02 R25 (H100 native CARI human adapter): all 501 frames decoded and
+  matched original SAM Body vertices/joints/70 keypoints, maximum errors
+  1.1161e-6 / 9.5554e-7 / 9.8483e-7 m. Fixed-K projection maximum 8.6317e-5 px;
+  8.42 s. This proves canonical input compatibility, not CoCoNet inference or
+  challenge accuracy. Shared-identity conversion remains separately verified.

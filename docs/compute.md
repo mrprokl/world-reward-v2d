@@ -148,3 +148,8 @@ completed in 106.61 s, no invalid input frames; independent mean mesh residual
 0.9719 mm, worst frame mean 1.4861 mm. These are prediction-to-export residuals,
 not challenge error. Three-frame MoGe2 depth smoke passed in 8.06 s, offline with
 RGB-size FOV prior only. CUDA camera/depth analytic gate precedes scale fitting.
+
+Code-only immutable snapshots now use Python stdlib XZ compression plus SHA-256
+verification and remote tar extraction, keeping the base64 Run Command payload
+below 100 KB as the implementation grows. Models/data/predictions remain remote.
+No active jobs or immutable snapshots are replaced by this transport change.

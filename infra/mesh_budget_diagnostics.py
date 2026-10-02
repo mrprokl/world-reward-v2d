@@ -33,7 +33,14 @@ def main():
                                   "signed_volume": float(mesh.volume), "extents": mesh.extents.tolist(),
                                   "boundary_edges": int((incidence == 1).sum()), "nonmanifold_edges": int((incidence > 2).sum()),
                                   "components": len(components), "component_volumes": [float(m.volume) for m in components[:10]]}
-    target = root / "results/mesh-budget-diagnostics.json"
+    small_components = meshes["budget_unprocessed"].split(only_watertight=False)
+    result["small_budget_components"] = []
+    for component in small_components:
+        if len(component.faces) <= 10:
+            result["small_budget_components"].append({"vertices": component.vertices.tolist(),
+                                                      "faces": component.faces.tolist(),
+                                                      "triangle_areas": component.area_faces.tolist()})
+    target = root / "results/mesh-budget-diagnostics-detail.json"
     with target.open("x") as handle:
         handle.write(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result))
