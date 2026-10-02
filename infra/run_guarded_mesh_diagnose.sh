@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+[[ $# == 2 && $1 == --episode && $2 == 0 ]] || { echo 'Require --episode 0 historical diagnostic' >&2; exit 2; }
+ROOT="${WR_ROOT:?}"
+CODE="${WR_CODE:?}"
+# Frozen native source closure: $CODE/infra/mesh_guarded_qem.cpp.
+export DOCKER_HOST="unix://$ROOT/docker.sock"
+BASE="$ROOT/outputs/episode_000000"
+OUT="$ROOT/diagnostic/episode000000-guarded-replay"
+[[ ! -L "$ROOT" && ! -L "$ROOT/diagnostic" && ! -e "$OUT" && ! -L "$OUT" ]]
+mkdir -p "$ROOT/diagnostic"
+mkdir "$OUT"
+chown "$(id -u scenesmith):$(id -g scenesmith)" "$OUT"
+IMAGE="$(python3 - "$ROOT/results/image-guarded-qem.json" <<'PY'
+import json,re,sys
+r=json.load(open(sys.argv[1])); assert r['stage']=='world_reward_guarded_qem_build' and r['status']=='pass'
+assert re.fullmatch('sha256:[0-9a-f]{64}',r['image_id']); print(r['image_id'])
+PY
+)"
+timeout --signal=TERM --kill-after=5s 123s docker run --rm --network none --memory 16g --cpus 4 \
+ --user "$(id -u scenesmith):$(id -g scenesmith)" --entrypoint python \
+ --env WR_ROOT="$ROOT" --env WR_CODE_REVISION="${WR_CODE_REVISION:?}" --env WR_IMAGE_ID="$IMAGE" \
+ --env PYTHONPATH="$CODE/src" --env PYTHONDONTWRITEBYTECODE=1 --env OPENBLAS_NUM_THREADS=1 --env OMP_NUM_THREADS=1 \
+ --mount "type=bind,src=$CODE,dst=$CODE,readonly" \
+ --mount "type=bind,src=$ROOT/results/image-guarded-qem.json,dst=$ROOT/results/image-guarded-qem.json,readonly" \
+ --mount "type=bind,src=$ROOT/validation/guarded_qem_v1/report.json,dst=$ROOT/validation/guarded_qem_v1/report.json,readonly" \
+ --mount "type=bind,src=$BASE/object_budget_guarded/report.json,dst=$BASE/object_budget_guarded/report.json,readonly" \
+ --mount "type=bind,src=$BASE/object_grounded/report.json,dst=$BASE/object_grounded/report.json,readonly" \
+ --mount "type=bind,src=$BASE/object_grounded/object.glb,dst=$BASE/object_grounded/object.glb,readonly" \
+ --mount "type=bind,src=$OUT,dst=$OUT" "$IMAGE" "$CODE/infra/guarded_mesh_diagnose.py" "$@"
