@@ -1815,3 +1815,20 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   NoheavyMac/SSH transfer, sourcepayloadassets12,632B/7files, prepare48,168B/14,
   validation80,112B/24. Bothterminal0 before serialMoGe→DA3→privateCPUdispatch.
   All15newtruths remainprivate; no depthaccuracyresult yet.
+
+- D88 actual runtime **PASS**, general depth replacement **REJECT**,
+  sourced691578c89db3f218afd4b1293f1e8f6957ca18b onVM01. MoGe15calls17.974782s,
+  receipt40aa813e60f5e517172d907bed01b9e01b25cf3c77eec865f1679f7389e23ee5;
+  DA315calls17.353809s, receipt
+  75286c4aab27347d17fb1b9b3f556307f220625c9d49f19149a95f50840c8dce.
+  All30immutableoutputs +sources/assets checkedbeforeprivate; noα/fitting.
+  CPUquality6.235516s, all15objectsupport100%complete, receipt
+  718c10517fbba50a7af1c8b065382443c112079a21e4521b8560dd667a36ab8c.
+  ClipmeanabsrelativeZ MoGe[.0364503,.1058318,.2477178],
+  DA3[.1794567,.1213736,.2824282]; gains[-3.9233216,-.1468538,-.1401205],
+  median **−14.68538%**, all3regress (worst392.332%). Primarygain and
+  nonregression gates FAIL, coverage PASS. KeepMoGe baseline; D76TUD-Lgain
+  19.416% is domain-specific evidence, not permission for generalreplacement.
+  No gate adjustment, depthrescaling, GTcamera adaptation, candidate adoption
+  or human/HOI superiority claim. Freshcohort+allsource receipts preserved;
+  no networkauth/NSG modifications or heavy local transit, unitterminal0.
