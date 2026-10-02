@@ -1022,3 +1022,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   GPU, challenge geometry or accuracy gate during build. Full tiny suite
  3464PASS/1optional-trimesh-testSKIP33.15s; actual procedural geometry checks
   follow on Azure and are not inferred from source-contract tests.
+- 2026-10-02 R86 (Azure volume controls/episode0,5e0a16f): two new controls
+  passed2.968s. Thin cavity CD0.743042%, net-volume0.002443%, max shell0.162438%,
+  zero volume vetoes; six multiscale cavities CD0.548030%, net0.043602%, max
+  shell4.990999%, one native veto. Independent intersections zero and every
+  cavity contained. Separate episode0 proposal passed7.589s: CD0.287107%,
+  net0.483433%, max matched-shell4.999369%, all original46shells retained,
+  final4096faces with independent embedding/float32 export/official packing
+  checks passed. Frozen metric scale baked exactly once, poses unchanged;
+  geometry SHA90579ac5…73380. Engineering-valid mesh proposal, not accuracy
+  validation/adoption or CARI4D victory. Proceed to original full-video pose
+  and native forward chain, not relaxed geometry tolerances.
