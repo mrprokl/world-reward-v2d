@@ -194,3 +194,46 @@ w2c_i=T_i@inv(T_0), c2w_i=T_0@inv(T_i). The provided DDA callback handles self-
 occlusion, not human/mask occlusion. Entropy-only1/2/3-view shape generation is a
 possible separate gate with existing SAM weights, not a complete moving-object
 pipeline or fixed-topology latent decoder. Same SAM license ambiguity persists.
+
+### Next O1 hypothesis: nested pose-only / shape+pose with abstention
+
+[BundleSDF](https://arxiv.org/html/2303.14158) (2023-03-24, CVPR2023,
+sections3.3–3.4) alternates pose graph/SE3 and continuous shape, distinguishing
+uncertain occlusion regions. Measured RGB-D is not monocular MoGe2 evidence.
+[Pinned code licence](https://github.com/NVlabs/BundleSDF/blob/ffa67d425240b5b76d2e387a7dd3d3735a7cf1a1/LICENSE.txt)
+is noncommercial: conceptual inspiration only, no code reuse.
+[CamP](https://arxiv.org/abs/2308.10902) (2023-08-21/30) supplies a projection-
+Jacobian preconditioner idea; [Apache2 source](https://github.com/google-research/google-research/blob/e49bbfe381c9c0e564b937f1c4e163a2273c65cc/camp_zipnerf/internal/camera_delta.py)
+does not make pose covariance calibrated or shape identifiable.
+
+Compare M0=fixed initial shape+SE3 corrections with M1=sharedSPD5+identical SE3
+corrections. Initial poses must come from generic image/depth hypotheses, never
+synthetic truth plus noise. Continuous visible-point distance, isotropic robust
+metric loss, equal frame weights, same pose budgets/priors; no hidden-surface
+attraction, extra scale or intrinsics fitting. Pose dispersion may come from
+automatic pixel-block bootstrap, labelled uncalibrated. Profile reserved-frame
+poses on pixel blocks A, then evaluate on disjoint B; fitting and selecting on
+the same held-out pixels would launder pose/shape error. Default M0: require
+validation gain above block uncertainty, nonregressing silhouette, nonsaturated
+bounds and pose-marginal shape identifiability before proposing M1. This remains
+a design hypothesis, not an implemented or validated replacement fitter.
+
+Use new calibration/test cohorts, untouched by the18failed cases: correct shape,
+representable deformation, weak-view/symmetric geometry, correlated depth noise,
+occlusion, and out-of-family scale/local deformation. Truth only manufactures
+observations/scores, never initializes inference. Score canonical and camera-
+posed geometry and pose separately, without GT realignment. False shape adoption
+on correct or unidentifiable controls falsifies the hypothesis.
+
+### Independent real validation acquisition screen
+
+[CORE4D-Real V2](https://github.com/leolyliu/CORE4D-Instructions/tree/96b9084b9516af3ec4382a65d79e892d3e5c22b9)
+announces CC-BY4.0 and provides object poses, human vertices/joints and camera
+metadata. Its HF card declares MIT; resolve scope before acquisition, audit
+challenge overlap without retrieving FORM-HOI, and avoid restricted SMPL-X
+model/source by evaluating supplied geometry only if its terms permit. Two-person
+Kinect15fps scenes are a domain shift, not automatically a Track1 substitute.
+Future validator would expose one RGB view only to inference, isolate reference
+assets until output hashes freeze, and report raw geometry plus one shared human/
+object Sim3 over the clip. **No CORE4D or BEHAVE data downloaded; no real metric
+validation or certified overlap clearance yet.**
