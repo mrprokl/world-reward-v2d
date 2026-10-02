@@ -1211,3 +1211,18 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   source gelée intacte. Quota Azure vérifié: SKU NCC40adsH100 famille
   StandardNCCads2023Family40/80cores (NCads/H100 autre famille0/0), pas nouvelle
   VM créée; ne pas confondre les noms SKU pour un futur secondGPU.
+- 2026-10-02 D73: avant toute adoption CPUbatch8, un **seul gate sur les
+  vraies profondeurs prédites gelées** épisode15, frames0–8 (8+tail1).
+  Aucun nouveau RGB/label/GT, ni changement de prepare0 actif. Binder original
+  PASS501prep producteur5d4f5db/SHA579498b, depthreceipt611d52a, align788ac61,
+  H5a9458af; champs legacy manquants acceptés uniquement par ces identités
+  exactes/source ép15, pas fallback générique. Regénérer raw=np.where(valid,
+  depth,0), aligned=raw*scale, valid_count=valid.sum **même si depth=0 valide**.
+  Source/indices/float32/clipscale/nativeJSONidentity intacts. Warmup2 chacun
+  et paires AB/BA9frames, tous nouveaux H5 validés exhaustivement: PNG exacts/
+  noms/metadata doivent égaler le **subset original H5**, pas seulement eux.
+ 240s4CPU16g/noGPU/networknone, medianwritegain≥1.25×, hashes entrées vérifiés
+  après, H5 temporaires supprimés. Pas replay501payloads pendant240s: reçu
+  original501exhaustive lié au H5SHA entier reste source. Scope neuf frames
+  write-only, no whole-prep timing/adoption/qualité. Tests48PASS1.03s;
+  anciens protocols/defaults et prédictions restent gelés.
