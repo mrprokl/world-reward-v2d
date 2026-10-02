@@ -193,3 +193,27 @@ source/dependency audit and technical equivalence validation.
 > native `v2d_cari4d/lib/cari4d` despite retained proprietary headers, and whether
 > the provided commercial checkpoint
 > `2026-08-25-09-35-57` is authorized for Track 1 despite its FORM-HOI training origin.
+
+## 4. External real validation subset, not challenge labels
+
+[TUD-L publisher](https://bop.felk.cvut.cz/datasets/#TUD-L) and
+[HFcard6527f7d4b25d3e2e8dec84529284d9797b15f7b5](https://huggingface.co/datasets/bop-benchmark/tudl/blob/6527f7d4b25d3e2e8dec84529284d9797b15f7b5/README.md)
+agree **CC-BY-SA4.0**, commercial use with attribution/share-alike obligations.
+Base/models ZIPs have no LICENSE; retain primary source bytes/URLs separately,
+not an invented embedded grant. HFREADME SHA f35ac7b3…31dcab; publisher447byte
+TUD-L license section SHA aeccefac…20b31a (mutable page drift fails acquisition).
+Attribution: TU Dresden Light, Hodaň, Michel et al., *BOP: Benchmark for 6D Object
+Pose Estimation*, ECCV2018. Preserve original `dataset_info.md`, exact blob
+hashes and modification notice for the selected subset. Never relicense media
+as World Reward Apache. This validation does not generate challenge labels.
+
+TUD-L is object-only RGB-D; no MHR/human quality guarantee. Main private sensor
+evaluation can use external calibration/masks, never challenge calibration or
+inference inputs. No declared MoGe2 train/eval entry names TUD-L, but checkpoint
+training frames/backbone overlap are not independently certified.
+
+Not acquired: CORE4D has conflicting CC-BY/NC metadata and SMPL-X-derived rights;
+HOPE/HANDAL author sites retain NC contrary to HF/BOP cards; HOT3D hand labels
+are NC with extra model restrictions. ContactPose nonmesh data/code MIT is
+promising, but individual mesh terms and useful hashed minibundle remain
+unaudited; do not import MANO fits or pretend it supplies full-body MHR truth.

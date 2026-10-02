@@ -1168,3 +1168,35 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   couvert au warmup mais pas chronométré. CPU4/16g/noGPU/networknone, charge
   CPU concurrente possible pendant préparation0: ne pas annoncer mesure
   isolée. Tests18PASS.24s; tester réellement sur Azure après gel du source.
+- 2026-10-02 R92 (Azure compactCPU,96542a7): **PASS56.838s**, deux paires
+  AB/BA complètes, payload-byte/ordre/métadonnées identiques et validation
+  exhaustive. Median single13.357s, batch8 3.370s, **3.963827× write-only**;
+  validations3.369–3.385s chacune. Zéros/valid_count conservés, fichiersH5
+  temporaires supprimés vérifiés. CPU préparation0 concurrente, donc pas débit
+  isolé du pipeline ni adoption dans son lecteur gelé. R88 ancien16frames
+  garde son statut FAIL. Full suite3740PASS/1optional-trimeshSKIP37.47s.
+  Reçu Body15 distant confirme MHRmodèle SHA352e271a…7377bc, exactement le
+  hash natif du hand-spec; identité assets n'est plus une inconnue d'ABI.
+- 2026-10-02 D72: validation **réelle objet-seul externe TUD-L**, distincte
+  de challengeGT et d'une métrique humaine/HOI complète. Trois scènes IDs1/2/3,
+  neuf RGB préchoisis par noms triés first/median-index100/last avant valeurs
+  privées:0/4074/8227;3/4013/7710;4/4028/7969. Trois ZIP HFpin6527f7d,
+  total374952356bytes, hashes exacts; fulltest14.9GB/train jamais acquis.
+  CC-BY-SA4 publisher et HF concordants, attribution/evidence conservées;
+  sources privées/médias restent Azure, aucune transmission locale. Extraction
+  publique RGB640×480 et SHA seulement, privé depth/K/masks/allinstances/
+  meshes séparé700; ZIP/nonselected nettoyés, subset9 conservé reproductible.
+  Comparer MoGe2 fixedf800 contre9focals RGB→median3/scene→nouveau9fixedFOV;
+  total27 appels natifs, fallback<2sampled64 refusé, même checkpoint/source,
+  aucune scale/GTcalibration/masque privé/Body à l'inférence. Budget600s32g4CPU
+  GPU serial derrière J2, acquisition séparéeCPU600s; évaluationCPU90s.
+  Tous9RGB/predictions/paramètres/counters validés **avant** lecture privée.
+  GTsensor Z×depth_scale(parimage)/1000 et rayons entiers BOP; XYZprédits
+  +.5 restent intacts avec leur propreK, jamais GTK pour reprojeter prédiction.
+  Main CDhalf visibleobjet sur mêmes pixels et mêmes8192samples max; threshold
+  median scene gain≥5%, aucune scène régression>5%, eachmethod coverage≥95%
+  et learned≥fixed−1point parframe. Pas dropping, alignement, oracle-ray,
+  sélection privée ou fauxscore humain. DepthAbsRel/MAE/Zbias/focalerror
+  diagnostiques seulement. TUD-L absent des24datasets train/10eval MoGe2
+  publiés, mais training_overlap_excludedFalse reste obligatoire: pas preuve
+  entièrement unseen, victoire CARI ou clairance du stack SAM/CARI entier.

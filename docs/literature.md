@@ -333,3 +333,26 @@ existing disclosed private diagnostic. Even a fixed-K baseline failure remains
 useful mechanism evidence, not permission to omit difficult clips or retune.
 Clip aggregation reduces jitter, not systematic focal/depth ambiguity: coherent
 projection is testable, **better calibration or metric accuracy is not assumed**.
+
+### External real camera/depth validation — 2026-10-02
+
+Use [TUD-L RGB-D](https://bop.felk.cvut.cz/datasets/#TUD-L) as **object-only**
+sensor evaluation, not human/HOI ground truth or V2D score. Reduced BOP19 ZIP
+372464733bytes plus models/base is374952356bytes, pinned HF6527f7d4. Three
+scenes have200 selected nonadjacent RGBframes each, native640×480; no temporal
+adjacency or accurate acceleration truth assumed. Calibration and visible masks
+are private evaluation only. BOP backprojection uses integer(x,y), while native
+MoGe uses(x+.5,y+.5); unchanged XYZ is equivalent under cx,cy−.5 convention
+conversion. Never erase focal error by reconstructing predicted Z with GTK.
+Sensor depth noise and manually initialized/ICP-propagated mesh poses remain
+limitations; prefer the measured sensor surface over a claim of perfect meshGT.
+
+MoGe2 paper §4/A.2 and
+[trainv2 at925b8ed](https://github.com/microsoft/MoGe/blob/925b8ed835a7a9cdb7578ba15c658a0afc969030/configs/train/v2.json)
+declare **24** datasets (16synthetic/3LiDAR/5SfM), not46. TUD-L/BOP/YCB are not
+listed; [evaluation10datasets](https://github.com/microsoft/MoGe/blob/925b8ed835a7a9cdb7578ba15c658a0afc969030/configs/eval/all_benchmarks.json)
+also excludes TUD-L. Indoor ARKitScenes/Taskonomy/ScanNet++/Hypersim/IRS/
+Structured3D and Objaverse overlap at domain/object level may still matter.
+Exact normal checkpoint card b135031 contains only MIT terms, no frame-level
+attestation; retain `training_overlap_excluded=False`. A paired RGB-only native
+focal-vs-fixed test is useful real mechanism evidence, not verified Track1 gain.
