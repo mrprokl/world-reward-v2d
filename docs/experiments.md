@@ -213,3 +213,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   error 2.38e-7 m; closed-box silhouette IoU 1, projection error 0 px. Camera Z
   and perspective/rectangular-image conventions now independently checked.
   This is numerical geometry validation, not reconstruction accuracy.
+
+- 2026-10-02 R21 (H100 predicted-depth consistency): human-anchored MoGe2
+  pointmap export passed on original frames 0/250/500. Camera K agrees within
+  4.58e-5 pixels, points.Z equals depth exactly and ray reprojection error is
+  <0.000279 pixels. Human rendered-mask IoU: 0.8052/0.8044/0.8432; valid human
+  depth correspondences: 24,212/23,347/25,804. Diagnostic per-frame median
+  depth ratios 1.0891/1.0900/1.0873 are consistent; only one clip scalar is
+  applied. Residuals to predicted human surfaces ~0.0031–0.0038 relative, not
+  independent metric accuracy. Frozen pointmaps remain Azure-only.
+- 2026-10-02 D21: test fixed-shape, fixed-scale rigid object pose using 24 generic
+  orientation hypotheses (not declared object symmetries), automatic observed
+  depth and silhouette. Keep exact official budget arrays; reject lost closed
+  oriented volume. Accept an ICP step only if trimmed depth RMSE and automatic
+  mask IoU do not worsen; report rejected underconstrained/near-plane candidates.
+  Three-frame hypotheses are an engineering smoke, not a full trajectory or
+  score. No depth-only residual masquerades as unseen-surface pose accuracy.
