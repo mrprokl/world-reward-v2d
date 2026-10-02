@@ -77,3 +77,9 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   detector NMS is a likely cause, not established by counts alone. Next test adds
   generic class-wise IoU NMS 0.7, while retaining distinct-instance ambiguity
   rejection and all previous thresholds. No manual per-frame annotations.
+- 2026-10-02 R05: generic NMS 0.7 did not resolve R04; all 16 frames still rejected.
+  This falsifies the simple high-IoU duplicate explanation at that threshold.
+  Stop blind retries or threshold relaxation. Inspect only automatic detector
+  labels/scores/box geometry on three remote RGB frames to distinguish genuine
+  distractors from preprocessing/model-query failure, before changing the method.
+  Full suite now 231 passed locally and on Azure with official-kit parity enabled.

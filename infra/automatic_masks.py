@@ -32,6 +32,7 @@ def main() -> None:
     parser.add_argument("--confidence", type=float, default=0.3)
     parser.add_argument("--ambiguity-margin", type=float, default=0.05)
     parser.add_argument("--nms-iou", type=float, default=0.7)
+    parser.add_argument("--diagnose-only", action="store_true")
     args = parser.parse_args()
     if not 0 <= args.episode < 30 or args.seed_frames < 2:
         raise ValueError("Require a valid episode and at least two seed candidate frames")
@@ -79,6 +80,7 @@ def main() -> None:
             rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
             image = Image.fromarray(rgb)
             groups = []
+            observations = []
             for text in ("person.", record["object_prompt"].strip()):
                 inputs = processor(images=image, text=text, return_tensors="pt").to(device)
                 with torch.inference_mode():
@@ -95,10 +97,26 @@ def main() -> None:
                     raw, image.width, image.height, confidence_threshold=args.confidence,
                     iou_threshold=args.nms_iou,
                 ))
+                observations.append({
+                    "query": text,
+                    "labels": detected["text_labels"],
+                    "boxes": [{"box": x.box, "score": x.score} for x in raw],
+                    "retained": [{"box": x.box, "score": x.score} for x in groups[-1]],
+                })
             candidates.append(FrameDetections(int(frame_index), image.width, image.height, groups[0], groups[1]))
             evidence.append({"frame": int(frame_index), "person_candidates": len(groups[0]), "object_candidates": len(groups[1])})
+            if len(evidence) <= 3:
+                evidence[-1]["detector_observations"] = observations
     finally:
         cap.release()
+    diagnostics = {"episode": args.episode, "frames": total, "observations": evidence,
+                   "confidence": args.confidence, "nms_iou": args.nms_iou,
+                   "detector_revision": DETECTOR_REVISION,
+                   "input_track": "track_1", "ground_truth_used": False, "hand_labeled_test": False}
+    (output / "seed-diagnostics.json").write_text(json.dumps(diagnostics, indent=2) + "\n")
+    if args.diagnose_only:
+        print(json.dumps({"status":"diagnostics_saved", "episode":args.episode}))
+        return
     selected = select_seed_prompts(
         candidates, object_prompt=record["object_prompt"], confidence_threshold=args.confidence,
         ambiguity_margin=args.ambiguity_margin, total_frames=total,
