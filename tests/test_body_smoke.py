@@ -875,6 +875,7 @@ def test_official_episode_identity_requires_integer_not_boolean_or_alias(smoke, 
 def test_body_argument_parser_default15_unchanged_and_all30_supported(smoke):
     default = smoke._argument_parser().parse_args([])
     assert default.episode == 15 and default.full_video is False
+    assert default.inference_type == "body"
     assert default.root == Path("/srv/scenesmith/world-reward")
     for index in range(30):
         parsed = smoke._argument_parser().parse_args(["--episode", str(index), "--full-video"])
@@ -907,3 +908,114 @@ def test_body_main_routes_selected_episode_to_input_guard_before_model_loading(s
     with pytest.raises(StopBeforeModel):
         smoke.main()
     assert calls == [(Path("/srv/tiny-episode-test"), episode)]
+
+
+@pytest.mark.parametrize("full_video", [False, True])
+def test_body_argument_parser_full_is_explicit_hand_proposal_mode(smoke, full_video):
+    arguments = ["--inference-type", "full"] + (["--full-video"] if full_video else [])
+    result = smoke._argument_parser().parse_args(arguments)
+    assert result.inference_type == "full" and result.full_video is full_video
+    assert result.episode == 15
+
+
+@pytest.mark.parametrize("value", ["hand", "Full", "both", "", "oracle"])
+def test_body_argument_parser_rejects_unsupported_inference_mode(smoke, value):
+    with pytest.raises(SystemExit):
+        smoke._argument_parser().parse_args(["--inference-type", value])
+
+
+@pytest.mark.parametrize("episode", [0, 15, 29])
+@pytest.mark.parametrize("full_video,inference_type,directory,stage", [
+    (False, "body", "body_smoke", "sam3d_body_three_frame_smoke"),
+    (True, "body", "body_full", "sam3d_body_full_video_initializer"),
+    (False, "full", "body_hands_smoke", "sam3d_body_three_frame_hand_proposals"),
+    (True, "full", "body_hands_full", "sam3d_body_full_video_hand_proposals"),
+])
+def test_run_layout_body_unchanged_hands_distinct_original_episode(smoke, tmp_path, episode, full_video, inference_type, directory, stage):
+    path, actual_stage = smoke._run_layout(tmp_path, episode, full_video=full_video, inference_type=inference_type)
+    assert path == tmp_path / f"outputs/episode_{episode:06d}" / directory
+    assert actual_stage == stage
+    assert not path.exists()  # layout selection never creates or overwrites files
+
+
+@pytest.mark.parametrize("kwargs", [
+    {"episode_index": True, "full_video": False, "inference_type": "full"},
+    {"episode_index": 30, "full_video": False, "inference_type": "full"},
+    {"episode_index": 15, "full_video": 1, "inference_type": "full"},
+    {"episode_index": 15, "full_video": False, "inference_type": "hand"},
+])
+def test_run_layout_rejects_alias_or_unsupported_contracts(smoke, tmp_path, kwargs):
+    with pytest.raises(ValueError):
+        smoke._run_layout(tmp_path, **kwargs)
+
+
+@pytest.mark.parametrize("inference_type,directory", [("body", "body_smoke"), ("full", "body_hands_smoke")])
+@pytest.mark.parametrize("full_video", [False, True])
+def test_body_main_existing_proposal_outputs_fail_before_weights_sources_or_heavy_imports(smoke, monkeypatch, tmp_path, inference_type, directory, full_video):
+    path, _ = smoke._run_layout(tmp_path, 15, full_video=full_video, inference_type=inference_type)
+    path.mkdir(parents=True)
+    frozen = path / "predictions.npz"
+    frozen.write_bytes(b"frozen-tiny-not-npz")
+    monkeypatch.setattr(smoke, "_validate_inputs", lambda *_args, **_kwargs: {"total_frames": 5, "indices": [0, 2, 4]})
+    monkeypatch.setattr(smoke, "_source_identity", lambda *_: pytest.fail("Existing output must fail before source/weight processing"))
+    monkeypatch.setattr(smoke, "_body_assets", lambda *_: pytest.fail("Existing output must fail before weight I/O"))
+    monkeypatch.setattr(smoke.platform, "system", lambda: "Linux")
+    original_iterdir = Path.iterdir
+    monkeypatch.setattr(Path, "iterdir", lambda p: iter([Path("/sys/class/net/lo")]) if str(p) == "/sys/class/net" else original_iterdir(p))
+    arguments = ["body_smoke.py", "--root", str(tmp_path), "--inference-type", inference_type]
+    if full_video:
+        arguments.append("--full-video")
+    monkeypatch.setattr(smoke.sys, "argv", arguments)
+    monkeypatch.setattr(smoke.sys, "dont_write_bytecode", smoke.sys.dont_write_bytecode)
+    for name in ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "MOMENTUM_ENABLED", "WANDB_MODE"):
+        monkeypatch.setenv(name, "fixture")
+    with pytest.raises(FileExistsError, match="frozen"):
+        smoke.main()
+    assert frozen.read_bytes() == b"frozen-tiny-not-npz"
+
+
+def test_full_hand_output_does_not_overwrite_or_reserve_existing_body_gate(smoke, tmp_path):
+    body, _ = smoke._run_layout(tmp_path, 15, full_video=False, inference_type="body")
+    body.mkdir(parents=True)
+    (body / "report.json").write_text("old-body-report")
+    hands, stage = smoke._run_layout(tmp_path, 15, full_video=False, inference_type="full")
+    assert not hands.exists() and stage.endswith("hand_proposals")
+    assert (body / "report.json").read_text() == "old-body-report"
+
+
+@pytest.mark.parametrize("raw_logits", ["zeroed", "absent", "unrelated"])
+def test_native_forward_encodes_original_blocks_without_raw_pose_or_shape_warp(smoke, raw_logits):
+    prediction = {
+        name: np.linspace(0.01, 0.1, size, dtype=np.float32)
+        for name, size in {"global_rot": 3, "body_pose_params": 133, "hand_pose_params": 108,
+                           "scale_params": 28, "shape_params": 45, "expr_params": 72}.items()
+    }
+    prediction["expr_params"][:] = 0
+    prediction["pred_cam_t"] = np.array([2., 3., 4.], dtype=np.float32)
+    prediction["mhr_model_params"] = np.full(204, 999., dtype=np.float32)
+    if raw_logits != "absent":
+        prediction["pred_pose_raw"] = np.zeros(266) if raw_logits == "zeroed" else np.full(266, 888.)
+    before = {name: value.copy() for name, value in prediction.items()}
+    calls = []
+    sentinel = object()
+    class Head:
+        def mhr(self, *_args, **_kwargs):
+            pytest.fail("Raw204 must not bypass the original parameter-block encoding gate")
+        def mhr_forward(self, **kwargs):
+            calls.append(kwargs)
+            return sentinel
+    assert smoke._native_forward_from_blocks(Head(), prediction) is sentinel
+    assert len(calls) == 1
+    forwarded = calls[0]
+    assert set(forwarded) == {
+        "global_trans", "global_rot", "body_pose_params", "hand_pose_params", "scale_params",
+        "shape_params", "expr_params", "return_keypoints", "return_joint_coords", "return_model_params",
+    }
+    assert forwarded["global_trans"].shape == (1, 3) and not forwarded["global_trans"].any()
+    for name in ("global_rot", "body_pose_params", "hand_pose_params", "scale_params", "shape_params", "expr_params"):
+        np.testing.assert_array_equal(forwarded[name], before[name][None])
+    assert forwarded["scale_params"].shape == (1, 28)  # not expanded physical scales68
+    assert forwarded["body_pose_params"].shape == (1, 133) and forwarded["hand_pose_params"].shape == (1, 108)
+    assert all(forwarded[name] is True for name in ("return_keypoints", "return_joint_coords", "return_model_params"))
+    for name in prediction:
+        np.testing.assert_array_equal(prediction[name], before[name])

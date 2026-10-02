@@ -362,3 +362,13 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Git metadata. Distinct entrypoint directories beneath jobs/<commit> prevent
   same-commit closure collisions; SHA verification remains mandatory. No large
   data/model transfer or arbitrary payload-limit increase.
+
+- 2026-10-02 D32: test native SAM Body full-mode hand proposals on the same
+  predeclared sparse engineering frames, automatic human masks only. Distinct
+  outputs preserve the existing body initializer; no shared-identity or hand
+  accuracy claim. Original133/108/3/28/45/72 parameter blocks must re-forward to
+  predicted vertices/joints/keypoints, not full-mode zeroed266 raw logits.
+  Full mode changes per-frame identity; it is a proposal source, not final
+  challenge reconstruction. Source/weight terms remain independently unresolved
+  for release eligibility. Second-pass SOTA priorities and falsification tests
+  documented in literature.md; no external metric experiment established yet.

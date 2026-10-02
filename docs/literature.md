@@ -8,7 +8,10 @@ Primary papers, project pages, GitHub source/README and Hugging Face metadata we
 2. Body branch: compare GEM-X/SOMA temporal output and SAM3D Body/MHR framewise output against original NLF on permitted non-overlapping external validation. Native SOMA reduces challenge export impedance. Couple a fixed sequence identity and image reprojected evidence; do not replace metric/global evaluation by PA-only.
 3. Object branch: multi-keyframe/seed shape candidates, SAM3D vs Hunyuan, score on withheld *same monocular video* frames for visible silhouette, photometry and robust inferred depth. Shared shape+scale. Do-as-I-Do guided SAM3D shape-fixed tracking is a deployable alternate to FP initialization failures.
 4. Symmetry-aware multi-hypothesis sequence optimization: include 180° hypotheses explicitly, scoring visible evidence + short-term continuity + hand contact. Select global sequence paths rather than greedy top1. Do not average symmetry-equivalent rotations or smooth through genuine fast motion. AgentSTAR is a useful difficult-case procedural shape/pose teacher.
-5. Fine hands: use SAM3D Body hand decoder and/or HaMeR/WiLoR/Dyn-HaMR as proposals; fuse local wrist+finger estimates into full-body chain via optimization. C2Dex supplies canonical-contact stabilization ideas; its implementation is not released.
+5. Fine hands: first activate the already available SAM3D Body hand decoder;
+   fit its articulation proposals under fixed full-clip identity. Do not add
+   HaMeR/WiLoR/Dyn-HaMR/MANO source with unresolved NC/redistribution eligibility.
+   C2Dex supplies canonical-contact ideas; its implementation is not released.
 6. Metric depth: MoGe2 for stable global scale, compare MoGe3 detail as alternate; its fine detail gains do not guarantee better metric calibration. Cross-frame shared scale and focal consensus, calibrating from RGB/allowed priors only.
 7. Physics RL refinement RePHO only after above, not default: original results trade worse 3D accuracy for physics and score successful rollout frames only. All challenge frames must remain reconstructed.
 
@@ -92,3 +95,75 @@ Primary papers, project pages, GitHub source/README and Hugging Face metadata we
 - Shape adoption: reject scale/thickness candidates that win single-frame IoU but worsen heldout-view/time residuals or contact feasibility. Mask erosion for inferred-depth boundary bias; no mesh shrink solely to reduce penetration.
 - Tracker adoption: measure catastrophic flip/reacquisition count, metric translation, surface CD and true acceleration error where external GT exists. Stop fixed smoothing if acceleration goes down but accuracy/dynamic fidelity worsens.
 - Physics adoption: discard if coverage <100%, visual/CD regression overwhelms physics gain, or mass/friction tuning invents unsupported motion. Preserve measured base trajectory fallback for all frames.
+
+## Second-pass prioritized hypotheses — 2026-10-02
+
+### O1: one fixed-topology shape latent from all monocular frames
+
+Implement our own low-dimensional cage/coarse-graph deformation with ARAP or
+Laplacian regularization, alternating a **clip-constant** shape and proper per-frame
+rigid poses. Keep verified K and the one human-anchored depth gauge fixed. Loss:
+visible silhouette, robust visible camera-Z depth and reliable free-space;
+actor-occluded regions are unknown, not negative evidence. Select complementary
+views automatically, check temporally excluded frames. No new model/source
+stack is needed beyond existing SAM (custom terms), Torch/PyTorch3D (BSD).
+
+Fail fast on our own procedural asymmetric/thin/symmetric objects with fast
+motion and occlusion: compare fixed-mesh ICP against shape fitting using metric
+surface/pose/scale errors **without oracle input/alignment**, held-out silhouettes,
+exact topology, closure and orientation. Reject a silhouette-only gain caused
+by shrinking or a regression on the opposite geometry/pose axis.
+
+### O2: MV-SAM3D multi-view latent fusion, adapted to a moving object
+
+- [MV-SAM3D v2](https://arxiv.org/html/2603.11633v2), 2026-04-09;
+  [released code pin abb04b5](https://github.com/devinli123/MV-SAM3D/tree/abb04b5e8af5bc33b0265bdf19937e76bbb6bcdd),
+  2026-05-30, `multi_view_utils.py:94–186`. SAM custom license, not Apache;
+  reuses existing SAM weights, no new checkpoint.
+- Entropy/visibility-weighted generative velocities share geometry with separate
+  pose conditions. GSO-30 reported CD42.0 single-view vs20.2 two-view/17.3 five-view;
+  different normalized protocol, **not Track1 metric evidence**.
+- Static exocamera does not mean static object: if estimated T_i maps object to
+  camera, use effective w2c=T_i and c2w=T_i^-1. Do not pass static scene/DA3
+  cameras as if the object were stationary. Test perturbation robustness from
+  RGB-derived poses before challenge deployment.
+- FlexiCubes topology can change during generation; final mesh is clip-constant,
+  not fixed-topology across decoded latents. O1 needs a frozen template/cage or
+  explicit projection, never invented vertex correspondences.
+
+The September [partial-observation guidance paper](https://arxiv.org/html/2609.10531)
+uses GT-rendered RGB-D in its benchmark and independent normalization/ICP in
+evaluation; no released implementation verified. Useful occupancy/free-space
+idea, not proof of a legal deployable monocular metric solution.
+
+### H1: native hand proposals, not a full-output identity shortcut
+
+Exact available runtime [sam3d_body.py at the audited NVIDIA pin](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam3d_body/lib/sam_3d_body/models/meta_arch/sam3d_body.py):
+body mode returns before hand decoder1217–1219; full mode derives automatic
+hand crops1227–1247 and fuses108 controls/wrists1471–1556. Existing crop/keypoint/
+angle guards1311–1382 are not accuracy evidence. No MANO model is needed.
+
+Full mode also changes scale8/9, scale18:+ and shape40:+ (1558–1593); it cannot
+be exported as a sequence identity unchanged. Use articulated proposals under
+one fixed identity, then verified official conversion. `pred_pose_raw` becomes
+zero1621–1623: re-forward the original body133/hand108/global3/shape45/scale28
+blocks, never decode that placeholder. FreiHAND PA-MPJPE5.5mm is local PA
+evidence, not camera-metric fingers under object occlusion. First sparse run is
+an engineering gate; adoption still needs our own procedural native-MHR hand
+validation (small/occluded/bimanual/free vs grasping) without GT input.
+
+### H2: uncertain canonical contact, independent native-MHR optimization
+
+[C2Dex v2](https://arxiv.org/html/2608.07045v2), 2026-09-06;
+[code pin eae9248](https://github.com/K-Jie/C2Dex_code/tree/eae9248accaedd7a61dccad562f8048bb9e6c36f)
+is README-only, not runnable. Its MPJPE28.55mm remains worse than HOLD22.13mm
+despite better PA/physics quantities: do not equate contact plausibility and
+metric accuracy. Implement independent native-MHR articulation/wrist/limited-arm
+fit using H1 keypoints, priors, non-penetration and only confident contacts.
+Allow free/contact/slip/regrasp states; no attraction from silhouette overlap
+alone. Test noncontact foreground/background crossing, slip and release first.
+Reject artificial hand displacement or over-smoothing masquerading as physics.
+
+Priority: **H1 and O1**, then O2 if pose-conditioned fusion is robust; H2 only
+after object geometry/poses are credible. Gates above remain proposed until
+measured. No challenge GT/manual test labels or new large local assets accessed.

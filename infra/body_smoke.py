@@ -1,4 +1,4 @@
-"""Azure-only, offline SAM 3D Body gate on three fixed Track 1 frames.
+"""Azure-only, offline SAM 3D Body/hand proposal gate on Track 1 frames.
 
 Run in the pinned CARI image with ``docker --network none``. Only automatic
 human masks are accepted. Outputs are raw, per-image model predictions, not a
@@ -270,7 +270,44 @@ def _argument_parser() -> argparse.ArgumentParser:
     parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
     parser.add_argument("--full-video", action="store_true",
                         help="Apply the verified initializer to every original frame; not CARI temporal reconstruction")
+    parser.add_argument("--inference-type", choices=("body", "full"), default="body",
+                        help="Full adds native automatic hand proposals; neither mode fits a clip-constant identity")
     return parser
+
+
+def _run_layout(root: Path, episode_index: int, *, full_video: bool, inference_type: str) -> tuple[Path, str]:
+    if inference_type not in ("body", "full") or type(full_video) is not bool:
+        raise ValueError("Require body/full inference and an explicit full-video boolean")
+    if type(episode_index) is not int or not 0 <= episode_index < TRACK1_EPISODE_COUNT:
+        raise ValueError("Require an integer Track 1 episode index in 0..29")
+    if inference_type == "full":
+        directory = "body_hands_full" if full_video else "body_hands_smoke"
+        stage = ("sam3d_body_full_video_hand_proposals" if full_video
+                 else "sam3d_body_three_frame_hand_proposals")
+    else:
+        directory = "body_full" if full_video else "body_smoke"
+        stage = "sam3d_body_full_video_initializer" if full_video else "sam3d_body_three_frame_smoke"
+    return root / f"outputs/episode_{episode_index:06d}" / directory, stage
+
+
+def _native_forward_from_blocks(head, prediction):
+    """Decode original parameter blocks, never the full-mode zeroed raw logits.
+
+    The head owns the exact scale/PCA transforms. Its public forward returns
+    metres before the SAM camera YZ flip. Root translation stays zero here;
+    pred_cam_t is added exactly once later. No averaging or shape/scale fitting
+    belongs in this proposal gate.
+    """
+    return head.mhr_forward(
+        global_trans=prediction["global_rot"][None] * 0,
+        global_rot=prediction["global_rot"][None],
+        body_pose_params=prediction["body_pose_params"][None],
+        hand_pose_params=prediction["hand_pose_params"][None],
+        scale_params=prediction["scale_params"][None],
+        shape_params=prediction["shape_params"][None],
+        expr_params=prediction["expr_params"][None],
+        return_keypoints=True, return_joint_coords=True, return_model_params=True,
+    )
 
 
 def main() -> None:
@@ -288,11 +325,12 @@ def main() -> None:
     inputs = _validate_inputs(root, episode_index=args.episode)
     if args.full_video:
         inputs["indices"] = list(range(inputs["total_frames"]))
-    source_hashes = _source_identity(root)
-    body_directory, asset_hashes = _body_assets(root)
-    output_directory = root / f"outputs/episode_{args.episode:06d}" / ("body_full" if args.full_video else "body_smoke")
+    output_directory, stage = _run_layout(root, args.episode, full_video=args.full_video,
+                                          inference_type=args.inference_type)
     if output_directory.exists():
         raise FileExistsError("Body smoke outputs are frozen; use a clean run directory, not overwrite")
+    source_hashes = _source_identity(root)
+    body_directory, asset_hashes = _body_assets(root)
     import cv2
     import numpy as np
     from PIL import Image
@@ -379,7 +417,7 @@ def main() -> None:
                     # Match CARI's production _prepare_batch, not the generic
                     # estimator wrapper which forwards raw 0/255 PNG values.
                     img=rgb, bboxes=box[None], masks=(mask > 0).astype(np.uint8)[..., None],
-                    cam_int=None, inference_type="body",
+                    cam_int=None, inference_type=args.inference_type,
                 )
             if not isinstance(predictions, list) or len(predictions) != 1:
                 raise RuntimeError("Expected exactly one body prediction per fixed image")
@@ -391,15 +429,28 @@ def main() -> None:
                 arrays[key].append(value.detach().float().cpu().numpy())
             if torch.count_nonzero(prediction["expr_params"]).item() != 0:
                 raise RuntimeError("SAM 3D Body facial expressions must be disabled")
+            if args.inference_type == "full" and torch.count_nonzero(prediction["pred_pose_raw"]).item() != 0:
+                raise RuntimeError("Pinned full hand fusion must zero invalidated raw pose logits; audit only")
             with torch.inference_mode():
-                native, _ = model.head_pose.mhr(
-                    prediction["shape_params"][None], prediction["mhr_model_params"][None],
-                    prediction["expr_params"][None],
-                )
-                recovered = native[0] * torch.tensor([1., -1., -1.], device=native.device) / 100.
+                native, native_keypoints, native_joints, native_controls = _native_forward_from_blocks(
+                    model.head_pose, prediction)
+                if (native.shape != (1, 18439, 3) or native_joints.shape != (1, 127, 3)
+                    or native_keypoints.ndim != 3 or native_keypoints.shape[0] != 1
+                    or native_keypoints.shape[1] < 70 or native_keypoints.shape[2] != 3
+                    or native_controls.shape != (1, 204)
+                    or any(not torch.isfinite(value).all() for value in (
+                        native, native_keypoints, native_joints, native_controls))):
+                    raise RuntimeError("Native parameter-block forward shape/finite contract failed")
+                camera_flip = torch.tensor([1., -1., -1.], device=native.device, dtype=native.dtype)
+                recovered = native[0] * camera_flip
                 unit_error = torch.linalg.vector_norm(recovered - prediction["pred_vertices"], dim=-1).max()
+                joint_error = torch.linalg.vector_norm(native_joints[0] * camera_flip - prediction["pred_joint_coords"], dim=-1).max()
+                keypoint_error = torch.linalg.vector_norm(native_keypoints[0, :70] * camera_flip - prediction["pred_keypoints_3d"], dim=-1).max()
+                control_error = (native_controls[0] - prediction["mhr_model_params"]).abs().max()
             if not torch.isfinite(unit_error) or float(unit_error) > 1e-5:
-                raise RuntimeError("Raw MHR forward does not reproduce camera-relative vertices in metres")
+                raise RuntimeError("Original MHR parameter-block forward does not reproduce camera-relative vertices in metres")
+            if float(joint_error) > 1e-5 or float(keypoint_error) > 1e-5 or float(control_error) > 1e-5:
+                raise RuntimeError("Original MHR parameter-block forward disagrees with joints/keypoints/native controls")
             vertices = arrays["pred_vertices"][-1] + arrays["pred_cam_t"][-1][None]
             if arrays["pred_cam_t"][-1][2] <= 0 or not np.isfinite(vertices).all():
                 raise RuntimeError("Invalid camera translation/translated native mesh")
@@ -423,6 +474,9 @@ def main() -> None:
                 "decoded_rgb_sha256": hashlib.sha256(rgb.tobytes()).hexdigest(),
                 "mask_pixels": len(xs), "bbox_xyxy": box.tolist(),
                 "native_forward_max_error_m": float(unit_error),
+                "native_joint_forward_max_error_m": float(joint_error),
+                "native_keypoint_forward_max_error_m": float(keypoint_error),
+                "native_controls_forward_max_error": float(control_error),
                 "projection_max_error_px": projection_error,
             })
     finally:
@@ -437,13 +491,13 @@ def main() -> None:
     with predictions_path.open("xb") as handle:
         np.savez_compressed(handle, **arrays)
     report = {
-        "stage": "sam3d_body_full_video_initializer" if args.full_video else "sam3d_body_three_frame_smoke",
+        "stage": stage,
         "status": "pass", "episode_index": args.episode,
         "total_video_frames": inputs["total_frames"], "frame_indices": inputs["indices"],
         "input_track": "track_1", "input_sha256": inputs["video_sha256"],
         "input_dataset_revision": inputs["dataset_revision"],
         "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": [],
-        "network": "none", "inference_type": "body", "camera_intrinsics": "RGB_size_default_FOV",
+        "network": "none", "inference_type": args.inference_type, "camera_intrinsics": "RGB_size_default_FOV",
         "human_mask_id": 0, "prompt_mode": "automatic_mask_and_derived_bbox_no_fallback",
         "decoder_mask_config": mask_conditioning,
         "model_mask_range": "uint8_0_1_matches_CARI_prepare_batch",
@@ -454,6 +508,10 @@ def main() -> None:
         "raw_mhr_geometry_units": "centimetres_before_/100_and_YZ_flip",
         "human_identity_clip_constant": False, "submission_eligible": False,
         "mhr_geometry_forward_verified": True, "challenge_performance_verified": False,
+        "mhr_geometry_forward_basis": "original_body133_hand108_global_rot3_scale28_shape45_expr72_not_raw_logits",
+        "raw_pose_logits_role": "audit_only_zeroed_after_full_hand_fusion" if args.inference_type == "full" else "audit_only_not_decoder_input",
+        "hand_decoder_proposals": args.inference_type == "full",
+        "hand_accuracy_verified": False, "human_identity_fitting_performed": False,
         "body_revision": BODY_REVISION, "body_assets": asset_hashes,
         "asset_hash_assurance": "recorded_local_hashes_after_pinned_acquisition_not_independent_release_hashes",
         "upstream_revision": UPSTREAM_REVISION, "inference_source_identity": source_hashes,
