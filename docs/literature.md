@@ -416,3 +416,21 @@ experiments.md, no privatecalibration/inference/manualtestlabels.
 Lowerprioritysafe-separatedGeoCalibfront-end+ourcamera math and discreteSAM
 mesh selection need separate rights/runtime audit; fullPerspectiveFields-adapted
 package is not cleared by top-levelApache or CC-BY weights alone.
+
+### D78 falsification and camera independence (2026-10-02)
+FreshJ3affinefits reduce predictedhuman spatialheldout relativeerror from
+[.01205,.01292,.02920] to[.00207,.00251,.00408], but objectcameraCDhalf
+regresses6.6042%median. αapproximately[.350,.388,.364] and β2.6–5.5m show
+localhuman-consistency collapses depthcontrast without establishing wider
+scenegeometry; do not tune βclipcaps/conditioning on theseprivateanswers.
+Relativehuman-objectcentroiderrors improve all3 yet rawcameraCD fails; neither
+metric alone certifies fullHOI. AffineJ3 is rejected under its predeclared gate.
+Pinned SAMBody's cam_int=None is NOT an independentcamera estimator: current
+SAM3DBodyEstimator is built without fov_estimator, so prepare_batch defaults
+f=hypot(W,H). Optionalnative FOVEstimator(name=moge2) calls the sameMoGe2
+focalinference; it would not provide independent evidence againstJ2regression.
+Next independentcamera evidence can come from perspective/gravity frontend or
+constrained backgroundvanishingpoints, with mandatoryweak-sceneabstention and
+freshnonchallengequality validation. GeoCalibwholepackage remainsuncleared
+because PerspectiveFieldsadaptedsource; audit commerciallycompatible frontend
+subset before acquisition and derive ownpinholemath ratherthancopyrestrictedLM.
