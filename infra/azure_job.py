@@ -237,10 +237,12 @@ systemd-run --unit "$UNIT" --property=Type=exec \\
 systemctl show "$UNIT" -p ActiveState -p ExecMainStatus -p MainPID
 """
     print(f"immutable_runtime_bundle_files={len(paths)} encoded_bytes={len(encoded)} revision={revision}", flush=True)
-    subprocess.run(["rtk", "proxy", "az", "vm", "run-command", "invoke",
+    result = subprocess.run(["rtk", "proxy", "az", "vm", "run-command", "invoke",
                     "--resource-group", args.resource_group, "--name", args.vm_name,
                     "--command-id", "RunShellScript", "--scripts", command,
-                    "--query", "value[0].message", "-o", "tsv"], check=True)
+                    "--query", "value[0].message", "-o", "tsv"], check=False)
+    if result.returncode:
+        raise RuntimeError("Azure dispatch failed; inspect target unit/log before any retry (payload omitted)")
 
 
 if __name__ == "__main__":

@@ -204,7 +204,7 @@ def test_symlink_runtime_aliases_rejected():
         launcher.runtime_archive(full_archive(files(), symlink=True), "infra/run_smoke.sh")
 
 
-def launch_stub(monkeypatch, args):
+def launch_stub(monkeypatch, args, *, returncode=0):
     """Capture argv and frozen remote script; no Git/Azure subprocess executes."""
     calls = []; revision = "a"*40
     def git(command):
@@ -215,10 +215,19 @@ def launch_stub(monkeypatch, args):
         if command[3] == "archive": return full_archive(files())
         raise AssertionError(command)
     monkeypatch.setattr(launcher.subprocess, "check_output", git)
-    monkeypatch.setattr(launcher.subprocess, "run", lambda command, **kwargs: calls.append((command, kwargs)))
+    def azure(command, **kwargs):
+        calls.append((command, kwargs))
+        return type('Result', (), {'returncode': returncode})()
+    monkeypatch.setattr(launcher.subprocess, "run", azure)
     launcher.main(["--name", "unit-test", "--script", "infra/run_smoke.sh", *args])
-    assert len(calls) == 1 and calls[0][1] == {"check": True}
+    assert len(calls) == 1 and calls[0][1] == {"check": False}
     return calls[0][0]
+
+
+def test_failed_dispatch_does_not_echo_frozen_payload_or_retry(monkeypatch):
+    with pytest.raises(RuntimeError,match='payload omitted') as caught:
+        launch_stub(monkeypatch,[],returncode=1)
+    assert 'base64' not in str(caught.value) and '--scripts' not in str(caught.value)
 
 
 def test_legacy_defaults_identical_to_explicit_target_and_snapshot(monkeypatch):
