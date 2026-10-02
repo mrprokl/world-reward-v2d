@@ -120,4 +120,11 @@ sparse exclusion of directories named `data` removed six **Python source** files
 inside SAM 3D Body. Restore only those exact 29,647 bytes from the audited pin;
 never include real datasets/GT/fixtures. Rebuild only a small derivative CARI
 source layer. Explicit code whitelist fixes future bootstrap; offline Git checks
-forbid lazy fetching. No body reconstruction result yet.
+forbid lazy fetching. Source imports pass; Body checkpoint state compatibility
+is being audited before any claim of forward success.
+
+Objects initial runtime missed Open3D's libusb dependency; small derivative
+`world-reward/sam3d-runtime:0.1` import gate passes after libusb installation.
+Offline first object generation passed in 45.90 s, all output on Azure. Raw mesh
+is 751,586 vertices/1,503,164 faces, closed and consistently oriented; generative
+scale not yet calibrated or suitable for submission. Full local suite 423 passed.

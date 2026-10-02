@@ -159,3 +159,18 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Sources: https://virtualhumans.mpi-inf.mpg.de/behave/license.html ;
   https://intercap.is.tue.mpg.de/license.html ;
   https://github.com/facebookresearch/pytorch3d/blob/main/LICENSE .
+- 2026-10-02 R14: object model import failed on missing `libusb-1.0.so.0`.
+  Install just libusb in a derivative image, then pre-GPU Open3D/Objects import
+  passes. Real offline fixed frame 0/seed 0 generation subsequently passed in
+  45.90 s: 751,586 vertices, 1,503,164 faces, watertight and consistent winding.
+  Transform scale 0.07596754 is an inferred generative estimate, **not calibrated
+  physical scale**. Geometry must be decimated/validated and metrified before
+  CARI4D; no final submission/reconstruction quality claim.
+- 2026-10-02 R15: Body source repair passed imports; strict checkpoint gate then
+  rejected state missing from the network checkpoint but constructed from MHR
+  assets, plus DINO mask token and unused hand PCA copies. Do not ignore arbitrary
+  missing weights. Bind exact MHR submodule state to an independent load of the
+  explicit pinned SAM asset, require learned/head state, audit genuinely unused
+  inference state separately. Added 98 small Body guard tests including retained
+  buffer alias regression; corrected comparison snapshot clone. Full suite 423
+  passed. Body model forward remains unverified until these gates pass.
