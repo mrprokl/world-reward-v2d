@@ -744,3 +744,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   replay. Frozen±0.001/0.002rad, finite nonzero vertex/orientation derivatives,
   excluded-joint/scales invariance,300s total/120s forward phase. No challenge
   inputs or full H1 adoption; neutral semantics is not RGB or hand accuracy.
+- 2026-10-02 D53: separate CPU real-object endpoint budget proposal, explicit
+  episode0..29,900s/4CPU/16GiB. Exact position welding preserves every oriented
+  triangle before one QEM call; no approximate merging, face cleanup or repairs.
+  Canonical GLB export then exact official weld/padding fidelity check, topology,
+  intersections, source deviation and once-baked grounding scale. Full-resolution
+  source cavity containment remains unverified; final two-shell containment is
+  checked where applicable. No pose/production route or frozen output changes.
