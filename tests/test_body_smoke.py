@@ -801,3 +801,109 @@ def test_explicit_retained_parameter_snapshot_cannot_mutate_during_loading(smoke
     fixture.loader = bad_loader
     with pytest.raises(RuntimeError, match="buffers changed during checkpoint loading"):
         load_explicit(smoke, fixture)
+
+
+def episode_inputs(smoke, audited_inputs, episode_index):
+    """Add a distinct tiny episode while preserving the default15 fixtures."""
+    other = episode_index
+    episodes = [json.loads(line) for line in audited_inputs.episodes.read_text().splitlines()]
+    if other != smoke.EPISODE:
+        episodes.append({"episode_index": other, "length": audited_inputs.total})
+    payload = "".join(json.dumps(item) + "\n" for item in episodes).encode()
+    audited_inputs.episodes.write_bytes(payload)
+    audited_inputs.manifest["files"][0] = record("track_1/meta/episodes.jsonl", payload)
+    relative = f"track_1/videos/chunk-000/observation.images.exo_camera/episode_{other:06d}.mp4"
+    if other != smoke.EPISODE:
+        video, entry = write_input(audited_inputs.root, relative, f"not-media-episode-{other}".encode())
+        audited_inputs.manifest["files"].append(entry)
+    else:
+        video, entry = audited_inputs.video, audited_inputs.video_entry
+    audited_inputs.manifest_path.write_text(json.dumps(audited_inputs.manifest))
+    masks = audited_inputs.root / f"outputs/episode_{other:06d}/automatic_masks"
+    human = masks / "masks/0"
+    human.mkdir(parents=True, exist_ok=True)
+    for index in range(audited_inputs.total):
+        (human / f"{index:06d}.png").write_bytes(b"not-a-png")
+    report = dict(audited_inputs.report, episode_index=other, input_sha256=entry["sha256"])
+    (masks / "report.json").write_text(json.dumps(report))
+    (masks / "prompts.json").write_text(json.dumps(audited_inputs.prompts))
+    return SimpleNamespace(video=video, entry=entry, masks=masks, human=human, report=report)
+
+
+@pytest.mark.parametrize("episode", range(30))
+def test_validate_inputs_all_track1_episodes_keep_distinct_paths_provenance(smoke, audited_inputs, episode):
+    chosen = episode_inputs(smoke, audited_inputs, episode)
+    original_default_video = audited_inputs.video.read_bytes()
+    result = smoke._validate_inputs(audited_inputs.root, episode_index=episode)
+    assert result["episode_index"] == episode
+    assert result["dataset_revision"] == smoke.DATASET_REVISION
+    assert result["video"] == chosen.video
+    assert result["video_sha256"] == chosen.entry["sha256"]
+    assert result["human_masks"] == chosen.human
+    assert result["indices"] == [0, 2, 4]
+    assert audited_inputs.video.read_bytes() == original_default_video
+
+
+@pytest.mark.parametrize("episode", [-1, 30, True, False, 15., "15", None, np.int64(15)])
+def test_validate_inputs_episode_index_strict_before_any_file_lookup(smoke, tmp_path, monkeypatch, episode):
+    monkeypatch.setattr(smoke, "_manifest_file", lambda *_: pytest.fail("Invalid episode must fail before any file lookup"))
+    with pytest.raises(ValueError, match="integer Track 1 episode index"):
+        smoke._validate_inputs(tmp_path, episode_index=episode)
+
+
+@pytest.mark.parametrize("field,value", [("episode_index", 15), ("episode_index", True), ("episode_index", 1.), ("input_sha256", "0" * 64)])
+def test_selected_episode_rejects_wrong_mask_provenance(smoke, audited_inputs, field, value):
+    chosen = episode_inputs(smoke, audited_inputs, 1)
+    chosen.report[field] = value
+    (chosen.masks / "report.json").write_text(json.dumps(chosen.report))
+    with pytest.raises(ValueError, match="provenance"):
+        smoke._validate_inputs(audited_inputs.root, episode_index=1)
+
+
+@pytest.mark.parametrize("episode_value", [True, 1., "1"])
+def test_official_episode_identity_requires_integer_not_boolean_or_alias(smoke, audited_inputs, episode_value):
+    chosen = episode_inputs(smoke, audited_inputs, 1)
+    entries = [{"episode_index": smoke.EPISODE, "length": 5}, {"episode_index": episode_value, "length": 5}]
+    payload = "".join(json.dumps(item) + "\n" for item in entries).encode()
+    audited_inputs.episodes.write_bytes(payload)
+    audited_inputs.manifest["files"][0] = record("track_1/meta/episodes.jsonl", payload)
+    audited_inputs.manifest_path.write_text(json.dumps(audited_inputs.manifest))
+    with pytest.raises(ValueError, match="episode 1 frame count"):
+        smoke._validate_inputs(audited_inputs.root, episode_index=1)
+
+
+def test_body_argument_parser_default15_unchanged_and_all30_supported(smoke):
+    default = smoke._argument_parser().parse_args([])
+    assert default.episode == 15 and default.full_video is False
+    assert default.root == Path("/srv/scenesmith/world-reward")
+    for index in range(30):
+        parsed = smoke._argument_parser().parse_args(["--episode", str(index), "--full-video"])
+        assert parsed.episode == index and parsed.full_video is True
+
+
+@pytest.mark.parametrize("episode", ["-1", "30", "1.0", "true"])
+def test_body_argument_parser_rejects_invalid_episode(smoke, episode):
+    with pytest.raises(SystemExit):
+        smoke._argument_parser().parse_args(["--episode", episode])
+
+
+@pytest.mark.parametrize("episode", [0, 15, 29])
+def test_body_main_routes_selected_episode_to_input_guard_before_model_loading(smoke, monkeypatch, episode):
+    class StopBeforeModel(Exception): pass
+    calls = []
+    def validate(root, *, episode_index):
+        calls.append((root, episode_index))
+        return {"total_frames": 5, "indices": [0, 2, 4]}
+    def stop(_root): raise StopBeforeModel()
+    monkeypatch.setattr(smoke, "_validate_inputs", validate)
+    monkeypatch.setattr(smoke, "_source_identity", stop)
+    monkeypatch.setattr(smoke.platform, "system", lambda: "Linux")
+    original_iterdir = Path.iterdir
+    monkeypatch.setattr(Path, "iterdir", lambda path: iter([Path("/sys/class/net/lo")]) if str(path) == "/sys/class/net" else original_iterdir(path))
+    monkeypatch.setattr(smoke.sys, "argv", ["body_smoke.py", "--root", "/srv/tiny-episode-test", "--episode", str(episode), "--full-video"])
+    monkeypatch.setattr(smoke.sys, "dont_write_bytecode", smoke.sys.dont_write_bytecode)
+    for name in ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "MOMENTUM_ENABLED", "WANDB_MODE"):
+        monkeypatch.setenv(name, "fixture")
+    with pytest.raises(StopBeforeModel):
+        smoke.main()
+    assert calls == [(Path("/srv/tiny-episode-test"), episode)]

@@ -10,28 +10,33 @@ from pathlib import Path
 import platform
 import time
 
-from body_smoke import _validate_inputs
+from body_smoke import EPISODE, TRACK1_EPISODE_COUNT, _validate_inputs
 from world_reward.data import sha256
 from world_reward.pointmap import validate_camera_pointmap
+
+
+def _argument_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
+    parser.add_argument("--full-video", action="store_true")
+    return parser
 
 
 def main() -> None:
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux GPU container with network none")
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--full-video", action="store_true")
-    args = parser.parse_args()
+    args = _argument_parser().parse_args()
+    root = Path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"))
+    inputs = _validate_inputs(root, episode_index=args.episode)
     import cv2
     import numpy as np
     import torch
     from moge.model.v2 import MoGeModel
-    root = Path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"))
-    inputs = _validate_inputs(root)
     revision = "b135031bae30b5ac2ae141a0e68717795ce38340"
     path = root / f"weights/cari4d/hf_home/hub/models--Ruicheng--moge-2-vitl-normal/snapshots/{revision}/model.pt"
     if not path.is_file() or not torch.cuda.is_available():
         raise RuntimeError("Pinned local MoGe2/CUDA missing")
-    output = root / "outputs/episode_000015" / ("depth_full" if args.full_video else "depth_smoke")
+    output = root / f"outputs/episode_{args.episode:06d}" / ("depth_full" if args.full_video else "depth_smoke")
     output.mkdir(exist_ok=False)
     started = time.perf_counter()
     model = MoGeModel.from_pretrained(str(path)).cuda().eval()
@@ -81,7 +86,8 @@ def main() -> None:
     finally:
         cap.release()
     report = {"stage": "monocular_moge2_full_video" if args.full_video else "monocular_moge2_three_frame",
-              "status": "pass", "frames": records, "total_video_frames": inputs["total_frames"],
+              "status": "pass", "episode_index": args.episode, "frames": records, "total_video_frames": inputs["total_frames"],
+              "input_dataset_revision": inputs["dataset_revision"],
               "array_storage": "verified_camera_Z_K_mask_no_redundant_XYZ" if args.full_video else "depth_points_K_mask",
               "elapsed_seconds": time.perf_counter() - started, "model_revision": revision,
               "model_sha256": sha256(path), "input_sha256": inputs["video_sha256"],
@@ -90,7 +96,7 @@ def main() -> None:
               "oracle_modes": [], "network": "none", "challenge_performance_verified": False,
               "metric_scale_accuracy_verified": False, "script_sha256": sha256(Path(__file__))}
     (output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
-    print(json.dumps({"stage": report["stage"], "status": "pass", "frames": len(records),
+    print(json.dumps({"stage": report["stage"], "status": "pass", "episode_index": args.episode, "frames": len(records),
                       "elapsed_seconds": report["elapsed_seconds"], "metric_scale_accuracy_verified": False}))
 
 

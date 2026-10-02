@@ -3,10 +3,15 @@ set -euo pipefail
 ROOT="${WR_ROOT:-/srv/scenesmith/world-reward}"
 CODE="${WR_CODE:?Require immutable committed source}"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-while [[ "$(systemctl show world-reward-cari-prepare -p ActiveState --value)" == active ]]; do
-  sleep 30
-done
-test -f "$ROOT/outputs/episode_000015/cari_inputs/report.json"
+if [[ "$#" == 0 ]]; then
+  while [[ "$(systemctl show world-reward-cari-prepare-v2 -p ActiveState --value)" == active ]]; do
+    sleep 30
+  done
+  test -f "$ROOT/outputs/episode_000015/cari_inputs/report.json"
+elif [[ "$#" != 1 || "$1" != --kernel-only ]]; then
+  echo 'Only default full forward or --kernel-only is supported' >&2
+  exit 2
+fi
 docker run --rm --gpus all --network none \
   --user "$(id -u scenesmith):$(id -g scenesmith)" \
   --env WR_ROOT="$ROOT" --env WR_CODE_REVISION="${WR_CODE_REVISION:?}" --env PYTHONPATH="$CODE/src" \

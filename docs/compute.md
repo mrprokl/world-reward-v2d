@@ -163,3 +163,10 @@ restart it because an Azure observation times out. The final Viterbi trajectory
 will be in `geometry_and_poses.npz`; per-frame `selected` diagnostics are greedy
 initializer comparisons, not the final selected path. No challenge submission
 or benchmark-win claim has been made.
+
+Native input preparation waiter `world-reward-cari-prepare-v2` launched from
+`5d4f5db` after stopping only its waiting predecessor for a verified EXDEV source
+bug; object producer stays unchanged. Latest combined observation 10:34:59 UTC:
+both active, object progress100/501 at788.14 s. No final pose/native-forward
+result yet. The state-load-only CARI gate can now run independently of episode
+input preparation; full forward still requires its verified report.

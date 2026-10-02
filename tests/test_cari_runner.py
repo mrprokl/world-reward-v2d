@@ -69,6 +69,24 @@ def test_exact_native_forward_only_command_and_offline_plan(runner, inputs):
         assert forbidden not in plan["argv"]
 
 
+def test_checkpoint_gate_environment_independent_of_episode_artifacts(runner, inputs, monkeypatch):
+    def forbidden(*args, **kwargs): raise AssertionError("No assets or episode reads")
+    monkeypatch.setattr(Path, "read_text", forbidden)
+    monkeypatch.setattr(Path, "exists", forbidden)
+    environment = runner.build_cari_runtime_environment(
+        inputs["native_root"], inputs["mhr_assets_root"], inputs["torch_home"], inputs["sam3d_source_root"],
+    )
+    assert environment == runner.build_cari_forward_command(**inputs)["environment"]
+    assert "TOKEN" not in " ".join(environment)
+
+
+@pytest.mark.parametrize("native, body", [("relative", "/srv/body"), ("/srv/native:evil", "/srv/body"),
+                                        ("/srv/native", "/srv/body:evil")])
+def test_independent_runtime_environment_still_rejects_path_injection(runner, native, body):
+    with pytest.raises(ValueError):
+        runner.build_cari_runtime_environment(native, "/srv/assets", "/srv/torch", body)
+
+
 def test_exact_96_frame_window_allowed_without_padding(runner, inputs):
     inputs["total_frames"] = 96
     assert runner.build_cari_forward_command(**inputs)["metadata"]["original_frame_count"] == 96

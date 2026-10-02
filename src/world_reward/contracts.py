@@ -4,6 +4,33 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import numpy as np
+from numbers import Integral
+
+
+def require_rigid_transforms(transforms: np.ndarray, total_frames: int) -> None:
+    """Reject scale, shear, reflections and perspective in a camera pose batch.
+
+    No projection onto SO(3): invalid native output must fail rather than be
+    silently repaired. Tolerances account for float32 roundoff only.
+    """
+    if isinstance(total_frames, (bool, np.bool_)) or not isinstance(total_frames, Integral) or total_frames < 1:
+        raise ValueError("total_frames must be a positive integer")
+    if np.ma.isMaskedArray(transforms):
+        raise ValueError("Rigid transforms cannot hide invalid entries behind a mask")
+    value = np.asarray(transforms)
+    if (value.shape != (total_frames, 4, 4)
+            or not (np.issubdtype(value.dtype, np.integer) or np.issubdtype(value.dtype, np.floating))
+            or not np.isfinite(value).all()):
+        raise ValueError("Require finite real [T,4,4] rigid transforms")
+    value = value.astype(np.float64)
+    if not np.allclose(value[:, 3], [0, 0, 0, 1], atol=1e-5, rtol=0):
+        raise ValueError("Rigid transforms must have homogeneous bottom row [0,0,0,1]")
+    rotation = value[:, :3, :3]
+    with np.errstate(over="ignore", invalid="ignore"):
+        if not np.allclose(rotation @ rotation.swapaxes(-1, -2), np.eye(3), atol=1e-4, rtol=0):
+            raise ValueError("Rigid transforms must contain orthonormal rotations")
+        if not np.allclose(np.linalg.det(rotation), 1, atol=1e-4, rtol=0):
+            raise ValueError("Rigid transforms must contain proper rotations, not reflections")
 
 
 @dataclass(frozen=True)

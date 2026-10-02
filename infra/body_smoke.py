@@ -23,6 +23,7 @@ from world_reward.data import sha256
 
 
 EPISODE = 15
+TRACK1_EPISODE_COUNT = 30
 UPSTREAM_REVISION = "7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80"
 DATASET_REVISION = "5f68335f3acc802033d1e80728c1633197521de8"
 BODY_REVISION = "11aaa346c7204874a1cbafe3d39a979080b2c55a"
@@ -107,7 +108,9 @@ def _source_identity(root: Path) -> dict:
     }
 
 
-def _validate_inputs(root: Path) -> dict:
+def _validate_inputs(root: Path, episode_index: int = EPISODE) -> dict:
+    if type(episode_index) is not int or not 0 <= episode_index < TRACK1_EPISODE_COUNT:
+        raise ValueError("Require an integer Track 1 episode index in 0..29")
     manifest = json.loads((root / "results/input-manifest.json").read_text())
     if (manifest.get("track"), manifest.get("repo_id"), manifest.get("revision")) != (
         "track_1", "nvidia/video_to_data_challenge", DATASET_REVISION,
@@ -115,23 +118,26 @@ def _validate_inputs(root: Path) -> dict:
         raise ValueError("Require the audited, pinned official Track 1 input manifest")
     episodes_path, _ = _manifest_file(root, manifest, "track_1/meta/episodes.jsonl")
     episodes = [json.loads(line) for line in episodes_path.read_text().splitlines()]
-    matches = [episode for episode in episodes if episode["episode_index"] == EPISODE]
+    matches = [episode for episode in episodes if type(episode.get("episode_index")) is int and episode["episode_index"] == episode_index]
     if len(matches) != 1 or type(matches[0]["length"]) is not int or matches[0]["length"] < 3:
-        raise ValueError("Missing/invalid official episode 15 frame count")
+        raise ValueError(f"Missing/invalid official episode {episode_index} frame count")
     total = matches[0]["length"]
-    relative = f"track_1/videos/chunk-000/observation.images.exo_camera/episode_{EPISODE:06d}.mp4"
+    relative = f"track_1/videos/chunk-000/observation.images.exo_camera/episode_{episode_index:06d}.mp4"
     video, video_hash = _manifest_file(root, manifest, relative)
-    masks_root = root / f"outputs/episode_{EPISODE:06d}/automatic_masks"
+    masks_root = root / f"outputs/episode_{episode_index:06d}/automatic_masks"
     mask_report_path = masks_root / "report.json"
     mask_report = json.loads(mask_report_path.read_text())
     required = {
-        "stage": "automatic_masks", "status": "pass", "episode_index": EPISODE,
+        "stage": "automatic_masks", "status": "pass", "episode_index": episode_index,
         "frames": total, "input_track": "track_1", "input_sha256": video_hash,
         "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": [],
     }
     for key, value in required.items():
         if key not in mask_report or mask_report[key] != value:
             raise ValueError(f"Automatic mask provenance failed: {key}")
+    for key in ("episode_index", "frames"):
+        if type(mask_report[key]) is not int:
+            raise ValueError(f"Automatic mask provenance requires an integer {key}")
     for key in ("ground_truth_used", "hand_labeled_test"):
         if mask_report[key] is not False:
             raise ValueError(f"Automatic mask provenance must explicitly forbid {key}")
@@ -149,6 +155,7 @@ def _validate_inputs(root: Path) -> dict:
         raise ValueError("Automatic person masks do not cover every original frame")
     return {
         "video": video, "video_sha256": video_hash, "total_frames": total,
+        "episode_index": episode_index, "dataset_revision": DATASET_REVISION,
         "indices": [0, total // 2, total - 1], "human_masks": human_masks,
         "mask_report_sha256": sha256(mask_report_path),
         "prompts_sha256": sha256(masks_root / "prompts.json"),
@@ -257,29 +264,33 @@ def _load_checkpoint_with_asset_buffers(module, state_dict, original_loader, tor
             "parameter_tensors_loaded": len(parameters), "unexpected_keys": []}
 
 
+def _argument_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", type=Path, default=Path("/srv/scenesmith/world-reward"))
+    parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
+    parser.add_argument("--full-video", action="store_true",
+                        help="Apply the verified initializer to every original frame; not CARI temporal reconstruction")
+    return parser
+
+
 def main() -> None:
     if platform.system() != "Linux":
         raise RuntimeError("Video/model processing is restricted to Azure Linux")
     if {path.name for path in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require an isolated container launched with docker --network none")
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", type=Path, default=Path("/srv/scenesmith/world-reward"))
-    parser.add_argument("--episode", type=int, choices=[EPISODE], default=EPISODE)
-    parser.add_argument("--full-video", action="store_true",
-                        help="Apply the verified initializer to every original frame; not CARI temporal reconstruction")
-    args = parser.parse_args()
+    args = _argument_parser().parse_args()
     root = args.root.resolve()
     sys.dont_write_bytecode = True
     os.environ.update({
         "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1",
         "MOMENTUM_ENABLED": "0", "WANDB_MODE": "disabled",
     })
-    inputs = _validate_inputs(root)
+    inputs = _validate_inputs(root, episode_index=args.episode)
     if args.full_video:
         inputs["indices"] = list(range(inputs["total_frames"]))
     source_hashes = _source_identity(root)
     body_directory, asset_hashes = _body_assets(root)
-    output_directory = root / f"outputs/episode_{EPISODE:06d}" / ("body_full" if args.full_video else "body_smoke")
+    output_directory = root / f"outputs/episode_{args.episode:06d}" / ("body_full" if args.full_video else "body_smoke")
     if output_directory.exists():
         raise FileExistsError("Body smoke outputs are frozen; use a clean run directory, not overwrite")
     import cv2
@@ -427,9 +438,10 @@ def main() -> None:
         np.savez_compressed(handle, **arrays)
     report = {
         "stage": "sam3d_body_full_video_initializer" if args.full_video else "sam3d_body_three_frame_smoke",
-        "status": "pass", "episode_index": EPISODE,
+        "status": "pass", "episode_index": args.episode,
         "total_video_frames": inputs["total_frames"], "frame_indices": inputs["indices"],
         "input_track": "track_1", "input_sha256": inputs["video_sha256"],
+        "input_dataset_revision": inputs["dataset_revision"],
         "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": [],
         "network": "none", "inference_type": "body", "camera_intrinsics": "RGB_size_default_FOV",
         "human_mask_id": 0, "prompt_mode": "automatic_mask_and_derived_bbox_no_fallback",

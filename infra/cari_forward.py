@@ -9,7 +9,8 @@ import sys
 import time
 
 from body_smoke import _pinned_checkout, _source_identity, _body_assets
-from cari_runner import build_cari_forward_command, CHECKPOINT_SHA256, UPSTREAM_REVISION
+from cari_runner import build_cari_forward_command, build_cari_runtime_environment, CHECKPOINT_SHA256, UPSTREAM_REVISION
+from world_reward.contracts import require_rigid_transforms
 from world_reward.data import sha256
 
 
@@ -57,21 +58,27 @@ def main():
     output = base / ("cari_kernel" if args.kernel_only else "cari_forward")
     if output.exists():
         raise RuntimeError("Frozen native CoCoNet result exists")
-    inputs_path = base / "cari_inputs/report.json"
-    inputs = json.loads(inputs_path.read_text())
-    expected = {"stage": "world_reward_native_cari_inputs", "status": "pass", "input_track": "track_1",
-                "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": []}
-    if (any(inputs.get(key) != value for key, value in expected.items())
-            or inputs["ground_truth_used"] is not False or inputs["hand_labeled_test"] is not False):
-        raise RuntimeError("Require verified full no-oracle CARI inputs")
-    for field in ("depth_h5", "mhr_init", "object_poses"):
-        if sha256(Path(inputs[field])) != inputs["file_sha256"][field]:
-            raise RuntimeError("Frozen CARI preparation changed")
-    plan = build_cari_forward_command(str(native), inputs["export_seq"], inputs["depth_h5"], inputs["mhr_init"],
-                                      inputs["object_poses"], str(checkpoint), str(output / "coconet.pth"),
-                                      total_frames=inputs["frames"], mhr_assets_root=str(assets), torch_home=str(torch_home),
-                                      sam3d_source_root="/workspace/v2d_sam3d_body/lib")
-    os.environ.update(plan["environment"])
+    inputs_path = None
+    if args.kernel_only:
+        environment = build_cari_runtime_environment(str(native), str(assets), str(torch_home),
+                                                     "/workspace/v2d_sam3d_body/lib")
+    else:
+        inputs_path = base / "cari_inputs/report.json"
+        inputs = json.loads(inputs_path.read_text())
+        expected = {"stage": "world_reward_native_cari_inputs", "status": "pass", "input_track": "track_1",
+                    "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": []}
+        if (any(inputs.get(key) != value for key, value in expected.items())
+                or inputs["ground_truth_used"] is not False or inputs["hand_labeled_test"] is not False):
+            raise RuntimeError("Require verified full no-oracle CARI inputs")
+        for field in ("depth_h5", "mhr_init", "object_poses"):
+            if sha256(Path(inputs[field])) != inputs["file_sha256"][field]:
+                raise RuntimeError("Frozen CARI preparation changed")
+        plan = build_cari_forward_command(str(native), inputs["export_seq"], inputs["depth_h5"], inputs["mhr_init"],
+                                          inputs["object_poses"], str(checkpoint), str(output / "coconet.pth"),
+                                          total_frames=inputs["frames"], mhr_assets_root=str(assets), torch_home=str(torch_home),
+                                          sam3d_source_root="/workspace/v2d_sam3d_body/lib")
+        environment = plan["environment"]
+    os.environ.update(environment)
     os.environ["MPLCONFIGDIR"] = "/tmp/world-reward-matplotlib"
     sys.path.insert(0, str(native))
     sys.path.insert(0, "/workspace/v2d_sam3d_body/lib")
@@ -119,9 +126,7 @@ def main():
                 if value.shape != (inputs["frames"], dimension) or not np.isfinite(value).all():
                     raise RuntimeError(f"Native CoCoNet produced invalid full {key}")
             pose = np.asarray(bundle["pr"]["pose_abs"])
-            if (pose.shape != (inputs["frames"], 4, 4) or not np.isfinite(pose).all()
-                    or not np.allclose(pose[:, 3], [0, 0, 0, 1], atol=1e-5)):
-                raise RuntimeError("Native CoCoNet produced invalid object transforms")
+            require_rigid_transforms(pose, inputs["frames"])
             metadata = {"native_metadata": bundle["metadata"], "actual_network_forward_verified": True,
                         "full_original_frame_coverage_verified": True, "human_shared_identity_verified": False}
     finally:
@@ -130,8 +135,10 @@ def main():
               "status": "pass", "input_track": "track_1", "ground_truth_used": False, "hand_labeled_test": False,
               "oracle_modes": [], "metadata": metadata, "hub_calls": hub_calls, "dinov2_revision": DINOV2_REVISION,
               "inference_source_identity": source_identity, "checkpoint_sha256": sha256(checkpoint),
-              "inputs_report_sha256": sha256(inputs_path), "bundle_sha256": None if bundle_path is None else sha256(bundle_path),
-              "method": "native_CoCoNet_forward_with_own_ICP_Viterbi_object_initializer_no_FoundationPose",
+              "inputs_report_sha256": None if inputs_path is None else sha256(inputs_path),
+              "episode_inputs_used": not args.kernel_only,
+              "bundle_sha256": None if bundle_path is None else sha256(bundle_path),
+              "method": "native_checkpoint_state_load_only" if args.kernel_only else "native_CoCoNet_forward_with_own_ICP_Viterbi_object_initializer_no_FoundationPose",
               "submission_eligible": False, "challenge_performance_verified": False,
               "elapsed_seconds": time.perf_counter() - started, "script_sha256": sha256(Path(__file__))}
     (output / "report.json").write_text(json.dumps(result, indent=2) + "\n")

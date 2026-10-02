@@ -318,3 +318,17 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Runner stores GT={}, checked before accepting output. Checkpoint load and
   actual full network forward are distinct gates. Pure builder tests119 pass,
   total908; native execution is not yet established by those tests.
+
+- 2026-10-02 D27: source audit caught the cross-bind-mount hardlink EXDEV
+  failure before native input preparation. Stop only the still-waiting old
+  preparation unit (no output created); corrected v2 uses SHA-verified copy
+  entirely within Azure and waits for the unchanged live object producer.
+  Full-forward dependency now names that exact v2 unit. Checkpoint state loading
+  is an independent fail-fast gate requiring no prepared episode inputs, not a
+  substitute for actual network forward. Native output poses must be proper
+  SO(3) rigid transforms; reject scale/shear/reflections, never repair silently.
+- 2026-10-02 D28: Body/depth initializers generalized to episodes 0..29 with
+  unchanged episode15 defaults, exact selected-video/mask SHA and original
+  timeline binding. New automatic-mask entrypoint uses existing immutable
+  source and offline image, without builds/downloads. Full local suite999 passes;
+  tests use tiny synthetic inputs, not extra challenge labels or heavy assets.

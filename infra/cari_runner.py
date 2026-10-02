@@ -45,6 +45,33 @@ def _runtime_path(value: Any, name: str, *, suffix: str | None = None) -> str:
     return str(path)
 
 
+def build_cari_runtime_environment(
+    native_root: str | PurePosixPath,
+    mhr_assets_root: str | PurePosixPath,
+    torch_home: str | PurePosixPath,
+    sam3d_source_root: str | PurePosixPath,
+) -> dict[str, str]:
+    """Offline runtime configuration, usable before episode inputs exist.
+
+    This plans paths only. The caller must verify original assets/source and
+    enforce network isolation; setting offline flags is not an access barrier.
+    """
+    paths = {key: _runtime_path(value, key) for key, value in (
+        ("native_root", native_root), ("mhr_assets_root", mhr_assets_root),
+        ("torch_home", torch_home), ("sam3d_source_root", sam3d_source_root),
+    )}
+    if any(":" in paths[key] for key in ("native_root", "sam3d_source_root")):
+        raise ValueError("Python source paths cannot contain the PYTHONPATH separator colon")
+    return {
+        "MHR_ASSETS_ROOT": paths["mhr_assets_root"],
+        "TORCH_HOME": paths["torch_home"],
+        "PYTHONPATH": paths["native_root"] + ":" + paths["sam3d_source_root"],
+        "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1",
+        "PYTHONDONTWRITEBYTECODE": "1", "PYTHONUNBUFFERED": "1",
+        "MOMENTUM_ENABLED": "0",
+    }
+
+
 def build_cari_forward_command(
     native_root: str | PurePosixPath,
     export_seq: str | PurePosixPath,
@@ -127,14 +154,9 @@ def build_cari_forward_command(
         "--offline-supervision-contract",
     ]
     argv.extend(["--no-input-cache"] if cache is None else ["--input-cache", cache])
-    environment = {
-        "MHR_ASSETS_ROOT": paths["mhr_assets_root"],
-        "TORCH_HOME": paths["torch_home"],
-        "PYTHONPATH": paths["native_root"] + ":" + paths["sam3d_source_root"],
-        "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1",
-        "PYTHONDONTWRITEBYTECODE": "1", "PYTHONUNBUFFERED": "1",
-        "MOMENTUM_ENABLED": "0",
-    }
+    environment = build_cari_runtime_environment(
+        paths["native_root"], paths["mhr_assets_root"], paths["torch_home"], paths["sam3d_source_root"],
+    )
     metadata = {
         "stage": "cari4d_native_coconet_full_forward_only",
         "upstream_revision_required": UPSTREAM_REVISION,
