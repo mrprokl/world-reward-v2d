@@ -182,10 +182,15 @@ def main(argv=None):
     if not re.fullmatch(r"[0-9a-f]{40}", revision) or not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
         raise ValueError("Require immutable renderer revision and image ID")
     destination = root / "validation/hands_rgb_v1"
-    if destination.exists() or destination.is_symlink(): raise FileExistsError("Synthetic dataset is frozen; never overwrite")
+    reserved = os.environ.get("WR_RENDER_OUTPUT_RESERVED") == "1"
+    if destination.is_symlink() or (destination.exists() and
+            (not reserved or not destination.is_dir() or any(destination.iterdir()))):
+        raise FileExistsError("Synthetic dataset is frozen; never overwrite")
+    if reserved and not destination.is_dir(): raise ValueError("Reserved dataset must be a new empty mount")
     if any(p.is_symlink() for p in destination.parents if p.is_relative_to(root)):
         raise ValueError("Require regular validation parents")
-    destination.mkdir(); public = destination / "inputs"; private = destination / "eval_private"
+    if not reserved: destination.mkdir()
+    public = destination / "inputs"; private = destination / "eval_private"
     public.mkdir(); private.mkdir(mode=0o700)
     with (private / "render-report.json").open("x") as handle:
         started = time.perf_counter()

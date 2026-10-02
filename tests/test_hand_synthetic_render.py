@@ -149,3 +149,26 @@ def test_no_experiment_cli_or_own_shared_identity_broadcast(render):
     assert "identity_rows(np.zeros(45, np.float32), 6)" in source
     assert "mhr-finger-semantics-v2.json" in source and 'private / "render-report.json"' in source
     assert "public_manifest(images)" in source and "model(identity, params, expression, True)" in source
+
+
+def test_wrapper_reserves_only_new_dataset_not_shared_parent(render):
+    wrapper = Path(render.__file__).with_name("run_hand_synthetic_render.sh").read_text()
+    assert 'mkdir "$DEST"' in wrapper and '"$DEST"' in wrapper
+    assert '--env WR_RENDER_OUTPUT_RESERVED=1' in wrapper
+    assert 'src=$DEST,dst=$DEST' in wrapper
+    assert 'src=$ROOT/validation,dst=$ROOT/validation' not in wrapper
+    assert 'chown -R' not in wrapper
+
+
+def test_reserved_empty_dataset_still_fails_prerequisite_without_overwrite(render, tmp_path, monkeypatch):
+    dest = tmp_path / "validation/hands_rgb_v1"; dest.mkdir(parents=True)
+    (tmp_path / "results").mkdir()
+    (tmp_path / "results/mhr-finger-semantics-v2.json").write_text('{"status":"fail"}')
+    monkeypatch.setenv("WR_ROOT", str(tmp_path)); monkeypatch.setenv("WR_CODE_REVISION", "a"*40)
+    monkeypatch.setenv("WR_IMAGE_ID", "sha256:"+"b"*64); monkeypatch.setenv("WR_RENDER_OUTPUT_RESERVED", "1")
+    monkeypatch.setattr(render.platform, "system", lambda: "Linux")
+    original = render.Path.iterdir
+    monkeypatch.setattr(render.Path, "iterdir", lambda self: [Path("lo")] if str(self) == "/sys/class/net" else original(self))
+    with pytest.raises(ValueError, match="semantic producer"): render.main([])
+    assert json.loads((dest / "eval_private/render-report.json").read_text())["status"] == "fail"
+    with pytest.raises(FileExistsError): render.main([])
