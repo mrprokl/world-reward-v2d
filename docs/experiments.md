@@ -1390,3 +1390,18 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   LiteraturemotivationDo-as-I-Do2606.19333/MoGe22507.02546, independentformula
   avoidsHaWoR/MANO and off-rayXYZtranslations. GeoCalibsource-separation and
   discrete3meshSAMselection lowerprioritiespendinggaugevalidation/rights.
+
+- 2026-10-02 R106: native episode0 refinement **PASS415.248s/790frames** but
+  refined official conversion still **FAIL** unchanged2mm per-frame gate. No
+  final schema/submission produced for0; do not weaken fidelity threshold.
+  Next bounded sealed original+F64 pose-only diagnostic is numerical research,
+  not GT fitting or submission adoption.
+- 2026-10-02 D78 implementation audit: independent reviews identified missing
+  copied-mask equality and coefficient-to-pointmap lineage proof. Public consumer
+  now verifies exact PNG masks, native18focal-call telemetry, producer/helper/
+  model pins and no prior fit; evaluator replays declared alpha/beta exactly on
+  all18frames BEFORE first private read. Tiny analytic18-array firewall tests
+  reject changed rays/Z/support/source and metadata without touching GT.
+  Full suite4297PASS/1optionaltrimeshSKIP66.16s, not GPU/accuracy proof. Split
+  immutable prepare(render/masks) and validation(infer/fit/quality) bundles to
+  keep code-only control payloads under100KB; no larger local data exception.

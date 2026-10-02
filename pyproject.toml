@@ -11,7 +11,7 @@ dependencies = ["numpy>=1.26", "scipy>=1.12"]
 
 [project.optional-dependencies]
 data = ["huggingface-hub>=1.0", "pyarrow>=14"]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "Pillow>=10.2"]
 
 [project.scripts]
 wr-data = "world_reward.data:main"
