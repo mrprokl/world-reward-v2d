@@ -46,10 +46,24 @@ YAMLS = {
 }
 WIDTH, HEIGHT, RADII = 256, 192, np.array([.29, .17, .23])
 K = np.array([[240., 0., 128.], [0., 240., 96.], [0., 0., 1.]])
+REPORT_NAME = "multiview-full-execution-gate-v2.json"
+PROPOSALS_NAME = "multiview-full-proposals-v2"
 
 
 def parse_args(argv=None):
     return argparse.ArgumentParser(description=__doc__, allow_abbrev=False).parse_args(argv)
+
+
+def local_hub_loader(original, repository, calls):
+    """Preserve Torch Hub's positional/keyword API; allow only audited DINO."""
+    def load(repo_or_dir, *args, **kwargs):
+        model = kwargs.get("model", args[0] if args else None)
+        if repo_or_dir not in ("facebookresearch/dinov2", "facebookresearch/dinov2:main") or model not in ("dinov2_vitl14_reg", "dinov2_vitb14_reg"):
+            raise RuntimeError("Unexpected Torch Hub model request")
+        calls.append(model)
+        kwargs["source"] = "local"
+        return original(str(repository), *args, **kwargs)
+    return load
 
 
 def constructor_config(config, workspace):
@@ -194,16 +208,10 @@ def run(root, source, report, started):
     original = torch.hub.load
     rng = random.getstate(), np.random.get_state(), torch.get_rng_state(), torch.cuda.get_rng_state_all()
     calls, depth_calls = [], []
-    def local_load(repo, *args, **kwargs):
-        model = kwargs.get("model", args[0] if args else None)
-        if repo not in ("facebookresearch/dinov2", "facebookresearch/dinov2:main") or model not in ("dinov2_vitl14_reg", "dinov2_vitb14_reg"):
-            raise RuntimeError("Unexpected Torch Hub model request")
-        calls.append(model); kwargs["source"] = "local"
-        return original(str(repository), *args, **kwargs)
     def forbidden_depth(*args, **kwargs):
         depth_calls.append(True)
         raise RuntimeError("Every view requires external pointmap; no depth model")
-    torch.hub.load = local_load
+    torch.hub.load = local_hub_loader(original, repository, calls)
     try:
         torch.cuda.reset_peak_memory_stats()
         pipe = instantiate(config)
@@ -212,7 +220,7 @@ def run(root, source, report, started):
         pipe.depth_model = forbidden_depth
         report.update(native_constructor_verified=True, models_loaded=True, dino_revision=ss.DINO_REVISION, dino_checkpoints=dino)
         images, masks, maps = procedural_views(report)
-        destination = root / "results/multiview-full-proposals"
+        destination = root / "results" / PROPOSALS_NAME
         destination.mkdir()
         generation_start = time.perf_counter()
         signal.alarm(max(1, min(180, int(300 - (generation_start - started)))))
@@ -257,8 +265,8 @@ def main(argv=None):
     revision, image = os.environ.get("WR_CODE_REVISION", ""), os.environ.get("WR_IMAGE_ID", "")
     if not re.fullmatch(r"[0-9a-f]{40}", revision) or not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
         raise RuntimeError("Require immutable source/image digests")
-    output = root / "results/multiview-full-execution-gate.json"
-    if output.exists() or (root / "results/multiview-full-proposals").exists():
+    output = root / "results" / REPORT_NAME
+    if output.exists() or (root / "results" / PROPOSALS_NAME).exists():
         raise FileExistsError("Full native reports/proposals are frozen")
     report = {"stage": "native_mv_sam3d_full_execution_only", "status": "fail", "code_revision": revision,
               "vendor_revision": prep.PIN, "objects_revision": prep.OBJECTS_REVISION, "image_id": image,
@@ -267,6 +275,7 @@ def main(argv=None):
               "native_constructor_verified": False, "native_decode_verified": False, "models_loaded": False,
               "depth_model_constructed": False, "entropy_fusion_verified": False, "accuracy_evaluated": False,
               "adoption_authorized": False, "submission_eligible": False,
+              "bootstrap_retry_changes": "TorchHub repo_or_dir keyword binding only; numerical fixture and budgets unchanged",
               "license_status": "SAM_custom_competition_eligibility_unresolved"}
     started = time.perf_counter()
     old = signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError("Frozen total300s/generation180s budget exceeded")))

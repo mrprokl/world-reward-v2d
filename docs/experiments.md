@@ -759,3 +759,9 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   unweighted three-view, seed42,SS50/SLAT25, Gaussian+mesh decoding, no texture,
   geometry/layout repair or accuracy/adoption selection.300s total/180s generation/
   80GiB peak; distinct frozen Azure proposals, no local renders/checkpoints.
+- 2026-10-02 R63 (Azure full MV bootstrap,9421d97): constructor stopped24.553s
+  before complete model initialization because DINO called Torch Hub with keyword
+  `repo_or_dir`, while our offline shim named its required argument `repo`.
+  Preserve the failed report; support the actual positional/keyword API without
+  changing native models/fixtures/budgets. V2 has distinct report/proposal paths;
+  this is infrastructure compatibility, not a multiview numerical result.

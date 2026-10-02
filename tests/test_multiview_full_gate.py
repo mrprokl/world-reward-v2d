@@ -76,6 +76,37 @@ def test_independent_inventory_contains_all_six_native_loads_and_config_hashes()
     assert gate.CHECKPOINTS["ss_generator"] == (gate.ss.SS_SHA256, gate.ss.SS_BYTES)
 
 
+@pytest.mark.parametrize("keyword", [False, True])
+def test_local_hub_loader_preserves_actual_positional_and_keyword_api(tmp_path, keyword):
+    seen, calls = [], []
+    def original(repo_or_dir, model, **kwargs):
+        seen.append((repo_or_dir, model, kwargs))
+        return "native-model"
+    load = gate.local_hub_loader(original, tmp_path, calls)
+    if keyword:
+        result = load(repo_or_dir="facebookresearch/dinov2", model="dinov2_vitl14_reg", source="github", pretrained=True)
+    else:
+        result = load("facebookresearch/dinov2:main", "dinov2_vitl14_reg", source="github", pretrained=True)
+    assert result == "native-model"
+    assert seen == [(str(tmp_path), "dinov2_vitl14_reg", {"source": "local", "pretrained": True})]
+    assert calls == ["dinov2_vitl14_reg"]
+
+
+@pytest.mark.parametrize("repo,model", [("other/repo", "dinov2_vitl14_reg"), ("facebookresearch/dinov2", "unknown")])
+def test_local_hub_loader_rejects_unapproved_requests_before_loader(tmp_path, repo, model):
+    def forbidden(*args, **kwargs):
+        pytest.fail("Unapproved upstream loader invoked")
+    calls = []
+    with pytest.raises(RuntimeError):
+        gate.local_hub_loader(forbidden, tmp_path, calls)(repo_or_dir=repo, model=model)
+    assert calls == []
+
+
+def test_bootstrap_retry_outputs_cannot_overwrite_original_reports():
+    assert gate.REPORT_NAME == "multiview-full-execution-gate-v2.json"
+    assert gate.PROPOSALS_NAME == "multiview-full-proposals-v2"
+
+
 def prerequisite(tmp_path, monkeypatch):
     workspace = tmp_path / "weights/sam3d/hf-download/checkpoints"
     workspace.mkdir(parents=True)
