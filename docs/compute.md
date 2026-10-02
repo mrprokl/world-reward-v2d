@@ -141,6 +141,7 @@ implicitly restarted/overwritten. Runtime closures are25files/~85KB encoded and
 21files/~63KB respectively, below100KB control-only transfer limit. H100 work
 remains serial, while disjoint source audits/tiny local tests run in parallel.
 Reference cold TorchScript replay requires unoptimized execution; fresh-process
-diagnosis passed17.546s. Strict hand semantic V4 is a separate pending prerequisite.
+diagnosis passed17.546s. Strict hand semantic V4 passed8.801s/6calls; public hand validation chain is
+launched separately at immutable d0b9d27.
 No synthetic quality result, new mesh adoption or final submission follows from
 these engineering checks alone. Latest full tiny suite3318PASS30.13s.

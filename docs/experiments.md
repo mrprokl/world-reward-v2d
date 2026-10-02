@@ -845,3 +845,9 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   both unoptimized conditions replayed bit-identically. This supports disabling
   TorchScript optimization for reference validation, not a proven causal graph
   pass/kernel diagnosis. V4 preserves strict algorithms and every prior tolerance.
+- 2026-10-02 R71 (Azure semantics-v4,0b5ee29): PASS8.801s/6calls. Actual
+ 54 named finger controls passed both corrective conditions, exact replay,
+ excluded-joint/scales invariance and two-step central orientation derivatives;
+ corrective skeletons are identical. Disabling JIT optimization follows R70,
+ not a numerical threshold change. This verifies the own neutral reference
+ rig semantics, not RGB anatomy/quality, SAM/reference shape parity or adoption.
