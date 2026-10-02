@@ -7,6 +7,7 @@ comes from official Track 1 metadata, not a human guess about a test frame.
 from __future__ import annotations
 
 import argparse
+from dataclasses import asdict
 import hashlib
 import json
 from pathlib import Path
@@ -14,6 +15,7 @@ import platform
 import time
 
 from world_reward.data import sha256
+from world_reward.actor_selection import select_interacting_actor
 from world_reward.prompt_selection import (
     BoxDetection, FrameDetections, non_maximum_suppression, select_seed_prompts,
 )
@@ -117,8 +119,10 @@ def main() -> None:
     if args.diagnose_only:
         print(json.dumps({"status":"diagnostics_saved", "episode":args.episode}))
         return
+    actor = select_interacting_actor(candidates, confidence_threshold=args.confidence,
+                                     object_ambiguity_margin=args.ambiguity_margin)
     selected = select_seed_prompts(
-        candidates, object_prompt=record["object_prompt"], confidence_threshold=args.confidence,
+        actor.frames, object_prompt=record["object_prompt"], confidence_threshold=args.confidence,
         ambiguity_margin=args.ambiguity_margin, total_frames=total,
     )
     prompt_file = output / "prompts.json"
@@ -141,6 +145,7 @@ def main() -> None:
         "stage": "automatic_masks", "status": "pass", "episode_index": args.episode,
         "frames": total, "seed_frame": selected.frame_index, "seed_candidates": evidence,
         "seed_confidence": selected.confidence, "rejected_seed_frames": selected.rejected_frames,
+        "actor_track_id": actor.track_id, "actor_scores": [asdict(score) for score in actor.scores],
         "confidence": args.confidence, "ambiguity_margin": args.ambiguity_margin,
         "nms_iou": args.nms_iou,
         "detector_revision": DETECTOR_REVISION, "input_sha256": expected["sha256"],

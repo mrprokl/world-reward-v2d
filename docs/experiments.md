@@ -90,3 +90,9 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Next method ranks automatically associated person tracks by video-wide proximity
   to the detected interaction object, requiring sufficient observations and a
   clear winning margin; retain failure rather than guess in ties/crossings.
+- 2026-10-02 D07: implement object-affinity actor selection as a generic automatic
+  initializer, not a person-ID label for a challenge episode. Gated one-to-one IoU
+  association, median normalized object-to-person-box distance (center distance
+  only for equal outside distance), ≥3 observations/≥50% support, margin >0.05.
+  Ambiguous associations or affinities fail. Synthetic actor+distractor/crossing/
+  missing tests pass; full suite 265 passed. Real smoke retry remains to verify.
