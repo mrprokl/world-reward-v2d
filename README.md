@@ -23,6 +23,10 @@ rtk uv sync --extra dev
 rtk uv run pytest -q
 ```
 
+Optional parity checks against the already-audited official kit use
+`WR_KIT_ROOT=/path/to/v2d_submission_kit`; only source helpers are imported and
+template I/O reads `row_id` alone, never sample prediction values.
+
 Remote Linux download (never run on the tethered local host):
 
 ```sh

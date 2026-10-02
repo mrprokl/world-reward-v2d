@@ -2,6 +2,7 @@
 
 from dataclasses import replace
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -19,7 +20,7 @@ from world_reward.submission import (
 
 
 COMMIT = "https://github.com/world-reward/v2d/commit/" + "a" * 40
-KIT = Path("/tmp/v2d-audit/v2d_submission_kit")
+KIT = Path(os.environ.get("WR_KIT_ROOT", "/tmp/v2d-audit/v2d_submission_kit"))
 
 
 def row_ids(episodes=(3,), frames=(2, 3, 4, 8, 9, 10), vertex_rows=8, face_rows=8):
