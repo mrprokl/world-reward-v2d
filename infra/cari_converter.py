@@ -10,6 +10,7 @@ not evidence of accuracy against challenge ground truth.
 from __future__ import annotations
 
 from collections.abc import Mapping
+import argparse
 import importlib.util
 import json
 from numbers import Integral
@@ -218,10 +219,18 @@ def require_fidelity(errors_mm, *, limit_mm: float = MAX_MEAN_VERTEX_ERROR_MM) -
     }
 
 
-def _read_report(path: Path, stage: str) -> dict:
+def _read_report(path: Path, stage: str, *, episode_index: int | None = None) -> dict:
     report = json.loads(path.read_text())
     require_report(report, stage)
+    if episode_index is not None:
+        _require_report_episode(report, episode_index)
     return report
+
+
+def _require_report_episode(report: Mapping, episode_index: int) -> None:
+    """Preserve SHA-bound legacy reports; reject a present wrong episode field."""
+    if type(report.get("episode_index", episode_index)) is not int or report.get("episode_index", episode_index) != episode_index:
+        raise ValueError("Frozen report belongs to another episode")
 
 
 def _require_hash(path: Path, expected: str) -> None:
@@ -231,24 +240,28 @@ def _require_hash(path: Path, expected: str) -> None:
         raise RuntimeError(f"Frozen artifact missing or altered: {path}")
 
 
+def _argument_parser() -> argparse.ArgumentParser:
+    from body_smoke import EPISODE, TRACK1_EPISODE_COUNT
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
+    return parser
+
+
 def main() -> None:
     if platform.system() != "Linux" or {path.name for path in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux GPU container with network none")
-    import torch
-    from body_smoke import _body_assets, _pinned_checkout, _source_identity
-
-    if not torch.cuda.is_available():
-        raise RuntimeError("CUDA required; no CPU/local fallback")
+    args = _argument_parser().parse_args()
     root = Path(os.environ["WR_ROOT"])
-    base = root / "outputs/episode_000015"
+    base = root / f"outputs/episode_{args.episode:06d}"
     forward_path = base / "cari_forward/report.json"
     forward = json.loads(forward_path.read_text())
     require_full_forward_report(forward)
+    _require_report_episode(forward, args.episode)
     bundle_path = base / "cari_forward/coconet.pth"
     _require_hash(bundle_path, forward.get("bundle_sha256"))
     inputs_path = base / "cari_inputs/report.json"
     _require_hash(inputs_path, forward.get("inputs_report_sha256"))
-    inputs = _read_report(inputs_path, "world_reward_native_cari_inputs")
+    inputs = _read_report(inputs_path, "world_reward_native_cari_inputs", episode_index=args.episode)
     count = inputs["frames"]
     if (isinstance(count, bool) or not isinstance(count, int) or count < 1
             or inputs.get("original_frame_coverage_verified") is not True):
@@ -263,9 +276,9 @@ def main() -> None:
     object_path = base / "object_pose_full/report.json"
     for key, path in (("body", body_path), ("adapter", adapter_path), ("object", object_path)):
         _require_hash(path, inputs["input_report_sha256"][key])
-    body = _read_report(body_path, "sam3d_body_full_video_initializer")
-    adapter = _read_report(adapter_path, "native_cari_body_adapter_full_video")
-    objects = _read_report(object_path, "fixed_scale_full_object_pose_initializer")
+    body = _read_report(body_path, "sam3d_body_full_video_initializer", episode_index=args.episode)
+    adapter = _read_report(adapter_path, "native_cari_body_adapter_full_video", episode_index=args.episode)
+    objects = _read_report(object_path, "fixed_scale_full_object_pose_initializer", episode_index=args.episode)
     if (body.get("total_video_frames") != count or body.get("frame_indices") != list(range(count))
             or body.get("mhr_geometry_forward_verified") is not True
             or body.get("upstream_revision") != UPSTREAM_REVISION
@@ -276,6 +289,10 @@ def main() -> None:
             or adapter.get("frames") != count or adapter.get("body_report_sha256") != sha256(body_path)
             or adapter.get("canonical_initializer_sha256") != inputs["file_sha256"]["mhr_init"]):
         raise RuntimeError("Full human/object/initializer provenance does not match native forward inputs")
+    import torch
+    from body_smoke import _body_assets, _pinned_checkout, _source_identity
+    if not torch.cuda.is_available():
+        raise RuntimeError("CUDA required; no CPU/local fallback")
     vendor = root / "vendor/video_to_data"
     _pinned_checkout(vendor, UPSTREAM_REVISION)
     source_identity = _source_identity(root)
@@ -292,7 +309,7 @@ def main() -> None:
     tool = root / "vendor/v2d_submission_kit/tools/track1/mesh_to_mhr_params.py"
     _require_hash(model, REFERENCE_MODEL_SHA256)
     _require_hash(tool, CONVERTER_SHA256)
-    export = base / "cari_inputs/export/episode_000015"
+    export = base / f"cari_inputs/export/episode_{args.episode:06d}"
     if Path(inputs["export_seq"]).resolve() != export:
         raise RuntimeError("Unexpected native export sequence path")
     wild_path = export / "wild_export.json"
@@ -382,7 +399,7 @@ def main() -> None:
             raise RuntimeError("Final archive changed fixed source mesh arrays")
         require_rigid_transforms(source_poses, count)
     result = {
-        "stage": "world_reward_native_cari_official_conversion", "status": "pass", "frames": count,
+        "stage": "world_reward_native_cari_official_conversion", "status": "pass", "episode_index": args.episode, "frames": count,
         "input_track": "track_1", "input_sha256": inputs["input_sha256"], "ground_truth_used": False,
         "hand_labeled_test": False, "oracle_modes": [], "network": "none",
         "original_frame_coverage_verified": True, "human_shared_identity_verified": True,

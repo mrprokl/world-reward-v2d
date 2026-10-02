@@ -8,7 +8,7 @@ import platform
 import sys
 import time
 
-from body_smoke import _pinned_checkout, _source_identity, _body_assets
+from body_smoke import EPISODE, TRACK1_EPISODE_COUNT, _pinned_checkout, _source_identity, _body_assets
 from cari_runner import build_cari_forward_command, build_cari_runtime_environment, CHECKPOINT_SHA256, UPSTREAM_REVISION
 from world_reward.contracts import require_rigid_transforms
 from world_reward.data import sha256
@@ -17,14 +17,23 @@ from world_reward.data import sha256
 DINOV2_REVISION = "7764ea0f912e53c92e82eb78a2a1631e92725fc8"
 
 
+def _argument_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
+    parser.add_argument("--kernel-only", action="store_true", help="Gate checkpoint loading only, not actual network forward")
+    return parser
+
+
 def main():
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux GPU container with network none")
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--kernel-only", action="store_true", help="Gate checkpoint loading only, not actual network forward")
-    args = parser.parse_args()
-    import torch
+    args = _argument_parser().parse_args()
     root = Path(os.environ["WR_ROOT"])
+    base = root / f"outputs/episode_{args.episode:06d}"
+    body_report = json.loads((base / "body_full/report.json").read_text())
+    if type(body_report.get("episode_index", args.episode)) is not int or body_report.get("episode_index", args.episode) != args.episode:
+        raise RuntimeError("Native decoder Body report belongs to another episode")
+    import torch
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA required; no CPU/local fallback")
     vendor = root / "vendor/video_to_data"
@@ -33,7 +42,6 @@ def main():
     native = vendor / "reconstruction/modules/v2d_cari4d/lib/cari4d"
     assets = root / "weights/cari4d/sam3d_body"
     body_assets, body_hashes = _body_assets(root)
-    body_report = json.loads((root / "outputs/episode_000015/body_full/report.json").read_text())
     if body_hashes != body_report["body_assets"] or (body_assets / "mhr_buffers.pt").exists():
         raise RuntimeError("Native CARI decoder must use original verified Body assets, not an unverified compact-buffer override")
     torch_home = assets / "torch_home"
@@ -54,7 +62,6 @@ def main():
     checkpoint = candidates[0]
     if sha256(checkpoint) != CHECKPOINT_SHA256:
         raise RuntimeError("CoCoNet checkpoint bytes differ from audited release")
-    base = root / "outputs/episode_000015"
     output = base / ("cari_kernel" if args.kernel_only else "cari_forward")
     if output.exists():
         raise RuntimeError("Frozen native CoCoNet result exists")
@@ -65,11 +72,21 @@ def main():
     else:
         inputs_path = base / "cari_inputs/report.json"
         inputs = json.loads(inputs_path.read_text())
+        if type(inputs.get("episode_index", args.episode)) is not int or inputs.get("episode_index", args.episode) != args.episode:
+            raise RuntimeError("Native preparation report belongs to another episode")
         expected = {"stage": "world_reward_native_cari_inputs", "status": "pass", "input_track": "track_1",
                     "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": []}
         if (any(inputs.get(key) != value for key, value in expected.items())
                 or inputs["ground_truth_used"] is not False or inputs["hand_labeled_test"] is not False):
             raise RuntimeError("Require verified full no-oracle CARI inputs")
+        # Legacy reports may omit episode_index. Their artifact paths must
+        # nevertheless bind the exact selected episode, not another clip.
+        paths = {"depth_h5": base / "cari_inputs/aligned_depth.h5",
+                 "mhr_init": base / "body_full/cari_adapter/canonical_initializer.pkl",
+                 "object_poses": base / "cari_inputs/own_object_poses.pkl",
+                 "export_seq": base / f"cari_inputs/export/episode_{args.episode:06d}"}
+        if any(Path(inputs[field]).resolve() != path for field, path in paths.items()):
+            raise RuntimeError("Native preparation paths belong to another episode")
         for field in ("depth_h5", "mhr_init", "object_poses"):
             if sha256(Path(inputs[field])) != inputs["file_sha256"][field]:
                 raise RuntimeError("Frozen CARI preparation changed")
@@ -136,7 +153,8 @@ def main():
     finally:
         torch.hub.load = original_hub
     result = {"stage": "native_cari_checkpoint_load_gate" if args.kernel_only else "world_reward_native_cari_full_forward",
-              "status": "pass", "input_track": "track_1", "ground_truth_used": False, "hand_labeled_test": False,
+              "status": "pass", "episode_index": args.episode, "input_track": "track_1",
+              "ground_truth_used": False, "hand_labeled_test": False,
               "oracle_modes": [], "metadata": metadata, "hub_calls": hub_calls, "dinov2_revision": DINOV2_REVISION,
               "inference_source_identity": source_identity, "checkpoint_sha256": sha256(checkpoint),
               "inputs_report_sha256": None if inputs_path is None else sha256(inputs_path),

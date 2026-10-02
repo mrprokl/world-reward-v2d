@@ -7,6 +7,7 @@ All large intermediates and model inputs remain on the remote managed disk.
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import os
@@ -17,22 +18,29 @@ import platform
 import sys
 import time
 
-from body_smoke import _validate_inputs, _pinned_checkout, UPSTREAM_REVISION
+from body_smoke import EPISODE, TRACK1_EPISODE_COUNT, _validate_inputs, _pinned_checkout, UPSTREAM_REVISION
 from world_reward.data import sha256
 from world_reward.mesh_geometry import normalize_degenerate_faces
+
+
+def _argument_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
+    return parser
 
 
 def main():
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux container with network none")
+    args = _argument_parser().parse_args()
+    root = Path(os.environ["WR_ROOT"])
+    inputs = _validate_inputs(root, episode_index=args.episode)
     import cv2
     import h5py
     import joblib
     import numpy as np
     from PIL import Image
     import trimesh
-    root = Path(os.environ["WR_ROOT"])
-    inputs = _validate_inputs(root)
     vendor = root / "vendor/video_to_data"
     _pinned_checkout(vendor, UPSTREAM_REVISION)
     native_root = vendor / "reconstruction/modules/v2d_cari4d/lib/cari4d"
@@ -41,7 +49,7 @@ def main():
     from prep.mhr_depth_h5 import MHRDepthH5Writer, validate_depth_h5, read_metric_depth
     from prep.mhr_depth_backend import MOGE2_MODEL_ID, MOGE2_MODEL_REVISION, MOGE2_SOURCE_COMMIT
     from prep.mhr_export_utils import MHR_CAMERA_NAMES, frame_names, read_rgb, read_mask, camera_calibration, load_edex
-    base = root / "outputs/episode_000015"
+    base = root / f"outputs/episode_{args.episode:06d}"
     output = base / "cari_inputs"
     if output.exists():
         raise RuntimeError("Frozen CARI inputs exist; never overwrite")
@@ -51,6 +59,8 @@ def main():
                     "adapter": base / "body_full/cari_adapter/report.json"}
     for key, path in report_paths.items():
         record = json.loads(path.read_text())
+        if type(record.get("episode_index", args.episode)) is not int or record.get("episode_index", args.episode) != args.episode:
+            raise RuntimeError(f"{key} report belongs to another episode")
         expected = {"status": "pass", "input_track": "track_1", "ground_truth_used": False,
                     "hand_labeled_test": False, "oracle_modes": []}
         if (any(record.get(field) != value for field, value in expected.items())
@@ -100,7 +110,7 @@ def main():
         raise RuntimeError("Packed fixed geometry must remain closed and correctly oriented")
     output.mkdir(exist_ok=False)
     started = time.perf_counter()
-    sequence = "episode_000015"
+    sequence = f"episode_{args.episode:06d}"
     video_link = output / (sequence + ".0.color.mp4")
     # Native prep resolves symlinks before validating its .0.color.mp4 ABI.
     # Same managed disk: a hardlink preserves bytes without duplicating video.
@@ -214,7 +224,7 @@ def main():
         quantized = read_metric_depth(aligned_depth_path, "aligned", camera_name, name)
         if quantized.shape != (1152, 1536) or not np.isfinite(quantized).all():
             raise RuntimeError("Native quantized depth decode contract failed")
-    result = {"stage": "world_reward_native_cari_inputs", "status": "pass", "frames": count,
+    result = {"stage": "world_reward_native_cari_inputs", "status": "pass", "episode_index": args.episode, "frames": count,
               "export_seq": str(export_seq), "depth_h5": str(aligned_depth_path), "mhr_init": str(adapter_path),
               "object_poses": str(object_poses_path), "object_pose_initializer": "own_ICP_Viterbi_not_FoundationPose",
               "depth_validation": depth_validation, "mesh_pose_frame_roundtrip_max_error_m": frame_transform_error,

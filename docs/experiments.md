@@ -425,3 +425,16 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   zero-control CD nonregression. Known/perturbed poses are explicitly derived
   from synthetic truth: this isolates shape behavior, **not RGB pose inference**.
   Fail any condition=>keep experiment, no challenge adoption or victory claim.
+
+- 2026-10-02 R34 (Azure raster batch gate): corrected camera construction
+  passed exact silhouette and camera-Z parity against scalar/singleton renders.
+  Three synchronized alternating trials, batch8 at1536×1152 on our own642-vertex
+  anisotropic mesh: scalar median.062400s, batch median.034993s, speedup1.7832,
+  peak638118912bytes. Predeclared>=1.3 gate passes. This measures rasterization
+  only, not full ICP throughput or reconstruction accuracy; live producer unchanged.
+- 2026-10-02 D37: native initializer adapter, preparation, full forward and
+  converter now route episodes0..29 with default15 preserved. Reject explicit
+  wrong episode fields; historical reports remain bound by selected paths/SHA.
+  Checkpoint-only gate stays independent of prepared inputs. Full timeline,
+  units, source assets and fidelity gates unchanged. Local suite1443 passes;
+  generalized wrappers and actual other-episode execution remain separate gates.

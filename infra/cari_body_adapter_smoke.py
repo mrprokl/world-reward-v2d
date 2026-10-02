@@ -1,5 +1,6 @@
 """Gate the canonical CARI MHR initializer against full original Body geometry."""
 
+import argparse
 import json
 import os
 from pathlib import Path
@@ -8,25 +9,36 @@ import pickle
 import sys
 import time
 
-from body_smoke import _body_assets, _source_identity, UPSTREAM_REVISION
+from body_smoke import EPISODE, TRACK1_EPISODE_COUNT, _body_assets, _source_identity, UPSTREAM_REVISION
 from cari_body_adapter import candidate_mhr_parameters
 from world_reward.data import sha256
+
+
+def _argument_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
+    return parser
 
 
 def main():
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux GPU container with network none")
-    import numpy as np
-    import torch
+    args = _argument_parser().parse_args()
     root = Path(os.environ["WR_ROOT"])
-    directory = root / "outputs/episode_000015/body_full"
+    directory = root / f"outputs/episode_{args.episode:06d}/body_full"
     report_path = directory / "report.json"
     report = json.loads(report_path.read_text())
+    # Old frozen reports lack this field; selected path and hashes still bind
+    # their identity. A present wrong/ambiguous episode is never ignored.
+    if type(report.get("episode_index", args.episode)) is not int or report.get("episode_index", args.episode) != args.episode:
+        raise RuntimeError("Body report belongs to another episode")
     if (report["status"] != "pass" or report["ground_truth_used"] is not False
             or report["hand_labeled_test"] is not False or report["oracle_modes"] != []
             or report["input_track"] != "track_1" or report["upstream_revision"] != UPSTREAM_REVISION
             or report["mhr_geometry_forward_verified"] is not True):
         raise RuntimeError("Require exact native Body provenance and forward verification")
+    import numpy as np
+    import torch
     path = directory / "predictions.npz"
     if sha256(path) != report["predictions_sha256"] or not torch.cuda.is_available():
         raise RuntimeError("Frozen Body predictions or CUDA missing")
@@ -60,7 +72,8 @@ def main():
     target = output / "canonical_initializer.pkl"
     with target.open("xb") as handle:
         pickle.dump(candidate, handle, protocol=4)
-    result = {"stage": "native_cari_body_adapter_full_video", "status": "pass", "frames": len(candidate["frames"]),
+    result = {"stage": "native_cari_body_adapter_full_video", "status": "pass", "episode_index": args.episode,
+              "frames": len(candidate["frames"]),
               "metadata": candidate["metadata"], "body_report_sha256": sha256(report_path),
               "canonical_initializer_sha256": sha256(target), "decoder_identity": layer.decoder_identity(),
               "inference_source_identity": source, "script_sha256": sha256(Path(__file__)),
