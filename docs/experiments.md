@@ -382,3 +382,16 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   no clipped parameters or uniform metric-scale fitting. Analytic volume and
   invalid-input tests establish mathematics only, not shape-fit improvement.
   Exact duplicate padding uses deterministic einsum. Full local suite1251 passes.
+
+- 2026-10-02 R31 (Azure native checkpoint gate): corrected native-first imports
+  allowed strict pinned CoCoNet load, finite model state and offline DINO passes
+  in7.12s. This gate performed **no network forward or episode inference**.
+- 2026-10-02 R32 (Azure hands engineering): native full-mode proposals passed
+  vertices/joints/keypoints/control/projection roundtrips on original0/250/500
+  in34.38s. Fresh decoded joint rotations replace stale pre-fusion cached values,
+  retained audit-only. No shared-identity fitting or hand accuracy measured.
+- 2026-10-02 R33 (raster throughput fail-fast): batch gate failed before parity,
+  because pinned PerspectiveCameras has no extend() API. Correctly failed with
+  no speed claim; construct full OpenCV camera tensors at batch size through
+  the same official projection utility. Keep failed report and use a new
+  report path/job for correction. Unchanged live object producer reached300/501.

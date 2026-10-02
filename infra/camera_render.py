@@ -127,14 +127,14 @@ def _mesh_inputs(vertices_camera_m, faces, camera_matrix, width, height, near_cl
     return vertices32, indices.astype(np.int64, copy=False), matrix32
 
 
-def _opencv_camera(torch, camera_matrix, width, height):
+def _opencv_camera(torch, camera_matrix, width, height, *, batch_size=1):
     from pytorch3d.utils import cameras_from_opencv_projection
 
     return cameras_from_opencv_projection(
-        R=torch.eye(3, device="cuda", dtype=torch.float32)[None],
-        tvec=torch.zeros((1, 3), device="cuda", dtype=torch.float32),
-        camera_matrix=torch.as_tensor(camera_matrix, device="cuda", dtype=torch.float32)[None],
-        image_size=torch.tensor([[height, width]], device="cuda", dtype=torch.float32),
+        R=torch.eye(3, device="cuda", dtype=torch.float32)[None].expand(batch_size, -1, -1),
+        tvec=torch.zeros((batch_size, 3), device="cuda", dtype=torch.float32),
+        camera_matrix=torch.as_tensor(camera_matrix, device="cuda", dtype=torch.float32)[None].expand(batch_size, -1, -1),
+        image_size=torch.tensor([[height, width]], device="cuda", dtype=torch.float32).expand(batch_size, -1),
     )
 
 
@@ -222,7 +222,7 @@ def raster_camera_mesh_batch(vertices_camera_m, faces, camera_matrix, width=1536
         raise RuntimeError("Require audited PyTorch3D 0.7.9 camera/depth contracts")
     count = len(vertices)
     with torch.inference_mode():
-        camera = _opencv_camera(torch, matrix, width, height).extend(count)
+        camera = _opencv_camera(torch, matrix, width, height, batch_size=count)
         verts_gpu = torch.as_tensor(vertices, device="cuda")
         faces_gpu = torch.as_tensor(indices, device="cuda")
         mesh = Meshes(verts=list(verts_gpu.unbind(0)), faces=[faces_gpu] * count)
