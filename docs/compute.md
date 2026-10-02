@@ -128,3 +128,9 @@ Objects initial runtime missed Open3D's libusb dependency; small derivative
 Offline first object generation passed in 45.90 s, all output on Azure. Raw mesh
 is 751,586 vertices/1,503,164 faces, closed and consistently oriented; generative
 scale not yet calibrated or suitable for submission. Full local suite 423 passed.
+
+Body direct inference subsequently passed on 3 fixed original frames in 15.64 s,
+including native MHR geometry and image-projection checks. Strict loading now
+distinguishes checkpoint network/head state from independently verified explicit
+MHR asset state and deterministic unused tokens/copies. Sparse NPZ remains remote;
+no full trajectory or challenge accuracy established. Local suite 456 passed.

@@ -174,3 +174,11 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   inference state separately. Added 98 small Body guard tests including retained
   buffer alias regression; corrected comparison snapshot clone. Full suite 423
   passed. Body model forward remains unverified until these gates pass.
+- 2026-10-02 R16: direct Body RGB forward passed on fixed frames 0/250/500 in
+  15.64 s. Learned and frozen head state loaded strictly; omitted rig/corrective
+  state matches an independent load of the exact SAM MHR asset. Deterministic I54
+  hand copies and zero DINO mask token are audited exceptions; non-null DINO token
+  masks rejected. Native MHR reforward and keypoint reprojection gates passed.
+  This verifies sparse model geometry/units, not full trajectory/shared identity
+  or reconstruction accuracy. Latest local suite 456 passed. Official shared-
+  identity converter is the next separate real-output gate.
