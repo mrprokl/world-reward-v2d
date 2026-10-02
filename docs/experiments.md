@@ -137,3 +137,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
 - 2026-10-02 R11: DINO auxiliary acquisition exited 0 with pinned clean DINOv2/v3
   source, validated official vitb/vits SHA-256 and recorded first-observed HTTPS
   reg4 hashes. No FoundationPose acquired; no complete-baseline readiness claim.
+- 2026-10-02 R12: mask proxy pass on all 501 frames; largest-component median 1
+  for both entities, maximum image-diagonal centroid jumps 0.001079/0.004910.
+  Three sparse independent detector bbox agreements ~0.963–0.967 human,
+  ~0.887–0.893 object. Masks overlap on 377 frames: report, do not strip object
+  pixels or label contact from this alone. These values are not segmentation GT
+  accuracy, temporal held-out reconstruction quality or a score.
+- 2026-10-02 R13: corrected SAM3D derivative actual core kernel smoke passed;
+  EGL still failed and recorded as optional. Body direct smoke failed before the
+  forward because bootstrap had excluded six source Python files named `data/`.
+  Diagnose/fix the infrastructure whitelist, not model hyperparameters. Original
+  images are preserved; small source-only derivative will be independently tested.

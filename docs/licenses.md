@@ -157,6 +157,12 @@ source/dependency audit and technical equivalence validation.
 - Do not use original NC CARI4D/HaWoR/WiLoR/MANO source as an Apache shortcut.
   This audit is not a complete transitive software bill of materials; perform that
   check on the frozen actual environment before submission.
+- Additional transitive restriction: [nvdiffrast source license](https://github.com/NVlabs/nvdiffrast/blob/main/LICENSE.txt)
+  §3.3 permits only non-commercial research/evaluation with no direct/indirect
+  monetary gain (except NVIDIA/affiliates). CUDA kernel functionality does not
+  establish eligibility. Include this dependency in the organizer question and
+  actual-image SBOM; prefer BSD PyTorch3D for our own commercially unrestricted
+  synthetic renderer. Current runtime use is research, not an asserted waiver.
 
 **Draft only — not sent** to `v2d_challenge@nvidia.com` / the public Kaggle forum:
 

@@ -109,3 +109,15 @@ SHA-256 verified on Azure, extracted read-only under `jobs/<commit>/code`; uniqu
 systemd unit/log, no implicit replacement/restart. Dataset/model downloads remain
 direct-to-Azure. DINO auxiliary acquisition is explicitly separate from the
 unresolved FoundationPose eligibility question.
+
+DINO acquisition completed on Azure; derivative `world-reward/sam3d-cuda:0.1`
+now passes actual PyTorch3D GPU KNN, Kaolin Chamfer, nvdiffrast raster and
+FlashAttention. EGL remains failed/optional; no claim that every capability works.
+Original CPU-only image and all previous user resources remain unchanged.
+
+Body model smoke exposed an infrastructure bug before model inference: broad
+sparse exclusion of directories named `data` removed six **Python source** files
+inside SAM 3D Body. Restore only those exact 29,647 bytes from the audited pin;
+never include real datasets/GT/fixtures. Rebuild only a small derivative CARI
+source layer. Explicit code whitelist fixes future bootstrap; offline Git checks
+forbid lazy fetching. No body reconstruction result yet.
