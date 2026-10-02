@@ -191,7 +191,7 @@ def _install_local_dinov3_loader(torch, repository: Path):
     return original, calls
 
 
-def _load_checkpoint_with_asset_buffers(module, state_dict, original_loader, torch) -> dict:
+def _load_checkpoint_with_asset_buffers(module, state_dict, original_loader, torch, *, explicit_asset_state=None) -> dict:
     """Require all checkpoint state except immutable rig buffers loaded from MHR.
 
     The official model constructs these buffers from the explicit TorchScript
@@ -202,19 +202,44 @@ def _load_checkpoint_with_asset_buffers(module, state_dict, original_loader, tor
     current = module.state_dict()
     parameters = dict(module.named_parameters(remove_duplicate=False))
     buffers = dict(module.named_buffers(remove_duplicate=False))
+    explicit = {}
+    if explicit_asset_state is not None:
+        for prefix in ("head_pose.mhr.", "head_pose_hand.mhr."):
+            local_keys = {name[len(prefix):] for name in current if name.startswith(prefix)}
+            if local_keys != set(explicit_asset_state):
+                raise RuntimeError("Constructed MHR submodule state differs from explicit asset inventory")
+            for name, value in explicit_asset_state.items():
+                key = prefix + name
+                if not torch.equal(current[key].cpu(), value.cpu()):
+                    raise RuntimeError(f"Constructed MHR differs from independent explicit asset: {key}")
+                explicit[key] = current[key].detach().clone()
+        for key in ("head_pose.hand_pose_comps_ori", "head_pose_hand.hand_pose_comps_ori"):
+            value = current[key]
+            if value.shape != (54, 54) or value.requires_grad or not torch.equal(value, torch.eye(54, device=value.device, dtype=value.dtype)):
+                raise RuntimeError("Unused original hand PCA copy must be deterministic identity")
+            explicit[key] = value.detach().clone()
+        key = "backbone.encoder.mask_token"
+        token = current[key]
+        if token.ndim != 2 or token.shape[0] != 1 or token.shape[1] != module.backbone.encoder.embed_dim or not torch.isfinite(token).all() or torch.count_nonzero(token).item():
+            raise RuntimeError("Unused DINO mask token must equal the pinned zero initialization")
+        explicit[key] = token.detach().clone()
     unexpected = set(state_dict) - set(current)
     if unexpected:
         raise RuntimeError(f"Unexpected checkpoint keys: {sorted(unexpected)[:8]}")
     missing = set(current) - set(state_dict)
     allowed = {name for name in missing if name.startswith(prefixes) and name in buffers
                and name not in parameters and not buffers[name].requires_grad}
+    allowed.update(missing & set(explicit))
     if missing - allowed:
         raise RuntimeError(f"Required model state missing: {sorted(missing - allowed)[:8]}")
     for name in parameters:
+        if name in explicit:
+            continue
         if name not in state_dict or not torch.isfinite(state_dict[name]).all():
             raise RuntimeError(f"Learned/frozen parameter missing or nonfinite: {name}")
     asset_buffers = {name: value.detach().clone() for name, value in current.items()
                      if name.startswith(prefixes) and name in buffers and name not in parameters}
+    asset_buffers.update(explicit)
     for name, asset_value in asset_buffers.items():
         if name in state_dict and not torch.equal(state_dict[name], asset_value):
             raise RuntimeError(f"Checkpoint contradicts explicit immutable MHR asset: {name}")
@@ -273,9 +298,17 @@ def main() -> None:
             raise RuntimeError("Unexpected SAM 3D Body import location")
         original_state_loader = build_models.load_state_dict
         checkpoint_loading = {}
+        independent_asset = torch.jit.load(str(body_directory / "assets/mhr_model.pt"), map_location="cpu").state_dict()
 
         def strict_state_loader(module, state_dict, strict=False, logger=None):
-            checkpoint_loading.update(_load_checkpoint_with_asset_buffers(module, state_dict, original_state_loader, torch))
+            checkpoint_loading.update(_load_checkpoint_with_asset_buffers(module, state_dict, original_state_loader, torch,
+                                                                          explicit_asset_state=independent_asset))
+            original_prepare = module.backbone.encoder.prepare_tokens_with_masks
+            def unmasked_rgb_tokens(x, masks=None):
+                if masks is not None:
+                    raise RuntimeError("The retained zero mask token is allowed only for unmasked DINO RGB tokens")
+                return original_prepare(x, masks=None)
+            module.backbone.encoder.prepare_tokens_with_masks = unmasked_rgb_tokens
 
         build_models.load_state_dict = strict_state_loader
         try:
