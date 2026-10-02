@@ -201,3 +201,14 @@ def test_main_routes_chosen_episode_to_input_guard_before_outputs_models(masks, 
     monkeypatch.setattr(sys, "argv", ["automatic_masks.py", "--root", "/srv/frozen-test", "--episode", str(episode)])
     with pytest.raises(StopAtGuard): masks.main()
     assert calls == [(Path("/srv/frozen-test"), episode)]
+def test_detector_batch_cannot_shadow_validated_input_provenance():
+    """Input identity must survive detector loops until the final report."""
+    import ast
+    tree = ast.parse((Path(__file__).resolve().parents[1] / "infra/automatic_masks.py").read_text())
+    main = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "main")
+    assignments = [node for node in ast.walk(main) if isinstance(node, ast.Name)
+                   and node.id == "inputs" and isinstance(node.ctx, ast.Store)]
+    assert len(assignments) == 1
+    gate = next(node for node in main.body if isinstance(node, ast.Assign)
+                and any(isinstance(target, ast.Name) and target.id == "inputs" for target in node.targets))
+    assert isinstance(gate.value, ast.Call) and gate.value.func.id == "_validate_inputs"

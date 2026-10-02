@@ -120,8 +120,8 @@ by shrinking or a regression on the opposite geometry/pose axis.
   [released code pin abb04b5](https://github.com/devinli123/MV-SAM3D/tree/abb04b5e8af5bc33b0265bdf19937e76bbb6bcdd),
   2026-05-30, `multi_view_utils.py:94–186`. SAM custom license, not Apache;
   reuses existing SAM weights, no new checkpoint.
-- Entropy/visibility-weighted generative velocities share geometry with separate
-  pose conditions. GSO-30 reported CD42.0 single-view vs20.2 two-view/17.3 five-view;
+- Entropy/visibility-weighted generative velocities share geometry; the exact
+  released API keeps pose outputs from view0. GSO-30 reported CD42.0 single-view vs20.2 two-view/17.3 five-view;
   different normalized protocol, **not Track1 metric evidence**.
 - Static exocamera does not mean static object: if estimated T_i maps object to
   camera, use effective w2c=T_i and c2w=T_i^-1. Do not pass static scene/DA3
@@ -144,8 +144,9 @@ hand crops1227–1247 and fuses108 controls/wrists1471–1556. Existing crop/key
 angle guards1311–1382 are not accuracy evidence. No MANO model is needed.
 
 Full mode also changes scale8/9, scale18:+ and shape40:+ (1558–1593); it cannot
-be exported as a sequence identity unchanged. Use articulated proposals under
-one fixed identity, then verified official conversion. `pred_pose_raw` becomes
+be exported as a sequence identity unchanged. The minimal current H1 experiment
+transfers fingers **after** official conversion, keeping identity/body/wrists fixed
+and never reconverting that proposal. `pred_pose_raw` becomes
 zero1621–1623: re-forward the original body133/hand108/global3/shape45/scale28
 blocks, never decode that placeholder. FreiHAND PA-MPJPE5.5mm is local PA
 evidence, not camera-metric fingers under object occlusion. First sparse run is
@@ -167,3 +168,29 @@ Reject artificial hand displacement or over-smoothing masquerading as physics.
 Priority: **H1 and O1**, then O2 if pose-conditioned fusion is robust; H2 only
 after object geometry/poses are credible. Gates above remain proposed until
 measured. No challenge GT/manual test labels or new large local assets accessed.
+
+## Follow-up after O1 falsification — 2026-10-02
+
+The first rendered five-DOF fitter is rejected (experiment R35): unchanged shape
+controls regressed despite lower visible-depth loss. Do not retune these controls.
+Next inexpensive measurement-model gate uses CUDA
+[point_face_distance at PyTorch3D pin33824be3](https://github.com/facebookresearch/pytorch3d/blob/33824be3cbc87a7dd1db0f6a9a9de9ac81b2d0ba/pytorch3d/loss/point_mesh_distance.py#L28-L93)
+for observed-to-continuous-triangle distance only. The high-level symmetric
+point_mesh_face_distance adds hidden-face-to-observation attraction and is not
+appropriate here. Its default min_triangle_area=.005m² also treats our small
+nondegenerate triangles as edges/points; use0 only after analytic interior/edge/
+vertex and gradient gates. This removes a discretization hypothesis, not pose
+bias. Any new fitter needs newly frozen shapes/paths/seeds and uncertainty-aware
+pose handling; the old18-condition report remains failed.
+
+MV-SAM3D exact pin audit: run_multi_view accepts RGB, masks and CHW pointmaps,
+**no direct pose/camera arguments**. POSE_KEYS retains view0; all_view_states_storage
+remainsNone, so the released all_view_poses_decoded branch is not a usable tracker.
+compute_pointmap expects OpenCV XYZ then applies(-X,-Y,Z), despite a conflicting
+PyTorch3D docstring: supply our already-scaled MoGe2 points without pre-flipping.
+Supplying all pointmaps skips DA3; do not use its unpinned automatic download.
+Visibility cameras require a custom callback: in camera0 coordinates,
+w2c_i=T_i@inv(T_0), c2w_i=T_0@inv(T_i). The provided DDA callback handles self-
+occlusion, not human/mask occlusion. Entropy-only1/2/3-view shape generation is a
+possible separate gate with existing SAM weights, not a complete moving-object
+pipeline or fixed-topology latent decoder. Same SAM license ambiguity persists.

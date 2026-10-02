@@ -124,11 +124,11 @@ def main() -> None:
             groups = []
             observations = []
             for text in ("person.", record["object_prompt"].strip()):
-                inputs = processor(images=image, text=text, return_tensors="pt").to(device)
+                model_inputs = processor(images=image, text=text, return_tensors="pt").to(device)
                 with torch.inference_mode():
-                    result = model(**inputs)
+                    result = model(**model_inputs)
                 detected = processor.post_process_grounded_object_detection(
-                    result, inputs.input_ids, threshold=args.confidence,
+                    result, model_inputs.input_ids, threshold=args.confidence,
                     text_threshold=0.25, target_sizes=[(image.height, image.width)],
                 )[0]
                 raw = tuple(

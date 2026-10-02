@@ -461,3 +461,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   verified against the source decoder, not raw266 or pre-fusion rotations.
   No reconversion or automatic adoption. Sparse ABI/projection/visible-image
   falsification precedes full-video testing; no hand-accuracy claim.
+
+- 2026-10-02 R36 (episode0 routing fail-fast): the generic automatic-mask job
+  completed mask generation but failed final provenance reporting: the detector
+  BatchEncoding shadowed the validated input dictionary, causing KeyError
+  video_sha256. No passing report means these masks cannot feed downstream jobs.
+  Rename the detector-local variable and add a regression on provenance binding;
+  preserve the verified failure cause, quarantine incomplete output before a
+  uniquely named retry. No manual masks, thresholds or actor choices changed.
+
+- 2026-10-02 D40: test observed-to-continuous-triangle CUDA distance before
+  writing a replacement shape fitter. Direct one-sided PyTorch3D primitive,
+  min_triangle_area0 on nondegenerate10mm triangle; analytic interior, boundary,
+  outside vertex **and outside hypotenuse**, then gradient/rigid/duplicate gates.
+  Source audit found a fixed1e-8 barycentric denominator may misclassify tiny
+  triangles. Keep original metric fixture and1e-9m² tolerance; no rescaling,
+  vendor patch or loose tolerance to hide a failure. Not adopted before GPU gate.
