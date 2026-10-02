@@ -1237,3 +1237,12 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   neufs, budgets/parité/frames/valid_count/gates inchangés. Reçu échec SHA
   bdcf72b2739aabe0030b13506d221732f6b73b5baf6961a192d5db9806034a00 conservé.
   Épisode0préparation550/790 à18:32:46UTC; aucune relance du lecteur actif.
+- 2026-10-02 R95 (actual-depth-v2 dispatch,f10b1a7): correction ABI seule,
+  même9frames/240s/parité/protocole, fermeture7files16496bytes. Unité active
+  à18:38:04UTC: warmups passés et single première paire56.011s, validation
+  19.108s; batch8 en cours. Reçu par défaut `status=fail` sans exception ni
+  finalphase **n'est pas encore un échec terminal**. Pas median/balanced gate
+  ni adoption avant fin des deux paires. Source héritée n'a pas été réécrite.
+  Fullsuite3889PASS/1optional-trimeshSKIP41.40s avec caches bytecode désactivés;
+  anciens caches locaux jetables nettoyés, code/receipts/predictions intacts.
+  Prepare0 depth600/790 observée; tous GPU jobs qualité restent séquentiels.
