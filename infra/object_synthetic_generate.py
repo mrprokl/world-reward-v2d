@@ -111,13 +111,11 @@ def export_actual(result, destination, name, torch):
             'isotropic_scale_verified':True,'camera_parity_max_error_m':maximum,'camera_parity_tolerance_m':tolerance}
 
 
-def run(root,report,path):
-    import torch
+def build_pipeline(root,report,torch):
+    """Shared audited offline constructor; no observation or private asset read."""
     from hydra.utils import instantiate
     from omegaconf import OmegaConf
     from body_smoke import _pinned_checkout
-    observations,receipt,digest=load_observations(root)
-    report['observation_report_sha256']=digest
     source,source_receipt=full.prep.validate_source(root)
     report['source_manifest']=source_receipt
     report['ss_prerequisite']=full.validate_ss(root,source_receipt,report['image_id'])
@@ -147,6 +145,15 @@ def run(root,report,path):
     if pipe.compile_model or pipe.depth_model is not None:raise ValueError('Require offline external-pointmap native constructor')
     def no_depth(*args,**kwargs):raise RuntimeError('No internal depth model or fallback permitted')
     pipe.depth_model=no_depth;torch.cuda.reset_peak_memory_stats()
+    report['native_constructor_verified']=True
+    return pipe
+
+
+def run(root,report,path):
+    import torch
+    observations,receipt,digest=load_observations(root)
+    report['observation_report_sha256']=digest
+    pipe=build_pipeline(root,report,torch)
     common=dict(seed=42,stage1_inference_steps=50,stage2_inference_steps=25,decode_formats=['gaussian','mesh'],
                 use_stage1_distillation=False,use_stage2_distillation=False,stage1_only=False,
                 with_mesh_postprocess=False,with_texture_baking=False,use_vertex_color=True)
