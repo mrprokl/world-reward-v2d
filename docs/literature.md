@@ -400,3 +400,19 @@ not acquired yet. Strict fullstate inclbuffers after one prefix removal, no
 partial matching. Paired independent quality gates stay≥5% median scene CD gain,
 no scene regression>5%, coverage≥95%; original MoGe queue unchanged. No accuracy
 or model inference claimed until actual receipts and paired evaluation complete.
+
+## D78 following paired quality evidence (2026-10-02)
+
+DA3Metric is19.4160%betterthanMoGe fixedK onTUD-L, yet absoluteerrors58.95–75.33cm
+remain; actualMoGelearnedcamera excelsTUD-L but pairedhumanJ2regresses22.88%.
+Do not conflate domain-biased camera, depth and objectshape. Next ownhypothesis
+is ray-preserving affinecameraZ referenced onlytoestimatedvisibleMHR:
+oneαperclip/βperframe, independentlyheldoutspatialhumanpatches, conditioningfrom
+**within-frame**depthspread (personmeanmotioncannotidentifyαwithfreeβ). This
+adapts humananchoring motivatedby [DoasIDo](https://arxiv.org/html/2606.19333)
+without its NC HaWoR/MANO dependencies or an off-ray3Dtranslation. [MoGe2](https://arxiv.org/html/2507.02546)
+explains underlyingaffine/focalgauge. NewJ3privatecohort/predeclaredgates in
+experiments.md, no privatecalibration/inference/manualtestlabels.
+Lowerprioritysafe-separatedGeoCalibfront-end+ourcamera math and discreteSAM
+mesh selection need separate rights/runtime audit; fullPerspectiveFields-adapted
+package is not cleared by top-levelApache or CC-BY weights alone.

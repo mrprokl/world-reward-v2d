@@ -1371,3 +1371,22 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Newpriority: independentlytestaffineZhuman-grounding andDA3human/newRGBcohort,
   notfitGTK800orclaimcalibrationfromthisobject-onlycohort. Onlyactualpinned
   addictMIT3832bytezipimportwasadded; baseimage/DA3sourceunchanged.
+
+- 2026-10-02 D78 (predeclared, not executed): fresh J3 human/object RGB cohort,
+  threeclips×sixframes, newclipconstantidentities/bottlemeshes/hiddenfocals and
+  depth-arm/non-contact/occlusion controls; onlyautomaticperson+bottlemasks.
+  ReusepinnedBody/MoGe fixedK1280 (notprivateK) eighteenactualcalls each, save
+  rawZ/XYZ/predhumanrender/masks before any fit/privateevaluation. TestOWN
+  camera-ray-preserving Z'=αclipZ+βframe; no framewise objectmesh scale,
+  humangeometrychange/contactattraction/perframeGTalignment. IdentifyαONLY
+  within-framehumanZvariation; checkerboard8×8train/holdoutregions separated,
+  Huber10IRLS/equalframeweights, ≥64pairs/frame/≥32eachsplit, pooledwithin-frame
+  SD/meanZ≥.005. Underconditionedabstainsretainα-onlybaseline; invalidinputfatal.
+  Affine selected onlypublicpredhuman-heldoutmedianrelativeerrorgain≥5% with
+  no>5%frameregression, otherwise α-only, never privateGTselection. Allframes
+  finalprivatecameraCDhalf/relativehuman-objecterror/coverage reported;
+  medianclipgain≥5%/no>5%clipregression/coverage≥95% gate, noCARIclaim. Newcohort
+  ratherthanrepeatedhyperparametertuningoldJ1/J2; rawsource/masks/mesh fixed.
+  LiteraturemotivationDo-as-I-Do2606.19333/MoGe22507.02546, independentformula
+  avoidsHaWoR/MANO and off-rayXYZtranslations. GeoCalibsource-separation and
+  discrete3meshSAMselection lowerprioritiespendinggaugevalidation/rights.
