@@ -1,0 +1,5 @@
+# Small dependency repair after a real import gate; no recompilation of models.
+FROM world-reward/sam3d-cuda:0.1
+RUN apt-get update && apt-get install -y libusb-1.0-0 && rm -rf /var/lib/apt/lists/*
+RUN python -c "import open3d; from v2d.sam3d.lib.image_to_mesh import image_to_mesh; print('objects_core_imports=pass')"
+ENV PYTHONUNBUFFERED=1

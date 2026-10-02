@@ -4,8 +4,8 @@ ROOT="${WR_ROOT:-/srv/scenesmith/world-reward}"
 CODE="${WR_CODE:?Require immutable committed source}"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
 # Wait for the exact derivative; don't restart the active builder.
-until docker image inspect world-reward/sam3d-cuda:0.1 >/dev/null 2>&1; do
-  state=$(systemctl show world-reward-sam3d-cuda-build -p ActiveState --value)
+until docker image inspect world-reward/sam3d-runtime:0.1 >/dev/null 2>&1; do
+  state=$(systemctl show world-reward-sam3d-runtime-build -p ActiveState --value)
   if [[ "$state" != active && "$state" != activating ]]; then
     echo "Repaired image unavailable, build terminal: $state" >&2; exit 1
   fi
@@ -22,4 +22,4 @@ docker run --rm --gpus all --network none \
   --mount "type=bind,src=$ROOT/outputs,dst=$ROOT/outputs" \
   --mount "type=bind,src=$ROOT/results,dst=$ROOT/results,readonly" \
   --mount "type=bind,src=$ROOT/cache,dst=$ROOT/cache" \
-  world-reward/sam3d-cuda:0.1 python "$CODE/infra/object_smoke.py" --root "$ROOT"
+  world-reward/sam3d-runtime:0.1 python "$CODE/infra/object_smoke.py" --root "$ROOT"
