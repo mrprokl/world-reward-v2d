@@ -211,9 +211,9 @@ def read_png(path, *, depth=False):
     return value != 0
 
 
-def run(root, report):
+def run(root, report, *, prediction_loader=None):
     base = root/"validation/tudl_rgb_v1"; private = base/"eval_private"
-    arrays, records, frozen, hashes = public_predictions(base)
+    arrays, records, frozen, hashes = (prediction_loader or public_predictions)(base)
     report.update(**hashes, predictions_frozen_before_private_truth_read=True, frames=[])
     ap = private/"acquisition-report.json"; ah = regular_hash(ap); acquisition = json.loads(ap.read_text())
     if (acquisition.get("status") != "pass" or acquisition.get("dataset_revision") != REVISION
