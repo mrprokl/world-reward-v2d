@@ -395,3 +395,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   no speed claim; construct full OpenCV camera tensors at batch size through
   the same official projection utility. Keep failed report and use a new
   report path/job for correction. Unchanged live object producer reached300/501.
+
+- 2026-10-02 D34: minimal O1 fitter optimizes one volume-preserving5DOF shape
+  against permitted visible depth points with supplied poses fixed. Only
+  observed-to-deformed-surface nearest neighbours, equal frame weights, robust
+  coordinate loss10mm in raw metric units, deterministic<=2048 samples/frame,
+  prior.01 and conservative log-stretch bounds; <=100 evaluations. No hidden
+  surface attraction, R/t/metric-scale fitting or automatic caller mesh mutation.
+  Nonconvergence/raw residual worsening returns an unaccepted proposal. Tiny
+  noiseless procedural partial-view test verifies implementation (>85% fitting
+  residual gain), not RGB-inferred pose robustness or challenge shape accuracy.
+  Full local suite1292 passes. Synthetic rendered/occluded tests still required.
