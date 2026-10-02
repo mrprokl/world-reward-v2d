@@ -976,3 +976,24 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   masks unchanged. Also fix private evaluator loop indentation found by source
   review, with a tiny eight-frame actual-file regression test before any evaluation.
   No failed method gate is reclassified; full suite3428PASS34.27s before fixes.
+- 2026-10-02 R83 (Azure frozen mesh replay diagnostic,b6dbabe): measurement
+  completed6.049s, same source/binary/configuration and available topology/
+  intersection signature as R80. Sampled diagonal CD0.287707%, net volume
+ 0.173878% pass;39of46 birthface-matched shells exceed5% volume error, worst
+ 14.0343% on inward component10. Historical candidate arrays were lost, so
+  bitwise identity is not proved. Replay arrays/maps now hashed and retained
+  remotely; original rejection/controls untouched, no prediction export/adoption.
+  This attributes the replay's failure to cavity volume fidelity, not global CD
+  or embedding; motivates one volume-constrained contraction test, not deleting
+  cavities or relaxing gates.
+- 2026-10-02 R84 (Azure all-frame motion quality,b6dbabe): tracking-v2
+  passed22.398s, all24frames;11PnP proposals,10explicit abstentions to measured
+  depth baseline. Actual predicted raster attachment parity passed for each
+  anchor; sparse counts30/65/59. Private evaluation passed44.716s. Mean camera
+  CD per object288.093→288.093,946.319→950.868,629.788→628.960cm; median gain
+ 0.131468%<5%, per-object regression0/+0.480712%/−0.131468%, fast-step gate
+  passes. Relative-motion surface diagnostic33.329→33.329,68.726→63.931,
+ 56.967→54.840cm; not actual-GT shape CD and never inference correction. Reject
+  this fixed-anchor direct LK/PnP hypothesis: large inherited metric bias remains,
+  so more tracking confidence is not itself reconstruction accuracy. No adoption,
+  final mesh/embedding guarantee or CARI4D win. Full tiny suite3450PASS32.89s.

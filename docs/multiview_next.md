@@ -24,12 +24,17 @@ camera errors combine metric depth, pose and shape; first diagnose those factors
 not retune the same fixtures. No claim about held-out pose tracking, full V2D
 metrics, photorealism, embedding, or final mesh budget follows.
 
-Next source-backed tracker hypothesis, not yet implemented: own OpenCV LK
+Completed source-backed tracker hypothesis: own OpenCV LK
 forward/backward correspondences attached to predicted-mesh raster barycentrics,
 PnP/RANSAC plus reserved-track reprojection. Shape/scale frozen; abstain on weak
-support and retain measured baseline. Requires a new adjacent-frame cohort;
-these six wide-baseline views are not a LK validation sequence. Private truth
-scores all frames only after inference freezes, without pose alignment.
+support and retain measured baseline. A separate three-object/eight-frame RGB
+cohort completed tracking22.398s and private evaluation44.716s. Camera CD median
+gain0.131468%<5%: **rejected**, not adopted. Relative-motion diagnostic improves
+on two objects but large inherited anchor depth/shape bias dominates absolute
+reconstruction. These six wide-baseline views were not reused as LK validation.
+Private truth scores all frames only after inference freezes, without alignment.
+Next priority is independently validated shared human/object metric grounding,
+not additional flow weights or claiming reprojection as pose accuracy.
 
 Source: [MV-SAM3D abb04b5](https://github.com/devinli123/MV-SAM3D/tree/abb04b5e8af5bc33b0265bdf19937e76bbb6bcdd).
 SAM custom licence/competition eligibility remains unresolved. Detailed useful

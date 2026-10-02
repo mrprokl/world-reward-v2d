@@ -147,4 +147,8 @@ hand cases passed automatic paired inference/official conversion; quality gain
 single/three-view proposals passed139.118s; median camera CD gain-0.18784%<5%,
 so fusion hypothesis rejected. Both private evaluations execute only after
 prediction hashes freeze; neither establishes challenge accuracy or adoption.
-Latest full tiny suite3323PASS33.34s. No new submission or production mesh.
+Latest full tiny suite3450PASS32.89s. No new submission or production mesh.
+Fixed-anchor RGB motion tracking completed24frames but quality gain0.131468%<5%
+rejects adoption. CPU guarded-QEM replay identifies39of46 cavity volume errors
+over5%, while global CD/net volume/embedding pass. Frozen failures are retained;
+no thresholds, source scale or camera trajectories are changed for mesh QA.
