@@ -1459,3 +1459,17 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Exactofficial targetunitconversion follows pinnedsource (F64castbefore×1000).
   Newtargetrequires explicitnewlineage; oldFAIL/oldSHAremain. If either gatefails,
   STOP withoutcoldconverterretry or loosenedtolerance. Noaccuracy/submissionclaim.
+
+- 2026-10-02 D80 actual strictreseal **REJECT37.154565s**: twofreshPython
+  nativeworkers completedstrictseed0/TF32off/CUBLASdeterministic/nooptimizedJIT
+  full790/chunk16, but rawtargets differ7182scalars (~.0164%), meanpointL2
+  3.3861546e-8mm/max.00101896mm. Firsttargetcanonicaldf8cfc73aeea41e114825205bc822003d07b471ce976ee458ef12ed229f12397,
+  second d17a842e61ae2634a95fab7b042b127fc076acffa948cdbec63ece2a8c3395b8.
+  Failure receipt314f80e8bbb19e9883c75ba262c13417cd34754c0eba364516f1060073c9e825;
+  code e2e446a35b2a6258ec52074cd9783964046b179c/63356Bcontrol.
+  Nohistoryreference/solver; bothsavedtargets+reports retainedAzure. DoNOTrepeat
+  samesettings orcallitbitexactPASS. CustomLBS/index_addis acandidateoperation,
+  notcausallyestablished (PyTorch hasdeterministicalternatives).
+  Firsttargetselectedbyprotocolorder BEFOREanyerrorselection maydefineaNEW
+  frozeninverseproblem, neveroldtargetrecovery. Nextstandalonehistoricalcontrol
+  reference usesunchangedrtol1e-5/atol1e-4mm, nooldSHAwaiver/noaccuracyadoption.

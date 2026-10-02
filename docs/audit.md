@@ -104,8 +104,10 @@ CD-H, CD-O, ACC-H, ACC-O and PEN. Each acceptance was read again after page load
 (or reload); no prediction/file upload and no quota consumption. No account
 creation, token disclosure, other-track entry or license exception.
 
-The PEN Team page currently says Thomas GOMEZ; rename to **World Reward** is
-prepared but requires the final public-name change confirmation. NVIDIA's separate
+User confirmed the final public-name change. **World Reward** was saved and
+verified after reload on ALL FIVE Track1 Team pages; no profile name, invitation
+or team member was changed. The authenticated CLI read-only check independently
+confirms entered=True, used_today=0 and remaining_today=5 on each metric. NVIDIA's separate
 once-per-team registration, producing Git commit accessibility and source-license
 compatibility remain independent prerequisites; Kaggle acceptance does not prove
 any of them.
