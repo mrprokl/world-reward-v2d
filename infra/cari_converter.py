@@ -11,12 +11,15 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 import argparse
+import hashlib
 import importlib.util
 import json
 from numbers import Integral
 import os
 from pathlib import Path
 import platform
+import re
+import signal
 import sys
 import time
 
@@ -32,6 +35,7 @@ CHECKPOINT_SHA256 = "78ff5cb874dd012a272382e3f2d8bc11226d5b7d0ecc739a60fbb4a97a5
 REFERENCE_MODEL_SHA256 = "352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc"
 CONVERTER_SHA256 = "c799ad612fca19620563fcb93bf61e5a4adad0a04251482358746b5f27f8a52e"
 MAX_MEAN_VERTEX_ERROR_MM = 2.0
+DIAGNOSTIC_BUDGET_SECONDS = 900
 FRAME_CHANGE_ATOL_M = 1e-5
 PARAMETER_DIMS = {
     "mhr_global_rot6d": 6, "mhr_trans": 3, "mhr_body_pose_cont": 260,
@@ -245,6 +249,8 @@ def _argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
     parser.add_argument("--bundle-source", choices=("forward", "refined"), default="forward")
+    parser.add_argument("--diagnostic-only", action="store_true",
+                        help="Seal original fit and run three-or-fewer source-bound numerical probes; no submission")
     return parser
 
 
@@ -253,6 +259,123 @@ def conversion_directory(bundle_source: str) -> str:
     if bundle_source not in ("forward", "refined"):
         raise ValueError("Require explicit forward or refined native bundle source")
     return "cari_conversion" if bundle_source == "forward" else "cari_conversion_refined"
+
+
+def diagnostic_directory(bundle_source: str) -> str:
+    if bundle_source not in ("forward", "refined"):
+        raise ValueError("Require explicit forward or refined diagnostic source")
+    return f"cari_converter_diagnostic_{bundle_source}_v1"
+
+
+def canonical_array_identity(value) -> dict:
+    """Hash finite native values as C-order little-endian bytes, without repair."""
+    array = _float_array(value, "native diagnostic array")
+    canonical = np.ascontiguousarray(array, dtype=array.dtype.newbyteorder("<"))
+    return {"sha256": hashlib.sha256(canonical.tobytes(order="C")).hexdigest(),
+            "dtype": canonical.dtype.str, "shape": list(canonical.shape), "bytes": canonical.nbytes}
+
+
+def bind_official_diagnostic_callbacks(torch, converter, tool, model, report):
+    """Bind real pinned F64 LM and separate F32 reference; no upstream patch.
+
+    NumPy inputs are copied into independent tensors, and returned arrays are
+    strict owned copies. A successful import alone never certifies execution.
+    """
+    _require_hash(tool, CONVERTER_SHA256); _require_hash(model, REFERENCE_MODEL_SHA256)
+    if (Path(converter.__file__).resolve() != tool.resolve()
+            or any(Path(symbol.__code__.co_filename).resolve() != tool.resolve()
+                   for symbol in (converter.MHR.run, converter.lm_pose))):
+        raise RuntimeError("Official diagnostic callbacks resolved outside the pinned converter")
+    f64 = converter.MHR(str(model), "cuda", chunk=3, precision="float64")
+    f32 = converter.MHR(str(model), "cuda", chunk=3, precision="float32")
+    if (f64.dtype != torch.float64 or f64.mdtype != torch.float64 or f64.fd_step != 1e-6 or f64.chunk != 3
+            or f32.dtype != torch.float64 or f32.mdtype != torch.float32 or f32.fd_step != 1e-3 or f32.chunk != 3
+            or f64.device.type != "cuda" or f32.device.type != "cuda"):
+        raise RuntimeError("Pinned reference precision/FD/chunk/device ABI differs")
+    report["runtime_bindings"] = {"converter_sha256": CONVERTER_SHA256, "reference_model_sha256": REFERENCE_MODEL_SHA256,
+        "float64_precision": "float64", "float64_fd_step": f64.fd_step, "float64_model_chunk": 3,
+        "float32_precision": "float32", "float32_fd_step": f32.fd_step, "float32_model_chunk": 3,
+        "lm_iters": 60, "lm_tol": 1e-5, "lm_frames_per_batch": 3,
+        "identity_fixed": True, "cols": None, "weights": None,
+        "float64_pose_polish_calls_completed": 0, "float32_reference_replay_calls_completed": 0}
+    bindings = report["runtime_bindings"]
+    def tensor(value, shape, name, dtype):
+        array = _float_array(value, name, shape)
+        if array.dtype != dtype:
+            raise ValueError(f"{name} has the wrong callback precision")
+        return torch.tensor(array.copy(), dtype=torch.float64, device="cuda")
+    def returned(value, shape, name):
+        array = value.detach().cpu().numpy().copy()
+        if array.dtype != np.float64:
+            raise ValueError(f"{name} must be an owned float64 native result")
+        return _float_array(array, name, shape)
+    def pose_polish(target, pose, identity, *, iters, tol):
+        count = len(pose)
+        if not 1 <= count <= 3 or iters != 60 or tol != 1e-5:
+            raise ValueError("Only the predeclared three-or-fewer60-step numerical probes are allowed")
+        p = tensor(pose, (count, 136), "float64 probe pose", np.float64)
+        z = tensor(identity, (1, 113), "fixed float64 probe identity", np.float64)
+        tgt = tensor(target, (count, 18439*3), "float64 target mm", np.float64)
+        initial_mm, _ = f64.run(p, z)
+        initial = returned(initial_mm, (count, 18439, 3), "float64 initial reference mm")
+        bindings["float64_initial_mean_vertex_error_mm"] = np.linalg.norm(
+            initial-target.reshape(count, 18439, 3), axis=-1).mean(1).tolist()
+        proposal, errors = converter.lm_pose(f64, tgt, p, z, iters=iters, tol=tol, frames_per_batch=3)
+        proposal = returned(proposal, (count, 136), "float64 LM proposal")
+        errors = returned(errors, (count,), "float64 LM errors")
+        if np.any(errors < 0): raise ValueError("Native LM returned negative residuals")
+        bindings["float64_pose_polish_calls_completed"] += 1
+        return proposal, errors
+    def reference_f32(pose, identity):
+        count = len(pose)
+        if not 1 <= count <= 3: raise ValueError("Only the sealed numerical probes may be replayed")
+        p = tensor(pose, (count, 136), "quantized probe pose", np.float32)
+        z = tensor(identity, (1, 113), "quantized fixed identity", np.float32)
+        vertices, _ = f32.run(p, z)
+        vertices = returned(vertices, (count, 18439, 3), "float32 reference mm")
+        bindings["float32_reference_replay_calls_completed"] += 1
+        return vertices
+    return pose_polish, reference_f32
+
+
+def finish_diagnostic(output, converted, params, native_vertices, *, torch, converter, tool, model,
+                      episode, frame_indices, provenance, report, persist):
+    """Seal full original errors *before* any 2-mm rejection; probes never adopt."""
+    from cari_converter_diagnostic import PINS, polish_probes, seal_original_converter
+    native_identity = canonical_array_identity(native_vertices)
+    provenance = {**provenance, **PINS, "native_vertices_sha256": native_identity["sha256"]}
+    sealed = seal_original_converter(output/"sealed_original", converted, params, episode_index=episode,
+                                     frame_index=frame_indices, provenance=provenance)
+    native_path = output/"native_parameters.npz"
+    with native_path.open("xb") as handle:
+        np.savez_compressed(handle, **params, frame_index=frame_indices)
+    for path in (native_path, output/"sealed_original/original_converter.npz", output/"sealed_original/original_report.json"):
+        path.chmod(0o444)
+    report.update(phase="original_sealed", original=sealed["original"], original_archive=sealed["original_archive"],
+                  frames=len(native_vertices), diagnostic_helper_sha256=sha256(Path(polish_probes.__code__.co_filename)),
+                  original_report_sha256=sha256(output/"sealed_original/original_report.json"),
+                  native_parameters_sha256=sha256(native_path), native_vertices_identity=native_identity,
+                  native_parameter_identities={k: canonical_array_identity(v) for k, v in params.items()},
+                  provenance=provenance, polish_protocol=sealed["polish_protocol"]); persist()
+    pose_polish, reference_f32 = bind_official_diagnostic_callbacks(torch, converter, tool, model, report)
+    report["phase"] = "probe_polish"; persist()
+    result = polish_probes(converted, sealed, native_vertices, pose_polish=pose_polish, reference_f32=reference_f32)
+    bindings = report["runtime_bindings"]
+    if bindings["float64_pose_polish_calls_completed"] != 1 or bindings["float32_reference_replay_calls_completed"] != 2:
+        raise RuntimeError("Require actual native LM and both separate F32 probe replays")
+    _require_hash(tool, CONVERTER_SHA256); _require_hash(model, REFERENCE_MODEL_SHA256)
+    target = output/"probes.npz"
+    with target.open("xb") as handle:
+        np.savez_compressed(handle, **{k: v for k, v in result.items() if k != "report"},
+                            frame_index=np.asarray(result["report"]["probe_indices"], np.int64))
+    report.update(status="pass", phase="complete", source_bindings_runtime_verified=True,
+                  actual_official_polish_verified=True, native_full_frame_decode_verified=True,
+                  full_frame_fidelity_verified=False, original_gate_pass=sealed["original"]["gate_pass"],
+                  probe_report=result["report"], probes_sha256=sha256(target), runtime_completed=True)
+    # The helper's flags describe unbound callbacks; this runtime certifies only
+    # the actual pinned probe calls, never full-frame adoption or accuracy.
+    report["probe_report"]["actual_official_polish_verified"] = True
+    persist()
 
 
 def require_refinement_chain(report, forward, *, forward_hash, inputs_hash, count, episode):
@@ -267,10 +390,7 @@ def require_refinement_chain(report, forward, *, forward_hash, inputs_hash, coun
         raise ValueError("Native refinement does not address the exact frozen full forward")
 
 
-def main() -> None:
-    if platform.system() != "Linux" or {path.name for path in Path("/sys/class/net").iterdir()} != {"lo"}:
-        raise RuntimeError("Require Azure Linux GPU container with network none")
-    args = _argument_parser().parse_args()
+def _convert_episode(args, diagnostic=None) -> None:
     root = Path(os.environ["WR_ROOT"])
     base = root / f"outputs/episode_{args.episode:06d}"
     forward_path = base / "cari_forward/report.json"
@@ -377,8 +497,8 @@ def main() -> None:
         loaded = Path(sys.modules[symbol.__module__].__file__).resolve()
         if not loaded.is_relative_to(native / "lib_mhr"):
             raise RuntimeError("Native MHR import resolved outside the pinned source")
-    output = base / conversion_directory(args.bundle_source)
-    if output.exists():
+    output = base / (diagnostic_directory(args.bundle_source) if diagnostic is not None else conversion_directory(args.bundle_source))
+    if diagnostic is None and output.exists():
         raise RuntimeError("Frozen native CARI conversion exists")
     absent_buffer = output / "never_use_an_unverified_compact_buffer.pt"
     layer = MHRLayer.from_mhr_assets(
@@ -388,18 +508,40 @@ def main() -> None:
     decoder_identity = layer.decoder_identity()
     if decoder_identity != adapter["decoder_identity"]:
         raise RuntimeError("Decoder identity differs from the full original-Body adapter")
-    output.mkdir(exist_ok=False)
+    if diagnostic is None:
+        output.mkdir(exist_ok=False)
+    else:
+        diagnostic["report"].update(phase="native_decode", decoder_identity=decoder_identity, body_assets=body_hashes,
+            inference_source_identity=source_identity, checkpoint_sha256=CHECKPOINT_SHA256,
+            reference_model_sha256=REFERENCE_MODEL_SHA256, official_converter_sha256=CONVERTER_SHA256,
+            input_report_sha256={"forward": sha256(forward_path), "inputs": sha256(inputs_path), "body": sha256(body_path),
+                                 "adapter": sha256(adapter_path), "object": sha256(object_path)})
+        if refinement_path is not None:
+            diagnostic["report"]["input_report_sha256"]["refinement"] = sha256(refinement_path)
+        diagnostic["persist"]()
     started = time.perf_counter()
     native_vertices = decode_mhr_vertices_numpy(layer, params, batch_size=16)
     _float_array(native_vertices, "native_camera_vertices_m", (count, 18439, 3))
-    del params, layer
+    del layer
+    if diagnostic is None:
+        del params
     spec = importlib.util.spec_from_file_location("world_reward_official_cari_converter", tool)
     if spec is None or spec.loader is None:
         raise RuntimeError("Cannot load the verified official converter")
     converter = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(converter)
+    if diagnostic is not None:
+        diagnostic["report"]["phase"] = "original_official_conversion"
+        diagnostic["persist"]()
     converted = converter.convert(native_vertices, str(model), device="cuda", precision="float32",
                                   model_batch=256, log=lambda *args, **kwargs: None)
+    if diagnostic is not None:
+        finish_diagnostic(output, converted, params, native_vertices, torch=torch, converter=converter, tool=tool, model=model,
+            episode=args.episode, frame_indices=frame_indices, provenance={"native_bundle_sha256": sha256(bundle_path),
+                "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": [], "input_track": "track_1",
+                "input_sha256": inputs["input_sha256"], "bundle_source": args.bundle_source},
+            report=diagnostic["report"], persist=diagnostic["persist"])
+        return
     official = parameters_from_official_converter(converted, max_mean_vertex_error_mm=MAX_MEAN_VERTEX_ERROR_MM)
     if len(official.pose) != count or np.any(official.expression != 0):
         raise RuntimeError("Official conversion changed coverage or the zero-expression contract")
@@ -461,6 +603,43 @@ def main() -> None:
                       "worst_frame_mean_mm": fidelity["worst_frame_mean_mm"],
                       "object_roundtrip_max_m": object_report["roundtrip_max_error_m"],
                       "elapsed_seconds": result["elapsed_seconds"], "challenge_performance_verified": False}))
+
+
+def main(argv=None) -> None:
+    if platform.system() != "Linux" or {path.name for path in Path("/sys/class/net").iterdir()} != {"lo"}:
+        raise RuntimeError("Require Azure Linux GPU container with network none")
+    args = _argument_parser().parse_args(argv)
+    if not args.diagnostic_only:
+        _convert_episode(args)
+        return
+    if args.episode not in (0, 15): raise ValueError("Diagnostic-only cohort is restricted to episodes0/15")
+    root = Path(os.environ["WR_ROOT"]); output = root/f"outputs/episode_{args.episode:06d}"/diagnostic_directory(args.bundle_source)
+    if output.is_symlink() or output.resolve() != output.absolute(): raise ValueError("Canonical diagnostic directory required")
+    revision, image = os.environ.get("WR_CODE_REVISION", ""), os.environ.get("WR_IMAGE_ID", "")
+    if not re.fullmatch(r"[0-9a-f]{40}", revision) or not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
+        raise ValueError("Immutable diagnostic source and image required")
+    if not output.exists(): output.mkdir()
+    if not output.is_dir() or any(output.iterdir()): raise FileExistsError("Diagnostic output must be new/exclusively reserved empty")
+    started = time.perf_counter()
+    with (output/"report.json").open("x") as handle:
+        report = {"stage": "world_reward_cari_converter_runtime_diagnostic", "status": "fail", "phase": "provenance",
+            "episode_index": args.episode, "bundle_source": args.bundle_source, "network": "none",
+            "producer_revision": revision, "image_id": image, "script_sha256": sha256(Path(__file__)),
+            "budget_seconds": DIAGNOSTIC_BUDGET_SECONDS, "input_track": "track_1", "ground_truth_used": False,
+            "hand_labeled_test": False, "oracle_modes": [], "research_only": True, "submission_produced": False,
+            "adoption_authorized": False, "challenge_performance_verified": False, "full_frame_fidelity_verified": False,
+            "source_bindings_runtime_verified": False, "actual_official_polish_verified": False}
+        def persist():
+            report["elapsed_seconds"] = time.perf_counter()-started
+            handle.seek(0); json.dump(report, handle, allow_nan=False); handle.write("\n"); handle.truncate(); handle.flush()
+        def expired(*_): raise TimeoutError("Whole numerical converter diagnostic exceeded900s")
+        alarm = signal.signal(signal.SIGALRM, expired); term = signal.signal(signal.SIGTERM, expired); signal.alarm(DIAGNOSTIC_BUDGET_SECONDS)
+        try: persist(); _convert_episode(args, {"report": report, "persist": persist}); persist()
+        except Exception as error:
+            report.update(status="fail", error_type=type(error).__name__, error=str(error)); raise
+        finally:
+            signal.alarm(0); signal.signal(signal.SIGALRM, alarm); signal.signal(signal.SIGTERM, term); persist()
+    print(json.dumps({k: report[k] for k in ("stage", "status", "original_gate_pass", "elapsed_seconds")}))
 
 
 if __name__ == "__main__":

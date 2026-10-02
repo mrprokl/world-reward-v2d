@@ -218,7 +218,7 @@ are NC with extra model restrictions. ContactPose nonmesh data/code MIT is
 promising, but individual mesh terms and useful hashed minibundle remain
 unaudited; do not import MANO fits or pretend it supplies full-body MHR truth.
 
-## 5. D76 metric-depth candidate (source audit, acquisition not yet executed)
+## 5. D76 metric-depth candidate (pinned acquisition PASS; inference pending)
 
 DA3METRIC-LARGE pin4010e39f3634a45bc60553321fb49fb760bd594e card declares
 Apache2; matching source3d835ec1a5802d64a8b8b15f817a1ab54809bfe4 Apache2.
