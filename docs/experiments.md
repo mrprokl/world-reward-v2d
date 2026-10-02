@@ -858,3 +858,12 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   PYTHONPATH. Original failure remains frozen; V2 adds the already installed
   audited package path only and uses a distinct predictions-v2 output. RGB,
   automatic masks, models and numerical settings are unchanged; no quality claim.
+- 2026-10-02 R73 (Azure independent hand quality,bb81cf8 continuation): RGB
+  renderer passed5.274s, automatic masks10.010s, paired Body/full inference
+  passed26.304s/12calls, official shared-identity proposals passed27.336s and
+  private evaluation completed0.234s over all six cases. Mean nonneutral hand
+  PVE baseline133.978mm→candidate132.875mm:0.8233% gain, below frozen5% gate.
+  Neutral-side changes-0.497/-0.201mm; synthetic hypothesis rejected, no adoption
+  or CARI4D win claim. Absolute errors include wrist/body camera error; private
+  wrist-relative and per-case metrics are retained for diagnosis. This diffuse
+  procedural cohort is not photorealistic/external real-data validation.
