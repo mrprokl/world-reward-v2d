@@ -1015,3 +1015,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   acquired or restricted source imported. Ask owners for written scope and two
   hashed single-view validation minibundles; do not fetch~104GB RGB shards plus
   ~40GBmotion batches for two clips or assert no pretraining/challenge overlap.
+- 2026-10-02 R85 (Azure volume QEM build,64a7a06): offline inherited-source
+  compilation/ABI gate passed13.048s, imagec8fb1632…e21137, binary SHAeb606feb…055e7.
+  Native placement/cost and collision blocking unchanged; fixed cumulative
+  per-source-shell signed volume limit5%. No new package/source acquisition,
+  GPU, challenge geometry or accuracy gate during build. Full tiny suite
+ 3464PASS/1optional-trimesh-testSKIP33.15s; actual procedural geometry checks
+  follow on Azure and are not inferred from source-contract tests.
