@@ -38,6 +38,7 @@ def public_da3(base, records):
               'scale_fit':False,'adoption_performed':False,'original_frame_coverage_verified':True,
               'DA3_calls_completed':9,'outputs_completed':9,'metric_depth_scaling_applied_once':True,
               'checkpoint_states_loaded':406,'checkpoint_load_strict':True,
+              'asset_source_reverified_after_inference':True,'RNG_seed_reset_before_each_forward':True,
               'native_sky_correction_unchanged':True,'native_sky_threshold':.3,'native_sky_quantile':.99,
               'confidence_validity_exclusion':False,'pointmap_geometry_filled':False,
               'native_forward_arguments':dict(extrinsics=None,intrinsics=None,export_feat_layers=[],infer_gs=False,use_ray_pose=False,ref_view_strategy='saddle_balanced'),

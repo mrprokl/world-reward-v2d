@@ -38,6 +38,7 @@ def paired(depth_evaluator,frozen):
                 image_id='sha256:'+'b'*64,private_truth_read=False,challenge_inputs_used=False,oracle_modes=[],scale_fit=False,
                 ground_truth_used=False,hand_labeled_test=False,actual_DA3_inference=True,checkpoint_states_loaded=406,
                 checkpoint_load_strict=True,native_sky_correction_unchanged=True,native_sky_threshold=.3,native_sky_quantile=.99,
+                asset_source_reverified_after_inference=True,RNG_seed_reset_before_each_forward=True,
                 confidence_validity_exclusion=False,pointmap_geometry_filled=False,public_records=baseline['public_records'],
                 native_forward_arguments=dict(extrinsics=None,intrinsics=None,export_feat_layers=[],infer_gs=False,use_ray_pose=False,ref_view_strategy='saddle_balanced'),
                 adoption_performed=False,original_frame_coverage_verified=True,DA3_calls_completed=9,outputs_completed=9,
