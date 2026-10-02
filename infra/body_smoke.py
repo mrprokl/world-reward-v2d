@@ -191,6 +191,47 @@ def _install_local_dinov3_loader(torch, repository: Path):
     return original, calls
 
 
+def _load_checkpoint_with_asset_buffers(module, state_dict, original_loader, torch) -> dict:
+    """Require all checkpoint state except immutable rig buffers loaded from MHR.
+
+    The official model constructs these buffers from the explicit TorchScript
+    asset before loading the network checkpoint. Frozen learned parameters and
+    head topology/PCA buffers still must appear in the checkpoint.
+    """
+    prefixes = ("head_pose.mhr.character_torch.", "head_pose_hand.mhr.character_torch.")
+    current = module.state_dict()
+    parameters = dict(module.named_parameters(remove_duplicate=False))
+    buffers = dict(module.named_buffers(remove_duplicate=False))
+    unexpected = set(state_dict) - set(current)
+    if unexpected:
+        raise RuntimeError(f"Unexpected checkpoint keys: {sorted(unexpected)[:8]}")
+    missing = set(current) - set(state_dict)
+    allowed = {name for name in missing if name.startswith(prefixes) and name in buffers
+               and name not in parameters and not buffers[name].requires_grad}
+    if missing - allowed:
+        raise RuntimeError(f"Required model state missing: {sorted(missing - allowed)[:8]}")
+    for name in parameters:
+        if name not in state_dict or not torch.isfinite(state_dict[name]).all():
+            raise RuntimeError(f"Learned/frozen parameter missing or nonfinite: {name}")
+    asset_buffers = {name: value.detach().clone() for name, value in current.items()
+                     if name.startswith(prefixes) and name in buffers and name not in parameters}
+    for name, asset_value in asset_buffers.items():
+        if name in state_dict and not torch.equal(state_dict[name], asset_value):
+            raise RuntimeError(f"Checkpoint contradicts explicit immutable MHR asset: {name}")
+    merged = state_dict.copy()
+    if hasattr(state_dict, "_metadata"):
+        merged._metadata = state_dict._metadata
+    for name in allowed:
+        merged[name] = asset_buffers[name]
+    original_loader(module, merged, strict=True)
+    after = module.state_dict()
+    if any(not torch.equal(after[name], value) for name, value in asset_buffers.items()):
+        raise RuntimeError("Immutable MHR asset buffers changed during checkpoint loading")
+    return {"mode": "strict_network_and_head_state_with_explicit_asset_buffer_retention",
+            "retained_mhr_asset_buffer_names": sorted(allowed),
+            "parameter_tensors_loaded": len(parameters), "unexpected_keys": []}
+
+
 def main() -> None:
     if platform.system() != "Linux":
         raise RuntimeError("Video/model processing is restricted to Azure Linux")
@@ -231,9 +272,10 @@ def main() -> None:
         ):
             raise RuntimeError("Unexpected SAM 3D Body import location")
         original_state_loader = build_models.load_state_dict
+        checkpoint_loading = {}
 
         def strict_state_loader(module, state_dict, strict=False, logger=None):
-            return original_state_loader(module, state_dict, strict=True, logger=logger)
+            checkpoint_loading.update(_load_checkpoint_with_asset_buffers(module, state_dict, original_state_loader, torch))
 
         build_models.load_state_dict = strict_state_loader
         try:
@@ -360,7 +402,7 @@ def main() -> None:
         "body_revision": BODY_REVISION, "body_assets": asset_hashes,
         "asset_hash_assurance": "recorded_local_hashes_after_pinned_acquisition_not_independent_release_hashes",
         "upstream_revision": UPSTREAM_REVISION, "inference_source_identity": source_hashes,
-        "dinov3_revision": DINOV3_REVISION, "backbone": hub_calls[0], "checkpoint_loading": "strict",
+        "dinov3_revision": DINOV3_REVISION, "backbone": hub_calls[0], "checkpoint_loading": checkpoint_loading,
         "mask_report_sha256": inputs["mask_report_sha256"], "prompts_sha256": inputs["prompts_sha256"],
         "frames": frame_records, "predictions_sha256": sha256(predictions_path),
         "script_sha256": sha256(Path(__file__)), "torch_version": torch.__version__,
