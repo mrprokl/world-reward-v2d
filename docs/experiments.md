@@ -45,3 +45,13 @@ test; parallelize independent hypotheses only after shared contracts are sound.
 - 2026-10-02 D05: Full Kaggle Foundational 4.b forbids manual test labeling.
   Automatic object-prompt grounding + SAM propagation replaces manual SAM2 GUI.
   Procedural shapes must be selected/fitted algorithmically from RGB, not hand-labeled.
+
+## Results
+
+- 2026-10-02 R01 (synthetic only): multi-hypothesis SO(3)/translation Viterbi with
+  image confidence and explicit true mesh symmetries implemented. Generated
+  occlusion scene: greedy mean translation error 0.342857 m, selected path 0 m.
+  Tests additionally check exhaustive global optimum, false 180° flip rejection,
+  real fast 170°/1 m motion with strong evidence, exact-zero speed, missing states,
+  invalid rotations, overflow and time/shape contracts. Full suite 68 passed.
+  This verifies selection logic, **not** real tracking or challenge performance.

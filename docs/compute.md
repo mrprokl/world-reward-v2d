@@ -16,9 +16,11 @@ hashes, whitelist downloads, structural Parquet schema and all frame indices. It
 does not train or claim benchmark superiority. Local tests do not need the dataset.
 
 Access check 2026-10-02 (token securely obtained from Modal): SAM3D Body and Objects
-artifact HEAD returns 200; `nvidia/cari4d_commercial` returns 403. User must accept
-the repository's license/access gate. No token value was printed or committed.
-Kaggle authentication and individual competition rule acceptance remain prerequisites.
+artifact HEAD returns 200. CARI4D initially returned 403; after user granted access,
+its exact pinned `2026-08-25-09-35-57/manifest.json` returned 200. Token securely
+configured remotely, mode 600; no value printed or committed. Kaggle CLI installed
+and API token in ignored mode-600 `.env` authenticated successfully. All five
+competitions still require user rule acceptance in browser (entry check verified).
 
 VM power is running, GPU confirmed through Azure Run Command. SSH port 22 blocked
 from current connection despite correct /32 NSG allow and healthy daemon; Azure
