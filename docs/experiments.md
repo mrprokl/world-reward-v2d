@@ -414,3 +414,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   No camera/gauge, generic simplification budget, pose hypotheses, ICP objective
   or Viterbi hyperparameter changes. Wrapper passes selected episode explicitly.
   Local suite1334 passes; actual other-episode execution is a separate gate.
+
+- 2026-10-02 D36: predeclare O1 rendered procedural test: asymmetric/thin/
+  unchanged-symmetric shapes ×0/25/50% own rectangular occlusion ×known and
+  deterministically perturbed fixed poses (.02rad/.005m),18 conditions. Fit
+  original synthetic frames0/2/4, hold out1/3/5; native full-size K/ray+.5,
+  shape samples8192seed0, observations<=2048, unchanged fitter defaults. Measure
+  physical two-sided CD without registration, held-out visible-mask IoU and
+  volume/topology; require5% deformed-case CD gain and<=5% heldout-IoU loss,
+  zero-control CD nonregression. Known/perturbed poses are explicitly derived
+  from synthetic truth: this isolates shape behavior, **not RGB pose inference**.
+  Fail any condition=>keep experiment, no challenge adoption or victory claim.
