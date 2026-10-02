@@ -347,3 +347,18 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   object trajectory job or tune to challenge labels. Full local suite1104 passes.
   Automatic masks now also hash both public metadata files and reject ambiguous
   episode records before reading prompts; immutable offline launch unchanged.
+
+- 2026-10-02 D30: after actual native full forward, decode canonical parameters
+  with exactly the original Body MHR decoder, then official full-video shared
+  identity fitting. Never concatenate native6D/body260/hand108/scales28 into
+  kit136/68. Engineering representation-fidelity limit2mm per-frame mean,
+  chosen consistently with the preceding Body conversion, not tuned to GT;
+  verify independently through the Apache reference forward. Restore original
+  packed metric mesh pairing by P_source=P_aligned@A, no second gauge scaling.
+  Final conversion stays unverified until its actual remote run passes.
+- 2026-10-02 D31: full code archive grew above100KB control payload; launcher
+  correctly refused before Azure execution. Send only deterministic committed
+  shell/Python-import closure plus the small project package/config, preserving
+  Git metadata. Distinct entrypoint directories beneath jobs/<commit> prevent
+  same-commit closure collisions; SHA verification remains mandatory. No large
+  data/model transfer or arbitrary payload-limit increase.
