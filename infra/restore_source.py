@@ -33,6 +33,9 @@ def main() -> None:
             raise RuntimeError("Preserve modified vendor work; refusing overwrite")
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
+    # Stop offline source checks from requesting excluded non-source blobs via
+    # partial-clone status. Explicitly include just the six audited code paths.
+    git("sparse-checkout", "add", "--no-cone", *["/" + path for path in paths])
     print("restored_sam3d_body_source_python_files=6")
 
 

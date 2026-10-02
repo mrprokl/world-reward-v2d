@@ -48,7 +48,7 @@ PARAMETER_SHAPES = {
 
 
 def _git(path: Path, *arguments: str) -> str:
-    environment = dict(os.environ, GIT_OPTIONAL_LOCKS="0")
+    environment = dict(os.environ, GIT_OPTIONAL_LOCKS="0", GIT_NO_LAZY_FETCH="1")
     return subprocess.check_output(
         ["git", "-c", f"safe.directory={path}", "-C", str(path), *arguments],
         text=True, env=environment,
