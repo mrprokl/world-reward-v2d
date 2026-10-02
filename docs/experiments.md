@@ -751,3 +751,11 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   intersections, source deviation and once-baked grounding scale. Full-resolution
   source cavity containment remains unverified; final two-shell containment is
   checked where applicable. No pose/production route or frozen output changes.
+- 2026-10-02 D54: native full-constructor/decoded-shape integration gate only.
+  Existing six exact Objects checkpoints/seven configs, no depth model or compile
+  warmup; actual source/image SS prerequisite required. Own rendered ellipsoid
+  RGB/masks/OpenCV pointmaps in three views; synthetic oracle observations are
+  disclosed, generating mesh/poses never passed to inference. Single anchor and
+  unweighted three-view, seed42,SS50/SLAT25, Gaussian+mesh decoding, no texture,
+  geometry/layout repair or accuracy/adoption selection.300s total/180s generation/
+  80GiB peak; distinct frozen Azure proposals, no local renders/checkpoints.
