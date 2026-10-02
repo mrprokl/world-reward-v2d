@@ -32,3 +32,15 @@ data and 21 MB pinned sparse reconstruction source/kit on Azure only. Downloader
 validated 30 episodes, 16,563 frames, structural-only Parquet and SHA-256 manifests.
 No video, mesh, weights or rendered frames were transferred back locally. Current
 source code has lightweight tests; GPU inference has **not** been validated yet.
+
+Existing VM was externally deallocated at 07:32 UTC. User confirmed other work
+stopped and re-authorized exclusive H100 use; VM restarted, H100 reverified. Extra
+VM attempts failed before compute creation; task-created RG/network resources are
+being deleted. Existing user resources remain intact. No additional VM needed.
+
+Docker storage isolated at `/srv/scenesmith/world-reward/docker`, socket
+`/srv/scenesmith/world-reward/docker.sock`; separate dockerd uses no bridge or
+iptables mutation, builds/runs use host networking. This avoids filling the old
+root disk or deleting prior Docker images. Model acquisition and runtime build
+are systemd jobs; poll those exact units and never restart after mere observation
+timeouts. Current acquisition failed early; inspect precise failure before retry.
