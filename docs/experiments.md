@@ -1405,3 +1405,15 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Full suite4297PASS/1optionaltrimeshSKIP66.16s, not GPU/accuracy proof. Split
   immutable prepare(render/masks) and validation(infer/fit/quality) bundles to
   keep code-only control payloads under100KB; no larger local data exception.
+
+- 2026-10-02 R107/D78 actual **REJECT**: freshJ3 publicBody18+MoGe18 calls
+  PASS40.756s, publicaffinefitPASS15.268s, privatequalityPASS5.967s. All18frames
+  and95%coveragegatePASS, but gains[+.91334%,-14.97561%,-6.60420%], median
+  -6.60420%. Noadoption/nohyperparameter-retune onthiscohort; predictedhuman
+  heldoutconsistency didnotgeneralizetoobjectquality atwrongfocal/depthcontext.
+  Source2867ab1; predictionreceipt4fe3b535f7c3c83f4ede99096a6d9fbabe0934ef1aeb957925604d78c679c2ed,
+  fitc1c69492b4c9cc572bca6714c1163023d30a5d4bfdba6c787a49426651854a68,
+  qualityd8405043595a716efcf52c4d85e4cd60664cb8ea32e7e633b2e0fbd96e0302e0.
+  Inference/fit/publicfreeze/privatefirewall areengineeringPASS, distinctfrom
+  hypothesisFAIL. Preservefrozenresults; investigatebetterdepth/camera/human
+  anchoring onnewvalidation, notreselectbetausingprivategroundtruth.
