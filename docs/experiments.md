@@ -881,3 +881,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Accept only these exact audited targets and mount the one global blob read-only;
   content SHA/size/model/FOV gates unchanged. Original observation failure frozen,
   V2 distinct directory. No reconstruction or quality result yet.
+- 2026-10-02 R75 (Azure object observations-v2,1c68365): six automatic RGB
+  masks and genuine MoGe2 full-grid pointmaps passed9.427s. Native first single
+  mesh decoded and raw/export/camera parity reached artifact publication, but
+  the scalar parity tolerance remained NumPyfloat32 and JSON reporting failed.
+  Preserve decoded artifact and partial failed receipt; cast this diagnostic
+  scalar to Pythonfloat only. Distinct proposals-v2 repeats unchanged inputs,
+  native steps/seed/gates; no model, observation or quality retuning.
