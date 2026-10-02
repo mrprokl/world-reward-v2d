@@ -73,3 +73,10 @@ Episode 15 is a predeclared engineering smoke, not a tuning/GT validation split.
 `world-reward-masks-smoke` waits for the exact SAM2 image. A preceding synthetic
 MHR forward/converter gate must pass 0.01 mm mean-per-frame residual. Neither
 this threshold nor mask proxies establish challenge reconstruction performance.
+
+Containerd migration left stale private BuildKit snapshot references; export
+failed with `parent snapshot ... does not exist`. Terminal failure verified, then
+pruned only the private World Reward builder cache and restarted the exact jobs.
+No shared images/caches pruned. Remote suite: 189 passed, 1 skipped (optional
+local audit-kit parity test); local suite 190 passed. Temporary task SSH NSG rule
+removed and absence verified; control remains Azure Run Command.
