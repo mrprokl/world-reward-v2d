@@ -1763,3 +1763,11 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   comparison. Prioritize depth (independentD76signal19.416% atsameK800) over
   speculative identitymedoid; that external result is not fullHOI superiority.
   Alljobs terminal0/no concurrentGPU; tiny source payload96,336B/23files.
+
+- D87 scale-of-error diagnostic (after frozen quality decision, no retune): raw
+  human cameraPVE clips[96.397263,90.780927,182.034193]cm; sharedidentity gains
+  only[.018273,.055050,.002435]cm. Baselinehuman-derived objectdepth α
+  [1.082365,1.058942,.960445] all5frames supported. Thus this synthetic test
+  does not establish native human camera/global accuracy; camera-prior/model
+  domain bias are plausible, not proved causes. Do not let tiny identity ABI
+  residuals conceal large reconstruction error or claim improved fullHOI.

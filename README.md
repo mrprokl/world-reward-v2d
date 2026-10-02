@@ -41,4 +41,6 @@ replacement metric or evidence of reconstruction accuracy.
 One frozen file goes to all five metric competitions after validation, quota check,
 rule acceptance, team identity **World Reward**, and accessible producing GitHub commit.
 Kaggle credentials are configured in an ignored secret file; browser acceptance
-of all five competition rules is still required before the first upload.
+of all five competition rules and team name was verified on 2026-10-02;
+NVIDIA’s separate registration, source-license eligibility and producing GitHub
+commit accessibility still require resolution before the first upload.
