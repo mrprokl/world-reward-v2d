@@ -1883,3 +1883,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Failure stops this policy without trying other medoids on the same outputs.
   Passing permits a structural pipeline pilot BEFORE neutralheight/cache,
   not accuracy adoption, fullHOI validation or verified CARI4D victory.
+
+  D90 actualruntimePASS20.187367s, publicconsensus **REJECT**, source
+  c72ea35b0746ff03864ea40cf037ea0d23b27e34. Geometricmedoidanchor72 frozen
+  before image scoring, identityreceipt
+  6da447c5be53b44f5dd685ac1439edc72cfd64eb44fa42a1f75dcc9de6fb5bba;
+  report059d775819caaac11a5ed9944496d2840d8b1cb32b5264dee8cab798e25e586b.
+  Rawreplayroot8.302e−7m/camera1.139e−6m/controls1.49e−8, allparityPASS;
+  3nativeheads/46samegridrasters, all23frame/mask/sourcechecksPASS.
+  Eleven midpointmeanΔIoU−.010760618 (−1.07606percentagepoints), worst
+  −.024725697 (−2.47257points), eight regressions. Bothpredeclared mean/perframe
+  gatesFAIL. No same-output anchor policy retune, constrainedinitializer/cache/
+  CoCoNet followup, adoption or submission. Stable identity with fixed original
+  pose/camera is not supported by this consistency test; coupled pose/camera/
+  identity estimation is a distinct future hypothesis requiring its own protocol.
+  Fullsource suite5084PASS/1optionaltrimeshSKIP73.02s, 72newfocusedPASS;
+  immutablebundle8files34,284B, noheavydata onMac or activeGPUafter terminal0.
