@@ -288,3 +288,14 @@ had pre-GPU queueFAIL because completedJ1 transientunit collected; no optimizer
 or output ran. Explicit newcontinuation source/assets checks without reacquisition
 or oldunitrestart. VM02import active, DA3publicacquisition dispatched; all data
 remain Azure. Full tiny suite4093PASS/1optional-trimeshSKIP65.55s.
+
+19:29UTC VM02 import image active, elapsed7+min and disk grows as verified
+14.6GB image layers unpack; do not mistake quiet import for stalled/restart.
+Independent DA3 acquisitionPASS35.157s, source+weights all exactpublisherpins.
+Frozensensor prediction transfer68.086MBPASS, no duplicateMoGe. Native15
+refinement newunitv3 dispatchedsource2286fbd, pendingactualoptimizerstatus.
+J2 **paired**camera change againstJ1 is−22.8774%median, failing adoption;
+its raw→scaled gain51.09% is a different question, not a camera improvement.
+Opposite realTUD gain91.5848% supports domain-dependent calibration, not global
+replacement. Launcher now sanitizes failed dispatch exceptions (no base64
+payload echo/no automaticretry); legacytarget/sourcecommands unchanged.
