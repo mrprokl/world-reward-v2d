@@ -873,3 +873,11 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   re-predicts body/IK wrists/shape, so local wrist-angle copying under a different
   parent is not a justified fix. Deprioritize wider hand-transfer scaffolding;
   investigate global/body evidence after the independent object experiment.
+- 2026-10-02 R74 (Azure RGB object cohort,e4c30ec): render-only12RGB passed
+  3.537s. Observations stopped0.007s before model load: audited HF repository
+  SHA blob itself links to the task's global deduplicated Xet blob. Actual target
+  is regular1,323,815,904bytes, content SHA280741fd…cc1a01 exactly matches pinned
+  primary metadata; Xet identifier9f4c4857…db37c is storage, not content SHA.
+  Accept only these exact audited targets and mount the one global blob read-only;
+  content SHA/size/model/FOV gates unchanged. Original observation failure frozen,
+  V2 distinct directory. No reconstruction or quality result yet.
