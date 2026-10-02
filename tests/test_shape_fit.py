@@ -176,6 +176,6 @@ def test_invalid_or_non_so3_fixed_poses_fail(procedural_case, field, bad):
                                        ("max_points_per_frame", 3.), ("shape_prior", -.01),
                                        ("shape_prior", np.nan), ("shape_prior", True), ("f_scale_m", 0),
                                        ("f_scale_m", np.inf), ("f_scale_m", np.nan), ("f_scale_m", True),
-                                       ("f_scale_m", 1e-300)])
+                                       ("f_scale_m", 1e-300), ("f_scale_m", 1e308)])
 def test_predeclared_control_bounds_fail_closed(procedural_case, name, value):
     with pytest.raises(ValueError): fit_case(procedural_case, **{name: value})

@@ -132,7 +132,9 @@ def fit_shared_shape(
             or not np.isfinite(shape_prior) or shape_prior < 0):
         raise ValueError("shape_prior must be finite and nonnegative")
     if (isinstance(f_scale_m, (bool, np.bool_)) or not isinstance(f_scale_m, Real)
-            or not np.isfinite(f_scale_m) or f_scale_m <= 0 or f_scale_m * f_scale_m == 0):
+            or not np.isfinite(f_scale_m) or f_scale_m <= 0
+            or f_scale_m < np.sqrt(np.finfo(np.float64).tiny * 2048)
+            or f_scale_m > np.sqrt(np.finfo(np.float64).max)):
         raise ValueError("f_scale_m must be finite and positive at float64 squared precision")
     for name, value, maximum in (("max_nfev", max_nfev, 100), ("max_points_per_frame", max_points_per_frame, 2048)):
         if isinstance(value, (bool, np.bool_)) or not isinstance(value, Integral) or not 1 <= value <= maximum:
