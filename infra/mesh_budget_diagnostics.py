@@ -17,6 +17,8 @@ def main():
     root = Path(os.environ["WR_ROOT"])
     sys.path.insert(0, str(root / "vendor/v2d_submission_kit"))
     from v2dlb.mesh_budget import budget_mesh
+    from world_reward.mesh_geometry import normalize_degenerate_faces
+    import inspect
     path = root / "outputs/episode_000015/object_grounded/object.glb"
     original = trimesh.load(path, force="mesh")
     vertices, faces = budget_mesh(str(path), faces=4096, vertices=4096)
@@ -40,6 +42,8 @@ def main():
             result["small_budget_components"].append({"vertices": component.vertices.tolist(),
                                                       "faces": component.faces.tolist(),
                                                       "triangle_areas": component.area_faces.tolist()})
+    _, result["collapsed_triangle_checks"] = normalize_degenerate_faces(vertices, faces)
+    result["budget_source"] = Path(inspect.getfile(budget_mesh)).read_text()
     target = root / "results/mesh-budget-diagnostics-detail.json"
     with target.open("x") as handle:
         handle.write(json.dumps(result, indent=2) + "\n")
