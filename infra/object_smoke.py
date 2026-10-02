@@ -10,7 +10,7 @@ from pathlib import Path
 import platform
 import time
 
-from body_smoke import _pinned_checkout, _validate_inputs, DINOV3_REVISION
+from body_smoke import _pinned_checkout, _validate_inputs
 from world_reward.data import sha256
 
 

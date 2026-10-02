@@ -46,6 +46,16 @@ def main() -> None:
         if not torch.isfinite(result).all() or not torch.equal(result, torch.zeros_like(result)):
             raise RuntimeError("Kaolin CUDA Chamfer tiny reference failed")
 
+    def pytorch3d_raster():
+        from pytorch3d.renderer.mesh.rasterize_meshes import rasterize_meshes
+        from pytorch3d.structures import Meshes
+        v = torch.tensor([[-.5, -.5, 1.], [.5, -.5, 1.], [0., .5, 1.]], device="cuda")
+        f = torch.tensor([[0, 1, 2]], device="cuda", dtype=torch.int64)
+        pixels, depth, _, _ = rasterize_meshes(Meshes(verts=[v], faces=[f]), image_size=32,
+                                              blur_radius=0., faces_per_pixel=1)
+        if not (pixels >= 0).any() or not torch.isfinite(depth).all():
+            raise RuntimeError("PyTorch3D CUDA raster produced no triangle")
+
     def nvdiffrast():
         import nvdiffrast.torch as dr
         context = dr.RasterizeCudaContext()
@@ -80,7 +90,8 @@ def main() -> None:
         if not torch.allclose(out, v, atol=1e-3, rtol=0):
             raise RuntimeError("FlashAttention CUDA tiny reference failed")
 
-    for name, function in (("pytorch3d_knn", pytorch3d), ("kaolin_chamfer", kaolin),
+    for name, function in (("pytorch3d_knn", pytorch3d), ("pytorch3d_raster", pytorch3d_raster),
+                           ("kaolin_chamfer", kaolin),
                            ("nvdiffrast_raster", nvdiffrast), ("egl_depth", egl)):
         gate(name, function)
     if args.flash_attention:
