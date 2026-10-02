@@ -1473,3 +1473,12 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Firsttargetselectedbyprotocolorder BEFOREanyerrorselection maydefineaNEW
   frozeninverseproblem, neveroldtargetrecovery. Nextstandalonehistoricalcontrol
   reference usesunchangedrtol1e-5/atol1e-4mm, nooldSHAwaiver/noaccuracyadoption.
+
+- 2026-10-02 D81 (predeclared): immutablefirstD80savedtarget (worker0byprotocol
+  order, notlowesterror) definesnewinverseproblem. No redecodingorconversion;
+  original controls/referenceF32exact source and targetF64mm arithmetic onceon
+  all790. Historicalagreementrtol1e-5/atol1e-4mm unchanged;180s/offline budget.
+  OldD79/D80FAILtargetSHA remain; strictreproducibility/historicaltargetrecovery
+  False evenifthiswarmstartgatepasses. ActualD80maxperframemeandifference
+  2.8553522e-7mm; all790poses/residuals/fitaccuracy stillseparatecontracts.
+  141focusedtinytestsPASS, nosolver/adoption orquota.
