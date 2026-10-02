@@ -9,7 +9,8 @@ source license, and challenge eligibility are four different checks.
 
 Source: [official CD-H Kaggle rules](https://www.kaggle.com/competitions/v2d-challenge-track1-cd-h/rules),
 read in the browser on 2026-10-02; see the full operational audit in
-[audit.md](audit.md). No rule acceptance or organizer message was sent.
+[audit.md](audit.md). All five Track1 rules were later accepted with user
+authorization; no organizer clarification message was sent.
 
 - **Specific 2.6.a:** “Your winning Submission and the source code used to generate
   it must be publicly released under the Apache License, Version 2.0”. The sponsor

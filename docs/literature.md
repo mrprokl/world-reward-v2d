@@ -455,3 +455,35 @@ focalCI>10%, missing3families, rankfailure orf²≤0 ->abstain. Proposedfresh36R
 worst≤10%, weakfalseaccept≤5%. SubsequentfreshcoupledBody+depth+human/object
 pairedvalidation stillrequired; camera-onlygain insufficientforadoption.
 NoVPcode/model/benchmark acquired/executed/adopted atthisaudit.
+
+### Independent camera frontend: exact GeoCalib safe-subset audit
+
+GeoCalib pin97b8968e7798a66bf04fcf791fb535624241bda7 (2024, not a2026
+SOTAclaim) supports an independent calibration hypothesis unlike optionalSAM
+MoGeFOV. Wholepackageclearance NOTestablished because PerspectiveFields includes
+AdobeNCadaptation. Runtimecandidate ONLY `geocalib/modules.py`18900B
+SHA222f28ef570fbda9bd46bbd7c6089ccff8b9d96072177dd54179b6444fd48de6
+plus GeoCalibclasses18–89 (LowLevelEncoder/UpDecoder/LatitudeDecoder/
+PerspectiveDecoder)2569B SHA95b63c6917f9922e0859c6e2ce268bd25915ef965aa7646ede6cfd40d9bb7414.
+These useTorch/typing only; owncontainer MSCAN+ll_enc+perspective_decoder excludes
+original LMOptimizer/camera/PerspectiveFields imports. GeoCalibApache2 + SegNeXt
+Apache2 (d46ffa737980ec7a9f5b9465c78f254449163509); retainlicenses/credits/changes.
+
+[Publisher pinhole v1.0 weight](https://github.com/cvg/GeoCalib/releases/download/v1.0/geocalib-pinhole.tar)
+116074121B published2024-09-08, READMECCBY4. PublisherSHAabsent; actualAzure
+weightSHA/header/keyshapes/strictload still UNVERIFIED and acquisitionpending.
+Require `checkpoint['model']`, explicitcollisionfreefullstatemapping includingBN
+buffers/finitevalues, strict=True (officialloaderpermissiveness notadopted).
+RGB[0,1] input; MSCAN internallyRGB→BGR×255. UpB2HW, latitudeB1HWrad, two
+confidenceBHW; Hamburger randominitialbases eveneval requireCPU/CUDAseedreplay.
+
+Ownmathematics: n=((u−cx)/fx,(v−cy)/fy,1), sinlatitude=g·n/||n||,
+up=normalize(g_xy−g_z*n_xy), **normalized-camera-plane** notpixelvectorunits;
+||g||=1, f=exp(a)>0. Integerpixelgridnative, distinctfromourcellcentres.
+Nativepreprocess shortedge320/bilinearantialias thencentercrop32multiple: e.g.
+1024×768→426×320→416×320; trackexact sx/sy/crophomography inK, noaveragefx/fy
+or silentcoordinateparity. Ownconfidenceweightedfit/rank+reservedspatialblocks
+onlymeasureconsistency, notaccuracy. Initialfrontendsmoke180s/offline twoNEW
+procedural320×416RGB(noresize), strictload+deterministicreplay; thenpredeclared
+freshcameraablation incluninformativecontrols andlaterfullhuman-objectvalidation
+beforeanyadoption. No fittedcalibration/GT challengeinput orCARIscoreclaim.
