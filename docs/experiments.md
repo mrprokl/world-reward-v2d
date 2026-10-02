@@ -798,3 +798,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   120s masks/180s inference budgets. Pending synthesis/semantic gates; no quality
   result or candidate adoption. New writable output directories owned by runtime
   user only; no broad permission changes.
+- 2026-10-02 R67 (Azure full MV-v2,f4e64c5): actual native full constructor,
+  single and unweighted three-view SS/SLAT/mesh decoding passed78.868s;
+  generation49.280s, peak allocated17.641GB. Single370648vertices/741288faces;
+  three-view357424vertices/714840faces, both watertight. These are integration
+  proposals from disclosed synthetic oracle observations, not accuracy evidence.
+  Native decoder-to-GLB axis rotation and anchor pose need a verified gauge
+  bridge before any scoring/real-video use; neither mesh is adopted.
