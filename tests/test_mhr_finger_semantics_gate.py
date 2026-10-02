@@ -168,7 +168,7 @@ def test_failed_report_exclusive_before_torch_or_forward(gate, tmp_path, monkeyp
     original = gate.Path.iterdir
     monkeypatch.setattr(gate.Path, "iterdir", lambda self: [Path("lo")] if str(self) == "/sys/class/net" else original(self))
     with pytest.raises(ValueError, match="acquisition"): gate.main([])
-    path = tmp_path / "results/mhr-finger-semantics-v3.json"; report = json.loads(path.read_text())
+    path = tmp_path / "results/mhr-finger-semantics-v4.json"; report = json.loads(path.read_text())
     assert report["status"] == "fail" and report["forward_calls"] == 0 and report["adoption_performed"] is False
     frozen = path.read_bytes()
     with pytest.raises(FileExistsError): gate.main([])
@@ -224,3 +224,19 @@ def test_strict_environment_source_contract(gate):
     assert 'cudnn.deterministic = True' in source and 'allow_tf32 = False' in source
     assert source.index('os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"')<source.index('            import torch')
     assert 'if not torch.equal(v, replay_v)' in source
+
+
+def test_fresh_unoptimized_evidence_required(gate):
+    report={"stage":gate.fresh.STAGE,"status":"pass","model_sha256":gate.MODEL_SHA,
+            "script_sha256":gate.sha256(Path(gate.fresh.__file__)),
+            "diagnostic_helper_sha256":gate.sha256(Path(gate.determinism.__file__)),
+            "unoptimized_fresh_replay_bitexact":True,"fresh_process_per_condition":True,"warmup_calls":0,
+            "forward_calls":12,"strict_algorithms":True,"network":"none","challenge_inputs_used":False,
+            "conditions":[{"optimized_execution":o,"apply_correctives":c,"status":"complete",
+                           "fresh_model_loaded":True,"completed_calls":3,"replay":{"bitexact":True}}
+                          for o,c in gate.fresh.CONDITIONS]}
+    gate.require_fresh_replay(report)
+    for key,value in (("script_sha256","a"*64),("warmup_calls",1),("fresh_process_per_condition",False),
+                      ("unoptimized_fresh_replay_bitexact",False),("forward_calls",True)):
+        with pytest.raises(ValueError):gate.require_fresh_replay(report|{key:value})
+    source=Path(gate.__file__).read_text();assert 'with torch.inference_mode(), torch.jit.optimized_execution(False):' in source

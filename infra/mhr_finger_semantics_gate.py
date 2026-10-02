@@ -18,6 +18,7 @@ import time
 import numpy as np
 from world_reward.data import sha256
 import mhr_determinism_gate as determinism
+import mhr_fresh_replay_gate as fresh
 
 MODEL_SHA = "352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc"
 BODY_SHA = "b5a2f9d305dd02626b967aa2e86021fba07065df66ce7a7e00ffb9664f150abf"
@@ -175,6 +176,16 @@ def require_determinism(report):
         raise ValueError("Require actual SHA-bound strict CPU/CUDA replay diagnosis before semantics-v3")
 
 
+
+def require_fresh_replay(report):
+    expected={"stage":fresh.STAGE,"status":"pass","model_sha256":MODEL_SHA,
+              "script_sha256":sha256(Path(fresh.__file__)),"diagnostic_helper_sha256":sha256(Path(determinism.__file__)),
+              "unoptimized_fresh_replay_bitexact":True,"fresh_process_per_condition":True,"warmup_calls":0,
+              "forward_calls":12,"strict_algorithms":True,"network":"none","challenge_inputs_used":False}
+    if (any(type(report.get(k)) is not type(v) or report.get(k)!=v for k,v in expected.items())
+            or not fresh.outcome(report.get("conditions",[]))):
+        raise ValueError("Require actual fresh-process unoptimized reference replay before semantics-v4")
+
 def strict_reference_runtime(torch):
     if os.environ.get("CUBLAS_WORKSPACE_CONFIG") != ":4096:8":
         raise RuntimeError("Require deterministic CUBLAS workspace configured before torch import")
@@ -193,7 +204,7 @@ def main(argv=None):
     root = Path(os.environ["WR_ROOT"]); revision = os.environ.get("WR_CODE_REVISION", ""); image = os.environ.get("WR_IMAGE_ID", "")
     if not re.fullmatch(r"[0-9a-f]{40}", revision) or not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
         raise ValueError("Require immutable source revision/image ID")
-    output = root / "results/mhr-finger-semantics-v3.json"
+    output = root / "results/mhr-finger-semantics-v4.json"
     if output.is_symlink(): raise FileExistsError("Frozen semantic report already exists")
     with output.open("x") as handle:
         started = time.perf_counter()
@@ -228,12 +239,15 @@ def main(argv=None):
             diagnosis_path = root / "results/mhr-determinism.json"; diagnosis_sha = sha256(diagnosis_path)
             regular_hash(diagnosis_path, root, diagnosis_sha)
             require_determinism(json.loads(diagnosis_path.read_text()))
+            fresh_path=root/"results/mhr-fresh-replay.json";fresh_sha=sha256(fresh_path)
+            regular_hash(fresh_path,root,fresh_sha);require_fresh_replay(json.loads(fresh_path.read_text()))
             if "torch" in __import__("sys").modules: raise RuntimeError("CUBLAS setup must precede torch import")
             os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
             import torch
             strict_reference_runtime(torch)
             report.update(determinism_report_sha256=diagnosis_sha, deterministic_algorithms=True,
-                          CUBLAS_WORKSPACE_CONFIG=":4096:8", TF32=False, seed=0)
+                          CUBLAS_WORKSPACE_CONFIG=":4096:8", TF32=False, seed=0,
+                          jit_optimized_execution=False, fresh_replay_report_sha256=fresh_sha)
             if not torch.cuda.is_available(): raise RuntimeError("CUDA required; no CPU/local forward fallback")
             payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
             state = payload.get("state_dict", payload) if isinstance(payload, Mapping) else None
@@ -244,7 +258,8 @@ def main(argv=None):
                 if not torch.is_tensor(value): raise ValueError("Pinned Body hand indices missing")
                 hands.append(value.detach().cpu().numpy().copy())
             del state, payload
-            model = torch.jit.load(str(model_path), map_location="cuda").float().eval()
+            with torch.jit.optimized_execution(False):
+                model = torch.jit.load(str(model_path), map_location="cuda").float().eval()
             schemas = {}
             for name in (*METHODS, "forward"):
                 schema = model._c._get_method(name).schema
@@ -278,7 +293,7 @@ def main(argv=None):
             expr = torch.zeros(216, 72, device="cuda")
             deadline = min(started + 300, time.perf_counter() + 120); signal.alarm(max(1, int(deadline-time.perf_counter())))
             previous_skeleton = None
-            with torch.inference_mode():
+            with torch.inference_mode(), torch.jit.optimized_execution(False):
                 for correctives in (False, True):
                     report["active_correctives"] = correctives
                     persist()
@@ -309,6 +324,7 @@ def main(argv=None):
             regular_hash(model_path, root, MODEL_SHA, 696110248); regular_hash(checkpoint, root, BODY_SHA, 2109129346)
             regular_hash(acquisition_path, root, acquisition_sha)
             regular_hash(diagnosis_path, root, diagnosis_sha)
+            regular_hash(fresh_path,root,fresh_sha)
             if time.perf_counter() > started+300: raise TimeoutError("Semantic gate exceeded300s")
             report.update(status="pass", phase="complete", phase_B_verified=True,
                           named_finger_joint_partition_verified=True, excluded_joint_invariance_verified=True,

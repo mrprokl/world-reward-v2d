@@ -36,7 +36,7 @@ def semantic_report(render):
             "model_sha256": render.semantics.MODEL_SHA, "body_checkpoint_sha256": render.semantics.BODY_SHA,
             "body_revision": render.semantics.BODY_REVISION, "network": "none", "challenge_inputs_used": False,
             "script_sha256": render.sha256(Path(render.semantics.__file__)), "deterministic_algorithms": True,
-            "CUBLAS_WORKSPACE_CONFIG": ":4096:8", "TF32": False}
+            "CUBLAS_WORKSPACE_CONFIG": ":4096:8", "TF32": False, "jit_optimized_execution": False}
 
 
 def test_semantic_report_current_bytes_not_directory_identity(render):
@@ -131,7 +131,7 @@ def test_private_camera_transform_once_and_no_side_colors(render):
 
 def test_failed_render_retains_private_only_report_never_public_manifest(render, tmp_path, monkeypatch):
     (tmp_path / "validation").mkdir(); (tmp_path / "results").mkdir()
-    (tmp_path / "results/mhr-finger-semantics-v3.json").write_text('{"status":"fail"}')
+    (tmp_path / "results/mhr-finger-semantics-v4.json").write_text('{"status":"fail"}')
     monkeypatch.setenv("WR_ROOT", str(tmp_path)); monkeypatch.setenv("WR_CODE_REVISION", "a"*40)
     monkeypatch.setenv("WR_IMAGE_ID", "sha256:"+"b"*64); monkeypatch.setattr(render.platform, "system", lambda: "Linux")
     original = render.Path.iterdir
@@ -148,7 +148,7 @@ def test_no_experiment_cli_or_own_shared_identity_broadcast(render):
     with pytest.raises(SystemExit): render.main(["--episode", "15"])
     source = Path(render.__file__).read_text()
     assert "identity_rows(np.zeros(45, np.float32), 6)" in source
-    assert "mhr-finger-semantics-v3.json" in source and 'private / "render-report.json"' in source
+    assert "mhr-finger-semantics-v4.json" in source and 'private / "render-report.json"' in source
     assert "public_manifest(images)" in source and "model(identity, params, expression, True)" in source
 
 
@@ -164,7 +164,7 @@ def test_wrapper_reserves_only_new_dataset_not_shared_parent(render):
 def test_reserved_empty_dataset_still_fails_prerequisite_without_overwrite(render, tmp_path, monkeypatch):
     dest = tmp_path / "validation/hands_rgb_v1"; dest.mkdir(parents=True)
     (tmp_path / "results").mkdir()
-    (tmp_path / "results/mhr-finger-semantics-v3.json").write_text('{"status":"fail"}')
+    (tmp_path / "results/mhr-finger-semantics-v4.json").write_text('{"status":"fail"}')
     monkeypatch.setenv("WR_ROOT", str(tmp_path)); monkeypatch.setenv("WR_CODE_REVISION", "a"*40)
     monkeypatch.setenv("WR_IMAGE_ID", "sha256:"+"b"*64); monkeypatch.setenv("WR_RENDER_OUTPUT_RESERVED", "1")
     monkeypatch.setattr(render.platform, "system", lambda: "Linux")

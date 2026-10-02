@@ -41,7 +41,7 @@ def require_semantic_report(report):
                 "model_sha256": semantics.MODEL_SHA, "body_checkpoint_sha256": semantics.BODY_SHA,
                 "body_revision": semantics.BODY_REVISION, "network": "none", "challenge_inputs_used": False,
                 "script_sha256": sha256(Path(semantics.__file__)), "deterministic_algorithms": True,
-                "CUBLAS_WORKSPACE_CONFIG": ":4096:8", "TF32": False}
+                "CUBLAS_WORKSPACE_CONFIG": ":4096:8", "TF32": False, "jit_optimized_execution": False}
     if any(type(report.get(k)) is not type(v) or report.get(k) != v for k, v in expected.items()):
         raise ValueError("Require actual passing SHA-bound current semantic producer, not same snapshot path")
 
@@ -214,7 +214,7 @@ def main(argv=None):
         previous_alarm = signal.signal(signal.SIGALRM, expired); previous_term = signal.signal(signal.SIGTERM, expired); signal.alarm(120)
         try:
             persist()
-            prerequisite = root / "results/mhr-finger-semantics-v3.json"; prerequisite_sha = sha256(prerequisite)
+            prerequisite = root / "results/mhr-finger-semantics-v4.json"; prerequisite_sha = sha256(prerequisite)
             semantics.regular_hash(prerequisite, root, prerequisite_sha)
             semantic = json.loads(prerequisite.read_text()); require_semantic_report(semantic)
             model_path = root / "weights/mhr/mhr_model.pt"
@@ -227,7 +227,8 @@ def main(argv=None):
             from PIL import Image
             if not torch.cuda.is_available() or pytorch3d.__version__ != "0.7.9":
                 raise RuntimeError("Require CUDA and audited PyTorch3D0.7.9")
-            model = torch.jit.load(str(model_path), map_location="cuda").float().eval()
+            with torch.jit.optimized_execution(False):
+                model = torch.jit.load(str(model_path), map_location="cuda").float().eval()
             names, joints = model.get_parameter_names(), model.get_joint_names()
             getter = model.get_parameter_limits().detach().cpu().numpy()
             controls, changed = named_controls(names, getter)
@@ -243,7 +244,7 @@ def main(argv=None):
             identity = torch.as_tensor(semantics.identity_rows(np.zeros(45, np.float32), 6), device="cuda")
             expression = torch.zeros(6, 72, device="cuda")
             params = torch.as_tensor(controls, device="cuda"); original = params.clone()
-            with torch.inference_mode():
+            with torch.inference_mode(), torch.jit.optimized_execution(False):
                 raw_v, skeleton = model(identity, params, expression, True)
             torch.cuda.synchronize()
             if not torch.equal(params, original) or torch.count_nonzero(identity) or torch.count_nonzero(expression):
