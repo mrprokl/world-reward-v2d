@@ -86,6 +86,7 @@ def visible_face_support(face_image, faces, mask):
 
 def decision(records):
     """Frozen >=5% mean nonneutral PVE gain; no neutral hand regression >1e-5m."""
+    if len(records) != CASES: raise ValueError('Require every frozen original case, not a subset')
     before = np.asarray([r['hands'][s]['baseline']['hand_pve_mm'] for r in records[1:] for s in ('left','right')])
     after = np.asarray([r['hands'][s]['candidate']['hand_pve_mm'] for r in records[1:] for s in ('left','right')])
     if not np.isfinite(np.r_[before, after]).all() or np.any(before < 0) or np.any(after < 0):

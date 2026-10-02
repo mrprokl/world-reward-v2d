@@ -70,3 +70,7 @@ def test_wrapper_has_no_gpu_models_challenge_or_writable_truth(evaluate):
     assert 'src=$BASE,dst=$BASE' not in wrapper
     assert '--network none' in wrapper and '60s docker run' in wrapper
     assert 'chown -R' not in wrapper
+
+
+def test_incomplete_quality_cohort_cannot_pass(evaluate):
+    with pytest.raises(ValueError):evaluate.decision(records()[:-1])
