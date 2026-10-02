@@ -349,3 +349,11 @@ ONLYaftersealedimport/CUDA/sourceimage/frozenbaseline/DA3prediction/quality
 receiptscheckedPASS; sourceassetmodels/privateeval/frozenoutputs unchanged.
 Cleanupreceipt65659f3f0707f47dc6e2137194c181a7d994c8aa5a1ea3299578519e92fd5791,
 VM02disknow35Gused89Gfree. Receiptsretained; originaltransferSSHauthrevoked.
+
+20:20UTC sourceVM01sameverified3completedTARs removed15,971,384,320B after
+transferdone receipts+exactSHA/bytecounts and independentVM02import/quality/
+cleanup confirmation. Cleanupreceipt56f8652ff5da9338ce2eabcd2a9167564d45e1b22f5a41a0e06af977dd47db91;
+sourceoriginalmodels/inputs/outputs/notices unchanged, alltransferreceipts kept.
+TotaltransientTARcleanup31,942,768,640B acrossAzure; nothing downloadedtoMac.
+Sealedconverterrefined0diagnosticcb75806 active, no simultaneousVM01GPUjob.
+J3fullcohort hypothesisREJECT−6.6042%median, engineeringallstagesPASS.
