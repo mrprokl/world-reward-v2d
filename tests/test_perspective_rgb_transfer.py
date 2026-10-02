@@ -119,3 +119,14 @@ def test_source_only_transfer_closure_and_wrappers(gate):
         closure=azure_job.runtime_bundle_paths(files,path)
         assert all(name.lstrip('/') in closure for name in (*gate.SOURCE_FILES.values(),gate.SEMANTIC_SOURCE))
         assert "--gpus" not in (root/path).read_text()
+
+
+def test_transfer_parent_traversal_precedes_unprivileged_work(gate):
+    root=Path(gate.__file__).resolve().parents[1]
+    for mode in ("export","import"):
+        text=(root/("infra/run_perspective_rgb_"+mode+".sh")).read_text()
+        assert text.index('chmod 711 "$ROOT/transfer"') < text.index('timeout --signal=TERM')
+        assert 'runuser -u scenesmith -- test -' in text
+    export=(root/"infra/run_perspective_rgb_export.sh").read_text()
+    assert 'OUT="$ROOT/transfer/perspective-v2"' in export
+    assert 'chmod 700 "$OUT"' in export

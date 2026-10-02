@@ -1587,3 +1587,31 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Full4633PASS/1optionaltrimeshSKIP67.93s before five extra transfer source/closure
   tests (22transferPASS); private archive0600 at creation, stdlib-only transfer,
   current renderer/semantic source and model hashes checked before extraction.
+
+- 2026-10-02 D84 render **PASS5.268301s** on VM01: exactly9 new RGBs and
+  two official MHR forwards. Reportbaf515907f21001516979a52ef8d6694037b45f9228f74cabea1ceb9e9bcabfe,
+  publicmanifest4faefffb9bd416b5255437e27a05a805a6e90cf82bbb6dcaf30c571a37b83370,
+  privatecalibration94feac21eef88413222c61e09eaba5458cd728f0d174915abc33423ad127deb1.
+  Exportv1 failed before archive creation: root-owned transfer parent0700 denied
+  UID1000 traversal despite cohort0700 ownership1000. No copy/inference/private
+  evaluation occurred. Preserve failedv1 log/emptyreceipt; explicit new exportv2
+  uses a new directory and traverse-only parent0711, private children unchanged.
+  Import checks UID1000 readability before writes. Temporary Azure-only SSH key,
+  source-restricted NSG allow and parent permissions are revoked/restored after
+  transfer; no local data/model transit and no implicit retry/overwrite.
+
+- 2026-10-02 D85 (predeclared): NEW native frame0 identity by protocol order,
+  shape45/scalePCA28 fixed across12 rounded linspace indices
+  [0,72,143,215,287,359,430,502,574,646,717,789], original poses/root/hands
+  unchanged. Twelve original checkpoint direct-head calls return204 controls;
+  verify expanded68 scales bit-identical, freeze targetF32 and controls read-only
+  BEFORE one native12batch and one pinned official-reference12batch replay.
+  Native maxpoint≤.01mm; official every-frame mean≤2mm, maxpoint diagnostic only.
+  Strict seed0/F32/noTF32/noJIToptimized/offline180s/32GB on VM01. No LM, cold
+  conversion, oldtarget read, error-selected identity, alignment or GT. D79/D80
+  failure receipts preserved. PASS authorizes only this new12frame ABI fidelity,
+  not full790, identity accuracy, historical recovery, determinism or adoption.
+  Independent source/unit audit READY;23focused and63independent tiny tests PASS.
+  Final source suite4662PASS/1optionaltrimeshSKIP63.54s. Both Azure transfer
+  parents' existing direct children independently checked0700 before use0711;
+  no unrelated readable transfer data is exposed.
