@@ -44,6 +44,26 @@ Primary papers, project pages, GitHub source/README and Hugging Face metadata we
 - https://github.com/NVlabs/GEM-X HEAD 32992550dba114c62243fb55e361311972dce8f9 (2026-04-27); repo creation 2026-03-03. README news dates May/June2025 are inconsistent with repository creation; use verified March/April2026 availability instead.
 - GEM-X temporal regression architecture ~520M, SAM3D Body features, 77 SOMA 2D joints, body/hands/face, camera/global output. Code Apache2.0, model NVIDIA Open Model license; no independent same-protocol challenge superiority demonstrated.
 - https://huggingface.co/nvidia/GEM-X nongated, created 2026-03-11, revision 5ccf5ca3746c3620aa4016114f069a5f6ae399cd (2026-06-23), gem_soma.ckpt / gem_smpl.ckpt and supporting model assets.
+- Follow-up source feasibility audit,2026-10-02: automatic YOLOX/ByteTrack
+  boxes, VitPose77 and actual SAM Body pose-token1024 feed temporal regression.
+  Static-camera mode uses identity camera, but demo K uses `max(W,H)` whereas
+  SAM defaults to `hypot(W,H)`; a fair comparison must fix the same RGB-derived
+  prior explicitly, not introduce source calibration. Require primary tokens,
+  never the fallback padded204 controls. Freeze `postproc=False` for the first
+  test; native global-scale clamp[.7,1.] and optional contact/IK remain possible
+  metric biases, not evidence of accuracy. SOMA returns metres with clip-shared
+  identity45/scales69 and77 articulated joints; it is **not** kit MHR136/68.
+  Released MHR→SOMA wrapping is the opposite direction to submission export;
+  no verified inverse exists here. A surface-quality experiment is possible,
+  but adopting it requires an independently checked MHR fit, not renaming arrays.
+  Mandatory SAM custom-license source leaves eligibility unresolved.
+  Pinned `gem_soma.ckpt`541758499bytes, SHA4c1f85ca…ee298e, plus
+  VitPose3388483384bytes would be new Azure assets; Body2109129346bytes
+  SHA b5a2f9d305dd02626b967aa2e86021fba07065df66ce7a7e00ffb9664f150abf
+  and reference MHR are exact existing assets, not new/different checkpoints.
+  SOMA assets pin d281db2d01553f7230c56e764cec00fe27ef23f7.
+  No acquisition/benchmark/adoption performed. Defer until the cheaper J1
+  grounding test shows which human/object depth error needs a new temporal prior.
 - GVHMR https://arxiv.org/abs/2409.06662 (2024-09-10), https://github.com/zju3dv/GVHMR ; gravity-view coordinates, temporal world body recovery, static-camera mode; useful alternate prior, not detailed hands/objects.
 
 ### Do as I Do — deployable alternate object tracker
