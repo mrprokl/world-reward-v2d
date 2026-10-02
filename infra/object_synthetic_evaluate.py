@@ -61,7 +61,7 @@ def decision(cases):
 
 
 def run(root,report):
-    base=root/'validation/objects_rgb_v1';proposal=base/'proposals';private=base/'eval_private'
+    base=root/'validation/objects_rgb_v1';proposal=base/'proposals-v2';private=base/'eval_private'
     p=proposal/'report.json';digest=sha256(p);require_hash(p,digest);receipt=json.loads(p.read_text())
     expected={'stage':'public_object_rgb_single_and_three_view_proposals','status':'pass','private_truth_read':False,
               'challenge_inputs_used':False,'adoption_performed':False,'actual_raw_decoder_parity_verified':True,

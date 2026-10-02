@@ -3,7 +3,7 @@ set -euo pipefail
 ROOT="${WR_ROOT:-/srv/scenesmith/world-reward}"
 CODE="${WR_CODE:?Require immutable source}"
 BASE="$ROOT/validation/objects_rgb_v1"
-OUT="$BASE/proposals"
+OUT="$BASE/proposals-v2"
 [[ ! -L "$BASE" && ! -e "$OUT" && ! -L "$OUT" ]]
 mkdir "$OUT"
 chown "$(id -u scenesmith):$(id -g scenesmith)" "$OUT"

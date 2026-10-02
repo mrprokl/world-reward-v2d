@@ -94,7 +94,7 @@ def export_actual(result, destination, name, torch):
     analytical=gauge.native_order_points(np.asarray(mesh.vertices),pose)
     if not np.isfinite(transformed).all() or not np.isfinite(analytical).all():
         raise ValueError('Actual native camera transformation is nonfinite')
-    maximum=float(np.abs(transformed-analytical).max()); tolerance=16*np.finfo(np.float32).eps*max(1.,float(np.abs(transformed).max()))
+    maximum=float(np.abs(transformed-analytical).max()); tolerance=float(16*np.finfo(np.float32).eps*max(1.,float(np.abs(transformed).max())))
     if maximum>tolerance:raise ValueError('Actual imported native camera transform differs from source-order bridge')
     serialized=mesh.export(file_type='glb');reload=trimesh.load(io.BytesIO(serialized),file_type='glb',force='mesh',process=False)
     if not np.array_equal(reload.vertices,vertices@gauge.A) or not np.array_equal(reload.faces,faces):
@@ -180,7 +180,7 @@ def main(argv=None):
     argparse.ArgumentParser(description=__doc__,allow_abbrev=False).parse_args(argv)
     if platform.system()!='Linux' or {p.name for p in Path('/sys/class/net').iterdir()}!={'lo'}:
         raise RuntimeError('Require isolated remote GPU generation')
-    root=Path(os.environ['WR_ROOT']);folder=root/'validation/objects_rgb_v1/proposals';path=folder/'report.json'
+    root=Path(os.environ['WR_ROOT']);folder=root/'validation/objects_rgb_v1/proposals-v2';path=folder/'report.json'
     if folder.is_symlink() or not folder.is_dir() or any(folder.iterdir()) or os.environ.get('WR_OBJECT_OUTPUT_RESERVED')!='1':
         raise FileExistsError('Require exclusive newly reserved public proposal output')
     revision,image=os.environ.get('WR_CODE_REVISION',''),os.environ.get('WR_IMAGE_ID','')

@@ -41,3 +41,10 @@ def test_exact_generation_configuration_and_actual_raw_parity_no_tautology(gener
     wrapper=Path(generate.__file__).with_name('run_object_synthetic_generate.sh').read_text()
     assert 'eval_private' not in wrapper and 'src=$BASE/inputs' not in wrapper
     assert 'src=$BASE/observations-v2,dst=$BASE/observations-v2,readonly' in wrapper and '--network none' in wrapper
+
+
+def test_camera_parity_tolerance_is_json_python_scalar(generate):
+    import json
+    tolerance=float(16*np.finfo(np.float32).eps*max(1.,2.))
+    assert type(tolerance) is float and json.loads(json.dumps({'tolerance':tolerance}))['tolerance']==tolerance
+    assert 'tolerance=float(16*np.finfo(np.float32).eps' in Path(generate.__file__).read_text()
