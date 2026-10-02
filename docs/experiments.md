@@ -1226,3 +1226,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   original501exhaustive lié au H5SHA entier reste source. Scope neuf frames
   write-only, no whole-prep timing/adoption/qualité. Tests48PASS1.03s;
   anciens protocols/defaults et prédictions restent gelés.
+- 2026-10-02 R94 (actual-depth CPU, f15c0a1): **FAIL.056s integrity**,
+  avant lecture H5/calcul/timing, aucune trial ni résultat de batching.
+  Source historique depth660e197 n'émettait pas `input_dataset_revision`,
+  pourtant nouvelle vérification le demandait; script primaire à5d4f importe
+  `_validate_inputs` du Bodyhelper qui vérifie le datasetpin5f68335 et fixe15.
+  Ne pas réécrire le vieux receipt ni inventer son champ. Accepter absence
+  **uniquement** pour depthreceiptSHA611d52a/script660e197 exacts, avec
+  source historique audité; champ présent erroné reste FAIL. Namespacev2/unit
+  neufs, budgets/parité/frames/valid_count/gates inchangés. Reçu échec SHA
+  bdcf72b2739aabe0030b13506d221732f6b73b5baf6961a192d5db9806034a00 conservé.
+  Épisode0préparation550/790 à18:32:46UTC; aucune relance du lecteur actif.

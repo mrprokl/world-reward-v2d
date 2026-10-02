@@ -215,3 +215,13 @@ PASS3.963827× writer-only, validation inchangée; ancien R88FAIL conservé,
 aucune mutation du prepare0 actif. AssetsBody15/MHRreference hash identiques
 352e271a…7377bc vérifiés. Réserve GPU Azure familleNCCads2023:40cores utilisés
 sur80; pas quota de la familleNCadsH100 (0/0), ni secondeVM provisionnée.
+
+SecondGPU option audited, not provisioned: existing confidential VMI exact
+`cgpu-NCC-2204-base-image/versions/2204.20260615.0`, SecureBoot/vTPM, zone1.
+Do not use vanilla Ubuntu/generic GPU extension or clone/restart running Docker
+state. Future new VM needs independent NIC/NSG/no ingress, same pinned VMI,
+SHA-checked image export/import into a fresh private Docker root, task-only
+artifact transfer within Azure, explicit target support in azure_job.py (currently
+VM01 hardcoded), new unit/output namespace and actual CUDA/replay checks.
+Quota permits one more40core SKU nominally; capacity/setup duration unverified.
+No snapshot, user-data copy, second VM or reader migration has been performed.

@@ -58,6 +58,12 @@ def checked_report(path, stage):
     return report, identity, legacy
 
 
+def legacy_dataset_identity_from_source(report, report_sha):
+    """Historical field absence only; never fill or rewrite the frozen report."""
+    return ("input_dataset_revision" not in report and "episode_index" not in report and "producer_revision" not in report
+            and report_sha == DEPTH_REPORT_SHA and report.get("script_sha256") == LEGACY_DEPTH_SHA)
+
+
 def load_inputs(root, native):
     base = root/f"outputs/episode_{EPISODE:06d}"
     paths = {"prep": base/"cari_inputs/report.json", "depth": base/"depth_full/report.json", "alignment": base/"scale_smoke/report.json"}
@@ -69,7 +75,8 @@ def load_inputs(root, native):
             or alignment.get("script_sha256") != ALIGNMENT_SCRIPT_SHA): raise ValueError("Require exact frozen actualepisode15 source reports")
     if (len({r["input_sha256"] for r in reports.values()}) != 1 or type(prep.get("frames")) is not int or prep["frames"] != TOTAL
             or prep.get("original_frame_coverage_verified") is not True or type(depth.get("total_video_frames")) is not int
-            or depth["total_video_frames"] != TOTAL or depth.get("input_dataset_revision") != DATASET_REVISION
+            or depth["total_video_frames"] != TOTAL or (depth.get("input_dataset_revision") != DATASET_REVISION
+                and not legacy_dataset_identity_from_source(depth, hashes["depth"]))
             or prep.get("input_report_sha256", {}).get("depth") != hashes["depth"]
             or prep.get("input_report_sha256", {}).get("alignment") != hashes["alignment"]
             or alignment.get("frame_indices") != [0, TOTAL//2, TOTAL-1]): raise ValueError("Full501-frame depth/scale/preparation chain mismatch")
@@ -175,6 +182,9 @@ def run_gate(native, output, report, path):
     report.update(input_report_sha256=hashes, reference_H5_sha256=hashes["reference_H5"], legacy_prep_source_identity_verified=legacy,
                   camera=camera, alignment_input_identity=identity, reference_receipt=expected,
                   selected_sources=[{"file": str(p), "sha256": h} for p, h in sources], original501_frame_coverage_verified=True)
+    report.update(legacy_dataset_identity_from_source=legacy_dataset_identity_from_source(reports["depth"], hashes["depth"]),
+                  historical_depth_receipt_dataset_revision_available="input_dataset_revision" in reports["depth"],
+                  dataset_identity_basis="audited hardwired episode15 producer with exact frozen depth/prep/H5 chain; absent historical field is not filled")
     original_arrays = [hashlib.sha256(a.tobytes()).hexdigest() for r in records for a in (r.raw_depth_m, r.aligned_depth_m)]
     report["native_input_array_sha256"] = original_arrays
     procedural.write_report(path, report)
@@ -217,13 +227,15 @@ def run_gate(native, output, report, path):
 
 
 def main(argv=None):
-    argparse.ArgumentParser(description=__doc__, allow_abbrev=False).parse_args(argv)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    parser.add_argument("--attempt", choices=("v1", "v2"), default="v1")
+    args = parser.parse_args(argv)
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}: raise RuntimeError("Require remote isolated CPU network-none")
-    root = Path(os.environ["WR_ROOT"]); output = root/"results/depth-batch-actual-v1"; path = output/"report.json"
+    root = Path(os.environ["WR_ROOT"]); output = root/"results"/f"depth-batch-actual-{args.attempt}"; path = output/"report.json"
     if output.resolve() != output.absolute() or not output.is_dir() or any(output.iterdir()): raise FileExistsError("Require fresh exclusively reserved benchmark")
     revision, image = os.environ["WR_CODE_REVISION"], os.environ["WR_IMAGE_ID"]
     if not re.fullmatch("[0-9a-f]{40}", revision) or not re.fullmatch("sha256:[0-9a-f]{64}", image): raise ValueError("Immutable source/image required")
-    report = {"stage": STAGE, "status": "fail", "phase": "integrity", "producer_revision": revision, "image_id": image,
+    report = {"stage": STAGE, "attempt": args.attempt, "status": "fail", "phase": "integrity", "producer_revision": revision, "image_id": image,
         "script_sha256": sha256(Path(__file__)), "shared_benchmark_helper_sha256": sha256(Path(procedural.__file__)),
         "native_source_sha256": procedural.SOURCE_SHA, "native_source_revision": procedural.REVISION, "trials": [],
         "episode_index": EPISODE, "selected_frame_indices": list(range(FRAMES)), "source_total_frames": TOTAL,

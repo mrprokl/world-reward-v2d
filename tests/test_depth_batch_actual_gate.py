@@ -41,7 +41,7 @@ def predicted_inputs(gate, tmp_path, monkeypatch):
     frames += [{"frame_index": i} for i in range(9, 501)]
     flags = {"status": "pass", "input_track": "track_1", "input_sha256": "a"*64, "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": []}
     depth = flags | {"stage": "monocular_moge2_full_video", "script_sha256": gate.LEGACY_DEPTH_SHA,
-        "total_video_frames": 501, "input_dataset_revision": gate.DATASET_REVISION, "frames": frames}
+        "total_video_frames": 501, "frames": frames}
     dp = base/"depth_full/report.json"; dp.write_text(json.dumps(depth)); monkeypatch.setattr(gate, "DEPTH_REPORT_SHA", gate.sha256(dp))
     alignment = flags | {"stage": "predicted_human_anchored_moge2_pointmaps", "episode_index": 15,
         "script_sha256": gate.ALIGNMENT_SCRIPT_SHA, "frame_indices": [0, 250, 500], "depth_alignment": {"shared_scale": .91321}}
@@ -59,6 +59,8 @@ def test_actual_operations_preserve_valid_zero_count_dtype_and_original_frame(ga
     predicted_inputs(gate, tmp_path, monkeypatch)
     reports, hashes, records, reference, sources, legacy = gate.load_inputs(tmp_path, SimpleNamespace(DepthFrameRecord=Record))
     assert legacy is True and len(records) == 9 and len(sources) == 13
+    assert gate.legacy_dataset_identity_from_source(reports["depth"], hashes["depth"]) is True
+    assert "input_dataset_revision" not in reports["depth"]
     for i, record in enumerate(records):
         assert record.index == i and record.valid_count == 4  # Not count_positive ==3!
         assert record.raw_depth_m.dtype == np.float32 and np.isfinite(record.raw_depth_m).all()
@@ -67,7 +69,7 @@ def test_actual_operations_preserve_valid_zero_count_dtype_and_original_frame(ga
     assert hashes["reference_H5"] == gate.sha256(reference)
 
 
-@pytest.mark.parametrize("fault", ["other_legacy_rev", "other_legacy_source", "depth_missing_source", "depth_episode_wrong", "video", "full_count", "duplicate", "scale", "h5sha", "npzsha", "oracle"])
+@pytest.mark.parametrize("fault", ["other_legacy_rev", "other_legacy_source", "depth_missing_source", "depth_episode_wrong", "dataset_presentbad", "video", "full_count", "duplicate", "scale", "h5sha", "npzsha", "oracle"])
 def test_actual_source_bindings_fail_closed(gate, tmp_path, monkeypatch, fault):
     pp, dp, ap, hp = predicted_inputs(gate, tmp_path, monkeypatch)
     p, d, a = [json.loads(x.read_text()) for x in (pp, dp, ap)]
@@ -75,6 +77,7 @@ def test_actual_source_bindings_fail_closed(gate, tmp_path, monkeypatch, fault):
     elif fault == "other_legacy_source": p["script_sha256"] = "b"*64
     elif fault == "depth_missing_source": d.pop("script_sha256")
     elif fault == "depth_episode_wrong": d["episode_index"] = 0
+    elif fault == "dataset_presentbad": d["input_dataset_revision"] = "b"*40
     elif fault == "video": a["input_sha256"] = "b"*64
     elif fault == "full_count": p["frames"] = 500
     elif fault == "duplicate": d["frames"][9]["frame_index"] = 8
@@ -84,6 +87,16 @@ def test_actual_source_bindings_fail_closed(gate, tmp_path, monkeypatch, fault):
     else: p["ground_truth_used"] = True
     for path, value in ((pp, p), (dp, d), (ap, a)): path.write_text(json.dumps(value))
     with pytest.raises(ValueError): gate.load_inputs(tmp_path, SimpleNamespace(DepthFrameRecord=Record))
+
+
+def test_legacy_dataset_predicate_exact_missing_only_no_field_invention(gate):
+    report = {"script_sha256": gate.LEGACY_DEPTH_SHA}
+    assert gate.legacy_dataset_identity_from_source(report, gate.DEPTH_REPORT_SHA) is True
+    assert report == {"script_sha256": gate.LEGACY_DEPTH_SHA}
+    for key, value in (("input_dataset_revision", None), ("input_dataset_revision", "bad"), ("episode_index", 15), ("producer_revision", "a"*40)):
+        assert gate.legacy_dataset_identity_from_source(report | {key: value}, gate.DEPTH_REPORT_SHA) is False
+    assert gate.legacy_dataset_identity_from_source(report, "a"*64) is False
+    assert gate.legacy_dataset_identity_from_source({"script_sha256": "a"*64}, gate.DEPTH_REPORT_SHA) is False
 
 
 @pytest.mark.parametrize("mode,sizes", [("single", [1]*9), ("batch8", [8, 1])])
@@ -173,8 +186,9 @@ def test_balanced_actual_trials_reference_parity_tail_cleanup_and_gate(gate, tmp
         "model_revision": "b135031bae30b5ac2ae141a0e68717795ce38340", "source_commit": "925b8ed835a7a9cdb7578ba15c658a0afc969030"},
         "ground_truth_used": False, "alignment": "one_predicted_human_anchored_clip_scalar_no_offset"}
     records = [Record(i, np.ones((2, 3), np.float32), np.ones((2, 3), np.float32), 1., 0., 6) for i in range(9)]
-    reports = {"prep": {"depth_validation": {"validation_mode": "exhaustive", "frame_counts": {"cam": 501}, "frame_shapes": {"cam": [2, 3]}}}}
-    monkeypatch.setattr(gate, "load_inputs", lambda *a: (reports, {"alignment": "a"*64, "reference_H5": "b"*64}, records, tmp_path/"reference", [], True))
+    reports = {"prep": {"depth_validation": {"validation_mode": "exhaustive", "frame_counts": {"cam": 501}, "frame_shapes": {"cam": [2, 3]}}},
+               "depth": {"script_sha256": gate.LEGACY_DEPTH_SHA}}
+    monkeypatch.setattr(gate, "load_inputs", lambda *a: (reports, {"depth": gate.DEPTH_REPORT_SHA, "alignment": "a"*64, "reference_H5": "b"*64}, records, tmp_path/"reference", [], True))
     def receipt(count, changed=False):
         return {"frame_names": [f"{i:06d}" for i in range(count)], "encoded_payloads": {"raw": ["changed" if changed else "reference"]*count},
             "alignment_metadata": {"scale": {"dtype": "float32", "values": [1.]*count,
@@ -224,3 +238,18 @@ def test_wrapper_specific_readonly_sources_no_video_GTorGPU(gate):
     assert "int(valid.sum())" in source and "raw = np.where(valid, d, 0.); aligned = raw*scale" in source
     assert "validate_payloads=False" not in source and "pickle" not in source.replace("allow_pickle=False", "")
     with pytest.raises(SystemExit): gate.main(["--episode", "0"])
+
+
+def test_attempt_v2_unique_report_preserves_failed_v1(gate, tmp_path, monkeypatch):
+    old = tmp_path/"results/depth-batch-actual-v1"; old.mkdir(parents=True); (old/"report.json").write_bytes(b"immutable actual v1 failed")
+    out = tmp_path/"results/depth-batch-actual-v2"; out.mkdir()
+    monkeypatch.setenv("WR_ROOT", str(tmp_path)); monkeypatch.setenv("WR_CODE_REVISION", "a"*40); monkeypatch.setenv("WR_IMAGE_ID", "sha256:"+"b"*64)
+    monkeypatch.setattr(gate.platform, "system", lambda: "Linux"); iterdir = gate.Path.iterdir
+    monkeypatch.setattr(gate.Path, "iterdir", lambda p: [Path("lo")] if str(p) == "/sys/class/net" else iterdir(p))
+    with pytest.raises(ValueError, match="source SHA"): gate.main(["--attempt", "v2"])
+    report = json.loads((out/"report.json").read_text())
+    assert report["attempt"] == "v2" and report["budget_seconds"] == 240 and report["adoption_performed"] is False
+    assert (old/"report.json").read_bytes() == b"immutable actual v1 failed"
+    with pytest.raises(FileExistsError): gate.main(["--attempt", "v2"])
+    for args in (["--attempt", "v3"], ["--att", "v2"], ["--attempt", "v1", "extra"]):
+        with pytest.raises(SystemExit): gate.main(args)

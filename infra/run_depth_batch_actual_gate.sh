@@ -3,9 +3,13 @@ set -euo pipefail
 ROOT="${WR_ROOT:-/srv/scenesmith/world-reward}"
 CODE="${WR_CODE:?Require immutable committed source}"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-(( $# == 0 )) || { echo 'Frozen nine-frame actual depth gate accepts no arguments' >&2; exit 2; }
+ATTEMPT=v1
+if (( $# > 0 )); then
+ [[ $# == 2 && "$1" == --attempt && ( "$2" == v1 || "$2" == v2 ) ]] || { echo 'Require --attempt v1|v2 only' >&2; exit 2; }
+ ATTEMPT="$2"
+fi
 BASE="$ROOT/outputs/episode_000015"
-OUT="$ROOT/results/depth-batch-actual-v1"
+OUT="$ROOT/results/depth-batch-actual-$ATTEMPT"
 [[ ! -L "$ROOT" && ! -L "$ROOT/results" && ! -e "$OUT" && ! -L "$OUT" ]]
 mkdir "$OUT"
 chown "$(id -u scenesmith):$(id -g scenesmith)" "$OUT"
@@ -28,4 +32,4 @@ timeout --signal=TERM --kill-after=5s 243s docker run --rm --network none --memo
  --env PYTHONPATH="$CODE/src" --env PYTHONDONTWRITEBYTECODE=1 --env OPENBLAS_NUM_THREADS=1 --env OMP_NUM_THREADS=1 \
  --mount "type=bind,src=$CODE,dst=$CODE,readonly" \
  --mount "type=bind,src=$ROOT/vendor/video_to_data,dst=$ROOT/vendor/video_to_data,readonly" \
- "${MOUNTS[@]}" --mount "type=bind,src=$OUT,dst=$OUT" "$IMAGE" "$CODE/infra/depth_batch_actual_gate.py"
+ "${MOUNTS[@]}" --mount "type=bind,src=$OUT,dst=$OUT" "$IMAGE" "$CODE/infra/depth_batch_actual_gate.py" --attempt "$ATTEMPT"
