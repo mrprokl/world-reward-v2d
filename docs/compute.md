@@ -56,6 +56,22 @@ fast; active waits are bounded12h. Never bypass stage provenance gates.
 
 ## Current engineering gates
 
+Active dispatch2026-10-02 16:18UTC, source
+`baba81be965dff878d7c16c9f132f85dcf712bd7`:
+`world-reward-episode0-volume-native-v2` runs the existing full790-frame object
+pose→native prepare→forward→conversion→schema chain, using the qualified frozen
+volume mesh without resimplification/second scale. Source closure93340encoded
+bytes only. The original empty legacy failed-pose directory was removed with
+`rmdir`; original failure log remains. Initial v1preflight log remains unchanged.
+Active state is observed, **not completion or validated accuracy**.
+
+`world-reward-joint-rgb-grounding` (same source,82444encoded bytes) is queued
+behind that exact unit, bounded12h. It independently renders a new nine-image
+human/object RGB cohort, produces automatic masks and Body/MoGe2 predictions,
+then scores frozen predictions against private synthesis truth. No native
+challenge predictions are J1 inputs. GPU steps remain serial; quality evaluation
+is CPU-only. No success/adoption follows from dispatch.
+
 Episode15 is a predeclared engineering clip, **not a labeled validation split**.
 All results below are execution/representation checks, not challenge accuracy.
 
