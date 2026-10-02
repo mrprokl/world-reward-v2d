@@ -1429,3 +1429,19 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Nextcandidateonlyifjustified: predeclaredsmall constrainedsharedidentity
   inversefit plus reservedframefidelity, never averageperframeidentities or
   altertargetgeometry toclaimconversionPASS. GTaccuracyremainunverified.
+
+- 2026-10-02 D79 (predeclared): refined0identityprobe aftersealedF64pose-only
+  failure. Nativeidentitiesvary maxrange28scale3.1790/45shape6.1944, but variation
+  alone isnot a geometriclowerbound. FitexactofficialF64LMjoint40 tol1e-5
+  fd1e-6 allvertices/prior0 onuniformframes[0,197,394,592,789], ONE shared
+ 113identity (scales68+shape45). Reserveidentityframes[98,296,493,690]+original
+  worst1; fitONLYtheir136poseLM60 with trainidentityfixed. Independentlyreplay
+  original/proposedexactF32 controls/reference onall9/10probes, everymean≤2mm
+  plusnoindividualregression>1e-4mm orREJECT/no790run. Reservedposesusetargets,
+  so theseare identity-reserved representationprobes NOTheldoutaccuracy.
+  Reusefrozenoriginalconverter/parameters; full790native targetregeneratedand
+  exactcanonicalSHAchecked, NOcoldconverterduplication/GT/modeltargetwarp.
+  Wholebudget900s/32GB/GPU01alone; sourceimage/codebound. Callbackjointchunk64/
+  frames_per_chunk1, pose_batch4, replaychunk16 are disclosedmemorychoices.
+  88focusedcontracttestsPASS, full4345PASS/1optionalSKIP65.16s BEFOREexecution;
+  no submission/adoption evenifprobePASS, fulltrajectoryfidelitystillrequired.
