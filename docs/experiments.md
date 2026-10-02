@@ -1615,3 +1615,9 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Final source suite4662PASS/1optionaltrimeshSKIP63.54s. Both Azure transfer
   parents' existing direct children independently checked0700 before use0711;
   no unrelated readable transfer data is exposed.
+
+- D84 runtime control optimization: audited single fail-fast CPUimport→H100infer→
+  CPUprivatequality wrapper; each child's original isolated mounts and namespace
+  remain unchanged. SHA validated before any work, no extra predictions/calls;
+  105 associated tests PASS, independent2wrappertests PASS. This avoids serial
+  control-plane wait overhead, not an asserted inference speedup.
