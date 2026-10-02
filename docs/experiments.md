@@ -997,3 +997,21 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   this fixed-anchor direct LK/PnP hypothesis: large inherited metric bias remains,
   so more tracking confidence is not itself reconstruction accuracy. No adoption,
   final mesh/embedding guarantee or CARI4D win. Full tiny suite3450PASS32.89s.
+- 2026-10-02 D64: isolate one mesh-fidelity mechanism after R83. Retain native
+  QSlim cost/placement and one global intersection tree; add pre-collapse
+  cumulative signed source-shell volume guard at the unchanged5% limit. Commit
+  local volume delta only after successful contraction; no cost normalization,
+  per-shell independent decimation, component deletion or repair. Build from
+  already pinned libigl/Eigen sources on Azure, no new acquisition. New thin-
+  cavity/multiscale controls first, independent embedding/CD/net/per-shell volume
+  and birth mapping; one distinct episode0 proposal only if controls pass.
+  If budget/fidelity fails, abandon this decoded source rather than repeatedly
+  broadening tolerances. Controls/previous failures remain immutable.
+- 2026-10-02 D65 (real validation rights screen): CORE4D metadata conflict
+  prevents claiming commercial clearance: instructions96b9084 sayCC-BY4.0,
+  HF81bb2bb cardMIT, website dataset JSON-LD atd3203b6 saysCC-BY-NC4.0.
+  Bundled SMPL-X model/software terms also cover derived meshes/animations;
+  reading supplied arrays with NumPy does not resolve their rights. No dataset
+  acquired or restricted source imported. Ask owners for written scope and two
+  hashed single-view validation minibundles; do not fetch~104GB RGB shards plus
+  ~40GBmotion batches for two clips or assert no pretraining/challenge overlap.

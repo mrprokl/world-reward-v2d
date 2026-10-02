@@ -237,3 +237,16 @@ Future validator would expose one RGB view only to inference, isolate reference
 assets until output hashes freeze, and report raw geometry plus one shared human/
 object Sim3 over the clip. **No CORE4D or BEHAVE data downloaded; no real metric
 validation or certified overlap clearance yet.**
+
+2026-10-02 follow-up blocks automatic CORE4D acquisition: the official
+[website source](https://github.com/CORE4D/CORE4D.github.io/blob/d3203b6cdf827705557282b99f39ce165d1f9ad3/index.html)
+dataset JSON-LD specifies CC-BY-NC4.0, conflicting with instructions CC-BY4.0
+and the tiny HF MIT card. Website footer licensing is not dataset licensing.
+Bundled SMPL-X terms also extend to model-derived meshes/animations; no such
+source/model is imported and supplied arrays do not establish a separate grant.
+Conditional owner-provided validation clips, selected from `test_unseen_obj`
+without examining outputs: `20231002/009`, `20231003_1/029`, absent the documented
+training split. This is not proof of person disjointness or model-training absence.
+Current HF concatenated RGB shards total103,868,863,822bytes and V2 motion batches
+39,621,177,728bytes; no audited per-clip URLs/batch mapping. Seek written rights
+and two hashed one-view minibundles before acquisition, not speculative bulk data.
