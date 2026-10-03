@@ -527,3 +527,22 @@ dependencies/numericfailure. Raiseonlylocalcode-controlcap160→256KB, preserve
 ALLcommittedconfig/provenance andboundedoversize-rejection tests; no heavydata
 transport change. ActualCLIalreadyaccepted146812B forfrontends, capnotclaimed
 Azureuniversalhardlimit. Focused202PASS6.29s; newfullsuite recheckpending.
+
+
+20:19:31UTC actualD107transportv2acquisitionPASS62.429337204s: producer
+70bf74e18b0989bc0573f71d4e121caa54a8ab30/46files45824encodedB publicHTTP200.
+VM02inactiveexit0/GPUempty; complete24 selectedbytes retained, original4.029GB
+archives removed. Receipt21050B/
+616090b11060005ad28476964de36d4b82894f5b27f61e45b86481b95870d8e4 0400.
+Originalv1FAILreceipt/publicempty preserved before/after. Nativeinfer/private
+qualityNOTyetrun; independentactualaudit/inputpin freeze precedesanyGPU.
+
+20:13:44UTC VM01EP3CPUassemblyactive300/592/noGPU; EP4originalunitfailedexit1
+MainPID0 andONLYautomatic_masks/seed-diagnostics.json. Independentactual
+diagnostic8017B/675c2629f6cf786f51be576188301b7f7863bc34cfc0c9f267d96d4f06d4b19c
+andoriginalunitlog2927B/90f705e8b766b290158b60adecc6f5b53022b05263d76ba75e63d0b3cc161970
+pinned. 20:18:14UTC actual8selectedsourcefiles allmatch oldGitf895e4a exactly;
+inputmanifest13081B/3df960ce0f594b8f51675b21bb070925de7aa87a583332674eb89b0e90fc6263
+and selectedoriginalEP4RGB/two publicmetadata hashesverified. No failurearchive
+ornewmaskrunyet. Archival CPU contract preservesoriginalFAIL/log/diagnostic via
+LinuxatomicNOREPLACE rename, never deletes/overwrites/reinterprets.

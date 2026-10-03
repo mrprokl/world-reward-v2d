@@ -5262,3 +5262,44 @@ tracks never substitute a bystander; ambiguity and contamination persist. Combin
 270PASS0.94s. Existing CLI accepts fixed 16/16 evidence; a separately frozen
 general policy and explicit failed-only archive are required before a new run.
 No challenge coordinates, manual labels or algorithm changes were used.
+
+
+Full-suite run started before the final TUM preservation-fixture edit: 9862PASS,
+2optionalSKIP,1FAIL262.75s; collected old mocked receipt lacks newly required
+before/after preservation fields. Focused final355PASS7.45s used current code
+and matching fixture. This is not a green full-suite claim; rerun after all
+concurrent source/test edits finish. No private values or model retuning.
+
+General actor policy `fixed_all16` is frozen before any new challenge run. Existing
+CLI uses all sixteen already-computed real detector frames with unchanged min3,
+coverage0.5, confidence0.3, ambiguity0.05, NMS0.7 and associationIoU0.1; no new
+detector frame, adaptive retry, unsupported track merge or manual prompt. Existing
+default-three artifacts keep their original policy/provenance. The clean frontend
+wrapper accepts only explicit `--actor-policy fixed_all16`; failed target still
+blocks until independently pinned failed-only archival completes.
+
+
+D107 actualv2acquisitionPASS62.429337204s, originalproducer70bf74e/46files45824B.
+Independentactualsource/helpers3/scientific21939B/transport1801B/originalfailed
+receipt andALL24private/public bytehashes verified BEFORE publicmanifestJSON;
+exact12originaltimestamp pairs/archiveheaders/filenamegates andALLsource/output
+rehashesafter PASS20:21:03UTC. Report21050B/616090b11060005ad28476964de36d4b82894f5b27f61e45b86481b95870d8e4;
+manifest4200B/b875487b35819928054ed90b7af23a60e95dbc6662d75f6b86c2de96128b5f6d.
+Inputpins derive twelveRGB hashes fromindependently frozen protocol, notfirstseen
+images; originaltimestamps/ranks retained. Sourcearchives4.029GB removedremote;
+no RGB/depth/media transferredlocally. Freeze13publicpins BEFOREnativeinference.
+
+Frontendpolicyfocused234PASS16.15s afterMacBash3.2 emptyarray/nounset failure
+found13FAILs; productioncompatibilityfixed usingexplicitbranch ratherthanarray,
+originaldefault argvunchanged. No globalmodel/selector source orsecrets printed;
+testfixture nowisolated explicitenv insteadofinheritingcredentials into failures.
+
+
+Failed-mask archival driver90proceduraltestsPASS; combined360PASS1.82s. Strict
+8selectedoldsourcepins (notfulloldfrontendclosure), actualoriginalunitfailed
+exit1/MainPID0, ONLYdiagnostic/no downstream, video/metadatahash and immutable
+currenthelper/config/dispatch checks precede mutation. Linuxrenameat2NOREPLACE
+preservesdiagnostic inode/no copies/deletions; current+oldsource rechecks before
+0400PASSreceipt. Crashorpostcheckfailure leaves archiveoccupied and no receipt,
+no rollback/retry. Rootcombined377PASS17.33s/bash-n/diffcheck beforeAzurefreeze;
+actualarchive/newmaskrun remainpending.

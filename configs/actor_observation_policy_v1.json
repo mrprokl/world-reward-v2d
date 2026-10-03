@@ -1,0 +1,19 @@
+{
+  "schema": "world_reward.actor_observation_policy.v1",
+  "name": "fixed_all16",
+  "actor_seed_observations": 16,
+  "seed_frames": 16,
+  "minimum_real_observations": 3,
+  "minimum_coverage": 0.5,
+  "confidence": 0.3,
+  "ambiguity_margin": 0.05,
+  "nms_iou": 0.7,
+  "association_iou": 0.1,
+  "observations": "unchanged sixteen uniform original-frame detections; all are used",
+  "adaptive_until_pass": false,
+  "imputed_observations": false,
+  "manual_challenge_identity_or_labels": false,
+  "procedural_validation": "30 missing/motion/bystander/crossing tests; 270 combined PASS",
+  "application": "explicit policy for future runs; old default-three outputs remain distinct",
+  "challenge_accuracy_verified": false
+}

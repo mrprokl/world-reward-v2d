@@ -5,8 +5,15 @@
 # This scoped lock serializes cooperating frontend launches; legacy/full-refine
 # units do not hold it and still require the root scheduler to serialize GPU work.
 set -eEuo pipefail
-[[ $# == 2 && "$1" == --episode && "$2" =~ ^(0|[1-9]|[12][0-9])$ ]] || exit 2
+[[ ( $# == 2 || $# == 4 ) && "$1" == --episode && "$2" =~ ^(0|[1-9]|[12][0-9])$ ]] || exit 2
 EPISODE="$2"
+MASK_POLICY=default_three
+if [[ $# == 4 ]];then
+ [[ "$3" == --actor-policy && "$4" == fixed_all16 ]] || exit 2
+ # Fixed global policy validated on procedural observations. No per-episode
+ # thresholds, adaptive until-pass search, fabricated or interpolated support.
+ MASK_POLICY=fixed_all16
+fi
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
    && "$CODE" == "$ROOT/jobs/$REV/run_track1_frontends/code" ]] || exit 2
@@ -79,7 +86,11 @@ phase pass
 
 CURRENT_STAGE=automatic_masks
 phase start
-timeout --signal=TERM --kill-after=10s 600s bash "$CODE/infra/run_automatic_masks.sh" --episode "$EPISODE"
+if [[ "$MASK_POLICY" == fixed_all16 ]];then
+ timeout --signal=TERM --kill-after=10s 600s bash "$CODE/infra/run_automatic_masks.sh" --episode "$EPISODE" --seed-frames 16 --actor-seed-observations 16
+else
+ timeout --signal=TERM --kill-after=10s 600s bash "$CODE/infra/run_automatic_masks.sh" --episode "$EPISODE"
+fi
 phase pass
 
 CURRENT_STAGE=episode_initializers

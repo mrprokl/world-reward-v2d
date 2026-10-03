@@ -1,0 +1,113 @@
+{
+  "schema": "world_reward.tum_rgbd_depth_input_pins.v1",
+  "acquisition_report": {
+    "bytes": 21050,
+    "sha256": "616090b11060005ad28476964de36d4b82894f5b27f61e45b86481b95870d8e4",
+    "producer_revision": "70bf74e18b0989bc0573f71d4e121caa54a8ab30",
+    "script_sha256": "8ea3db9adb16443667ff0770517900dce612c8f705eb328a085b07fb6e31f1c2"
+  },
+  "public_files": {
+    "manifest.json": {
+      "bytes": 4200,
+      "sha256": "b875487b35819928054ed90b7af23a60e95dbc6662d75f6b86c2de96128b5f6d"
+    },
+    "scene_000001_rgb_1305031454.127701.png": {
+      "bytes": 442006,
+      "sha256": "e7d9ebe77a418b083cad3d775cc8470ad3cb3fc99d3b8485f40e6c26ba60ad96"
+    },
+    "scene_000001_rgb_1305031455.459589.png": {
+      "bytes": 495514,
+      "sha256": "357216d1667c79d0def00c3fb05715eda04136e51901065162fdb40f30df5db0"
+    },
+    "scene_000001_rgb_1305031456.791649.png": {
+      "bytes": 495764,
+      "sha256": "da8cb4c39a8b3322dc28431261629b48d8ebe179114ce6370a650c62feeffc98"
+    },
+    "scene_000001_rgb_1305031458.127605.png": {
+      "bytes": 571425,
+      "sha256": "92b51a7c5d5543489b20982499ee65ca2ceda23e1a87e61353356d9d5e31818d"
+    },
+    "scene_000002_rgb_1311867171.794171.png": {
+      "bytes": 468034,
+      "sha256": "7dc485e1231f0e5de58e59987545fc2d68dd256a5502cbd713fdc24e45cb7258"
+    },
+    "scene_000002_rgb_1311867173.126782.png": {
+      "bytes": 497967,
+      "sha256": "8d0ed1f7891e07a46169de80e44b9be4780962c239ff4b56751818610ce5d92b"
+    },
+    "scene_000002_rgb_1311867174.463016.png": {
+      "bytes": 497982,
+      "sha256": "cb37b74e846c652aacf5882303797a6d4ea369ac1711686998797daf01803a74"
+    },
+    "scene_000002_rgb_1311867175.794862.png": {
+      "bytes": 497932,
+      "sha256": "5690151e4ceec0aa387996e2d829a8d6fb49342c40a4ea95d21f23127f974379"
+    },
+    "scene_000003_rgb_1341847982.062739.png": {
+      "bytes": 469554,
+      "sha256": "89a3bcb8ae140221c19e4d45b2b583b057e0f9a244db288a79fcc0a9f9c171c7"
+    },
+    "scene_000003_rgb_1341847983.402670.png": {
+      "bytes": 469003,
+      "sha256": "c3df0da7c96f39d638bbfcb10c94bcdcc0ee28309ba2e77ab67d55b877ff46b8"
+    },
+    "scene_000003_rgb_1341847984.743352.png": {
+      "bytes": 466190,
+      "sha256": "a55c645df3d230382c221d4d369d6fcd4a584e4c2de121fefd4f3f95de3b25ea"
+    },
+    "scene_000003_rgb_1341847986.082612.png": {
+      "bytes": 496459,
+      "sha256": "abb64c559b4ef277e400f8ba106490d62781679c6ff82f3a5a39c77628f863a9"
+    }
+  },
+  "ordered_frames": [
+    [
+      1,
+      40
+    ],
+    [
+      1,
+      80
+    ],
+    [
+      1,
+      120
+    ],
+    [
+      1,
+      160
+    ],
+    [
+      2,
+      40
+    ],
+    [
+      2,
+      80
+    ],
+    [
+      2,
+      120
+    ],
+    [
+      2,
+      160
+    ],
+    [
+      3,
+      40
+    ],
+    [
+      3,
+      80
+    ],
+    [
+      3,
+      120
+    ],
+    [
+      3,
+      160
+    ]
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "schema": "world_reward.failed_masks_transition_pins.v1",
+  "episode_index": 4,
+  "old_producer_revision": "f895e4a1eb1415ff815776503f6b0930ba54d29c",
+  "old_source_files": {
+    "infra/run_track1_frontends.sh": {
+      "bytes": 5343,
+      "sha256": "5ed25733d6a37118f2bc24e08168499dba63c92025297b4265055c6f6a4986ec"
+    },
+    "infra/run_automatic_masks.sh": {
+      "bytes": 1457,
+      "sha256": "5bf193b1b02ff3f83821aa39c3b36b52f5bbd99af1edabe260bef49c011f9378"
+    },
+    "infra/automatic_masks.py": {
+      "bytes": 11604,
+      "sha256": "b6d5b543ace41c1cca6b327182ff23528328a1052ead0f4f1d7423dc7404e234"
+    },
+    "infra/body_smoke.py": {
+      "bytes": 32390,
+      "sha256": "e4d659de33bacff9d5c85c1cb2fedce34f4aa34bdbae93b3b9b7e08950613ce3"
+    },
+    "src/world_reward/__init__.py": {
+      "bytes": 81,
+      "sha256": "1ac8c64041277f0c3cf4d8838b3153210d7076dd86a5121d1e6ef494b64b36a1"
+    },
+    "src/world_reward/actor_selection.py": {
+      "bytes": 13250,
+      "sha256": "b14e737fbf3e86d691ca10974e8264a941220296d855e8435f6b499f1d56fa60"
+    },
+    "src/world_reward/prompt_selection.py": {
+      "bytes": 9971,
+      "sha256": "04c9ed2ce9d004920da436d2e15ce0d464275598f122411eac87b47bb8c95ae6"
+    },
+    "src/world_reward/data.py": {
+      "bytes": 5181,
+      "sha256": "c8200e28900a88394f2821c558cd3693225ae8547331f12f2aff7d225c008a30"
+    }
+  },
+  "failed_unit": "world-reward-track1-episode4-frontends.service",
+  "failed_log": {
+    "name": "track1-episode4-frontends.log",
+    "bytes": 2927,
+    "sha256": "90f705e8b766b290158b60adecc6f5b53022b05263d76ba75e63d0b3cc161970"
+  },
+  "diagnostic": {
+    "bytes": 8017,
+    "sha256": "675c2629f6cf786f51be576188301b7f7863bc34cfc0c9f267d96d4f06d4b19c"
+  },
+  "input_manifest": {
+    "bytes": 13081,
+    "sha256": "3df960ce0f594b8f51675b21bb070925de7aa87a583332674eb89b0e90fc6263"
+  },
+  "track1_inputs": {
+    "track_1/meta/episodes.jsonl": {
+      "bytes": 6850,
+      "sha256": "11cc802c05ce62d83602e70d4f12991656e5701083a66d43e5452c16d3e4343b"
+    },
+    "track_1/meta/episodes_metadata.jsonl": {
+      "bytes": 7597,
+      "sha256": "cce105292e2b670f32b49e0504b0ece67b8aa860ea69dc9e728fce97531b53fe"
+    },
+    "track_1/videos/chunk-000/observation.images.exo_camera/episode_000004.mp4": {
+      "bytes": 21247810,
+      "sha256": "f1cadfa308b37dc91a3f296c2e5a2b538236cbe8a76d76d651df19554386cce6"
+    }
+  }
+}

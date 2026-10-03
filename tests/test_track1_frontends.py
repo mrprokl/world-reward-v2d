@@ -79,7 +79,7 @@ shift 3
 exec "$@"
 '''}
     for name,source in scripts.items():p=bin/name;p.write_text(source);p.chmod(0o755)
-    env=dict(os.environ,WR_ROOT=str(root),WR_CODE=str(code),WR_CODE_REVISION=revision,FAKE_LOG=str(log),PATH=str(bin)+":"+os.environ["PATH"])
+    env=dict(WR_ROOT=str(root),WR_CODE=str(code),WR_CODE_REVISION=revision,FAKE_LOG=str(log),PATH=str(bin)+":"+os.environ["PATH"])
     def run(*args):return subprocess.run(["bash",str(wrapper),*args],env=env,capture_output=True,text=True,timeout=8)
     return env,run,log,wrapper
 
@@ -178,3 +178,27 @@ def test_actual_archive_closure_all_children_no_oldprediction_route():
     assert selected>={"infra/"+name for name in (*WRAPPERS,*PRODUCERS,"run_episode_initializers.sh","cari_wrapper_common.sh")}
     assert "infra/run_cari_forward.sh" not in selected and "infra/run_cari_converter.sh" not in selected
     assert "infra/cari_forward.py" not in selected and "infra/cari_converter.py" not in selected
+
+
+@pytest.mark.parametrize("ep", [0, 4, 15, 29])
+def test_explicit_fixed_all16_policy_changes_only_real_observation_count(runtime, ep):
+    env, run, log, _ = runtime
+    result = run("--episode", str(ep), "--actor-policy", "fixed_all16")
+    assert result.returncode == 0, result.stderr
+    children = [row for row in log.read_text().splitlines() if row.startswith("child|")]
+    assert children[0] == f"child|automatic_masks|--episode {ep} --seed-frames 16 --actor-seed-observations 16"
+    assert len(children) == 10
+    assert all("--actor-policy" not in row and "--actor-seed-observations" not in row for row in children[1:])
+
+
+@pytest.mark.parametrize("args", [
+    ["--episode", "4", "--actor-policy", "adaptive"],
+    ["--episode", "4", "--actor-seed-observations", "2"],
+    ["--episode", "4", "--actor-policy", "16"],
+    ["--episode", "4", "--actor-policy"],
+    ["--episode", "4", "--actor-policy", "fixed_all16", "--confidence", "0.1"],
+])
+def test_no_arbitrary_or_episode_specific_actor_policy_controls(runtime, args):
+    env, run, log, _ = runtime
+    result = run(*args)
+    assert result.returncode == 2 and not log.exists()

@@ -251,3 +251,25 @@ KaggleliveJSshell did not expose rules text; this check does NOT replace the
 Oct2browser rule audit/acceptance. No written clarification received, outgoing
 organizer question/registration notsent. Research engineering continues;
 finalrelease/awardeligibility remains unresolved, not an asserted waiver.
+
+
+### 2026-10-03 independent eligibility re-audit
+
+Primary SAMBody/Objects customlicence againconfirmedcovers inference source,
+not just weights; FoundationPose and nvdiffrast NC restrictions stillapply.
+CurrentnvdiffrastLICENSE at253ac4fcea7de5f396371124af597e6cc957bfae retains
+noncommercial research/evaluation and no direct/indirect monetarygain.
+CARIforwardactuallyusesCUDA rasterized inputrenders; TAO/TRT trackingstillimports
+NC FoundationPose/learning. Replacing a visualizer or weights alone cannotclose
+this dependencygraph. Organizer clarification remainsunsent/unresolved; public
+KaggleJSshell notclaimednewverifiedrules. No waiver/eligibility/overlap clearance.
+
+MHR v1.0.1 [primaryrelease](https://api.github.com/repos/facebookresearch/MHR/releases/tags/v1.0.1)
+explicitly states “Added LICENSE to assets”; primarysource licence isApache-2.0.
+Publishedassets.zip digest e4f4f205cd87c0fa106577ba1de4fc763e4eb197c924461d2ef7e6944e9d6b94,
+198943157B (metadataONLY, not downloadedlocally). Existingacquire_weights.py
+retainsmhr_model.pt butnotassetsLICENSE. Preserveactuallicense+notices before
+bundling/distribution; a manifestlabel alone isnotnoticeclosure. SAM-acquired
+MHR checkpoint remains its originalSAMMaterials provenance, neverrelabeldedup
+asApache. MANO/SMPL conversiontargets remainseparate. Continue research with
+permissiveown/MHR/MoGe/SAM2/P3Dblocks whilefinallicencepath staysunverified.
