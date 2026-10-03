@@ -4585,8 +4585,18 @@ Combined independent6files255PASS43.19s. Runtime preserves original MoGe and
 DA3 helper bytes; no old nine-frame FRAME_IDS monkeypatch. Original host644
 dispatch markers are read-only bind mounts; hash/stat before/after instead
 of incorrectly requiring their host mode to be444. No marker mutation.
-New36? Source closure inventory is **33files52876encodedB inference** and
+Source closure inventory is **33files52876encodedB inference** and
 **35files65272encodedB evaluator**, within authoritative160000B code-only
 limit; evaluator cannot execute until actual independent prediction pins exist.
 Native668prepare closure34files55324encodedB; original600s/16frame chunk
 protocol unchanged. No actual anchored-depth inference or native668 yet.
+
+Full suite **9241PASS/2sameoptionalSKIP265.54s** at frozen77b462e: collected
+before evaluator35tests were written, so do NOT claim their inclusion. The
+completed evaluator+wrapper70tests separately PASS11.89s at the same frozen
+source; all source/helpers unchanged. This fixes only stale transport tests.
+Actual anchored-depth VM02 dispatch77b462eefb76adfff17474a341ac1226dd9accaf,
+33files53304encodedB/public exactcommitHTTP200; unitactiveMainPID141044.
+Actual native668sharedprepare dispatch at same revision34files55808encodedB
+after verified VM01 GPUidle. No parallel jobs on the same GPU; VM02depth and
+VM01native are disjoint. Outcomes still pending, no predicted quality gain.
