@@ -4952,3 +4952,15 @@ persist. CUDA30s/outer33s with scopednamedcontainer boundedstop/kill/rm, no
 lingering-job inference. ProbePASS will mean measurementexecution only, not
 2e-5gateacceptance, causeofpreviousfailure or modelquality. FivefocusedPASS;
 probe+authoredpipeline/grid118PASS0.87s beforefreeze. Nofailedreference rerun.
+
+2026-10-03 18:27:25UTC actual EP3frontend **FAILEDexit1**, object_pose_full
+failed18:14:12UTC beforetracking: every defaultQEM budget candidate violated
+manifold/componentorientation/Euler contracts. Originalmask andseveninitializer
+reportsPASS, bodyfull192.219272s/depthfull340.690830s/adapter8.514697s/all592.
+Sourcepredictedmesh267902V/535772F remainsoriginal, defaultobject_pose_full
+directoryempty. No user labels/prompt/geometryshrink/componentdeletion or
+frame removal. Retain originalunit/logfailure andindependent hashes. Same
+alreadyvalidated standalonevolumeproposal asEP2 is the next automaticfallback,
+with unchangedoriginal900s/component/shellvolume/CD/embedding gates; commit
+its independentlyobserved pins before any separatetrackingcontinuation.
+No nativechain/inputassembly or performance score for EP3 yet.

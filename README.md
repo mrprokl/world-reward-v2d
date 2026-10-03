@@ -21,7 +21,9 @@ No final Parquet, submission or verified CARI4D improvement yet.
   continuation exceeded the original time budget: provenance PASS is not a
   timing PASS. Its full native preparation, forward, refinement and export
   and original official packing now pass independently. The next 592-frame
-  episode is running from automatic masks. No frames,
+  episode completed automatic masks and all initializers, but its default
+  mesh-budget route failed before object tracking. A separately gated,
+  volume-preserving mesh proposal is the next production step. No frames,
   components or trajectories were dropped to rescue it.
 - **Research:** a frozen DA3 depth hypothesis, anchored to MoGe by one
   scene-constant median ratio on the fixed 10% image border, gains **33.42%**
