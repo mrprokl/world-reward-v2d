@@ -2257,3 +2257,28 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   all15cases/no thresholding or confidence-basedsample selection. Prefix
   removed, allinputs/source/assets/outputs rehashed. No freshprivategeometry,
   fitoptimizer/contact or qualitygate yet; abstentionnevermasqueradesasPASS.
+
+  D96 optimizercontract frozen BEFORE freshpublicBody/DWPose observations:
+  for eachframe fixedbody/hand/firstRGBidentity nativeMHR10trainingkeypoints,
+  exactly60evaluatedstates/59Adamupdates lr.01/betas(.9,.999)/eps1e-8, select
+  LOWESTtotalobjective EVALUATEDstate (firsttie), neverunevaluatedlaststep.
+  Sixdimensionlesslatentzeros: Δxy=.30tanh(u[:2]); ΔlogZ=ln1.25tanh(u[2]);
+  Tz=Tz0exp(ΔlogZ); ΔnativeEuler=.30tanh(||u[3:]||)u[3:]/||u[3:]|| with
+  analyticzeroextension, finitegradient/norm≤.30rad. Allnativeglobal_trans0.
+  DataL=mean_valid h(||reproject−DWPosepixel||2/5px), h(q)=.5q² ifq≤1 elseq−.5;
+  priorL=.5[(Δx/.15m)²+(Δy/.15m)²+(ΔlogZ/.15)²+||ΔEuler/.15rad||²], coefficient1.
+  Equalbinaryfinitepositive observations; no prior multiplied bylandmarkcount,
+  no learningrate/weights/camera/shape adaptation or silhouette/depthloss.
+  Require≥6validtrainingpoints/frame with observedxyextent≥32px EACHaxis;
+  initialunregularized2DresidualJacobian fromsameinitialnativeforward wrt6
+  latentcoords mustfinite/fullrank withsmin/smax≥1e-5. Priorrows never enter
+  ranktest; otherwisefailentiretrial/allcases retained, no bestframepicking.
+  Initialnativegeometry/keypoints parity againstfrozenbaseline≤1e-5m, allfinite
+  positivecameraZ/no clipping, nativecontrols/shape/scales/boundschecked.
+  TrainstrictCUDAfloat32/noTF32/autogradno contextdetach or suppressedkernel
+  errors; anyruntimefailure stops beforequality, not silent relaxation.
+  Finalbesttotalobjective≤initial+1e-6/frame, onefinalnativeexport/frame;
+  exactly900objectiveforwards+15finalheads, initialJacobian20orlessresidual
+  reversegradrows reusessameinitialforward, 180sCUDAfit/32GiB4CPU inclmodel
+  load/integrity. Freezeall15candidateblocks/controls/V/KP/J/rotations+source
+  beforeprivate; numericalreplay/qualitydecision separate, not predictedwin.
