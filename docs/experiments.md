@@ -4664,3 +4664,37 @@ failure/old prediction/producer/source/coefficients. Original source/scoring/
 MoGe/DA3/12NPZ+ratio settings byte-identical, no private labels seen. Source
 closure38files68304encodedB for separatev2 and42files81916B native668forward,
 within original160000B code-onlycontrol. No v2evaluation/forward result yet.
+
+Actual separate v2 private evaluation **PASS2.854420s/12frames**, original
+v1FAIL preserved and exactlyzero private frames before correction. Producer
+29eabe39ee85378d54da785be3a32b6c03987368/publicexactHTTP200,
+38files68736encodedB. Sole400receipt20854B/
+c0d19010569e2d0dd6393b5fb882756744eb585713431e0d20b2fe013714ad1f.
+All12 predictions frozen/bytepinned before sensorK/depth/visiblemask scoring;
+all original object instances retained, predictionXYZ/K untouched, noalignment.
+Per-scene mean visible-object cameraCD half (cm):
+
+| Scene | Original MoGe | Anchored DA3 | Relative gain |
+|---|---:|---:|---:|
+| 1 | 106.786177 | 71.906949 | 32.662681% |
+| 2 | 103.310000 | 68.781528 | 33.422198% |
+| 3 | 100.453137 | 57.687827 | 42.572399% |
+
+Median paired scene gain **33.422198%**, no scene regression, >=95% object
+coverage and EXACT candidate validity=baseline. Predeclared narrow object-depth
+hypothesis SUPPORTED, not automatically deployed. Absolute57.69–71.91cm errors
+remain substantial; same three development scenes/objects, sparseframe temporal
+quality and human/MHR/contact/motion/completeV2D score unverified, backbone
+training overlap/license closure unverified. **Not a verified CARI4D victory.**
+Do not retune/re-score this12frame set as untouched validation; future methods
+require new independent holdout. No inference rerun/prediction/shape/scale repair.
+
+Actual episode1 full668nativeforward dispatched at29eabe3,42files82464encodedB;
+unitactiveMainPID855140 after originalprepare+sourcepins. Samefull7window
+schedule/firstoccurrence assembly/nativecheckpoint; no native refinement yet.
+
+Final all-source tiny suite **9330PASS/2sameoptionalSKIP265.44s** after exact
+v2measurement/provenance integration at29eabe3. Focused199PASS23.48s includes
+newv2wrapper/metadata/firewall/completebundle; independent240PASS24.50s.
+Originalprediction script remains2ed48a89, no model/inference/ratio/scoring
+source change after private results. Only concise result/decision recorded.
