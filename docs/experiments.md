@@ -4485,3 +4485,57 @@ Newentrypoints independently≤code-onlylimit; do not omitprovenance toshrink.
 Authorv2/holdout frozen fullsuite **9041PASS/2sameoptionalSKIP214.40s**;
 209posttransport-assertfocusedPASS11.77s. OriginalGPUpredictions unchanged;
 freeze/push bothdisjointCPUentrypoints beforeactualAzure-onlygates.
+
+Actual authored-reference v2 **FAIL4.561462s**, phaseoriginal_full_surface_rest:
+unchanged original certificate rejects well-conditioned positive outward volume.
+Original reference byte-identity prerequisite PASS; no returned surface
+certificate, solid queries, NPZ, RGB, geometry repair or quality adoption.
+This does not identify the failing component or prove that every face points
+inward; do not flip faces, change geometry/resolution or rerun this protocol.
+Producer7305c0fcdb8d079ab2bea216a6f33061d0a2a4cd, 29files39352encodedB,
+archivef6108239a7b0424cfa78ceb120d702af8b5dca3cd85c19023325070ae1d12e62.
+Sole400receipt3462B/4899656c8d961130ed751248cb06cfd4c9e93ed75c1e829cf5a1deeb5c605a1c;
+v1FAIL and native-neutral crossing witnesses remain unchanged. Stop author route.
+
+Actual TUD-L frameholdout acquisition **PASS9.221497s/12RGB** onVM02,
+producer7305c0f, 25files23836encodedB, archived844141e6323bce0b4f31e7ba1eb36255debe4b765f192fe8971af62cb4473c6.
+Private400receipt18380B/4b0f1309490d812ab2eec1bab91110ba953e11b285078a801dedda3b63540378;
+all disposable ZIPs removed. Independently hash all13public files against the
+sealed acquisition receipt, then hash again; commit exact SHA/bytes in
+configs/tudl_frame_holdout_input_pins.json. RGB manifest2993B/
+ca1041f5ef0bcb9c8201af5602ec7e301934bb9f33ad2a52badc3d749267582f.
+New readonly stdlib reader hashes all13 BEFORE JSON and AFTER interpretation;
+exact12IDs, original640x480, no private file read/media decode/calibration.
+Acquisition and byte checks are NOT accuracy validation or new scene/object
+independence. No holdout predictions/evaluation yet.
+
+VM02 actual assets already exist, no download/transfer/rebuild needed:
+DA3 receipt17496B/d7d08e92c0177bcb7787d56950c97f1125b714b0afaf7ac75546396f57ae58d3,
+source manifest13341B/3faa74f9b1b22fe076fd37833f1227da94c27256a06e1e8ebc27ce8b2367ede5,
+model1336734448B/bbea5b0b3ee389849cffa7ddae89de064a90abd2b055fc5aa99aac68db324776,
+Addict3832B/249bb56bbfd3cdc2a004ea0ff4c2b6ddc84d53bc2194761636eb314d5cfa5dfc.
+Full pinned source/406state/model checks still required before actual inference;
+receipt presence is not verified training-overlap/license closure.
+
+### Border-proxy anchored relative depth — frozen hypothesis, 2026-10-03
+
+One new hypothesis on the untouched12frame holdout: preserve MoGe's metric
+gauge but replace relative camera-Z with DA3. Both unchanged native predictors
+consume only originalRGB, same fixed size-prior K=(800,800,320,240), +0.5 rays.
+For each scene, ONE positive coefficient is the median of four equally weighted
+frame medians Z_MoGe/Z_DA3 over a fixed10% peripheral band (x<64 or x>=576 or
+y<48 or y>=432), paired MoGe-valid and DA3-positive. Require >=1024 paired
+pixels and >=95% peripheral support in EVERY frame; failure STOP, no sweep.
+This is a geometric border/background PROXY, not a semantic guarantee that
+people/objects are excluded; do not call it automatic semantic masking.
+Candidate Z=a_scene*Z_DA3; no offset/per-frame coefficients, clipping, private
+calibration, labels, object geometry/scale or human changes. Preserve full
+original camera grid, all12IDs and EXACT MoGe validity, no added pixel drop.
+Native DA3 preprocessing/sky correction/BF16+FP32head/processedfocal metric
+factor unchanged. Full source/inputs/weights reverified before and after.
+Freeze all12 baseline/raw/candidate arrays and public receipt before private
+evaluation. Predeclared adoption gate: >=5% median per-scene visible-object
+camera CD gain; no scene >5% regression; >=95% object coverage with no
+candidate validity loss. It is sparse-frame, object-only non-challenge evidence,
+NOT tracking/acceleration/humanPVE/fullCARI4D superiority or eligibility proof.
+No deployment if gate fails; no new sweep on these held-out frames.

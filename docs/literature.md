@@ -1104,3 +1104,13 @@ not be object/scenedisjoint or supporttemporalacceleration (sparseBOP19).
 Onefuturefreeze-beforeprivate comparison:medianper-sceneCD gain>=5%, no
 regression>5%,coverage>=95%, insufficientbackgroundratio=>STOP. No new
 benchmark/assets/modeltransfer/job, nor superiorityclaim.
+
+2026-10-03 follow-up: a new12frame same-scene holdout was actually acquired
+onAzure using filename indices40/80/120/160 before private values; exactpublic
+identities now committed. Existing MoGe/DA3 assets are already present onVM02.
+The next narrowly defined test uses a fixed10% peripheral band as a border
+proxy, NOT the semantic nonperson/nonobject mask suggested above. One shared
+scene ratio, equal frame weight, all original frames/validity preserved; lack
+of >=95% border support means STOP. Background contamination remains a real
+limitation to measure, not a semantic masking claim. No inference/evaluation
+result or superiority follows merely from acquisition/provenance checks.
