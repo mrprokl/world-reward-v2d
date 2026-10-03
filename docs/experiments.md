@@ -2438,3 +2438,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   [0,0]/soft-limit semantics before proposing a new method; no clamp or waiver of
   the failed contract, no samecohort optimization. OriginalfitFAIL and auditv1FAIL
   SHA preserved, quality_v1 absent; terminal0/MainPID0/GPUidle81MiB.
+  Important semantic boundary: these are exact violations of the dense returned
+  bounds under the preregistered D96 interpretation. Public exporter/getter source
+  has not established whether every[0,0] means a genuine equality constraint or
+  a sentinel for an absent sparse limit. Do not call all SAM predictions physically
+  invalid from this audit. Next cheap decisive check is CPU-only JIT getter code/
+  graph and minmax metadata introspection, still without forward/GT. No new
+  fitting protocol is frozen until this distinction is resolved.
