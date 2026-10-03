@@ -3014,3 +3014,66 @@ newquality; not resurrectDWelbow-only prompts or addrootfreedom. Literature
 audit supplies exactAPI/coordinate/SHAM/nativeidentity constraints; no extra
 checkpoint required, allGPUdata remainsAzure. H99marksPROGRESS (actual
 scientificrejection changesnextmethod), not a blocker or completedsubmission.
+
+## H100 — public-only native photometric mechanism preregistration
+
+Previous goal turn was PROGRESS: actual H9924-frame diagnostic rejected
+DWprompt evidence and changes next method, not a wait/blocker. H100 is
+mechanism validation only, not a substitute for requested fullHOIsubmission.
+NewoneRGB `validation/photometric_native_v1`, no scored H99image reuse.
+Ownmanufacture: shape first2(.23,−.16), free68scale.02/locked0, named
+leftupperarm.21/elbow.36/rightupperarm−.015/fingers.16; actual249legal
+animated+neutral recipe. Neutral wholeactorframing8px, K1280/1024×768,
+stripedownappearance and bottle1.3. Reference352e…2batches/1raster.
+No truthgeometry/rig/parameter/camera array stored; only originalRGB,
+RGB-onlymanifest and reproducibility receipt. No inference receives the
+manufacturer report/mesh/camera/labels.
+
+Singlezeroargument frozenjob with THREE isolated offlinecontainers: manufacture
+120s, automaticDINO/SAM2personmask120s, Bodymechanism180s; eachH100/32GB/
+4CPU, imageb47…/grounding53b… pinned;3s outergrace/10skill. Source-only
+archive≤160KB; no data/model/RGB downloaded toMac. Entire output route
+exclusive, no restart/replacement of a failed namespace.
+
+Threephotometric inputs fixedorderedgamma(1,.8,1.2), deterministicuint8
+LUT floor(255*(x/255)^gamma+.5), SAMEoriginalautomaticmask/bbox/K.
+ThreeSHAMgamma1copies (sixactualordinaryBodycalls total) samefixedseed0
+withstrictTF32off/CUBLAS/determinism, no newweights/decoderprompts.
+Gamma1bytes must exactlyoriginal; original/transformedRGBhashes logged.
+Everyordinaryprediction gets independent freshnativeblockparity plus308KP
+head; actual originalBody1101parameters/113rigbuffers strictloader unchanged.
+Anchorshape45/PCA28/globalZYXEuler/Tcam/hands108/zeroexpr comefromfirst
+originalRGB; proposeONLYnativebody133. Nativeusesfirst130 body slots,
+actualhandcolumns68:122overwritten, controls0:6+136:204 bytefixed.
+Fullreturned204 checks fixed0:6/68:122/136:204 byteexact, all V18439/KP308/
+J127positivefinite and127properSO3. body133includes6skeletaltranslation
+controls130:136; this is nativeBODY-block consistency, NOT purearmrotation
+or allvertexZ/physicalshape fixed. No obsolete D96dense249baselineguard
+is silentlywaived: this new mechanism has finite/proper/nativeparity+
+bytefixedblock guards, no physiological/qualityclaim.
+
+Sixfixednativeheads then existingprediction medoid perimage fromthree
+fullcameraV sets: F64mean square vertex distance sumtoother2, earliest
+exacttieoriginalgamma1; noEuler/geometricaverage, GT/IoUselection or scale
+alignment. SHAM3rawpredictions must EXACTnativearraybytes matchoriginal,
+SHAM3fixedheads EXACTfixedoriginal; SHAMscores0/index0. Baseline/SHAM/TTA
+selectedexistingproposals independentlynative-replayed once (3heads),
+maximum V/KP/J/control/R errors≤1e−5. Expected6Body/6parity/6KPheads/6fixed
+heads/3selectedreplays,15immutableNPZs reread plusreceipt, source/assets/
+originalRGB/mask/semantic rehashed. Anyfailure stops route; no epsilon
+relaxation/gamma search/privatequery/omission.
+
+PASS proves only that the mechanism runs and SHAM is sound. It DOES NOT
+authorize adoption/submission or a superiority claim. IfPASS, preregister
+a NEW24human-only quality pilot againstsameclipidentity baseline with
+sharedbaseline-firsthumanSim3, no retuning H99; fullreal-domain/object/
+contact/temporal verification and faithful frozenParquet remain necessary.
+Independent nativeAPI/source/purepolicy/manufacture audits and156focused
+unit/bundle tests PASS0.39s; completeordinaryclosure33files106,504B.
+No actualH100modeloutput/accuracy observed beforethispreregistration.
+Fullsuite6330PASS/oneoptionaltrimeshSKIP85.77s;156focusedtestsPASS after
+final sourceguards. Independent runtimeaudit confirmsnoTorchimport before
+GPUstage, exactnativecontrolcontract/SHAM/budgets. SAM2installedsource
+nowrehashedafterautomaticmaskinference (notjustweights); 1101nativelearned
+parameter/113rigbufferloader evidence+actualhandindices retained explicitly.
+No actual H100output/privatequality read while adding theseintegrityguards.
