@@ -549,3 +549,19 @@ GEM-X temporal SOMA still lacks a verified inverse to kit MHR136/68 and does not
 Native low-level output is133 COCO joints, not134: the higher Wholebody wrapper inserts a synthetic neck/remaps OpenPose. Freeze original pixel coordinates/scores; scores are not calibrated visibility. RGB-conditioned2D predictions differ from [SAMBody's projected latent3D joints](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam3d_body/lib/sam_3d_body/models/meta_arch/sam3d_body.py#L473-L483), not independent measurements made by that same reconstruction.
 [SLAHMR CVPR2023](https://arxiv.org/abs/2302.12827), [MIT58518fec991877bc4911e260776589185b828fe9](https://github.com/vye16/slahmr/tree/58518fec991877bc4911e260776589185b828fe9), supports shared shape/per-frame poses/translations with robust external-keypoint reprojection. Borrow the architecture, not SMPL/VPoser/HuMoR code/models; own nativeMHR forward/export must preserve ABI/bounds and one clip identity.
 First hypothesis fixes existing K/metric prior, jointly refits translation/root then pose/identity with independent2D/silhouette evidence and regularization, instead of substituting identity into fixed poses. Joint2D alone cannot identify focal/body scale/depth; no per-frame camera to erase body error, no GT calibration. Future protocol/gates not yet preregistered; no accuracy/adoption or complete stack-licence claim, no download/install/job.
+
+### Independent2D runtime prerequisite — pinned CPU ORT, not acquired
+
+[PyPI ONNXRuntime1.30.0 metadata](https://pypi.org/pypi/onnxruntime/1.30.0/json)
+reports the compatible LinuxCPython3.11 wheel uploaded2026-09-10T16:31:11Z,
+latest stable compatible version identified before the2026-09-30 cutoff.
+`onnxruntime-1.30.0-cp311-cp311-manylinux_2_28_x86_64.whl`23561046B,
+SHA256`fd54b314ea385bcecac69ab431f020ba503e3878dad4ebb645fec5a24b041242`.
+[Sourcev1.30.0](https://github.com/microsoft/onnxruntime/tree/f2c39fe2f838cf35ce7da92824f5a5e3ee6e88a7)
+is MIT, LICENSE1073B/SHA256`2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c`;
+embedded third-party notices still require audit. Nativeimage Python3.11.10
+has noORT. Dependencies flatbuffers,numpy>=1.21.6,packaging,protobuf>=4.25.8
+and glibc>=2.28 must be checked before an isolated Azure-only offline
+`--no-index --no-deps --target` install; no Torch/CUDA/cuDNN or global resolver
+changes. ExplicitCPUExecutionProvider/version/importpath mandatory; CPU cost
+not measured. This is a runtime plan, no wheel/model install or inference.
