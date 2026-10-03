@@ -4876,3 +4876,13 @@ submission or performance score. Nextfirst-absent EP3/592 frontend dispatched
 sameimmutableproducer,76files132152encodedB, unitactiveMainPID878736. Existing
 exclusive-target/sourcechecks and scopedGPUlock apply; original600/5400/7200/
 7200 stage budgets unchanged. Heavy assets remainAzure, no duplicate GPUrun.
+
+2026-10-03 18:04:12UTC full866 original official packing **PASS17.781534s**,
+unitinactive/exit0, one original call/return, scratch_removed=True and sole
+outputreport.json; no retained Parquet. Actual444receipt9255B/
+3afc4f2ebb9cb6799fe5e966faabcf80318991d746e0fe7bbe5a37f84b3ad002,
+producer0595a29 unchanged. Thirdfullclip now completes nativeprepare/forward/
+refine/export/officialpacking, still not all30 or a verified CARI4D score.
+EP3/592 automaticmasks **PASS56.727549s**, originalTrack1/GTfalse; frontend
+unitrunning initializer stage. No episode/frame/prompt selected from private
+labels and no heavy local transfer. Preserve originalEP2frontendtimingFAIL.
