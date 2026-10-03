@@ -3239,3 +3239,68 @@ remainimmutable; no rescoring/privatetruth. Unit inactiveexit0/lastGPU125MiB0%.
 Next actualscience requires NEW24human-only pairedquality preregistration,
 SAMEscopedexecution on every method/nativehead, all24/8groups retained and
 existingSHAM/native/sourcegates; never use thisindex0 toadjustgammas.
+
+## H101 — untouched human-only photometric quality preregistration
+
+Mechanism H100cPASS required and nowobserved; noH101RGB/prediction/quality
+exists yet. Frozennew24rendererrecipe above unchanged exceptactualnativejoint
+name `l_lowarm`. Use nativepolicy exactlyH100c: ordinarylearnedCUDAFalse/
+warnFalse/seed0/TF32off/CUBLAS:4096:8, allMHRheads strictTrue/warnFalse/JIT
+unoptimized withsynchronize+restore includingintermediategeometry. No new
+weights/gamma/camera/objectrecipe search. Reference-onlymanufacture120s,
+automatic24personDINO/SAM masks120s, learnedBody144calls/native600s, final
+private diagnostic120s; each32GB/4CPUofflineH100, separateexclusiveoutputs.
+All heavyRGB/geometry/models remainAzure. ExistingH99andH100failures immutable.
+
+All8groups2morph×2appearance×2occlusion/3realadjacentposes counted, noinvalid/
+confidence/visibilitysubset. Publiconly24RGB+manifest; masksautomaticperson.
+queries(originalRGBonly), fixedwholegrid/bbox/K1280. Sixbranches/frame ordered
+original,gamma.8,gamma1.2,sham0,sham1,sham2 (latterRGBbyteexact). Clipfirst
+originalshape45/PCA28 sharedall3methods/3poses; frameoriginalEulerroot/Tcam/
+hands108/facezero sharedmethods, BODY133onlyproposal. Expanded68scales
+clipbyteconstant; actualfixed0:6/68:122/136:204 checked. BODY133 includes
+sixskeletaltranslationcontrols130:136, not purearmrotation or allvertexZfixed.
+144Body/144freshparity/144KP/24frameanchor/144fixed/72selected replayheads,
+1,392scopednativecalls (58/frame), allactualattempt/completedcounts required.
+360NPZ(6raw/6fixed/3selected×24)+actualnativefaces/LBShandmetadataimmutable
+andreread beforeprivate. RAWandFIXEDSHAM3allarraybytes mustbaselineexact,
+SHAMzero/index0; independentselectedreplaysV/KP/J/controls/R≤1e−5. Selection
+existingfull18439cameraVmedoid3gammas, F64meansquared distances/sum/firsttie,
+no average, imageconfidence, IoU/GTselection, camera fit or label-driven prior.
+NativefaceI32hashf674…acd6/source/semantic/modelpins andallsourceasset/RGB/
+mask pre/postrehash. Anypublicmechanism/coverage failure stops BEFOREquality.
+If everyframe selectsoriginal with no actual geometrychange, retain outcome
+as no useful mechanism/no improvement, never tune gammas onthiscohort.
+
+Freeze render/mask/body receipts/scripts/canonicalproducingcommits inone
+explicitqualitypinsconfig AFTERproducerPASS andBEFOREprivateevaluation.
+Quality firstvalidatesall24×15arrays/publiccallprovenance/native1392scopes,
+not onlyJSONstatus. Onlythenreads ownprivatesynthesistruth9fields/rig.
+No producer/inference receivesprivatecamera/pose/shape/visibility/geometry.
+Oneproperpositivefull18439Sim3 from SAMEconstrainedbaselineframe0 pergroup,
+sharedALLmethods/ALL3poses; no perframe orcandidate-specificalignment.
+RawcameraPVE/centered/centroidXYZ, alignedfullhumanV/J andseparateLBShands
+reported. Primary equal3posemean within8groups: pairedrelativealignedhuman
+PVEgain median≥5%, everygroup regression≤5%, everygroup/EACHhand aligned
+PVEregression≤5%. Zerobaseline relativegainundefined =>rejectrelativegate,
+retaincase; nohandabsoluteincrease allowedfromzero. SHAMmetricsmustexact
+baseline. Also every24frame TTArawcamera humanIoU against SAMEfrozen
+automaticmask mustnotdrop>1pp vsbaseline;72complete scalarGPUrasters
+baseline/SHAM/TTA, noSim3forsilhouettes/noGTvisiblemaskgating/occlusiondrop.
+All24scoredONCE evenifqualitysafeguard fails; no rerun/rescue/thresholdsearch.
+Jointsecond-difference across3adjacentposes is descriptivenofps², not a
+fluiditygate oroptimization; zeroaccelerationdoesnotproveaccuracy.
+
+ExecutionPASS andsciencehypothesissupport reportedseparately. Thishuman-only
+syntheticpilot NEVERauthorizesfullHOIsubmission/adoption or CARI4Dranking:
+noobjectprediction/contact/CD-O/PENmeasure, nonphotorealisticmanufacture and
+knowncamera limitations explicit. If scientificrejection, do not retuneH101:
+priority separatelypreregistered nativefullHOItemporal96+realframes with
+validinferredmetricobjectmesh andsameidentity/camera, then realdomain checks.
+Finalpacker/Parquet/all30clips/sharedHOIframe/licenses/registration/Gitcommit
+accessibility stillrequired. Preregisteredbefore firstH101manufacture.
+
+H101 preprocessing/metrics/scoped-policy73focusedtestsPASS0.71s while
+finalnativeobserver metadata+samequalifiedscopedroute andprivateevaluator
+are beingcompleted/audited. NoH101manufacture, inference or quality dispatched;
+allgate thresholds andnewrecipe above alreadypreregistered.
