@@ -2146,3 +2146,62 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   licenses/assets/source rehash and180sCPUbudget. No cast/channel/preprocessing
   repair, confidence/quality threshold or semantic/3Daccuracy claim. No same-job
   fallback; failedv1 remains unchanged, installprefix always disposable.
+
+  D95v2sourcefreeze5428PASS/1optionaltrimeshSKIP72.53s,197independentfocused
+  testsPASS andbashsyntax/diffcheckPASS. Actualsource9b0a4e19ac8a13b50417089e351913b2aacf0892,
+  bundle7files23,328B. Exactsymbolicmetadata means no arbitrary wildcard;
+  rawmetadata savedbeforeguard; actualnumeric133contracts unchanged. AzureCPU
+  dispatch started withv1failure mountedRO, no GPUjobs/heavyMac transfer.
+
+- D96 preregistered **fresh causal human-root refit in full human/object
+  synthetic scenes**, not photorealistic/fullHOI-method/Track1 validation.
+  New validation/keypoint_rgb_v1, schema world-reward-keypoint-rgb-v1, original
+  1024x768,3clips×5frames, bothentitiesvisible≥64pixels. Generate new fixed
+  scenes BEFORE seeing outputs; no renderer retry, threshold/recipe retune or
+  image/frame selection. Publicmanifest contains onlyschema/images/file/SHA/
+  width/height. Manufacturinggeometry/depth/camera/controls remaineval_private.
+  TrueK1280 onallclips coincides with prechosen genericRGBdiagonalprior1280
+  in BOTH inferencebranches; no privatecalibration transmitted. This isolates
+  a known-focal synthetic scenario and does not establish real-camera quality.
+
+  Frozen generation: shape45firsttwo ((-.33,.09),(.21,-.18),(.38,.14)), others0;
+  scale68freecontrols(-.025,.045,.060), actualzero-lockedcontrols0, strictnative
+  bounds/no clipping. Interactionside r,l,r respectively. Forframef0..4:
+  activeuparm_ry=.21+.040f, elbow_bend=.30+.050f, wrist_ry=-.06+.025f,
+  oppositeuparm_ry=.018(f-2), activeindex/middle/ring/pinky1_rz=.14+.025f;
+  otherarticulations/rootcontrols0. ActorcameraYyaw(-.12,.19,-.21)+.035(f-2),
+  actorXYZincrement(.012(f-2),.007sin(.8f),.035(f-2)); neutralcombined3identity
+  bboxframing uses1280 and29%grid margin plus.4m, one clipconstantdistance.
+  Bottleownclosedmesh×1.08, rotationvector(.03(f-2),.07f,-.04(f-2)); position
+  activehandbboxcenter + (.040*(-1forl/1forr),.018,zoffset[f]),
+  zoffset=(-.09,-.035,.025,.07,.115). SkinRGB(.73,.69,.65), garmentband.23..81
+  exclhandregions with(.27+.03sin(13x),.33+.02cos(11y),.39+.025sin(8z));
+  bottle(.19,.38,.43),cap(.25,.27,.29); existingdata-independentroombackground
+  unchanged, no semanticperclip colorcodes. 120sCUDA/32GiB/4CPU render.
+  Then separateRGB-only Grounding/SAM2automaticperson./bottle. masks, same
+  existing thresholds/NMS/ambiguity policy,30detector/30SAM/15encoders/all15
+  frames, nonemptyoriginalgridmask no fallback,180sCUDA. Source/models/image
+  pinned/rehashed, no privateassets exposed to mask/inference containers.
+
+  After successfulD95ABI/preparation, one fixed baseline: SAMBody15 +MoGe15
+  withgenericK1280 andautomaticmasks, nativeMHR firstRGBshape45/scale28 shared
+  unchanged inbothbranches. Freezeallbaseline/identity/raw133DWPose15 and a
+  common visibleobjectpoint proxy scaled frombaselinehuman BEFORE refit.
+  FitCOCO[5,6,7,8,11,12,13,14,15,16]→nativeMHR[5..14]; reserveface/wrists
+  [0,1,2,3,4,9,10] solelydiagnostic. Rawpositivefinite scores→equalbinaryweights;
+  ≥6train/frame andfull15coverage required; degenerategeometry/Jacobian fails
+  entiretrial ratherthan droppingframes. No semanticconfidence qualityclaim.
+  Trainonly6nativeparameters: three nativeEulerZYXrootcontrols (no assumed
+  externalSE3 conversion) andcameraXYZtranslation. Nativeglobal_trans0, meters
+  YZfliponce+translationonce. Body/hand/expression, K/shape/scales and common
+  objectproxy fixed. No silhouette/depth residual or optimizerGTinitialization.
+  Proposed60evaluations/frame/180sfit, robust5pxHuber+priorsσXY=.15m,
+  σlogZ=.15/σrotation=.15rad, boundsXY±.30m/logZ±ln1.25/rotationincrementnorm≤.30rad.
+  Exact optimizer/Jacobian numerical guards must be frozen before any fresh
+  inference/refit; prepare-only run cannot imply these unimplemented gatesPASS.
+  Finalall15candidates frozen BEFORE separateprivate evaluation: medianperclip
+  cameraabsolutePVE gain≥5%, noclipregression>5%, bothperhand/clip relative
+  objectvectorerrorregression≤5% (fixedcommonobjectproxy), zero-baselinecase
+  explicit; reportcentroidZ/centeredPVE/heldout2D without Procrustes/alignment.
+  Rejectrecipe onanygate; no samecohortretune/realadoption, objectrigidmesh/
+  contact/penetration accuracy or challengewin claim.
