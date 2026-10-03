@@ -5544,3 +5544,24 @@ no-deps wheels Tf4.53.3/tokens0.21.4/safe0.6.2/hub0.36.2 and optional
 decord0.6.0. NVCC12.4/H100arch9.0/SAM2extensionerrorsfatal; baseTorch/
 NumPy unchanged, new image rather than pretending original53b parity.
 32own tinytestsPASS, no actual acquisition/build/CUDA/model result yet.
+
+
+Private Azure peer2 actuallyPASS148.228256220s: senderreceipt862B/
+9bced4f493fbdf65459c1bb7eb2d695493d76128249a85b3ae54cb645719da6c,
+receiverreceipt642B/2b2d93f3eb588a58c95833a136ac2394fa72ca9dad1ad52727a453c9662c6521;
+full19911464960B SHA5b817ea1... rehashedbothends. NSGexceptionremoved;
+22:17:40UTCserver2 stopped andownedhostprivate/authremoved afterexact
+receipts checked. Extraction/replica/model/CUDAeligibility stillpending.
+
+Actual scopedGroundingbuilder1 FAIL12.137276983s atpublic_acquisition,
+receipt5297B/61ae8e488bf8a6049e9bf2f168387996e17239e0f78756d0b2ee6021065adb73.
+44publicsources+transformers/tokenizerswheelbytes acquiredAzure only;
+tokenizers0.21.4 pinnedwheel hasNO LICENSE/NOTICE members. Preservefailure;
+newgeneralpublisher-source noticeclosure required, do not fabricatewheel
+notice/reclassifyPASS. NoDockerbuild/model/GPU occurred. BaseNVCC12.4/g++
+actuallyavailable; NumPy1.26.3/Torch2.5.1cu124 unchanged.
+
+Queuedfrontend scheduling validates explicitsuccessfulpredecessor, original
+lock and idleGPU then hands off to originalchild fixed_all16; nofakecode
+namespace/markers. Exactqueuedsource namespace accepted by child only with
+actualreadonlywrapper.235focusedPASS52.67s; noGPUqueueddispatchyet.

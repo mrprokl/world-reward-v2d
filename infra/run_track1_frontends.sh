@@ -16,7 +16,8 @@ if [[ $# == 4 ]];then
 fi
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
-   && "$CODE" == "$ROOT/jobs/$REV/run_track1_frontends/code" ]] || exit 2
+   && ( "$CODE" == "$ROOT/jobs/$REV/run_track1_frontends/code" \
+        || "$CODE" == "$ROOT/jobs/$REV/run_track1_frontends_queued/code" ) ]] || exit 2
 printf -v PADDED '%06d' "$EPISODE"
 BASE="$ROOT/outputs/episode_$PADDED"
 CURRENT_STAGE=preflight
@@ -38,6 +39,10 @@ for path in (root,code,base,executing):
   raise ValueError('Canonical launcher/source/output paths required; no symlinks')
 if not root.is_dir() or not code.is_dir() or executing!=code/'infra/run_track1_frontends.sh':
  raise ValueError('Actual immutable launcher entrypoint required')
+if code==root/'jobs'/revision/'run_track1_frontends_queued/code':
+ queued=code/'infra/run_track1_frontends_queued.sh'
+ if queued.is_symlink() or not queued.is_file() or queued.stat().st_mode&0o222:
+  raise ValueError('Actual readonly scheduling wrapper required for queued namespace')
 if (code.parent/'revision').read_text().strip()!=revision or not re.fullmatch('[0-9a-f]{64}',(code.parent/'source-sha256').read_text().strip()):
  raise ValueError('Exact immutable launcher revision/archive identity markers required')
 children=('run_automatic_masks.sh','run_episode_initializers.sh','run_body_smoke.sh','run_depth_smoke.sh',
