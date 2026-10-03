@@ -298,7 +298,7 @@ def test_wrapper_shell_syntax_and_no_private_or_historical_data_mounts():
     subprocess.run(["bash", "-n", str(shell)], check=True)
     text = shell.read_text()
     assert '--network none' in text and '1203s docker run' in text and '--memory 64g --cpus 4' in text
-    assert 'validation/cari96_forward_v3' in text and 'validation/cari96_public_v1' in text
+    assert 'validation/cari96_forward_v4' in text and 'validation/cari96_public_v1' in text
     assert '(( $# == 0 )) || exit 2' in text and 'Never overwrite complete or incomplete refinement' in text
     assert 'eval_private' not in text and 'outputs/episode_' not in text and '--privileged' not in text
     tree = ast.parse((ROOT / "infra/cari96_refine.py").read_text())

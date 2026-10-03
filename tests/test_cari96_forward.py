@@ -285,6 +285,8 @@ def test_actual_prepare_config_and_source_helpers_without_data(gate):
     pins=json.loads((ROOT/"configs/cari96_prepare_pins.json").read_text());gate.validate_prepare_pins(pins)
     assert len(pins["prepare_files"])==13
     assert gate.inputs.sha256(ROOT/"infra/cari96_prepare.py")==pins["prepare"]["script_sha256"]
+    assert "learning/training/mhr_supervision.py" in gate.SOURCES
+    assert "lib_mhr/mhr_supervision.py" not in gate.SOURCES
     # Primary acquisition producer fields, not simplified invented runtime keys.
     aux=ast.parse((ROOT/"infra/acquire_auxiliary.py").read_text());weights=ast.parse((ROOT/"infra/acquire_weights.py").read_text())
     assert any(isinstance(n,ast.Constant)and n.value=="source_revisions"for n in ast.walk(aux))

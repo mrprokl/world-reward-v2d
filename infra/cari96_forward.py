@@ -21,7 +21,7 @@ import cari96_native as constrained
 from cari_runner import build_cari_runtime_environment, CHECKPOINT_SHA256, CHECKPOINT_REVISION, CHECKPOINT_RELATIVE_PATH, CONFIG_RELATIVE_PATH
 from world_reward.contracts import require_rigid_transforms
 
-BASE = "validation/cari96_forward_v3"
+BASE = "validation/cari96_forward_v4"
 PREPARE = "validation/cari96_public_v1"
 STAGE, BUDGET = "public_cari96_constrained_coconet_forward", 360
 IMAGE = "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7"
@@ -34,7 +34,7 @@ SOURCES = {constrained.NATIVE_RELATIVE_PATH: constrained.NATIVE_SOURCE_SHA256,
     "lib_mhr/mhr_layer.py": "a753ab8e730b6730fca275384fab629859311983292a407390d88c66ffe68c23",
     "lib_mhr/delta.py": "da495861dc55b266dabaf74a06fc683b74d2354f557827914cfc926b0daa2518",
     "learning/inference.py": "1d4fb02b3bf8345eee2510c96c4f2edcc7f7d17ae298fc7d23a392c56ebace9f",
-    "lib_mhr/mhr_supervision.py": "e7f4c5f8991e312eec69a760204758d44edaf9f29f9456ec181d288241686635",
+    "learning/training/mhr_supervision.py": "e7f4c5f8991e312eec69a760204758d44edaf9f29f9456ec181d288241686635",
     "learning/training/training_config.py": "d2acefefeea13f4257f8810865fd492079abdca30e7d9198c95eb0b7037fe4cf"}
 FACE_SHA = "f6748e290ef37fbb6877c4cc5bd7287105db9e98252b0ba170ae9ac3c45eacd6"
 CAMERA = "front_stereo_camera_left"

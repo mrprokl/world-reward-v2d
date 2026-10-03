@@ -24,7 +24,7 @@ from cari_converter import validate_native_bundle, require_aligned_object_metada
 
 BASE = "validation/cari96_refined_v1"
 PREPARE = "validation/cari96_public_v1"
-FORWARD = "validation/cari96_forward_v3"
+FORWARD = "validation/cari96_forward_v4"
 STAGE = "public_cari96_unchanged_native_parity_refinement"
 IMAGE = "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7"
 BUDGET, FRAMES = 1200, 96

@@ -3549,3 +3549,14 @@ rawhanddelta positivezero bytes exact, faceheadabsent,4,267initializernegative
 expressionzeros become positivezero; no numericalchange. Fullsuite6980PASS/
 2sameSKIP118.34s. Newv3 namespace/unit/log absent/H10035MiB0%; no failedproducer
 rerun in place. Each fresh attempt uses unchanged public96 sources/gates.
+
+H102 forwardv3 **FAIL before network1.936760s**: newly recorded supervision
+source had an incorrect directory (`lib_mhr` instead of actual
+`learning/training`). Source15a3d46f79ba113bd07fa2de29bb52910d296897, driver
+6b14fc02ffd9e96c5a2ebc4bb578cea76ac7521824fd1524aca11c6a11b0f6be,
+receipt ef422d5196adab781b96f90df7020f3b4b5cabb00f9fa376ce6d56f50ea5098a
+(1,172B), zero forwardattempts. Exact primary import and remote file SHA now
+verify `learning/training/mhr_supervision.py`,20,826B/e7f4c5f8991e312eec69a760204758d44edaf9f29f9456ec181d288241686635.
+Correct path and add regression; no source/gate/model/numerical change.
+Newv4 namespace/unit/log preflight absent; focused228PASS2.25s. Additive generic
+fullclip source auditor independently155PASS6.33s; no new GPU/data read by it.
