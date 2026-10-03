@@ -2368,3 +2368,36 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   has happened at this source freeze.
   Full source suite5673PASS/1optionaltrimeshSKIP71.10s; bashsyntax/diffcheck
   PASS. Clear disposable local bytecode/test caches; models/data remain Azure.
+
+  D96actual strict fit **FAIL**27.683201s, source52f35c0b0df9a1448adf16c1cff796007fb41198,
+  script`d5146d1f89a0fbbd0e4614abd8896a9e13679bd4307535a3cea0b2f46a84583b`,
+  receipt`aacb82e7c48b5b28ec26f1eb3bb88194c76fbb3c0ce07cc54d6032adb25412d2`.
+  Actual Git closures fit25files98,016B and quality25files99,952B encoded.
+  All15 common proxies frozen BEFORE the first optimizer head; native249 bounds
+  or rootEuler correspondence guard failed on clip_00_frame_000 at latent zero.
+  One native head returned before the guard, but counters increment AFTER it:
+  recorded0 objective heads means0 fully validated objective forwards, NOT zero
+  model calls. No Jacobian, loss evaluation, Adam update or final candidate;
+  no private truth read, no quality namespace/run, no silent bounds clipping,
+  bypass or repeat. TerminalExecMainStatus1/MainPID0/GPUidle81MiB.
+  This is an execution/initial-feasibility failure, not a scored3D rejection.
+  Preserve the failed report/proxies; a NEW read-only CPU metadata audit of all15
+  frozen raw/shared249 controls against exact native bounds will distinguish
+  scale/shape/articulation limits from root-control mapping, without model forward,
+  fitting, repair or private geometry. Only after that evidence define a future
+  fresh protocol; do not relax the already-failed D96 hypothesis on this cohort.
+  Post-failure read-only receipt check: baseline and DWPose SHA unchanged,
+  quality_v1 absent, all15 proxy artifacts retained, empty candidates. Three
+  frozen shared consistency scales1.0195142344/1.0058856855/.9935995941 are
+  diagnostic estimates, not ground-truth metric gains. First frame had10 valid
+  training observations; failure preceded their Jacobian/loss evaluation.
+  Bounds audit source frozen separately: CPU60s/8GiB/4threads, exact reference
+  asset696,110,248B and49 immutable baseline/failure/proxy/source/manifest files;
+  only `get_parameter_limits/get_parameter_names`, zero reference/model forward,
+  zero optimizer or private read. All15 raw/shared control blocks retained and
+  compared against actual249 limits; violations are recorded, not repaired.
+  28 own/112 combined policy/bundling tests PASS; five-file source closure~9.5KB,
+  no imports of unused Body/MoGe/DWPose/fit/evaluation drivers. Diagnostic execution
+  PASS is distinct from prediction feasibility or reconstruction quality.
+  Full suite5701PASS/1optionaltrimeshSKIP74.41s and independent audit PASS;
+  bashsyntax/diffcheck PASS before the separate CPU metadata dispatch.

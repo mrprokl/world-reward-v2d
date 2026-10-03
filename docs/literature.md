@@ -658,3 +658,22 @@ trainingrights/challengeoverlap uncertainty or monocular3D ambiguity.
 Native root3 are EulerZYXcontrols (`roma.rotmat_to_euler("ZYX",...)` inhead),
 so futureoptimization should preserve nativeMHRforward and not assume an
 arbitrary rigidSE3increment converts back to those controls unchanged.
+
+### Native bounds are not guaranteed by learned decoding (2026-10-03)
+
+After the strict D96 initial-feasibility failure, refresh primary source rather
+than clip observations or bypass the preregistered bounds. Pinned native head
+above expands68 scales as `scale_mean + scale_params @ scale_comps` (L226),
+without projecting to physiological limits. [MHR body conversion](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam3d_body/lib/sam_3d_body/models/modules/mhr_utils.py),
+15,157B/SHA`40d33308c83516c15e14889d148419b8c610a8c33aca57b3922354aa4987ec6e`,
+uses6D-to-Euler and atan2 for compact body controls (L318–344). Wrist branch
+selection minimizes original/alternative Euler limit violation; it does not
+hard-clip every decoded articulation (L65–95).
+[Momentum ParameterLimits](https://github.com/facebookresearch/momentum/blob/c54b9def6df15b7b807e6c3010f09bd7c3988ecb/pymomentum/torch/parameter_limits.py),
+22,562B/SHA`21da39297684b8f2a27ae1b58ba9659ff478328c666e67773c05b3924e638819`,
+explicitly calls its LimitErrorFunction a **soft constraint** (L17–19);
+`evaluate_minmax_error` returns weighted violations (L366–386), not a projection.
+These sources explain why a valid learned forward can still violate limits;
+they do NOT identify the actual failed control, certify the exact TorchScript
+getter semantics or authorize relaxing D96. Inspect frozen249 controls and
+native metadata separately, without optimization or held-out quality reads.
