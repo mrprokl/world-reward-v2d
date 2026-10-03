@@ -100,7 +100,7 @@ def run(gate, tmp_path, count=97, fault=None, receipt=None, events=None, persist
     return frozen, receipt, (params, poses, vertices, faces, K, spec), events
 
 
-@pytest.mark.parametrize("count,chunks", [(96, [16] * 6), (97, [16] * 6 + [1]), (501, [16] * 31 + [5])])
+@pytest.mark.parametrize("count,chunks", [(96, [16] * 6), (97, [16] * 6 + [1]), (501, [16] * 31 + [5]), (668, [16] * 41 + [12])])
 def test_complete_original_four_routes_no_tail_padding_or_identity_reselection(gate, tmp_path, count, chunks):
     frozen, receipt, values, events = run(gate, tmp_path, count)
     assert set(frozen) == gate.OUTPUTS and receipt["phase"] == "geometry_routes_complete"

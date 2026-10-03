@@ -104,7 +104,7 @@ def captured(gate,n=501,fault=None,starts=None,delegate=compose):
     return collector,dict(raw=raw,pr=predicted),initializer,poses,report
 
 
-@pytest.mark.parametrize("n",[96,97,191,192,193,501,790])
+@pytest.mark.parametrize("n",[96,97,191,192,193,501,668,790])
 def test_actual_caller_indices_first_occurrence_and_owned_byte_copies(gate,n):
     capture,bundle,init,poses,report=captured(gate,n)
     before=copy.deepcopy(report);evidence=capture.verify(bundle)
@@ -120,6 +120,11 @@ def test_actual_caller_indices_first_occurrence_and_owned_byte_copies(gate,n):
         assert evidence["window_starts"]==[0,96,192,288,384,405]
         assert evidence["window_owned_counts"]==[96,96,96,96,96,21]
         assert np.all(bundle["pr"]["contact_logits"][405:480]==4) and np.all(bundle["pr"]["contact_logits"][480:]==5)
+    if n==668:
+        assert evidence["window_starts"]==[0,96,192,288,384,480,572]
+        assert evidence["window_owned_counts"]==[96,96,96,96,96,96,92]
+        assert np.all(bundle["pr"]["contact_logits"][572:576]==5)
+        assert np.all(bundle["pr"]["contact_logits"][576:]==6)
 
 
 @pytest.mark.parametrize("fault",["indices","names","batchidentity","poseidentity","deltadtype","rawnonfinite","scalehead","contact","decoder"])

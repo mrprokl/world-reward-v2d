@@ -31,7 +31,10 @@ also passes, as do the fresh full501 HOI forward,301-update native
 refinement and full direct export. The complete pipeline now passes on one
 public video, including the source-bound CPU episode consumer. All30 original
 videos now pass the metadata/hash readiness audit; the first structurally clean
-new episode is running through the automatic frontends. All30 reconstruction
+new episode is running through the automatic frontends. The original official
+packer also passes on the full501-frame source, with exact GLB-surface and native
+FP32 fidelity checks; its temporary one-episode Parquet is deleted after QA.
+All30 reconstruction
 and independent real/fullHOI accuracy validation remain separate.
 Detailed receipts and decisions: [experiments](docs/experiments.md).
 Heavy data and all GPU work remain onAzure.

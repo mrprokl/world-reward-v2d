@@ -110,7 +110,7 @@ def run_core(gate,out,count=97,fault=None,original_data=None,events=None,receipt
     return result,receipt,data
 
 
-@pytest.mark.parametrize("count,expected",[(96,[16]*6),(97,[16]*6+[1]),(501,[16]*31+[5])])
+@pytest.mark.parametrize("count,expected",[(96,[16]*6),(97,[16]*6+[1]),(501,[16]*31+[5]),(668,[16]*41+[12])])
 def test_fullN_original_order_tail_and_four_actual_routes_before_complete(gate,tmp_path,count,expected):
     events=[];data=original(gate,count);before=pickle.dumps(data,protocol=4)
     frozen,receipt,_=run_core(gate,tmp_path,count,original_data=data,events=events)

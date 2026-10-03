@@ -4144,3 +4144,23 @@ unchanged. Complete **8353PASS/2same optionalSKIP122.00s**. New closure51files
 139,152encodedB, below160KB, no heavydata. Oldnative/export/own-grasp/surface/
 builder helpers unchanged. Freeze distinctv2 CPUoutput before one retry; v1FAIL
 receipt untouched. Latestep1 stillactive500/668objectframes3,310.150985s.
+
+Actual distinctv2 official packing **PASS14.426082s**, unitinactive/dead/exit0,
+producer04008877243bd7dcdd797181ed8aad56b9a35065/driver
+1aa758e7a7de116172a479e3dd24b2aff845dc3f2330bc0adbbcbd6f00cb37b4,
+actualclosure51files139,800encodedB, exactpublicproducerHTTP200. One original
+packer attempt/return/validation;501fullsource frames,356originalscoredframes,
+26,031rows. Original4,080positive triangles retain exact rawFP64 surface and
+exactnativeFP32quantization; one complete scene instance, 16nullface/2052vertex
+padding only. Six full control arrays/sharedidentity/scale1 unchanged; original
+export/GLB/source/runtime rehashed. ScratchParquet/payloads removed; sole444
+receipt1b8f873741c5c89b1fa30ddef80bccdb5858b60c63896ca17649c15e435c4049(10,604B).
+NoGT/sampleXYZ/GPU/model/scorer/render/upload/finalall30file. v1FAIL unchanged.
+This is official packaging/fidelity success only, not accuracy or eligibility.
+
+Added668 synthetic parameterizations for native first-occurrence capture,
+shared16frame chunk tail and export/replay tail;191focusedPASS1.34s and complete
+**8356PASS/2same optionalSKIP128.50s**. Native numerical helpers unchanged.
+Actualep1 stillactive600/668objectframes3,732.862977s; finalobject/input receipts
+not yet present. Next root checks completion/freeGPU before native one-state
+private grasp feasibility; no GPU duplication, implicit resume or heavytransfer.
