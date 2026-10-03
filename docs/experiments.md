@@ -3731,3 +3731,35 @@ imports forbidden; valid paths and invalid episode/hash gates covered12tests.
 Combined bootstrap/fullstage/archive **349PASS5.26s**. All prepared generator
 helpers and full forward Python driver are unchanged. Retry uses a new unit/
 log and clean producing commit, retaining the still-absent exclusive output.
+
+Full501 forward retry actual **PASS118.209749s**, producer
+8c338c0d3feff3f8a1e6ff5bd6a767fedc94908d, unchanged Python driver
+ac07d96a6bb8bad8aa8977b74f7b266600bbcc26fc92bf07ba6419be0142fd2f.
+Actual32file76,016B encodedGitclosure. One overall forward/return/validated,
+six captured/compose/delegate/verified windows0/96/192/288/384/405, owned
+96/96/96/96/96/21; original501 complete, actual caller/initializer/object-pose/
+decoder identities and raw/contact assembly preserved. Two original offline
+DINO loads; source/predecessor/assets/helpers pre/post and saved-bundle reread
+PASS. Receipt42999af278aeb9d0c9bf477e60df320a6b3d04470e477dec75bd3cdd88017c18
+(68,584B), bundlec20c4269c3605b181cd566d2af0164ff9ee72afe2017614a257a47daa849fb68
+(383,360,892B), both0444. Unitinactiveexit0/H10025MiB0%. Actual complete
+pins committed before native refinement. No GT, old prediction/cache, quality
+result, finalParquet or CARI4D superiority claim.
+
+Additive stdlib-only stage inventory emits tiny source-bound next-stage pins:
+independently supplied actual producer revision/script SHA, complete readonly
+inventory hashed before strict JSON and after, no model/geometry loads or file
+mutation. Python3.8 dict-union runtime incompatibility caught during root review
+and removed;137testsPASS plus all four real bootstrap testsPASS149 total0.66s.
+It inventories prior numerical execution, not independent geometry or quality.
+
+Additive full-native episode consumer, not old LM conversion: exact five
+externally pinned export files rehashed before JSON/trajectory-only NPZ load,
+actual generic predecessor/source/helper chain and unchanged aligned GLB
+verified. Full eleven-key owned FP32/I64/F64 trajectory retains501original
+frames, shared identity/scale1/zeroexpression/inferredK and strictTrack1Episode
+schema/positive-camera object roundtrip. Other native archives/target/models/
+videos remain hash-only. Independent48test audit followed by root combined
+inventory/bootstrap/fullstage/archive/consumer **534PASS3.32s**. No actual full
+export or independent quality demonstrated by these tests. All numerical
+producer helpers remain unchanged; actual clean Git closure precedes refine.
