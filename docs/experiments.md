@@ -3503,3 +3503,24 @@ all observations/raw/contact/pr_initial/fixed blocks. These are algorithm-level
 ABI guards, not per-episode labels or quality adjustments. Azure preflight found
 forward namespace/unit/log absent, preparation inactiveexit0, H10095MiB/0%,
 573GBfree. Next one immutable forward dispatch after clean Git closure check.
+
+H102 first forward **FAIL before network0.151416s**, source
+`cd7d3b9c7d17c62d16c5dd7596ccba038ffa718d`,21-file50,652B Git closure
+(SHA-XZ6506d855c61804b0650a2175b274d3c1fe3cfc1c17e415bada5b347e0b9bed63).
+Attempt/return/hook/Hub counters all0; unitfailedexit1/H10095MiB0%.
+Cause: code-relative provenance literal `infra/run_cari96_prepare.sh` was omitted
+by the archive selector, which previously followed sibling literals/imports only.
+Correct selector rather than bypassing the generator hash: include exact infra/
+own-package code-relative literals and their full transitive closure, fail closed
+if absent. Added synthetic and allthree actual H102 closure regressions. First
+failed namespace remains frozen; new `validation/cari96_forward_v2` is reserved
+for a new source-bound attempt with identical data/weights/numerical gates.
+Failure receipt d6271c5c0c68c785c375d91b1997e0c88dcc80f6c0588c599db0064721a7f324
+(1,177B), driver e419724d701552d167fa0a8ad9d7c721109cf58ed695dae726d9b31904a762e4.
+Corrected archive/gate checks311PASS4.22s; fullsuite6753PASS/2sameSKIP105.27s.
+Additive original-timeline helpers separately82PASS0.11s: full501 has actual
+windows0,96,192,288,384,405, first-occurrence terminal ownership480..500,
+finite last decoder chunk5, actual unchanged caller indices validated readonly.
+No H102 generator or numerical gate changed by those helpers; not yet executed
+on full video. Newforward preflight confirms absent namespace/unit/log, old
+failure terminal, H10095MiB/0%. Recheck actual committed closure before dispatch.

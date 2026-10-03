@@ -172,6 +172,33 @@ def test_finite_sibling_hash_list_is_frozen_without_inventing_vendor_files():
     assert "infra/build_sam.py" not in selected
 
 
+@pytest.mark.parametrize("name", ["infra/run_audit.sh", "src/world_reward/other.py"])
+def test_code_relative_receipt_helper_includes_complete_closure_and_missing_fails(name):
+    source = files()
+    source["infra/helper.py"] += f'helpers = {{{name!r}}}\n'.encode()
+    source[name] = b'python "$CODE/infra/audit.py"\n' if name.endswith('.sh') else b'from world_reward import check\n'
+    source["infra/audit.py"] = b'from world_reward import check\n'
+    selected = launcher.runtime_bundle_paths(source, "infra/run_smoke.sh")
+    assert {name, "src/world_reward/check.py"} <= set(selected)
+    if name.endswith('.sh'): assert "infra/audit.py" in selected
+    source.pop(name)
+    with pytest.raises(ValueError, match="Literal code-relative source dependency is not committed"):
+        launcher.runtime_bundle_paths(source, "infra/run_smoke.sh")
+
+
+def test_h102_closures_keep_their_actual_producer_provenance_helpers():
+    root = Path(__file__).resolve().parents[1]
+    source = {str(p.relative_to(root)): p.read_bytes()
+              for folder in ("infra", "src", "configs") for p in (root / folder).rglob("*")
+              if p.is_file() and "__pycache__" not in p.parts}
+    source["pyproject.toml"] = (root / "pyproject.toml").read_bytes()
+    for stage in ("forward", "refine", "export"):
+        required = {"infra/cari96_inputs.py", "infra/body_smoke.py"}
+        required |= ({"infra/cari96_refine.py", "infra/run_cari96_refine.sh", "infra/cari_refine.py"}
+                     if stage == "refine" else {"infra/cari96_prepare.py", "infra/run_cari96_prepare.sh"})
+        assert required <= set(launcher.runtime_bundle_paths(source, f"infra/run_cari96_{stage}.sh"))
+
+
 def test_h98_native_fit_bundle_includes_all_DW_source_only_wrappers():
     root = Path(__file__).resolve().parents[1]
     source = {str(p.relative_to(root)): p.read_bytes()

@@ -118,6 +118,14 @@ def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
                     package_aliases.update(alias.asname or alias.name for alias in node.names if alias.name == "world_reward")
             for node in ast.walk(tree):
                 if isinstance(node, ast.Constant) and isinstance(node.value, str) and re.fullmatch(
+                    r"infra/[a-z0-9_]+\.(?:py|sh|cpp)|src/world_reward/[a-zA-Z0-9_/]+\.py", node.value,
+                ):
+                    # Receipts can name code-relative helpers rather than
+                    # sibling filenames. Their complete closure is mandatory.
+                    if node.value not in files:
+                        raise ValueError(f"Literal code-relative source dependency is not committed: {node.value}")
+                    dependencies.add(node.value)
+                if isinstance(node, ast.Constant) and isinstance(node.value, str) and re.fullmatch(
                     r"[a-z0-9_]+\.(?:py|sh|cpp)|Dockerfile\.[a-z0-9_]+", node.value,
                 ):
                     sibling = str(Path(path).with_name(node.value))

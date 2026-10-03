@@ -21,7 +21,7 @@ import cari96_native as constrained
 from cari_runner import build_cari_runtime_environment, CHECKPOINT_SHA256, CHECKPOINT_REVISION, CHECKPOINT_RELATIVE_PATH, CONFIG_RELATIVE_PATH
 from world_reward.contracts import require_rigid_transforms
 
-BASE = "validation/cari96_forward_v1"
+BASE = "validation/cari96_forward_v2"
 PREPARE = "validation/cari96_public_v1"
 STAGE, BUDGET = "public_cari96_constrained_coconet_forward", 360
 IMAGE = "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7"
