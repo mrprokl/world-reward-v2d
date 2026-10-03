@@ -4698,3 +4698,14 @@ v2measurement/provenance integration at29eabe3. Focused199PASS23.48s includes
 newv2wrapper/metadata/firewall/completebundle; independent240PASS24.50s.
 Originalprediction script remains2ed48a89, no model/inference/ratio/scoring
 source change after private results. Only concise result/decision recorded.
+
+17:13:22UTC actual episode1fullnativeforward **PASS132.186250s/668**,
+unitinactive/exit0; all7windows[0,96,192,288,384,480,572] verified, original
+first-occurrence assembly/nativecomposition/hooks retained, storedbundle replay
+and sharedidentity/source checks PASS. Receipt71612B/
+b371588e6bf85d98e7d93cd537ae7899cc9cf3e9045d7bfbc72628bd7e6bd580;
+nativebundle510994684B/ff44b3a03244d6f3694e45fedfcfdc21d4d680bbdfbce8f9b5db682284472c14.
+Separate readonly twofile forwardinventory PASS, original29eabe3/ac07d96a
+independently bound; reuse immutable stdlibinventory9c583d7, no new GPUjob.
+Commit configs/cari_clip_000001_shared_forward_pins.json before refinement.
+No dynamicquality/human/object/penetration/completeV2D metric measured here.
