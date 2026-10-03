@@ -2418,3 +2418,23 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   both previous failures and all public artifacts retain strict immutable modes.
   Independent review and Bash syntax PASS; no prediction/model forward introduced.
   V2 full suite5716PASS/1optionaltrimeshSKIP74.00s before immutable CPU dispatch.
+  Actual bounds auditv2 **PASS**2.361279s, source3cdef2da0c2e935080410562c826752a1833fcef,
+  script`8fce37c4d9aed75328e302f54c7f092e532ab2253d47c7db4c50eecba7130003`,
+  receipt`8e5e725f244a5a122fa5a154ce0ce49334619494d1f5df9a45c58e6b7bdbd21b`.
+  Five-file actual dispatch10,560B encoded; CPU getters only,0model forwards/
+  optimizer updates/private reads, all originals rehashed. Exact model VFS mount
+  ro/relatime, host write bits128 (owner write), backing superblock rw: explicit
+  read-only bind proof succeeded without modifying original model.
+  All15 raw and15 shared cases each have36 exact249 bound violations:
+  32pose+4scale perframe,0root/0shape; rootEuler byte correspondence correct
+  onall15 inbothbranches. Perbranch540 violations total,510 on metadata[0,0]
+  controls,30 on finite one-sided clavicle bounds; maximum excess.409344733.
+  Examples flexible spine/foot/body-length controls, clavicles, hip-height/depth,
+  knee-knock and ankle-height scale controls; some last-scale excesses are tiny
+  numerical residuals, others are substantial, so not a blanket float tolerance.
+  The root-only bounded-D96 trial was infeasible at the frozen initial remainder;
+  it did not test 2D→3D quality or independent depth improvement. Raw/shared
+  sameness of these counts is not shape/interaction correctness. Clarify native
+  [0,0]/soft-limit semantics before proposing a new method; no clamp or waiver of
+  the failed contract, no samecohort optimization. OriginalfitFAIL and auditv1FAIL
+  SHA preserved, quality_v1 absent; terminal0/MainPID0/GPUidle81MiB.
