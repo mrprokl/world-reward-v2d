@@ -2550,3 +2550,39 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   evaluator revision. Pin/recheck original fitPASS and quality-v1FAIL, all source
   consumers/policy/fit hashes and complete900/885 replay before private scoring.
   Independent audit PASS;28-file closure~104.6KB, no data/model transfer.
+  Final v2 focused47tests and148 combined H97tests PASS; previous whole suite
+  5880PASS/1optionaltrimeshSKIP82.73s (additional final test cases verified in
+  the focused run). Actual28-file code-only dispatch105,008B, source
+  85782e18ee45aa071c9475d5e5c9492c2a81496d; exact prior fit2799 unchanged.
+  Actual H97 quality-v2 execution **PASS**6.638334s, all15 frames scored ONCE;
+  script`197541442e8fe02fe1393a358a35b95c0503d8105f1b5694a739507810de1a49`,
+  receipt`c8c06b237327c1ffb01746c4cc2b75d67661b8642b54a3944be62f64e71f4897`
+  (59,906B/0444). Native int32 face ABI verified without cast/reindex; all
+  public/private/source/proxy/candidate inputs rehashed, fitPASSa910 and old
+  quality-v1FAIL733b SHA unchanged; no optimizer/native rerun or gate change.
+  **H97 hypothesis REJECTED, not adopted.** Camera PVE clip means (cm):
+  shared baseline17.671374/9.026262/5.399058 → fitted23.115441/11.937983/
+  8.474327, relative gains−30.8073%/−32.2583%/−56.9594%; median−32.2583%.
+  Both human5% gates fail, though every hand/clip relative-object vector improves
+  and its nonregression gate passes. Reserved RGB error also worsens:
+  equal-frame mean2.182218→2.343398pixels. Training-objective decreases and
+  observation Jacobian rank3 did NOT imply useful3D identification.
+  Preserve frozen outputs/reports; no XY/Z/weights/LR retuning or new quality
+  read on this now-scored cohort. Retain unmodified shared-body baseline and
+  existing metric-depth procedure. Evidence supports studying visual bias and
+  depth-gauge/orientation separately on a new untouched cohort, not accepting
+  a hand-relative proxy gain that masks worse body reconstruction. No fullHOI,
+  real-domain superiority, acceleration/PEN or CARI4D victory is established.
+  All units terminal; GPUidle0%/81MiB, no heavy Mac transfer.
+  Next prioritized hypothesis (NOT frozen/executed): one new-cohort fixed-depth
+  XY+native-rootEuler pilot. Hold metric camera Z/native remainder/object proxy
+  fixed; test whether orientation-aware visual correction helps without using
+  global depth to explain biased2D/body-shape residuals. Require native parity
+  and a fresh preregistration, automatic silhouette safeguard and unchanged
+  camera-PVE/all-hand gates. Independent measurements can be biased; do not
+  assume five DOF or confidence weighting solves H97. GEM-X deferred: temporal
+  SOMA69-scale→MHR68 inverse/export and new~4GB assets are higher-risk before
+  a discriminating body experiment. No new images/weights/quality run yet.
+  Final complete source suite5888PASS/1optionaltrimeshSKIP83.96s; Bash syntax/
+  diffcheck PASS. Remove disposable local test/bytecode caches; immutable Azure
+  failures, successful predictions and scalar receipts preserved for reproduction.
