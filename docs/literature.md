@@ -605,7 +605,7 @@ primary-notice binding in a new read-only namespace. This is not a blanket
 waiver of third-party rights or wheel/binary eligibility.
 
 NextD95 ABI plan (not yet executable/passed): offlineCPU isolatedtemporary
-ORT+Flatbuffers install only afterD94v2integrityPASS; old synthetic public
+ORT+Flatbuffers install only afterD94v3integrityPASS; old synthetic public
 RGB clip_00_frame_000/clip_01_frame_000 and automaticSAM2humanmasks, noprivate
 geometry/K/depth/modelassets. Signedmanifest2199B/SHA
 `2c584ea633a958c737520d53c68c12b1429b8358f182c07bf46e53627b8f8267`;
@@ -616,3 +616,24 @@ preprocess/postprocess, rawscorevalidity and exactreplay,180smaximumincluding
 isolatedinstall. Existingcohort alreadyprivatelyevaluated: this is ABI/replay
 only, neverfresh independentquality or D87retuning. Nativefloat64list feed
 conversion mustbe observed, not silentlyadvertisedasnativefloat32casting.
+
+### Verified independentCOCO→nativeMHR keypoint semantics (2026-10-03)
+
+[NVIDIA nativeMHR70 names at7c0d](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam3d_body/lib/sam_3d_body/metadata/mhr70.py),
+26326B/SHA`695c2c7d472e32757c480114fdb054d54ee4af53f69b2a6e040b00a55b270dc9`,
+and DWPoseCOCOwholebody names agree body17 DWPose0..16→MHRkeypoints
+`[0,1,2,3,4,5,6,7,8,62,41,9,10,11,12,13,14]`. Wrists are62/41,
+not raw127joint indices. [NativeMHRHead](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam3d_body/lib/sam_3d_body/models/heads/mhr_head.py),
+14148B/SHA`62af48b1f33462bc445d7f342009fcbceabd221f2a6e9bcd1d3739d582bc9fd6`,
+`mhr_forward(return_keypoints=True,return_joint_coords=True)` returns vertices,
+**308keypoints**,127joints; fixedkeypoint_mapping[308,18566] applied after
+metre conversion. ModelHEAD.forward alone slices keypoints[:70] and flipsYZ.
+Use first70nativekeypoints with YZflip once+pred_cam_t once for our camera;
+not joint-skeleton ordinal guesses or projectedSAMtargets as observations.
+Future cheap2Dbody fit can hold K,metricZ,shape/scales/hands fixed, optimize
+XY/rootrotation against these independentRGB17points with fixedconfidence
+policy/poseprior and reservedkeypoints/frames. No proof2Didentifiesdepth/
+3Dshape/contact; nativeautograd/runtime and hypothesis gates still needed.
+Feet17..22 map native15..20. Handroots91→62/112→41 and fingertips are
+semanticallyverified; intermediateproximal/distal conventions and fullface68
+mapping remainunverified, so do not guess a full133→70correspondence.
