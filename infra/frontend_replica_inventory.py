@@ -93,9 +93,10 @@ CONSTANT_EVIDENCE = {
     "multiview_ss_gate": (15496, "f1540033c4a09fe97c1a8fee54f48c83764c9a6693cf1da0de56dad19cd79545"),
     "acquire_auxiliary": (4256, "27b0887ffeec489117acdd44b3fdb711b47a436bebc5b5925c11d07d1e1bf8c3"),
     "acquire_weights": (4652, "f1a8cdc68963e6a65916df897a1acef21236ad840f5d537deff8f688aab63d20"),
-    "official_track1_pack_gate": (38158, "1aa758e7a7de116172a479e3dd24b2aff845dc3f2330bc0adbbcbd6f00cb37b4")}
+    "official_track1_pack_gate": (38589, "031969fcb966178ac94a3c70926d744d3a82b80f7aee3a16c83393412afb2232")}
 HISTORICAL_CONSTANT_EVIDENCE = {
-    "body_smoke": (32390, "e4d659de33bacff9d5c85c1cb2fedce34f4aa34bdbae93b3b9b7e08950613ce3")}
+    "body_smoke": (32390, "e4d659de33bacff9d5c85c1cb2fedce34f4aa34bdbae93b3b9b7e08950613ce3"),
+    "official_track1_pack_gate": (38158, "1aa758e7a7de116172a479e3dd24b2aff845dc3f2330bc0adbbcbd6f00cb37b4")}
 
 
 def safe_name(name):

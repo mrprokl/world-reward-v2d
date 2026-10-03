@@ -50,3 +50,29 @@ event without additional evidence; its hand branch remains a prior. Likewise
 stationary fallback motion is possible when endpoints coincide, but is not
 claimed to reflect actual hidden motion or rewarded as a quality improvement.
 No thresholds or fixture parameters were retuned following this result.
+
+
+## Next independent RGB availability-ablation gate (not yet run)
+
+Freeze a NEW authored 4×48 cohort: accelerating carry, free motion, slip and
+regrasp. Hide only automatic object-observation rows 9–11 and 20–31 after
+freezing all 192 model-inferred observations. Both branches receive identical
+RGB, camera, shape, scale, predicted object mesh and named camera-frame joints.
+This tests missing-observation initialization, **not natural occlusion or physical
+contact**, and cannot authorize challenge adoption by itself. Existing rejected
+closed-human/raster references and already exposed cohorts remain rejected.
+
+Fail fast in this order: independent nearest-triangle FP64 ray/camera/depth
+microgate; four fixed RGB anchors with automatic masks/Body/MoGe; all observations
+and single clip gauge; source-bound named127-joint frame and independent RGB
+hand-support checks; freeze both complete output trajectories; private authored
+pose evaluation only afterward. Finite hand joints alone are not validity.
+Without enough RGB evidence, the unchanged operator must take its explicit
+endpoint branch or abstain; no ideal-hand or per-episode rescue.
+
+Use full asymmetric-surface camera displacement without alignment. Require
+carry improvement ≥10% versus endpoint interpolation and no free/slip/regrasp
+regression >5%, complete original indices, byte-identical observed poses and no
+leading/trailing extrapolation. Report absolute pose/motion errors and all
+abstentions; do not retune or reroll after the first result. A model-inferred
+synthetic result is still not external natural-video generalization.

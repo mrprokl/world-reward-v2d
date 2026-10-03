@@ -425,11 +425,17 @@ def main(argv=None):
     args = parser().parse_args(argv)
     root = Path(os.environ["WR_ROOT"]); code = Path(os.environ["WR_CODE"]); revision = os.environ["WR_CODE_REVISION"]
     out = root / output_relative(args.episode)
-    if (platform.system() != "Linux" or root != Path("/srv/scenesmith/world-reward") or os.geteuid() != 1000
+    historical_root = os.environ.get("WR_HISTORICAL_READONLY_ROOT", "0")
+    if (platform.system() != "Linux" or root != Path("/srv/scenesmith/world-reward")
+            or historical_root not in ("0", "1") or os.geteuid() != (0 if historical_root == "1" else 1000)
+            or historical_root == "1" and os.getegid() != 0
             or {path.name for path in Path("/sys/class/net").iterdir()} != {"lo"} or os.environ["WR_IMAGE_ID"] != IMAGE
             or not re.fullmatch(r"[0-9a-f]{40}", revision) or root.resolve() != root.absolute() or code.resolve() != code.absolute()
             or not out.is_dir() or any(out.iterdir()) or out.resolve() != out.absolute()):
         raise ValueError("Fresh source-bound offline Azure full native export required")
+    if historical_root == "1":
+        from cari_historical_source import verify_historical_source
+        verify_historical_source(root, code / f"configs/cari_clip_{args.episode:06d}_historical_source_pins.json")
     report = dict(stage=STAGE, status="fail", phase="public_integrity", episode_index=args.episode, producer_revision=revision,
         script_sha256=sha256(Path(__file__)), image_id=IMAGE, input_track="track_1", network="none",
         ground_truth_used=False, ground_truth_read=False, private_truth_read=False, hand_labeled_test=False, oracle_modes=[],

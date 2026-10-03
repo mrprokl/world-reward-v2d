@@ -626,13 +626,19 @@ def main(argv=None):
     args = parser().parse_args(argv)
     root = Path(os.environ["WR_ROOT"]); code = Path(os.environ["WR_CODE"]); revision = os.environ["WR_CODE_REVISION"]
     out = root / output_relative(args.episode)
-    if (platform.system() != "Linux" or root != ROOT or os.geteuid() != 1000
+    historical_root = os.environ.get("WR_HISTORICAL_READONLY_ROOT", "0")
+    if (platform.system() != "Linux" or root != ROOT
+            or historical_root not in ("0", "1") or os.geteuid() != (0 if historical_root == "1" else 1000)
+            or historical_root == "1" and os.getegid() != 0
             or {path.name for path in Path("/sys/class/net").iterdir()} != {"lo"}
             or not re.fullmatch(r"[0-9a-f]{40}", revision)
             or code != root / "jobs" / revision / "run_official_track1_pack_gate/code"
             or Path(__file__).resolve() != code / "infra/official_track1_pack_gate.py"
             or any(path.resolve() != path.absolute() or any(p.is_symlink() for p in (path, *path.parents)) for path in (root, code, out))):
         raise ValueError("Actual immutable offline CPU official packer launcher/image required")
+    if historical_root == "1":
+        from cari_historical_source import verify_historical_source
+        verify_historical_source(root, code / f"configs/cari_clip_{args.episode:06d}_historical_source_pins.json")
     runtime = load_runtime(root, code)
     if os.environ["WR_IMAGE_ID"] != runtime["pins"]["image_id"]:
         raise ValueError("Actual immutable CPU image ID differs from runtime pins")

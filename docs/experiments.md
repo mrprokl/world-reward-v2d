@@ -5754,3 +5754,40 @@ remain rejected; new17.45cm grazing-triangle raster diagnostic is not a
 passing depthreference. Next small independent FP64 nearest-triangle ray
 microgate before any4x48RGB/model job, pose-onlytriangle-soup explicitly
 notcontact/penetrationtruth. No previouscohort rescoring or GTalignment.
+
+EP3 correctedexportv2 actualFAIL0.029303809s beforeallnativecalls: private
+root-owned400 queuedsourceaudit cannot be read by UID1000container. Receipt
+1380B/9e0a88cfc3dec8c4fe1fe0b88776780935cd7940950b27e49ede5729a227df27;
+log1816B/cd52b209cf28b06de14502fb7fca861d1707c759b072480c4c78db4a0c5a7b9a.
+Do not change privateproof permissions/bytes; new explicitlyauthenticated
+historical-root branch only. ActualUID1000default preserved. SecondFAIL
+archivependingatomicNOREPLACE; no source/prediction changes or PASSinference.
+
+Groundingv6 actualCPUbuildPASS152.198723912s, source d1fcb8ad; offlineexit0
+andprivatechildprobeexit0. ReceiptSHAfffedb80e00b7c5e0f29bd39c491043227330a42a32237aa388a07c417bd5093;
+privateprobe624B/ffa9d2069c67bf9a3c779ca7bfc55b3ce5f1707fa0399897d9c2c30164b53b4f.
+NewtinyCUDA_Coperatorgate pending; noGPU/model/parity/replicareadyclaim.
+
+New independentFP64triangle reference microgate:28ownPASS,171combinedPASS0.93s;
+onlytiny64x48localCPU. New640x480Azurecontrol/rasterdiagnostic notrunyet.
+Uses completegeometry/originalface ties/fullray/80digit plane+nearestlabels;
+20Mwork/100s failfast. Scope triangle-soup camera reference, notphysicaltruth.
+
+Historicalreadonlycontainer accessfix: actualUID/GID1000default preserved;
+explicitflag1+UID/GID0 allowed ONLYafter exact historical77source/cacheaudit
+authentication before firstreceipt/native/packer. Root400proof unmodified.
+223focusedPASS;298withhistorical/closurePASS2.87s. NineearlynewtestFAIL caught
+Bash3.2compound-errexit behavior; exact pin/bind checks nowexplicit||exit1.
+No thresholds, predictions or old producer source changed.
+
+Actualv6 finalreceipt24023B/fffedb80e00b7c5e0f29bd39c491043227330a42a32237aa388a07c417bd5093,
+newimagefd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252.
+CPUbuildsourceowner ee124ceba5aeca9392bb3321ea3a4ef7215b804222f06eda263c309359e772c5;
+actualinactiveexit0. Kernel gate independentCLI freezes measuredreport identity
+and originalbuildsourceSHA, notreport-derived trust.
+EP3secondFAILreport/log atomicNOREPLACEarchivePASS; originalroot0audit still
+752B/290bbe877f23a48fbd25d41b1888b739329c7ed5d8d9d10d0025c0e7f589d584 mode400.
+
+547focusedruntime/producer/consumer/ray/kernel/source testsPASS4.32s. New
+officialpackerUIDguard alters currenthelperpin only; original38158B/1aa758
+historicalidentity retainedseparately and NEVERwrittenintooldreceipts.

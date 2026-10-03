@@ -42,11 +42,17 @@ while IFS= read -r relative;do
  path="$ROOT/$relative";[[ -f "$path" && ! -L "$path" ]]
  MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
 done <<< "$SOURCES"
-if [[ -f "$CODE/configs/cari_clip_${PADDED}_historical_source_pins.json" ]];then
+HISTORICAL_PIN="$CODE/configs/cari_clip_${PADDED}_historical_source_pins.json"
+CONTAINER_USER="$(id -u scenesmith):$(id -g scenesmith)"; HISTORICAL_ROOT=0
+if [[ -e "$HISTORICAL_PIN" || -L "$HISTORICAL_PIN" ]];then
+ [[ -f "$HISTORICAL_PIN" && ! -L "$HISTORICAL_PIN" ]] || exit 1
+ # The container authenticates this readonly provenance before substantive work.
+ CONTAINER_USER=0:0; HISTORICAL_ROOT=1
  HISTORICAL="$ROOT/jobs/672b10ee5d8b8532686cf39ccd44134adc26178b/run_cari_full_refine_queued/code"
  for path in "$HISTORICAL" "${HISTORICAL%/code}/revision" "${HISTORICAL%/code}/source-sha256" \
   "$ROOT/results/episode3-queued-source-cache-audit.json";do
-  [[ -e "$path" && ! -L "$path" ]];MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
+  [[ -e "$path" && ! -L "$path" ]] || exit 1
+  MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
  done
 fi
 for stage in prepare forward refined export;do
@@ -61,7 +67,8 @@ for path in "$ROOT/vendor/video_to_data" "$ROOT/vendor/v2d_submission_kit/tools/
 done
 mkdir "$OUT";chmod 755 "$OUT";chown scenesmith:scenesmith "$OUT"
 timeout --signal=TERM --kill-after=10s 303s docker run --rm --network none --memory 4g --cpus 2 \
- --user "$(id -u scenesmith):$(id -g scenesmith)" --entrypoint python \
+ --user "$CONTAINER_USER" --entrypoint python \
+ --env "WR_HISTORICAL_READONLY_ROOT=$HISTORICAL_ROOT" \
  --env "WR_ROOT=$ROOT" --env "WR_CODE=$CODE" --env "WR_CODE_REVISION=$REV" --env "WR_IMAGE_ID=$IMAGE" \
  --env "PYTHONPATH=$CODE/src:$CODE/infra" --env PYTHONDONTWRITEBYTECODE=1 \
  --env HOME=/tmp --env HF_HUB_OFFLINE=1 --env TRANSFORMERS_OFFLINE=1 --env MOMENTUM_ENABLED=0 \

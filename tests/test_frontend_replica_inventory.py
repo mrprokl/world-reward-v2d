@@ -30,7 +30,9 @@ def test_fixed_constants_equal_genuine_existing_binders(gate, monkeypatch):
         raw = (root / "infra" / (name + ".py")).read_bytes()
         assert (len(raw), hashlib.sha256(raw).hexdigest()) == (size, digest)
     assert gate.HISTORICAL_CONSTANT_EVIDENCE == {"body_smoke": (32390,
-        "e4d659de33bacff9d5c85c1cb2fedce34f4aa34bdbae93b3b9b7e08950613ce3")}
+        "e4d659de33bacff9d5c85c1cb2fedce34f4aa34bdbae93b3b9b7e08950613ce3"),
+        "official_track1_pack_gate": (38158,
+        "1aa758e7a7de116172a479e3dd24b2aff845dc3f2330bc0adbbcbd6f00cb37b4")}
     assert gate.CONSTANT_EVIDENCE["body_smoke"] != gate.HISTORICAL_CONSTANT_EVIDENCE["body_smoke"]
 
 

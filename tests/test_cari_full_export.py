@@ -1,8 +1,10 @@
 """Tiny draft full-N direct export tests: no Torch, models, data or cloud."""
+import ast
 import copy
 import hashlib
 import importlib.util
 import os
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -202,6 +204,111 @@ def test_wrapper_validates_args_without_cli_and_has_ro_firewall():
     assert "--network none" in source and "603s docker run" in source
     assert "source_paths(spec)" in source and "validate_pins(spec,pins)" in source
     assert "src=$ROOT/outputs,dst=$ROOT/outputs" not in source and "src=$ROOT/data" not in source
+
+
+HISTORICAL_CONSUMERS = ("cari_full_export", "cari_shared_episode_gate", "official_track1_pack_gate")
+
+
+def historical_readonly_fixture(tmp_path):
+    """Tiny original producer bytes; the private audit stays0400/inode-identical."""
+    revision = "672b10ee5d8b8532686cf39ccd44134adc26178b"
+    code = tmp_path/"jobs"/revision/"run_cari_full_refine_queued/code"
+    source = code/"infra/original.py"; source.parent.mkdir(parents=True)
+    source.write_bytes(b"raise AssertionError('historical source must never execute')\n"); source.chmod(0o444)
+    for name, value in (("revision", revision), ("source-sha256", "a"*64)):
+        path = code.parent/name; path.write_text(value+"\n"); path.chmod(0o444)
+    for path in (code, source.parent): path.chmod(0o555)
+    audit = tmp_path/"results/episode3-queued-source-cache-audit.json"; audit.parent.mkdir()
+    audit.write_bytes(b'{"status":"pass","queue_status":"fail"}\n'); audit.chmod(0o400)
+    def pin(path): return {"bytes": path.stat().st_size, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+    pins = dict(schema="world_reward.historical_native_source_pins.v1", producer_revision=revision,
+        job="run_cari_full_refine_queued", source_archive_sha256="a"*64, queue_status_reclassified=False,
+        files={"infra/original.py": pin(source)},
+        separate_queue_failure_receipt={"relative_path": str(audit.relative_to(tmp_path)), **pin(audit)})
+    consumer = tmp_path/"current"; target = consumer/"configs/cari_clip_000003_historical_source_pins.json"
+    target.parent.mkdir(parents=True); target.write_text(json.dumps(pins)); target.chmod(0o444)
+    return consumer, target, source, audit
+
+
+@pytest.mark.parametrize("name", HISTORICAL_CONSUMERS)
+@pytest.mark.parametrize("flag,uid,gid,accepted", [(None,1000,1000,True),("0",1000,1000,True),
+    (None,0,0,False),("0",0,0,False),("1",0,0,True),("1",1000,1000,False),
+    ("1",0,1000,False),("true",0,0,False),("",1000,1000,False),(None,1001,1001,False)])
+def test_actual_consumer_uid_policy_authenticates_historical_before_work(name,flag,uid,gid,accepted,tmp_path,monkeypatch):
+    monkeypatch.syspath_prepend(str(ROOT/"infra"))
+    code, pin, source, audit = historical_readonly_fixture(tmp_path)
+    before = (audit.read_bytes(), audit.stat())
+    tree = ast.parse((ROOT/"infra"/(name+".py")).read_text())
+    main = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "main")
+    assign = next(node for node in main.body if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == "historical_root" for target in node.targets))
+    guard = next(node for node in main.body if isinstance(node, ast.If)
+        and any(isinstance(call, ast.Attribute) and call.attr == "geteuid" for call in ast.walk(node.test)))
+    # Execute the genuine new UID terms, not Azure hostname/path conditions.
+    terms = [node for node in guard.test.values if any(isinstance(value, ast.Name) and value.id == "historical_root"
+        or isinstance(value, ast.Attribute) and value.attr == "geteuid" for value in ast.walk(node))]
+    selected_guard = ast.If(test=ast.BoolOp(op=ast.Or(), values=terms), body=guard.body, orelse=[])
+    auth = next(node for node in main.body if isinstance(node, ast.If)
+        and any(isinstance(call, ast.Name) and call.id == "verify_historical_source" for call in ast.walk(node)))
+    # Authentication precedes runtime loading, receipt creation and prediction.
+    after = ast.unparse(ast.Module(body=main.body[main.body.index(auth)+1:], type_ignores=[]))
+    assert ("report =" if name == "cari_full_export" else "execute(") in after
+    if name == "official_track1_pack_gate": assert "load_runtime(" in after
+    environment = {} if flag is None else {"WR_HISTORICAL_READONLY_ROOT": flag}
+    namespace = dict(os=SimpleNamespace(environ=environment, geteuid=lambda:uid, getegid=lambda:gid),
+        root=tmp_path, code=code, args=SimpleNamespace(episode=3))
+    policy = compile(ast.fix_missing_locations(ast.Module(body=[assign, selected_guard, auth],type_ignores=[])),str(ROOT/"infra"/(name+".py")),"exec")
+    if accepted: exec(policy, namespace)
+    else:
+        with pytest.raises(ValueError): exec(policy, namespace)
+    assert "verify_historical_source" in namespace if accepted and flag == "1" else "verify_historical_source" not in namespace
+    now = audit.stat()
+    assert audit.read_bytes() == before[0]
+    assert (now.st_ino,now.st_mode,now.st_mtime_ns,now.st_ctime_ns) == (
+        before[1].st_ino,before[1].st_mode,before[1].st_mtime_ns,before[1].st_ctime_ns)
+
+
+@pytest.mark.parametrize("name", HISTORICAL_CONSUMERS)
+@pytest.mark.parametrize("fault", ["missing", "writable_pin", "alias", "source", "audit", "marker"])
+def test_actual_root_branch_never_trusts_flag_or_pin_presence_alone(name,fault,tmp_path,monkeypatch):
+    monkeypatch.syspath_prepend(str(ROOT/"infra"))
+    code,pin,source,audit = historical_readonly_fixture(tmp_path)
+    if fault == "missing": pin.unlink()
+    elif fault == "writable_pin": pin.chmod(0o644)
+    elif fault == "alias":
+        saved=pin.with_name("saved.json"); pin.rename(saved); pin.symlink_to(saved)
+    elif fault == "source": source.chmod(0o644); source.write_bytes(b"modified"); source.chmod(0o444)
+    elif fault == "audit": audit.chmod(0o600); audit.write_bytes(b'{"status":"fail"}'); audit.chmod(0o400)
+    else:
+        marker=source.parents[2]/"revision"; marker.chmod(0o644); marker.write_bytes(b"changed"); marker.chmod(0o444)
+    tree=ast.parse((ROOT/"infra"/(name+".py")).read_text())
+    main=next(node for node in tree.body if isinstance(node,ast.FunctionDef) and node.name=="main")
+    auth=next(node for node in main.body if isinstance(node,ast.If)
+        and any(isinstance(call,ast.Name) and call.id=="verify_historical_source" for call in ast.walk(node)))
+    with pytest.raises((ValueError,FileNotFoundError)):
+        exec(compile(ast.Module(body=[auth],type_ignores=[]),str(ROOT/"infra"/(name+".py")),"exec"),
+            dict(historical_root="1",root=tmp_path,code=code,args=SimpleNamespace(episode=3)))
+
+
+@pytest.mark.parametrize("name", HISTORICAL_CONSUMERS)
+@pytest.mark.parametrize("kind", ["absent", "regular", "alias", "directory", "dangling"])
+def test_actual_wrapper_explicit_uid_selection_no_host_flag_inheritance(name,kind,tmp_path):
+    code,pin,_,_ = historical_readonly_fixture(tmp_path)
+    if kind == "absent": pin.unlink()
+    elif kind == "alias":
+        saved=pin.with_name("saved.json");pin.rename(saved);pin.symlink_to(saved)
+    elif kind == "directory": pin.unlink();pin.mkdir()
+    elif kind == "dangling": pin.unlink();pin.symlink_to(pin.with_name("missing.json"))
+    text=(ROOT/"infra"/("run_"+name+".sh")).read_text()
+    snippet=text.split('HISTORICAL_PIN="$CODE/configs/cari_clip_${PADDED}_historical_source_pins.json"',1)[1].split('\nfor stage in',1)[0]
+    script='id() { if [[ "$1" == -u ]];then echo 1000;else echo 1001;fi; }; MOUNTS=();\nHISTORICAL_PIN="$CODE/configs/cari_clip_${PADDED}_historical_source_pins.json"'+snippet+'\nprintf "%s|%s|%s\\n" "$CONTAINER_USER" "$HISTORICAL_ROOT" "${#MOUNTS[@]}"'
+    result=subprocess.run(["bash","-euc",script],capture_output=True,text=True,
+        env={"PATH":"/usr/bin:/bin","HOME":"/nonexistent","ROOT":str(tmp_path),"CODE":str(code),"PADDED":"000003","WR_HISTORICAL_READONLY_ROOT":"1"})
+    if kind in ("absent","regular"):
+        assert result.returncode==0,result.stderr
+        assert result.stdout.strip()==("1000:1001|0|0" if kind=="absent" else "0:0|1|8")
+    else: assert result.returncode!=0
+    assert '--user "$CONTAINER_USER"' in text and '--env "WR_HISTORICAL_READONLY_ROOT=$HISTORICAL_ROOT"' in text
 
 
 def test_full_actual_report_gates_every_frame_and_complete_route_counts(gate, tmp_path):
