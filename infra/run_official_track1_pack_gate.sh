@@ -9,7 +9,7 @@ ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_official_track1_pack_gate/code" ]]
 printf -v PADDED '%06d' "$EPISODE"
-BASE="$ROOT/outputs/episode_$PADDED";OUT="$BASE/official_track1_pack_smoke_v1"
+BASE="$ROOT/outputs/episode_$PADDED";OUT="$BASE/official_track1_pack_smoke_v2"
 PIN="$CODE/configs/cari_clip_${PADDED}_input_pins.json"
 EXPORT_PIN="$CODE/configs/cari_clip_${PADDED}_shared_export_pins.json"
 RUNTIME_PIN="$CODE/configs/official_pack_runtime_pins.json"

@@ -8,6 +8,7 @@ removed after source/schema/geometry checks. No models, scoring or upload.
 from __future__ import annotations
 
 import argparse
+import ast
 import csv
 from dataclasses import asdict
 import hashlib
@@ -53,6 +54,10 @@ OFFICIAL_SOURCES = {
     "v2dlb/mhr_metrics.py": {"bytes": 25647, "sha256": "73077b65b5c3e0204307feef784317aab8c733d7462b6b8e6f4f397f7b91d2e0"},
 }
 NPZ_KEYS = ("pose", "scales", "shape", "object_rotation", "object_translation", "object_scale")
+NATIVE_MESH_SOURCES = {
+    "learning/training/mhr_opt_refineout.py": {"bytes": 92824, "sha256": "84e0e818a3bc0935bb30b75fcd82fd7c5e3730ed812864594cd759697ddb406b"},
+    "lib_mhr/contact.py": {"bytes": 9646, "sha256": "d4e8a92845d75a7bae962f312dee4d747587c39157a978908293a5645beb6d5c"},
+}
 
 
 def parser():
@@ -69,7 +74,7 @@ def parser():
 def output_relative(episode):
     if type(episode) is not int or not 0 <= episode < 30:
         raise ValueError("Explicit Track1 integer episode0..29 required")
-    return f"outputs/episode_{episode:06d}/official_track1_pack_smoke_v1"
+    return f"outputs/episode_{episode:06d}/official_track1_pack_smoke_v2"
 
 
 def identity(path, *, immutable=True):
@@ -107,7 +112,8 @@ def code_commit_url(revision):
 
 def source_helpers(code):
     names = ("infra/official_track1_pack_gate.py", "infra/run_official_track1_pack_gate.sh",
-             "infra/cari_shared_episode_loader.py", "src/world_reward/submission.py")
+             "infra/cari_shared_episode_loader.py", "src/world_reward/submission.py",
+             "infra/official_pack_geometry.py")
     return {name: identity(code / name) for name in names}
 
 
@@ -290,30 +296,95 @@ def array_fingerprint(episode):
 
 
 def oriented_triangles(vertices, faces):
-    """Exact cyclic-oriented triangle multiset; ignore only index-degenerate padding."""
+    """Lazy pure helper: host runtime preflight remains stdlib-only."""
+    from official_pack_geometry import canonical_oriented_triangles
+    return canonical_oriented_triangles(vertices, faces)
+
+
+def native_mesh_sources(root):
+    native = root / "vendor/video_to_data/reconstruction/modules/v2d_cari4d/lib/cari4d"
+    observed = {name: identity(native / name, immutable=False) for name in NATIVE_MESH_SOURCES}
+    if observed != NATIVE_MESH_SOURCES:
+        raise ValueError("Exact original native scene mesh/FP32 conversion source required")
+    return native, observed
+
+
+def isolated_source_function(path, name, namespace):
+    """Execute one original hash-bound CPU function, never its model imports.
+
+    Original AST, filename and line numbers stay intact. No body rewrite,
+    oracle branch, native module monkeypatch or optimizer/model execution.
+    """
+    tree = ast.parse(path.read_text(), filename=str(path))
+    definitions = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == name]
+    if len(definitions) != 1 or definitions[0].decorator_list:
+        raise ValueError("One undecorated original native CPU mesh function required")
+    function = definitions[0]
+    if (len(function.args.args) != 1 or function.args.args[0].arg != "path"
+            or function.args.posonlyargs or function.args.kwonlyargs or function.args.defaults
+            or function.args.vararg or function.args.kwarg):
+        raise ValueError("Exact unchanged native one-path mesh function ABI required")
+    imports = [node for node in tree.body if isinstance(node, ast.ImportFrom) and node.module == "__future__"]
+    isolated = ast.Module(body=[*imports, function], type_ignores=[])
+    exec(compile(isolated, str(path), "exec"), namespace)
+    actual = namespace[name]
+    if actual.__code__.co_filename != str(path) or actual.__code__.co_firstlineno != function.lineno:
+        raise ValueError("Actual original isolated native source binding differs")
+    return actual
+
+
+def load_mesh_authorities(root, mesh, episode):
+    """Full original GLB authority plus actual native scene/FP32 authority."""
     import numpy as np
-    vertices, faces = np.asarray(vertices), np.asarray(faces)
-    if (vertices.ndim != 2 or vertices.shape[1:] != (3,) or vertices.dtype.kind != "f"
-            or not np.isfinite(vertices).all() or faces.ndim != 2 or faces.shape[1:] != (3,)
-            or faces.dtype.kind not in "iu" or not len(faces) or np.min(faces) < 0 or np.max(faces) >= len(vertices)):
-        raise ValueError("Finite exact triangle arrays required")
-    points = vertices.astype(np.float64)[faces]
-    cross = np.cross(points[:, 1] - points[:, 0], points[:, 2] - points[:, 0])
-    if not np.isfinite(cross).all():
-        raise ValueError("Triangle arithmetic must remain finite")
-    # Exact zero only: no angle/area/score tolerance can shave small surfaces.
-    # Repeated indices, repeated coordinates and exactly collinear triangles
-    # have no surface; all original nonzero triangles remain in the multiset.
-    points = points[np.any(cross != 0, axis=1)]
-    if not len(points):
-        raise ValueError("At least one original nondegenerate triangle is required")
-    choices = np.stack((points, np.roll(points, 1, axis=1), np.roll(points, 2, axis=1)), axis=1).reshape(-1, 3, 9)
-    order = np.lexsort(tuple(choices[:, :, j] for j in range(8, -1, -1)), axis=1)
-    rows = choices[np.arange(len(points)), order[:, 0]]
-    return rows[np.lexsort(tuple(rows[:, j] for j in range(8, -1, -1)))]
+    import trimesh
+    native, sources = native_mesh_sources(root)
+    mesh_id = identity(mesh)
+    # Audit complete scene instances before either original mesh reader. Reject
+    # nontriangular/empty/orphan geometry instead of silently omitting it.
+    scene = trimesh.load(mesh, force="scene", process=False)
+    if not isinstance(scene, trimesh.Scene) or not scene.geometry:
+        raise ValueError("Complete original nonempty GLB scene required")
+    dumped = scene.dump(concatenate=False)
+    nodes = list(scene.graph.nodes_geometry)
+    if len(dumped) != len(nodes) or not nodes:
+        raise ValueError("Every original scene instance must be decoded exactly once")
+    used = set()
+    for node in nodes:
+        transform, geometry = scene.graph[node]
+        if (geometry not in scene.geometry or np.asarray(transform).shape != (4, 4)
+                or not np.isfinite(transform).all()):
+            raise ValueError("Original scene instance transform/geometry missing")
+        used.add(geometry)
+    if used != set(scene.geometry) or any(not isinstance(value, trimesh.Trimesh)
+            or not len(value.vertices) or not len(value.faces) for value in (*scene.geometry.values(), *dumped)):
+        raise ValueError("All original scene geometries/instances must retain full triangles")
+    raw = trimesh.load(mesh, force="mesh", process=False)
+    if not isinstance(raw, trimesh.Trimesh):
+        raise ValueError("Original official force-mesh reader must retain all scene triangles")
+    namespace = {"np": np, "trimesh": trimesh, "Path": Path}
+    load_scene = isolated_source_function(native / "lib_mhr/contact.py", "load_object_mesh", namespace)
+    load_native = isolated_source_function(native / "learning/training/mhr_opt_refineout.py", "_load_object_vertices", namespace)
+    native_vertices, native_faces = load_native(mesh)
+    if (np.asarray(native_vertices).dtype != np.dtype("float32") or np.asarray(native_faces).dtype != np.dtype("int64")
+            or native_vertices.shape != episode.object_vertices.shape or native_faces.shape != episode.object_faces.shape
+            or native_vertices.tobytes() != episode.object_vertices.tobytes()
+            or native_faces.tobytes() != episode.object_faces.tobytes()):
+        raise ValueError("Actual original scene/FP32 loader must reproduce frozen native geometry byte-exactly")
+    raw_vertices = np.asarray(raw.vertices); raw_faces = np.asarray(raw.faces)
+    flattened = trimesh.util.concatenate(list(dumped))
+    if (not np.array_equal(oriented_triangles(raw_vertices, raw_faces),
+                           oriented_triangles(flattened.vertices, flattened.faces))
+            or identity(mesh) != mesh_id or native_mesh_sources(root)[1] != sources
+            or any(name in sys.modules for name in ("torch", "joblib"))):
+        raise ValueError("Original full scene surface/source changed during authority reads")
+    proof = dict(original_GLB_sha256=mesh_id["sha256"], native_mesh_sources=sources,
+                 scene_geometries=len(scene.geometry), scene_instances=len(nodes),
+                 full_scene_instances_verified=True, original_native_FP32_loader_replayed=True,
+                 native_geometry_byte_exact=True, model_imports=False)
+    return raw_vertices.copy(), raw_faces.copy(), proof
 
 
-def verify_output(rows, layout, episode, commit):
+def verify_output(rows, layout, episode, commit, *, raw_mesh=None):
     """Exact controls and oriented surface identity, not an independent model replay."""
     import numpy as np
     from world_reward.submission import decode_submission
@@ -335,20 +406,27 @@ def verify_output(rows, layout, episode, commit):
     vertices, faces = recovered.object_vertices, recovered.object_faces
     if vertices.shape != (4096, 3) or faces.shape != (4096, 3):
         raise ValueError("Actual official budget must pad exactly4096 vertices and faces")
+    from official_pack_geometry import nonzero_triangle_mask
     zero = (faces == 0).all(axis=1)
-    active = faces[~zero]
+    real = nonzero_triangle_mask(vertices, faces)
+    if np.any(~real & ~zero):
+        raise ValueError("Every nonsurface official padding face must be exactly[0,0,0]")
+    active = faces[real]
     if not len(active):
         raise ValueError("Original official mesh must retain nonpadding surfaces")
-    source = oriented_triangles(episode.object_vertices, episode.object_faces)
+    from official_pack_geometry import verify_exact_dual_surfaces
+    raw_vertices, raw_faces = raw_mesh if raw_mesh is not None else (episode.object_vertices.astype(np.float64), episode.object_faces)
+    surface_proof = verify_exact_dual_surfaces(episode.object_vertices, episode.object_faces,
+                                              raw_vertices, raw_faces, vertices, faces)
+    source = oriented_triangles(raw_vertices, raw_faces)
     packed = oriented_triangles(vertices, faces)
-    if not np.array_equal(source, packed):
-        raise ValueError("Unmodified official budget changed oriented triangle geometry; no second simplification")
     unused = np.setdiff1d(np.arange(len(vertices)), np.unique(active))
     if len(unused) and not np.array_equal(vertices[unused], np.repeat(vertices[:1], len(unused), axis=0)):
         raise ValueError("Official unused vertices must be exact first-vertex padding")
     return dict(episodes=1, rows=len(layout.row_ids), scored_frames=len(frames),
                 original_frame_indices=frames.tolist(), full_source_frames=episode.total_video_frames,
                 exact_controls_and_shared_identity=True, oriented_triangles_exact=True,
+                exact_dual_surface_proof=surface_proof,
                 active_faces=len(packed), source_active_faces=len(source),
                 source_exact_degenerate_faces=len(episode.object_faces) - len(source),
                 packed_exact_degenerate_faces=len(faces) - len(packed),
@@ -395,7 +473,11 @@ def pack_once(root, scratch, loaded, layout, report, persist, *, commit, packer=
             raise ValueError("Only row_id CSV columns may enter the original official reader")
     output = scratch / "one_episode_smoke.parquet"
     actual_official = packer is None
+    raw_mesh = None
     if actual_official:
+        raw_vertices, raw_faces, mesh_proof = load_mesh_authorities(root, mesh, episode)
+        raw_mesh = raw_vertices, raw_faces
+        report["mesh_authority"] = mesh_proof
         packer = load_official_packer(root)
     report.update(phase="unmodified_official_packer", official_packer_attempts=1,
                   scratch_payload_full_frames=episode.total_video_frames,
@@ -406,8 +488,9 @@ def pack_once(root, scratch, loaded, layout, report, persist, *, commit, packer=
     if actual_official:
         report["official_imported_sources"] = verify_official_imports(root, complete=True)
     result = read_submission(output, layout)
-    verification = verify_output(result, layout, episode, commit)
+    verification = verify_output(result, layout, episode, commit, raw_mesh=raw_mesh)
     if (array_fingerprint(episode) != before or identity(mesh) != original_mesh
+            or actual_official and native_mesh_sources(root)[1] != mesh_proof["native_mesh_sources"]
             or any(identity(path) != value for path, value in inputs.items())):
         raise ValueError("Original trajectory/mesh or scratch inputs changed during official packing")
     report.update(official_packer_validated=1, packing_roundtrip=verification,

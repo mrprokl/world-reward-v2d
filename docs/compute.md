@@ -15,7 +15,7 @@ trajectory use. Private own-grasp feasibility is frozen separately,
 not yet dispatched and cannot overlap this GPU work.
 
 H97/H98 root pilots, H99 DWPose prompt diagnostic and H101 gamma-medoid remain
-rejected without retuning/rescoring. Latest fullsuite8282PASS/2same optionalSKIP.
+rejected without retuning/rescoring. Latest fullsuite8353PASS/2same optionalSKIP.
 No final Parquet or verified CARI4D improvement. Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
 [experiments](experiments.md). No final submission/CARI4D superiority yet.
@@ -69,7 +69,10 @@ fast; active waits are bounded12h. Never bypass stage provenance gates.
   Body Python `data/` files; PyTorch3D0.7.9/CUDA and original MHR assets.
 - `world-reward/official-pack-cpu:0.1`: separate pinned CPU child1a04b193,
   verified Arrow19.0.1 addition only, original CARI parent b47e unchanged.
-  CPU build passes68.37s; runtime-bound one-episode official packing pending.
+  CPU build passes68.37s; first official pack smoke rejected14.38s for exact
+  source-vs-packed surface mismatch. Readonly audit proves original GLB surface
+  unchanged: source trajectory uses native FP32, GLB/packer FP64. New dual-exact
+  geometry/source gate tested; separatev2 actual CPU packing pending.
 - `world-reward/sam3d-runtime:0.1`: Objects with required libusb/Open3D dependency.
 - GPU KNN, Kaolin, FlashAttention and nvdiffrast kernels passed. EGL failed and is
   optional, not silently considered supported. Our renderer uses BSD PyTorch3D.

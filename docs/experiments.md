@@ -4083,3 +4083,64 @@ Parent/native export pins remain b47e, no fabricated relabeling. Runtime-bound
 official gate tests77PASS; complete **8282PASS/2same optionalSKIP124.02s**.
 No actual official packing yet; freeze/push the actual producing code before
 one CPU-only episode15 smoke. No benchmark accuracy or all30 submission claim.
+
+First actual official pack smoke dispatched producer6a99faf9d49a24a38b63e7fa78c8714a9aa0523a,
+50files136,072encodedB, publicly accessible exact commit verified HTTP200
+without authentication. Unitworld-reward-official-track1-pack-episode15-v1
+**FAIL14.382861s**, phaseunmodified_official_packer, one attempt/return and zero
+validated packing. Exact oriented source-vs-packed triangle multiset differs;
+all scratch payloads/Parquet removed, sole444 report retained. Do not weaken
+geometry checks, reuse failed output, claim packingPASS or upload. Next bounded
+CPU-only readonly diagnostic compares full native trajectory, raw alignedGLB,
+unmodified official budget arrays and actual native mesh-loader source; determine
+rounding/frame/topology cause before any distinct general fix. Original501
+producers/GLB remain immutable. Activeep1 reaches400/668objectframes2,594.214886s;
+no complete trajectory receipt yet. GPU unchanged/serial, no local heavy transfer.
+
+Readonly CPU diagnostic isolates a representation mismatch, not mesh alteration:
+nativeFP32trajectory2044V/4080F vs rawGLBFP64; original official budget4096/4096
+retains all4,080 real triangles. RawGLB↔budget oriented surface **exactly equal**;
+native↔FP32(raw)↔FP32(budget) **exactly equal**; raw/native maxcoordinate delta
+3.72502959034e-9m. All source hashes unchanged, no files/packer/model/GPU calls.
+Actual native optimizer84e0e818/92,824B calls contact.load_object_mesh then
+np.asarray(vertices,dtype=np.float32). Contactsource d4e8a92845d75a7bae962f312dee4d747587c39157a978908293a5645beb6d5c/9,646B
+loads scene process=False, dumps transformed instances then concatenates.
+First smoke remains FAIL; correcting the gate's conflated precision comparison
+requires two exact independent proofs: full originalGLB surface equals packed
+FP64 and original source-bound nativeFP32 replay equals frozen trajectory and
+quantized raw/packed surfaces. Every positive original triangle survives FP32;
+epsilon/near-weld/deletion/inversion cannot be hidden by casting. No tolerance,
+mesh/pose/scale changes, model execution or past producer rewrite permitted.
+
+Read-only next-route audit finds full668 generic native staging compatible:
+15-source inventory → sharedprepare → forward → refined → export → CPUconsumer;
+pins must come from each actual PASS producer, not episode15. Forward windows
+[0,96,192,288,384,480,572], first-owner lengths[96,96,96,96,96,96,92]. Chunk16
+41full+12tail, init8 83full+4tail. No perclip exception/patch or current execution
+claim. Actualfrontend/CPUinput completion still required before new pin inventory.
+
+Independent dynamic-proximity route audit rejects reuse of oldJ1/H99 placements/
+AABB/scale recipes. Own one-state native feasibility must PASS first; then new
+two96frame RGB-only sequences, positive approach/grasp/relative-object rotation/
+occlusion/release and negative measuredsurface separation≥60mm, all192 full
+states certified before rendering. Fixed body/identity/scales/objectgeometry/
+camera, private truth separated from RGB-only adapter; candidate fingers only,
+baseline/candidate frozen before any privatequality measurement. Existing public
+Track1/6/24-case loaders cannot accept fakeown96 episodes: additive RGB-only
+adapter is required. Current certificate is .5mm positivegap proximity only,
+not physicaltouch/forceclosure or between-frame swept-volume proof. No cohort,
+render, adaptation or quality execution yet; fail prerequisites rather than
+relax geometry/contact certificates.
+
+New packing dual-authority helper59tinytestsPASS; full scene/source/native
+byte-replay and gate tests89PASS (combined148), closure223PASS2.82s. Independent
+audit additionally catches nonzero-index but zero-area padding that could hide
+nonfirst unused vertices: gate now requires every nonsurface face exactly000
+and firstvertex-only unused padding; three adversarial tests reject it. Original
+GLB positive surfaces still compared without epsilon/cast-only loophole.
+Fullsuite first finds one test-process isolation leak (Joblib imported by earlier
+test); fixture now explicitly models fresh CPU process, production prohibition
+unchanged. Complete **8353PASS/2same optionalSKIP122.00s**. New closure51files
+139,152encodedB, below160KB, no heavydata. Oldnative/export/own-grasp/surface/
+builder helpers unchanged. Freeze distinctv2 CPUoutput before one retry; v1FAIL
+receipt untouched. Latestep1 stillactive500/668objectframes3,310.150985s.

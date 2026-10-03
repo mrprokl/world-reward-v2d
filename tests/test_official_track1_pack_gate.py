@@ -230,7 +230,7 @@ def lifecycle_fixture(gate, tmp_path, monkeypatch):
     receipt_path = root / gate.BUILD_RECEIPT; receipt_path.parent.mkdir(parents=True, exist_ok=True)
     receipt_path.write_bytes(runtime_raw); receipt_path.chmod(0o444)
     monkeypatch.setattr(gate, "check_runtime_packages", lambda expected: expected.copy())
-    for name in ("infra/official_track1_pack_gate.py", "infra/run_official_track1_pack_gate.sh", "infra/cari_shared_episode_loader.py", "src/world_reward/submission.py"):
+    for name in ("infra/official_track1_pack_gate.py", "infra/run_official_track1_pack_gate.sh", "infra/cari_shared_episode_loader.py", "src/world_reward/submission.py", "infra/official_pack_geometry.py"):
         p = code / name; p.parent.mkdir(parents=True, exist_ok=True); p.write_bytes((ROOT / name).read_bytes()); p.chmod(0o444)
     mesh = root / "outputs/episode_000015/cari_shared_export_v1/object_aligned.glb"; mesh.parent.mkdir(parents=True)
     files = {}
@@ -516,3 +516,136 @@ def test_actual_runtime_host_bootstrap_all_stdlib_no_builder_import(gate, tmp_pa
     namespace = {}
     exec(source, namespace)
     assert namespace['load_runtime'] is gate.load_runtime
+
+
+def test_isolated_original_source_function_does_not_execute_module_imports(gate, tmp_path):
+    path = tmp_path / 'own_original_function.py'
+    path.write_text('from __future__ import annotations\nimport forbidden_model\n\ndef selected(path: Path):\n    return path, np\n')
+    marker = object(); namespace = dict(Path=Path, np=marker)
+    selected = gate.isolated_source_function(path, 'selected', namespace)
+    assert selected('owned') == ('owned', marker)
+    assert selected.__code__.co_filename == str(path)
+    assert selected.__code__.co_firstlineno == 4
+    assert 'forbidden_model' not in sys.modules
+    for invalid in ['@decorator\ndef selected(path):\n return path\n',
+                    'def selected(path, other):\n return path\n',
+                    'def selected(path):\n return path\ndef selected(path):\n return path\n']:
+        path.write_text(invalid)
+        with pytest.raises(ValueError): gate.isolated_source_function(path, 'selected', namespace)
+
+
+def scene_authority_fixture(gate, tmp_path, monkeypatch, fault=None):
+    # Other suite modules may legitimately import Joblib. This fixture models
+    # the production fresh CPU process without changing production import guards.
+    for name in ("torch", "joblib"):
+        monkeypatch.delitem(sys.modules, name, raising=False)
+    ep = episode(97)
+    native = tmp_path / 'vendor/video_to_data/reconstruction/modules/v2d_cari4d/lib/cari4d'
+    sources = {
+        'lib_mhr/contact.py': '''from __future__ import annotations
+import forbidden_native_models
+def load_object_mesh(path: str | Path) -> trimesh.Trimesh:
+    mesh_or_scene = trimesh.load(path, force="scene", process=False)
+    if isinstance(mesh_or_scene, trimesh.Scene):
+        geometries = [geom for geom in mesh_or_scene.dump(concatenate=False) if isinstance(geom, trimesh.Trimesh) and len(geom.vertices) > 0]
+        if not geometries:
+            raise ValueError("has no mesh geometry")
+        if len(geometries) == 1:
+            return geometries[0]
+        return trimesh.util.concatenate(geometries)
+    return mesh_or_scene
+''',
+        'learning/training/mhr_opt_refineout.py': '''from __future__ import annotations
+import forbidden_optimizer
+
+def _load_object_vertices(path: str | Path) -> tuple[np.ndarray, np.ndarray | None]:
+    mesh = load_object_mesh(path)
+    vertices = np.asarray(mesh.vertices, dtype=np.float32)
+    faces = None if getattr(mesh, "faces", None) is None else np.asarray(mesh.faces, dtype=np.int64)
+    return vertices, faces
+'''}
+    observed = {}
+    for name, source in sources.items():
+        p = native / name; p.parent.mkdir(parents=True, exist_ok=True); p.write_text(source)
+        observed[name] = gate.identity(p, immutable=False)
+    monkeypatch.setattr(gate, 'NATIVE_MESH_SOURCES', observed)
+    meshpath = tmp_path / 'original.glb'; meshpath.write_bytes(b'own scene fixture'); meshpath.chmod(0o444)
+    class Mesh:
+        def __init__(self, vertices, faces): self.vertices, self.faces = vertices, faces
+    first = Mesh(ep.object_vertices.astype(np.float64), ep.object_faces.copy())
+    moved = Mesh(first.vertices + np.array([.5, 0, 0]), first.faces.copy())
+    joined = Mesh(np.r_[first.vertices, moved.vertices], np.r_[first.faces, moved.faces + len(first.vertices)])
+    ep = replace(ep, object_vertices=joined.vertices.astype(np.float32), object_faces=joined.faces)
+    class Graph:
+        nodes_geometry = ['original', 'translated']
+        def __getitem__(self, name):
+            transform = np.eye(4)
+            if name == 'translated': transform[0, 3] = .5
+            if fault == 'transform': transform[0, 0] = np.nan
+            return transform, 'geometry'
+    class Scene:
+        geometry = {'geometry': first}
+        graph = Graph()
+        def dump(self, concatenate=False):
+            assert concatenate is False
+            return [first] if fault == 'missing_instance' else [first, moved]
+    scene = Scene()
+    if fault == 'orphan': scene.geometry = dict(scene.geometry, orphan=first)
+    if fault == 'nontriangle': scene.geometry = {'geometry': object()}
+    def concatenate(items):
+        assert len(items) == 2
+        return joined
+    def load(path, *, force, process):
+        assert Path(path) == meshpath and process is False
+        if force == 'scene': return scene
+        assert force == 'mesh'
+        return first if fault == 'official_drops_instance' else joined
+    fake = SimpleNamespace(Trimesh=Mesh, Scene=Scene, load=load, util=SimpleNamespace(concatenate=concatenate))
+    monkeypatch.setitem(sys.modules, 'trimesh', fake)
+    if fault == 'native_geometry': ep.object_vertices[0, 0] += .01
+    return meshpath, ep
+
+
+def test_full_scene_instances_and_actual_native_FP32_source_replay(gate, tmp_path, monkeypatch):
+    path, ep = scene_authority_fixture(gate, tmp_path, monkeypatch)
+    vertices, faces, proof = gate.load_mesh_authorities(tmp_path, path, ep)
+    assert vertices.dtype == np.float64 and faces.dtype == np.int64
+    assert proof['scene_instances'] == 2 and proof['scene_geometries'] == 1
+    assert proof['full_scene_instances_verified'] and proof['native_geometry_byte_exact']
+    assert proof['original_native_FP32_loader_replayed'] and proof['model_imports'] is False
+    assert 'forbidden_native_models' not in sys.modules and 'forbidden_optimizer' not in sys.modules
+
+
+@pytest.mark.parametrize('fault', ['missing_instance', 'orphan', 'nontriangle', 'official_drops_instance', 'native_geometry', 'transform'])
+def test_scene_source_authorities_failclosed(gate, tmp_path, monkeypatch, fault):
+    path, ep = scene_authority_fixture(gate, tmp_path, monkeypatch, fault)
+    with pytest.raises(ValueError): gate.load_mesh_authorities(tmp_path, path, ep)
+
+
+def test_original_native_scene_source_hash_checked_before_execution(gate, tmp_path, monkeypatch):
+    path, ep = scene_authority_fixture(gate, tmp_path, monkeypatch)
+    source = tmp_path / 'vendor/video_to_data/reconstruction/modules/v2d_cari4d/lib/cari4d/lib_mhr/contact.py'
+    source.write_text('raise RuntimeError("must not execute altered source")')
+    with pytest.raises(ValueError, match='Exact original native'):
+        gate.load_mesh_authorities(tmp_path, path, ep)
+
+
+@pytest.mark.parametrize('fault', ['repeated_index', 'collinear', 'repeated_coordinates'])
+def test_zero_area_tail_cannot_hide_nonfirst_vertex_padding(gate, fault):
+    ep, layout, rows = output_rows(gate)
+    values = rows.values.copy()
+    vertices = np.flatnonzero(layout.keys[:, 2] == 6)
+    faces = np.flatnonzero(layout.keys[:, 2] == 7)
+    values[vertices[-3]] = [.7, .8, .9]
+    values[vertices[-2]] = [.3, .2, .1]
+    values[vertices[-1]] = 2 * values[vertices[-2]] - values[vertices[-3]]
+    if fault == 'repeated_index': values[faces[-1]] = [4093, 4093, 4094]
+    elif fault == 'repeated_coordinates':
+        values[vertices[-2]] = values[vertices[-3]]
+        values[faces[-1]] = [4093, 4094, 4095]
+    else:
+        # Exactly dyadic coordinates, so all three points are truly collinear.
+        values[vertices[-3:]] = [[.25, .25, .25], [.5, .5, .5], [.75, .75, .75]]
+        values[faces[-1]] = [4093, 4094, 4095]
+    with pytest.raises(ValueError, match='padding face'):
+        gate.verify_output(replace(rows, values=values), layout, ep, COMMIT)
