@@ -2299,3 +2299,24 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   additionallyretained;45explicitheadcalls15rawparity+15rawkeypoint+15shared
   with15Body/15MoGe/1officialreference. Azure baseline-only started600s;
   no privateevaluation/fitting or quality/adoption claim.
+
+  D96actualPUBLIC baselinePASS44.827999s/sourcef5c78f7abfec3c6234bbbee7f7dad70736836ae7,
+  receipt`8ebfce153ea5ff708578c155d60adb97e737b672e2c2df56df38c635fbbc80c3`,
+  scriptSHA`4950979a0dfbeb6759f0a7149a9d79ca61fdb13c96cf09c5349fca1f6f73459b`.
+  Actual15Body/15MoGe/45explicitnativehead/1officialreference, all15raw+15
+  shared artifacts frozen inorderedstages; native308keypoints/127joints/proper
+  rotations/full18439V andshape45/PCA28/68byteconst verified. All15official
+  meanfidelity .000146754..000252711mm wellbelow2mm; not reconstructionerror.
+  Source/assets/publicbytes rechecked; private_truth_read/ground_truth_used/
+  accuracy_verifiedFALSE. No failure or fallback.
+  D96actualPUBLIC DWPosePASS2.855874s/source776e479c0a3492078313b93b8bf92e7443b274cf,
+  receipt`949bdf218514335cedc2745b081f2a79f93d4372bc66a0894a1bda7749e29c49`,
+  scriptSHA`f6fbf3e578e2a3c603a9644f341401576cc6360694ec52cf909907ba00771121`.
+  ExactlyoneCPUfreshsession15nativeunmodifiedcalls/all15NPZ,133positivescores
+  eachframe (not correctness), actualSimCC133finite/nativecoords/scores/validity
+  integrityPASS. D95v2PASS/oldv1FAIL/allassets/sources/publicoutputs rehashed,
+  temporaryprefixremoved, no image/globalenvironment change/GT/fit. Actual
+  DWPosebundle9files27,368B. Bothterminal0/MainPID0/GPU0%87MiB; no heavyMac
+  transfer. Baseline+independentobservations NOWfrozen; freshprivatequality
+  remains UNREAD. Next run ONLYalready-frozen sixparamroot policy, not retune
+  optimizer after viewingobservations or declare these ABIchecks a3Dgain.
