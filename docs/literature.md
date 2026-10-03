@@ -704,3 +704,36 @@ soft-limit implementation, this is metadata evidence, not proof the forward
 hard-enforces these values or every learned prediction is physiologically invalid.
 Immutable inspection receipt `c78b5ec438f1ff91685bd0cf53b76658d718504e4ac25e36c26597ef3d7c713a`;
 zero forward/optimizer/GT, all source/input/model hashes rechecked.
+
+### After H97: discriminate observation bias from model misspecification
+
+Prospective, before H98 private scores. H97's translation-only RGB loss gain
+and full-rank Jacobian did not prevent a32.26% median camera-PVE degradation.
+H98 fixed-depth native orientation addresses one nuisance variable, not wrong
+limb flexion, body proportions, detector bias or metric-depth calibration.
+If it fails scientifically, prefer one untouched factorial observation diagnostic
+(2 new morphologies ×2 appearances ×2 occlusion states ×3 articulation frames,
+24 RGBs) over another camera optimizer. Freeze ordinary Body+DWPose first;
+private evaluation only then compares projected landmark errors, centroid-Z,
+centered3D errors and proportions across all8groups. No private-gradient update,
+label-guided prompt selection, fitted candidate choice or challenge GT.
+
+A concrete next mechanism, conditional on the diagnostic showing articulation
+error with useful external2D evidence: prompt the existing trained SAMBody
+with two automatically detected elbows, specified before observing scores.
+[Native keypoint-prompt API at pinned7c0d](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam3d_body/lib/sam_3d_body/models/meta_arch/sam3d_body.py#L1649-L1681)
+uses its original crop affine and one additional decoder pass; do not normalize
+image pixels directly as crop coordinates. Decode fresh body articulation under
+unchanged root/translation/Z/K, clip identity, hands and object proxy. Preserve
+full-frame coverage and the same no-regression/metric/silhouette gates on a
+NEW cohort, followed by independent confirmation if promising.
+
+[SAM3D Body §6.2/AppendixB](https://arxiv.org/html/2602.15989v1) supplies source
+motivation for learned prompt-conditioned correction, not proof that DWPose
+prompts improve3D. Noisy prompts can worsen results; the paper's most-erroneous
+landmark selection uses reference evidence and is NOT a permitted test-time
+procedure here. [SLAHMR](https://arxiv.org/abs/2302.12827) motivates articulated
+priors with video evidence; [CARI4D v3](https://arxiv.org/html/2512.11988v3)
+motivates coupled temporal/depth/interaction constraints. GEM-X remains a
+higher-cost temporal alternative until SOMA→MHR export and source eligibility
+are resolved. These are hypotheses, no execution/adoption/Track1 gain claims.

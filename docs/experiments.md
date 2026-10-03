@@ -2794,3 +2794,20 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   exactbytes, legacy7metrics exactAST, fit/replay4ed1…field compatibility,
   full249 manufacturing/private topology/source/mount provenance; no blocker
   found. Only actual fit/replay PASS and realqualitypins authorizeGT scoring.
+  Actual native fit-v2 execution **PASS**252.099728s (300s budget), source
+  13720afb6f75bed59e449ff5e5f033d88e49a153, driver
+  `4ed1b4d60c89a47b083359815673f2e5a61d50dffdf25ca5bec2c15ec6efa03c`,
+  frozenreceipt`3fd709d185e32412edb0d4a0325960e1ef63f535bfc992253178d04a55ac5aa1`
+  (796,553B/0444).All15candidates/traces/300initialJrows,900objective+
+ 15finalnativeheads/885backwards+updates/30rasters returned/validated exactly;
+  peakallocated4,178,142,208/reserved4,188,012,544B, sourceassets rehashed,
+  zero private reads, original bootstrapfailure unchanged. Terminal unit.
+  Automatic human silhouette safeguard **FAIL**: worstframeΔ−.024868986,
+  clipmeans−.019316461/−.020968655/−.009918749; no candidates selected via
+  guard or omitted/exportblocked. This recipe already cannot satisfy all
+  preregistered quality gates. Still execute the planned independent selected
+  native replay and ONE private paired score for diagnosis, not to override
+  rejection or retune. Metric accuracy remains unmeasured at this point.
+  Actual immutablefitpin written (completed SHA+producerrevision only);
+  nofit/public/helper source edits after this observation. Next separate
+ 120s/15-native-head/zero-optimizer replay, then actualqualitypins ifPASS.
