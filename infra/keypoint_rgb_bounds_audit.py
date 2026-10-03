@@ -17,8 +17,8 @@ import time
 import numpy as np
 
 BASE = "validation/keypoint_rgb_v1"
-OUT = "results/keypoint-rgb-bounds-audit-v1"
-STAGE = "public_keypoint_rgb_native_bounds_readonly_audit"
+OUT = "results/keypoint-rgb-bounds-audit-v2"
+STAGE = "public_keypoint_rgb_native_bounds_readonly_audit_v2"
 BUDGET = 60
 IMAGE = "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7"
 MODEL_SHA = "352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc"
@@ -30,17 +30,46 @@ MANIFEST_SHA = "082549b5a1f8a4a7d687bc17ec6847f3628d6d4230186053951caa2454d2979d
 FAILED_SHA = "aacb82e7c48b5b28ec26f1eb3bb88194c76fbb3c0ce07cc54d6032adb25412d2"
 FAILED_REV = "52f35c0b0df9a1448adf16c1cff796007fb41198"
 FAILED_SCRIPT = "d5146d1f89a0fbbd0e4614abd8896a9e13679bd4307535a3cea0b2f46a84583b"
+PREVIOUS = "results/keypoint-rgb-bounds-audit-v1/report.json"
+PREVIOUS_SHA = "1a566a9c1e8ac31cce6654372b79ee2dad00fb47a92d24134cafa915c886244f"
+PREVIOUS_REV = "d232abb7bc306860bdda254d82a768a257ba2fc0"
+PREVIOUS_SCRIPT = "a6b0542eea2d7b8d717ef9fe4eb0f5610f37a5d0c81c36d45c958476d204ebd8"
 
 
-def regular(path, digest=None, size=None):
+def regular(path, digest=None, size=None, *, require_mode_immutable=True):
     path=Path(path)
-    if path.resolve()!=path.absolute() or not path.is_file() or path.stat().st_mode & 0o222:
+    if path.resolve()!=path.absolute() or not path.is_file() or (require_mode_immutable and path.stat().st_mode & 0o222):
         raise ValueError("Canonical read-only regular input required")
     with path.open("rb") as stream: actual=hashlib.file_digest(stream,"sha256").hexdigest()
     row=dict(path=str(path),sha256=actual,bytes=path.stat().st_size)
     if (digest is not None and actual!=digest) or (size is not None and row["bytes"]!=size):
         raise ValueError("Frozen input SHA/bytes changed")
     return row
+
+
+def readonly_model_mount(text, model_path):
+    """Require the exact file's VFS bind mount to be read-only, not its parent."""
+    target=str(Path(model_path));matches=[]
+    for line in text.splitlines():
+        fields=line.split();separator=fields.index("-") if "-" in fields else -1
+        if separator<6 or len(fields)<separator+4: raise ValueError("Malformed kernel mountinfo")
+        mount=re.sub(r"\\(040|011|012|134)",lambda m:chr(int(m[1],8)),fields[4])
+        if re.search(r"\\[0-9]",mount): raise ValueError("Unsupported kernel mount path escape")
+        if mount==target:
+            options=fields[5].split(",")
+            if "ro" not in options or "rw" in options: raise ValueError("Exact model file mount must be read-only")
+            matches.append(dict(mount_point=mount,mount_options=options,super_options=fields[separator+3].split(",")))
+    if len(matches)!=1: raise ValueError("One exact read-only model file mount required; parent mounts insufficient")
+    return matches[0]
+
+
+def previous_failure(root):
+    path=Path(root)/PREVIOUS;receipt=regular(path,PREVIOUS_SHA);row=json.loads(path.read_text())
+    fields(row,dict(stage="public_keypoint_rgb_native_bounds_readonly_audit",status="fail",phase="frozen_input_integrity",
+        producer_revision=PREVIOUS_REV,script_sha256=PREVIOUS_SCRIPT,image_id=IMAGE,error_type="ValueError",
+        error="Canonical read-only regular input required",model_forward_calls=0,optimizer_updates=0,private_truth_read=False,
+        ground_truth_used=False,challenge_inputs_used=False,oracle_modes=[],original_inputs_rehashed=False,records=[]))
+    return receipt
 
 
 def fields(data, expected):
@@ -150,9 +179,13 @@ def read_inputs(root):
 
 
 def perform(root,report,persist):
+    previous=previous_failure(root)
     raws,pairs,receipts=read_inputs(root);model_path=root/"weights/mhr/mhr_model.pt"
-    receipts.extend([regular(model_path,MODEL_SHA,MODEL_BYTES),regular(Path(__file__))])
-    report.update(phase="CPU_metadata_load",input_files=receipts);persist()
+    mount=readonly_model_mount(Path("/proc/self/mountinfo").read_text(),model_path)
+    model_receipt=regular(model_path,MODEL_SHA,MODEL_BYTES,require_mode_immutable=False)
+    receipts.extend([previous,regular(Path(__file__))])
+    report.update(phase="CPU_metadata_load",input_files=receipts,model_file=model_receipt,model_mount=mount,
+        model_host_write_bits=int(model_path.stat().st_mode & 0o222),model_exact_mount_readonly_verified=True);persist()
     if "torch"in sys.modules:raise ValueError("Standalone CPU metadata runtime required")
     import torch
     torch.set_num_threads(4);torch.manual_seed(0)
@@ -165,6 +198,9 @@ def perform(root,report,persist):
             shared=audit_controls(pair["shared_model_controls"],pair["shared_shape_params"],raw["global_rot"],limits,names))
         report["records"].append(row);persist()
     for receipt in receipts:regular(receipt["path"],receipt["sha256"],receipt["bytes"])
+    if readonly_model_mount(Path("/proc/self/mountinfo").read_text(),model_path)!=mount:
+        raise ValueError("Exact read-only model mount changed")
+    regular(model_path,MODEL_SHA,MODEL_BYTES,require_mode_immutable=False)
     report.update(status="pass",phase="complete",frames=15,all_cases_retained=True,original_inputs_rehashed=True,
         raw_violating_frames=sum(bool(r["raw"]["violations"])for r in report["records"]),
         shared_violating_frames=sum(bool(r["shared"]["violations"])for r in report["records"]),
@@ -182,6 +218,7 @@ def main(argv=None):
         raise ValueError("Fresh reserved offline CPU metadata audit required")
     report=dict(stage=STAGE,status="fail",phase="frozen_input_integrity",producer_revision=revision,image_id=IMAGE,
         network="none",device="cpu",budget_seconds=BUDGET,failed_fit_report_sha256=FAILED_SHA,records=[],
+        previous_failed_audit_sha256=PREVIOUS_SHA,previous_failure_rewritten=False,model_exact_mount_readonly_verified=False,
         model_forward_calls=0,optimizer_updates=0,private_truth_read=False,ground_truth_used=False,challenge_inputs_used=False,
         hand_labeled_test=False,oracle_modes=[],accuracy_verified=False,adoption_authorized=False,bounds_relaxed=False,
         predictions_modified=False,original_failure_rewritten=False,actual_known_failed_fit_native_head_calls=1,

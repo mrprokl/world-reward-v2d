@@ -6,7 +6,7 @@ CODE="${WR_CODE:?Require immutable committed source}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$CODE" == /* && "${WR_CODE_REVISION:?}" =~ ^[0-9a-f]{40}$ ]]
 export DOCKER_HOST="unix://$ROOT/docker.sock"
 BASE="$ROOT/validation/keypoint_rgb_v1"
-OUT="$ROOT/results/keypoint-rgb-bounds-audit-v1"
+OUT="$ROOT/results/keypoint-rgb-bounds-audit-v2"
 python3 - "$ROOT" "$OUT" <<'PYSAFE'
 from pathlib import Path
 import sys
@@ -27,6 +27,7 @@ timeout --signal=TERM --kill-after=10s 63s docker run --rm --network none --cpus
  --env HOME=/tmp --env OMP_NUM_THREADS=4 --env OPENBLAS_NUM_THREADS=4 --env MKL_NUM_THREADS=4 \
  --mount "type=bind,src=$CODE,dst=$CODE,readonly" \
  --mount "type=bind,src=$ROOT/weights/mhr/mhr_model.pt,dst=$ROOT/weights/mhr/mhr_model.pt,readonly" \
+ --mount "type=bind,src=$ROOT/results/keypoint-rgb-bounds-audit-v1/report.json,dst=$ROOT/results/keypoint-rgb-bounds-audit-v1/report.json,readonly" \
  --mount "type=bind,src=$BASE/inputs/manifest.json,dst=$BASE/inputs/manifest.json,readonly" \
  --mount "type=bind,src=$BASE/baseline_v1,dst=$BASE/baseline_v1,readonly" \
  --mount "type=bind,src=$BASE/root_fit_v1,dst=$BASE/root_fit_v1,readonly" \

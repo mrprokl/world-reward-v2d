@@ -142,3 +142,50 @@ def test_readonly_source_cpu_firewall_and_bash(gate):
     assert "model.forward"not in source and ".run("not in source
     assert "--gpus"not in shell.read_text() and "--network none"in shell.read_text() and "--memory 8g"in shell.read_text()
     assert "eval_private"not in shell.read_text() and "63s"in shell.read_text()
+
+
+@pytest.mark.parametrize("fault",[None,"rw","parent","missing","ambiguous","malformed"])
+def test_exact_file_mount_readonly_not_inherited_parent(gate,fault):
+    path="/srv/weights/mhr_model.pt"
+    line="31 22 0:8 /source "+path+" ro,nosuid,relatime - ext4 /dev/root rw,errors=remount-ro"
+    if fault=="rw":line=line.replace("ro,nosuid","rw,nosuid")
+    elif fault=="parent":line=line.replace(path,"/srv/weights")
+    elif fault=="missing":line=""
+    elif fault=="ambiguous":line+="\n"+line
+    elif fault=="malformed":line="bad mountinfo"
+    if fault:
+        with pytest.raises(ValueError):gate.readonly_model_mount(line,path)
+    else:
+        row=gate.readonly_model_mount(line,path)
+        assert row["mount_point"]==path and "ro"in row["mount_options"] and "rw"in row["super_options"]
+
+
+def test_mount_kernel_octal_escapes_and_mode_exception_scoped(gate,tmp_path):
+    model=tmp_path/"model with space.pt";model.write_bytes(b"ownmodel");model.chmod(0o644)
+    escaped=str(model).replace(" ",r"\040")
+    line=f"31 22 0:8 /source {escaped} ro - ext4 /dev/root rw"
+    assert gate.readonly_model_mount(line,model)["mount_point"]==str(model)
+    with pytest.raises(ValueError):gate.regular(model)
+    assert gate.regular(model,require_mode_immutable=False)["bytes"]==8
+    assert model.stat().st_mode & 0o222
+    with pytest.raises(ValueError):gate.readonly_model_mount(line.replace(r"\040",r"\041"),model)
+
+
+@pytest.mark.parametrize("fault",[None,"status","source","phase","calls","private","error","hash"])
+def test_previous_metadata_only_failure_preserved_exact(gate,tmp_path,monkeypatch,fault):
+    path=tmp_path/gate.PREVIOUS;path.parent.mkdir(parents=True)
+    row=dict(stage="public_keypoint_rgb_native_bounds_readonly_audit",status="fail",phase="frozen_input_integrity",
+        producer_revision=gate.PREVIOUS_REV,script_sha256=gate.PREVIOUS_SCRIPT,image_id=gate.IMAGE,error_type="ValueError",
+        error="Canonical read-only regular input required",model_forward_calls=0,optimizer_updates=0,private_truth_read=False,
+        ground_truth_used=False,challenge_inputs_used=False,oracle_modes=[],original_inputs_rehashed=False,records=[])
+    if fault=="status":row["status"]="pass"
+    elif fault=="source":row["script_sha256"]="a"*64
+    elif fault=="phase":row["phase"]="complete"
+    elif fault=="calls":row["model_forward_calls"]=1
+    elif fault=="private":row["private_truth_read"]=True
+    elif fault=="error":row["error"]="different"
+    path.write_text(json.dumps(row));path.chmod(0o444);monkeypatch.setattr(gate,"PREVIOUS_SHA",gate.regular(path)["sha256"])
+    if fault=="hash":monkeypatch.setattr(gate,"PREVIOUS_SHA","a"*64)
+    if fault:
+        with pytest.raises(ValueError):gate.previous_failure(tmp_path)
+    else:assert gate.previous_failure(tmp_path)["path"]==str(path)

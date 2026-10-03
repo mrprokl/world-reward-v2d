@@ -2401,3 +2401,20 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   PASS is distinct from prediction feasibility or reconstruction quality.
   Full suite5701PASS/1optionaltrimeshSKIP74.41s and independent audit PASS;
   bashsyntax/diffcheck PASS before the separate CPU metadata dispatch.
+  ActualCPU auditv1 **FAIL**.114352s/source d232abb7bc306860bdda254d82a768a257ba2fc0,
+  script`a6b0542eea2d7b8d717ef9fe4eb0f5610f37a5d0c81c36d45c958476d204ebd8`,
+  receipt`1a566a9c1e8ac31cce6654372b79ee2dad00fb47a92d24134cafa915c886244f`.
+  All49 baseline/failure/proxy/source inputs passed, but reference-file immutable
+  host-mode check failed before Torch/model metadata load. A Docker read-only
+  bind does not erase host write bits: preserve this packaging failure unchanged.
+  Explicit newv2 engineering-only namespace will require exact assetSHA/size and
+  canonical regular path plus actual `/proc/self/mountinfo` read-only-file-mount
+  proof for this reference ONLY; public predictions/sources/reports still require
+  no write bits. Record asset mode and mount evidence, do not chmod/change asset,
+  prediction, physiological bounds, D96 fit policy or private-read status.
+  V2 source audit43tests/127combined PASS; exact VFS file mount must be uniquely
+  read-only (a read-only parent alone is insufficient; underlying superblock
+  may remain rw). Recheck same mount and exact model bytes after metadata read;
+  both previous failures and all public artifacts retain strict immutable modes.
+  Independent review and Bash syntax PASS; no prediction/model forward introduced.
+  V2 full suite5716PASS/1optionaltrimeshSKIP74.00s before immutable CPU dispatch.
