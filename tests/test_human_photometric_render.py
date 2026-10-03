@@ -73,7 +73,7 @@ def test_geometry_byte_identical_for_appearance_and_depth_order(renderer):
         assert np.allclose(results[1][2][300:494] - results[0][2][300:494], [0., 0., .5])
         assert np.array_equal(results[0][6], of) and np.allclose(np.ptp(results[0][2][300:494], axis=0), renderer.BOTTLE_SCALE * np.ptp(bottle, axis=0))
         assert not np.array_equal(results[0][4][:300], results[2][4][:300])
-    assert np.array_equal(h, before) and renderer.ELBOW_NAME == "l_elbow"
+    assert np.array_equal(h, before) and renderer.ELBOW_NAME == "l_lowarm"
 
 
 def test_human_only_truth_does_not_relabel_nuisance_or_background(renderer, monkeypatch):

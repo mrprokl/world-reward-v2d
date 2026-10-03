@@ -138,8 +138,8 @@ def test_scene_rejects_masked_missing_regions_and_bad_framing(module):
 
 def test_wrapper_three_isolated_stages_and_no_truth_exports(module):
     path = REPO / "infra/run_photometric_capability.sh"; text = path.read_text()
-    subprocess.run(["bash", "-n", str(path)], check=True)
-    assert subprocess.run(["bash", str(path), "--retry"], capture_output=True).returncode == 2
+    subprocess.run(["rtk", "proxy", "bash", "-n", str(path)], check=True)
+    assert subprocess.run(["rtk", "proxy", "bash", str(path), "--retry"], capture_output=True).returncode == 2
     assert text.count("docker run") == 3 and text.count("--stage masks") == text.count("--stage body") == 1
     assert "123s" in text and "183s" in text and "--network none --memory 32g --cpus 4" in text
     assert module.IMAGE in text and "53b33bc4b60e0e3e8f83b401775b4701b18eef54408fd585fbe3a5d376c042e1" in text
