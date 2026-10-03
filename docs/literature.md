@@ -1270,3 +1270,32 @@ per-frameevalalignment. CurrentownrigidtrackingalreadyICP/Viterbi, notreplace
 itunnecessarilywithNCFoundationPose. nvdiffrast/SAM/license/trainoverlap
 remain independentfinaleligibility blockers. Allprimaryaudit text/metadataonly;
 no heavydataset/model downloads ornewGPUjobsfortheseproposals.
+
+### OpenLORIS temporal-data preflight (primary audit, not acquisition)
+
+Official [download pin d1e81a9](https://github.com/lifelong-robotic-vision/OpenLORIS-Scene/blob/d1e81a915a6e19c8ad079a6fb9be54ada7bfefa5/download.md)
+and [publisher HF cbc0310](https://huggingface.co/datasets/shixuesong/openloris-scene/tree/cbc03108723d08322b23d0338680bffa9404cce9)
+agree CC-BY-ND4: commercial internal use/producing unshared adapted material is
+allowed, not distribution of transformed subsets. D435 color848×480/30Hz,
+aligned_depth uint16×0.001m; timestamp six-decimal PNG names from publisher
+[extractor ce6a483](https://github.com/lifelong-robotic-vision/openloris-scene-tools/blob/ce6a4839f618bf036d3f3dbae14561bfc7413641/dataprocess/extract_data_from_bag.py).
+No interior timestamp/member inventory verified yet. Publisher LFS archives:
+office10618337280B/2a610f040aaf4939b7104fe8fe8c60de82bcf641c6d04d7263de751147f6ff22,
+cafe7466711040B/6f42810f87f21b3c720f517f0c514c6ba37ccf789c596f96e75df60226f43899,
+home18974105600B/5a6b14cc01843669a9d77d077355fd5ca6e7ff88297718a8a7d6d5947a584e75.
+Three domains would require37.06GB Azure, not 288 directly published PNGs.
+
+Important convention gate: publisher uses rs.align(color), but pinned
+[librealsense v2.33.1 align.cpp](https://github.com/IntelRealSense/librealsense/blob/v2.33.1/src/proc/align.cpp)
+transforms points only to choose color pixels, copies original depth-camera Z.
+Thus registration alone does NOT establish exact color-camera Z. Before a
+scientific protocol either bound actual archived SDK/extrinsic bias privately,
+or explicitly evaluate registered D435 sensor-Z as a proxy; never feed K/poses
+to inference or silently relabel it exact camera-Z. Archive metadata inventory
+must precede choosing fixed contiguous windows, without sensor decoding or
+post-result window replacement. office1-7 has documented dynamic people; arbitrary
+96-frame windows/home/cafe are not guaranteed dynamic. Eulerian depth-change
+error compares real same-pixel variation, not jitter or 3D motion; any RGB-flow
+alternative must be frozen before sensor evaluation. Joint AbsRel/temporal gates
+must reject static smoothing. New data does not certify training-overlap absence,
+human/object/contact accuracy or CARI4D superiority. No assets downloaded.

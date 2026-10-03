@@ -5407,3 +5407,20 @@ checks before/after final hash and no late chmod; tiny replacement test preserve
 foreign bytes/mode and displaced archive while failing. New95focusedPASS follows.
 EP4 distinct CPU volume proposal dispatched once from f8f268b; actual unit active
 MainPID947301, full code59files/84400encodedB. No proposal result/adoption yet.
+
+EP3 fifteen original public inputs independently inventoried using fresh
+6ba2359 closure57files/77400encodedB, actual inactive/exit0 before reading its
+tiny log. Exact3358B/01425547... original input receipt, every original source
+hash and structural spec3/592/front_stereo_camera_left/1152/1536 frozen in NEW
+cari_clip_000003_input_pins.json. No predictions/GT decoded by the inventory.
+Native shared-frame pipeline remains pending until this commit and actual GPU
+idle check. Failed/read-tail path query to nonexistent jobs/logs is diagnostic
+only; real production logs live under results, no input PASS inferred from it.
+
+Asset archive wrapper+input inventory focused240PASS3.85s, Bash syntax/diffcheck
+PASS. Independent89PASS4.52s review confirms fingerprint ordering and actual
+config1155B/312a10621c02c02449d0786649eac137abc6d9d314236f851848942fb4bff72e;
+old caller-pinned40fd inventory149203B/95d09454.../448files+3links retained.
+Same-run archive verification is explicitly operational, not independent or
+replica/licence/CUDA/training eligibility. Timeout can leave partial0400 archive
+without receipt, never PASS; owned cleanup requires checking that failure first.

@@ -1,0 +1,28 @@
+{
+  "inventory_code": "jobs/40fdc2780076d3f83632dc20c7926a3a6763e9d7/run_frontend_replica_inventory/code",
+  "inventory_report": {
+    "pathrelative": "results/frontend-replica-inventory-40fdc2780076d3f83632dc20c7926a3a6763e9d7/report.json",
+    "pin": {
+      "bytes": 149203,
+      "entries_sha256": "bdae24745ec4d49e61557f6930ba81e21a4b62ce940d042b7f858fb55e28177f",
+      "files": 448,
+      "links": 3,
+      "producer_revision": "40fdc2780076d3f83632dc20c7926a3a6763e9d7",
+      "sha256": "95d09454133e481324380e9253d235ba3bbdd3657e1fac25f97e8f7c4f1741f1",
+      "total_bytes": 19910803804
+    }
+  },
+  "inventory_source_pins": {
+    "infra/frontend_replica_inventory.py": {
+      "bytes": 28238,
+      "git_blob_sha1": "a46ae3bf244ca70d5ce74df308dbdc285229da36",
+      "sha256": "f9cbb398a53beb257c580df0959c47c707e978afb653ea411382ae8e205821ee"
+    },
+    "infra/run_frontend_replica_inventory.sh": {
+      "bytes": 3088,
+      "git_blob_sha1": "14e57c10933f13164a8fcb32bccd0e439fab674b",
+      "sha256": "db01c510368134cb0dcac6fc10cc73d8e18f689d635c7fd62248b0fd11727fc3"
+    }
+  },
+  "schema": "world_reward.frontend_replica_inventory.pins.v1"
+}
