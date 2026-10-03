@@ -85,7 +85,7 @@ def fixture_bundle(gate,init,objects,monkeypatch):
         pr=predicted,pr_initial=copy.deepcopy(predicted),**{"in":dict(pose_abs=objects["obj_pose_world"].copy(),**{k:init[k].copy()for k in gate.inputs.PARAMETER_DIMS})},
         faces=faces,mhr_neutral_height_init=np.full(96,1.8,np.float32),mhr_spatial_scale=np.full(96,2/1.8,np.float32),mesh_diameter=np.full(96,2.,np.float32),
         K_rois=np.broadcast_to(np.eye(3,dtype=np.float32),(96,3,3)).copy(),bboxes=np.tile(np.array([0,0,224,224],np.float32),(96,1)),
-        observations=dict(human_mask=np.zeros((96,224,224),bool),object_mask=np.zeros((96,224,224),bool),K_full=np.tile(np.array([[1920,0,768],[0,1920,576],[0,0,1]],np.float32),(96,1,1)),postopt_K_rois=np.tile(np.eye(3,dtype=np.float32),(96,1,1)),postopt_crop_contract="cari4d.smplh_postopt_full_resolution_crop.v1",postopt_human_mask=np.zeros((96,256,256),np.float32),postopt_object_mask=np.zeros((96,256,256),np.float32)),raw=dict(rot=np.zeros((96,6),np.float32),trans=np.zeros((96,3),np.float32),delta_mhr_shape=np.full((96,45),.5,np.float32)))
+        observations=dict(human_mask=np.zeros((96,224,224),bool),object_mask=np.zeros((96,224,224),bool),K_full=np.tile(np.array([[1920,0,768],[0,1920,576],[0,0,1]],np.float32),(96,1,1)),postopt_K_rois=np.tile(np.eye(3,dtype=np.float32),(96,1,1)),postopt_crop_contract="cari4d.smplh_postopt_full_resolution_crop.v1",postopt_human_mask=np.zeros((96,256,256),np.float32),postopt_object_mask=np.zeros((96,256,256),np.float32)),raw=dict(rot=np.zeros((96,6),np.float32),trans=np.zeros((96,3),np.float32),delta_mhr_shape=np.full((96,45),.5,np.float32),delta_mhr_hand=np.zeros((96,108),np.float32)))
     hook={k:1 for k in gate.constrained.COUNTERS}|dict(raw_prediction_bytes_preserved=True,initializer_bytes_preserved=True,
         native_compose_global_unchanged=True,native_function_code_unchanged=True)
     return bundle,hook
@@ -161,6 +161,39 @@ def test_native_composition_changes_identity_only_rawshape_remains_original(gate
     assert b["pr"]["mhr_shape"].tobytes()==init["mhr_shape"].tobytes() and b["raw"]["delta_mhr_shape"].max()==.5
     assert before=={k:v.tobytes()for k,v in b["raw"].items()} and summary["delta_mhr_shape"]["shape"]==[96,45]
     assert b["pr"]["mhr_body_pose_cont"][0,0]==np.float32(.02)
+
+
+def test_frozen_zero_expression_requires_exact_native_addition_not_signed_zero_copy(gate,monkeypatch):
+    init=initializer(gate); init["mhr_face"][:]=-0.; init["mhr_hand"][:,0]=-0.
+    objects=dict(obj_pose_world=np.broadcast_to(np.eye(4,dtype=np.float32),(96,4,4)).copy())
+    b,h=fixture_bundle(gate,init,objects,monkeypatch)
+    with pytest.raises(ValueError,match="exact FP32 init\\+zero"):
+        gate.validate_bundle(b,init,objects,h)
+    for key in ("mhr_hand","mhr_face"):
+        b["pr"][key]=init[key]+np.zeros_like(init[key]); b["pr_initial"][key]=b["pr"][key].copy()
+    gate.validate_bundle(b,init,objects,h)
+    assert not np.any(b["pr"]["mhr_face"]) and np.signbit(init["mhr_face"]).all()
+    assert not np.signbit(b["pr"]["mhr_face"]).any()
+
+
+@pytest.mark.parametrize("fault",["missing","nonzero","negativezero","shape","face_delta"])
+def test_frozen_raw_delta_cannot_hide_a_real_change_or_invented_supervision(gate,monkeypatch,fault):
+    init=initializer(gate);objects=dict(obj_pose_world=np.broadcast_to(np.eye(4,dtype=np.float32),(96,4,4)).copy())
+    b,h=fixture_bundle(gate,init,objects,monkeypatch)
+    if fault=="missing":b["raw"].pop("delta_mhr_hand")
+    elif fault=="nonzero":b["raw"]["delta_mhr_hand"][0,0]=np.float32(1e-10)
+    elif fault=="negativezero":b["raw"]["delta_mhr_hand"][:]=-0.
+    elif fault=="shape":b["raw"]["delta_mhr_hand"]=np.zeros((96,107),np.float32)
+    else:b["raw"]["delta_mhr_face"]=np.full((96,72),1e-10,np.float32)
+    with pytest.raises(ValueError):gate.validate_bundle(b,init,objects,h)
+
+
+def test_unused_infinite_training_config_is_unchanged_but_never_logged_as_nonfinite_json(gate):
+    cfg=dict(clip_len=96,enable_amp=True,pred_mhr_shape=True,pred_mhr_scale=False,body_model="mhr",
+             mhr_joint_supervision_mode="body12_freeze_hand_face_all_losses",clip_grad_norm=float("inf"))
+    before=dict(cfg); active,digest=gate.config_receipt(cfg)
+    json.dumps(active,allow_nan=False)
+    assert cfg==before and "clip_grad_norm" not in active and len(digest)==64
 
 
 @pytest.mark.parametrize("fault",["GT","timeline","shape","scale","hand","face","dtype","reflection","raw","rawscale","rawnan","count","preserved","config","checkpoint","input","posecopy","root","neutral","K","bbox","contact","masks","fullK"])

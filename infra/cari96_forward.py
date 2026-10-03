@@ -21,7 +21,7 @@ import cari96_native as constrained
 from cari_runner import build_cari_runtime_environment, CHECKPOINT_SHA256, CHECKPOINT_REVISION, CHECKPOINT_RELATIVE_PATH, CONFIG_RELATIVE_PATH
 from world_reward.contracts import require_rigid_transforms
 
-BASE = "validation/cari96_forward_v2"
+BASE = "validation/cari96_forward_v3"
 PREPARE = "validation/cari96_public_v1"
 STAGE, BUDGET = "public_cari96_constrained_coconet_forward", 360
 IMAGE = "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7"
@@ -34,6 +34,7 @@ SOURCES = {constrained.NATIVE_RELATIVE_PATH: constrained.NATIVE_SOURCE_SHA256,
     "lib_mhr/mhr_layer.py": "a753ab8e730b6730fca275384fab629859311983292a407390d88c66ffe68c23",
     "lib_mhr/delta.py": "da495861dc55b266dabaf74a06fc683b74d2354f557827914cfc926b0daa2518",
     "learning/inference.py": "1d4fb02b3bf8345eee2510c96c4f2edcc7f7d17ae298fc7d23a392c56ebace9f",
+    "lib_mhr/mhr_supervision.py": "e7f4c5f8991e312eec69a760204758d44edaf9f29f9456ec181d288241686635",
     "learning/training/training_config.py": "d2acefefeea13f4257f8810865fd492079abdca30e7d9198c95eb0b7037fe4cf"}
 FACE_SHA = "f6748e290ef37fbb6877c4cc5bd7287105db9e98252b0ba170ae9ac3c45eacd6"
 CAMERA = "front_stereo_camera_left"
@@ -180,8 +181,6 @@ def validate_bundle(bundle, initializer, object_poses, hook):
             raise ValueError("Native input/initial-prediction blocks changed")
     for key in constrained.IDENTITY_DIMS:
         if bundle["pr"][key].tobytes() != initializer[key].tobytes(): raise ValueError("Constrained identity changed")
-    for key in ("mhr_hand","mhr_face"):
-        if bundle["pr"][key].tobytes() != initializer[key].tobytes(): raise ValueError("Native frozen hand/face supervision differs")
     if bundle["in"]["pose_abs"].tobytes() != object_poses["obj_pose_world"].tobytes(): raise ValueError("Inferred object trajectory/basis changed")
     faces = bundle.get("faces")
     if (type(faces) is not np.ndarray or faces.dtype != np.int32 or faces.shape != (36874,3)
@@ -219,10 +218,48 @@ def validate_bundle(bundle, initializer, object_poses, hook):
         if key not in {"rot","trans"} and not key.startswith("delta_mhr_"): raise ValueError("Unexpected native raw key")
         if type(value) is not np.ndarray or value.dtype != np.float32 or value.ndim != 2 or value.shape[0] != 96 or not np.isfinite(value).all():
             raise ValueError("Complete unmodified native raw FP32 output required")
+    validate_frozen_supervision(bundle,initializer)
     if any(type(hook.get(k)) is not int or hook[k] != 1 for k in constrained.COUNTERS): raise ValueError("Exactly one native composition/delegate/verification required")
     if any(hook.get(k) is not True for k in ("raw_prediction_bytes_preserved","initializer_bytes_preserved","native_compose_global_unchanged","native_function_code_unchanged")):
         raise ValueError("Native raw/global preservation evidence required")
     return {k:{"shape":list(v.shape),"sha256":hashlib.sha256(v.tobytes()).hexdigest()} for k,v in raw.items()}
+
+
+def validate_frozen_supervision(bundle, initializer):
+    """Exact upstream FP32 init+zero operation, not signed-zero restoration.
+
+    The pinned supervision layer zeros hand deltas; face has no head. Native
+    composition nevertheless adds positive zero to both blocks. -0 -> +0 is
+    an IEEE representation change, not a changed expression or hand pose.
+    Verify that exact operation and retain the untouched native output bytes.
+    """
+    raw = bundle["raw"]
+    for key,dimension in (("mhr_hand",108),("mhr_face",72)):
+        delta_key = "delta_"+key
+        if key == "mhr_hand" and delta_key not in raw:
+            raise ValueError("Original frozen native hand delta must be present")
+        if delta_key in raw:
+            delta = _array(raw[delta_key],(96,dimension))
+            if delta.tobytes() != np.zeros_like(delta).tobytes():
+                raise ValueError("Native frozen hand/face delta differs from exact zeros_like")
+        expected = initializer[key]+np.zeros_like(initializer[key])
+        actual = _array(bundle["pr"][key],(96,dimension))
+        if (actual.tobytes() != expected.tobytes() or not np.array_equal(actual,initializer[key])):
+            raise ValueError("Native frozen hand/face composition differs from exact FP32 init+zero")
+
+
+def config_receipt(cfg):
+    """Log active inference settings only; hash untouched training metadata.
+
+    The native config includes an unused Infinity gradient-clip default. Keep
+    it unchanged in the source/bundle, but do not emit nonstandard JSON numbers
+    or rewrite it to fit our finite receipt format.
+    """
+    keys = ("clip_len","enable_amp","pred_mhr_shape","pred_mhr_scale","body_model","mhr_joint_supervision_mode")
+    active = {key:cfg[key] for key in keys}
+    json.dumps(active,allow_nan=False)
+    digest = hashlib.sha256(json.dumps(cfg,sort_keys=True,allow_nan=True).encode()).hexdigest()
+    return active,digest
 
 
 def validate_forward_report(report):
@@ -342,7 +379,10 @@ def run(root,out,code,report,persist):
         if any(bundle["metadata"].get(k) != str(v) for k,v in paths.items()): raise ValueError("Native consumed-input paths differ")
         if any(bundle.get("checkpoint",{}).get(k) != v for k,v in dict(path=str(checkpoint),step=200000).items()): raise ValueError("Native checkpoint provenance differs")
         if torch.are_deterministic_algorithms_enabled() or torch.is_deterministic_algorithms_warn_only_enabled(): raise ValueError("Native ordinary CUDA policy changed")
-        report.update(native_raw=raw,native_metadata=bundle["metadata"],native_config=bundle["config"],source_files=files,helper_files=helpers)
+        active_config,config_digest = config_receipt(bundle["config"])
+        report.update(native_raw=raw,native_metadata=bundle["metadata"],native_config=active_config,
+            native_config_fingerprint=config_digest,native_frozen_hand_face_operation="unchanged_fp32_init_plus_exact_zero",
+            source_files=files,helper_files=helpers)
     finally:
         torch.hub.load = original; report["hub_restored"] = torch.hub.load is original;persist()
     if not report["hub_attempts"] or report["hub_returns"] != report["hub_attempts"]: raise ValueError("All actual offline DINO loads must return")

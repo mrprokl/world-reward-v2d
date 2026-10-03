@@ -20,11 +20,13 @@ Body2D error2.34px vsDWPose5.11px, worse in all8groups. Appearance changes
 increased centered geometry error despite identical reference geometry.
 A separate scoped-native photometric execution test now passes exact SHAM,
 after two preserved runtime failures. It validates reproducible mechanism on
-one fixture only; the medoid kept the original image prediction. Next is an
+one fixture only; the medoid kept the original image prediction. The subsequent
 untouched24-image human-only comparison under clip-constant identity also
 rejects gamma-medoid:0% median gain, two changed predictions slightly worse.
-No retuning/rescore. Next: constrained-identity native fullHOI execution and
-complete production outputs, with independent real/fullHOI validation separate.
+No retuning/rescore. The native96 shared-identity preparation now passes;
+the actual HOI network returned, but its export validation needs an exact
+signed-zero ABI correction before refinement/direct export. Next: complete
+production outputs, with independent real/fullHOI validation separate.
 Detailed receipts and decisions: [experiments](docs/experiments.md).
 Heavy data and all GPU work remain onAzure.
 

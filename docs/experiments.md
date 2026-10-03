@@ -3524,3 +3524,28 @@ finite last decoder chunk5, actual unchanged caller indices validated readonly.
 No H102 generator or numerical gate changed by those helpers; not yet executed
 on full video. Newforward preflight confirms absent namespace/unit/log, old
 failure terminal, H10095MiB/0%. Recheck actual committed closure before dispatch.
+
+H102 forwardv2 **network returned / validatorFAIL66.929384s**, source
+`2d0fa9ac9b68a16bfaf18c50eeab5efc5d7bfc64`, driver
+99854a70cb6e705cf8028b454d65356904711ad7750d6bc589d084f7c339b6ca,
+22-file50,808B Git closure SHA-XZf25133cb1daa216424b9705027bf819344933c69704ee2a659f63c776f27f98a.
+One forwardattempt/return, twoHubloads, onehook/delegate/verified complete;
+no final forwardPASS, refinement or export. Failedreceipt
+1b9897e5043cb03acb5c3c36d2e0ec97fe82212296f6b9234f2e114d2dd2f0f7
+(5,808B), nativebundle3241f42401904d7b9ae0c493eff54fdec84c523c520b26d28e3d33b9aa99d996
+(73,829,436B) retained Azure only. Readonly scalar inspection: hands byteexact;
+face differs in signed-zero bytes only, all6,912 values remain exactlyzero.
+Independent source audit: frozen hand deltas explicitly zeros_like; face has no
+head; pinned delta.py always performs FP32 init+zero, including−0→+0. Correct
+validation to require EXACT native FP32 addition bytes plus numericalidentity
+and exact frozen rawdelta zeros, with no epsilon/restoration/output changes.
+Also preserve an unused Infinity training-config default in source/nativebundle
+but record only finite active inference settings plus full untouched config
+fingerprint. No change to upstream prediction or active inference settings.
+Seven regression cases added; focused357PASS2.00s includes generic fullidentity
+contracts (129PASS0.11s separately). Newforwardv3 namespace, no oldbundle reuse.
+Readonly Azure operation check confirms exactnativeaddition forbothblocks,
+rawhanddelta positivezero bytes exact, faceheadabsent,4,267initializernegative
+expressionzeros become positivezero; no numericalchange. Fullsuite6980PASS/
+2sameSKIP118.34s. Newv3 namespace/unit/log absent/H10035MiB0%; no failedproducer
+rerun in place. Each fresh attempt uses unchanged public96 sources/gates.

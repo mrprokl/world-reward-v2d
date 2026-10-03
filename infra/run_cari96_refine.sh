@@ -18,7 +18,7 @@ export DOCKER_HOST="unix://$ROOT/docker.sock"
 IMAGE="$(docker image inspect world-reward/cari4d-source:0.1 --format '{{.Id}}')"
 [[ "$IMAGE" == sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7 ]]
 MOUNTS=(--mount "type=bind,src=$CODE,dst=$CODE,readonly")
-for path in "$ROOT/validation/cari96_forward_v2" "$ROOT/validation/cari96_public_v1" \
+for path in "$ROOT/validation/cari96_forward_v3" "$ROOT/validation/cari96_public_v1" \
  "$ROOT/vendor/video_to_data" "$ROOT/weights/cari4d/sam3d_body" \
  "$ROOT/weights/cari4d/refinement" "$ROOT/results/cari-refinement-assets.json" \
  "$ROOT/results/weights-acquisition.json"; do

@@ -4,7 +4,7 @@ set -euo pipefail
 (( $# == 0 )) || exit 2
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$CODE" == /* && "$REV" =~ ^[0-9a-f]{40}$ ]]
-OUT="$ROOT/validation/cari96_forward_v2"
+OUT="$ROOT/validation/cari96_forward_v3"
 python3 - "$ROOT" "$CODE" "$OUT" <<'PYSAFE'
 from pathlib import Path
 import sys
