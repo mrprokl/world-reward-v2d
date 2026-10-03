@@ -30,6 +30,8 @@ No final Parquet, submission or verified CARI4D improvement yet.
   are unverified. This is **not** a CARI4D victory or deployment authorization.
   Earlier root correction, DWPose prompts, gamma-medoid and global DA3
   replacement hypotheses were rejected; no post-score retuning/rescoring.
+  The independent T-LESS acquisition stopped at its frozen layout/licence
+  gates before heavy data or predictions; no generalization score exists.
 - **Eligibility:** upstream source/checkpoint licenses, training overlap and
   NVIDIA's separate registration remain unresolved before any submission.
   World Reward and all five Kaggle rule acceptances were verified on October 2.

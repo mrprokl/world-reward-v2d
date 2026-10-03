@@ -82,3 +82,13 @@ exact candidate/baseline validity. No evaluation alignment; zero/insufficient
 baseline support rejects. Preserve prior negative DA3 results and limited scope
 of the TUD-L positive result. Cross-dataset object-geometry identity and model
 training/challenge overlap are **unverified**, not asserted disjoint.
+
+## Actual outcome — STOP, 2026-10-03
+
+The original acquisition failed in **0.993362 s** before the 825 MB test ZIP,
+private annotation values, RGB selection or inference. The byte-pinned base
+contains an extra `test_targets_bop18.json`; a separate Azure-only metadata audit
+also finds no embedded licence declaration in `dataset_info.md`. Neither meets
+this frozen protocol. Preserve the original failure, remove disposable ZIPs,
+and do **not** widen the layout or infer a licence waiver to rerun it. No T-LESS
+generalization result or twelve-image input set exists.
