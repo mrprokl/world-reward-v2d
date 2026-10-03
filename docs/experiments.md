@@ -3811,3 +3811,36 @@ Readiness audits only selected30RGB+2metadata hashes/container metadata,
 never sample values/other tracks/labels/model files. All unverified occupied
 outputs remain opaque; no automatic reuse or resume. Actual Azure readiness
 execution and full export are still separate gates.
+
+Full501 direct native export actual **PASS34.580988s**, producer
+bf54ceb75d3b4240f24639184de47a7ac209f02e, unchanged driver
+967b45eb50959aa3854f01d1baae89fb946679f68bbaa8aff8a2d59287b27ee0.
+Actual43file116,432B Gitclosure SHA-XZ
+3138aebd081352da221858c7218861d15a791c174449f7a3c9eed733448dadb4.
+All four32attempt/return/validated routes cover original501/tail5; native
+direct/replaymax0.002870962/0.000953936mm, unchanged .01mm point gate.
+Every original official-reference mean passes unchanged2mm gate; complete
+mean/worstframe statistics still to inventory, not inferred from native values.
+Original refined7blocks/raw/contact/masks/source/model/helpers and saved
+payload rereadPASS; aligned2044vertex object scale1/camera roundtrip0m retained.
+Receipt947a97d9abfa8ee712ea5adf9747e95aa74f6a9006c34a95801434e0e19768c6
+(23,205B/0444); actual complete four payload pins committed for the consumer.
+Unitinactiveexit0/H100141MiB0%. Full prepare/forward/refine/export engineering
+chain now passes, not yet all30/finalParquet/independent accuracy/CARI4D win.
+
+Additive stage-inventory export support retains actual missing-field semantics,
+all previous gates and exact five-file hashes; new export fields mirror recorded
+full-N fidelity/source/object-roundtrip proofs. Root combined387testsPASS2.06s,
+no numerical producer helper changed. Clean-launch guard rejected a readiness
+dispatch while a disjoint agent had uncommitted additive work; no Azure command
+or unit was created. Commit all verified work before actual readonly preflight.
+
+Full-native episode CPU consumer gate added separately: pinned existing image,
+networknone/noGPU4GiB2CPU,300s/outer303, exact public/predecessor/source assets
+readonly, exclusive one444JSON receipt. No new trajectories, model execution,
+fitting, rendering, repacking or Parquet. Real peer imports and callback lifecycle
+25testsPASS followed root source/inventory/consumer/readiness/archive checks.
+All original prepare/forward/refinement helper bytes verified against their
+actual producing commits10/16/9files. A first local source_helpers call correctly
+rejected writable checkout files; rerun direct Git-byte comparisons, not altered
+file modes or remote evidence. Actual consumer runtime remains to execute.

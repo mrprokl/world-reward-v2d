@@ -27,8 +27,9 @@ No retuning/rescore. The native96 shared-identity preparation now passes;
 the actual HOI forward and saved-output validation now pass after an exact
 signed-zero ABI correction, without changing predictions. Native301-update
 refinement and direct export now pass on96frames. Full501 shared preparation
-also passes, as do the fresh full501 HOI forward and301-update native
-refinement; full direct export remains next. Independent
+also passes, as do the fresh full501 HOI forward,301-update native
+refinement and full direct export. The complete pipeline now passes on one
+public video; all30 production and independent
 real/fullHOI accuracy validation remains separate.
 Detailed receipts and decisions: [experiments](docs/experiments.md).
 Heavy data and all GPU work remain onAzure.

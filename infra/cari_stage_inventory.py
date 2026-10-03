@@ -38,6 +38,11 @@ STAGES = {
         "stage": "world_reward_native_cari_shared_full_video_refinement",
         "script": "infra/cari_full_refine.py", "payloads": ("refined.pth",),
     },
+    "export": {
+        "stage": "world_reward_native_cari_shared_full_video_direct_export",
+        "script": "infra/cari_full_export.py",
+        "payloads": ("trajectory.npz", "native_parameters.npz", "target.npy", "object_aligned.glb"),
+    },
 }
 SPEC_KEYS = {"episode_index", "total_frames", "camera_name", "height", "width"}
 
@@ -57,7 +62,7 @@ def _episode(value):
 def output_relative(episode, stage):
     _episode(episode)
     if type(stage) is not str or stage not in STAGES:
-        raise ValueError("Exact stage prepare, forward or refined required")
+        raise ValueError("Exact stage prepare, forward, refined or export required")
     return f"outputs/episode_{episode:06d}/cari_shared_{stage}_v1"
 
 
@@ -148,6 +153,68 @@ def _window_starts(count):
     return starts
 
 
+def _bounded_number(value,maximum,label):
+    if type(value) not in (int,float) or not math.isfinite(value) or not 0<=value<=maximum:
+        raise ValueError(label)
+
+
+def _public_source_paths(spec):
+    """Exact original fifteen identities; no payload interpretation/imports."""
+    base=f"outputs/episode_{spec['episode_index']:06d}"
+    export=base+f"/cari_inputs/export/episode_{spec['episode_index']:06d}"
+    return {
+        base+"/cari_inputs/aligned_depth.h5",base+"/cari_inputs/own_object_poses.pkl",
+        base+"/body_full/cari_adapter/canonical_initializer.pkl",base+"/cari_inputs/report.json",
+        export+"/object_mesh/output_aligned.glb",export+"/wild_export.json",export+"/edex",
+        *(export+f"/{kind}/{spec['camera_name']}.h5" for kind in ("images","human_masks","object_masks")),
+        *(base+"/"+name+"/report.json" for name in ("body_full","depth_full","object_pose_full","scale_smoke","body_full/cari_adapter")),
+    }
+
+
+def _validate_export_receipt(report,spec,files):
+    """Mirror actual export's recorded full-N scalar gate, never decode arrays.
+
+    Source hashes bind the runtime producer's complete lineage; this tiny host
+    operation independently rehashes only the five exact frozen export files.
+    It does not independently rerun geometry, camera, or reference replay.
+    """
+    count=spec["total_frames"];chunks=_chunks(count,16)
+    _expected(report,dict(chunk_counts=chunks,budget_seconds=600,ground_truth_read=False,
+        learned_inference_calls=0,optimizer_calls=0,converter_LM_calls=0,identity_reselection_performed=False,
+        submission_eligible=False,final_Parquet_produced=False,predictions_frozen_before_replays=True,
+        unchanged_refined_predictions_verified=True,stored_native_replay_verified=True,
+        native_Track1Episode_schema_verified=True,original_frame_coverage_verified=True,
+        frozen_outputs_rehashed_after_reference=True,raw_masks_contacts_object_pose_unchanged=True,
+        full_original_native_export_verified=True),"Complete unchanged full native export receipt required")
+    _expected(report,{name+suffix:len(chunks) for name in ("native_geometry","native_direct","native_replay","reference")
+        for suffix in ("_attempts","_returns","_validated")},"Every actual native/direct/saved/reference original chunk required")
+    _expected(report.get("reference_settings"),dict(precision="float32",residual_dtype="float64",chunk=16,device="cuda",
+        mean_point_gate_mm=2.,native_max_point_gate_mm=.01),"Original unchanged FP32 reference settings required")
+    errors=report.get("reference_per_frame_mean_mm")
+    if type(errors) is not list or len(errors)!=count:
+        raise ValueError("Every original exported reference-fidelity scalar required")
+    for value in errors:_bounded_number(value,2.,"Every original exported frame must retain unchanged2mm mean fidelity")
+    for key in ("native_direct_max_point_mm","native_replay_max_point_mm"):
+        _bounded_number(report.get(key),.01,"Unchanged .01mm native maximum-point replay fidelity required")
+    _bounded_number(report.get("reference_max_point_mm"),float("inf"),"Finite nonnegative official maximum-point diagnostic required")
+    for key in ("refined_report_sha256","refined_bundle_sha256","aligned_object_mesh_sha256"):_hex(report.get(key),64,key)
+    for key in ("input_pins","refined_pins"):_receipt(report.get(key))
+    original=report.get("source_files")
+    if type(original) is not dict or set(original)!=_public_source_paths(spec):
+        raise ValueError("Exact fifteen original public source identities required")
+    for row in original.values():_receipt(row)
+    mesh=f"outputs/episode_{spec['episode_index']:06d}/cari_inputs/export/episode_{spec['episode_index']:06d}/object_mesh/output_aligned.glb"
+    if (original[mesh]!=files["object_aligned.glb"]
+            or report["aligned_object_mesh_sha256"]!=files["object_aligned.glb"]["sha256"]):
+        raise ValueError("Original aligned public GLB identity must equal the actual frozen export")
+    roundtrip=report.get("object_roundtrip")
+    _expected(roundtrip,dict(frames=count,aligned_local_frame_retained=True,object_scale=1.,additional_frame_transform=False),
+        "Every original object frame must retain local geometry, unit scale, and camera frame roundtrip")
+    if type(roundtrip.get("vertices_per_frame")) is not int or roundtrip["vertices_per_frame"]<=0:
+        raise ValueError("Original full nonempty object vertices required in every frame")
+    _bounded_number(roundtrip.get("max_point_error_m"),1e-5,"Recorded original object/camera frame roundtrip fidelity required")
+
+
 def validate_report(report,episode,stage,producer_revision,producer_script_sha256,files):
     """Stdlib receipt/scalar gate, not an independent geometry/accuracy check."""
     spec=_spec(report.get("clip_spec") if type(report) is dict else None,episode);count=spec["total_frames"]
@@ -156,7 +223,7 @@ def validate_report(report,episode,stage,producer_revision,producer_script_sha25
         original_frame_indices=list(range(count)),producer_revision=producer_revision,script_sha256=producer_script_sha256,
         image_id=IMAGE,input_track="track_1",network="none",ground_truth_used=False,private_truth_read=False,
         hand_labeled_test=False,oracle_modes=[],quality_verified=False,adoption_authorized=False,submission_produced=False,
-        input_dataset_revision=DATASET_REVISION,source_inputs_assets_rehashed=True,source_helpers_rehashed=True),
+        source_inputs_assets_rehashed=True,source_helpers_rehashed=True),
         "Complete source-bound full-video public producer receipt required")
     helpers=report.get("source_helpers")
     if type(helpers) is not dict or STAGES[stage]["script"] not in helpers:
@@ -166,14 +233,18 @@ def validate_report(report,episode,stage,producer_revision,producer_script_sha25
         raise ValueError("Producer script helper differs from independently supplied source SHA")
     if any(type(index) is not int for index in report["original_frame_indices"]):
         raise ValueError("Original frame indices must remain actual integers")
-    _hex(report.get("input_sha256"),64,"input video SHA256")
-    if stage!="forward":_hex(report.get("input_report_sha256"),64,"input report SHA256")
+    if stage!="export":
+        _expected(report,dict(input_dataset_revision=DATASET_REVISION),"Actual original public dataset revision required")
+        _hex(report.get("input_sha256"),64,"input video SHA256")
+        if stage!="forward":_hex(report.get("input_report_sha256"),64,"input report SHA256")
     payloads={name:files[name] for name in STAGES[stage]["payloads"]}
     actual=report.get("output_files")
     if type(actual) is not dict or set(actual)!=set(payloads):raise ValueError("Exact producer payload manifest inventory required")
     for row in actual.values():_receipt(row)
     if actual!=payloads:raise ValueError("Complete actual producer payload SHA/size manifest differs")
-    if stage=="prepare":
+    if stage=="export":
+        _validate_export_receipt(report,spec,files)
+    elif stage=="prepare":
         _expected(report,dict(learned_inference_calls=0,optimizer_calls=0,converter_LM_calls=0,submission_eligible=False,
             identity_fixed_before_first_decode=True,chunk_counts=_chunks(count,16),predictions_frozen_before_replays=True,
             stored_initializer_native_replay_verified=True,shared_identity_verified=True,original_initializer_unchanged=True,
