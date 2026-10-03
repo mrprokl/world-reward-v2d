@@ -4857,3 +4857,14 @@ all-source9391PASS/2SKIP precedes only new tiny stagepins/docs, no runtime
 numerical source change. Full866 export dispatched oncee7d196dd30726323eaa45af5006ab21ca33462b4,
 58files125568encodedB/publicexactHTTP200; original600s/16chunks/source967b45eb,
 unitactiveMainPID875527. No native rerun, new algorithm or score claim.
+
+2026-10-03 17:59:03UTC full866 native directexport **PASS44.907846s**,
+unitinactive/exit0/GPUidle. All55 native geometry/direct/stored/reference
+chunks verified, full original866indices and constant geometry retained.
+Readonly444 receipt33656B/
+d8aebecce0f91c44a9300821f785059d6420cb3c8877cdb76dfda75f1eaeba5e;
+trajectory525074B/107ed9bc496dd31e307024139e53b63183841928e135a6d8fe7b3ec8b18f31db.
+Separate5artifact stdlibinventory9c583d7 independently binds originale7d196d/
+script967b45eb, allhashesbefore/afterJSON. Commitactual exportpins before
+CPU originalpacking. Nativepipeline executionPASS does not erase the earlier
+frontend7200s timingFAIL or prove CARI4D improvement. No final Parquet/upload.

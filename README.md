@@ -19,7 +19,8 @@ No final Parquet, submission or verified CARI4D improvement yet.
   official packer.
   A further 866-frame episode has verified complete inputs, but its frontend
   continuation exceeded the original time budget: provenance PASS is not a
-  timing PASS. Its full native preparation and forward now pass independently. No frames,
+  timing PASS. Its full native preparation, forward, refinement and export
+  now pass independently; official packing remains pending. No frames,
   components or trajectories were dropped to rescue it.
 - **Research:** a frozen DA3 depth hypothesis, anchored to MoGe by one
   scene-constant median ratio on the fixed 10% image border, gains **33.42%**
