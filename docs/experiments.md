@@ -2941,3 +2941,7 @@ V/J maxerrors0.0m, names/topology exact. All12front/backpairs useful,
 minimum994 newlyvisiblehuman pixels. No inference/quality performed.
 Terminalunit/H10039MiB0%. Actual manifestpins onlynow committed, nofactor
 labels or geometry in publicmanifest; nextseparate48DINO/48SAM inference.
+Private diagnostic strengthens recorded nativeDW feed/output trace: exact
+24listF64[3,384,288] supplied, delegated unchanged, two nativeSimCCF32
+[1,133,576]/[1,133,768] byte identities matchrecords. No inference/score
+policy changed or private labels accessed.36tiny quality tests PASS.

@@ -115,6 +115,23 @@ def test_first_human_sim3_shared_future_pose_cannot_erase_later_drift(gate):
     assert gate.geometry_metrics(late,target)["pve_cm"]==pytest.approx(12.)
 
 
+@pytest.mark.parametrize("fault",["none","partial","cast","delegate","output","row","sha"])
+def test_native_dw_actual_list_feed_trace(gate,fault):
+    array=lambda shape,dtype:dict(shape=shape,dtype=dtype,sha256="a"*64)
+    call=dict(supplied_container="list",effective_feed_shape=[1,3,384,288],effective_runtime_conversion_observed=False,
+        delegated_unmodified=True,run_completed=True,supplied_array=array([3,384,288],"float64"),
+        raw_simcc=[array([1,133,576],"float32"),array([1,133,768],"float32")])
+    report=dict(calls=[json.loads(json.dumps(call))for _ in range(24)],records=[dict(raw_simcc=call["raw_simcc"])for _ in range(24)])
+    if fault=="none":gate.dwpose_call_trace(report);return
+    if fault=="partial":report["calls"].pop()
+    elif fault=="cast":report["calls"][0]["supplied_array"]["dtype"]="float32"
+    elif fault=="delegate":report["calls"][0]["delegated_unmodified"]=False
+    elif fault=="output":report["calls"][0]["raw_simcc"][0]["shape"]=[1,134,576]
+    elif fault=="row":report["records"][0]["raw_simcc"]=[]
+    else:report["calls"][0]["supplied_array"]["sha256"]="bad"
+    with pytest.raises(ValueError):gate.dwpose_call_trace(report)
+
+
 def truth(gate,monkeypatch):
     hf=np.tile([0,1,2],(36874,1)).astype(np.int32);monkeypatch.setattr(gate,"FACE_SHA",hashlib.sha256(hf.tobytes()).hexdigest())
     ids=np.full((768,1024),-1,np.int64);ids.flat[:64]=0;ids.flat[64:128]=36874

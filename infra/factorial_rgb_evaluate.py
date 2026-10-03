@@ -77,6 +77,22 @@ def pinned_report(path,pin):
     return report,receipt
 
 
+def dwpose_call_trace(report):
+    calls,rows=report.get("calls"),report.get("records")
+    if not isinstance(calls,list)or len(calls)!=24 or not isinstance(rows,list)or len(rows)!=24:
+        raise ValueError("All24 actual native CPU call/record pairs required")
+    for call,row in zip(calls,rows):
+        require_fields(call,dict(supplied_container="list",effective_feed_shape=[1,3,384,288],
+            effective_runtime_conversion_observed=False,delegated_unmodified=True,run_completed=True))
+        require_fields(call.get("supplied_array"),dict(dtype="float64",shape=[3,384,288]))
+        arrays=call.get("raw_simcc")
+        if not isinstance(arrays,list)or len(arrays)!=2 or row.get("raw_simcc")!=arrays:raise ValueError("Native source returned exact two recorded SimCC arrays")
+        for value,shape in zip(arrays,([1,133,576],[1,133,768])):
+            require_fields(value,dict(dtype="float32",shape=shape))
+        for value in (call["supplied_array"],*arrays):
+            if not re.fullmatch("[0-9a-f]{64}",str(value.get("sha256",""))):raise ValueError("Native feed/output byte identity required")
+
+
 def public_observations(root,pins,quality):
     records,inputs=public.public_inputs(root,pins);reports={};arrays={};frozen=[]
     for role,validator in (("body",public.validate_body),("dwpose",public.validate_dw)):
@@ -116,8 +132,7 @@ def public_observations(root,pins,quality):
                 native_source_modified=False,own_feed_cast=False,channel_swap=False,full_image_fallback=False,raw_scores_clamped=False,
                 confidence_threshold_applied=False,wrapper_neck134_used=False,global_image_modified=False,gpu_used=False,
                 capability_evidence=public.dw_helper.validate_smoke(root),assets=public.smoke.validate_assets(root),dependencies=public.smoke.dependency_identity()))
-            calls=report.get("calls")
-            if not isinstance(calls,list) or len(calls)!=24 or any(c.get("run_completed")is not True for c in calls):raise ValueError("All24 actual native CPU calls required")
+            dwpose_call_trace(report)
         values=public.frozen_artifacts(path.parent,report.get("records"),records,validator)
         for row,data in zip(report["records"],values):
             frozen.append(regular(path.parent/row["prediction_file"],row["prediction"]["sha256"]))
