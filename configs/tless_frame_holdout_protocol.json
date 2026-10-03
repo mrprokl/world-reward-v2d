@@ -1,0 +1,36 @@
+{
+  "schema": "world-reward-tless-frame-holdout-protocol-v1",
+  "dataset": "bop-benchmark/tless",
+  "revision": "5fd309a04476a842d93abfb584fba9ee7caecdf1",
+  "license": "CC-BY-4.0",
+  "archives": {
+    "tless_base.zip": {"bytes": 49597, "sha256": "dd70ca884b7c471a530a952f70c5ab2c212f3d2c2f371be86397442b97d70a7e", "git_blob_sha1": "aa13c0f04b155533cdcb6a8bbd037dd05fdb7cdb"},
+    "tless_test_primesense_bop19.zip": {"bytes": 825276992, "sha256": "1a18f6bbfb5ac4ced8529f7a35225adfed88c0f62ef38067933e2b541ef1d00b", "git_blob_sha1": "72f63df493066d4e431e949f4cbd8db73ce8f194"}
+  },
+  "license_sources": {
+    "huggingface_README": {"url": "https://huggingface.co/datasets/bop-benchmark/tless/raw/5fd309a04476a842d93abfb584fba9ee7caecdf1/README.md", "bytes": 30, "sha256": "8f0c7e5b67cd5f155f6570a713fd5f75ed8202614734e37df3566efa045460d2", "git_blob_sha1": "7da79263d0e701a53a0d662d245c4fc3db39b287"},
+    "BOP_TLESS_section": {"url": "https://bop.felk.cvut.cz/datasets/#T-LESS", "bytes": 958, "sha256": "aa30ba3f957cca7a0982243086467a360139905da7fc0f4598b8a68db6797131"}
+  },
+  "source_format": {"url": "https://raw.githubusercontent.com/thodan/bop_toolkit/b72b3015c87a96fa6398c2ef4c196e85f798d3e6/bop_toolkit_lib/dataset_params.py", "bytes": 32303, "sha256": "a935fc4f6fd42f367a0bbf816036f783fb4c5d87200a8615ce1e08e6d51af05e", "revision": "b72b3015c87a96fa6398c2ef4c196e85f798d3e6"},
+  "acquisition": {"budget_seconds": 600, "maximum_expanded_zip_bytes": 8000000000, "maximum_zip_members": 500000, "maximum_member_bytes": 128000000, "maximum_retained_bytes": 256000000, "models_acquired": false},
+  "selection": {"scene_ids": [1, 10, 20], "ranks": "floor(k*N/5), k=1,2,3,4 on sorted native RGB filenames in each fixed scene", "N_200_ranks": [40, 80, 120, 160], "minimum_RGB_files_per_scene": 5, "images": 12, "before_private_annotation_values": true},
+  "public_inputs": {"width": 720, "height": 540, "RGB_files_only_plus_attributed_manifest": true, "private_K_depth_masks_meshes_or_labels": false},
+  "future_frozen_method": {
+    "performed_by_acquisition": false,
+    "fixed_camera_K": [[800.0, 0.0, 360.0], [0.0, 800.0, 270.0], [0.0, 0.0, 1.0]],
+    "prediction_pixel_convention": "centres_plus_0.5",
+    "border": "xx<72 or xx>=648 or yy<54 or yy>=486; proxy only, no semantic exclusion",
+    "minimum_border_pairs": 1024,
+    "minimum_border_coverage": 0.95,
+    "anchor": "one median of four image-median native MoGe_Z/native DA3_Z ratios per fixed scene",
+    "candidate_validity": "exact unchanged native MoGe validity; no drop or expansion",
+    "apply_mask": false,
+    "force_projection": true,
+    "per_frame_anchor_fit": false,
+    "offset_fit": false,
+    "private_camera_used_for_prediction": false,
+    "alignment_performed": false
+  },
+  "future_private_evaluation": {"all_selected_object_instances": true, "visible_mask_union": true, "native_depth_scale_per_frame": true, "sensor_pixel_convention": "integer_BOP", "scene_score": "mean four paired frame camera Chamfer half cm, then scene relative gain", "minimum_median_relative_gain": 0.05, "maximum_any_scene_relative_regression": 0.05, "minimum_each_frame_baseline_and_candidate_object_coverage": 0.95, "exact_candidate_validity_matches_baseline": true, "no_alignment": true},
+  "claims": {"new_capture_dataset_vs_TUDL": true, "training_overlap_verified": false, "challenge_overlap_verified": false, "exact_cross_dataset_object_geometry_disjointness_verified": false, "full_human_object_quality_verified": false, "temporal_quality_verified": false, "verified_victory_over_CARI4D": false}
+}

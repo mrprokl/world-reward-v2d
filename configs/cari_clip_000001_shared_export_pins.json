@@ -1,0 +1,12 @@
+{
+  "schema": "world-reward-cari-shared-export-pins-v1",
+  "clip_spec": {"episode_index": 1, "total_frames": 668, "camera_name": "front_stereo_camera_left", "height": 1152, "width": 1536},
+  "export": {"sha256": "c85d306b42c94681971b1a12a8a558bb6808ff4ae634167e0212be2be5b4cc44", "bytes": 28005, "producer_revision": "0c815d06ba974d9e2761a31b1bfa098de72022bd", "script_sha256": "967b45eb50959aa3854f01d1baae89fb946679f68bbaa8aff8a2d59287b27ee0"},
+  "export_files": {
+    "native_parameters.npz": {"sha256": "553b0ff4da94c5c2cbcc571d14b152ebe7823b9f0c810235f36e4604fb4a78a6", "bytes": 2384112},
+    "object_aligned.glb": {"sha256": "870277e87e3436b07a831f9cf21a607629bb2424549b93c0bc1d5dd2b96896db", "bytes": 75148},
+    "report.json": {"sha256": "c85d306b42c94681971b1a12a8a558bb6808ff4ae634167e0212be2be5b4cc44", "bytes": 28005},
+    "target.npy": {"sha256": "920f143e1b88cf39ad60afe78457dc392240a8f79233d88fa0aa61e104207fe5", "bytes": 147807152},
+    "trajectory.npz": {"sha256": "e1ba0b564859c75d775dc6df99dd8e6c1b69479d946c1573bbb4bc706f39d898", "bytes": 413991}
+  }
+}

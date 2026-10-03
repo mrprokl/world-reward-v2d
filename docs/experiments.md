@@ -4730,3 +4730,52 @@ Independent readonly stage inventory9c583d7 binds original producered1ed9a/
 scriptb874a91c and both exact files before/after JSON. Commit actual
 configs/cari_clip_000001_shared_refined_pins.json before full export. This is
 execution/provenance, not measured reconstruction quality or a final Parquet.
+
+Full668 direct export dispatched once at0c815d06ba974d9e2761a31b1bfa098de72022bd,
+53files122816encodedB/publicexactHTTP200. Actual **PASS38.977407s** by
+17:30:14UTC, unit inactive/exit0/GPUidle; all42 native geometry/direct/stored
+replay/official-reference chunks validated, original668trajectory retained.
+Readonly444 receipt28005B/
+c85d306b42c94681971b1a12a8a558bb6808ff4ae634167e0212be2be5b4cc44;
+trajectory413991B/e1ba0b564859c75d775dc6df99dd8e6c1b69479d946c1573bbb4bc706f39d898.
+Separate stdlib inventory9c583d7 binds original0c815d0/script967b45eb and
+all five export artifacts before/after JSON. Exact stage pins committed before
+CPU consumer/original official packing; no trajectory fitting or final Parquet.
+
+Next full866 nativeprepare uses the **already present immutable0c815d0 export
+closure**, with actual unchanged prepareba5d431a/wrapperb70e444d/inputpinbf943071
+checked before dispatch. No local archive transfer, replacement or broader
+mounts: original fifteen inputs, exact code/image/assets and exclusive new
+episode2 output. Original frontend exit124/7376.218425s remains a timingFAIL;
+its independent input-provenance PASS does not erase that failure.
+
+Readonly throughput audit chooses EP3/592 next by first-absent episode policy,
+not quality. Prioritize ready native chains; GPU and disjoint CPU assembly can
+overlap only after actual GPU/worker checks. Estimated59–63min tracking and
+82–84min CPU assembly, not measured latency. No numerical speed-up, frame
+reduction, relaxed7200s gate, duplicate job or legacy forward/converter proposed.
+
+2026-10-03 17:34:55UTC full866 nativeprepare **PASS24.392144s**, unit
+inactive/exit0/GPUidle; all55 native geometry/direct/stored replay/reference
+chunks retained. Actual444 receipt34304B/
+71f9e8b9db2578b32771552fb1c7c6ed191901e59d7641201dade91f8c6c0826,
+original0c815d0/ba5d431a source. Independent4artifact inventory9c583d7PASS,
+no labels or geometry/model execution; commitactual stagepins before forward.
+
+New T-LESS acquisition-only protocol is frozen before private values:
+HF5fd309a0, CC-BY-4.0 publisher/card plus mandatory embedded terms gate,
+scenes1/10/20, four sorted filename ranks floor(k*N/5), all12 native720x540RGB,
+all instances retained privately,600s budget. Entire3563B protocol SHA
+cff213716625f4070d4547f8a4cb0f361692d93f19aaebad8eac1cc0d0e9bd1c;
+unknown layout/licence/bounds causeSTOP, not retry/waiver. Archives are
+Azure-only and disposable. Tiny acquisition/originalinput/archive254PASS2.20s;
+nativeexport/consumer/officialpack/stage405PASS3.84s. No actual acquisition
+or generalization result yet.
+
+Additive RGB-grid anchor contract reproduces original TUD-L pure-array
+calculations without modifying the frozen inference/evaluation producers.
+It computes DA3 processed K from native RGB-sizeK and resizes camera-Z to
+the original grid;720x540 expectedfx575.555556/fy580.740741, not the old640
+grid constants. All masks/XYZ/fullvalidity replay unchanged. Border v1 remains
+strict dimensions divisible by10: **1536x1152 is not yet supported**, rather
+than silently introducing rounded borders. No challenge deployment/model run.
