@@ -2003,3 +2003,26 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   COCO/UBody rights/overlap, actualONNX channelgraph/runtimeABI, CPU cost and
   2D accuracy remain unverified. Future isolated offline installation and
   actual133-output image smoke need their own gates, not implied by acquisition.
+
+  D93 actualruntimePASS42.067650s/sourceb0850dc4da2d403477ddbdb7f5b67df7006b534e,
+  receipt`d0c5efa69988a87cd148a3abbe7f5d9542aed6b107de6c122da8de76326ae6bb`.
+  Medoidanchor136, actual4nativehead/64soft/60backward/115hardcalls; rawparity
+  root7.7804e-7m/camera1.0341e-6m/controls2.9802e-8, integrity/flagsPASS.
+  PeakGPUallocated1,134,425,088B/reserved1,237,319,680B wellinside32GiB.
+  M0train .011020621→.010981362;M1 .010601408→.010547599, bothnonincreasing.
+  Max|XY| M0 .01707443m/M1 .01611209m. Pairedfinalheldout M1minusM0 mean
+  .025384998, median .019786718, worst **-.012062284** below frozen-.01: 
+  hypothesis **REJECT**, no sameepisode threshold/medoid/optimizer retune.
+  Full23meanheldout IoU raw .85693245,M0initial .83704839,M1initial .85333777,
+  M0final .82377277,M1final .84915777. Fitafterminusbefore M0mean-.01327562,
+  worst-.04438353,22/23regress;M1mean-.00418001,worst-.03544947,15/23regress.
+  Thus the small softtrain decrease does NOT demonstrate hardheldout gain;
+  M1betterthanM0 is not sufficient for adoption, 3D/HOI accuracy or victory.
+  No causal attribution to blur/camera/optimizer without a separate experiment.
+  Identityreceipt`8e18a269ddf62990762cbbdc808bebbdc8b3f3afb7f482098ab14da067eecffe`,
+  inputgeometry/masks`1c807e9380b7cfcf6044c88d92a2eff5e39d9cdeabec8f6555be97f594dffd8a`,
+  finalXY`0ec010e51f363e901596540f04d6a88a15ea7d37f26e074ba489d0749b601df5`
+  all immutableAzure-only, no export/adoption. Sourcebundle11files49,792B;
+  suite5231PASS/1optionaltrimeshSKIP71.84s,183independentfocusedPASS,
+  terminal0/GPUinactive confirmed. Next independentRGB2D observations need
+  actualruntime/ABI gates before another coupled identity/pose hypothesis.
