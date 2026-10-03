@@ -2344,3 +2344,27 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   handregionvertexPVE maybediagnostic, labelledasregionnotjointaccuracy.
   Qualityprotocolsuccess distinctfromhypothesisacceptance; anygateFAILrejects
   recipe withoutsamecohortretune/realadoption. No alignment/contact/Track1win.
+
+  D96 fit/quality implementation freeze: public-only native CUDA fitter and
+  separate CPU quality driver share a lightweight artifact consumer. Historical
+  producer sources are mounted at their canonical immutable paths, read-only
+  for hashing only (not imported or executed), avoiding unnecessary GPU/renderer
+  imports and nonexistent child mounts inside the read-only CPU source bundle.
+  Recheck all nine DWPose assets, notices, historical source texts and capability
+  receipts, Body/MoGe assets and all original public arrays before/after fitting.
+  Native249 bounds and rootEuler/control correspondence are checked at every
+  head forward; the frozen consumer also checks the exported correspondence.
+  The quality firewall verifies all15 evaluated schedules, initial native parity,
+  observation-only singular values/rank and actual training validity/indices
+  before its first private read. True visible-object median uses ALL foreground
+  object pixels at pixel centers (+.5); the common predicted proxy remains the
+  independently frozen, bounded8192-point sample. Reserved face/wrist RGB errors
+  and hand-region vertex PVE are diagnostics, never unavailable GT joint labels.
+  Independent reviews found and fixed integration/source-closure and evidence
+  guards before execution; optimizer, data, time limits and quality gates unchanged.
+  Final independent source audit PASS;121 combined policy/fit/quality and64
+  bundling tests PASS. Actual native autograd,180s budget and held-out quality
+  are not established by these lightweight tests; no GPU run or GT quality read
+  has happened at this source freeze.
+  Full source suite5673PASS/1optionaltrimeshSKIP71.10s; bashsyntax/diffcheck
+  PASS. Clear disposable local bytecode/test caches; models/data remain Azure.
