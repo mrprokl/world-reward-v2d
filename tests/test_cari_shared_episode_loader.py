@@ -217,7 +217,7 @@ import inspect,sys
 sys.path[:0]=[{str(ROOT/'src')!r},{str(ROOT/'infra')!r}]
 import cari_shared_episode_loader as loader
 assert str(inspect.signature(loader.export.validate_export_report))=='(report, spec)'
-assert str(inspect.signature(loader.export.lineage.verify_refined_artifacts))=='(root, code, spec, pins)'
+assert str(inspect.signature(loader.export.lineage.verify_refined_artifacts))=='(root, code, spec, pins, source_code=None)'
 assert loader.export.__file__.endswith('/infra/cari_full_export.py')
 assert loader.export.lineage.__file__.endswith('/infra/cari_full_refine.py')
 assert 'torch' not in sys.modules and 'joblib' not in sys.modules

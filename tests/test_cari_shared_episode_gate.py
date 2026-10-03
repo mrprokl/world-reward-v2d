@@ -166,4 +166,4 @@ def test_complete_actual_archive_closure_under_control_cap():
         for name in selected:
             entry=tarfile.TarInfo(name);entry.size=len(files[name]);entry.mode=0o444;archive.addfile(entry,io.BytesIO(files[name]))
     encoded,_=launcher.encoded_runtime_archive(stream.getvalue())
-    assert len(encoded)<=160000
+    assert len(encoded)<=launcher.MAX_CODE_CONTROL_BYTES
