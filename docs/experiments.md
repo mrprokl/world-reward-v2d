@@ -4709,3 +4709,12 @@ Separate readonly twofile forwardinventory PASS, original29eabe3/ac07d96a
 independently bound; reuse immutable stdlibinventory9c583d7, no new GPUjob.
 Commit configs/cari_clip_000001_shared_forward_pins.json before refinement.
 No dynamicquality/human/object/penetration/completeV2D metric measured here.
+
+Native fullforward/refine/stageinventory/archive integration511PASS2.93s at
+actual668pins. Original final9330PASS/2sameoptionalSKIP265.44s predates only
+new tiny stagepins/results. Refinement dispatched once at
+ed1ed9aca796215938ad812097c2f6e82a3f7e89/publicexactHTTP200,
+50files117024encodedB; unitactiveMainPID858441, original300requested/301effective
+fullvideo updates,7200s budget/sourceb874a91c unchanged. All668fullpose/depth/
+camera/sharedidentity retained, no support reduction/GT/staticreplacement.
+Refinement is pending and not a verified score gain; no finalParquet/upload.
