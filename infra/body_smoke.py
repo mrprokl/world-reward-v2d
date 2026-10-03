@@ -78,8 +78,12 @@ def _manifest_file(root: Path, manifest: dict, relative: str) -> tuple[Path, str
     return path, record["sha256"]
 
 
-def _source_identity(root: Path) -> dict:
+def _source_identity(root: Path, *, selected_manifest=None) -> dict:
     """Bind the installed inference package to the audited, clean upstream tree."""
+    if selected_manifest is not None:
+        from frontend_selected_assets import load_contract, bind_body
+        contract = load_contract(root, selected_manifest)
+        return bind_body(contract, Path("/workspace/v2d_sam3d_body/lib/sam_3d_body"))
     vendor = root / "vendor/video_to_data"
     _pinned_checkout(vendor, UPSTREAM_REVISION)
     expected = vendor / BODY_PACKAGE
@@ -179,9 +183,14 @@ def _body_assets(root: Path) -> tuple[Path, dict]:
     return directory, records
 
 
-def _install_local_dinov3_loader(torch, repository: Path):
+def _install_local_dinov3_loader(torch, repository: Path, *, selected_manifest=None):
     """Never resolve GitHub/default branches or fetch weights through Torch Hub."""
-    _pinned_checkout(repository, DINOV3_REVISION)
+    if selected_manifest is None:
+        _pinned_checkout(repository, DINOV3_REVISION)
+    else:
+        from frontend_selected_assets import load_contract, bind_dinov3
+        root = repository.parents[5]
+        bind_dinov3(load_contract(root, selected_manifest), repository)
     original = torch.hub.load
     calls = []
 
@@ -272,6 +281,8 @@ def _argument_parser() -> argparse.ArgumentParser:
                         help="Apply the verified initializer to every original frame; not CARI temporal reconstruction")
     parser.add_argument("--inference-type", choices=("body", "full"), default="body",
                         help="Full adds native automatic hand proposals; neither mode fits a clip-constant identity")
+    parser.add_argument("--selected-source-manifest", type=Path, default=None,
+                        help="Explicit independently pinned VM02 selected archive; never claim a complete Git checkout")
     return parser
 
 
@@ -330,7 +341,8 @@ def main() -> None:
                                           inference_type=args.inference_type)
     if output_directory.exists():
         raise FileExistsError("Body smoke outputs are frozen; use a clean run directory, not overwrite")
-    source_hashes = _source_identity(root)
+    source_hashes = (_source_identity(root) if args.selected_source_manifest is None
+                     else _source_identity(root, selected_manifest=args.selected_source_manifest))
     body_directory, asset_hashes = _body_assets(root)
     import cv2
     import numpy as np
@@ -341,7 +353,8 @@ def main() -> None:
         raise RuntimeError("CUDA unavailable; never silently process challenge images on CPU")
     started = time.perf_counter()
     repository = root / "weights/cari4d/sam3d_body/torch_home/hub/facebookresearch_dinov3_main"
-    original_hub_load, hub_calls = _install_local_dinov3_loader(torch, repository)
+    original_hub_load, hub_calls = (_install_local_dinov3_loader(torch, repository) if args.selected_source_manifest is None
+                                  else _install_local_dinov3_loader(torch, repository, selected_manifest=args.selected_source_manifest))
     try:
         import sam_3d_body
         from sam_3d_body import build_models
@@ -535,6 +548,8 @@ def main() -> None:
         "frame_independent_initializer_only": True,
         "license": "SAM_3D_Body_Materials_license_not_Apache_wrapper_license",
     }
+    if args.selected_source_manifest is not None:
+        report.update(source_binding="verified_selected_archive", whole_checkout_verified=False)
     with (output_directory / "report.json").open("x") as handle:
         handle.write(json.dumps(report, indent=2) + "\n")
     print(json.dumps({**{key: report[key] for key in (

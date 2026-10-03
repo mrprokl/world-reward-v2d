@@ -5655,3 +5655,31 @@ NOT proven. Freshv3 removes redundantmutable runtimeGitHubtaglookup
 source/license/version SHA/blobs and wheelpins. Staticpublicendpoint/
 HTTPstatus+phase errors nowactionablewithoutsecrets; no retry/URLretune.
 40ownPASS/115runtimeclosurePASS0.74s; actualv3buildpending.
+
+
+Frozen da2f3db fullsuite10394PASS/2optionalSKIP332.15s, clean source before
+new edits. Groundingv3 actualFAIL143.783675151s atoffline_CPU_build:
+ALLimmutablepublicsource/wheel/notice acquisition completed, Docker error
+details were discarded by control helper. No proven missing source/compiler
+cause, no_Cdisable/dependency/numeric retuning. Newv4 changes diagnostics only:
+exact same source/wheel/CPU build recipe; private Azure400 build log+SHA/exit
+code, no raw compiler output returned locally. 43own+75closuretestsPASS.
+
+EP5 full668automaticmasks/body/depthinitializers PASS; outerfrontend actually
+failed before object tracking completion. Cause not yet audited; no input or
+native reconstruction PASS. GPUempty checked. EP3 originalfullnativeexport
+dispatched once fromda2f3db/80files152152encodedB, active992123; no exportPASS
+inferred. Independent native refinement provenance preserves originalqueueFAIL.
+
+Newexplicit selectedarchiveBody/DINO source binder:28own proceduraltests,
+243combinedBodyPASS. Actual75fdea extraction+manifest bytepins, selectedsource
+SHA/Gitblob and installed exactPython set; no fabricated.Git/wholecheckout
+claim, no20GBrehash, no inference/gauge changes. Default originalGitbinder
+unmodified; explicit CLIoptin only. ActualVM02binding stillpending.
+
+Independent temporal research audit: no existing fresh eligible jointRGB
+split available. Oldcohorts alreadyexposed/too short or object/depth-only.
+Next proposed4×48newauthoredRGBmodel-inferred availability ablation is NOT
+natural occlusion validation or challenge adoption. Camera hand axes/joint
+semantics and embedding limitations must settle first; do not rescore prior
+cohorts or substitute idealhand poses for model observations.

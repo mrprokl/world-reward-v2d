@@ -23,7 +23,7 @@ import zipfile
 
 ROOT=Path('/srv/scenesmith/world-reward')
 BASE='sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3'
-TARGET='world-reward/frontend-grounding-v3:0.1'
+TARGET='world-reward/frontend-grounding-v4:0.1'
 CONFIG='configs/frontend_grounding_source_pins.json'
 HELPERS=('infra/frontend_grounding_build.py','infra/run_frontend_grounding_build.sh',CONFIG)
 SAM_REV='2b90b9f5ceec907a1c18123530e92e794ad901a4'
@@ -87,7 +87,7 @@ def source_binding(code,revision):
  return {'markers':markers,'closure_sha256':sha.hexdigest(),'helpers':{n:identity(code/n,True)for n in HELPERS}}
 
 def validate_pins(pins):
- require(type(pins)is dict and pins.get('schema')=='world_reward.frontend_grounding_source_pins.v3' and pins.get('base_image_id')==BASE and pins.get('target_image')==TARGET,'Exact new child identity contract required')
+ require(type(pins)is dict and pins.get('schema')=='world_reward.frontend_grounding_source_pins.v4' and pins.get('base_image_id')==BASE and pins.get('target_image')==TARGET,'Exact new child identity contract required')
  repositories=pins.get('repositories');require(type(repositories)is list and len(repositories)==2,'Two public pinned source repositories required')
  for row,(repo,revision)in zip(repositories,(('facebookresearch/sam2',SAM_REV),('nvidia-isaac/video_to_data',NV_REV))):
   require(row.get('repo')==repo and row.get('revision')==revision,'Exact historical public source commit required')
@@ -179,6 +179,25 @@ def command(arguments,seconds=30):
  require(result.returncode==0,'Runtime control failed: '+Path(arguments[0]).name)
  return result.stdout
 
+def offline_build(arguments,log_path,report):
+ # Public pinned source only, env-i, no mounts/credentials/GPU/network. Preserve
+ # actionable build diagnostics privately on Azure, never in terminal output.
+ log_path=canonical(log_path);fd=os.open(log_path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o400)
+ try:
+  with os.fdopen(fd,'wb')as log:
+   try:
+    result=subprocess.run(['/usr/bin/timeout','--signal=TERM','--kill-after=5s','1000s',*arguments],env=SAFE_ENV,stdout=log,stderr=subprocess.STDOUT,timeout=1007,check=False)
+   except(OSError,subprocess.TimeoutExpired):raise ValueError('Bounded offline build unavailable or timed out')from None
+   finally:log.flush();os.fsync(log.fileno())
+  digest=hashlib.sha256();size=0
+  with log_path.open('rb')as log:
+   for block in iter(lambda:log.read(1024*1024),b''):digest.update(block);size+=len(block)
+  report['private_build_log']={'relative_path':str(log_path.relative_to(ROOT)),'bytes':size,'sha256':digest.hexdigest(),'terminal_output_disclosed':False}
+  report['offline_build_exit_code']=result.returncode
+  require(result.returncode==0,'Offline CPU build failed; inspect owned private Azure build log')
+ finally:
+  require(log_path.lstat().st_mode&0o777==0o400,'Private build log mode changed')
+
 def inspect_image(image):
  fmt='{"Id":{{json .Id}},"Architecture":{{json .Architecture}},"Os":{{json .Os}},"RootFS":{{json .RootFS}}}'
  row=strict_json(command(['docker','image','inspect',image,'--format',fmt]))
@@ -264,7 +283,7 @@ def build(code,revision,output,report):
  exclusive(context/'Dockerfile',dockerfile(pins,owner,prior['decord']is None))
  report.update(phase='offline_CPU_build',source_files=files,wheels=wheels,build_recipe_identity=identity(context/'Dockerfile'))
  require(source_binding(code,revision)==before,'Frozen builder source changed before build')
- command(['docker','build','--network','none','--pull=false','--force-rm','--memory','12g','--cpu-period','100000','--cpu-quota','400000','--tag',TARGET,'--file',str(context/'Dockerfile'),str(context)],1000)
+ offline_build(['docker','build','--network','none','--pull=false','--force-rm','--memory','12g','--cpu-period','100000','--cpu-quota','400000','--tag',TARGET,'--file',str(context/'Dockerfile'),str(context)],output/'offline-build.log',report)
  child=inspect_image(TARGET);require(child['Id']!=BASE and child['RootFS']['Layers'][:44]==parent['RootFS']['Layers'],'New child must preserve exact ordered parent rootfs')
  label=command(['docker','image','inspect',child['Id'],'--format','{{index .Config.Labels "'+LABEL+'"}}']).strip();require(label==owner,'Owned new child label required')
  after=probe(child['Id'],'wr-grounding-child-'+revision[:12],owner,True)
@@ -280,9 +299,9 @@ def main(argv=None):
  root=Path(os.environ['WR_ROOT']);code=Path(os.environ['WR_CODE']);revision=os.environ['WR_CODE_REVISION']
  require(root==ROOT and Path(__file__).resolve()==code/'infra/frontend_grounding_build.py','Actual frozen builder file required')
  source_binding(code,revision)
- output=canonical(root/'results/frontend-grounding-build-v3');require(output.parent.is_dir()and not output.exists(),'Fresh owned Grounding build namespace required; no overwrite or retry')
+ output=canonical(root/'results/frontend-grounding-build-v4');require(output.parent.is_dir()and not output.exists(),'Fresh owned Grounding build namespace required; no overwrite or retry')
  os.umask(0o077);output.mkdir(mode=0o700)
- report={'schema':'world_reward.frontend_grounding_build.v3','stage':'frontend_grounding_build','status':'fail','phase':'preflight','producer_revision':revision,
+ report={'schema':'world_reward.frontend_grounding_build.v4','stage':'frontend_grounding_build','status':'fail','phase':'preflight','producer_revision':revision,
   'budget_seconds':BUDGET,'GPU_used':False,'model_loaded':False,'challenge_data_read':False,'private_validation_read':False,'credential_material_read':False,
   'build_network':'none','base_pull_performed':False,'replica_ready':False,'license_eligibility_verified':False,'training_overlap_verified':False}
  started=time.monotonic()

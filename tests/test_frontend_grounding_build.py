@@ -111,8 +111,8 @@ def test_publisher_tag_version_and_license_evidence(pins,tmp_path,monkeypatch):
 
 def test_original_failure_and_image_not_reused(pins):
  source=(ROOT/'infra/frontend_grounding_build.py').read_text()
- assert build.TARGET=='world-reward/frontend-grounding-v3:0.1'
- assert "root/'results/frontend-grounding-build-v3'"in source
+ assert build.TARGET=='world-reward/frontend-grounding-v4:0.1'
+ assert "root/'results/frontend-grounding-build-v4'"in source
  assert 'frontend-grounding-build-v1'not in source and 'frontend-grounding-build-v2'not in source
  recipe=build.dockerfile(pins,'a'*64,True).decode()
  assert 'COPY publisher-notices /opt/world-reward-grounding/publisher-notices'in recipe
@@ -152,3 +152,21 @@ def test_receipt_no_overwrite_and_readonly(tmp_path):
  target=tmp_path/'output/report.json';build.exclusive(target,b'{}\n')
  assert target.stat().st_mode&0o777==0o400
  with pytest.raises(FileExistsError):build.exclusive(target,b'new')
+
+@pytest.mark.parametrize('status',[0,1,124])
+def test_offline_build_private_log_not_terminal_or_error(tmp_path,monkeypatch,status):
+ monkeypatch.setattr(build,'ROOT',tmp_path);calls=[]
+ def run(args,**kwargs):
+  calls.append((args,kwargs));kwargs['stdout'].write(b'procedural public compiler diagnostic\n')
+  return subprocess.CompletedProcess(args,status)
+ monkeypatch.setattr(build.subprocess,'run',run)
+ report={};path=tmp_path/'private.log'
+ if status:
+  with pytest.raises(ValueError,match='inspect owned private Azure build log'):build.offline_build(['docker','build'],path,report)
+ else:build.offline_build(['docker','build'],path,report)
+ assert path.stat().st_mode&0o777==0o400
+ assert report['offline_build_exit_code']==status
+ assert report['private_build_log']=={'relative_path':'private.log','bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'terminal_output_disclosed':False}
+ args,kwargs=calls[0];assert args[:4]==['/usr/bin/timeout','--signal=TERM','--kill-after=5s','1000s']
+ assert kwargs['env']==build.SAFE_ENV and kwargs['stderr']==subprocess.STDOUT and kwargs['timeout']==1007
+ with pytest.raises(FileExistsError):build.offline_build(['docker','build'],path,{})

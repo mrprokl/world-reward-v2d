@@ -21,11 +21,13 @@ No final Parquet, submission or verified CARI4D improvement yet.
   continuation exceeded the original time budget: provenance PASS is not a
   timing PASS. Its full native preparation, forward, refinement and export
   and original official packing now pass independently. The next 592-frame
-  episode now passes full native preparation and forward; its unchanged
-  refinement is queued behind the existing GPU lock. The following 747-frame
-  episode rejected its default mesh simplification before tracking. Its
-  independently gated volume-preserving replacement keeps all 25 components;
-  full tracking is running from frozen pins. No frames, components or
+  episode has independently verified preparation, forward and native refinement;
+  the outer queue failed its source-cache postcheck and is not reclassified.
+  After a separate source audit, native export is running. The 747-frame
+  episode keeps all 25 object components but tracking stopped at 18 frames
+  with empty automatic object masks. The next 668-frame episode has complete
+  automatic masks and Body/depth initializers; its frontend continuation failed
+  and still needs diagnosis. No frames, components or
   trajectories were dropped to rescue either episode.
 - **Research:** a frozen DA3 depth hypothesis, anchored to MoGe by one
   scene-constant median ratio on the fixed 10% image border, gains **33.42%**
@@ -44,6 +46,11 @@ No final Parquet, submission or verified CARI4D improvement yet.
 - **Eligibility:** upstream source/checkpoint licenses, training overlap and
   NVIDIA's separate registration remain unresolved before any submission.
   World Reward and all five Kaggle rule acceptances were verified on October 2.
+
+A verified 19.91 GB asset-only transfer and extraction between Azure VMs
+completed without local checkpoint traffic. The second runtime is not yet
+ready: its minimal Grounding build failed, with no parity or eligibility claim.
+The full frozen `da2f3db` lightweight suite passed **10,394 tests, 2 optional skips**.
 
 Heavy data, models and computation remain on Azure. Only reproducibility pins,
 results and decisions are kept here; see [experiments](docs/experiments.md).

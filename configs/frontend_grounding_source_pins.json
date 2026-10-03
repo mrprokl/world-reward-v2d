@@ -1,7 +1,7 @@
 {
-  "schema": "world_reward.frontend_grounding_source_pins.v3",
+  "schema": "world_reward.frontend_grounding_source_pins.v4",
   "base_image_id": "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3",
-  "target_image": "world-reward/frontend-grounding-v3:0.1",
+  "target_image": "world-reward/frontend-grounding-v4:0.1",
   "repositories": [
     {
       "repo": "facebookresearch/sam2",
