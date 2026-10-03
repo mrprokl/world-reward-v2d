@@ -3321,3 +3321,16 @@ metricgauge diagnostics even ifalignedgain passes. Existinglicenses/
 trainingoverlap remain unresolved; norenderer/SHAMPASS clearsfinaleligibility.
 127focusedmanufacture/policy/bundle testsPASS0.56s; observer/eval source still
 beingcompleted, noH101job/GTscore. Budgets/gamma/coverage/gates unchanged.
+
+H101 final pre-execution observer/evaluator audits completed: qualified scoped
+route and all360 artifact/metadata checks, actual native topology/LBS lineage,
+baseline-first shared Sim3 and complete24/72 raw silhouette diagnostics. The
+independent audit caught a uint8 0/255 mask incorrectly treated as boolean in
+the evaluator; corrected explicitly before any manufacture/GT, with a real
+PNG/reader regression test. No threshold/recipe/selection change. Final159
+targeted testsPASS18.98s; earlier204 observer/policy/bundle testsPASS12.35s.
+One full-suite run started while the new fixture was being corrected failed
+its moved-path identity check (6510PASS/1FAIL/1optionalSKIP), not a GPU/quality
+outcome; final frozen full suite is being rerun. Azure preflight: freshH101
+namespace, H100NVL95,830MiB/125MiBused/0%,574GBfree, previousH100c exit0.
+Only code/scalars transferred; no challenge/private quality queried.
