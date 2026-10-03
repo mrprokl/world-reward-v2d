@@ -5014,3 +5014,20 @@ No numeric/source/gate change. Proposal+inventory/loader/continuation286PASS
 precededonlynewprobeandtinyactualpins. Separateprecisionaudit verifies ideal
 grazingplane FP64 against70digitDecimal max4.24e-10m, supporting measured
 NEWfixture rasterproblem, notpreviousfailurecause norcohortrescuepermission.
+
+ActualEP3pin+loader/continuation167PASS31.68s; producer624238921936746f03b48cfb855331a0c204d2f7
+publishedexactHTTP200 beforedispatch. RootremovedONLY the originalemptyfailed
+object_pose_full via rmdir after failedunitexit1, exact73876Bfailedloghash,
+qualified19147Bproposalhash/freshcari_inputs/GPUidle checks; no array/frame/
+predictions deleted, originalfailedlogretained. Pinnedvolumecontinuationuses
+originala543e317 wrapper/original25hypotheses/full592timeline with separate
+7200s tracking/7200s CPUassembly; no timinggate widening or numericretune.
+
+Nextqualityreference design is separate analyticconvexraycasting, notrepaired
+oldpolycohort: new3ellipsoidshapes/seeds+4uniforminstants preregistered,
+stableFP64rayquadratic firstpositive root beforephysicalfiniteZplane; RGB/Z/
+visibility allsamehit. Independentlycheckimplicitresidual, nearestroot,
+analytic silhouette andpreselectedhighprecisionprobes; unresolvedtangencies
+STOP underdeclaredbounds. Newnamespace/privatepublicpins BEFOREinference,
+unchangeddepthanchor/gates, hard360s manufacturebudget. No implementation/
+manufacture/predictions/result yet, nooldcohortrescue/realHOI/CARIclaim.
