@@ -1,0 +1,29 @@
+{
+  "schema": "world_reward.authored_rgbd_protocol.v1",
+  "namespace": "validation/authored_rgbd_holdout_v1",
+  "origin": "new World Reward authored geometry, texture, camera and lighting; no downloaded data",
+  "manufacture": {
+    "budget_seconds": 360,
+    "runtime_image": "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3",
+    "torch": "2.5.1+cu124",
+    "pytorch3d": "0.7.9",
+    "numpy": "1.26.3",
+    "network": "none",
+    "public_manifest_only_after_all_gates": true,
+    "failure_discards_arrays_and_public_images": true
+  },
+  "grid": {"width": 640, "height": 480, "K": [[800.0, 0.0, 320.0], [0.0, 800.0, 240.0], [0.0, 0.0, 1.0]], "pixel_rays": "integer_indices_plus_0.5"},
+  "objects": [
+    {"scene_id": 1, "semiaxes_m": [0.25, 0.18, 0.22], "material_seed": 2026103101, "depth_m": 1.55, "start_angle_rad": -0.25, "angle_extent_rad": 0.65, "background_z_m": 3.2, "light_m": [-0.35, -0.4, 0.35]},
+    {"scene_id": 2, "semiaxes_m": [0.19, 0.30, 0.16], "material_seed": 2026103102, "depth_m": 1.85, "start_angle_rad": 0.15, "angle_extent_rad": 0.8, "background_z_m": 3.6, "light_m": [0.4, -0.3, 0.25]},
+    {"scene_id": 3, "semiaxes_m": [0.32, 0.15, 0.24], "material_seed": 2026103103, "depth_m": 2.05, "start_angle_rad": -0.35, "angle_extent_rad": 0.6, "background_z_m": 4.0, "light_m": [-0.2, 0.4, 0.2]}
+  ],
+  "mesh": {"latitudes": 24, "longitudes": 48, "surface": "positive diagonal affine transform of inscribed unit-sphere triangulation", "no_repairs": true, "support_plane_tolerance_m": 1e-12},
+  "motion": {"instants": [0.0, 0.3333333333333333, 0.6666666666666666, 1.0], "axis": [0.3, 1.0, 0.2], "translation_m": "[-0.045+0.09*t, 0.02*sin(2*pi*t), depth_m+0.05*t]", "shape_scale_and_background_constant_per_scene": true},
+  "appearance": {"object": "object-space seeded three sinusoidal bands, evaluated at perspective-correct raster surface points", "background": "physical finite-Z plane, continuous seeded sinusoidal texture in camera XY", "background_extent_xy_m": [2.2, 1.7], "lighting": "constant point light per scene, 0.45 ambient + 0.55 Lambertian diffuse; no specular term", "texture_phase": "PCG64(material_seed), three uniform phases in [0,2*pi)", "background_seed_offset": 1000},
+  "manufacture_gates": {"closed_two_face_edge_manifold": true, "consistent_outward_winding_and_positive_volume": true, "all_vertices_active_and_triangles_nondegenerate": true, "convex_support_plane_check": true, "minimum_camera_z_m": 0.01, "whole_object_pixel_margin": 8, "full_grid_finite_positive_camera_depth": true, "independent_float64_pixel_ray_selected_triangle_check": true, "independent_projected_convex_hull_visibility_check": true, "hull_boundary_tolerance_pixels": 0.0002, "selected_object_face_is_front_facing": true, "maximum_camera_z_error_m": 0.00002, "minimum_reference_barycentric": -0.0002, "minimum_object_pixels": 1024},
+  "public_inputs": {"schema": "world_reward.authored_rgbd_public.v1", "scene_ids": [1, 2, 3], "frame_ids": [0, 1, 2, 3], "files": "12 PNG RGB files and manifest.json only", "camera_K_depth_visibility_mesh_pose_in_public": false},
+  "frozen_method": {"performed_by_renderer": false, "fixed_K": "grid.K chosen from method, never private input", "border": "xx<64 or xx>=576 or yy<48 or yy>=432; background proxy only", "minimum_border_pairs": 1024, "minimum_border_coverage": 0.95, "anchor": "one scene median of four image-median native MoGe_Z/native DA3_Z ratios", "candidate_validity": "exact unchanged native MoGe validity", "offset_or_per_frame_fit": false, "alignment": false},
+  "private_evaluation": {"object_visible_pixels_only": true, "camera_pixel_rays": "integer_indices_plus_0.5", "samples_per_frame": 8192, "sampling": "all_if_count<=8192_else_sorted_PCG64_seed0_choice_without_replacement", "minimum_visible_object_pixels": 32, "scene_score": "mean four paired camera Chamfer half cm, then relative gain", "minimum_median_relative_gain": 0.05, "maximum_any_scene_relative_regression": 0.05, "minimum_each_frame_object_coverage": 0.95, "alignment": false},
+  "claims": {"synthetic_transfer_only": true, "real_data_generalization_verified": false, "photorealism_verified": false, "human_object_or_temporal_quality_verified": false, "pretrained_model_license_or_overlap_clearance": false, "verified_victory_over_CARI4D": false}
+}

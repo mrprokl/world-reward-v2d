@@ -4886,3 +4886,33 @@ refine/export/officialpacking, still not all30 or a verified CARI4D score.
 EP3/592 automaticmasks **PASS56.727549s**, originalTrack1/GTfalse; frontend
 unitrunning initializer stage. No episode/frame/prompt selected from private
 labels and no heavy local transfer. Preserve originalEP2frontendtimingFAIL.
+
+## 2026-10-03 — new authored RGBD transfer protocol, before manufacture
+
+Freeze a genuinely new object-only twelve-frame synthetic holdout, not a
+rescore of TUD-L12 or D88. Complete recipe4316B/
+5d53806c3737aa1b15288628ba2fc364bbeb9dc95731075c2f3821ef5a2c053e:
+three constant convex ellipsoids, four predetermined rigid instants each,
+native640x480/K800, seeded procedural material and physical finite-Z background.
+Closed/outward/positive-volume convex geometry, independent full-grid +.5
+ray/selected-triangle depth and projected-hull visibility must pass before
+publishing any public manifest. No MHR, downloaded geometry or challenge input.
+Original360s manufacture/300s inference/180s private evaluation gates; no rescue.
+
+Inference reuses unchanged native MoGe/DA3 and grid contracts, fixed10%border
+proxy/median-of-four scene coefficient, unchanged validity. Public input and
+prediction hashes are independently committed before their next consumers.
+Blind inference mounts only its actual infra/src closure, one inputpin file,
+individual public RGB and model/source assets: archive-wide configs are NOT
+mounted, preventing renderer recipe geometry/depth from being available.
+Private evaluation opens truth only after complete prediction audits; +.5
+camera XYZ, deterministic8192samples, no alignment, >=95% eachframecoverage,
+median gain>=5% and no scene regression>5%. No production adoption, real-world
+generalization, human/contact/motion or CARI4D performance claim.
+
+Independent agent audits caught and closed a missing-object visibility hole
+before freezing: selected raster depth alone is insufficient, so a separately
+computed projected convex hull now checks all strict inside/outside pixels with
+the declared2e-4pixel tie band. Complete source331focusedPASS3.66s and shell
+syntaxPASS before remote execution. Actual CUDA manufacture/predictions/scores
+remain unverified at this point; all outputs will stay Azure.
