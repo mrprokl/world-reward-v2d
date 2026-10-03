@@ -173,6 +173,121 @@ def test_original_download_headers_and_first_observed_digest_not_fake_pin(gate, 
         assert observed == gate.bytes_identity(raw) and "sha256" not in record
 
 
+@pytest.mark.parametrize("fault", [None, "HEAD_host", "GET_host", "HEAD_path", "GET_path", "HEAD_etag", "GET_etag", "HEAD_status", "GET_length"])
+def test_v2_exact_publisher_mapping_independent_HEAD_before_GET(gate, tmp_path, monkeypatch, fault):
+    raw = b"tiny unchanged archive bytes"; methods = []
+    record = dict(url="https://cvg.cit.tum.de/rgbd/dataset/freiburg1/rgbd_dataset_freiburg1_desk.tgz", bytes=len(raw), etag='"original"', last_modified="old")
+    class Response(io.BytesIO):
+        def __init__(self, method):
+            super().__init__(raw); self.method = method; self.status = 404 if fault == method + "_status" else 200
+            self.headers = {"Content-Length": str(len(raw) + (1 if fault == method + "_length" else 0)),
+                "ETag": "changed" if fault == method + "_etag" else '"original"', "Last-Modified": "old"}
+        def geturl(self):
+            url = gate.mapped_final_url(record["url"])
+            if fault == self.method + "_host": url = url.replace("webshare.cvg.cit.tum.de", "other.invalid")
+            if fault == self.method + "_path": url = url.replace("/g/rgbd/", "/other/rgbd/")
+            return url
+        def read(self, *args):
+            assert self.method == "GET", "HEAD must never read archive body"
+            return super().read(*args)
+    def request(request, **kwargs):
+        methods.append(request.get_method()); assert request.full_url == record["url"]
+        return Response(request.get_method())
+    monkeypatch.setattr(gate, "urlopen", request)
+    if fault:
+        with pytest.raises(ValueError, match="transport provenance"): gate.download_archive(record, tmp_path / "archive.tgz", True)
+        assert methods == (["HEAD"] if fault.startswith("HEAD") else ["HEAD", "GET"])
+        assert not (tmp_path / "archive.tgz").exists()
+    else:
+        assert gate.download_archive(record, tmp_path / "archive.tgz", True) == gate.bytes_identity(raw)
+        assert methods == ["HEAD", "GET"]
+
+
+def test_v2_transport_config_pin_namespace_and_original_failure_preserved(gate, tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    path = tmp_path / gate.TRANSPORT; path.parent.mkdir(); path.write_bytes((root / gate.TRANSPORT).read_bytes()); path.chmod(0o444)
+    identity, config = gate.transport_config(tmp_path)
+    assert identity == gate.TRANSPORT_ID and config["namespace"] == gate.BASE_V2
+    assert config["parent_scientific_protocol"] == {"file": gate.PROTOCOL, **gate.PROTOCOL_ID}
+    assert config["failed_original_acquisition"]["output_preserved"] is True
+    assert gate.V2_SOURCE_FILES == (*gate.SOURCE_FILES, "infra/run_tum_rgbd_depth_acquire_v2.sh")
+    wrapper = (root / gate.V2_SOURCE_FILES[-1]).read_text()
+    assert "--publisher-redirect-v2" in wrapper and gate.BASE_V2 in wrapper and gate.BASE not in wrapper
+    assert "run_tum_rgbd_depth_acquire_v2/code" in wrapper
+
+
+def test_v2_actual_source_archive_includes_both_wrappers_without_model_helpers(gate):
+    import azure_job
+    root = Path(__file__).resolve().parents[1]
+    files = {str(p.relative_to(root)): p.read_bytes() for folder in ("infra", "src", "configs") for p in (root / folder).rglob("*") if p.is_file() and p.suffix in (".py", ".sh", ".json", ".toml", ".cpp")}
+    files["pyproject.toml"] = (root / "pyproject.toml").read_bytes()
+    selected = azure_job.runtime_bundle_paths(files, gate.V2_SOURCE_FILES[-1])
+    assert {name for name in selected if name.startswith("infra/")} == set(gate.V2_SOURCE_FILES)
+    assert not any("infer" in name or "render" in name or "evaluate" in name for name in selected if name.startswith("infra/"))
+
+
+def test_v2_transport_config_drift_rejected(gate, tmp_path):
+    path = tmp_path / gate.TRANSPORT; path.parent.mkdir(); path.write_bytes(b"changed transport policy"); path.chmod(0o444)
+    with pytest.raises(ValueError, match="frozen transport"): gate.transport_config(tmp_path)
+
+
+def test_v2_main_records_distinct_namespace_parent_and_transport_receipt(gate, tmp_path, monkeypatch):
+    root = Path(__file__).resolve().parents[1]; transport = json.loads((root / gate.TRANSPORT).read_bytes())
+    frozen = dict(sequences=[fixture_sequence(gate, scene)[0] for scene in (1, 2, 3)])
+    output = tmp_path / gate.BASE_V2; output.mkdir(parents=True)
+    monkeypatch.setattr(gate.platform, "system", lambda: "Linux")
+    for name, value in dict(WR_ROOT=str(tmp_path), WR_CODE=str(tmp_path / "code"), WR_CODE_REVISION="a" * 40, WR_TUM_OUTPUT_RESERVED="1").items():
+        monkeypatch.setenv(name, value)
+    helpers = {gate.SOURCE_FILES[0]: dict(bytes=1, sha256="a" * 64)}; v2_flags = []
+    def binding(root, code, revision, executing, v2=False):
+        v2_flags.append(v2); return helpers, gate.PROTOCOL_ID, frozen
+    monkeypatch.setattr(gate, "bound_source", binding); monkeypatch.setattr(gate, "transport_config", lambda _: (gate.TRANSPORT_ID, transport))
+    old_receipt = dict(bytes=2412, sha256="3cf80bcc5fd992c64765971084c40a50a5134136af95a6437bb95c981c424e85"); checks = []
+    monkeypatch.setattr(gate, "verify_old_failure", lambda *_: checks.append("verified") or old_receipt)
+    handlers = {gate.signal.SIGALRM: object(), gate.signal.SIGTERM: object()}; before = handlers.copy()
+    def signal(number, handler): previous = handlers[number]; handlers[number] = handler; return previous
+    monkeypatch.setattr(gate.signal, "signal", signal); monkeypatch.setattr(gate.signal, "alarm", lambda _: None)
+    def acquire(destination, frozen, report, persist, v2=False):
+        assert destination == output and v2 is True
+        report.update(all24_original_files_hashed_before_depth_values=True)
+        return {}
+    monkeypatch.setattr(gate, "acquire", acquire); monkeypatch.setattr(gate, "output_inventory", lambda *_: {})
+    gate.main(["--publisher-redirect-v2"])
+    report = json.loads((output / "eval_private/acquisition-report.json").read_bytes())
+    assert report["status"] == "pass" and report["transport_version"] == 2
+    assert report["transport_identity"] == gate.TRANSPORT_ID and report["actual_output_namespace"] == gate.BASE_V2
+    assert report["scientific_protocol_identity"] == report["protocol_identity"] == gate.PROTOCOL_ID
+    assert report["original_failed_run_preserved"] is True and report["scientific_hyperparameters_retuned"] is False
+    assert report["original_failed_receipt_verified_before"] == report["original_failed_receipt_verified_after"] == old_receipt
+    assert checks == ["verified", "verified"]
+    assert handlers == before and v2_flags == [True, True]
+    assert not (tmp_path / gate.BASE).exists()
+
+
+@pytest.mark.parametrize("fault", [None, "hash", "mode", "status", "producer", "inference", "depth", "public", "private", "symlink"])
+def test_preserved_old_failure_verified_before_any_new_network(gate, tmp_path, fault):
+    parent = tmp_path / gate.BASE; public, private = parent / "inputs", parent / "eval_private"
+    public.mkdir(parents=True); private.mkdir(); (private / "source").mkdir()
+    failure = dict(stage=gate.STAGE, status="fail", phase="original_download", producer_revision="a" * 40,
+        inference_performed=False, depth_values_decoded=False, source_camera_or_trajectory_read=False)
+    if fault == "status": failure["status"] = "pass"
+    elif fault == "producer": failure["producer_revision"] = "b" * 40
+    elif fault == "inference": failure["inference_performed"] = True
+    elif fault == "depth": failure["depth_values_decoded"] = True
+    raw = json.dumps(failure).encode(); path = private / "acquisition-report.json"; path.write_bytes(raw); path.chmod(0o400)
+    transport = dict(failed_original_acquisition=dict(receipt_bytes=len(raw), receipt_sha256=hashlib.sha256(raw).hexdigest(),
+        phase="original_download", producer_revision="a" * 40))
+    if fault == "hash": transport["failed_original_acquisition"]["receipt_sha256"] = "0" * 64
+    elif fault == "mode": path.chmod(0o444)
+    elif fault == "public": (public / "unexpected.png").write_bytes(b"media")
+    elif fault == "private": (private / "unexpected-depth.png").write_bytes(b"private media")
+    elif fault == "symlink":
+        path.rename(private / "old.json"); path.symlink_to(private / "old.json")
+    if fault:
+        with pytest.raises(ValueError): gate.verify_old_failure(tmp_path, transport)
+    else: assert gate.verify_old_failure(tmp_path, transport) == gate.bytes_identity(raw)
+
+
 def test_failed_cleanup_reserved_only_receipt_and_terms_survive(gate, tmp_path):
     sequence, _ = fixture_sequence(gate); frozen = dict(sequences=[sequence])
     public, private = tmp_path / "inputs", tmp_path / "eval_private"; public.mkdir(); private.mkdir(); (private / "source").mkdir()
@@ -192,7 +307,7 @@ def test_actual_archive_closure_only_two_acquisition_helpers(gate, monkeypatch):
     files = {str(p.relative_to(root)): p.read_bytes() for folder in ("infra", "src", "configs") for p in (root / folder).rglob("*") if p.is_file() and p.suffix in (".py", ".sh", ".json", ".toml", ".cpp")}
     files["pyproject.toml"] = (root / "pyproject.toml").read_bytes()
     selected = azure_job.runtime_bundle_paths(files, gate.SOURCE_FILES[1])
-    assert {name for name in selected if name.startswith("infra/")} == set(gate.SOURCE_FILES)
+    assert {name for name in selected if name.startswith("infra/")} == set(gate.V2_SOURCE_FILES)
     assert not any("infer" in name or "render" in name or "evaluate" in name for name in selected if name.startswith("infra/"))
 
 

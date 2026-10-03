@@ -28,11 +28,14 @@ ROOT, BASE, IMAGE_ID = inference.ROOT, inference.BASE, inference.IMAGE_ID
 PINS = "configs/tum_rgbd_depth_prediction_pins.json"
 PROTOCOL = "configs/tum_rgbd_depth_protocol.json"
 PROTOCOL_ID = dict(bytes=21939, sha256="ed1f038546ac073d2b52f01874934a6683e05357f9730cbac1a5112930ded035")
+TRANSPORT = "configs/tum_rgbd_depth_transport_v2.json"
+TRANSPORT_ID = dict(bytes=1801, sha256="467adfda9eb0539be5d94e5182291622c475e28e7e65e8ebc7502902190581dc")
+ACQUISITION_SOURCES = ("infra/tum_rgbd_depth_acquire.py", "infra/run_tum_rgbd_depth_acquire.sh", "infra/run_tum_rgbd_depth_acquire_v2.sh")
 STAGE = "private_tum_rgbd_scalar_depth_quality"
 BUDGET = 180
 QUALITY_SHA = "09d097a5377027f7eebfe167c0ea2d1a45e75af2a02a8dd8a240076dec1f1745"
 SOURCE_FILES = tuple(dict.fromkeys(("infra/tum_rgbd_depth_evaluate.py", "infra/run_tum_rgbd_depth_evaluate.sh",
-    "infra/tum_depth_quality.py", "infra/tum_rgbd_depth_acquire.py", "infra/run_tum_rgbd_depth_acquire.sh",
+    "infra/tum_depth_quality.py", *ACQUISITION_SOURCES,
     "infra/tudl_anchor_evaluate.py", "infra/tudl_evaluate.py", "infra/run_tudl_anchor_evaluate.sh",
     "infra/run_tudl_anchor_evaluate_v2.sh", *inference.SOURCE_FILES)))
 exact, require = original_audit.exact, original_audit.require_fields
@@ -170,13 +173,22 @@ def public_predictions(root, code):
 def private_inputs(root, code, public, records):
     """Audit whole acquisition and private bytes before any sensor PNG decode."""
     protocol_path = code / PROTOCOL; protocol = pinned_json(protocol_path, PROTOCOL_ID)
+    transport_path = code / TRANSPORT; transport = pinned_json(transport_path, TRANSPORT_ID)
+    require(transport, dict(schema="world_reward.tum_rgbd_depth_transport.v2", namespace=BASE,
+        parent_scientific_protocol=dict(file=PROTOCOL, **PROTOCOL_ID)), "Exact distinct transport-v2 namespace and unchanged scientific protocol required")
     private = root / BASE / "eval_private"; expected = public["input_pins"]["acquisition_report"]
     ap = private / "acquisition-report.json"; rid = {key: expected[key] for key in ("sha256", "bytes")}
     acquisition = pinned_json(ap, rid)
     require(acquisition, dict(stage=acquisition_source.STAGE, status="pass", phase="complete",
         producer_revision=expected["producer_revision"], script_sha256=expected["script_sha256"],
-        source_helpers={name: inputs.identity(code / name) for name in acquisition_source.SOURCE_FILES},
-        protocol_identity=PROTOCOL_ID, budget_seconds=600, device="cpu", gpu_used=False, inference_performed=False,
+        source_helpers={name: inputs.identity(code / name) for name in ACQUISITION_SOURCES},
+        protocol_identity=PROTOCOL_ID, scientific_protocol_identity=PROTOCOL_ID,
+        transport_identity=TRANSPORT_ID, transport_version=2, actual_output_namespace=BASE,
+        original_failed_run_preserved=True,
+        original_failed_receipt_verified_before=dict(bytes=transport["failed_original_acquisition"]["receipt_bytes"], sha256=transport["failed_original_acquisition"]["receipt_sha256"]),
+        original_failed_receipt_verified_after=dict(bytes=transport["failed_original_acquisition"]["receipt_bytes"], sha256=transport["failed_original_acquisition"]["receipt_sha256"]),
+        scientific_hyperparameters_retuned=False,
+        budget_seconds=600, device="cpu", gpu_used=False, inference_performed=False,
         challenge_inputs_used=False, source_camera_or_trajectory_read=False, depth_values_decoded=False,
         ground_truth_used_for_inference=False, independent_full_archive_SHA256_known=False,
         training_overlap_verified=False, challenge_overlap_verified=False, accuracy_verified=False,
@@ -222,6 +234,8 @@ def private_inputs(root, code, public, records):
     if {row["file"] for row in license_rows} != expected_source: raise ValueError("Primary license source missing or duplicate")
     for archive, sequence in zip(archives, protocol["sequences"]):
         require(archive, dict(sequence_id=sequence["sequence_id"], url=sequence["archive"]["url"], bytes=sequence["archive"]["bytes"],
+            final_url=sequence["archive"]["url"].replace("https://cvg.cit.tum.de/rgbd/dataset/", "https://webshare.cvg.cit.tum.de/g/rgbd/dataset/", 1),
+            independent_HEAD_and_GET_exact_mapping_headers_verified=True,
             sha256_independently_preknown=False, sha256_is_first_observed_reproducibility_digest=True,
             nearest_timestamp_pairs_verified=True, selected8_independent_byte_pins_verified=True), "Original archive provenance/selection gates required")
         identity_record({key: archive[key] for key in ("bytes", "sha256")})
@@ -242,7 +256,7 @@ def private_inputs(root, code, public, records):
             expected_source.add(name); required["eval_private/" + name] = identity_record({key: term[key] for key in ("bytes", "sha256")})
     output_files = acquisition.get("output_files")
     if not exact(output_files, required): raise ValueError("Complete output inventory must equal original24 pins plus license/manifest")
-    frozen = [(ap, rid), (protocol_path, PROTOCOL_ID)]
+    frozen = [(ap, rid), (protocol_path, PROTOCOL_ID), (transport_path, TRANSPORT_ID)]
     for name, identity in required.items():
         path = root / BASE / name
         if name.startswith("eval_private/") and stat.S_IMODE(path.stat().st_mode) != 0o400: raise ValueError("Every original private file must be0400")

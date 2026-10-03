@@ -49,7 +49,7 @@ mutation. Inference uses `--network none`; acquisition downloads directly toAzur
 ## Reproducible jobs
 
 `infra/azure_job.py` requires a clean committed worktree, sends only source import
-closure plus small package/config as SHA-verified XZ (≤160KB base64), extracts
+closure plus small package/config as SHA-verified XZ (≤256KB base64), extracts
 read-only, and creates one unique systemd unit/log. Never replace active readers,
 restart on an observation timeout, or reuse a failed result path. Earlier legacy
 snapshots under `jobs/<commit>/code` remain unchanged. Status observations alone
@@ -511,3 +511,19 @@ MoGe1exactad326snapshot→2relativebloblinks→actualflat22/22786b09976058705034
 Actualimageindex/rootfs counts body44/grounding23/Objects37 intact. Noimageexport/
 transfer/CUDAcamera/installedsourceparity/licenseclearance/replicaready yet; next
 sealableownedimage+assetexport canuse thisauditedwhitelist, neverwholeweights/cache.
+
+TUMv1acquisition actualFAIL0.882454892s beforeanyarchivebody/publicRGB/depth;
+receipt2412B/3cf80bcc5fd992c64765971084c40a50a5134136af95a6437bb95c981c424e85.
+ActualreadonlyHEAD+GET(noBODY)20:01:29UTC proves soletransportcontractdefect:
+publisher originalURL redirects to exactwebshare.cvg.cit.tum.de/g/rgbd/dataset
+suffix, all200/ContentLength344011403/ETag/LastModified identicalfrozenHEAD.
+No changedbytes/labels/predictions. Preservev1FAIL/licenses/emptyinputs; distinct
+transportv2namespace andhardmappedofficialredirect willretainALL24sourcepins/
+scientific/licence/model/support/evalgates. DoNOTreinterpretv1 assuccess.
+
+Fullsuite9806PASS/2optionalSKIP/2FAIL266.14s: genuinehumanphotometric/official
+packercodeclosures now162312/163116encodedB duefullyretainedconfigs, notmissing
+dependencies/numericfailure. Raiseonlylocalcode-controlcap160→256KB, preserve
+ALLcommittedconfig/provenance andboundedoversize-rejection tests; no heavydata
+transport change. ActualCLIalreadyaccepted146812B forfrontends, capnotclaimed
+Azureuniversalhardlimit. Focused202PASS6.29s; newfullsuite recheckpending.

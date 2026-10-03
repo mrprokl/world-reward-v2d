@@ -5243,3 +5243,22 @@ spacedobservations, notprovenEP4cause. Candidategeneralmethod usesALL16existing
 observations unchangedidentitythresholds, no adaptuntilpass/interpolatedbox,
 validatedfirstonnewnonchallengeproceduralmissing/crossing/distractor fixtures.
 Originalactor/safety suite240PASS0.81s; no newchallengealgorithm runyet.
+
+
+D107 transport-only v2 freeze: original v1 FAIL0.882455s retained, zero media or
+predictions. Exact official prefix redirect, HEAD+GET headers and all original
+24 byte/cohort/licence/scientific gates unchanged in distinct namespace. Original
+0400 failure receipt, provenance and empty public directory verified before and
+after; no assertion-only preservation flag. Private evaluator checks both
+verification identities before sensor values. Acquisition69 tinyPASS0.19s;
+combined initial focused345PASS6.82s (before preservation addition), final focused
+recheck355PASS7.45s/bash-n/diffcheck PASS. No accuracy result or inference retuning.
+
+Actor-window procedural evidence: 30 new non-challenge tests exercise unchanged
+selector/default gates. One missing observation among three abstains, 15/16 real
+observations pass without imputation; sparse known-motion fragmentation abstains
+while genuine denser frames bridge the same trajectory. Closest unsupported
+tracks never substitute a bystander; ambiguity and contamination persist. Combined
+270PASS0.94s. Existing CLI accepts fixed 16/16 evidence; a separately frozen
+general policy and explicit failed-only archive are required before a new run.
+No challenge coordinates, manual labels or algorithm changes were used.

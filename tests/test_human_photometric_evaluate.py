@@ -176,7 +176,7 @@ def test_complete_runtime_closure_keeps_sources_and_small_config_only(gate):
     with tarfile.open(fileobj=output, mode="w", format=tarfile.PAX_FORMAT) as target:
         for path in selected:
             member = tarfile.TarInfo(path); member.size = len(files[path]); target.addfile(member, io.BytesIO(files[path]))
-    assert len(launch.encoded_runtime_archive(output.getvalue())[0]) < 160000
+    assert len(launch.encoded_runtime_archive(output.getvalue())[0]) <= launch.MAX_CODE_CONTROL_BYTES
     assert "infra/human_photometric_evaluate.py" in selected and "src/world_reward/human_photometric_metrics.py" in selected
 
 

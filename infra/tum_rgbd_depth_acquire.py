@@ -25,6 +25,10 @@ BASE = "validation/tum_rgbd_depth_holdout_v1"
 PROTOCOL = "configs/tum_rgbd_depth_protocol.json"
 PROTOCOL_ID = dict(bytes=21939, sha256="ed1f038546ac073d2b52f01874934a6683e05357f9730cbac1a5112930ded035")
 SOURCE_FILES = ("infra/tum_rgbd_depth_acquire.py", "infra/run_tum_rgbd_depth_acquire.sh")
+V2_SOURCE_FILES = (*SOURCE_FILES, "infra/run_tum_rgbd_depth_acquire_v2.sh")
+TRANSPORT = "configs/tum_rgbd_depth_transport_v2.json"
+TRANSPORT_ID = dict(bytes=1801, sha256="467adfda9eb0539be5d94e5182291622c475e28e7e65e8ebc7502902190581dc")
+BASE_V2 = "validation/tum_rgbd_depth_holdout_transport_v2"
 SCHEMA = "world_reward.tum_rgbd_depth_public.v1"
 SELECTION = "sorted_RGB_indices_40_80_120_160_per_sequence_before_depth_values"
 STAGE = "external_tum_rgbd_depth_holdout_acquisition"
@@ -64,16 +68,50 @@ def save(path, raw, mode=0o400):
     Path(path).chmod(mode)
 
 
-def bound_source(root, code, revision, executing):
+def transport_config(code):
+    path = canonical(Path(code) / TRANSPORT)
+    before = identity(path)
+    if before != TRANSPORT_ID or path.stat().st_mode & 0o222:
+        raise ValueError("Exact readonly independently frozen transport-v2 contract required")
+    transport = json.loads(path.read_bytes())
+    if identity(path) != before: raise ValueError("Transport contract changed during interpretation")
+    return before, transport
+
+
+def verify_old_failure(root, transport):
+    """Verify preserved original failure, without opening any depth/RGB values."""
+    parent = canonical(Path(root) / BASE); public, private = parent / "inputs", parent / "eval_private"
+    path = canonical(private / "acquisition-report.json"); expected = transport["failed_original_acquisition"]
+    pinned = dict(bytes=expected["receipt_bytes"], sha256=expected["receipt_sha256"])
+    if path.stat().st_mode & 0o777 != 0o400 or identity(path) != pinned:
+        raise ValueError("Original frozen failure receipt changed; transport-v2 cannot overwrite or reinterpret it")
+    raw = path.read_bytes()
+    if bytes_identity(raw) != pinned: raise ValueError("Original failure changed before JSON interpretation")
+    failure = json.loads(raw)
+    required = dict(stage=STAGE, status="fail", phase=expected["phase"], producer_revision=expected["producer_revision"],
+        inference_performed=False, depth_values_decoded=False, source_camera_or_trajectory_read=False)
+    if any(type(failure.get(k)) is not type(value) or failure[k] != value for k, value in required.items()):
+        raise ValueError("Original acquisition failure/provenance or no-inference contract differs")
+    if (not public.is_dir() or canonical(public) != public or any(public.iterdir())
+            or {p.name for p in parent.iterdir()} != {"inputs", "eval_private"}
+            or {p.name for p in private.iterdir()} != {"source", "acquisition-report.json"}
+            or identity(path) != pinned):
+        raise ValueError("Original failed output must remain media-empty and unchanged")
+    return pinned
+
+
+def bound_source(root, code, revision, executing, publisher_redirect_v2=False):
     root, code = canonical(root), canonical(code)
+    run_name = "run_tum_rgbd_depth_acquire_v2" if publisher_redirect_v2 else "run_tum_rgbd_depth_acquire"
+    source_files = V2_SOURCE_FILES if publisher_redirect_v2 else SOURCE_FILES
     if (root != ROOT or re.fullmatch(r"[0-9a-f]{40}", revision) is None or not root.is_dir()
-            or code != root / "jobs" / revision / "run_tum_rgbd_depth_acquire/code"
+            or code != root / "jobs" / revision / run_name / "code"
             or not code.is_dir() or Path(executing) != code / SOURCE_FILES[0]):
         raise ValueError("Exact immutable remote acquisition producer required")
-    if {str(p.relative_to(code)) for p in (code / "infra").rglob("*") if p.is_file()} != set(SOURCE_FILES):
-        raise ValueError("Only two stdlib acquisition source helpers permitted")
-    helpers = {name: identity(code / name) for name in SOURCE_FILES}
-    if any((code / name).stat().st_mode & 0o222 for name in (*SOURCE_FILES, PROTOCOL)):
+    if {str(p.relative_to(code)) for p in (code / "infra").rglob("*") if p.is_file()} != set(source_files):
+        raise ValueError("Only declared stdlib acquisition source helpers permitted")
+    helpers = {name: identity(code / name) for name in source_files}
+    if any((code / name).stat().st_mode & 0o222 for name in (*source_files, PROTOCOL)):
         raise ValueError("Original source and protocol must be readonly")
     before = identity(code / PROTOCOL)
     if before != PROTOCOL_ID: raise ValueError("Entire frozen TUM protocol changed")
@@ -127,15 +165,27 @@ def license_evidence(private, frozen):
     return records
 
 
-def download_archive(record, destination):
+def mapped_final_url(url):
+    prefix = "https://cvg.cit.tum.de/rgbd/dataset/"
+    if not url.startswith(prefix): raise ValueError("Exact original publisher prefix required")
+    return "https://webshare.cvg.cit.tum.de/g/rgbd/dataset/" + url[len(prefix):]
+
+
+def download_archive(record, destination, publisher_redirect_v2=False):
     url = record["url"]
     if not re.fullmatch(r"https://cvg\.cit\.tum\.de/rgbd/dataset/freiburg[123]/rgbd_dataset_freiburg[123]_[a-z_]+\.tgz", url):
         raise ValueError("Original selected publisher archive URL required")
+    final = mapped_final_url(url) if publisher_redirect_v2 else url
+    def verify(response, method):
+        if (response.status != 200 or response.geturl() != final or response.headers.get("Content-Length") != str(record["bytes"])
+                or response.headers.get("ETag") != record["etag"] or response.headers.get("Last-Modified") != record["last_modified"]):
+            raise ValueError("Original " + method + " final URL/headers differ from exact transport provenance")
+    if publisher_redirect_v2:
+        with urlopen(Request(url, method="HEAD", headers={"User-Agent": "WorldReward-TUM-acquisition/1.0"}), timeout=30) as response:
+            verify(response, "HEAD")  # No archive body is read by this independent check.
     digest = hashlib.sha256(); count = 0
     with urlopen(Request(url, headers={"User-Agent": "WorldReward-TUM-acquisition/1.0"}), timeout=30) as response:
-        if (response.status != 200 or response.geturl() != url or response.headers.get("Content-Length") != str(record["bytes"])
-                or response.headers.get("ETag") != record["etag"] or response.headers.get("Last-Modified") != record["last_modified"]):
-            raise ValueError("Original GET headers differ from predeclared primary provenance")
+        verify(response, "GET")
         with destination.open("xb") as stream:
             while True:
                 chunk = response.read(min(4 * 1024 * 1024, record["bytes"] - count + 1))
@@ -266,7 +316,7 @@ def output_inventory(destination, frozen):
     return files
 
 
-def acquire(destination, frozen, report, persist):
+def acquire(destination, frozen, report, persist, publisher_redirect_v2=False):
     public, private = destination / "inputs", destination / "eval_private"
     report["license_evidence"] = license_evidence(private, frozen); persist()
     staging = private / ".staging"; staging.mkdir(mode=0o700); retained = []
@@ -274,9 +324,11 @@ def acquire(destination, frozen, report, persist):
         for sequence in frozen["sequences"]:
             report.update(phase="original_download", active_sequence=sequence["name"]); persist()
             path = staging / (sequence["name"] + ".tgz")
-            observed = download_archive(sequence["archive"], path)
+            observed = download_archive(sequence["archive"], path, publisher_redirect_v2) if publisher_redirect_v2 else download_archive(sequence["archive"], path)
             row = dict(sequence_id=sequence["sequence_id"], url=sequence["archive"]["url"], **observed,
                 sha256_independently_preknown=False, sha256_is_first_observed_reproducibility_digest=True)
+            if publisher_redirect_v2:
+                row.update(final_url=mapped_final_url(sequence["archive"]["url"]), independent_HEAD_and_GET_exact_mapping_headers_verified=True)
             report["archives"].append(row); report.update(phase="filename_and_selected_byte_gates"); persist()
             records, checks, terms = scan_archive(path, sequence, staging); row.update(checks)
             if identity(path) != observed: raise ValueError("Original archive changed during streaming scan")
@@ -331,10 +383,17 @@ def cleanup_failure(destination, frozen):
 
 
 def main(argv=None):
-    argparse.ArgumentParser(description=__doc__, allow_abbrev=False).parse_args(argv)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    parser.add_argument("--publisher-redirect-v2", action="store_true")
+    args = parser.parse_args(argv); v2 = args.publisher_redirect_v2
     if platform.system() != "Linux": raise RuntimeError("Heavy external data stays on Azure Linux CPU")
     root, code, revision = Path(os.environ["WR_ROOT"]), Path(os.environ["WR_CODE"]), os.environ["WR_CODE_REVISION"]
-    helpers, protocol_id, frozen = bound_source(root, code, revision, Path(__file__)); destination = canonical(root / BASE)
+    transport_id, transport = transport_config(code) if v2 else (None, None)
+    old_failure_id = verify_old_failure(root, transport) if v2 else None
+    helpers, protocol_id, frozen = bound_source(root, code, revision, Path(__file__), v2) if v2 else bound_source(root, code, revision, Path(__file__))
+    if v2 and (transport["namespace"] != BASE_V2 or transport["parent_scientific_protocol"] != {"file": PROTOCOL, **PROTOCOL_ID}):
+        raise ValueError("Transport-only namespace/unchanged parent protocol required")
+    destination = canonical(root / (BASE_V2 if v2 else BASE))
     if os.environ.get("WR_TUM_OUTPUT_RESERVED") != "1" or not destination.is_dir() or any(destination.iterdir()):
         raise ValueError("Exclusive empty reserved new output required; no reuse/overwrite")
     private = destination / "eval_private"; private.mkdir(mode=0o700); (destination / "inputs").mkdir(mode=0o755)
@@ -344,6 +403,10 @@ def main(argv=None):
         challenge_inputs_used=False, source_camera_or_trajectory_read=False, depth_values_decoded=False,
         ground_truth_used_for_inference=False, independent_full_archive_SHA256_known=False,
         training_overlap_verified=False, challenge_overlap_verified=False, accuracy_verified=False)
+    if v2:
+        report.update(transport_version=2, transport_identity=transport_id, actual_output_namespace=BASE_V2,
+            scientific_protocol_identity=protocol_id, original_failed_run_preserved=True,
+            original_failed_receipt_verified_before=old_failure_id, scientific_hyperparameters_retuned=False)
     started = time.perf_counter(); path = private / "acquisition-report.json"; error = None
     with path.open("x") as stream:
         def persist():
@@ -353,17 +416,23 @@ def main(argv=None):
         alarm = signal.signal(signal.SIGALRM, expired); term = signal.signal(signal.SIGTERM, expired); signal.alarm(BUDGET)
         oldmask = os.umask(0o077)
         try:
-            persist(); report["output_files"] = acquire(destination, frozen, report, persist)
+            persist(); report["output_files"] = acquire(destination, frozen, report, persist, True) if v2 else acquire(destination, frozen, report, persist)
             if output_inventory(destination, frozen) != report["output_files"]: raise ValueError("Retained bytes changed")
             report["outputs_rehashed_after"] = True
         except Exception as caught: error = caught; report.update(error_type=type(caught).__name__, error=str(caught)[:250])
         finally:
             try:
-                if bound_source(root, code, revision, Path(__file__)) != (helpers, protocol_id, frozen):
+                after = bound_source(root, code, revision, Path(__file__), True) if v2 else bound_source(root, code, revision, Path(__file__))
+                if after != (helpers, protocol_id, frozen) or v2 and transport_config(code) != (transport_id, transport):
                     raise ValueError("Original producer/protocol changed after acquisition")
+                if v2:
+                    checked_failure = verify_old_failure(root, transport)
+                    if checked_failure != old_failure_id: raise ValueError("Preserved original failure identity changed")
+                    report["original_failed_receipt_verified_after"] = checked_failure
                 report["source_helpers_rehashed_after"] = True
             except Exception as caught:
                 report.update(source_recheck_error_type=type(caught).__name__, source_recheck_error=str(caught)[:250])
+                if v2: report["original_failed_run_preserved"] = False
                 if error is None: error = caught
             if error is not None:
                 try: report["failed_partial_media_removed"] = cleanup_failure(destination, frozen)

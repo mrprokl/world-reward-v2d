@@ -11,7 +11,7 @@ from decimal import Decimal
 
 from tudl_holdout_inputs import identity, strict_json, _canonical
 
-BASE = "validation/tum_rgbd_depth_holdout_v1"
+BASE = "validation/tum_rgbd_depth_holdout_transport_v2"
 SCHEMA = "world_reward.tum_rgbd_depth_public.v1"
 PINS_SCHEMA = "world_reward.tum_rgbd_depth_input_pins.v1"
 DATASET, LICENSE = "TUM RGB-D", "CC-BY-4.0"
@@ -69,7 +69,7 @@ def validate_pins(pins):
 
 def public_inputs(directory, pins):
     validate_pins(pins); expected = copy.deepcopy(pins); directory = _canonical(directory)
-    if directory.parts[-3:] != ("validation", "tum_rgbd_depth_holdout_v1", "inputs") or not directory.is_dir():
+    if directory.parts[-3:] != ("validation", "tum_rgbd_depth_holdout_transport_v2", "inputs") or not directory.is_dir():
         raise ValueError("Exact new TUM public namespace required")
     names = {"manifest.json", *filenames(pins)}
     if {path.name for path in directory.iterdir()} != names: raise ValueError("Only thirteen independently pinned public files may be exposed")

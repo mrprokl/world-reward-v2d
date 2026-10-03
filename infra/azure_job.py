@@ -21,7 +21,7 @@ import tarfile
 
 DEFAULT_RESOURCE_GROUP = "SCENESMITH-H100"
 DEFAULT_VM_NAME = "scenesmith-ncc-h100-01"
-MAX_CODE_CONTROL_BYTES = 160_000
+MAX_CODE_CONTROL_BYTES = 256_000
 
 
 def encoded_runtime_archive(source_archive: bytes) -> tuple[str, str]:
@@ -33,7 +33,7 @@ def encoded_runtime_archive(source_archive: bytes) -> tuple[str, str]:
     archive = lzma.compress(source_archive, preset=6)
     encoded = base64.b64encode(archive).decode()
     if len(encoded) > MAX_CODE_CONTROL_BYTES:
-        raise RuntimeError("Run Command payload exceeds the 160KB code-only control budget")
+        raise RuntimeError("Run Command payload exceeds the 256KB code-only control budget")
     return encoded, hashlib.sha256(archive).hexdigest()
 
 

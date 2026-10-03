@@ -20,7 +20,7 @@ def test_explicit_code_only_control_ceiling_preserves_full_import_closure(monkey
     compressed = base64.b64decode(encoded)
     assert lzma.decompress(compressed) == source
     assert digest == hashlib.sha256(compressed).hexdigest()
-    assert launcher.MAX_CODE_CONTROL_BYTES == 160_000
+    assert launcher.MAX_CODE_CONTROL_BYTES == 256_000
     monkeypatch.setattr(launcher, "MAX_CODE_CONTROL_BYTES", len(encoded))
     assert launcher.encoded_runtime_archive(source)[0] == encoded
     monkeypatch.setattr(launcher, "MAX_CODE_CONTROL_BYTES", len(encoded)-1)

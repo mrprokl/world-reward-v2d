@@ -47,7 +47,7 @@ def private_fixture(gate, tmp_path, monkeypatch):
     root, code = tmp_path / "remote", tmp_path / "code"; base = root / gate.BASE; public_dir, private = base / "inputs", base / "eval_private"
     public_dir.mkdir(parents=True); private.mkdir(mode=0o700); (private / "source").mkdir(mode=0o700)
     repository = Path(__file__).resolve().parents[1]
-    for name in [gate.PROTOCOL, *gate.acquisition_source.SOURCE_FILES]:
+    for name in [gate.PROTOCOL, gate.TRANSPORT, *gate.ACQUISITION_SOURCES]:
         path = code / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes((repository / name).read_bytes()); path.chmod(0o444)
     protocol = json.loads((code / gate.PROTOCOL).read_bytes()); selected, records, required = [], [], {}
     # Tiny media identities replace protocol pins only in this call-boundary mock.
@@ -74,12 +74,19 @@ def private_fixture(gate, tmp_path, monkeypatch):
     descriptions = {sequence["name"]: gate.inputs.identity(private / "source" / (sequence["name"] + "-description.html")) for sequence in protocol["sequences"]}
     monkeypatch.setattr(gate.acquisition_source, "DESCRIPTION_IDS", descriptions)
     archives = [dict(sequence_id=sequence["sequence_id"], url=sequence["archive"]["url"], bytes=sequence["archive"]["bytes"], sha256="d" * 64,
+        final_url=sequence["archive"]["url"].replace("https://cvg.cit.tum.de/rgbd/dataset/", "https://webshare.cvg.cit.tum.de/g/rgbd/dataset/", 1),
+        independent_HEAD_and_GET_exact_mapping_headers_verified=True,
         sha256_independently_preknown=False, sha256_is_first_observed_reproducibility_digest=True,
         nearest_timestamp_pairs_verified=True, selected8_independent_byte_pins_verified=True, archive_license_files_present=False, term_files=[],
         filename_inventories={kind: dict(files=sequence[kind + "_file_count"], sha256="e" * 64) for kind in ("rgb", "depth")}) for sequence in protocol["sequences"]]
     acquisition = dict(stage=gate.acquisition_source.STAGE, status="pass", phase="complete", producer_revision="b" * 40,
-        script_sha256=gate.inputs.identity(code / gate.acquisition_source.SOURCE_FILES[0])["sha256"],
-        source_helpers={name: gate.inputs.identity(code / name) for name in gate.acquisition_source.SOURCE_FILES}, protocol_identity=gate.PROTOCOL_ID,
+        script_sha256=gate.inputs.identity(code / gate.ACQUISITION_SOURCES[0])["sha256"],
+        source_helpers={name: gate.inputs.identity(code / name) for name in gate.ACQUISITION_SOURCES}, protocol_identity=gate.PROTOCOL_ID,
+        scientific_protocol_identity=gate.PROTOCOL_ID, transport_identity=gate.TRANSPORT_ID,
+        transport_version=2, actual_output_namespace=gate.BASE, original_failed_run_preserved=True,
+        original_failed_receipt_verified_before=dict(bytes=2412,sha256="3cf80bcc5fd992c64765971084c40a50a5134136af95a6437bb95c981c424e85"),
+        original_failed_receipt_verified_after=dict(bytes=2412,sha256="3cf80bcc5fd992c64765971084c40a50a5134136af95a6437bb95c981c424e85"),
+        scientific_hyperparameters_retuned=False,
         budget_seconds=600, device="cpu", gpu_used=False, inference_performed=False, challenge_inputs_used=False,
         source_camera_or_trajectory_read=False, depth_values_decoded=False, ground_truth_used_for_inference=False,
         independent_full_archive_SHA256_known=False, training_overlap_verified=False, challenge_overlap_verified=False, accuracy_verified=False,
@@ -106,12 +113,12 @@ def test_all_private_byte_pins_and24_original_associations_before_sensor_decode(
         return original(raw)
     monkeypatch.setattr(gate.inputs, "identity", identity); monkeypatch.setattr(gate.inputs, "strict_json", parse)
     depths, frozen, _ = gate.private_inputs(root, code, public, records)
-    assert len(depths) == 12 and len(frozen) == 32
+    assert len(depths) == 12 and len(frozen) == 33
     assert [(row["scene_id"], row["frame_id"]) for row in depths] == list(gate.inputs.ORDERED_FRAMES)
     assert len({row["file"] for row in depths}) == 12
 
 
-@pytest.mark.parametrize("fault", ["private_sha", "extra_private", "decoded_before", "wrong_pair", "missing_source"])
+@pytest.mark.parametrize("fault", ["private_sha", "extra_private", "decoded_before", "wrong_pair", "missing_source", "wrong_transport", "old_namespace"])
 def test_private_provenance_fails_before_any_sensor_values(gate, tmp_path, monkeypatch, fault):
     root, code, public, records, private, acquisition = private_fixture(gate, tmp_path, monkeypatch)
     if fault == "private_sha":
@@ -120,6 +127,8 @@ def test_private_provenance_fails_before_any_sensor_values(gate, tmp_path, monke
     elif fault == "missing_source": (private / "source/TUM-license-section.html").unlink()
     else:
         if fault == "decoded_before": acquisition["depth_values_decoded"] = True
+        elif fault == "wrong_transport": acquisition["transport_version"] = 1
+        elif fault == "old_namespace": acquisition["actual_output_namespace"] = "validation/tum_rgbd_depth_holdout_v1"
         else: acquisition["selected_records"][0]["frame_id"] = 80
         receipt = private / "acquisition-report.json"; receipt.chmod(0o600); receipt.write_text(json.dumps(acquisition)); receipt.chmod(0o400)
         public["input_pins"]["acquisition_report"].update(gate.inputs.identity(receipt))

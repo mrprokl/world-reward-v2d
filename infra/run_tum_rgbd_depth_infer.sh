@@ -6,7 +6,7 @@ set -euo pipefail
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_tum_rgbd_depth_infer/code" && "$(uname -s)" == Linux ]] || exit 2
-BASE="$ROOT/validation/tum_rgbd_depth_holdout_v1"
+BASE="$ROOT/validation/tum_rgbd_depth_holdout_transport_v2"
 OUT="$BASE/anchor_predictions_v1"
 JOB="${CODE%/code}"
 CONTAINER="world-reward-tum-depth-anchor-$REV"
@@ -61,7 +61,7 @@ for path in(code,*sorted(code.rglob('*'))):
 sys.path.insert(0,str(code/'infra'))
 import tum_rgbd_depth_inputs as public
 pins=public.strict_json((code/'configs/tum_rgbd_depth_input_pins.json').read_bytes())
-directory=root/'validation/tum_rgbd_depth_holdout_v1/inputs'
+directory=root/'validation/tum_rgbd_depth_holdout_transport_v2/inputs'
 records,receipt=public.public_inputs(directory,pins)
 lock=root/'jobs/.world-reward-h100.lock'
 if lock.is_symlink()or(lock.exists()and not stat.S_ISREG(lock.lstat().st_mode)):

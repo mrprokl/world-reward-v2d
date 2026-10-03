@@ -6,7 +6,7 @@ set -euo pipefail
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_tum_rgbd_depth_evaluate/code" ]] || exit 2
-BASE="$ROOT/validation/tum_rgbd_depth_holdout_v1"; OUT="$BASE/quality_anchor_v1"; JOB="${CODE%/code}"
+BASE="$ROOT/validation/tum_rgbd_depth_holdout_transport_v2"; OUT="$BASE/quality_anchor_v1"; JOB="${CODE%/code}"
 IMAGE_PIN=sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3
 integrity() {
  env PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "$ROOT" "$CODE" "$REV" "${BASH_SOURCE[0]}" <<'PY'

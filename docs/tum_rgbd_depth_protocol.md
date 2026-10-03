@@ -102,3 +102,24 @@ model depth. RGB/depth timestamp mismatch, sensor noise/missingness and possible
 shared scene objects also remain limitations. A PASS would support this frozen
 method on new real depth records only, not calibration accuracy, human mesh,
 object trajectory, contact, acceleration, full-HOI gain or a CARI4D victory.
+
+
+## Distinct transport correction, scientific protocol unchanged
+
+The first acquisition (producer `7e6c84a872f224e7c8aa4bfa90ec26532b285a95`)
+failed in 0.882455 s before reading an archive body: the original publisher URL
+redirects to its official `webshare.cvg.cit.tum.de/g/rgbd/dataset/` endpoint.
+Read-only HEAD and GET checks verified identical size, ETag and Last-Modified.
+The failure receipt (2,412 bytes, SHA256
+`3cf80bcc5fd992c64765971084c40a50a5134136af95a6437bb95c981c424e85`)
+and empty original public directory remain unchanged. This is not a scientific
+result or a successful acquisition.
+
+Transport v2 is separately frozen in `configs/tum_rgbd_depth_transport_v2.json`
+and uses `validation/tum_rgbd_depth_holdout_transport_v2`. Independent HEAD and
+GET must resolve to the exact publisher prefix mapping with a byte-identical
+suffix and all originally frozen headers. All other endpoints/header changes
+fail closed. Verify the original failure before and after acquisition. The parent
+scientific JSON, 24 independent selected-byte pins, licence checks, cohort,
+models, K800 prior, support, coefficients and quality gates are unchanged.
+No native prediction or private quality result exists yet.

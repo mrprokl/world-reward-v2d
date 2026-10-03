@@ -382,7 +382,7 @@ def test_actual_runtime_archive_closure_control_cap():
             entry = tarfile.TarInfo(name); entry.size = len(files[name]); entry.mode = 0o444
             archive.addfile(entry, io.BytesIO(files[name]))
     encoded, _ = launcher.encoded_runtime_archive(stream.getvalue())
-    assert len(encoded) <= 160000
+    assert len(encoded) <= launcher.MAX_CODE_CONTROL_BYTES
 
 
 def test_exact_readonly_bind_mounts_not_filemode_assumption(gate, tmp_path):

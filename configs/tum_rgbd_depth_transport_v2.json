@@ -1,0 +1,41 @@
+{
+  "schema": "world_reward.tum_rgbd_depth_transport.v2",
+  "namespace": "validation/tum_rgbd_depth_holdout_transport_v2",
+  "parent_scientific_protocol": {
+    "file": "configs/tum_rgbd_depth_protocol.json",
+    "bytes": 21939,
+    "sha256": "ed1f038546ac073d2b52f01874934a6683e05357f9730cbac1a5112930ded035"
+  },
+  "failed_original_acquisition": {
+    "producer_revision": "7e6c84a872f224e7c8aa4bfa90ec26532b285a95",
+    "receipt_bytes": 2412,
+    "receipt_sha256": "3cf80bcc5fd992c64765971084c40a50a5134136af95a6437bb95c981c424e85",
+    "phase": "original_download",
+    "elapsed_seconds": 0.8824548919947119,
+    "media_downloaded": false,
+    "predictions_or_scores_produced": false,
+    "output_preserved": true
+  },
+  "publisher_redirect_contract": {
+    "original_prefix": "https://cvg.cit.tum.de/rgbd/dataset/",
+    "only_allowed_final_prefix": "https://webshare.cvg.cit.tum.de/g/rgbd/dataset/",
+    "path_suffix_must_be_byte_identical": true,
+    "HEAD_and_GET_status": 200,
+    "HEAD_and_GET_final_URL_must_match_exact_mapping": true,
+    "Content_Length_ETag_Last_Modified_must_match_parent_protocol": true,
+    "other_hosts_paths_or_header_changes_rejected": true
+  },
+  "unchanged_contracts": [
+    "three sequences and twelve filename-selected timestamp associations",
+    "all twenty-four independently pinned selected RGB/depth byte identities",
+    "primary licence section and per-sequence description identities",
+    "no sensor values before independently frozen complete predictions",
+    "native models, K800, whole-valid support, anchor and evaluation gates"
+  ],
+  "claims": {
+    "transport_correction_only": true,
+    "original_failed_run_reinterpreted_as_pass": false,
+    "scientific_hyperparameters_retuned": false,
+    "accuracy_or_CARI4D_victory_verified": false
+  }
+}

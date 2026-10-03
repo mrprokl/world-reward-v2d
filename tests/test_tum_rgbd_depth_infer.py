@@ -41,7 +41,7 @@ def test_wrapper_exposes_only_infra_src_single_pin_and_public_files_never_recipe
     assert "src=$CODE/infra,dst=$CODE/infra,readonly" in source and "src=$CODE/src,dst=$CODE/src,readonly" in source
     assert "src=$CODE/configs/tum_rgbd_depth_input_pins.json,dst=$CODE/configs/tum_rgbd_depth_input_pins.json,readonly" in source
     assert 'src=$path,dst=$path,readonly' in source and 'path="$BASE/inputs/$name"' in source
-    assert all(text not in source for text in ("eval_private", "tum_rgbd_depth_protocol", "MHR", 'src=$BASE,dst=$BASE'))
+    assert all(text not in source for text in ("eval_private", "tum_rgbd_depth_protocol", "tum_rgbd_depth_transport_v2.json", "MHR", 'src=$BASE,dst=$BASE'))
     assert "--network none" in source and "flock --nonblock 9" in source
     assert "303s docker run" in source and "--kill-after=10s" in source and "AFTER=\"$(integrity)\"" in source
     assert '--name "$CONTAINER"' in source and 'CONTAINER="world-reward-tum-depth-anchor-$REV"' in source
