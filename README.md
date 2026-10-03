@@ -26,8 +26,9 @@ No final Parquet, submission or verified CARI4D improvement yet.
   After a separate source audit, two export attempts stopped before model
   execution: first on historical-source binding, then on private-proof access.
   The explicit authenticated readonly-source access fix now passes a full native
-  export of all 592 frames. Its independent export inventory now passes;
-  CPU consumer validation and official packing remain pending. The 747-frame
+  export of all 592 frames. Its independent export inventory, CPU consumer
+  validation and original official packing now pass; scratch Parquet deleted.
+  The 747-frame
   episode keeps all 25 object components but tracking stopped at 18 frames
   with empty automatic object masks. The next 668-frame episode has complete
   automatic masks and Body/depth initializers; its default topology reduction failed before object tracking. A separately

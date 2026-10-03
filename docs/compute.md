@@ -1,4 +1,4 @@
-# Azure runtime — current state 2026-10-03
+# Azure runtime — current state 2026-10-04
 
 ## Current jobs and gates
 
@@ -8,14 +8,14 @@ namespaces. These are engineering/fidelity results, not independent challenge
 accuracy. All30 original RGB/hash/container-metadata readiness passes:
 16,563frames,30Hz/1536x1152, no frame/model/GT decode in that readiness audit.
 
-Episode3 full592 frontends/native shared preparation/forward have completed;
-independent source/prepare/forward pins are committed. Native refinement is
-queued behind episode4's scoped GPU phase, not its later CPU input preparation.
-Episode4 full747 automatic masks and initializers pass; original packingFAIL
-remains archived. The unchanged externally validated CPU volume proposal passes
-with all25 original components preserved. New frozen-mesh whole tracking is
-running, no tracking/input/full-chain PASS yet. One cooperating GPU job at a
-time; GPU lock is released before CPU preparation, allowing disjoint phase overlap.
+Episode3 full592 native refinement and export now pass after independent
+historical-source authentication; the outer queue/cache and two earlier export
+FAILs remain separate. Its independently audited CPU consumer and original
+official packing pass; temporary Parquet deleted. Episode4 full747 preserves
+all25 components but tracking stopped at18 empty automatic masks; no full-chain
+PASS. Episode5 full668 initializers and a separately gated three-shell/cavity
+volume proposal pass; full tracking is active, not yet validated. One GPU job
+per VM; scoped locks release before CPU preparation for disjoint overlap.
 
 D107 real-depth independent validation is closedREJECT: median4.904632756%
 gain is below frozen5%; no retuning or rounded success. Native offline temporal
@@ -48,9 +48,11 @@ Azure Run Command controls jobs; earlier SSH tests failed and temporary22/443
 ingress rules/listener were removed. Separate owned VM02 now exists on Azure
 with no publicIP, a byte-sealed equivalent Body runtime and1TB owned data disk
 mounted `/srv/world-reward-data`. Native model/data work remains remote. A
-19.91GB frontend asset-only archive passes independent extraction-free audit on
-VM01; no transfer yet, no Grounding/Objects runtime/source-parity/CUDA readiness
-or final licence/train-overlap eligibility claim. Earlier failed empty resources
+19.91GB frontend asset-only archive passes independent audit, private transfer
+and extraction on VM02; no local checkpoint traffic. Selected Body/DINO source,
+offline Grounding v6 CPU imports and independent SAM2 CUDA operator gates pass.
+Model readiness, historical-image parity and final licence/train-overlap
+eligibility remain unverified. Earlier failed empty resources
 were cleaned; preserve all unrelated SceneSmith infrastructure.
 Private Docker socket `unix:///srv/scenesmith/world-reward/docker.sock`, with
 private dockerd/containerd data and state on managed disk. No bridge or iptables

@@ -5833,3 +5833,27 @@ childimagefd26863. No models loaded, challenge inputs, historicalimageparity,
 replica readiness, license eligibility or training-overlap PASS claimed.
 Newindependent640x480triangle-raygate3bee2c7 dispatched separately; real
 result pending, previous authored/raster FAILs remain rejected.
+
+Actual independent640x480triangle-raygate3bee2c7 PASS2.271235518s,
+inactiveexit0. Receipt2408B/d8eb655ff51df1f7b313fd0aabd6b63f8d14f32a35ebf9f2030b167f0973f8ac.
+All307200 pixels/20Decimal80samples/nearestlayers agree: zero independent
+label disagreements; maxray3.424993622e-11m, plane2.414646261e-11m,
+Decimal1.503375202e-11m versus frozen1e-8m. ActualCUDA diagnostic differs
+on3labels, skinnyface max.0206681139m; this is NOT a passing CUDAdepth
+reference or reversal of previous FAILs. Models/media/privatecohorts unused.
+Next NEW four RGB anchors only (seed2026100401/frame0 of future4x48):
+shared640x480/K800, fixed ownasymmetricbottle and authored namedMHRposes,
+triangle-soup scope only. Fullplane+64stratified all-triangle ray proofs and
+visiblehuman>=2048/object>=64 precede publication of ONLYfourRGB+manifest.
+No idealhand/model observations/contacttruth; automatic mask/Body/MoGe
+recognizability must pass before192frame execution or availability ablation.
+61tinytestsPASS0.54s; no localmedia/models. Host hash streaming avoids
+requiring Python3.11 file_digest; no scientific recipe/threshold changes.
+
+EP3 actual879a37ef CPUconsumer PASS12.416344526s/all592/inactiveexit0,
+receipt3823B/d8e8717093b81549966a445cc3ad04970745a57bef77925faa95382a4d0b5939.
+Originalofficialpacking PASS15.084462961s/all592, exactly1attempt/return/
+validated call. Receipt10526B/dd57e2757b36b2bc6a1760d4e0dff0277e12c9333fbf9742aa9b34d7357f7ea9.
+Originalrow_idorder retained, samplepredictioncolumns NOTread, fullsource/
+export/runtime rehashed. ScratchoneepisodeParquet deleted; ONLYreport.json
+remains. No finalall30Parquet, upload, reconstructionquality or eligibility PASS.
