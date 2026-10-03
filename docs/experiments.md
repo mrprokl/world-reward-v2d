@@ -2714,3 +2714,30 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   behavior only, keeps all public artifacts strictly444; v2exclusive namespace.
   Full corrective source suite5971PASS/oneoptionaltrimeshSKIP84.34s and
   Bash syntax/diffcheck PASS before new baseline_v2 dispatch.
+  Corrective baseline-v2 actual **PASS**45.007966s, producing
+  feae71ea16a1d942f08e95ccafc131b6467dffb9, observer
+  `0e034078bf9026b338783867293aa5f95f8c1955b5b21760b7916408ec496018`,
+  receipt`675fbad6dd6888a37d7ee7f36dc968d9276de0a79eb534aec90eceb35da8668e`
+  (49,759B/0444).15Body/15MoGe/15raw-parity/15keypoint/15shared
+  native heads+one official reference; all15 cases retained, fixed clip identity,
+  zero private reads. Independent reference mean fidelity .000154–.000250mm
+  establishes representation consistency, NOT geometric accuracy. Original
+  baseline-v1 FAIL receipt/hash/mode unchanged; no previous failure rewritten.
+  First fresh DWPose actual **PASS**2.735390s, samefeae/0e034…,
+  receipt`73472e495492002e88ee74e7bf59f1f38914a987d59353581b0b89016037aeea`
+  (35,962B/0444); one CPU session/15native133-keypoint calls, original float64
+  list feed/keypoints, float32 scores, no cast/channel modification/neck134,
+  private access or GPU. Final inputs/assets/source rehashed. Both units terminal.
+  Mandatory six-field public pins configuration binds actual completed manifest,
+  masks, baseline-v2 and DW receipts and stage-specific source revisions; no
+  dynamic discovery/placeholder/fallback. Separate CPU public contract owns
+  all candidate/proxy/continuous60-state59-update replay validation; native fit
+  and replay use it without importing old stage mains or private readers.
+  Implementation172focused tests PASS2.34s, independent115public/fit/observer
+  tests and actual native signature/source/mount audit PASS. Ordinary fit code
+  closure33files133,976B before tiny actual-pin config (<160KB). Top-level
+  fit native_backwards/optimizer_updates count real885, replay counts zero.
+  No fit, replay or private quality executed at this receipt freeze.
+  Full frozen public+fit source suite6060PASS/oneoptionaltrimeshSKIP84.34s;
+  actual-pin complete static closure34files134,268B encoded control, Bash
+  syntax/diffcheck PASS before first immutable native fit dispatch.

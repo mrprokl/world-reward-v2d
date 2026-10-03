@@ -1,0 +1,12 @@
+{
+  "automatic_masks_sha256": "3f509385e3cf1e711580cd34e0f55de55d95a2cf75a5122141a6c94c202a0050",
+  "baseline_sha256": "675fbad6dd6888a37d7ee7f36dc968d9276de0a79eb534aec90eceb35da8668e",
+  "dwpose_sha256": "73472e495492002e88ee74e7bf59f1f38914a987d59353581b0b89016037aeea",
+  "manifest_sha256": "16d909d206ea9a71f402c01a699e69d63603e5b1366e1e24d55ac208846f466b",
+  "producer_revision": {
+    "baseline": "feae71ea16a1d942f08e95ccafc131b6467dffb9",
+    "dwpose": "feae71ea16a1d942f08e95ccafc131b6467dffb9",
+    "masks": "8084688a4d84bbad9ba8c0580e4d1b2803745511"
+  },
+  "schema": "world-reward-root5-public-pins-v1"
+}
