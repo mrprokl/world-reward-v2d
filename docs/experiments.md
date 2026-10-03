@@ -2290,3 +2290,12 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   andfiniteoutput arithmetic/physicalbound guards preventoverflow fromfinite
   extremes. No clipping/loss repair. NativeTorchautograd/Jacobian/runtime not
   yetverified; policytests do not establish3D/HOI gain or privacy-stage completion.
+
+  Publicproducer sourcefreeze5572PASS/1optionaltrimeshSKIP72.05s,37baseline/
+  40DWPose/20puremath focusedPASS plusindependentreview/no sourceblocker.
+  Bashsyntax/diffcheckPASS; actual sourcef5c78f7abfec3c6234bbbee7f7dad70736836ae7.
+  Baselineclosure22files86,428B actualdispatch, DWPose9files~27KBplanned,
+  allnewownfiles/oldhelpers untouched. Rawkeypoint308+nativeSO3rotations
+  additionallyretained;45explicitheadcalls15rawparity+15rawkeypoint+15shared
+  with15Body/15MoGe/1officialreference. Azure baseline-only started600s;
+  no privateevaluation/fitting or quality/adoption claim.
