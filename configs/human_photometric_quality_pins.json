@@ -1,0 +1,21 @@
+{
+  "schema": "world-reward-human-photometric-quality-pins-v1",
+  "render": {
+    "producer_revision": "05ef12488cc10bce68c233a92ea73a71005c44de",
+    "report_sha256": "62960a7f30d1ea7c58a4c1fba320b9f06ae01e8d889a0c836a0d73ddf91010bc",
+    "report_bytes": 29468,
+    "script_sha256": "359e1fe495fa5ac7dc87d482a8ad90a6074455a9f68690099549eb2433da3eee"
+  },
+  "masks": {
+    "producer_revision": "05ef12488cc10bce68c233a92ea73a71005c44de",
+    "report_sha256": "4ac9cb33bf5478d62430d6346a925d776116895472c79511d9a819131a44276d",
+    "report_bytes": 19433,
+    "script_sha256": "2c68d9b12da166b36cc28c29ab93cfebca5960ed917339d19b12f524e0f553da"
+  },
+  "body": {
+    "producer_revision": "05ef12488cc10bce68c233a92ea73a71005c44de",
+    "report_sha256": "3ca209a3421583850d582b7e0309b1f943b8bb4c56ee72404b94b09020d0ba60",
+    "report_bytes": 684258,
+    "script_sha256": "2c68d9b12da166b36cc28c29ab93cfebca5960ed917339d19b12f524e0f553da"
+  }
+}

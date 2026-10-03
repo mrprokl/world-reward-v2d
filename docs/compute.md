@@ -11,9 +11,10 @@ native+unoptimizedJIT replay PASS23.15s with exactSHAM and57nativecalls;
 unit inactiveexit0, lastGPU125MiB0%. This is mechanism only, not accuracy.
 NEW24human-only protocol/observer/evaluator fully frozen and audited;6511local
 testsPASS/1optionalSKIP. First manufacture/public predictions are nowready;
-H101manufacturePASS10.37s/24RGB andautomaticmasksPASS17.32s/24masks;
-Body source05ef124…dispatched next,600sbudget/144Body/1392nativeheads.
-Privatequality remains unexecuted, requiring actualBody/replayproducerPASS.
+H101manufacturePASS10.37s/24RGB, automaticmasksPASS17.32s/24masks,
+BodyPASS121.50s/144learnedcalls/1392nativeheads/all24exactSHAM, source05ef124….
+All3unitsinactiveexit0/GPU107MiB0%; actualqualityproducerpins frozen.
+Privatequality nextONCE120s, noaccuracy resultyet; all24count/no thresholdsearch.
 Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
 [experiments](experiments.md). No final submission/CARI4D superiority yet.

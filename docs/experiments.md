@@ -3360,3 +3360,16 @@ Body observer nowdispatched from SAMEimmutable05ef124…bundle116,024B,
 unit`world-reward-h101-human-photometric-body`;600sbudget/144learnedcalls/
 1392strictnative scopes required. Quality pins NOTyetcreated; waitallpublic
 mechanism/replay/provenancePASS, noaccuracyquery orproducerrestart.
+
+H101 Body actual **PASS121.499012s**, SAME05ef124…observer/runtime source,
+receipt`3ca209a3421583850d582b7e0309b1f943b8bb4c56ee72404b94b09020d0ba60`
+(684,258B/0444), unitinactiveexit0/GPU107MiB0%. All144Body/144parity/144KP/
+24anchor/144fixed/72selected and1392scopedattempt/return/validation complete;
+all24RAW/FIXEDSHAMbyteexact, methodrestored, all360arrays/rigfrozen+reread,
+fullsources/inputs/assetsrehash/no privateinput. Publicmedoid selected original
+22/24frames; gamma1.2group01frame0, gamma.8group06frame2. This is NOTaccuracy;
+two changes are retained and entire24quality cohort mustcount, no gamma tuning.
+Explicit actualrender/mask/bodycommit/script/receiptSHA/bytepins nowrecorded
+in configs/human_photometric_quality_pins.json BEFORE any privateevaluation.
+Next ONE120s privatepaired diagnostic; all8groups/24frames/72rawrasters,
+sharedbaselineSim3/hands/gauge diagnostics and predeclaredsafeguards unchanged.
