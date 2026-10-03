@@ -5303,3 +5303,33 @@ preservesdiagnostic inode/no copies/deletions; current+oldsource rechecks before
 0400PASSreceipt. Crashorpostcheckfailure leaves archiveoccupied and no receipt,
 no rollback/retry. Rootcombined377PASS17.33s/bash-n/diffcheck beforeAzurefreeze;
 actualarchive/newmaskrun remainpending.
+
+
+Frozen cf35d11fullsuite9962PASS/2unchangedoptionalSKIP274.19s; no concurrent
+source/test edits during this run. Earlier mixedfixturefullsuiteFAIL remains
+recorded, not reinterpreted. ActualTUMnativepublicinferencePASS25.208047623s
+12MoGe+12DA3, receipt89756B/
+6b41836494e58f4e93ef042b9871fc1e1d31e161bbe05ac13f789a5bb2d7f9e2 0400.
+Threefrozencoefficients[1.0656694691979407,1.1067200658947218,
+0.9785037078617507]; source/grid/native numericsunchanged/privateunmounted.
+Independentall14helper/public13/pred12audit mustprecedepredictionpinfreeze and
+private evaluation. UnfilteredlogratioIQR .08415911.. .27470795 diagnostic only;
+firstscalarquery requestedwrongpaired_countkey→nulls, NOTzero/missingsupport.
+Actualcorrectpaired_valid_pixels/coverage verifiedbyindependentaudit next.
+
+ActualEP4failed-only archivalPASS producercf35d11/90files156272encodedB.
+Independentactualreceipt/source/config/archiveddiagnostic/originalunitlog
+hash/readonly/emptyepisodeauditPASS20:30:33UTC; receipt4268B/
+57462b7a6818e03d25e3c000532a52e2a14400b17a5886f1a89213ff9b0a312b.
+OriginalmaskFAIL isunchanged/retained, notconvertedtosuccess. Newexplicitglobal
+fixed_all16frontend dispatchedonce cf35d11/88files149900B MainPID934504.
+No maskPASS/initializer/trackqualityclaimyet. EP3CPUassembly450/592active/noGPU
+20:30:33UTC, no fullnativechainPASS.
+
+
+20:33:41UTC independentactual14producerhelper bytes allmatchGitcf35d11,
+public13 andALL12 predictionNPZs/report hashedbeforeJSON, originalorder/counts/
+source/publicpostrehashPASS. Everyframewholepaired support307200/coverage1.0,
+no per-pixel confidencefilter or droppedvalidity. FreezeALL12NPZ/report/three
+coefficients beforeprivatequality; predictionartifacttotal110MB staysAzure.
+No sensorvalues/privatecalibration decoded sofar, no verifiedaccuracygain.

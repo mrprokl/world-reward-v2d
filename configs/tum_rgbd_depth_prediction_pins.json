@@ -1,0 +1,64 @@
+{
+  "schema": "world_reward.tum_rgbd_depth_prediction_pins.v1",
+  "report": {
+    "bytes": 89756,
+    "sha256": "6b41836494e58f4e93ef042b9871fc1e1d31e161bbe05ac13f789a5bb2d7f9e2",
+    "producer_revision": "cf35d11574d5849e4a885378ddf6a544913bce05",
+    "script_sha256": "9c985865061ee500781f1b764e961e9b87395fe192e88fdbf5911baf15ab8aad"
+  },
+  "outputs": {
+    "scene_000001_rgb_1305031454.127701.npz": {
+      "bytes": 9458451,
+      "sha256": "38bf3a56d259345ff7d5d176ec17ded263255ee6c8a32601990ce031b84273fd"
+    },
+    "scene_000001_rgb_1305031455.459589.npz": {
+      "bytes": 9096103,
+      "sha256": "d88e961c0066b8f32372d8f2b6df6eecd0b8f00e9ab0892bf195133057952d9d"
+    },
+    "scene_000001_rgb_1305031456.791649.npz": {
+      "bytes": 9181542,
+      "sha256": "19552ee7345fff98b0d451b13e1402ae53080f020d9f8c7e541696f7dfd4b406"
+    },
+    "scene_000001_rgb_1305031458.127605.npz": {
+      "bytes": 9474500,
+      "sha256": "12e22b4bdf0f43aec1b422d38e8109d3d27542127f620e95598d2d55eb08a54d"
+    },
+    "scene_000002_rgb_1311867171.794171.npz": {
+      "bytes": 8702836,
+      "sha256": "ba34ad21f9bfa224e67188638301c5dd01ebcaa559dddd0d58bbd5deb04fe66c"
+    },
+    "scene_000002_rgb_1311867173.126782.npz": {
+      "bytes": 8851729,
+      "sha256": "a4392c25047ca0d01c6a54594095da32f1d3e5f9523d907cc08d801acde58762"
+    },
+    "scene_000002_rgb_1311867174.463016.npz": {
+      "bytes": 8936446,
+      "sha256": "fad636445363a81a5cef8e3a70fe0809efed02bedd1dbe229e309764a7a84d2e"
+    },
+    "scene_000002_rgb_1311867175.794862.npz": {
+      "bytes": 9040121,
+      "sha256": "dbbdd553bdea005e92633cd8846cce428e76186588161428b1ac688613f63a20"
+    },
+    "scene_000003_rgb_1341847982.062739.npz": {
+      "bytes": 9254423,
+      "sha256": "ded8fc74f7fb6e0521cf61fe5388dea6ab8bd8fdada424337937f3a3126c4acc"
+    },
+    "scene_000003_rgb_1341847983.402670.npz": {
+      "bytes": 9417720,
+      "sha256": "e88b13c7d35319349b5187d0523d79a116be904a6c19a0e5e13fca90eff057a9"
+    },
+    "scene_000003_rgb_1341847984.743352.npz": {
+      "bytes": 9504404,
+      "sha256": "e38ca6a281c2c87493353b95b72cbe696232a6eb0b26905b4ee674ace8302e0b"
+    },
+    "scene_000003_rgb_1341847986.082612.npz": {
+      "bytes": 9523596,
+      "sha256": "f579c803cdf98aa0106b9f311a256f7035de8f0b1754ce3ad7b7b11c0a5e1e7e"
+    }
+  },
+  "coefficients": [
+    1.0656694691979407,
+    1.1067200658947218,
+    0.9785037078617507
+  ]
+}
