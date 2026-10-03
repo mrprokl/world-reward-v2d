@@ -3309,3 +3309,15 @@ Preexecutionnumericboundary fix: evaluate inclusive5%regression as
 after≤before×1.05, inclusive1ppIoU asafter≥before−.01, avoiding cancellation
 at exactlythethreshold. Samepreregisteredthresholds/noepsilon/newtolerance;
 nextafter-overboundary rejected,17purepolicytestsPASS0.04s. NoH101qualityseen.
+
+H101independentscience/rules auditREADY beforemanufacture:8groups aretwo
+parametricmorphs crossedwithsamegeometry nuisance variants, NOTeight
+independentpeople or statisticalSOTA/real-domain evidence. Gammaaffectswhole
+RGB includingbackground, so evenPASS wouldnotisolategarmenttexturecausality.
+KnowntrueK matchesgenericprior bydesign, nolearnedcalibrationproof. Full18439
+baselinealignment differsfromofficialsubset; fixedhandcoefficients canstill
+movehandpositions throughbody, hencehandsafeguards. Keepallrawcentroid/
+metricgauge diagnostics even ifalignedgain passes. Existinglicenses/
+trainingoverlap remain unresolved; norenderer/SHAMPASS clearsfinaleligibility.
+127focusedmanufacture/policy/bundle testsPASS0.56s; observer/eval source still
+beingcompleted, noH101job/GTscore. Budgets/gamma/coverage/gates unchanged.

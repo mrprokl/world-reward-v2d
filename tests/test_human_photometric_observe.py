@@ -1,7 +1,9 @@
 """Tiny public/native-contract tests; no actual learned model or GPU execution."""
 import ast
 from dataclasses import asdict
+from contextlib import contextmanager
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -66,11 +68,35 @@ def rig(gate):
     return dict(human_faces=np.tile([0,1,2],(36874,1)).astype(np.int64),hand_mask_left=left,hand_mask_right=right,camera_K=np.asarray(gate.COHORT.fixed_K))
 
 
-@pytest.mark.parametrize("fault",["none","faces","overlap","missing","K","masked"])
-def test_actual_rig_metadata_finite_topology_hands_camera(gate,fault):
+def pin_toy_rig(gate,monkeypatch):
+    """The native asset never travels locally; only this procedural fixture is pinned."""
+    monkeypatch.setattr(gate,"FACE_SHA",hashlib.sha256(rig(gate)["human_faces"].astype("<i4").tobytes()).hexdigest())
+
+
+def branch_rows(gate,record):
+    parity=dict(maximum_errors={k:0. for k in ("vertices_camera_m","keypoints_camera_m","joints_camera_m","controls","rotations")},
+        all_native_arrays_byte_equal=True)
+    result=[]
+    for name,gamma in gate.core.ALL_BRANCHES:
+        row=dict(name=name,gamma=gamma,source_RGB_sha256="a"*64,transformed_RGB_sha256="a"*64 if gamma==1. else "b"*64,
+            native_forward_errors={k:0. for k in ("vertices_m","joints_m","keypoints_m","controls")})
+        if name=="original":
+            row["anchor_native_parity"]={k:v.copy() if isinstance(v,dict) else v for k,v in parity.items()}
+            if record["frame_index"]==0:row["clip_first_native_parity"]={k:v.copy() if isinstance(v,dict) else v for k,v in parity.items()}
+        if name.startswith("sham"):
+            for key in ("raw_SHAM_parity","fixed_SHAM_parity"):
+                row[key]={k:v.copy() if isinstance(v,dict) else v for k,v in parity.items()}
+        result.append(row)
+    return result,parity
+
+
+@pytest.mark.parametrize("fault",["none","faces","topology","overlap","missing","K","masked"])
+def test_actual_rig_metadata_finite_topology_hands_camera(gate,monkeypatch,fault):
+    pin_toy_rig(gate,monkeypatch)
     data=rig(gate)
     if fault=="none":assert gate.validate_rig(data)is data;return
     if fault=="faces":data["human_faces"][0,0]=18439
+    elif fault=="topology":data["human_faces"][0,0]=2
     elif fault=="overlap":data["hand_mask_right"][0]=True
     elif fault=="missing":data.pop("hand_mask_left")
     elif fault=="K":data["camera_K"][0,0]=1279
@@ -78,9 +104,15 @@ def test_actual_rig_metadata_finite_topology_hands_camera(gate,fault):
     with pytest.raises(ValueError):gate.validate_rig(data)
 
 
+def test_source_native_topology_pin_is_not_a_dimension_only_check(gate):
+    assert gate.FACE_SHA=="f6748e290ef37fbb6877c4cc5bd7287105db9e98252b0ba170ae9ac3c45eacd6"
+    with pytest.raises(ValueError,match="topology SHA"):gate.validate_rig(rig(gate))
+
+
 def frame_fixture(gate,monkeypatch,tmp_path):
     """All24×15 real tiny-compressed native-shaped arrays; only decoder is fake."""
     monkeypatch.setattr(gate.baseline,"shared_decode",lambda torch,head,blocks,first:decoder(gate,blocks,first))
+    pin_toy_rig(gate,monkeypatch)
     out=tmp_path/"predictions";out.mkdir();(out/"report.json").write_text("{}");r=rig(gate)
     with (out/"rig_metadata.npz").open("xb") as stream:np.savez_compressed(stream,**r)
     (out/"rig_metadata.npz").chmod(0o444);ri=gate.core.identity(out/"rig_metadata.npz")
@@ -91,11 +123,14 @@ def frame_fixture(gate,monkeypatch,tmp_path):
         anchor=gate.frame_anchor(None,None,original,first[group]);folder=out/Path(gate.COHORT.frame_name(i)).stem;folder.mkdir()
         record=dict(file=gate.COHORT.frame_name(i),group_index=group,frame_index=frame,sha256=f"{i:064x}",human_mask_sha256="a"*64)
         row={k:record[k] for k in ("file","group_index","frame_index")} | dict(rgb_sha256=record["sha256"],human_mask_sha256=record["human_mask_sha256"],
-            clip_anchor_file=gate.COHORT.frame_name(group*3),artifacts=[])
+            clip_anchor_file=gate.COHORT.frame_name(group*3),artifacts=[],bbox=[1.,1.,100.,100.],camera_K=[list(r) for r in gate.COHORT.fixed_K],selected_replays=[])
+        row["branches"],parity=branch_rows(gate,record)
         for prefix,p in (("raw",original),("fixed",anchor)):
             for name,_ in gate.core.ALL_BRANCHES:row["artifacts"].append(gate.core.save_proposal(folder,prefix+"_"+name,p))
         fixed=[anchor]*6;row["selection"],row["SHAM"]=gate.selection_record(fixed)
-        for mode in ("baseline","sham","tta"):row["artifacts"].append(gate.core.save_proposal(folder,"selected_"+mode,anchor))
+        for mode in ("baseline","sham","tta"):
+            artifact=gate.core.save_proposal(folder,"selected_"+mode,anchor);row["artifacts"].append(artifact)
+            row["selected_replays"].append(dict(mode=mode,native_replay={k:v.copy() if isinstance(v,dict) else v for k,v in parity.items()},artifact=artifact))
         records.append(record);rows.append(row)
     return out,records,rows,ri
 
@@ -119,6 +154,64 @@ def test_complete_frozen_frame_lineage_no_drop_or_reselect(gate,monkeypatch,tmp_
     elif fault=="anchor":rows[1]["clip_anchor_file"]=records[1]["file"]
     else:(out/"extra").write_text("noise")
     with pytest.raises(ValueError):gate.frozen_frames(out,rows,records,ri)
+
+
+@pytest.mark.parametrize("fault",["emptybranch","orderbranch","branchname","gammas","rgbhash","shamrgb","decodekeys","decodeNaN","decodehigh",
+    "negativeerror","boolerror","missingfirstparity","shamflag","shamerrorkeys","emptyreplay","orderreplay","replaymode","replaykeys",
+    "replayhigh","replayflag","artifactlink","bbox","bboxnan","bboxmasked","K","hidden"])
+def test_full_frame_metadata_errors_and_replay_links(gate,monkeypatch,tmp_path,fault):
+    out,records,rows,ri=frame_fixture(gate,monkeypatch,tmp_path);row=rows[0]
+    if fault=="emptybranch":row["branches"]=[]
+    elif fault=="orderbranch":row["branches"][0],row["branches"][1]=row["branches"][1],row["branches"][0]
+    elif fault=="branchname":row["branches"][1]["name"]="original"
+    elif fault=="gammas":row["branches"][1]["gamma"]=1.
+    elif fault=="rgbhash":row["branches"][1]["source_RGB_sha256"]="c"*64
+    elif fault=="shamrgb":row["branches"][3]["transformed_RGB_sha256"]="c"*64
+    elif fault=="decodekeys":row["branches"][0]["native_forward_errors"].pop("controls")
+    elif fault=="decodeNaN":row["branches"][0]["native_forward_errors"]["controls"]=float("nan")
+    elif fault=="decodehigh":row["branches"][0]["native_forward_errors"]["controls"]=1.001e-5
+    elif fault=="negativeerror":row["branches"][0]["native_forward_errors"]["controls"]=-1.
+    elif fault=="boolerror":row["branches"][0]["native_forward_errors"]["controls"]=False
+    elif fault=="missingfirstparity":row["branches"][0].pop("clip_first_native_parity")
+    elif fault=="shamflag":row["branches"][3]["raw_SHAM_parity"]["all_native_arrays_byte_equal"]=False
+    elif fault=="shamerrorkeys":row["branches"][3]["fixed_SHAM_parity"]["maximum_errors"].pop("rotations")
+    elif fault=="emptyreplay":row["selected_replays"]=[]
+    elif fault=="orderreplay":row["selected_replays"][0],row["selected_replays"][1]=row["selected_replays"][1],row["selected_replays"][0]
+    elif fault=="replaymode":row["selected_replays"][0]["mode"]="tta"
+    elif fault=="replaykeys":row["selected_replays"][0]["native_replay"]["maximum_errors"]["hidden"]=0.
+    elif fault=="replayhigh":row["selected_replays"][0]["native_replay"]["maximum_errors"]["rotations"]=1.001e-5
+    elif fault=="replayflag":row["selected_replays"][0]["native_replay"]["all_native_arrays_byte_equal"]=1
+    elif fault=="artifactlink":row["selected_replays"][0]["artifact"]=row["artifacts"][0]
+    elif fault=="bbox":row["bbox"]=[0.,0.,0.,0.]
+    elif fault=="bboxnan":row["bbox"][0]=float("nan")
+    elif fault=="bboxmasked":row["bbox"]=np.ma.array(row["bbox"],mask=False)
+    elif fault=="K":row["camera_K"][0][0]=1279.
+    else:(out/Path(records[0]["file"]).stem/".hidden").write_text("noise")
+    with pytest.raises(ValueError):gate.frozen_frames(out,rows,records,ri)
+
+
+def test_completed_body_requires_all_actual_calls_and_exact_scoped_trace(gate):
+    report={k+s:v for k,v in gate.COUNTS.items() for s in ("_attempts","_completed")}
+    report.update(actual_body_inference=True,all_artifacts_frozen_and_reloaded=True,SHAM_exact_replay_verified=True,
+        original_native_replay_verified=True,empirical_same_process_reproducibility_only=True,hand_regions_native_verified=True,
+        native_topology=gate.rig_metadata(),execution_policy_instrumented=True,native_operations_modified=False,native_arguments_modified=False,
+        scoped_MHR_execution="strictTrue_warnFalse_JITunoptimized",native_head_method_restored=True,scoped_MHR_attempts=1392,scoped_MHR_returns=1392,
+        scoped_MHR_validated=1392,deterministic_algorithms=False,warn_only=False,TF32=False,records=[{} for _ in range(24)],
+        scoped_MHR_calls=[dict(index=i,input_guard_enabled=False,input_warn_only=False,strict_enabled=True,warn_only=False,JIT_optimized=False,
+            delegated_original=True,returned=True,validated=True,restored=True,synchronized=True) for i in range(1,1393)])
+    gate.completed_body(report)
+    import copy
+    for kind in ("counter","scope_count","scope_restored","scope_strict","scope_order","head_restored","topology","private_mode"):
+        changed=copy.deepcopy(report)
+        if kind=="counter":changed["body_completed"]-=1
+        elif kind=="scope_count":changed["scoped_MHR_calls"].pop()
+        elif kind=="scope_restored":changed["scoped_MHR_calls"][0]["restored"]=False
+        elif kind=="scope_strict":changed["scoped_MHR_calls"][0]["strict_enabled"]=False
+        elif kind=="scope_order":changed["scoped_MHR_calls"][0]["index"]=2
+        elif kind=="head_restored":changed["native_head_method_restored"]=False
+        elif kind=="topology":changed["native_topology"]["human_faces_sha256"]="a"*64
+        else:changed["deterministic_algorithms"]=True
+        with pytest.raises(ValueError):gate.completed_body(changed)
 
 
 def small_masks(gate,monkeypatch,tmp_path):
@@ -176,6 +269,46 @@ def test_runtime_empirical_false_no_warning_explicit(gate,mode):
 def test_bad_public_inputs_before_torch_or_model(gate,tmp_path,monkeypatch):
     monkeypatch.setattr(gate,"public_masks",lambda *_:(_ for _ in ()).throw(ValueError("public rejected")))
     with pytest.raises(ValueError,match="public rejected"):gate.run_body(tmp_path,tmp_path,{},lambda:None,"a"*40)
+
+
+@pytest.mark.parametrize("failure",[False,True])
+def test_run_body_scope_delegates_restores_no_global_or_native_operation_patch(gate,monkeypatch,tmp_path,failure):
+    enabled=False;warn=False;optimized=True;synchronized=[];seen=[]
+    def flags(value,*,warn_only):
+        nonlocal enabled,warn
+        enabled=value;warn=warn_only
+    @contextmanager
+    def jit(value):
+        nonlocal optimized
+        previous=optimized;optimized=value
+        try:yield
+        finally:optimized=previous
+    torch=SimpleNamespace(are_deterministic_algorithms_enabled=lambda:enabled,is_deterministic_algorithms_warn_only_enabled=lambda:warn,
+        use_deterministic_algorithms=flags,jit=SimpleNamespace(optimized_execution=jit),cuda=SimpleNamespace(synchronize=lambda:synchronized.append(1)))
+    token=object()
+    def original(*args,**kwargs):
+        assert enabled and not warn and not optimized
+        seen.append((args,kwargs));return token
+    head=SimpleNamespace(mhr_forward=original);model=SimpleNamespace(head_pose=head)
+    monkeypatch.setattr(gate.native.human,"load_model",lambda root,torch:(model,None,None,None))
+    report={};completed=[]
+    def body(root,out,row,persist,revision,load):
+        loaded=load(root,torch)
+        for _ in range(1392 if not failure else 1):
+            assert loaded[0].head_pose.mhr_forward(token,argument=token) is token
+        if failure:raise ValueError("prediction failure, never retry")
+    monkeypatch.setattr(gate,"run_body_native",body)
+    # Completed counters/arrays are tested by the separate pure completed_body contract.
+    monkeypatch.setattr(gate,"completed_body",lambda row:completed.append(row.copy()))
+    if failure:
+        with pytest.raises(ValueError,match="never retry"):gate.run_body(tmp_path,tmp_path,report,lambda:None,"a"*40)
+        assert not completed
+    else:
+        gate.run_body(tmp_path,tmp_path,report,lambda:None,"a"*40)
+        assert len(completed)==1 and report["scoped_MHR_validated"]==1392
+    assert head.mhr_forward is original and not enabled and not warn and optimized and report["native_head_method_restored"]
+    assert len(synchronized)==len(seen)==(1 if failure else 1392)
+    assert all(args==(token,) and kwargs=={"argument":token} for args,kwargs in seen)
 
 
 def test_source_has_original_native_methods_attempt_counters_and_no_fit(gate):
