@@ -15,10 +15,13 @@ translation XYZ worsened median camera PVE32.26%; fixed-depth native XY/Euler
 worsened2.19% and failed the silhouette safeguard. All frames were retained;
 private labels were used only after frozen predictions, never for fitting.
 
-Next: an untouched morphology/appearance/occlusion factorial diagnostic to
-separate independent2D observation bias from articulation/depth errors before
-trying prompt-conditioned body refinement. Detailed receipts and decisions:
-[experiments](docs/experiments.md). Heavy data and all GPU work remain onAzure.
+The untouched24-case factorial diagnostic now rejects external DWPose prompts:
+Body2D error2.34px vsDWPose5.11px, worse in all8groups. Appearance changes
+increased centered geometry error despite identical reference geometry.
+Next: appearance/temporal consistency under clip-constant native identity,
+then real-domain/fullHOI validation; no retuning any already-scored cohort.
+Detailed receipts and decisions: [experiments](docs/experiments.md).
+Heavy data and all GPU work remain onAzure.
 
 ## Layout
 

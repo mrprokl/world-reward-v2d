@@ -2,11 +2,13 @@
 
 ## Latest research gate
 
-H98 native fixed-depth root5 fit and independent native replay completed;
-private all15-frame quality completed once and **rejected the hypothesis**.
-All units terminal; H100 idle45MiB/0%, disk451GBused/574GBfree. Frozen receipts,
-actual producing commits, exact budgets and scientific decisions are in
-[experiments](experiments.md). No final submission or CARI4D superiority yet.
+H99 factorial manufacture, automatic masks, original Body, native DWPose and
+one private24-case diagnostic all completed. Execution passed; independent
+DWprompt-evidence hypothesis rejected (0/8supportinggroups). H97/H98root
+pilots remain rejected; no retuning or extra private score query.
+All5H99units terminal; lastH10027MiB/0%. Heavy models/RGB/arrays stayAzure.
+Frozen receipts, producing commits, budgets and decisions are in
+[experiments](experiments.md). No final submission/CARI4D superiority yet.
 Older completed engineering records below are historical, not active jobs.
 
 ## Isolation and data flow

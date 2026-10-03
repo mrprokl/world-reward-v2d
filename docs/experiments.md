@@ -2971,3 +2971,39 @@ actual qualitypins nowcommitted (exact3producerrev/source/SHA/bytes +public
 configSHA). One120s private diagnostic next, all24cases/all8groups retained;
 no model/optimizer/private labels passed to any producer. No scienceoutcome
 observed beforetheseactualpins; preregisteredruleunchanged.
+Actual H99 private diagnostic execution PASS4.731652s, source
+0314cd0380eed79e02015ce772dae229e63c644d, driver
+54f67adeabbe0611a4ba287edac55f5687396eec19c07bb42ed0c98ecd4de234,
+receipt87d66f54aa31896f467e5faf749add68e1608ae9fbf36a7272b7a81af71630ad
+(66,534B/0444).All24cases scored ONCE after complete public24Body/24DW
+arrays+nativecallprovenance verified, predictions frozenbeforeprivate,
+zero private model/optimizer calls; allinputs/assets/private/source rehashed.
+Execution success is NOT scientific hypothesis support. **IndependentDW
+prompt-evidence hypothesis REJECTED**, automaticpromptpilot NOT authorized.
+All408/408COCO17nativeDWpositive, fullcoveragePASS; relativeDWerrorgains
+by8groups = −158.4863%, −121.9856%, −91.1497%, −76.9623%, −178.0110%,
+−136.1079%, −117.0072%, −99.6485%; supportinggroups0/8 (required≥6).
+Bothappearance/occlusion supportgatesFAIL. No selectivelandmark/error/
+confidence reweighting, no DWelbow-only rescue/threshold retune onthiscohort.
+
+Equal8-group macro Bodyall17/paired2.336319px vsDW5.107629px; rawcamera
+humanPVE14.354771cm, centeredPVE4.857469cm, signedcentroidZ13.911338cm.
+Firsthuman-only full18439 Sim3(mean3poses/group)3.858476cm; oneproper
+transform/group fixed3poses, scales .974524..998771. This removes gauge
+error for diagnosis, NOT inference/fullHOI/officialsubsetscore/CARIranking.
+Plain/stripe appearance means Body2D2.033976/2.638661px, centeredPVE
+3.711756/6.003181cm, firsthumanSim3PVE2.647056/5.069896cm. Matched
+humanV/J/KP/Kbytesverifiedidentical; descriptiveappearance dependence,
+notpopulationstatisticalsignificance or proof2Dmapperanatomicalaccuracy.
+Morphology0/1signedZmean9.512900/18.309775cm. Do not infer that adding
+Zfreedom or a new detector cures this; H97/H98rootrecipesremainrejected.
+
+Stop DWprompt path; preserve allH99frozenreceipts, nosecondqualityquery.
+Next scientific priority: publicRGB appearance/temporal consistency with
+clip-constant identity, tested against an unchanged SAMEidentity baseline
+and a matched SHAM on an untouched cohort, then real-domain/fullHOI
+validation. Research nativeSAM/GEM-X representation and licenses first;
+no newstack assets just because H100available, no promisedCARIvictory.
+All5H99units terminal; lastH10027MiB0%, noheavydata/model/RGBtransferred
+locally.143focusedtestsPASS1.73s immediatelybeforeactualqualitydispatch;
+actualqualityarchive43files148,268B<160KB.
