@@ -1,24 +1,22 @@
 # Azure runtime — current state 2026-10-03
 
-## Latest research gate
+## Current jobs and gates
 
-H99 factorial manufacture, automatic masks, original Body, native DWPose and
-one private24-case diagnostic all completed. Execution passed; independent
-DWprompt-evidence hypothesis rejected (0/8supportinggroups). H97/H98root
-pilots remain rejected; no retuning or extra private score query.
-All5H99units terminal. H100/H100b failures remain frozen. H100c scopedstrict
-native+unoptimizedJIT replay PASS23.15s with exactSHAM and57nativecalls;
-unit inactiveexit0, lastGPU125MiB0%. This is mechanism only, not accuracy.
-NEW24human-only protocol/observer/evaluator fully frozen and audited;6511local
-testsPASS/1optionalSKIP. First manufacture/public predictions are nowready;
-H101manufacturePASS10.37s/24RGB, automaticmasksPASS17.32s/24masks,
-BodyPASS121.50s/144learnedcalls/1392nativeheads/all24exactSHAM, source05ef124….
-All3unitsinactiveexit0/GPU107MiB0%; actualqualityproducerpins frozen.
-SingleprivatequalityPASS26.07s/all24/72rasters butscienceREJECT:0%mediangain,
-twochangedproposals slightregression. All4H101unitsinactiveexit0/GPU101MiB0%.
-Gamma-medoid abandoned withoutretuning/rescore; nextconstrainednativeHOI96
-publicmechanism/generalproductionroute. No finalsubmission/CARI4Dimprovement.
-Heavy models/RGB/arrays stayAzure.
+Full501 shared prepare, captured native forward,301-update refinement, direct
+export and CPU episode consumer all pass in immutable new namespaces. These
+are engineering/fidelity results, not independent challenge accuracy.
+All30 original RGB/hash/container-metadata readiness passes:16,563frames,
+30Hz/1536x1152, no frame decode/model/GT access in that audit.
+First wholly absent frontend episode1/N668 is running fromce0519f under
+`world-reward-track1-episode1-frontends`. One serial H100 only; actual automatic
+masks, sparse Body/depth/shared gauge and grounded object generation pass,
+full-video frontend work continues. No implicit resume/overwrite or old learned
+trajectory use. Private own-grasp feasibility is being implemented separately,
+not yet dispatched and cannot overlap this GPU work.
+
+H97/H98 root pilots, H99 DWPose prompt diagnostic and H101 gamma-medoid remain
+rejected without retuning/rescoring. Latest fullsuite8033PASS/2same optionalSKIP.
+No final Parquet or verified CARI4D improvement. Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
 [experiments](experiments.md). No final submission/CARI4D superiority yet.
 Older completed engineering records below are historical, not active jobs.

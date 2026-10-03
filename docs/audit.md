@@ -111,3 +111,18 @@ confirms entered=True, used_today=0 and remaining_today=5 on each metric. NVIDIA
 once-per-team registration, producing Git commit accessibility and source-license
 compatibility remain independent prerequisites; Kaggle acceptance does not prove
 any of them.
+
+## Public code access — 2026-10-03
+
+Own-source hygiene audit found no tracked/history model, media, challenge GT or
+credential material; this is practical inspection, not a complete originality/
+SBOM/legal guarantee. Created public own-code repository
+[mrprokl/world-reward-v2d](https://github.com/mrprokl/world-reward-v2d) and pushed
+the existing producer history without squash/rebase/amend. `main` initially
+points toce0519fb99125ee0b847cd89c9f37ea6a684738a; subsequent source changes must
+also be pushed before claiming their commit is accessible. No gated assets,
+third-party source, private synthesis truth or runtime credentials published.
+Unauthenticated HTTPS exact commit page200, full producing hash present; remote
+`refs/heads/main` equalsce0519f. No authorization/cookie was sent for this check.
+Final producing commit, rules-required public sharing and registration/licensing/
+reproducibility/quota checks still precede any upload.

@@ -3884,3 +3884,68 @@ support requirements. Leave them strict; preserve failures rather than patch
 individual episodes. Existing three image tags must resolve to verified actual
 images before launch; root scheduler excludes all GPU jobs, since the cooperating
 flock does not cover older units. Never claim this resolves license eligibility.
+
+All30 readiness retry actual **PASS2.210132s**, producer
+ce0519fb99125ee0b847cd89c9f37ea6a684738a, driver
+d985426860041ec1f6bf8c2398f15ce7fd30f5de0718e9eee3a2e9de05235e3a.
+Thirty original1536x1152/30Hz clips,16,563frames; selected32 hashes verified,
+35 other legitimate manifest files never read,30 metadata-only probes, zero
+decoded frames/model/private/GT reads. Manifest
+3df960ce0f594b8f51675b21bb070925de7aa87a583332674eb89b0e90fc6263
+(13,081B), readiness log33e8b0ef4c7613596ab27885e33a45b3926391166db0e58448006ecb6222ca19
+(27,378B) stays onAzure; no full log transferred. Exact original lengths0..29:
+790/668/866/592/747/668/816/777/634/415/577/877/405/425/442/501/
+360/419/535/443/549/563/533/552/420/365/399/440/366/419.
+Only episode0 and15 frontend targets occupied, still opaque/unvalidated by
+readiness; deterministic first clean episode1/N668, not a visually selected case.
+Actual613,831,860,224free bytes,106,636,103free inodes and~306GiB RAM available.
+All three expected images present at their verified IDs; upstream7c0d clean,
+required assets/camera gate present, UID1000 and no compute jobs. MoGe weight
+snapshot is an existing audited HF symlink, not a new regular-file assertion;
+existing model producer checks remain unchanged. License clearance is separate.
+
+Dispatch the exclusive episode1 frontend-only engineering pilot fromce0519f:
+53file103,212B closure SHA-XZ
+bf0ef94a5041138b3269748e76067a21acb78cb40695e872f918d3a108aac751.
+Fixed masks600/7initializers5400/objectpose7200/CPUprepare7200s,
+no historical predictions/CoCoNet/refinement/LM or overwrites. Actual outcome
+pending; serial H100, potential CPU overlap only after GPU lock release.
+Actual dispatch returned active/MainPID711539; no second GPU job started.
+Complete latest suite **8033PASS/2same optionalSKIP125.77s**, including exact
+Azure ffprobe compatibility and callback test-order regressions.
+
+New own-data feasibility prerequisite only: complete closed/outward/manifold
+mesh, original face/vertex coverage, conservative self-intersection and full
+human/object triangle intersection plus solid containment audits. Adjacent faces
+are exempt only after proving intersection is their original shared simplex;
+coplanar overlap/tolerance ambiguity/exact touch fail. All possible pairs use
+complete sphere/AABB broadphase, never sampled collision points; positive
+<=2mm gaps are proximity, not true contact/force closure/biomechanics. No face
+deletion, repair or scaling. Float64/tolerance1e-8m and bounded30s/2M candidate
+pairs explicitly limit the numerical certificate, not an exact-arithmetic proof.
+Own analytic54testsPASS0.92s; root combined120PASS1.00s. Native18439vertex/
+36874face human closure/embedding/runtime remains unverified onAzure.
+
+Separate private one-state manufacture capability being implemented, not run:
+fixed full194vertex/384face own asymmetric bottle/scale1, native shared zero45/
+zero68/zero72 identity with legal204 controls, automatic actual distal thumb/
+index surface patches, actual opposed normals and .5mm positive target gaps.
+No human AABB proxy, old synthetic/challenge poses, rendered RGB or inference
+quality. Fresh neutral embedding and native autograd/finite-difference checks
+must pass before bounded legal thumb/index plus object rigid-pose fitting.
+Hard300s/100 total native forwards including diagnosis/final replay; failure
+stops before rendering or cohort manufacture. Only private output and exact
+reference model/code mounts; no dataset, labels, vendor, old predictions or
+historical truth mounts. One-state feasibility cannot establish full96 temporal
+HOI validation or method adoption. H100 execution waits for frontend GPU release.
+
+Own-source/publication audit:638 tracked text files/~6MB,331 reachable producer
+commits; no tracked/history assets, private labels, credential files or concrete
+token/private-key literals found (invalid credential-shaped tests excluded).
+No upstream implementation bundled; external runtime/licenses remain separate.
+Public repositorymrprokl/world-reward-v2d created, existing main/history pushed
+without rewritten producer commits; exactce0519f page unauthenticatedHTTPS200
+and remote main hash match. Future producing commits must be pushed too.
+This removes the missing remote/access blocker, not registration/runtime-license/
+one-command final all30 reproduction/Parquet/quality checks. No Kaggle upload,
+organizer message, gated assets, private synthesis truth or credentials published.

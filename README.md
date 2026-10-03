@@ -29,8 +29,10 @@ signed-zero ABI correction, without changing predictions. Native301-update
 refinement and direct export now pass on96frames. Full501 shared preparation
 also passes, as do the fresh full501 HOI forward,301-update native
 refinement and full direct export. The complete pipeline now passes on one
-public video; all30 production and independent
-real/fullHOI accuracy validation remains separate.
+public video, including the source-bound CPU episode consumer. All30 original
+videos now pass the metadata/hash readiness audit; the first structurally clean
+new episode is running through the automatic frontends. All30 reconstruction
+and independent real/fullHOI accuracy validation remain separate.
 Detailed receipts and decisions: [experiments](docs/experiments.md).
 Heavy data and all GPU work remain onAzure.
 
@@ -69,5 +71,7 @@ One frozen file goes to all five metric competitions after validation, quota che
 rule acceptance, team identity **World Reward**, and accessible producing GitHub commit.
 Kaggle credentials are configured in an ignored secret file; browser acceptance
 of all five competition rules and team name was verified on 2026-10-02;
-NVIDIA’s separate registration, source-license eligibility and producing GitHub
-commit accessibility still require resolution before the first upload.
+the own-code producer history is now public at
+[mrprokl/world-reward-v2d](https://github.com/mrprokl/world-reward-v2d).
+NVIDIA’s separate registration, source-license eligibility and the final exact
+producing commit/reproduction still require verification before the first upload.
