@@ -3334,3 +3334,10 @@ its moved-path identity check (6510PASS/1FAIL/1optionalSKIP), not a GPU/quality
 outcome; final frozen full suite is being rerun. Azure preflight: freshH101
 namespace, H100NVL95,830MiB/125MiBused/0%,574GBfree, previousH100c exit0.
 Only code/scalars transferred; no challenge/private quality queried.
+
+Final frozen local full suite6511PASS/1optional-trimeshSKIP96.93s, nofailure.
+Committed full Git-metadata code closure: manufacture20files52,508B,
+observer36files116,008B, evaluator40files134,188B, allbelow160KBcontrolbudget.
+H101 ready for first manufacture/public inference; no private quality or scores
+yet. Launch manufacture/masks/body from the same frozen source revision; record
+their immutable scalar receipts only after body dispatch, preserving that pin.

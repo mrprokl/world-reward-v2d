@@ -9,7 +9,9 @@ pilots remain rejected; no retuning or extra private score query.
 All5H99units terminal. H100/H100b failures remain frozen. H100c scopedstrict
 native+unoptimizedJIT replay PASS23.15s with exactSHAM and57nativecalls;
 unit inactiveexit0, lastGPU125MiB0%. This is mechanism only, not accuracy.
-NEW24human-only quality remains unexecuted, pending complete prerequisites.
+NEW24human-only protocol/observer/evaluator fully frozen and audited;6511local
+testsPASS/1optionalSKIP. First manufacture/public predictions are nowready;
+privatequality remains unexecuted, requiring allactual publicproducerPASS.
 Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
 [experiments](experiments.md). No final submission/CARI4D superiority yet.
