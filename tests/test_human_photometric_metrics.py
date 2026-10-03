@@ -19,6 +19,13 @@ def test_exact_sham_and_full_group_paired_gate_no_adoption():
     assert all(np.array_equal(v,b)for v,b in zip(values,before))
 
 
+def test_inclusive_safeguard_boundaries_no_cancellation_or_extra_tolerance():
+    p,i,h=arrays();p[7,2]=p[7,0]*1.05;i[23,2]=i[23,0]-.01;h[7,2]=h[7,0]*1.05
+    assert quality_decision(p,i,h)["synthetic_human_photometric_hypothesis_supported"]
+    p[7,2]=np.nextafter(p[7,0]*1.05,np.inf)
+    assert not quality_decision(p,i,h)["synthetic_human_photometric_hypothesis_supported"]
+
+
 @pytest.mark.parametrize("fault",["nochange","group","hand","iou","zerobaseline"])
 def test_reject_each_failed_gate_without_omitting_a_case(fault):
     p,i,h=arrays()

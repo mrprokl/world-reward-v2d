@@ -3304,3 +3304,8 @@ H101 preprocessing/metrics/scoped-policy73focusedtestsPASS0.71s while
 finalnativeobserver metadata+samequalifiedscopedroute andprivateevaluator
 are beingcompleted/audited. NoH101manufacture, inference or quality dispatched;
 allgate thresholds andnewrecipe above alreadypreregistered.
+
+Preexecutionnumericboundary fix: evaluate inclusive5%regression as
+after≤before×1.05, inclusive1ppIoU asafter≥before−.01, avoiding cancellation
+at exactlythethreshold. Samepreregisteredthresholds/noepsilon/newtolerance;
+nextafter-overboundary rejected,17purepolicytestsPASS0.04s. NoH101qualityseen.

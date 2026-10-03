@@ -51,9 +51,9 @@ def quality_decision(group_pve,frame_iou,group_hand_pve):
     if not np.isfinite(hand_limit).all():raise ValueError("Finite hand safeguards required")
     drop=iou[:,2]-iou[:,0]
     gates=dict(median_paired_group_aligned_pve_gain_5pct=defined and float(np.median(gains))>=.05,
-        no_group_aligned_pve_regression_over_5pct=defined and bool(np.all(gains>=-.05)),
+        no_group_aligned_pve_regression_over_5pct=defined and bool(np.all(pve[:,2]<=pve[:,0]*1.05)),
         no_group_per_hand_aligned_pve_regression_over_5pct=bool(np.all(hands[:,2]<=hand_limit)),
-        no_original_frame_automatic_human_iou_drop_over_1pp=bool(np.all(drop>=-.01)))
+        no_original_frame_automatic_human_iou_drop_over_1pp=bool(np.all(iou[:,2]>=iou[:,0]-.01)))
     return dict(rule=RULE,modes=list(MODES),gates=gates,synthetic_human_photometric_hypothesis_supported=all(gates.values()),
         per_group_aligned_human_relative_gain=gains.tolist()if defined else None,
         median_paired_group_aligned_human_relative_gain=float(np.median(gains))if defined else None,
