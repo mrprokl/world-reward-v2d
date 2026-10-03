@@ -5813,3 +5813,23 @@ b845869ecfdf23298672f6b212c4456e2708e299ec4a217c6fc4e5bc82494b19.
 Candidate/export sampledChamferdiagonal .0060983867 (<.01 unchangedgate);
 fulltracking next, notCARIaccuracy. Fivefixturefailures fixedwithactual40fd
 Gitblobs+anti-substitution;128frontendextract/archivetestsPASS5.00s.
+
+Frozen3bee2c7 fullsuite actual10570PASS/2optionalSKIP343.81s, no failures.
+EP3 independentexportinventory3bee2c7 actualPASSinactiveexit0; five original
+file identities frozen cari_clip_000003_shared_export_pins.json. Inventorylog
+992B/c9f5cabe0b07b3c3b8c6dcd897a9077bb63638ce2f85dd61e2e699915bac2d6e.
+No helper bytes changed after the 168a809 export; CPU consumer/packer next.
+EP5 originalempty object_pose_full namespace and exact originalFAILlog
+authenticated, then atomicrenameat2NOREPLACE to object_pose_topology_failed_v1.
+Volumecontinuation3bee2c7 dispatched83files141192encodedB, actualactive unit;
+tracking not yet verified, no predictions/frames deleted or thresholds changed.
+
+VM02 SAM2kernel168a809 actualPASS2.180097928s/inactiveexit0: six binary
+fixtures match independent8connected BFS partitions and counts; <=8hole
+fill and larger-hole retention pass without fallback. Receipt2069B/
+dfad765d2d8e9021191b6fc6b6111b944e222a268b2c37ea59e58a1e432f916b.
+ActualH100NVL/nativeextension1353848B/acd3d17cc98745b8da081bed64f0015362bafc5ebc897276d0522c1a790d27bd,
+childimagefd26863. No models loaded, challenge inputs, historicalimageparity,
+replica readiness, license eligibility or training-overlap PASS claimed.
+Newindependent640x480triangle-raygate3bee2c7 dispatched separately; real
+result pending, previous authored/raster FAILs remain rejected.

@@ -26,13 +26,13 @@ No final Parquet, submission or verified CARI4D improvement yet.
   After a separate source audit, two export attempts stopped before model
   execution: first on historical-source binding, then on private-proof access.
   The explicit authenticated readonly-source access fix now passes a full native
-  export of all 592 frames. Independent export inventory and official packing
-  remain pending. The 747-frame
+  export of all 592 frames. Its independent export inventory now passes;
+  CPU consumer validation and official packing remain pending. The 747-frame
   episode keeps all 25 object components but tracking stopped at 18 frames
   with empty automatic object masks. The next 668-frame episode has complete
   automatic masks and Body/depth initializers; its default topology reduction failed before object tracking. A separately
   gated volume-constrained proposal retains its three shells, including two
-  cavities; full tracking remains unverified. No frames, components or
+  cavities; full tracking is running and remains unverified. No frames, components or
   trajectories were dropped to rescue either episode.
 - **Research:** a frozen DA3 depth hypothesis, anchored to MoGe by one
   scene-constant median ratio on the fixed 10% image border, gains **33.42%**
@@ -55,13 +55,12 @@ No final Parquet, submission or verified CARI4D improvement yet.
 A verified 19.91 GB asset-only transfer and extraction between Azure VMs
 completed without local checkpoint traffic. The second runtime is not yet
 ready: the selected Body/DINO source binding passes, and the minimal Grounding
-image compiles offline, and its thin Python import gate now passes. The new CUDA operator gate is
-pending; no CUDA
-execution parity or eligibility claim.
-The full frozen `da2f3db` lightweight suite passed **10,394 tests, 2 optional skips**.
-The newer `168a809` suite has **10,564 passes, 5 failures, 2 optional skips**.
-Those failures concern tiny extraction fixtures confusing historical and current
-source bytes; the historical producer and production pins remain unchanged.
+image compiles offline and its thin Python import gate passes. The independent
+SAM2 CUDA connectivity/hole-filling operator gate also passes, without models
+or historical image-parity/eligibility claims. Replica model readiness is unverified.
+The full frozen `3bee2c7` lightweight suite passed **10,570 tests, 2 optional skips**.
+Earlier extraction-fixture failures were corrected using authenticated historical
+Git bytes; the historical producer and production pins remain unchanged.
 
 Heavy data, models and computation remain on Azure. Only reproducibility pins,
 results and decisions are kept here; see [experiments](docs/experiments.md).
