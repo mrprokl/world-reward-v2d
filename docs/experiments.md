@@ -2862,3 +2862,68 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   is usefuldepth diagnosis, not evidence ofchallenge ranking superiority.
   All exact H98publicfitFAIL/fitPASS/replayPASS/qualityPASS receipts unchanged;
   lastGPUidle45MiB/0%,451GBused/574GBfree. Noheavyartifact downloaded locally.
+
+## H99 — preregistered morphology/appearance/occlusion diagnosis
+
+New untouched `validation/factorial_rgb_v1`: 24 own RGB cases,
+2 morphologies ×2 diffuse appearances ×2 bottle depth orders ×3 identical
+articulations. Morphology shape first2 (.31,.09)/(-.28,.18), free scale68
+.04/-.03 (locked values0), legal native249 bounds; no clipping/repair.
+One K1280/1024×768 and framing from both neutral identities; no per-case
+camera adjustment. Same human V/J/KP/camera bytes across matched appearances
+and occlusion. Own bottle manufacturing scale1.45, elbow-centred Z±.25;
+12 front/back pairs must expose≥64 extra human pixels BEFORE inference or
+abort manufacture (no recipe repair from model predictions). This controlled
+render is not a photorealistic/real-domain or interaction reconstruction test.
+
+Native truth uses reference352e… V18439/J127, exact frozen checkpoint
+`head_pose.keypoint_mapping` F32[308,18566] from Bodyb5a2…; map V/J cm/100
+BEFORE YZflip and common sceneR/T, no row normalization/semantic guessing.
+Existing bundled Body MHR SHA352e…/696110248B is byte-identical to reference
+(previous completed Body receipt independently inspected; metadata only).
+Preparation additionally runs6 same249 parameters through each rig and
+requires exact joint names/topology, V/J≤1e−5m; reference2 +bundled1 batches,
+24 rasters,120s/32GB/4CPU/offline H100. Public manifest exposes24 original
+RGB identities/dimensions only; all factors/geometry/rig/camera remain private.
+
+After actual preparation PASS, commit exact manifest pins only; masks180s
+48DINO/48SAM2/24encoders (`person.`/`bottle.`) without human prompts. After
+actual mask PASS, commit exact producer/source/report pins. Framewise original
+Body24 +24 native parity +24 full308 heads (300s/32GB), native DWPose133
+24 unmodified F64-list-feed calls/one CPUORT session (180s/8GB). No MoGe,
+proxy, optimizer, shared identity fitting or score-dependent selection here.
+Every24 output immutable and reread; source/model/input bytes rehashed.
+Invalid required inference fails execution, never drop/replace a case.
+
+Before first private diagnostic, commit actual Body/DW/render receipts and
+source revisions/hashes/sizes. One CPU120s/8GB read of all24 frozen cases.
+Primary descriptive measures: raw camera native PVE, centroidXYZ, centred
+PVE/RMS (RMS²=centroid²+centredRMS²), joints, derived COCO17landmarks,
+8 limb proportions; Body2D vs DWPose2D on SAME native-positiveCOCO17indices
+per frame, no score weights or GT visibility. Report Bodyall17 and all positive
+counts. Equal landmark means→3pose means→8group macro, no missing-case drop.
+Next automatic prompt pilot has supporting evidence ONLY if relative DWPose
+error gain≥10% in≥6/8groups, every24frame has a positive pair/all8gains are
+defined, and both appearance/occlusion levels occur among supportinggroups.
+Otherwise deprioritize that prompt hypothesis; no threshold retuning.
+Always report12 appearance and12 occlusion paired contrasts using common
+positive-index intersections across compared levels; Bodyall17 separately.
+Factor labels private quality only. These3poses/2morphologies are not independent
+people; no significance or anatomical measurement independence claim (truth
+landmarks share the pretrained mapper definition, not RGB predictions).
+
+Separate gauge diagnostic: one proper positive full18439 first-human Sim3
+pergroup, frozen across3poses, transforms+raw camera errors disclosed. Reuse
+existing tested Umeyama helper (`joint_rgb_evaluate`, row@R.T convention).
+NOT official alignment subset or fullHOI score; no object prediction/contact/
+temporal metric in this diagnostic, no per-frame/object fitting/K correction.
+H97/H98 scored cohorts/failed gates remain immutable; no extra score query.
+Public contracts verified before any private read; zero private model/optimizer
+calls. No adoption/submission/CARI4D-superiority claim regardless of outcome.
+
+Independent prep/observer/quality source audits; 109 focused tiny tests PASS
+1.68s before first Azure H99 dispatch. All heavy arrays/RGB/models remainAzure.
+Full suite6235PASS/oneoptionaltrimeshSKIP84.48s. Source-only closures
+prepare17files52,288B; observer33files115,488B; quality40files146,476B
+(<160KB). Three independent read-only audits complete. Commit beforedispatch;
+no actual H99 runtime/accuracy result has been observed at preregistration.
