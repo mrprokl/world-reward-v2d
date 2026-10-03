@@ -10,12 +10,12 @@ All30 original RGB/hash/container-metadata readiness passes:16,563frames,
 First wholly absent frontend episode1/N668 is running fromce0519f under
 `world-reward-track1-episode1-frontends`. One serial H100 only; actual automatic
 masks, sparse Body/depth/shared gauge and grounded object generation pass,
-full-video frontend work continues. No implicit resume/overwrite or old learned
-trajectory use. Private own-grasp feasibility is being implemented separately,
+full Body668frames, depth668frames and native adapter pass; object-pose work continues. No implicit resume/overwrite or old learned
+trajectory use. Private own-grasp feasibility is frozen separately,
 not yet dispatched and cannot overlap this GPU work.
 
 H97/H98 root pilots, H99 DWPose prompt diagnostic and H101 gamma-medoid remain
-rejected without retuning/rescoring. Latest fullsuite8033PASS/2same optionalSKIP.
+rejected without retuning/rescoring. Latest fullsuite8164PASS/2same optionalSKIP.
 No final Parquet or verified CARI4D improvement. Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
 [experiments](experiments.md). No final submission/CARI4D superiority yet.

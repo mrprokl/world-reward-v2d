@@ -966,3 +966,50 @@ negative-control and GT-relative acceleration errors matter, not lower proxy
 penetration/acceleration alone. If coarse reconstruction dominates or no credible
 predicted contact run exists, stop that pilot as uninformative rather than force
 contacts. No implementation, RGB generation, quality query or adoption here.
+
+### Targeted hand/contact follow-up — cutoff 2026-09-30
+
+[DynamicHOI](https://arxiv.org/html/2609.36454v1), submitted2026-09-29,
+couples geometry-guided diffusion with hand/object dynamics. Primary
+[page at cutoff](https://github.com/wenliangguo/HOI-Reconstruction-Page/blob/15133685c4ad613da536c15ff1e2d3fb57c8a3a2/index.html)
+says Code Coming Soon. MANO hand-only plus supplied canonical object mesh; no
+released MHR/source/weights license or Track1 video-only replacement established.
+Article CC-BY4 is not a software/model grant.
+[MOCHI](https://github.com/jiyewise/MOCHI/tree/b993ccb4c5514269feaabb27c1705783575dcfb4)
+(June2026) likewise has teaser/README, promised source and no actual license;
+not an executable branch.
+[ContactOpt](https://github.com/facebookresearch/ContactOpt/tree/9eeb59a1cdddf4a5e94fec39d77808ddd5ed512c)
+(CVPR2021) code MIT but MANO optimizer explicitly permits soft-tissue
+interpenetration, including2mm/capsule offsets. Do not borrow it as a
+nonpenetration certificate or silently replace native MHR hand geometry.
+
+[ContactPose](https://github.com/facebookresearch/ContactPose/tree/89cec790f2c7bdb3c81f4d9e98b337387ce6dda8)
+explicitly declares code and non-mesh data MIT; RGB-D/thermal contact and measured
+21joints could support narrow sensor/hand validation without MANO. Per-object
+mesh terms, accessible minibundle and training/challenge overlap remain unchecked.
+Mostly static grasps, not full-body96frame dynamic HOI. Unobserved thermal zeros
+are unknown, not noncontact. No assets acquired or full-HOI clearance claimed.
+HOT3D hand/UmeTrack annotations remain NC; ACE-Data-0 restricts academic use
+including derived statistics/commercial benchmarks and has no released files
+established. Neither unblocks our independent commercial full-HOI cohort.
+
+Potential separately frozen candidate: fingers-only refinement with object/body/
+root/identity/camera fixed; automatically distinguish free/adhesion/slip/release
+in the predicted object frame, stabilize correspondence only during adhesion,
+allow tangential slip and disable attraction on uncertain/released associations.
+2D overlap alone is never contact evidence. First the private native one-state
+full-surface capability must pass; then NEW RGB-only frontend capability and two
+NEW96frame/30Hz full interactions, including60mm depth-separated negative control.
+Proposed preregistration before any cohort scoring:100% originalcoverage/unchanged
+topology/scales, finger camera error median gain>=5%, no body/object/true-
+acceleration regression>5%, no negative-control contact. No retune of the same
+cohort; lower physical proxy alone is not success. No candidate implemented or
+adopted.
+
+[MHR paper](https://arxiv.org/html/2511.15586v1) explicitly lacks eyeball geometry
+and an interior mouth/teeth/tongue system. Its
+[native forward](https://github.com/facebookresearch/MHR/blob/d96fafa33bbf018647c70c3525e91f53e79d2a14/mhr/mhr.py)
+has no self-collision guarantee. Do not invent ocular/oral causes for a future
+closure failure; actual pinned neutral topology and embedding decide. Never
+delete or alter geometry to pass a certificate. This audit used primary small
+text only, no GT/model/media access or challenge scoring.

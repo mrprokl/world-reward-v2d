@@ -3998,3 +3998,45 @@ Complete own-grasp/source regression suite **8164PASS/2same optionalSKIP124.83s*
 No native/GPU execution or quality query during local tests. The corrected actual
 immutable source namespace is jobs/<revision>/run_own_grasp_capability/code;
 generic Azure dispatcher unchanged.
+
+Targeted throughput audit retains original object-pose execution unchanged.
+Episode1 actual200/668frames at1,224.703523s, not an allframe outcome; existing
+H100 remains occupied. Earlier canonical-tree full-candidate test already failed
+useful-speedup gate1.2794<1.3, so do not repeat or lower its threshold. New tiny
+own CPU diagnostic (NumPy2.4.6/SciPy1.17.1, <0.4s) finds nontied8192/2048
+queries1.99x and three14-iteration ICPs1.79x, exactR/T/status/inliers/iterations,
+residualdelta<6e-18m; not H100/end-to-end evidence. Rotated equidistant/near-trim
+cases instead diverge by40mm translation or6vs3 iterations at nearly unchanged
+residual. SO3 floating query equivalence is not universal discrete parity. Keep
+cache/batch proposals unadopted; any future distinct ambiguity-aware candidate
+needs original fallback or failclosed, exact branches/NN/trim/candidate path and
+original camera/mesh parity plus measured>=1.3x whole-frame throughput. No
+hypothesis reduction, resizing, relaxed acceptance or running-source mutation.
+
+Official packer actual source/import audit completed onAzure, six small files
+pinned in the new one-episode CPU gate. Actualpack_track1(args)->None supports
+an exact episode-only row layout; no missing29 predictions needed. Original
+read_sample reads all columns before selectingrow_id, so pass only a new CSV
+made by our existing Arrow columns=['row_id'] projection of the hash-bound
+originalsample. Originalsample3,495,851B/SHA1db56c5ec7267cdb7a68d42928f85c092c6b8e9bfbc0dc98a2b020d7a48bc621,
+740,780rows/9,877scoredframes/30episodes. Never read its XYZ as predictions.
+
+New official gate retains complete source-bound501frame episode, writes exactly
+six full trajectory arrays and byte-identical aligned GLB into disposableAzure
+scratch, invokes unchanged officialpacker once, checks originalscoredindices/
+exactcontrol/clipidentity and full cyclic-oriented triangle multiset after
+official welding/padding. No second simplification/geometrytolerance. Scratch
+including temporaryParquet deleted finally; sole444 JSONreceipt. NoTorch/Joblib/
+model/scorer/render/upload or finalall30 artifact. Focused48PASS1.58s, combined
+122PASS1.89s, complete **8212PASS/2same optionalSKIP124.04s**; sourceclosure
+47files126,632encodedB within160KB. Actualexecutionpending.
+
+Dependency preflight fails before packing: existing pinned CARIimage has
+NumPy1.26.3/SciPy1.16.3/pandas3.0.6/trimesh5.1.0/fast-simplification0.2.0,
+but PyArrow absent. Do not mutate it or call a schema-only pass packing success.
+Build a separate CPU child image adding only Apache PyArrow19.0.1 cp311
+manylinux2.28x86_64 pinned wheel42,084,055B/SHA
+49a3aecb62c1be1d822f8bf629226d4a96418228a42f5b40835c1f10d42e4db6
+from public PyPI metadata; wheel fetch/build staysAzure, no dependency upgrade.
+Actualnewimage/receipt binding must precede dispatch. GPUfrontend continues;
+this CPUruntime work can overlap without GPU duplication.
