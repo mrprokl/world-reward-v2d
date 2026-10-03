@@ -183,14 +183,17 @@ def reset_seed(torch):
     torch.manual_seed(0);torch.cuda.manual_seed_all(0)
 
 
-def run_body(root,out,report,persist,revision):
-    record,inputs=public_mask(root,revision);report.update(public_inputs=inputs,phase="native_model_load");persist()
+def run_body(root,out,report,persist,revision,*,deterministic_algorithms=True,public_input_reader=None):
+    if type(deterministic_algorithms)is not bool:raise ValueError("Explicit native runtime mode required")
+    if public_input_reader is None:public_input_reader=public_mask
+    record,inputs=public_input_reader(root,revision);report.update(public_inputs=inputs,phase="native_model_load");persist()
     if "torch"in sys.modules:raise ValueError("Strict CUBLAS setup must precede Torch")
     os.environ["CUBLAS_WORKSPACE_CONFIG"]=":4096:8"
     import torch
     from PIL import Image
     if not torch.cuda.is_available()or str(torch.__version__)!="2.5.1+cu124"or torch.version.cuda!="12.4":raise ValueError("Pinned actual native CUDA required")
     reset_seed(torch);torch.set_num_threads(4);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False;torch.backends.cudnn.benchmark=False
+    torch.use_deterministic_algorithms(deterministic_algorithms,warn_only=False)
     semantic_path=root/"results/mhr-finger-semantics-v4.json";semantic_id=native.regular(semantic_path)
     semantic=json.loads(semantic_path.read_text());native.regions_helper.require_semantic_report(semantic)
     if semantic.get("source_image_id")!=IMAGE:raise ValueError("Pinned semantic source image required")
@@ -202,13 +205,15 @@ def run_body(root,out,report,persist,revision):
     if not isinstance(retained,list)or len(retained)!=113 or len(set(retained))!=113:raise ValueError("Exact113 immutable native rig buffers required")
     report["actual_native_hand_indices"]=model_source["hand_indices"]
     report.update(body_model=model_source,semantic_report_sha256=semantic_id["sha256"],torch_version=str(torch.__version__),CUDA_version=torch.version.cuda,
-        seed=0,TF32=False,deterministic_algorithms=True,warn_only=False,CUBLAS_WORKSPACE_CONFIG=":4096:8",phase="photometric_body_inference");persist()
-    torch.use_deterministic_algorithms(True,warn_only=False)
+        seed=0,TF32=False,deterministic_algorithms=deterministic_algorithms,warn_only=False,CUBLAS_WORKSPACE_CONFIG=":4096:8",phase="photometric_body_inference");persist()
     camera=torch.as_tensor(K.astype(np.float32),device="cuda")[None];rgb=read_rgb(record,Image)
     human=native.joint.read_mask(record["human_mask_path"],Image)
     if int(np.count_nonzero(human))!=record["human_mask_pixels"]:raise ValueError("Frozen automatic mask area changed")
     box,prompt=native.human.derived_bbox(rgb,human);raw=[];fixed=[];artifacts=[];anchor=None
     for name,gamma in ALL_BRANCHES:
+        if (torch.are_deterministic_algorithms_enabled()!=deterministic_algorithms
+            or torch.is_deterministic_algorithms_warn_only_enabled()or torch.backends.cuda.matmul.allow_tf32
+            or torch.backends.cudnn.allow_tf32):raise ValueError("Frozen actual native runtime mode changed")
         variant=gamma_rgb(rgb,gamma);row=dict(name=name,gamma=gamma,source_RGB_sha256=hashlib.sha256(rgb.tobytes()).hexdigest(),
             transformed_RGB_sha256=hashlib.sha256(variant.tobytes()).hexdigest(),original_bbox=box.tolist(),original_mask=inputs["automatic_mask"],camera_K=K.tolist())
         if gamma==1. and variant.tobytes()!=rgb.tobytes():raise ValueError("Original/SHAM RGB identity must be byte-exact")
@@ -243,7 +248,7 @@ def run_body(root,out,report,persist,revision):
         native_body_block_scope="133 proposal slots; native first130 used, hands overwritten; includes6 skeletal translation controls130:136",
         hard249_bounds_gate_applied=False,original_bbox=box.tolist(),camera_K=K.tolist())
     reread_proposals(out,artifacts,anchor)
-    if public_mask(root,revision)[1]!=inputs or native.regular(semantic_path)!=semantic_id:raise ValueError("Original RGB/mask/semantic bytes changed")
+    if public_input_reader(root,revision)[1]!=inputs or native.regular(semantic_path)!=semantic_id:raise ValueError("Original RGB/mask/semantic bytes changed")
     if native.human.body._source_identity(root)!=model_source["inference_source_identity"]or native.human.body._body_assets(root)[1]!=model_source["body_assets"]:raise ValueError("Original Body model/source changed")
     require_fields(report,{k:6 for k in("body_attempts","body_calls_completed","parity_head_attempts","parity_heads_completed","keypoint_head_attempts","keypoint_heads_completed","fixed_head_attempts","fixed_heads_completed")}|dict(selected_replay_attempts=3,selected_replays_completed=3))
     report.update(actual_native_photometric_mechanism_verified=True,all_artifacts_frozen_and_reloaded=True,

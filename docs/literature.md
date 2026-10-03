@@ -826,3 +826,43 @@ mandatorySAMcustomsource eligibility unresolved, nativeglobal_scaleclamp
 [.7,1] evenpostprocFalse. FullCARI objectmesh/pose/contact/temporal quality
 remains necessary; photometricpilot doesnotreplace it or establish victory.
 No newweights, RGB, GT or proxy downloaded/run during this literatureaudit.
+
+### Photometric hypothesis — causal limits and fair next test
+
+Gamma changes intensity, not spatial stripe geometry; coherent model bias can
+survive all three views. Full18439 squared-distance medoid chooses the candidate
+closest to the ensemble mean, not the most accurate or confident one. Dense
+torso vertices can dominate hands. NLF motivates photometric TTA only: no
+transfer of its accuracy claims to this nativeSAM recipe. Reduced dispersion
+alone is never a scientific success criterion.
+
+For a future clip-quality test, do not pass clipframe0 as the complete frame
+anchor: that would incorrectly freeze motion, camera and hands. Construct each
+frame anchor from that frame's original RGB prediction, replace only shape45
+and PCA28 with clipfirstoriginal identity, then decode the constrained baseline.
+All variants use this SAME frame anchor; native expanded68 remains clipconstant.
+The shared diagnostic Sim3 must derive from this constrained baseline firstframe,
+not rawframewise or gamma-selected geometry. Apply it once to every method and
+pose; silhouette checks use original camera geometry and automatic masks.
+Human-only gains still do not prove metric gauge, contact or challenge superiority.
+If gamma consistency fails, do not search gammas on the scored cohort: prioritize
+a separately tested native temporal identity/pose prior or the faithful fullHOI
+baseline. New-stack assets and representation conversions remain second-line.
+Independent read-only audits produced these constraints; no additional weights,
+private labels, RGB or GPU jobs were used for this literature follow-up.
+
+If the untouched gamma pilot rejects accuracy, the existing native CARI temporal
+HOI context is a stronger second-line causal test than smoothing Body output.
+Pinned7c0d README describes96-frame RGB/mask/point/metric-mesh windows, MHRjoint1
+centering and normalization to2m human height with metric restoration. Compare
+unchanged initializer vsCoCoNet vsnative refinement on two NEW contiguous96-frame
+clips, sharing inferred object mesh, initializer identity and K; never repeat/pad
+a tiny clip or pass a truth mesh/pose. Existing stride96/first-occurrence merging
+is not an averaging guarantee. One baseline-human alignment shared across both
+actors/methods, allframes, geometry/contact and motion diagnostics required.
+Frozen body12 refinement keeps hands/root/trans/identity fixed and cannot promise
+a Z-bias cure. First validate closed/oriented, topology-preserved predicted mesh
+and metric grounding; no face deletion, object shrinking or GT templates.
+Sources: official CARI README7c0d and paper2512.11988v3(2026-04-19); existing
+infra/cari_forward.py executes the original pipeline. Proposal only, not a
+launched experiment, new acceptance threshold or verified license clearance.

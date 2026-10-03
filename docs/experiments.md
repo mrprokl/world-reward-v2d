@@ -3077,3 +3077,63 @@ GPUstage, exactnativecontrolcontract/SHAM/budgets. SAM2installedsource
 nowrehashedafterautomaticmaskinference (notjustweights); 1101nativelearned
 parameter/113rigbufferloader evidence+actualhandindices retained explicitly.
 No actual H100output/privatequality read while adding theseintegrityguards.
+
+### H100 actual unsupported-native-kernel failure; H100b preregistration
+
+Actual source8c68fba8d4f9034c2e19ed2fa9eac394c9f64758, completeclosure33files
+107,164encodedB. Render PASS4.254044s, receipt21e81b9dd3c6a7c1436382aaa8f4528d0caf56c71b0a81957cf7e7b0e3410b41
+(1,873B/0444). Automaticmask PASS10.722988s, receiptd268cc0bd750cf2eb336da390534faadafd8c1271d442cb28e653cf0c8a349c9
+(6,602B/0444). NativeBody FAIL18.691310s BEFOREfirstprediction: official
+prompt_encoder.pyL241 `grid.cumsum(dim=0)` lacks PyTorch2.5.1 deterministic
+CUDA implementation. Exactly1Bodyattempt/0completed/0decoderheads. Receipt
+e136b3cd417fd72d54368885e32163250514b692acda9c808f6ea98207a0caaf
+(17,361B/0444), driverd8ada243dd8bd234aaf640f2bd40f56f0e3abfa7d671829780a7898e54822e5f.
+Unit terminalfailed/lastGPU137MiB0%. No quality/privatequery, no native
+prediction seen; H100 remains FAIL, not a scientific rejection or PASS.
+
+H100b is a separate180s public-only engineering contract, newuniqueunit and
+`capability_replay_v1` output. Reuse original immutableRGB+automaticmask via
+exacthistoricalproducer/source/reportSHA+bytes and currentpre/postidentity;
+originalbodyFAIL scalarreceipt preserved and independently pinned. Bind original
+source at its SAMEcanonicalpath; expose no failedNPZ/private/modelreference.
+Unmodified official learned model/cumsum/source/checkpoint, seed0/TF32off/
+CUBLAS:4096:8/4threads; explicitly `deterministic_algorithms(False,warn_only=False)`
+for all6ordinary predictions andallnativeheads. Actualalgorithm/TF32state checked
+before every branch, no scoped kernel patch, hidden warmup or inference retry.
+Runtime inability is not excused by `warn_only`; this newcontract does not claim
+PyTorchglobally guaranteed deterministic kernels. ORIGINAL exactRAW+FIXED SHAM
+allarraybyteparity, zeroSHAMmedoid/index0, native≤1e−5replays, same15artifacts/
+6Body+6parity+6KP+6fixed+3selectedcounts remain mandatory. If SHAM fails, stop
+honestly; no tolerance relaxation or claiming seeds guarantee atomics.
+PASS only demonstrates empirical repeated-input fidelity on this fixture and
+process, not crossprocess/allframes/accuracy/adoption. Gamma/grid/mask/K/policy
+unchanged.163focusedtinytests PASS0.38s before anyH100boutput/privatequality.
+
+H101 code/planning may proceed independently, but no quality manufacture or
+inference dispatch until H100bPASS and complete newquality preregistration.
+This engineering failure is actionable progress, not external blockage.
+
+### H101 renderer frozen pending mechanism PASS; not dispatched
+
+Newhuman-only24RGB cohort `validation/human_photometric_v1` (8groups×3poses),
+noH99/H100scoredimage reuse. Manufacture recipefixed: shape(.18,−.11)/(−.21,.14),
+free68scales.025/−.02/locked0; namedleftupperarm.16+.05f/elbow.24+.06f/
+wrist.008−.012f/rightupperarm−.018(f−1)/fourleftfingers.10+.03f; ownyaw
+.10+.03(f−1),cameraX.01(f−1). Plaingarment(.34,.35,.37) vsfrequency20
+stripes(.45,.40,.35)/(.22,.29,.38), samehumanV/J bytes; bottle nuisance1.35
+front/back±.25Z around actualnamed l_elbow, NOTanobjectprediction/HOIproxy.
+Commonwhole2neutralidentityframing8px/K1280/1024×768. Native249limitsstrict
+(noadaptation), reference6animated+2neutral in2calls, actualbundled352e same
+asset/source6animated1call maxV/J≤1e−5m/fulltypedtopology/source/acqrehash.
+All24originalRGB+manifestonlypublic;9fieldhumanV/J/F/K/visibility/raster/group/
+frame truth private400/dir700, fullrigprivate400. All12occlusioncontrasts
+≥64newlyvisiblehumanpixels, bothentitysupport≥64, geometrybytesindependent
+ofappearance/occlusion, otherwiseFAILnotreciperepair. Oneoffline120s/32GB/
+4CPUrendercontainer; onlyreference+bundledMHRassets, no2GBcheckpoint/model
+inference.42tinyprotocol/render/wrappertestsPASS; closure20files52,224B.
+Code is prepared only: noH101manufacture/inference/privatequality dispatched.
+Quality inference/decision guards must be fully preregistered separately first.
+
+H100b independent frozen/currentAST-source audit READY: historicalpublicreader/
+helperSHA unchanged, oldsource canonicalRO, complete34fileclosure108,016B,
+139focusedcombinedtestsPASS0.70s/bash/diffPASS. RuntimeactualSHAMstillunknown.
