@@ -3949,3 +3949,17 @@ and remote main hash match. Future producing commits must be pushed too.
 This removes the missing remote/access blocker, not registration/runtime-license/
 one-command final all30 reproduction/Parquet/quality checks. No Kaggle upload,
 organizer message, gated assets, private synthesis truth or credentials published.
+Complete surface-audit/source suite **8087PASS/2same optionalSKIP124.84s**;
+all numerical production helpers unchanged. Public main32c62a2 now includes
+that own-surface source and actual all30 readiness documentation.
+
+Episode1 automatic masks actualPASS63.422972s, receipt
+a26684ab3524d2d7af85fbd8883268eddf6370a6482a5e873d1ce0712e0d1604(9,034B).
+SparseBody/depth/shared gauge16.275605/8.571827/3.616264s PASS.
+Grounded object generation32.633463s PASS,31,334vertices/62,616faces before
+the separate topology-preserving pack/pose gate; receipt
+8d87466bba415ee5ae5c86da3d719cbf4e0a6e9ea6e37a23f88072414a929981(15,645B).
+Full Body668original frames actualPASS217.117887s, predictions
+db11c5eb14fdf43f400b01f64b1efc2367b5875c65876c4e68e821688b78b981;
+native geometry/input dataset5f683... verified. Fulldepth/adapter/objectpose/
+input-preparation still pending; no early numerical/fullchain or quality claim.

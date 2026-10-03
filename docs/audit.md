@@ -126,3 +126,10 @@ Unauthenticated HTTPS exact commit page200, full producing hash present; remote
 `refs/heads/main` equalsce0519f. No authorization/cookie was sent for this check.
 Final producing commit, rules-required public sharing and registration/licensing/
 reproducibility/quota checks still precede any upload.
+
+The public [once-per-team registration form](https://docs.google.com/forms/d/e/1FAIpQLSdZJYNsEPPGDeIRH2yb_Dui-lWcIxWRF2CON7UOIijzCw8zyA/viewform)
+was inspected read-only: required primary contact email, skill set and approach;
+member name/email/affiliation may also be listed. No form submitted, signed-in
+email inferred, affiliation/experience invented or track2/3 selected. Thomas
+Gomez is authorized as the personal name; contact email and truthful affiliation/
+skill-set details remain to confirm if registration is not already completed.
