@@ -122,4 +122,16 @@ suffix and all originally frozen headers. All other endpoints/header changes
 fail closed. Verify the original failure before and after acquisition. The parent
 scientific JSON, 24 independent selected-byte pins, licence checks, cohort,
 models, K800 prior, support, coefficients and quality gates are unchanged.
-No native prediction or private quality result exists yet.
+At transport freeze no native prediction or private quality result existed.
+
+
+## Closed result: preregistered hypothesis rejected
+
+All twelve native predictions completed and were independently pinned before
+private evaluation. Whole support and sensor-coverage gates passed. The median
+sequence relative AbsRel improvement was **4.904632756%**, below the frozen 5%
+gate; one sequence regressed 1.523%. The result is **REJECT**, not a rounded PASS.
+Absolute sequence AbsRel remains 39–59%; no adoption or CARI4D victory is claimed.
+Close this cohort without threshold, camera-prior, coefficient or frame changes.
+A new hypothesis must isolate camera-prior or temporal/shared-gauge effects on
+independently declared new validation rather than rescuing these recordings.

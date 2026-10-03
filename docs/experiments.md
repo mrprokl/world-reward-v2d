@@ -5333,3 +5333,36 @@ source/publicpostrehashPASS. Everyframewholepaired support307200/coverage1.0,
 no per-pixel confidencefilter or droppedvalidity. FreezeALL12NPZ/report/three
 coefficients beforeprivatequality; predictionartifacttotal110MB staysAzure.
 No sensorvalues/privatecalibration decoded sofar, no verifiedaccuracygain.
+
+
+D107 private evaluation executedPASS2.404968011s, producer801043f6462437e77c25d24e5a3cf7617b56a889
+70files117452encodedB; actualVM02inactiveexit0 20:37:34UTC. Receipt13188B/
+96bd70959eb55ab4c391b0afce58cef3d9051145d252f7072aeed4091ba8790d 0400.
+Scientificfrozen5%gate **REJECT**: AbsRel scene1 .518207660141→.491557801105
+(gain5.142698784%), scene2 .579773378027→.588603496106 (−1.523029241%),
+scene3 .410936206152→.390781294380 (4.904632756%). Median4.904632756% is
+BELOW5%, notroundedtoPASS. All12scored, originalsensorcoverage≥.69182617,
+native-sensorcoverage1.0/exactvalidity, noalignment/camera/GTtrajectory fitting.
+Absolute39–59%AbsRel unacceptable; narrowTUDL gaindoesnotgeneralize sufficiently
+under frozenK800/wholeanchor recipe. **CloseD107REJECT**, no thresholdchange,
+newTUMrecords, weightedfusion, tunedK ordata-mining rescue. Independentactual
+source/prediction/private/hash decisionaudit remainsnext check; noscore/CARIwin
+oradoption. Next hypothesis must isolateobservableRGBintrinsics/temporal or
+shared-human/objectgauge onnew nonchallengevalidation, notretunethiscohort.
+
+EP4newfixed_all16 automaticmasksactualPASS747frames134.682456436s; report10554B/
+f6e6a3f9d21589d3c5a89db03b41b652aec38a6168b838e79b57d2c8d6d6f2bf.
+Selectedautomatictrackhas15realobservations/16; competitors retained, selected
+seedoriginalframe547. Nohumanprompt orimputedobservations; unchangedselector
+numerics/min3/coverage.5. This is operationalmaskcoverage only, notpersonidentity
+accuracy/HumanHOIgain. Originaldefault3FAIL remainsimmutablearchived. Unit
+continuedtoSAMBodyinitializers20:36:34UTC, notfullfrontend/trackPASS. EP3CPU
+assembly500/592active/noGPU atsameobservation; fullnativechainstillpending.
+
+
+20:39:07UTC independentactual24helper/source/13public/12completeNPZ/private24/
+licence+acquisitionpins audited withgenuine frozen public/privatecontract; every
+frameorder andfrozen decisionrecomputedfromrecordedscalars, originalsensorPNG
+valuesnotdecodedbyaudit. ALLartifacts/helperrehashesafterPASS; originalreceipt
+13188B/96bd70959eb55ab4c391b0afce58cef3d9051145d252f7072aeed4091ba8790d intact.
+ScientificREJECT confirmed4.904632756%, no reinterpretation or rescue.
