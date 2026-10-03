@@ -161,3 +161,14 @@ def test_forward_pass_report_records_enforced_network_namespace_contract():
     assert isinstance(main.body[0], ast.If)
     assert "/sys/class/net" in ast.unparse(main.body[0].test)
     assert isinstance(main.body[0].body[0], ast.Raise)
+
+
+def test_new_full_input_report_binds_the_actually_validated_dataset_revision():
+    import ast
+    path = Path(__file__).resolve().parents[1] / "infra/cari_prepare.py"
+    tree = ast.parse(path.read_text())
+    result = next(node.value for node in ast.walk(tree) if isinstance(node, ast.Assign)
+                  and any(isinstance(t, ast.Name) and t.id == "result" for t in node.targets))
+    fields = {key.value: value for key, value in zip(result.keys, result.values) if isinstance(key, ast.Constant)}
+    assert ast.unparse(fields["input_dataset_revision"]) == "inputs['dataset_revision']"
+    assert ast.unparse(fields["input_sha256"]) == "inputs['video_sha256']"

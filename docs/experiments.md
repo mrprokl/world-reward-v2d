@@ -3625,3 +3625,28 @@ this prefix. Receipt44d4a3dd5bc20a7f9be629ef1cad7a46d199a7447335af07fecee2e160e6
 query used unavailable Python3.8 hashlib.file_digest; rerun with streaming SHA256,
 no artifacts/producer changed. Export and full501prepare namespaces verified
 absent. Engineering execution, not independent quality/CARI4D improvement.
+
+H102 direct export actual **PASS16.485373s**, source
+`78b9005471496448acc38fa7308940b0093306df`, driver
+`7c46111d623ee4c32154da2e151ff0465edee812c1d03c5dca1fd14eb5519372`.
+Actual Gitclosure31files80,172B, SHA-XZ
+`7eaa2f3fe4780f2052b9e69e29453bbe8d42cc315cfc1ca9c66d4c4e35cbf38b`.
+All four routes6attempts/returns/validated; full96 official replay
+mean/worstframe0.000413737/0.000770197mm, maxpoint0.002632832mm diagnostic.
+Original refined7blocks/sharedidentity/raw/contact/masks/source/assets/fixed
+aligned2044-vertex object/scale1 unchanged; object camera roundtrip exact0m,
+savedparameters reread and strictTrack1Episode96PASS. Receipt
+95b432ba4b91c2cb10625da2488bcf5460b4aaf30283ce0e08bc4b00e5e481df(7,526B/0444).
+Frozen trajectory6d5c998c30722bf2908d5cedd77170edce316c3ec016af5c403a18d716816718
+(97,381B); nativearchive507ec525fb535656fde0857f5a6cc089ffd950f1512443b2abcc4e659c061678
+(473,077B),targetf1331b114fd48f2fab755fe2606c2152a4882aac7d0eea14b56d54bb462e6b38
+(21,241,856B),unchangedGLBdb97398bf5c1a45eca41ca42d6b521408a92a89d9618563b39b7c3ac889d7b32
+(74,596B). Unitinactiveexit0/H10091MiB0%. No LM/newfitting/identitychoice,
+complete501 reconstruction, finalParquet, accuracy result or CARI4D victory.
+
+Full501 shared prepare dispatched from same clean78b9005 source: actualclosure
+25files50,288B, SHA-XZdb8cbc83a22dbebecc3e58c2744c80b09ee8d31482c3988fdbb161b9927f3be1.
+No old full501 CARI outputs reused; complete public sources remain Azure only.
+Future clean-episode input producer now records the dataset revision already
+verified by its input audit. Do not edit historical receipts or fabricate a
+missing historical field; legacy acceptance remains exact-hash-specific.
