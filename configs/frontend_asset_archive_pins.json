@@ -20,5 +20,9 @@
   "replica_ready": false,
   "license_eligibility_verified": false,
   "training_overlap_verified": false,
-  "independent_external_archive_verification_completed": false
+  "independent_external_archive_verification_completed": true,
+  "independent_verification_receipt_identity": {
+    "bytes": 1301,
+    "sha256": "351bfbb323bce6e35808a2d5784990aab55960c83827a297d7f55d3a299d3fbf"
+  }
 }

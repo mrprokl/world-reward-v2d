@@ -5460,3 +5460,26 @@ is still pending and explicitlyFalse in committed byte pins. No media local,
 rawbuildreceipts/images/private/challenge data exported, no transfer/replicaready
 claim. Grounding/Objects image transfer/build deferred pending actual installed
 source/dependency audit; do not copy old privateTUDL exporter or invent OCIIDs.
+
+Independent actual archive auditPASS94.281942467s, receipt1301B/
+351bfbb323bce6e35808a2d5784990aab55960c83827a297d7f55d3a299d3fbf:
+caller-frozen full archive/manifest hashes, exact old two-source pins and current
+27980B/5b9bc159... verifier authenticated BEFORE import. Streamed all451payload
+members without extraction, original run receipt/source unchanged afterward.
+Now external verification completedTrue; replica/CUDA/license/overlap/transfer
+remainFalse. 19.91GB archive staysAzure; zero media/checkpoint local transfers.
+
+EP3 full592 native forward actuallyPASS125.865139902s, producer6bce26f,
+receipt71204B/326fe216b3ed57951ae771fd1a0cf9f8aef0d7bb1a5cc04063669e6a901b27e3;
+scriptac07d96a... unchanged, fullseven nativewindows/firstoccurrence coverage.
+Next independent forward pin inventory, not refinement/export/accuracy PASS.
+
+Original EP4 failed EMPTY object_pose_full archived once with byte-authenticated
+cf35d11 Linux renameat2NOREPLACE helper, actual failedexit1/MainPID0 and original
+107227B/25cc63a4... log rechecked before/after. Exact owned empty directory inode
+preserved500, no files/media removed/copied; tiny0400receipt854B/
+73456688ec4cbba80a2a4ee3689b8ce1d3f21022c56f0e37d71daee197522241. Original
+failure remainsunchanged, not successful; namespace newly absent permits frozen
+all25-component mesh continuation. Actual new6bce26f/77files127288encodedB
+unittrack1-episode4-volume-frontends-v1 activeMainPID962210; no trackingPASSyet.
+Root verified GPUempty before dispatch; EP3refinement must await releasedGPU.
