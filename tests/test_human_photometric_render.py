@@ -116,8 +116,8 @@ def test_exact_bundled_asset_receipt_without_loading_checkpoint(renderer, tmp_pa
 def test_private_schema_and_asset_only_wrapper_firewall(renderer):
     assert renderer.TRUTH_KEYS == {"human_vertices_camera_m", "human_faces", "human_joints_camera_m", "camera_K", "scene_depth_m",
         "visible_face_indices", "human_visibility", "group_index", "frame_index"}
-    wrapper = REPO / "infra/run_human_photometric_prepare.sh"; text = wrapper.read_text(); subprocess.run(["bash", "-n", str(wrapper)], check=True)
-    assert subprocess.run(["bash", str(wrapper), "--resume"], capture_output=True).returncode == 2
+    wrapper = REPO / "infra/run_human_photometric_prepare.sh"; text = wrapper.read_text(); subprocess.run(["rtk", "proxy", "bash", "-n", str(wrapper)], check=True)
+    assert subprocess.run(["rtk", "proxy", "bash", str(wrapper), "--resume"], capture_output=True).returncode == 2
     assert text.count("docker run") == 1 and "123s" in text and "--gpus all --network none --memory 32g --cpus 4" in text
     assert renderer.IMAGE in text and "assets/mhr_model.pt,dst=" in text and "weights/mhr/mhr_model.pt,dst=" in text
     assert "model.ckpt" not in text and "grounding_dino" not in text and "vendor/video_to_data" not in text
@@ -129,7 +129,7 @@ def test_private_schema_and_asset_only_wrapper_firewall(renderer):
 
 def test_runtime_archive_is_complete_bounded_and_has_no_observer(renderer):
     spec = importlib.util.spec_from_file_location("h101_bundle", REPO / "infra/azure_job.py"); launcher = importlib.util.module_from_spec(spec); spec.loader.exec_module(launcher)
-    paths = subprocess.check_output(["git", "ls-files", "-c", "-o", "--exclude-standard", "infra", "src", "configs", "pyproject.toml"], cwd=REPO, text=True).splitlines()
+    paths = subprocess.check_output(["rtk", "proxy", "git", "ls-files", "-c", "-o", "--exclude-standard", "infra", "src", "configs", "pyproject.toml"], cwd=REPO, text=True).splitlines()
     files = {p: (REPO / p).read_bytes() for p in set(paths) if (REPO / p).is_file() and not (REPO / p).is_symlink()}
     selected = launcher.runtime_bundle_paths(files, "infra/run_human_photometric_prepare.sh"); output = io.BytesIO()
     with tarfile.open(fileobj=output, mode="w", format=tarfile.PAX_FORMAT) as target:
