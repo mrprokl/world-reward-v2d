@@ -4718,3 +4718,15 @@ ed1ed9aca796215938ad812097c2f6e82a3f7e89/publicexactHTTP200,
 fullvideo updates,7200s budget/sourceb874a91c unchanged. All668fullpose/depth/
 camera/sharedidentity retained, no support reduction/GT/staticreplacement.
 Refinement is pending and not a verified score gain; no finalParquet/upload.
+
+2026-10-03 17:25:33UTC: episode1 full668 refinement **PASS418.981016s**,
+unit inactive/exit0 and GPU idle. One native optimizer call returned and
+validated all301 effective updates; original source/budget/geometry/coverage
+unchanged. Readonly444 report15149B/
+647140888262db8c32b17026a34f9232ad55a5c3d4f72a36a7da6b34d41b1093;
+refined bundle511044384B/
+b0f46d5dac10a4c1c346d1cfa727250b45f79ddce3f1fec11b31ba39141ebeb1.
+Independent readonly stage inventory9c583d7 binds original producered1ed9a/
+scriptb874a91c and both exact files before/after JSON. Commit actual
+configs/cari_clip_000001_shared_refined_pins.json before full export. This is
+execution/provenance, not measured reconstruction quality or a final Parquet.

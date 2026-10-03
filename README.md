@@ -9,46 +9,31 @@ Third-party source/model terms and unresolved eligibility are documented in
 
 ## Research status — 2026-10-03
 
-No final Parquet or verified CARI4D improvement yet. Two independent synthetic
-RGB pilots rejected root-only correction despite valid execution/replay:
-translation XYZ worsened median camera PVE32.26%; fixed-depth native XY/Euler
-worsened2.19% and failed the silhouette safeguard. All frames were retained;
-private labels were used only after frozen predictions, never for fitting.
+No final Parquet, submission or verified CARI4D improvement yet.
 
-The untouched24-case factorial diagnostic now rejects external DWPose prompts:
-Body2D error2.34px vsDWPose5.11px, worse in all8groups. Appearance changes
-increased centered geometry error despite identical reference geometry.
-A separate scoped-native photometric execution test now passes exact SHAM,
-after two preserved runtime failures. It validates reproducible mechanism on
-one fixture only; the medoid kept the original image prediction. The subsequent
-untouched24-image human-only comparison under clip-constant identity also
-rejects gamma-medoid:0% median gain, two changed predictions slightly worse.
-No retuning/rescore. The native96 shared-identity preparation now passes;
-the actual HOI forward and saved-output validation now pass after an exact
-signed-zero ABI correction, without changing predictions. Native301-update
-refinement and direct export now pass on96frames. Full501 shared preparation
-also passes, as do the fresh full501 HOI forward,301-update native
-refinement and full direct export. The complete pipeline now passes on one
-public video, including the source-bound CPU episode consumer. All30 original
-videos pass metadata/hash readiness. A second episode now completes its
-automatic frontends on all668frames, with source-bound inputs frozen for the
-native continuation. The original official
-packer also passes on the full501-frame source, with exact GLB-surface and native
-FP32 fidelity checks; its temporary one-episode Parquet is deleted after QA.
-The next episode's object trajectory and CPU input assembly pass all668
-originalframes. The following episode failed the original fast-QEM mesh
-budget gate, then passed one independent volume-preserving proposal retaining
-all18components; its full866-frame tracking is now running from frozen pins.
-A fresh native near-grasp manufacture route remains stopped at neutral
-self-embedding; exact rational witnesses confirm eight flagged crossings.
-No geometry or thresholds are relaxed to rescue it. One separate authored
-full-human reference gate stopped at its support prerequisite before surface
-certification. An audit found that prerequisite can reject buried union
-primitives; this is a protocol limitation, not proof of defective geometry.
-No retry, RGB, new prediction method or quality result is claimed. All30 reconstruction and independent real/fullHOI accuracy
-validation remain separate.
-Detailed receipts and decisions: [experiments](docs/experiments.md).
-Heavy data and all GPU work remain onAzure.
+- **Engineering:** all 30 original Track 1 videos pass byte/metadata readiness.
+  The full 501-frame episode passes native preparation, forward, refinement,
+  direct export and the original official packer; its temporary one-episode
+  Parquet was deleted after QA. The next full 668-frame episode now passes
+  preparation, forward and 301-update refinement; export remains pending.
+  A further 866-frame episode has verified complete inputs, but its frontend
+  continuation exceeded the original time budget: provenance PASS is not a
+  timing PASS. No frames, components or trajectories were dropped to rescue it.
+- **Research:** a frozen DA3 depth hypothesis, anchored to MoGe by one
+  scene-constant median ratio on the fixed 10% image border, gains **33.42%**
+  median visible-object camera Chamfer on 12 external TUD-L frames. This is
+  a background **proxy**, not semantic exclusion. The same three scenes/objects
+  were previously used for development; absolute errors remain large.
+  Independent generalization and full human/object/contact/motion accuracy
+  are unverified. This is **not** a CARI4D victory or deployment authorization.
+  Earlier root correction, DWPose prompts, gamma-medoid and global DA3
+  replacement hypotheses were rejected; no post-score retuning/rescoring.
+- **Eligibility:** upstream source/checkpoint licenses, training overlap and
+  NVIDIA's separate registration remain unresolved before any submission.
+  World Reward and all five Kaggle rule acceptances were verified on October 2.
+
+Heavy data, models and computation remain on Azure. Only reproducibility pins,
+results and decisions are kept here; see [experiments](docs/experiments.md).
 
 ## Layout
 

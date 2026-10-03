@@ -1114,3 +1114,22 @@ scene ratio, equal frame weight, all original frames/validity preserved; lack
 of >=95% border support means STOP. Background contamination remains a real
 limitation to measure, not a semantic masking claim. No inference/evaluation
 result or superiority follows merely from acquisition/provenance checks.
+
+Actual frozen12frame TUD-L comparison now supports the narrow border-anchor
+hypothesis: median paired scene cameraCD gain33.422198%, no scene regression,
+unchanged baseline validity and >=95% visible-object coverage. No semantic
+background mask was used. Absolute errors57.69–71.91cm, same development
+scenes/objects, unknown backbone overlap and unmeasured human/contact/temporal
+accuracy prevent a full-HOI or CARI4D superiority claim. These12frames are now
+observed validation, never a fresh holdout for retuning.
+
+Independent primary-source screen identifies T-LESS as a conditional next
+object-camera generalization test: [BOP](https://bop.felk.cvut.cz/datasets/#T-LESS)
+and [pinned HF card](https://huggingface.co/datasets/bop-benchmark/tless/raw/5fd309a04476a842d93abfb584fba9ee7caecdf1/README.md)
+agree CC-BY-4.0. Pinned test Primesense BOP19 ZIP825276992B and base49597B
+remain Azure-only; embedded license/inventory checks precede use. Proposed
+three different scenes/objects, filename-only12RGB selection, unchanged border/
+camera/ratio/coverage/CD gates; truth depth/K/all instances only after predictions
+freeze. No asset acquisition or generalization result yet. ITODD (NC/Gray-D)
+and IC-BIN (unverified custom license) rejected for this purpose. T-LESS is
+not independent full-HOI validation and training overlap remains unverified.
