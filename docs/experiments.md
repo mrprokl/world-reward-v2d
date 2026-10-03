@@ -2227,3 +2227,33 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   primitiveforeground_truth already gatesbothentities≥64, no duplicatechanged
   algorithm. ActualAzure prepare-only dispatch120srender+180smasks started;
   no privateevaluation, Body/DWPose inference/refit or qualitydecision yet.
+
+  D96prepareactualPASS source42f457fc46fbeb814befb48b8104403b06922f63:
+  render7.189764s/twonativeMHRcalls/all15freshRGB+privatecases, receipt
+  `2407c53871f4b7f8e16d1e3420416a65b93bffcb0ea22cafb14b963f4206e158`;
+  automaticmasks16.371879s/30detector30SAM15encoders/all15nonemptyperson+bottle,
+  receipt`d9cae7c4c7131b599ebcafc58a415b9f763286806f80d4a6a46ee114249d8568`.
+  Manifest2199B/SHA`082549b5a1f8a4a7d687bc17ec6847f3628d6d4230186053951caa2454d2979d`,
+  nativecontrols/fullprivate-publicinventory/model/sourceintegrityPASS.
+  Humanmaskareas27,989..31,597pixels/object2,114..2,937; these are predicted
+  support, not accuracy. OldD95v1 preserved; no privatequality evaluation,
+  nativehumanDWPose/reconstruction/refit yet. Terminal0/MainPID0/GPUidle93MiB,
+  no heavyMac transit. Torchvisionread-onlyNumPywarning observed; no evidence
+  bytesmutated (posthashPASS), avoidcausalclaim or samecohortmodelretune.
+
+  D96 next **freeze public observations/baseline ONLY**: consume exactfresh
+  manifest+maskreceipt above, all15orderedRGB/masks, no privatefolder mounted.
+  Produce15SAMBody and15MoGe predictions underfixedgenericK1280, then15native
+  sharedfirstRGBidentity decodes. Retain raw blocks/geometry/depth/points,
+  clipconstantshape45/PCA28/expanded68, native308keypoints/127joints/full18439
+  vertices andhandregions. UseexactexistingnativeMHR/source/assets, YZflip
+  once+cameraTonce; verify sharedgeometryagainst officialreference≤2mmmean
+  all15. Rawpredictions freeze BEFORE identitydecode, allshared freeze BEFORE
+  independentreference verification; no fit/evaluation. 600sCUDA32GiB4CPU.
+  Separatelyfreeze15nativeDWPose133RGBcroppredictions withautomaticmaskbbox,
+  sameactualD95v2CPU1.30.0/Flatbuffers/nativefloat64-list/SHA/exportsignature
+  contracts; onefreshCPUsession15calls/180s, rawcoords/scores/validity/SimCC
+  hashes retained. BindactualD95v2PASSreceipt/source+oldFAILread-only, retain
+  all15cases/no thresholding or confidence-basedsample selection. Prefix
+  removed, allinputs/source/assets/outputs rehashed. No freshprivategeometry,
+  fitoptimizer/contact or qualitygate yet; abstentionnevermasqueradesasPASS.
