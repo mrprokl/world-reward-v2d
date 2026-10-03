@@ -3844,3 +3844,43 @@ All original prepare/forward/refinement helper bytes verified against their
 actual producing commits10/16/9files. A first local source_helpers call correctly
 rejected writable checkout files; rerun direct Git-byte comparisons, not altered
 file modes or remote evidence. Actual consumer runtime remains to execute.
+
+Actual full501 official reference export: mean0.000430992957mm,
+worst original frame0.000833857652mm, diagnostic max point0.002441872758mm;
+501 per-frame means, unchanged2mm gate. No geometry threshold changed.
+The CPU episode consumer wrote immutable receipt
+b0645f81745314fc684f923a2e827820095d0b6a9c97a6cb40a95e7566b57ba0
+(3,826B/0444); complete actual source chain/trajectory details are inventoried
+by the real consumer. Actual **PASS11.832886s**, producer1c635b5,
+driverbcf588e20de2f47b6a20f29570726122cb9b11a0c728e5fb2b3b7f54e0a0b28f,
+62 original source bindings,501 full owned trajectory/schema/object roundtrip,
+export pins/source helpers rehashed. Unitinactiveexit0, no GPU/model/optimizer/
+render/Parquet calls. It does not invoke the official packer or produce Parquet.
+
+First actual all30 readonly readiness stopped after5.014187s with
+`Exactly one selected RGB video stream metadata required`; producer1c635b5,
+script9821ff7601bd887ad73b627fb9033bf20976df8cb06dc1995007d990dbb00e56.
+No decoder/model/GT fallback, inference or frontend output creation occurred.
+Inspect the actual ffprobe metadata envelope before any correction or retry;
+retain the failed receipt/log and original source. This is not data readiness PASS.
+Actual original episode0 metadata-only ffprobe confirms exact1536x1152/30Hz/
+790frames plus an empty `programs: []` envelope. Accept only this specific empty
+optional envelope in addition to `streams`; unknown fields/nonempty programs
+still fail. Stream dimensionality/frame/rate/hash gates, no-count/decode/fallback
+policy and120s deadline remain unchanged. Retry uses a new source/unit/log.
+
+Latest fullsuite initially exposed three synthetic CPU consumer callback tests
+inheriting Joblib from an earlier test module. Scope optional-import isolation
+to the callback fixture, restore worker state and add a polluted-worker regression;
+the production fresh-process guard and numerical helpers remain unchanged.
+Focused order regression182PASS2.44s; fullsuite
+**8025PASS/2same optionalSKIP124.12s**. Independent callback tests26PASS0.53s.
+Exact ffprobe-envelope regressions plus consumer/inventory/actual Gitclosure
+**464PASS2.66s**; fixed dimensionality/rate/frame/no-fallback rules retained.
+Read-only frontend audit confirms the generic route is one fail-fast engineering
+pilot, not an all30 occlusion guarantee: automatic masks may be empty, but Body,
+scale anchors, object frame0, visible-depth ICP and input prep have explicit
+support requirements. Leave them strict; preserve failures rather than patch
+individual episodes. Existing three image tags must resolve to verified actual
+images before launch; root scheduler excludes all GPU jobs, since the cooperating
+flock does not cover older units. Never claim this resolves license eligibility.

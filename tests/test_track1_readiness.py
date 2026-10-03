@@ -234,6 +234,25 @@ def test_video_only_selected_stream_inventory(gate, value):
         gate.validate_video_metadata(value, 552)
 
 
+def test_actual_azure_ffprobe_empty_program_envelope(gate):
+    value = {"programs": [], "streams": [{"width": 1536, "height": 1152,
+        "r_frame_rate": "30/1", "nb_frames": "790"}]}
+    assert gate.validate_video_metadata(value, 790) == dict(width=1536, height=1152, nb_frames=790, fps=30)
+
+
+@pytest.mark.parametrize("programs", [None, False, {}, "", [{"streams": []}], [1]])
+def test_program_metadata_not_empty_envelope_rejected(gate, programs):
+    value = stream(gate, 552); value["programs"] = programs
+    with pytest.raises(ValueError):
+        gate.validate_video_metadata(value, 552)
+
+
+def test_ffprobe_unknown_envelope_fields_rejected(gate):
+    value = stream(gate, 552); value["unexpected"] = []
+    with pytest.raises(ValueError):
+        gate.validate_video_metadata(value, 552)
+
+
 def test_exact_rational_30_hz(gate):
     value = stream(gate, 552); value["streams"][0]["r_frame_rate"] = "30000/1000"
     assert gate.validate_video_metadata(value, 552)["fps"] == 30

@@ -197,7 +197,11 @@ def probe_video(path, timeout):
 
 
 def validate_video_metadata(value, length):
-    if (type(value) is not dict or set(value) != {"streams"}
+    # Azure ffprobe emits an empty programs envelope for this same explicit
+    # selected-stream query. Permit that exact non-stream envelope only;
+    # unknown fields/nonempty programs remain rejected, without a fallback.
+    if (type(value) is not dict or set(value) not in ({"streams"}, {"streams", "programs"})
+            or ("programs" in value and (type(value["programs"]) is not list or value["programs"]))
             or type(value["streams"]) is not list or len(value["streams"]) != 1):
         raise ValueError("Exactly one selected RGB video stream metadata required")
     stream = value["streams"][0]

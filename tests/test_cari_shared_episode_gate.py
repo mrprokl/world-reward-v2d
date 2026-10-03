@@ -22,6 +22,12 @@ def gate(monkeypatch):
 
 
 def fixture(gate,tmp_path,monkeypatch,n=501,episode=15):
+    # Callback lifecycle tests emulate the fresh production process, rather
+    # than inheriting earlier tests' optional imports in the pytest worker.
+    # The real production guard stays strict; actual imports are separately
+    # verified in a fresh subprocess below. Monkeypatch restores worker state.
+    for name in ("torch","joblib"):
+        monkeypatch.delitem(sys.modules,name,raising=False)
     code=tmp_path/"code";root=tmp_path/"root";code.mkdir();root.mkdir()
     for name in ("infra/cari_shared_episode_gate.py","infra/run_cari_shared_episode_gate.sh","infra/cari_shared_episode_loader.py"):
         path=code/name;path.parent.mkdir(exist_ok=True);path.write_bytes((ROOT/name).read_bytes());path.chmod(0o444)
@@ -81,6 +87,14 @@ def test_no_overwrite_existing_engineering_receipt(gate,tmp_path,monkeypatch):
     root,code,out,*_=fixture(gate,tmp_path,monkeypatch);(out/"report.json").write_bytes(b"frozen previous")
     with pytest.raises(ValueError):gate.execute(root,out,code,15,"d"*40)
     assert (out/"report.json").read_bytes()==b"frozen previous"
+
+
+def test_callback_fixture_isolates_prior_worker_optional_imports(gate,tmp_path,monkeypatch):
+    for name in ("torch","joblib"):
+        monkeypatch.setitem(sys.modules,name,SimpleNamespace(prior_test_import=True))
+    root,code,out,_,_,consumer,_=fixture(gate,tmp_path,monkeypatch)
+    assert "torch" not in sys.modules and "joblib" not in sys.modules
+    assert gate.execute(root,out,code,15,"d"*40,consumer=consumer)["status"]=="pass"
 
 
 @pytest.mark.parametrize("args",[[],["--episode","30"],["--episode","-1"],["--ep","15"],["--episode","15","--episode","16"],["--episode","15","--root","/tmp"]])
