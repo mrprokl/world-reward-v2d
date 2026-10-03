@@ -3763,3 +3763,51 @@ videos remain hash-only. Independent48test audit followed by root combined
 inventory/bootstrap/fullstage/archive/consumer **534PASS3.32s**. No actual full
 export or independent quality demonstrated by these tests. All numerical
 producer helpers remain unchanged; actual clean Git closure precedes refine.
+
+All30 integration audit: existing clean route still ends in old unconstrained
+forward/LM conversion; a separate frontend-only route and actual source-pin
+inventory are needed, never implicit reuse/overwrite. First audit all30 original
+N/HW/fps/SHA and readiness with no media transfer or label reads. Hard occlusion
+limits persist in body crops, fixed scale anchors, object seed/depth support and
+input-mask prep; downstream zero-mask acceptance is not a frontend cure. Keep
+automatic masks unchanged, full timeline and confidence explicit. Do not add
+filled masks, static/interpolated-only final poses, test-specific thresholds or
+frame deletion. General bidirectional/temporal recovery needs non-challenge
+validation before adoption.
+
+Historical501 frontend object-pose3929.56s/CPUprepare3582.24s dominate; all16563
+linear projection74.1h is a planning estimate, not ETA. Serial oneH100; CPU-only
+prep may overlap another episode's GPU work with isolated outputs onAzure.
+Conservative250GiB working envelope vs latest actual573GiB free. Source15,
+dependency reports and actual producer artifacts remain frozen; cleanup only
+after verifying no current/future source manifest consumes an intermediate.
+No extra VM or heavy local transfer was needed. Separate code closures must
+remain below160KB control ceiling as all30 actual pins accumulate.
+
+Full501 native refinement actual **PASS268.838208s**, source
+76c67928579a7046485129645245f328d520f015, unchanged driver
+b874a91cd0754e88c758daac2863ca6a621eedcc320e627dba8aadaddc5060b6.
+Actual40file110,588B encodedGitclosure. One attempt/return/validated, original
+300requested301actual full501updates/history0/100/200/300, all fixed blocks/
+raw/observations/source/assets/helper/predicted mesh and saved rereadPASS.
+Native postopt human mask is empty on59frames, object0; original224masks both0.
+Those59automatic crop observations remained zero, no filling/deletion, and
+unchanged full native optimization completed. This is neither a full frontend
+occlusion recovery proof nor quality evidence. Receipt
+b9947c21ec2b809c993c52617766c558f0590444a773eab4271f753495295a84(14,316B),
+bundlefb2460279117512ba91d6a826fa9965f053c6ee562942829043f193faf9424f2
+(383,399,392B), both0444. Unitinactiveexit0/H100147MiB0%. Actual pins frozen
+before direct export; no thresholds, poses or immutable producer helpers changed.
+
+Root fullsuite **7829PASS/2same optionalSKIP124.26s**, followed additive
+readiness tests separately (created after collection); combined tiny source/
+inventory/frontend/consumer/archive gates553PASS13.28s. Frontend route has
+conservative deadlines600/5400/7200/7200s and cooperating scoped GPU lock,
+ending at original input prep, not old learned/conversion route. Existing child
+image-tag/broad-mount behavior is unchanged, not newly claimed hardened.
+Source-pin inventory uses independently supplied original structure and actual
+producer hashes, exact15pre/posthash and report-only audit, not GT/heavydecode.
+Readiness audits only selected30RGB+2metadata hashes/container metadata,
+never sample values/other tracks/labels/model files. All unverified occupied
+outputs remain opaque; no automatic reuse or resume. Actual Azure readiness
+execution and full export are still separate gates.

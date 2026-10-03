@@ -926,3 +926,43 @@ arise from intermediateMHR or otherlearnedops. Neither diagnosis nor1e−5parity
 proves cause or crossprocess determinism. No cumsum cache/CPU/arange replacement,
 no extra warmup, tolerance relaxation or accuracy query. JIT optimization policy
 is another explicit predeclared variable, not a hidden warmup rescue.
+
+### Next full-HOI validation: feasibility before another synthetic cohort
+
+Read-only follow-up finds no newly cleared independent real full-HOI reference.
+HODome's Apache toolbox does not clear its NC data or unknown MHR annotation
+method. Do not acquire its labels or call the native501 engineering pass quality.
+
+The next useful own-data route needs new actual surface-feasible contact, not
+J1's hand-AABB object placement or reused H99–H101 images. Existing native MHR
+parameter names/limits, semantic hand regions, fixed reference model and own
+asymmetric bottle can support one bounded private manufacture feasibility check.
+Require opposing distal surface contacts, actual normals and full human/object
+cross-triangle intersection/containment checks; no object scaling, deleted faces
+or relaxed geometry to manufacture a pass. This does not prove force closure,
+gravity stability or photorealism. Stop before rendering if infeasible.
+
+Then a NEW three-keyframe RGB-only automatic frontend capability gate must pass
+before investing in two continuous96-frame clips (grasp/rotate/occlude/release
+and depth-separated no-contact crossing). A distinct synthetic adapter is needed:
+never forge challenge episode metadata/pins. Native whole96 execution cannot be
+proved by padding three keyframes. Only RGB/dimensions/hashes/original indices
+reach inference; true geometry, depth, camera, controls, phases and contact labels
+remain private. Frontend budgets must follow measured capability timings: the
+withdrawn1800s whole-pipeline estimate was not evidence-backed.
+
+Contact remains conditional on credible automatically reconstructed geometry/
+poses. Source84e0 optimizer freezes contact eligibility as predicted logit>0
+AND initial hand/surface distance<50mm; its per-frame closest hand vertex has no
+temporal canonical correspondence. C2Dex motivates phase-local anchors, not a
+released drop-in or a proven accuracy improvement. A possible separate ablation
+uses native-eligible stable predicted surface runs, an actual surface medoid and
+fixed hand vertex ID, without bridging releases/slips; otherwise native fallback.
+An isolated FunctionType dispatch to a private subclass overriding only contact
+loss is source-compatible in the audited code; this is **not** a native CUDA/
+gradient execution proof and must not mutate upstream globals or production.
+Freeze any candidate before private evaluation; raw geometry, relative placement,
+negative-control and GT-relative acceleration errors matter, not lower proxy
+penetration/acceleration alone. If coarse reconstruction dominates or no credible
+predicted contact run exists, stop that pilot as uninformative rather than force
+contacts. No implementation, RGB generation, quality query or adoption here.
