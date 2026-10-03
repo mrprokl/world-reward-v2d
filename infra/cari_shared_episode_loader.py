@@ -148,7 +148,18 @@ def load_shared_track1_episode(root,code,spec,export_pins):
     refined_pins=_json(refined_path);input_pins=_json(input_path);public.validate_pins(spec,input_pins)
     if report.get("refined_pins")!=refined_id or report.get("input_pins")!=input_id:
         raise ValueError("Export must use the exact bundled actual refined/public pins")
-    chain=export.lineage.verify_refined_artifacts(root,code,spec,refined_pins)
+    historical_path=code/f"configs/cari_clip_{spec.episode_index:06d}_historical_source_pins.json"
+    historical=None
+    if historical_path.exists():
+        from cari_historical_source import verify_historical_source
+        historical,historical_proof=verify_historical_source(root,historical_path)
+        if report.get("historical_source_binding")!=historical_proof:
+            raise ValueError("Export historical source binding differs from independent pins")
+        chain=export.lineage.verify_refined_artifacts(root,code,spec,refined_pins,source_code=historical)
+    else:
+        chain=export.lineage.verify_refined_artifacts(root,code,spec,refined_pins)
+    if historical is not None and verify_historical_source(root,historical_path)!=(historical,historical_proof):
+        raise ValueError("Historical source changed during export consumption")
     refined,prepared=chain["report"],chain["prepare"]["report"]
     sources=chain["prepare"]["source_files"]
     if (sources!=input_pins["source_files"] or report.get("source_files")!=sources
