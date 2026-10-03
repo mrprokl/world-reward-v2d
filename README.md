@@ -34,6 +34,9 @@ No final Parquet, submission or verified CARI4D improvement yet.
   replacement hypotheses were rejected; no post-score retuning/rescoring.
   The independent T-LESS acquisition stopped at its frozen layout/licence
   gates before heavy data or predictions; no generalization score exists.
+  A new authored object-only RGBD fixture also stopped at its independent
+  CUDA depth/ray gate before publishing RGB or running models; no score
+  exists and the failed reference was not relaxed or rerun.
 - **Eligibility:** upstream source/checkpoint licenses, training overlap and
   NVIDIA's separate registration remain unresolved before any submission.
   World Reward and all five Kaggle rule acceptances were verified on October 2.

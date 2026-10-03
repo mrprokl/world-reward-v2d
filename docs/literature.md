@@ -1163,3 +1163,12 @@ gates stay unchanged. Actual VM02 CUDA raster preflight and a separate
 source-bound predictor namespace are prerequisites; no manufacture/inference
 implemented. This could test new **synthetic object-depth** transfer only,
 never real/fullHOI/human/contact/CARI superiority or checkpoint leakage clearance.
+
+Actual new authored reference `024af9c` subsequently failed the frozen CUDA
+camera-ray/triangle gate in2.177880111s, before RGB publication/inference/scoring;
+all partial arrays were removed. No new synthetic validation result. Preserve
+failure without threshold widening or cohort rerun. Primary pinned PyTorch3D
+source confirms +.5 pixel cells and view-space camera-Z, so an integer-pixel
+explanation is unsupported; FP32 grazing-triangle conditioning is a possible,
+not established, cause. One separate new scalar-only diagnostic is appropriate
+before selecting a future renderer/reference, not repeated reference rescue.

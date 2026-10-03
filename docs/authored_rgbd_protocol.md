@@ -111,3 +111,17 @@ mesh rejection, independent centre-ray depth versus Euclidean distance,
 wrong/back/missing/outside face rejection, independent silhouette missing/extra
 pixel rejection, and exact public manifest completeness/privacy. These are
 code contracts, **not actual CUDA manufacture or model-performance evidence**.
+
+## Actual execution — STOP
+
+Producer `024af9c6f01b715c2c2fbece19bfd67d064e0fea` was published and
+executed once on VM02. Manufacture **failed in 2.177880111 seconds** at the
+independent camera-ray/triangle gate, before the first completed frame,
+public manifest, model inference or quality score. Partial RGB/arrays were
+removed; the original private failure receipt is 1,476 bytes, SHA-256
+`0bcc7cbc97be4ae87b452c33da028b26afe8e77287ebafac8c72e3e588662ae8`.
+No input/prediction pins or synthetic generalization score exist.
+
+The failed cohort and gates remain unchanged and will not be rerun to rescue
+them. A separate scalar-only precision diagnostic on new triangles may explain
+renderer conditioning; it cannot convert this failure into validation evidence.

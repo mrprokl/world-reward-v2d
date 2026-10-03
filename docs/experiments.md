@@ -4916,3 +4916,39 @@ computed projected convex hull now checks all strict inside/outside pixels with
 the declared2e-4pixel tie band. Complete source331focusedPASS3.66s and shell
 syntaxPASS before remote execution. Actual CUDA manufacture/predictions/scores
 remain unverified at this point; all outputs will stay Azure.
+
+Published producer024af9c6f01b715c2c2fbece19bfd67d064e0fea verified exact
+unauthenticatedHTTP200; VM02 manufacture dispatched once37files28872encodedB.
+Actual2026-10-03 18:21:46UTC unitfailed/exit1/GPUidle:
+**FAIL2.177880111s**, beforefirstcompletedcase/publicmanifest/modelinference/
+anyqualityscore. Original independent nearest camera-ray/triangle gate rejects
+the CUDA raster. Failure receipt1476B/0400/
+0bcc7cbc97be4ae87b452c33da028b26afe8e77287ebafac8c72e3e588662ae8;
+source592ccaf0abc122c8b370f871ed729457d7ae096574374c473925426c73236355.
+arrays_removed=True, public/private retained arrays0, no publicmanifest or
+input/predictionpins. Preserve this FAIL; do not alterthresholds, geometry or
+rerender it to rescue the reference. No syntheticgeneralizationscore exists.
+
+Read-only primary PyTorch3D33824be3 audit confirms original+.5 rastercells and
+view-spacecameraZ, not an integer-pixel convention bug. Generic failure did
+not preserve its failing submetric; cause remainsunknown. A separate tiny own
+NumPy conditioning example shows FP32projected grazingtriangles can disagree
+with ideal FP64 planes by15.59mm versus1.68e-8m on a wide triangle. This is
+only a possible mechanism, not evidence of the actualfailure. Next one new
+scalar-only CUDA precisionprobe will use distinct triangles/background, no
+cohort assets/RGB/models/predictions; no gate or sceneparameter retuning.
+
+Frozen024af9c complete suite **9468PASS/2optionalSKIP263.18s**; focused331PASS
+precededactualmanufacture. Engineering source correctness cannot substitute
+for the failed CUDA ground-truth gate. EP3production remainedseparateactive
+and completed body/depth fullinitializers+adapter; latestactualunit/GPU
+stage still requires scalar-only polling before any next GPU dispatch.
+
+New independent precisionprobe source frozen before execution: four distinct
+wide/grazing/background triangles640x480/K800, no oldcohort imports/data/RGB/
+models. Compare originalFP64, castFP32 and actualprojectedFP32 planes at ray
+offset0/.5/1; only perface scalar error/barycentric/cosine/coverage statistics
+persist. CUDA30s/outer33s with scopednamedcontainer boundedstop/kill/rm, no
+lingering-job inference. ProbePASS will mean measurementexecution only, not
+2e-5gateacceptance, causeofpreviousfailure or modelquality. FivefocusedPASS;
+probe+authoredpipeline/grid118PASS0.87s beforefreeze. Nofailedreference rerun.
