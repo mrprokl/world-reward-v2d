@@ -22,15 +22,34 @@ def execute(source, args):
         input=source, capture_output=True, text=True, timeout=10)
 
 
+@pytest.fixture(scope="session")
+def historical_sources():
+    """Actual frozen producer blobs, never current helpers relabeled as40fd."""
+    pins = json.loads((ROOT / "configs/frontend_replica_inventory_pins.json").read_bytes())
+    assert pins["schema"] == "world_reward.frontend_replica_inventory.pins.v1"
+    revision = pins["inventory_report"]["pin"]["producer_revision"]
+    assert pins["inventory_code"] == f"jobs/{revision}/run_frontend_replica_inventory/code"
+    sources = {}
+    for name, expected in pins["inventory_source_pins"].items():
+        result = subprocess.run(["rtk", "proxy", "git", "-C", str(ROOT), "show", revision + ":" + name],
+            check=True, capture_output=True, timeout=10)
+        raw = result.stdout
+        actual = dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest(),
+            git_blob_sha1=hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest())
+        assert actual == expected
+        sources[name] = raw
+    return sources, pins["inventory_source_pins"]
+
+
 @pytest.fixture
-def runtime(tmp_path):
+def runtime(tmp_path, historical_sources):
     root = tmp_path / "root"; rev = "a" * 40
     code = root / "jobs" / rev / "run_frontend_asset_extract/code"; (code / "infra").mkdir(parents=True)
     (root / "results").mkdir()
     for name, raw in (("revision", rev + "\n"), ("source-sha256", "b" * 64 + "\n")):
         (code.parent / name).write_text(raw)
-    for name in ("frontend_replica_inventory.py", "run_frontend_replica_inventory.sh"):
-        (code / "infra" / name).write_bytes((ROOT / "infra" / name).read_bytes())
+    for name, raw in historical_sources[0].items():
+        (code / name).write_bytes(raw)
     (code / "infra/frontend_asset_archive.py").write_text("# tiny authenticated fixture helper\n")
     fixture = '''from pathlib import Path
 import hashlib,json
@@ -143,7 +162,7 @@ def test_preflight_rejects_output_parent_alias_before_shell_reservation(runtime,
     assert result.returncode != 0 and not out.exists()
 
 
-def test_complete_bundle_retains_current_original_byteidentical_helpers(monkeypatch):
+def test_complete_bundle_retains_current_closure_distinct_from_historical_producer(monkeypatch, historical_sources):
     monkeypatch.syspath_prepend(str(ROOT / "infra")); import azure_job
     files = {str(p.relative_to(ROOT)): p.read_bytes() for folder in ("infra", "src", "configs")
         for p in (ROOT / folder).rglob("*") if p.is_file() and "__pycache__" not in p.parts}
@@ -151,7 +170,21 @@ def test_complete_bundle_retains_current_original_byteidentical_helpers(monkeypa
     selected = azure_job.runtime_bundle_paths(files, "infra/run_frontend_asset_extract.sh")
     assert {p for p in selected if p.startswith("infra/")} == {"infra/run_frontend_asset_extract.sh", "infra/frontend_asset_extract.py",
         "infra/frontend_asset_archive.py", "infra/frontend_replica_inventory.py", "infra/run_frontend_replica_inventory.sh"}
-    expected = {"infra/frontend_replica_inventory.py": "f9cbb398a53beb257c580df0959c47c707e978afb653ea411382ae8e205821ee",
-        "infra/run_frontend_replica_inventory.sh": "db01c510368134cb0dcac6fc10cc73d8e18f689d635c7fd62248b0fd11727fc3"}
-    assert all(hashlib.sha256(files[n]).hexdigest() == sha for n, sha in expected.items())
+    # Closure selection includes current files; it does not authenticate the
+    # old producer. The runtime control above supplies independently pinned old
+    # blobs explicitly. Updating a helper must not rewrite that old identity.
+    helpers = next(node.value for node in ast.parse(block("PY")).body if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == "helpers" for target in node.targets))
+    assert ast.literal_eval(helpers) == historical_sources[1]
+    assert files["infra/frontend_replica_inventory.py"] != historical_sources[0]["infra/frontend_replica_inventory.py"]
     assert all(n in selected for n in files if n.startswith("configs/"))
+
+
+def test_current_inventory_is_not_reclassified_as_original_producer(runtime):
+    target = runtime["code"] / "infra/frontend_replica_inventory.py"
+    before = target.read_bytes()
+    current = (ROOT / "infra/frontend_replica_inventory.py").read_bytes()
+    assert current != before
+    target.chmod(0o600); target.write_bytes(current); target.chmod(0o444)
+    assert runtime["control"]().returncode != 0
+    assert not runtime["dest"].exists()

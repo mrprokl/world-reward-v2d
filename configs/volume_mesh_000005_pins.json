@@ -1,0 +1,42 @@
+{
+  "episode_index": 5,
+  "files": {
+    "outputs/episode_000005/object_budget_volume/geometry.npz": {
+      "bytes": 62462,
+      "sha256": "9ab51a169b3ddb487696fbb9e90171d1ebb66d1ee25c54bfa1fd2d347ed6ae84"
+    },
+    "outputs/episode_000005/object_budget_volume/object_fixed_canonical.glb": {
+      "bytes": 74560,
+      "sha256": "0a2e71c04abbdf192a05d30238f18b84bc681ee40c80612834eefe45f012a517"
+    },
+    "outputs/episode_000005/object_budget_volume/report.json": {
+      "bytes": 10822,
+      "sha256": "aacdb39690c8c2a67de227067f4322b29bab7a1f2dec799c59ff32ea24d30d21"
+    },
+    "outputs/episode_000005/object_grounded/report.json": {
+      "bytes": 15647,
+      "sha256": "225120f3311894c047761cc8970e3c3224ae7464e82be90693a9a5cf254d445a"
+    },
+    "outputs/episode_000005/scale_smoke/report.json": {
+      "bytes": 9430,
+      "sha256": "e22eb72535a8f9970bcf0976a65c686abe14fd0342023041eb852c7b567c9b18"
+    },
+    "results/image-volume-qem.json": {
+      "bytes": 3429,
+      "sha256": "8c5441162603260fb768dad688ed7d47ddf29a79de6de53fde603c84994c28ec"
+    },
+    "validation/volume_qem_v1/report.json": {
+      "bytes": 19887,
+      "sha256": "5fcea041873ff54a4c116224a86d6ac0a3ca2c4699584c4699d615b7703f0500"
+    }
+  },
+  "input_sha256": "9613c76d9a4f9f34ecaf7697f2129ee2c59b6b03b0f014ee531a53d1fe39c30e",
+  "metric_scale_baked_once": 0.3524153232574463,
+  "report": {
+    "bytes": 10822,
+    "producer_revision": "3e7d39192437dbe7d2c5e4ffbc43bbbec956f077",
+    "script_sha256": "bb6b17696ed928b749e805ed6405fb9144419421fbef70691a2dd8235cc714e9",
+    "sha256": "aacdb39690c8c2a67de227067f4322b29bab7a1f2dec799c59ff32ea24d30d21"
+  },
+  "schema": "world-reward-volume-mesh-pins-v1"
+}

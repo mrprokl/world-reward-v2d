@@ -25,8 +25,9 @@ No final Parquet, submission or verified CARI4D improvement yet.
   the outer queue failed its source-cache postcheck and is not reclassified.
   After a separate source audit, two export attempts stopped before model
   execution: first on historical-source binding, then on private-proof access.
-  An explicit authenticated readonly-source access fix passes focused tests;
-  the next export run is pending. The 747-frame
+  The explicit authenticated readonly-source access fix now passes a full native
+  export of all 592 frames. Independent export inventory and official packing
+  remain pending. The 747-frame
   episode keeps all 25 object components but tracking stopped at 18 frames
   with empty automatic object masks. The next 668-frame episode has complete
   automatic masks and Body/depth initializers; its default topology reduction failed before object tracking. A separately
@@ -58,9 +59,9 @@ image compiles offline, and its thin Python import gate now passes. The new CUDA
 pending; no CUDA
 execution parity or eligibility claim.
 The full frozen `da2f3db` lightweight suite passed **10,394 tests, 2 optional skips**.
-The newer `3e7d391` suite has **10,446 passes, 3 failures, 2 optional skips**;
-those historical-producer versus current-helper source bindings now pass the
-focused suite; a fresh full-suite check remains pending.
+The newer `168a809` suite has **10,564 passes, 5 failures, 2 optional skips**.
+Those failures concern tiny extraction fixtures confusing historical and current
+source bytes; the historical producer and production pins remain unchanged.
 
 Heavy data, models and computation remain on Azure. Only reproducibility pins,
 results and decisions are kept here; see [experiments](docs/experiments.md).

@@ -5791,3 +5791,25 @@ EP3secondFAILreport/log atomicNOREPLACEarchivePASS; originalroot0audit still
 547focusedruntime/producer/consumer/ray/kernel/source testsPASS4.32s. New
 officialpackerUIDguard alters currenthelperpin only; original38158B/1aa758
 historicalidentity retainedseparately and NEVERwrittenintooldreceipts.
+
+Frozen168a809fullsuite10564PASS/5FAIL/2optionalSKIP332.79s. All5failures
+are historical40fdinventory bytes incorrectly substituted withcurrenthelper
+in tinyextractionwrapper fixtures; actualoldruntime untouched. Dedicatedfix
+uses config-pinned Git40fdbytes/SHA/Gitblob and explicitlyrejects current
+source substitution. No productionpin/wrapper/transport gate relaxation.
+EP3exportv3 launched168a809/83files162656encodedB; volumeinventoryEP5
+70files104508B andVM02SAM2kernel60files66456B separately dispatched.
+NoqualityPASSinferred; allheavydata remainsAzure.
+
+EP3exportv3 actualPASS36.651204698s/all592frames/37fullnative+reference
+chunks, inactiveexit0. Receipt26222B/1070baa48b19470e2d66aa8cde332133520661a15dba9636c9249f6754d7bcb9;
+producer168a809, scriptac27278ff86d0cba77f9bc0224da5f0a54feea40d2fb75bd31005368ced711c4.
+Independentexportfile inventory andCPUofficialpacking stillpending; source
+queueFAIL and2earlierexportFAIL remainseparate. Noquality/eligibility claim.
+
+EP5independentvolumeinventory168a809 actualPASSinactiveexit0, sevenoriginal
+fileidentities frozen volume_mesh_000005_pins.json. Inventory1453B/
+b845869ecfdf23298672f6b212c4456e2708e299ec4a217c6fc4e5bc82494b19.
+Candidate/export sampledChamferdiagonal .0060983867 (<.01 unchangedgate);
+fulltracking next, notCARIaccuracy. Fivefixturefailures fixedwithactual40fd
+Gitblobs+anti-substitution;128frontendextract/archivetestsPASS5.00s.
