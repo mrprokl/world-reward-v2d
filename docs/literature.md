@@ -1082,3 +1082,25 @@ failure meansproxyinadequate, not a victory. Novel96dynamiccohort and baseline/
 candidate accuracy follow onlyafterthisgate; fullhumanChamfer/namedjoints, NOT
 MHRindexPVE. InitialsharedSim3/noindependentobject/perframealignment remain.
 No field/geometry/RGB/referenceacquisition or evaluation implemented yet.
+
+
+Actual2026-10-03Azureprobe resolves meshingavailability: VM02 alreadyhas
+scikit-image0.26.0, not earlieraudited0.25.2. Its installed12,872B Lewiner
+wrapper/f482cdb5 matches primary
+https://github.com/scikit-image/scikit-image/blob/v0.26.0/src/skimage/measure/_marching_cubes_lewiner.py
+;6435B LICENSE611d3207 matchesv0.26.0/LICENSE.txt (BSD3default). No
+installation/rebuild; actualimage andsource/licensenumericpins required by
+ONE authorreferencegeometrygate. This reference isnot a SOTApredictionmethod.
+
+Independentdepthfollow-up identifies ONE possiblehypothesis (notimplemented):
+DA3 objectrelativecontrast anchored to frozenMoGe gauge by a singleclipmedian
+Z_MoGe/Z_DA3 on automaticnonperson/nonobjectbackground, equalframeweight, same
+RGBcamera/rays/frozenmetric scale/shape/rigidICP/human. No offset/perframeratio/
+privatecamera/depth. D76nineTUDLnowdevelopment; D88globalreplacementREJECT.
+Existingacquisition/VM02transfer retainsONLYthose9RGB+privateannotations and
+deletesarchives/nonselected, so there isno actualfresh validationmanifest.
+Never rescore them asheldout. Conditionalnewframeholdout same3scenes would
+not be object/scenedisjoint or supporttemporalacceleration (sparseBOP19).
+Onefuturefreeze-beforeprivate comparison:medianper-sceneCD gain>=5%, no
+regression>5%,coverage>=95%, insufficientbackgroundratio=>STOP. No new
+benchmark/assets/modeltransfer/job, nor superiorityclaim.

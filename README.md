@@ -35,10 +35,14 @@ new episode is running through the automatic frontends. The original official
 packer also passes on the full501-frame source, with exact GLB-surface and native
 FP32 fidelity checks; its temporary one-episode Parquet is deleted after QA.
 The next episode's object trajectory passes all668originalframes; CPU input
-assembly is ongoing; the following episode stopped before tracking at its
-topology-preserving mesh-budget gate. A fresh native near-grasp manufacture route is stopped at neutral
-self-embedding, before optimization/rendering; no geometry or thresholds are
-relaxed to rescue it. All30 reconstruction and independent real/fullHOI accuracy
+assembly is ongoing. The following episode failed the original fast-QEM mesh
+budget gate, then passed one independent volume-preserving proposal retaining
+all18components; its full866-frame tracking is now running from frozen pins.
+A fresh native near-grasp manufacture route remains stopped at neutral
+self-embedding; exact rational witnesses confirm eight flagged crossings.
+No geometry or thresholds are relaxed to rescue it. One separate authored
+full-human reference feasibility gate is predeclared; it is not a new prediction
+method or a quality result. All30 reconstruction and independent real/fullHOI accuracy
 validation remain separate.
 Detailed receipts and decisions: [experiments](docs/experiments.md).
 Heavy data and all GPU work remain onAzure.

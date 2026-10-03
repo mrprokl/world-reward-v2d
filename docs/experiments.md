@@ -4353,3 +4353,48 @@ Postpin gate167PASS29.04s; no fulltrackingPASS/accuracy/native866 yet.
 13:00:45UTC actualvolumecontinuationactive/MainPID789439, GPU789526/1886MiB,
 noGPUduplication; originalep1scalarCPUdepth600/668. Bothinputreceipts stillabsent,
 nofull866trackingPASS or 668nativechainclaim. Runtimeheavydata remainAzure.
+
+
+### Author-only full-human reference feasibility — predeclared 2026-10-03
+
+Native-neutral manufacture remains STOP; exacteightcrosswitnesses unchanged.
+ONE new authored capsule/ellipsoid smooth-union FIELD (not final intersecting
+parts), fullconnected human/fivefingers eachhand, fixed .012m grid/resolution
+and padding; Lewiner extractrest once, freezevertices/faces/rig/namedjoints/
+weights. No importedgeometry/GT/challengeinputs/nativeMHR/repair/componentdelete/
+resolution or pose sweep. Certificate originalcross_surface d808600c, fullface
+coverage/component1/outwardclosed/embedding,1e-8/2Mpairs/30s perstate, overall
+20min. States only rest+carry+fingerbend fixed beforedispatch. AnyfailureSTOP
+before geometrypayload or RGB; no perstate remeshing. PASSauthorgeometry is
+referencefeasibility, notrecognition/contact/forceclosure/motion/Track1quality.
+No newprediction method adopted. Later RGBblindrecognition gate requiredbefore
+newdynamiccohort, independentlyfrozenbaseline/candidate and labelsafterprediction.
+
+13:07:29UTC exactVM02 CPUdependencyprobe: classicimage7ebfff18 unchanged,
+Python3.11.10/NumPy1.26.3/SciPy1.16.3/scikit-image0.26.0 ALREADYinstalled;
+noinstall/rebuild/assettransfer. InstalledLewiner12872B/f482cdb5c9996c1a465a1fc84ffea9f88eec012200b61ca67e8ac7eab964f7fa
+andLICENSE6435B/611d3207504dcb4a808df209d2e7c9b4f2e89fe690f84735c0d548160966b527
+match primaryv0.26.0/src/skimage/measure/_marching_cubes_lewiner.py and
+LICENSE.txt HTTP200; BSD3defaultcoversmodule. Prior0.25.2sourceaudit wasnot
+installedversion: use actual0.26.0 pins, not a fabricatedupgrade. CPU-only
+networknone4CPUs/12GB onVM02/code+twoexactdispatchmarkersRO/privateoutputRW.
+No GPU/models/vendor/dataset mounts; originalimage has no newinputs.
+
+
+Authorreference integration232focusedPASS10.32s incloriginalcrosssurface/
+Azurecodeclosure; wrapper37PASSexact4mounts (code+2dispatchmarkersRO/outputRW),
+CPU-only. Primitiveendpoint/tenfinger nontrivialdistalweight>.1 andnearest
+surface support are sanitychecks, not anatomical/digit-topologyproof. Original
+fullsurface audit separatelydecides one connectedoutwardclosedembedding.
+No actualmanufacture/localheavydata or modelread; originalnativeFAILunchanged.
+
+13:22:49UTC episode1fullfrontend unitinactive/exit0; CPUinputassembly
+**PASS5559.248892s/668originalframes**, sharedmesh/poseroundtrip error
+1.8038988979531736e-15m. Originalproducerce0519f/scriptc529b240 unchanged.
+Originalscalar writer/noGPU rewrite, finalreport appearedaftercompletion
+13:18:36UTC. Next readonly15actualinputhashes before native668launch; GPU
+episode2volumecontinuationactive/250frames, no GPUdup. Noaccuracyclaim.
+
+Root complete tiny suite **8847PASS/2sameoptionalSKIP196.11s** before
+freeze; no localfullgeometry/model/video/render. Authorcode+CPUwrapper+
+strictdriver frozen, no neutralrepair or qualityadoption.
