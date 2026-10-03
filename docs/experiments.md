@@ -5039,3 +5039,35 @@ publicexactHTTP200 beforelaunch. No duplicateGPUjob/initializer rerun/new
 geometryhypothesis. Nativefullprepare/inputassembly stillpending, nottracking
 PASS or finishedfull592chain. Currentpublicmain contains results/decisions;
 heavydata/models/renders stayAzure, localcachecleanup+gitdiffcheckPASS.
+
+
+## D105 — preregistered analytic RGBD reference, 2026-10-03
+
+New independent reference implemented under analytic_rgbd_holdout_v1, not an
+old triangulated-cohort repair. Complete 4821B protocol SHA4ff1631da8a59c4bdf075e2ba59be7d7196f1608ff43c157c851c40bafd3c7c4:
+3 new clip-constant ellipsoids/seeds, 4 uniformly selected instants, K800 640x480
++.5 rays, physical finite-Z plane. FP64 stable first-positive quadric hit generates
+RGB/Z/visibility; all-grid independent completed-square/root/implicit-residual,
+normalized tangency STOP1e-12, fixed9 Decimal70 probes, FP32 cast<=1e-6m.
+Manufacture CPU Azure 360/363s, networknone, no source/challenge/model assets.
+Failure deletes only new arrays/PNGs, sole original failure receipt retained.
+
+Separate public-only native MoGe/DA3 adapter: exact13infra/src source closure,
+only single input pin and individual13public files mounted, no renderer/recipe/
+private directory exposed. Originalnative2ed48a89 and grid d3541ce4 unchanged.
+Original300/303s GPU/border1024/95%/median-of-four/onepositive-scene-scale/
+exactbaseline-validity rule unchanged. Independent actual input pins precede
+inference; all12predictionNPZ+receipt pins precede private evaluation. CPU180/183s
+private evaluator checks every prediction/nativeasset metadata before private IO,
+then all15truth/geometry bytes and independent full-grid nearest-hit/rigid-pose/
+clip-constant geometry. Samepairedvisible8192PCG0/coverage95/median5/no scene−5.
+No calibration/offset/per-framealignment or dropped-frame fitting.
+
+Independent readonly agent audit found no blocking math/privacy/runtime issue.
+All3 wrappers now bound namedownedcontainer stop/kill/rm and failclosed absence
+checks; no unrelatedjob/container touched. Focused tests142PASS1.15s, syntaxPASS;
+these are tiny code contracts, not real rendering/model/quality evidence. No
+Azure manufacture or prediction/score is claimed by this preregistration. New
+reference can only establish synthetic object-camera depth transfer, not real
+HOI/human/contact/licensing/overlap clearance or CARI4D victory. EP3full592tracking
+remainedactive18:45:53UTC; no duplicateGPUjob or oldfailedcohort rescue.
