@@ -1,0 +1,19 @@
+{
+  "schema": "world-reward-cari96-forward-pins-v1",
+  "forward": {
+    "sha256": "8a0cdf1b5aec4c67e47a775b473dc183bfd20e18af610ea15fb5e5acc7514fc8",
+    "bytes": 50377,
+    "producer_revision": "d8513283a92d870db75184f64c39fd1262fde9d7",
+    "script_sha256": "37ade3cc40cd06f7857934445beea9175286df33162e13cb7e58a70e96c2bcf7"
+  },
+  "forward_files": {
+    "report.json": {
+      "sha256": "8a0cdf1b5aec4c67e47a775b473dc183bfd20e18af610ea15fb5e5acc7514fc8",
+      "bytes": 50377
+    },
+    "coconet.pth": {
+      "sha256": "6e9a8b00b781a411753f629e01b9abf7e2d93015d81d557b5e29037f9675829c",
+      "bytes": 73829436
+    }
+  }
+}

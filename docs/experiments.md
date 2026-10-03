@@ -3560,3 +3560,18 @@ verify `learning/training/mhr_supervision.py`,20,826B/e7f4c5f8991e312eec69a76020
 Correct path and add regression; no source/gate/model/numerical change.
 Newv4 namespace/unit/log preflight absent; focused228PASS2.25s. Additive generic
 fullclip source auditor independently155PASS6.33s; no new GPU/data read by it.
+
+H102 forwardv4 actual **PASS72.173626s**, source
+`d8513283a92d870db75184f64c39fd1262fde9d7`, driver
+37ade3cc40cd06f7857934445beea9175286df33162e13cb7e58a70e96c2bcf7.
+22-file51,640B Gitclosure SHA-XZ2e1180a925f2bdc03649de96b5464c9d96b67e7c20fd9b29e2c44475711f3823.
+Oneforwardattempt/return/verified andonecompositionhook/delegate/verified,
+twoofflineHubloads; all96 source/identity/K/masks/contact/raw/asset checks plus
+savedbundle rereadPASS. Unitinactiveexit0/H100103MiB0%. Immutable receipt
+8a0cdf1b5aec4c67e47a775b473dc183bfd20e18af610ea15fb5e5acc7514fc8
+(50,377B), nativebundle6e9a8b00b781a411753f629e01b9abf7e2d93015d81d557b5e29037f9675829c
+(73,829,436B); actualcompleteinventory pinned before refinement. No strict
+network determinism, independent accuracy or full501 submission claim. Next
+one unchanged full96 native300requested/301update refinement. Generic source
+audit156PASS1.70s separately; newfull501 inputpins referonlyexistingpublic
+15sourcefiles, neverold CARI predictions. No newfull501 GPU run yet.
