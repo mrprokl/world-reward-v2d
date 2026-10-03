@@ -5071,3 +5071,19 @@ Azure manufacture or prediction/score is claimed by this preregistration. New
 reference can only establish synthetic object-camera depth transfer, not real
 HOI/human/contact/licensing/overlap clearance or CARI4D victory. EP3full592tracking
 remainedactive18:45:53UTC; no duplicateGPUjob or oldfailedcohort rescue.
+
+
+D105 actual analytic manufacture **PASS3.064792078s**, VM02 unitinactive/exit0
+18:58:34UTC, no live Docker/GPUprocess. Producerdec00ae5c792b6b47c62bf37e254d6f5ced92878,
+39files29696encodedB, exactpublicHTTP200 beforedispatch; originalprotocol/source
+unchanged. All12frames307200pixels: max independent root error3.421e-12m,
+implicitresidual9.859e-14, cast1.1921e-7m, fixed9Decimal70error1.510e-14m;
+minimumnormalizeddisc1.0616e-8>1e-12, visible16680..25981. AllgatesPASS before
+publicmanifest. Actualreceipt12641B/29711a907aa663b9c2377494ce0d7690c918da4e19fcac2b589154bb6e58b7cc400;
+publicmanifest2784B/1796a2e77ff7dda98194750c4f48e53025095064bf8e7be771681b8d7e92e091444.
+Independent readonly stdlib audit suppliedactual producer/script/protocol pins,
+hashedALL13public+15private bytes BEFOREpublicJSON and rehashedafter; actual
+configs/analytic_rgbd_input_pins.json committedbeforeblindinference. First
+inventoryoutput was Azuretail-truncated due12fullcaseprint; boundedaggregate
+readonlysecondinventory completed, no manufacture rerun or overwritten output.
+No depth predictions/privatequality score yet, no real-HOI/CARIclaim.

@@ -1,0 +1,63 @@
+{
+  "manufacture_report": {
+    "bytes": 12641,
+    "producer_revision": "dec00ae5c792b6b47c62bf37e254d6f5ced92878",
+    "script_sha256": "46de65ed4a31458552a9a799a7bc9f0d6db8f658a7b44f91dc6bb393607c6324",
+    "sha256": "29711a907aa663b9c2377494ce0d7690c918da4e19fcac2b589154bb6e58b7cc"
+  },
+  "public_files": {
+    "manifest.json": {
+      "bytes": 2784,
+      "sha256": "1796a2e77ff7dda98194750c4f48e53025095064bf8e7be771681b8d7e92e091"
+    },
+    "scene_000001_frame_000000.png": {
+      "bytes": 192740,
+      "sha256": "f7d96b303b7171ebce9158e0b3bd39401cd0e28b16660b8a335499a4013c1a9c"
+    },
+    "scene_000001_frame_000001.png": {
+      "bytes": 192507,
+      "sha256": "74a241c5367900c72a763415051cb70839fce720b43437a033dbafc871edce47"
+    },
+    "scene_000001_frame_000002.png": {
+      "bytes": 192716,
+      "sha256": "2ccb99eaad7a1e31c3965ba18b4e470e51989f6d6e4c42414671e5693e1b7ed9"
+    },
+    "scene_000001_frame_000003.png": {
+      "bytes": 192709,
+      "sha256": "9039015676f05b7a7d9b548654fcdf98923520c5aa49db240e6cb7e179bf3a48"
+    },
+    "scene_000002_frame_000000.png": {
+      "bytes": 205272,
+      "sha256": "2389aefc75f3d8a97ed7454d153de0e349ba8ed1c4b853765f5846f0dd24a86e"
+    },
+    "scene_000002_frame_000001.png": {
+      "bytes": 204555,
+      "sha256": "105140a7d47dbeea15bbd31816620c2b5b02f69162c67e95a25d838249b77a77"
+    },
+    "scene_000002_frame_000002.png": {
+      "bytes": 204169,
+      "sha256": "6d541208df4b649ac796f9d43e19f688e2bda88c0dfbf056280c03fed12bb212"
+    },
+    "scene_000002_frame_000003.png": {
+      "bytes": 203564,
+      "sha256": "e67161b710b3987e55ef86724c9335c27c6333a4b2241fb87a2cbdb8c9a2f594"
+    },
+    "scene_000003_frame_000000.png": {
+      "bytes": 217928,
+      "sha256": "2ec7fa82dedc62a8ab1556bdb85ab93ef31ab44086dbcc7ad4c11717565b814c"
+    },
+    "scene_000003_frame_000001.png": {
+      "bytes": 217737,
+      "sha256": "e2e7618c5f64f7d033b18f75e0a1df37b5b1ccd1e362edb9cdbb3e87f5f5a519"
+    },
+    "scene_000003_frame_000002.png": {
+      "bytes": 217872,
+      "sha256": "435aebb07a47c52130087f32cf34f9d6839bca4e9f4a602c483a7976a2ba414c"
+    },
+    "scene_000003_frame_000003.png": {
+      "bytes": 217514,
+      "sha256": "3005a2440ebe80c926bc9120c9342ca2854a79acc8f7429487c659c0b7289a7b"
+    }
+  },
+  "schema": "world_reward.analytic_rgbd_input_pins.v1"
+}
