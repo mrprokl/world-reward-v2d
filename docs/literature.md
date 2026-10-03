@@ -565,3 +565,9 @@ and glibc>=2.28 must be checked before an isolated Azure-only offline
 `--no-index --no-deps --target` install; no Torch/CUDA/cuDNN or global resolver
 changes. ExplicitCPUExecutionProvider/version/importpath mandatory; CPU cost
 not measured. This is a runtime plan, no wheel/model install or inference.
+
+Azure actualCPUimage check2026-10-03: glibc2.35,Python3.11.10; NumPy1.26.3,
+packaging24.1,protobuf7.36.2 present, **flatbuffers absent**. FutureORT install
+therefore additionally needs its own pinned flatbuffers wheel/source notice;
+no install attempted and no existing image modified. GPU0%,111MiB while this
+metadata-only check ran, no competing inference.
