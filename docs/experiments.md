@@ -4164,3 +4164,30 @@ shared16frame chunk tail and export/replay tail;191focusedPASS1.34s and complete
 Actualep1 stillactive600/668objectframes3,732.862977s; finalobject/input receipts
 not yet present. Next root checks completion/freeGPU before native one-state
 private grasp feasibility; no GPU duplication, implicit resume or heavytransfer.
+
+Episode1 full object tracking actual **PASS4028.069842s/668frames**;
+driver65e1338fd4d0439307be9b5afaf490f76da088d9e7d9f2c39f689901a01fafa0.
+Receipt8b045758f526d2678f4445faacd59e0ca32da679dca5c0d5696781e4d6cd0d86
+(34,041,999B) remains onAzure. Original frontend unit now assembles CPU-only
+inputs; no final input receipt yet. Actual GPU applications empty and scoped
+frontend lock free before separate private native capability launch.
+
+Own-grasp v1 actual **FAIL2.485810s**, producer
+2618e591858d4984e7a72876ef5c6c61a529bb87; driver
+53a3aaceed3bfd80101bcc1b5672efca2df93e0354687a98a417c6636578b75f.
+TorchScript rejects module-wide `requires_grad_(False)` before any nativeforward;
+no geometry/gradient/contact certificate or rendered cohort. GPU idle afterward;
+original400 receiptb60008e1b6738ed3d2606df3264674d1813c2c9c29b7437ee23d2a9c5379d76a
+(2,513B) preserved in own_grasp_capability_v1. General API correction freezes
+each actual parameter tensor instead, verifies all frozen, and leaves ambient
+autograd/input controls unchanged. New exclusive v2output; no old receipt/source
+rewrite, geometry/solver/budget/tolerance change or scientific gain claim.
+
+Independent read-only native ABI audit confirms tensor-level parameter freezing
+without `no_grad`/inference_mode/jit.freeze or eager-module assumptions. Added
+four tiny regressions for unsupported module API and still-trainable weights;
+210focusedPASS2.73s, complete **8360PASS/2same optionalSKIP140.68s**.
+No model/geometry/gradient execution locally. Frozen v2driver
+3ca1565892fc0d88eff7d3144fa0df05c841a4c0b2e69f6a08d371cc8a44aa07;
+wrapper7169ffe044de814b1c9377bc809e68e4127f73ec25bf0aaf38d1427b53790b33.
+Original crosssurface d808600c and directexport967b45eb unchanged.

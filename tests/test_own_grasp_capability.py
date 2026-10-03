@@ -174,6 +174,37 @@ def test_ledger_every_actual_attempt_return_validation_and_max100(gate):
     with pytest.raises(ValueError):ledger.complete()
 
 
+@pytest.mark.parametrize("parameter_count",[0,1,3])
+def test_freeze_uses_only_native_parameter_tensor_api_not_scriptmodule_api(gate,parameter_count):
+    class Parameter:
+        def __init__(self):
+            self.requires_grad=True
+            self.value=b"unchanged-native-parameter-values"
+            self.calls=[]
+        def requires_grad_(self,value):
+            self.calls.append(value)
+            self.requires_grad=value
+    class ScriptModule:
+        def __init__(self):self.weights=[Parameter() for _ in range(parameter_count)]
+        def parameters(self):return iter(self.weights)
+        def requires_grad_(self,_):pytest.fail("TorchScript module-wide requires_grad_ is unsupported")
+    model=ScriptModule();gate.freeze_native_weights(model)
+    assert all(p.requires_grad is False and p.calls==[False]
+        and p.value==b"unchanged-native-parameter-values" for p in model.weights)
+    tree=ast.parse((ROOT/"infra/own_grasp_capability.py").read_text())
+    function=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=="freeze_native_weights")
+    assert not any(isinstance(n,ast.Name) and n.id=="torch" for n in ast.walk(function))
+
+
+def test_freeze_rejects_a_native_parameter_that_remains_trainable(gate):
+    class Parameter:
+        requires_grad=True
+        def requires_grad_(self,_):return self
+    class Model:
+        def parameters(self):return iter([Parameter()])
+    with pytest.raises(ValueError,match="weights must remain frozen"):gate.freeze_native_weights(Model())
+
+
 @pytest.mark.parametrize("fault",["controls","identity","expression","signedzero"])
 def test_synthetic_original_forward_mutation_never_validated(gate,fault):
     q=np.zeros(204,np.float32);identity=np.zeros((1,45),np.float32);expr=np.zeros((1,72),np.float32)
@@ -302,7 +333,7 @@ def test_real_azure_bundle_namespace_and_original_marker_preflight_without_gpu(g
     root=tmp_path.resolve();revision="a"*40
     # Derive with the unchanged real launcher's algorithm, not a guessed name.
     script="infra/run_own_grasp_capability.sh";bundle=script.removeprefix("infra/").removesuffix(".sh")
-    code=root/"jobs"/revision/bundle/"code";out=root/"validation/own_grasp_capability_v1";out.parent.mkdir()
+    code=root/"jobs"/revision/bundle/"code";out=root/gate.OUTPUT;out.parent.mkdir()
     model=root/"weights/mhr/mhr_model.pt";model.parent.mkdir(parents=True)
     with model.open("wb") as stream:stream.truncate(gate.MODEL_BYTES)  # Sparse metadata fixture, never a downloaded model.
     for name in gate.HELPERS:

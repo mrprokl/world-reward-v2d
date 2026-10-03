@@ -25,7 +25,7 @@ import numpy as np
 from world_reward.cross_surface import audit_closed_surface, audit_cross_surfaces
 
 ROOT=Path("/srv/scenesmith/world-reward")
-OUTPUT="validation/own_grasp_capability_v1"
+OUTPUT="validation/own_grasp_capability_v2"
 IMAGE="sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7"
 MODEL_SHA="352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc"
 MODEL_BYTES=696110248
@@ -355,6 +355,18 @@ def _strict_runtime(torch):
             or not torch.is_grad_enabled()):raise ValueError("Actual strict differentiable native CUDA required")
 
 
+def freeze_native_weights(model):
+    """Freeze parameter tensors, not the unsupported ScriptModule-wide API.
+
+    This leaves the ambient autograd policy and differentiable input controls
+    untouched. No model value is replaced or changed.
+    """
+    for parameter in model.parameters():
+        parameter.requires_grad_(False)
+    if any(parameter.requires_grad for parameter in model.parameters()):
+        raise ValueError("Native weights must remain frozen")
+
+
 def run(root,code,out,report,persist,started):
     bound_code(root,code,report["producer_revision"])
     mount_text=Path("/proc/self/mountinfo").read_text()
@@ -370,8 +382,7 @@ def run(root,code,out,report,persist,started):
     torch.backends.cudnn.allow_tf32=False;torch.backends.cudnn.benchmark=False;torch.backends.cudnn.deterministic=True
     _strict_runtime(torch)
     with torch.jit.optimized_execution(False):model=torch.jit.load(str(model_path),map_location="cuda").float().eval()
-    model.requires_grad_(False)
-    if any(p.requires_grad for p in model.parameters()):raise ValueError("Native weights must remain frozen")
+    freeze_native_weights(model)
     names,joints=list(model.get_parameter_names()),list(model.get_joint_names())
     if (model.get_num_identity_blendshapes(),model.get_num_face_expression_blendshapes())!=(45,72):raise ValueError("Native coefficient ABI differs")
     schema=model._c._get_method("forward").schema
