@@ -1133,3 +1133,19 @@ camera/ratio/coverage/CD gates; truth depth/K/all instances only after predictio
 freeze. No asset acquisition or generalization result yet. ITODD (NC/Gray-D)
 and IC-BIN (unverified custom license) rejected for this purpose. T-LESS is
 not independent full-HOI validation and training overlap remains unverified.
+
+Actual T-LESS Azure acquisition stopped before the825MB test download. Its
+byte-pinned base contains an additionalBOP18 target file and1816B dataset_info
+without an embedded licence declaration. Both violate the preregistered
+acquisition contract; no layout widening/licence-waiver inference/retry.
+No new RGBs, predictions or generalization score were produced.
+
+A bounded10-request primary-text fallback audit rejects HOPE despite the
+[HF card](https://huggingface.co/datasets/bop-benchmark/hope/raw/ddd0a26ca3460085e93b648748160fb25e4b5566/README.md)
+and BOP claimingCC-BY-SA4: the
+[original publisher README](https://raw.githubusercontent.com/swtyree/hope-dataset/621d855f58817f8edbb4367ee0efbb7786a59a66/README.md)
+(2022-12-15,9522B/SHA27af06152747d49bfe05dfb56f7b13950758c158109c802b8836f911eabd1f0f)
+explicitly declaresCC-BY-NC-SA4. Do not acquire its153745625B RGB-D validation
+ZIP without written clarification. LINEMOD publisher/embedded terms and exact
+archive pins remain unverified despite BOP/HF750b2f78 CC-BY4 metadata, so no
+acquisition yet. No assets or label values were inspected in this text audit.

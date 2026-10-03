@@ -4830,3 +4830,14 @@ Publisher/card concordance alone does not satisfy the preregistered contract.
 Episode2 full866 native refinement dispatched once040e1b55a250de5086b5e4c8816cbff25f175297,
 55files119824encodedB/publicexactHTTP200, unitactiveMainPID871067. Original
 301effectiveupdates/7200s/all866 remain; no completion/quality claim yet.
+
+17:48:49UTC actual full866 refinement remains running, native progress200/300,
+one19094MiB GPUworker. Running receipt is provisional, not a terminalFAIL.
+Independent readonly packer check confirms full668 original scratch_removed=True,
+output directory contains **only report.json**, no retained Parquet or upload.
+
+Bounded primary-text fallback screen rejects HOPE: publisherCC-BY-NC-SA4
+contradicts BOP/HF CC-BY-SA4; LINEMOD publisher/embedded terms remain unverified.
+No asset acquisition or changed T-LESS protocol. Seek a genuinely new external
+holdout only after source terms resolve, or separately preregister a new authored
+object-camera fixture; never rescore observed TUD-L12 or D88 as fresh validation.
