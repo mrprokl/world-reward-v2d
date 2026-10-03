@@ -102,17 +102,18 @@ def test_publisher_tag_version_and_license_evidence(pins,tmp_path,monkeypatch):
  monkeypatch.setattr(build,'verify_source',lambda raw,source:{'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'git_blob_sha1':source['git_blob_sha1']})
  monkeypatch.setattr(build,'exclusive',lambda path,raw:captured.append((path,raw)))
  evidence=build.publisher_notice(row,tmp_path)
- assert evidence['release_tag_binding_verified']is True
+ assert evidence['runtime_tag_resolution_performed']is False
+ assert evidence['immutable_publisher_sources_verified']is True
  assert evidence['wheel_bytes_equivalent_to_publisher_source_proven']is False
  assert len(captured)==2 and all('publisher-notices/tokenizers'in str(path)for path,raw in captured)
- responses[notice['release_ref_url']]=json.dumps({'ref':'refs/tags/'+notice['release_tag'],'object':{'type':'commit','sha':'0'*40}}).encode()
- with pytest.raises(ValueError,match='changed'):build.publisher_notice(row,tmp_path)
+ del responses[notice['release_ref_url']]
+ assert build.publisher_notice(row,tmp_path)['runtime_tag_resolution_performed']is False
 
 def test_original_failure_and_image_not_reused(pins):
  source=(ROOT/'infra/frontend_grounding_build.py').read_text()
- assert build.TARGET=='world-reward/frontend-grounding-v2:0.1'
- assert "root/'results/frontend-grounding-build-v2'"in source
- assert 'frontend-grounding-build-v1'not in source
+ assert build.TARGET=='world-reward/frontend-grounding-v3:0.1'
+ assert "root/'results/frontend-grounding-build-v3'"in source
+ assert 'frontend-grounding-build-v1'not in source and 'frontend-grounding-build-v2'not in source
  recipe=build.dockerfile(pins,'a'*64,True).decode()
  assert 'COPY publisher-notices /opt/world-reward-grounding/publisher-notices'in recipe
 

@@ -5644,3 +5644,14 @@ branches, fullindices+observedbytes preserved; unboundedleading/trailing
 abstain. Hiddenregraspunidentifiable; masks-overlapnotcontact. No retuning
 or challengeuse. See occlusion_bridge_protocol.md; nextbodycamera-hand
 conventionaudit plus NEW inferred-observation validation, notEP4manualfits.
+
+
+ActualGroundingv2 FAIL12.093028301s beforebuild, report5287B/
+197cccc25a964baf19fa87bba45224848b2c5ae40c9802378f8a48446df92630.
+Context reachedsafetensorswheel aftertokenizersnoticeclosure; exactlater
+Safetag/LICENSE/versionendpointprojectionsall200, so API outage/cause
+NOT proven. Freshv3 removes redundantmutable runtimeGitHubtaglookup
+(independentprimarytag→commitmetadata remainsfrozen), retains ALLimmutable
+source/license/version SHA/blobs and wheelpins. Staticpublicendpoint/
+HTTPstatus+phase errors nowactionablewithoutsecrets; no retry/URLretune.
+40ownPASS/115runtimeclosurePASS0.74s; actualv3buildpending.

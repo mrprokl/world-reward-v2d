@@ -23,7 +23,7 @@ import zipfile
 
 ROOT=Path('/srv/scenesmith/world-reward')
 BASE='sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3'
-TARGET='world-reward/frontend-grounding-v2:0.1'
+TARGET='world-reward/frontend-grounding-v3:0.1'
 CONFIG='configs/frontend_grounding_source_pins.json'
 HELPERS=('infra/frontend_grounding_build.py','infra/run_frontend_grounding_build.sh',CONFIG)
 SAM_REV='2b90b9f5ceec907a1c18123530e92e794ad901a4'
@@ -87,7 +87,7 @@ def source_binding(code,revision):
  return {'markers':markers,'closure_sha256':sha.hexdigest(),'helpers':{n:identity(code/n,True)for n in HELPERS}}
 
 def validate_pins(pins):
- require(type(pins)is dict and pins.get('schema')=='world_reward.frontend_grounding_source_pins.v2' and pins.get('base_image_id')==BASE and pins.get('target_image')==TARGET,'Exact new child identity contract required')
+ require(type(pins)is dict and pins.get('schema')=='world_reward.frontend_grounding_source_pins.v3' and pins.get('base_image_id')==BASE and pins.get('target_image')==TARGET,'Exact new child identity contract required')
  repositories=pins.get('repositories');require(type(repositories)is list and len(repositories)==2,'Two public pinned source repositories required')
  for row,(repo,revision)in zip(repositories,(('facebookresearch/sam2',SAM_REV),('nvidia-isaac/video_to_data',NV_REV))):
   require(row.get('repo')==repo and row.get('revision')==revision,'Exact historical public source commit required')
@@ -126,7 +126,13 @@ def fetch(url,maximum):
  try:
   with opener.open(urllib.request.Request(url,headers={'User-Agent':'WorldReward-pinned-runtime'}),timeout=25)as stream:
    raw=stream.read(maximum+1)
- except Exception as error:raise ValueError('Pinned public HTTPS acquisition failed')from None
+ except Exception as error:
+  parsed=urllib.parse.urlsplit(url)
+  # Only the already-public frozen hostname/path and numeric HTTP status. Never
+  # exception text, response bytes, query, userinfo, headers or credentials.
+  endpoint=parsed.hostname+parsed.path
+  status=getattr(error,'code',None);detail=' HTTP '+str(status)if type(status)is int else' '+type(error).__name__
+  raise ValueError('Pinned public HTTPS failed'+detail+': '+endpoint)from None
  require(len(raw)<=maximum,'Public endpoint exceeded declared byte bound');return raw
 
 def verify_source(raw,row):
@@ -154,18 +160,14 @@ def wheel_notices(path,external_notice_verified=False):
 
 def publisher_notice(row,context):
  notice=row['publisher_notice'];repo,tag,revision=NOTICE_RELEASES[row['name']]
- ref=strict_json(fetch(notice['release_ref_url'],20000));require(ref.get('ref')=='refs/tags/'+tag,'Exact publisher release tag required')
- obj=ref.get('object',{})
- if obj.get('type')=='tag':
-  sha=obj.get('sha');require(re.fullmatch('[0-9a-f]{40}',str(sha)),'Exact annotated publisher tag required')
-  obj=strict_json(fetch(f'https://api.github.com/repos/{repo}/git/tags/{sha}',20000)).get('object',{})
- require(obj.get('type')=='commit'and obj.get('sha')==revision,'Publisher tag changed from independently pinned release commit')
+ # Tag→commit was independently resolved before this frozen source. Do not
+ # introduce mutable tag/API availability into exact immutable byte checks.
  evidence={}
  for key in('license','version_source'):
   source=notice[key];raw=fetch(source['url'],source['bytes']);pin=verify_source(raw,source)
   if key=='version_source':require(notice['version_literal'].encode()in raw,'Publisher source version disagrees with exact wheel version')
   path='publisher-notices/'+row['name']+'/'+source['path'];exclusive(context/path,raw);evidence[key]={'context_path':path,**pin}
- return {'repo':repo,'release_tag':tag,'revision':revision,'release_tag_binding_verified':True,'wheel_bytes_equivalent_to_publisher_source_proven':False,**evidence}
+ return {'repo':repo,'release_tag':tag,'revision':revision,'release_tag_binding_assurance':'independently_pinned_primary_tag_to_commit_metadata','runtime_tag_resolution_performed':False,'immutable_publisher_sources_verified':True,'wheel_bytes_equivalent_to_publisher_source_proven':False,**evidence}
 
 def exclusive(path,raw):
  canonical(path);path.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
@@ -247,12 +249,15 @@ def build(code,revision,output,report):
  for repo in pins['repositories']:
   folder='sam2'if repo['repo']=='facebookresearch/sam2'else'nvidia'
   for row in repo['files']:
+   report['phase']='public_source_'+folder
    raw=fetch(row['url'],row['bytes']);pin=verify_source(raw,row);relative=folder+'/'+row['path'];exclusive(context/relative,raw);files[relative]=pin
  for row in pins['wheels']:
   if row['name']=='decord'and prior['decord']is not None:continue
+  report['phase']='wheel_metadata_'+row['name']
   metadata=wheel_metadata(fetch(row['pypi_url'],200000),row);raw=fetch(row['url'],row['bytes'])
   require(len(raw)==row['bytes']and hashlib.sha256(raw).hexdigest()==row['sha256'],'Downloaded wheel differs from independent primary SHA/bytes')
   path=context/'wheels'/row['filename'];exclusive(path,raw)
+  report['phase']='publisher_notice_'+row['name']
   external=publisher_notice(row,context)if'publisher_notice'in row else None
   notices=wheel_notices(path,external_notice_verified=external is not None)
   wheels[row['name']]={'version':row['version'],'bytes':row['bytes'],'sha256':row['sha256'],'primary_metadata':metadata,'packaged_notice_identities':notices,'packaged_notices_present':bool(notices),'external_publisher_notice':external}
@@ -275,9 +280,9 @@ def main(argv=None):
  root=Path(os.environ['WR_ROOT']);code=Path(os.environ['WR_CODE']);revision=os.environ['WR_CODE_REVISION']
  require(root==ROOT and Path(__file__).resolve()==code/'infra/frontend_grounding_build.py','Actual frozen builder file required')
  source_binding(code,revision)
- output=canonical(root/'results/frontend-grounding-build-v2');require(output.parent.is_dir()and not output.exists(),'Fresh owned Grounding build namespace required; no overwrite or retry')
+ output=canonical(root/'results/frontend-grounding-build-v3');require(output.parent.is_dir()and not output.exists(),'Fresh owned Grounding build namespace required; no overwrite or retry')
  os.umask(0o077);output.mkdir(mode=0o700)
- report={'schema':'world_reward.frontend_grounding_build.v2','stage':'frontend_grounding_build','status':'fail','phase':'preflight','producer_revision':revision,
+ report={'schema':'world_reward.frontend_grounding_build.v3','stage':'frontend_grounding_build','status':'fail','phase':'preflight','producer_revision':revision,
   'budget_seconds':BUDGET,'GPU_used':False,'model_loaded':False,'challenge_data_read':False,'private_validation_read':False,'credential_material_read':False,
   'build_network':'none','base_pull_performed':False,'replica_ready':False,'license_eligibility_verified':False,'training_overlap_verified':False}
  started=time.monotonic()
