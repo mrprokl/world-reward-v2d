@@ -1925,3 +1925,18 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   actualimagePython3.11.10/Torch2.5.1+cu124. ORTabsent verifiedCPUimportgate,
   so futureDWPose requires pinned isolated runtime acquisition, not an assumed
   installedGPUprovider. No model checkpoint/keypoint inference acquired yet.
+
+- D92 separately predeclared **numerical**, not bit-deterministic, CUDA
+  backward capability: immutableD91FAIL/source/receipt retained. Two fresh
+  Python processes, same fixture/seed/K/shader/target, each exactly5rasters/
+  1backward/1fixed0.5mmtranslation. Temporarily permit the known atomic-add
+  kernel only inside each backward, synchronize then restore deterministic
+  enabled/warn-only states in finally; all forward settings remain strict.
+  Inputs/source/target/lossbefore identical, each finite nonzeroXYZ gradient
+  individually produces strict same-loss decrease and preserves metricextent.
+  Per-component symmetricgradient agreement rtol1e−5/atol1e−7; lossafter
+  agreement rtol1e−5/atol1e−7. No averaging, branch selection, retries or later
+  tolerance relaxation. Two independentworkerreceipts + newparent manifest,
+  all in exclusiveAzure namespace, total180s (not180perworker). PASS means
+  numericalreproducibility on this H100 fixture only, never exactgradient,
+  geometricidentifiability/HOIquality/adoption. No video/models/GT acquisition.
