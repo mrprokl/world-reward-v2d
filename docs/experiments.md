@@ -1940,3 +1940,17 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   all in exclusiveAzure namespace, total180s (not180perworker). PASS means
   numericalreproducibility on this H100 fixture only, never exactgradient,
   geometricidentifiability/HOIquality/adoption. No video/models/GT acquisition.
+
+  D92actualPASS6.177863s/sourcecf27c8343b047c34cb19a9faeda4637a8ea0f751,
+  parentreceipta1de8261ed2e2898c141b985f3b52656c7411036af0e15141fe5e51a19429dec.
+  Freshworkers2.285162s/2.163099s, receipts
+  3414a1d8e28e09a90d46bb2c041dea441fb6966d748e947027c3bb4a6c4364be /
+  bb93d418f9dacc275893bc5659f96879691724917b0409b5b98c085e73f51408.
+  Both strictforwardlossbefore .0011723724892362952, afteronefixed0.5mmstep
+  .0010569767327979207 (samebits), gradientsXYZ approximately
+  [-.154606506,.177536920,.006768564], maxabsolutereplaydifference
+  9.313226e−10 <predeclaredbound. Both5rasters/1backward/1step; originalflags
+  andbackwardhookrestored, metricextentretained. NumericalcapabilityPASS;
+  bitdeterminismFALSE, originalD91FAILpreserved. No reconstruction/GT/quality
+  adoption. Fullsource suite5173PASS/1optionaltrimeshSKIP73.46s,53newfocused
+  PASS, source-onlybundle8files23,776B, terminal0/noGPUjob active.
