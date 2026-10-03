@@ -2945,3 +2945,11 @@ Private diagnostic strengthens recorded nativeDW feed/output trace: exact
 24listF64[3,384,288] supplied, delegated unchanged, two nativeSimCCF32
 [1,133,576]/[1,133,768] byte identities matchrecords. No inference/score
 policy changed or private labels accessed.36tiny quality tests PASS.
+Actual H99 automatic masks PASS22.212740s, sourcebebe9f5ab99d84346520acc559c8799b12d3c0fd,
+observer9c69c9d8f7951ef03db2cad73d45766c95b605de70fdcaa907b13bf67142d667,
+receipt1c901b3f681b064583d1646328a59a19a3f58d101924be2c312ba29f51422f6a
+(31,507B/0444). All48DINO/48SAM/24encoders and24outputs complete,
+private_truth_readFalse, terminalunit/H10033MiB0%. Actualmaskpins committed
+onlyafterreceiptPASS; unchangedobserver/sourcehelpers/camera/cohort.
+143 focused quality/observer/bundler testsPASS1.64s. NextBody/DW independent
+serialstages, no private scene mounted and nofitselection.
