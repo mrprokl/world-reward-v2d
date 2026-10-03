@@ -4539,3 +4539,54 @@ camera CD gain; no scene >5% regression; >=95% object coverage with no
 candidate validity loss. It is sparse-frame, object-only non-challenge evidence,
 NOT tracking/acceleration/humanPVE/fullCARI4D superiority or eligibility proof.
 No deployment if gate fails; no new sweep on these held-out frames.
+
+Root integration before native anchored-depth launch: 151public-reader/new
+wrapper/CPU-evaluation-wrapper tests PASS33.30s; 266newinference/original
+MoGe/DA3/completearchive tests PASS2.13s. The small CPU wrapper fixture first
+used an overbroad substring `rm -` and wrongly matched Docker `--rm`; corrected
+only that test to anchored shell cleanup-command detection, no runtime change.
+Actual16:40:12UTC VM02 GPUidle and existing runtime/source/asset namespaces
+verified: exact7eb image, Torch2.5.1cu124/NumPy1.26.3/SciPy1.16.3,
+MoGe Git925b8ed metadata. Prediction namespace absent. One transient local DNS
+failure occurred before Azure invocation succeeded; no inference dispatched
+or retried, no credentials/network rules changed, no model/media transfer.
+
+16:42:24UTC episode2 continuation is **FAILED/exit124**, not a timing PASS.
+Object tracking receipt reports all866/PASS5519.914076s. CPU input receipt
+exists/all866/PASS7376.218425s, exceeding the fixed7200s wrapper budget;
+the Docker client timeout did not prove the container workload was terminated.
+Actual GPU is now idle, original preparation source remainsc529b240.
+Preserve timeout and both outputs; do not rerun, enlarge the budget, claim a
+successful continuation, or silently reuse the self-reportedPASS. Outputs
+require a separate original-input inventory/certificate before any native
+consumer. No data/prediction is removed; no speed/quality/eligibility claim.
+
+Separate read-only episode2 original-input inventory **PASS**, existing frozen
+inventory code00074fe8d7585219bdeb952cd305c466631c6932 and unchangedc529b240
+independently bound to actual originalproducera45a7db1. All15 artifact hashes
+before/after all strictJSON dependency checks, no video/array/model decode.
+Commit configs/cari_clip_000002_input_pins.json actual3357B/
+4f99b75ddfdcac6dba599b3805154c5f3b4a18375b1faa26de33a8a8866572dd.
+This certifies original-input provenance/completeness, NOT timing or native
+accuracy. Preserve exit124 and original7376.218425s; no preparation rerun.
+
+Root full suite **9240PASS/2sameoptionalSKIP/1FAIL251.28s** before evaluator
+integration: the OTHER historical translation transport test still used128000B
+and its complete unchanged closure plus new tiny config now encoded128284B.
+Correct only this remaining stale test to actual authoritative
+azure_job.MAX_CODE_CONTROL_BYTES (160000); no runtime/payload/model/gate/source
+relaxed, no provenance removed. Authoritative strict boundary tests unchanged.
+
+Frozen new anchored-depth entrypoints: 411native-input/translation-focused
+tests PASS13.18s; 275public-inference/wrapper/archive tests PASS36.20s;
+70private-evaluator/CPU-wrapper tests PASS15.44s, including micro12frame
+all-instance scoring, camera fidelity and reject-before-private firewall.
+Combined independent6files255PASS43.19s. Runtime preserves original MoGe and
+DA3 helper bytes; no old nine-frame FRAME_IDS monkeypatch. Original host644
+dispatch markers are read-only bind mounts; hash/stat before/after instead
+of incorrectly requiring their host mode to be444. No marker mutation.
+New36? Source closure inventory is **33files52876encodedB inference** and
+**35files65272encodedB evaluator**, within authoritative160000B code-only
+limit; evaluator cannot execute until actual independent prediction pins exist.
+Native668prepare closure34files55324encodedB; original600s/16frame chunk
+protocol unchanged. No actual anchored-depth inference or native668 yet.

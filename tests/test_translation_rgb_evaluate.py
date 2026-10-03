@@ -382,4 +382,4 @@ def test_complete_static_code_closure_within_explicit_control_budget(quality):
         for path in paths:
             info=tarfile.TarInfo(path);info.size=len(files[path]);archive.addfile(info,io.BytesIO(files[path]))
     encoded,_=azure_job.encoded_runtime_archive(stream.getvalue())
-    assert len(encoded)<=128000
+    assert len(encoded)<=azure_job.MAX_CODE_CONTROL_BYTES
