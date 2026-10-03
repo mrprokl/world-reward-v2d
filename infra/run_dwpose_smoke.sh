@@ -8,8 +8,9 @@ test -f "$CODE/infra/dwpose_acquire.py"
 test -f "$CODE/infra/dwpose_wheel_audit.py"
 BASE="$ROOT/validation/identity_rgb_v2"; ASSETS="$ROOT/weights/dwpose_native_v1"
 AUDIT="$ROOT/results/dwpose-wheel-audit-v3"; FAILED="$ROOT/results/dwpose-acquisition-v1.json"
-PREVIOUS="$ROOT/results/dwpose-wheel-audit-v2/report.json"; OUT="$ROOT/validation/dwpose_smoke_v1"
-python3 - "$ROOT" "$ASSETS" "$AUDIT" "$OUT" "$FAILED" "$PREVIOUS" "$BASE/inputs/manifest.json" "$BASE/automatic_masks/report.json" \
+PREVIOUS="$ROOT/results/dwpose-wheel-audit-v2/report.json"; SMOKE_V1="$ROOT/validation/dwpose_smoke_v1/report.json"
+OUT="$ROOT/validation/dwpose_smoke_v2"
+python3 - "$ROOT" "$ASSETS" "$AUDIT" "$OUT" "$FAILED" "$PREVIOUS" "$SMOKE_V1" "$BASE/inputs/manifest.json" "$BASE/automatic_masks/report.json" \
  "$BASE/inputs/clip_00_frame_000.png" "$BASE/inputs/clip_01_frame_000.png" \
  "$BASE/automatic_masks/clip_00_frame_000_human.png" "$BASE/automatic_masks/clip_01_frame_000_human.png" <<'PY'
 from pathlib import Path
@@ -34,6 +35,7 @@ timeout --signal=TERM --kill-after=10s 183s docker run --rm --network none --mem
  --mount "type=bind,src=$AUDIT,dst=$AUDIT,readonly" \
  --mount "type=bind,src=$FAILED,dst=$FAILED,readonly" \
  --mount "type=bind,src=$PREVIOUS,dst=$PREVIOUS,readonly" \
+ --mount "type=bind,src=$SMOKE_V1,dst=$SMOKE_V1,readonly" \
  --mount "type=bind,src=$BASE/inputs/manifest.json,dst=$BASE/inputs/manifest.json,readonly" \
  --mount "type=bind,src=$BASE/automatic_masks/report.json,dst=$BASE/automatic_masks/report.json,readonly" \
  --mount "type=bind,src=$BASE/inputs/clip_00_frame_000.png,dst=$BASE/inputs/clip_00_frame_000.png,readonly" \

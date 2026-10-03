@@ -18,17 +18,17 @@ gate = importlib.util.module_from_spec(spec); spec.loader.exec_module(gate)
 
 
 def metadata_session(*, provider=None, input_shape=None, outputs=None):
-    inputs = [SimpleNamespace(name="image", shape=input_shape or [1, 3, 384, 288], type="tensor(float)")]
-    out = outputs or [SimpleNamespace(name="simcc_x", shape=[1, 133, 576], type="tensor(float)"),
-                      SimpleNamespace(name="simcc_y", shape=[1, 133, 768], type="tensor(float)")]
-    return SimpleNamespace(get_inputs=lambda: inputs, get_outputs=lambda: out, get_providers=lambda: provider or ["CPUExecutionProvider"])
+    inputs = [SimpleNamespace(name="input", shape=input_shape or ["batch", 3, 384, 288], type="tensor(float)")]
+    out = outputs or [SimpleNamespace(name="simcc_x", shape=["batch", "MatMulsimcc_x_dim_1", "MatMulsimcc_x_dim_2"], type="tensor(float)"),
+                      SimpleNamespace(name="simcc_y", shape=["batch", "MatMulsimcc_y_dim_1", "MatMulsimcc_y_dim_2"], type="tensor(float)")]
+    return SimpleNamespace(get_inputs=lambda: inputs, get_outputs=lambda: out, get_providers=lambda: provider or ["CPUExecutionProvider"], get_modelmeta=lambda: SimpleNamespace(custom_metadata_map={}))
 
 
-def test_graph_metadata_actual_names_cpu_only_symbolic_batch():
-    for batch in (1, "batch", None):
-        session = metadata_session(input_shape=[batch, 3, 384, 288])
-        result = gate.validate_session(session)
-        assert result["input"]["name"] == "image" and result["outputs"][0]["shape"][-1] == 576
+def test_graph_metadata_exact_publisher_symbolic_signature():
+    result = gate.validate_session(metadata_session())
+    assert result["inputs"][0]["name"] == "input"
+    assert result["outputs"][0]["shape"] == ["batch", "MatMulsimcc_x_dim_1", "MatMulsimcc_x_dim_2"]
+    assert result["custom_metadata"] == {}
 
 
 @pytest.mark.parametrize("kwargs", [{"provider": ["CUDAExecutionProvider", "CPUExecutionProvider"]},
@@ -42,6 +42,21 @@ def test_graph_metadata_failclosed(kwargs):
 def test_no_134_or_extra_output_names_or_nonfloat_graph():
     session = metadata_session(); session.get_inputs()[0].type = "tensor(double)"
     with pytest.raises(ValueError): gate.validate_session(session)
+
+
+@pytest.mark.parametrize("kind", ["batch_fixed", "batch_none", "arbitrary_symbol", "dim_token", "name", "fixed133", "custom"])
+def test_pinned_symbolic_export_not_generic_wildcard(kind):
+    session = metadata_session()
+    if kind == "batch_fixed": session.get_inputs()[0].shape[0] = 1
+    elif kind == "batch_none": session.get_inputs()[0].shape[0] = None
+    elif kind == "arbitrary_symbol": session.get_inputs()[0].shape[0] = "other_batch"
+    elif kind == "dim_token": session.get_outputs()[0].shape[1] = "MatMul_other_dim_1"
+    elif kind == "name": session.get_inputs()[0].name = "image"
+    elif kind == "fixed133":
+        session.get_outputs()[0].shape = ["batch", 133, 576]
+        session.get_outputs()[1].shape = ["batch", 133, 768]
+    elif kind == "custom": session.get_modelmeta = lambda: SimpleNamespace(custom_metadata_map={"unknown": "not pinned"})
+    with pytest.raises(ValueError, match="exact pinned symbolic"): gate.validate_session(session)
     session = metadata_session(); session.get_outputs()[1].name = "simcc_x"
     with pytest.raises(ValueError): gate.validate_session(session)
 
@@ -81,9 +96,9 @@ def test_proxy_delegates_same_native_float64_list_objects_no_cast():
     outputs = [np.ones((1, 133, 576), np.float32), np.ones((1, 133, 768), np.float32)]
     session.run = lambda names, feed: (seen.append((names, feed)), outputs)[1]
     value = [np.arange(3 * 384 * 288, dtype=np.float64).reshape(3, 384, 288)]
-    feed = {"image": value}; proxy = gate.SessionProxy(session, records, lambda: persisted.append(True))
+    feed = {"input": value}; proxy = gate.SessionProxy(session, records, lambda: persisted.append(True))
     assert proxy.run(["simcc_x", "simcc_y"], feed) is outputs
-    assert seen[0][1] is feed and seen[0][1]["image"] is value and seen[0][1]["image"][0] is value[0]
+    assert seen[0][1] is feed and seen[0][1]["input"] is value and seen[0][1]["input"][0] is value[0]
     assert records[0]["supplied_array"]["dtype"] == "float64"
     assert records[0]["delegated_unmodified"] is True and records[0]["effective_runtime_conversion_observed"] is False
     assert records[0]["run_completed"] is True and len(persisted) == 2
@@ -93,13 +108,13 @@ def test_proxy_delegates_same_native_float64_list_objects_no_cast():
 def test_proxy_bad_feed_does_not_soft_retry(kind):
     session = metadata_session(); calls = []
     session.run = lambda *_: calls.append(1) or [np.zeros((1, 133, 576), np.float32), np.zeros((1, 133, 768), np.float32)]
-    names = ["simcc_x", "simcc_y"]; feed = {"image": [np.zeros((3, 384, 288), np.float64)]}
-    if kind == "f32": feed["image"][0] = feed["image"][0].astype(np.float32)
-    elif kind == "ndarray": feed["image"] = np.array(feed["image"])
-    elif kind == "shape": feed["image"][0] = np.zeros((3, 288, 384), np.float64)
-    elif kind == "nan": feed["image"][0][0, 0, 0] = np.nan
+    names = ["simcc_x", "simcc_y"]; feed = {"input": [np.zeros((3, 384, 288), np.float64)]}
+    if kind == "f32": feed["input"][0] = feed["input"][0].astype(np.float32)
+    elif kind == "ndarray": feed["input"] = np.array(feed["input"])
+    elif kind == "shape": feed["input"][0] = np.zeros((3, 288, 384), np.float64)
+    elif kind == "nan": feed["input"][0][0, 0, 0] = np.nan
     elif kind == "names": names.reverse()
-    elif kind == "extra": feed["extra"] = feed["image"]
+    elif kind == "extra": feed["extra"] = feed["input"]
     elif kind == "outputs": session.run = lambda *_: [np.zeros((1, 134, 576), np.float32), np.zeros((1, 134, 768), np.float32)]
     with pytest.raises(ValueError): gate.SessionProxy(session, [], lambda: None).run(names, feed)
     if kind != "outputs": assert calls == []
@@ -110,7 +125,7 @@ def test_native_feed_backend_failure_preserves_attempt_no_cast_or_retry():
     def run(*_): count.append(1); raise RuntimeError("native backend cannot consume float64 list")
     session.run = run; records = []
     with pytest.raises(RuntimeError, match="cannot consume"):
-        gate.SessionProxy(session, records, lambda: None).run(["simcc_x", "simcc_y"], {"image": [np.zeros((3, 384, 288), np.float64)]})
+        gate.SessionProxy(session, records, lambda: None).run(["simcc_x", "simcc_y"], {"input": [np.zeros((3, 384, 288), np.float64)]})
     assert count == [1] and len(records) == 1 and records[0]["run_completed"] is False
     assert records[0]["supplied_array"]["dtype"] == "float64"
 
@@ -119,13 +134,13 @@ def test_native_pipeline_fixture_preserves_float64_normalization_and_decode():
     """Fixture executes native-style preprocessing/delegation, not actual ORT."""
     session = metadata_session(); records = []
     def backend(names, feed):
-        assert isinstance(feed["image"], list) and feed["image"][0].dtype == np.float64
+        assert isinstance(feed["input"], list) and feed["input"][0].dtype == np.float64
         x = np.zeros((1, 133, 576), np.float32); y = np.zeros((1, 133, 768), np.float32)
         x[..., 20] = 2.; y[..., 30] = 3.
         return [x, y]
     session.run = backend
     normalized = (np.full((384, 288, 3), 128, np.uint8) - np.array([123.675, 116.28, 103.53])) / np.array([58.395, 57.12, 57.375])
-    outputs = gate.SessionProxy(session, records, lambda: None).run(["simcc_x", "simcc_y"], {"image": [normalized.transpose(2, 0, 1)]})
+    outputs = gate.SessionProxy(session, records, lambda: None).run(["simcc_x", "simcc_y"], {"input": [normalized.transpose(2, 0, 1)]})
     points = np.stack([outputs[0].argmax(-1), outputs[1].argmax(-1)], -1).astype(np.float32) / 2.
     scores = np.minimum(outputs[0].max(-1), outputs[1].max(-1))
     assert gate.validate_prediction(points, scores).all()
@@ -311,6 +326,37 @@ def test_source_pins_and_no_old_source_edits():
     assert data["dwpose_wheel_audit.py"]["sha256"] == gate.AUDIT_SOURCE_SHA
 
 
+def previous_smoke_fixture(tmp_path, monkeypatch):
+    path = tmp_path / gate.PREVIOUS_SMOKE; path.parent.mkdir(parents=True)
+    data = {"stage": "native_dwpose_rgb133_cpu_abi_and_replay", "status": "fail", "phase": "native_source_load",
+        "producer_revision": gate.PREVIOUS_SMOKE_REVISION, "script_sha256": gate.PREVIOUS_SMOKE_SOURCE_SHA, "image_id": gate.audit.IMAGE,
+        "error_type": "ValueError", "error": "Require native two SimCC133 graph outputs", "sessions": [],
+        "private_prefix_packages_installed": True, "private_prefix_removed": True, "device": "cpu", "network": "none",
+        "native_cpu_abi_verified": False, "two_session_byte_replay_verified": False, "gpu_used": False,
+        "own_feed_cast": False, "native_source_modified": False, "private_truth_read": False, "ground_truth_used": False,
+        "challenge_inputs_used": False, "oracle_modes": [], "adoption_authorized": False}
+    def write():
+        path.write_text(json.dumps(data)); monkeypatch.setattr(gate, "PREVIOUS_SMOKE_SHA", gate.acquisition.digest(path))
+    write(); return path, data, write
+
+
+def test_prior_metadata_failure_exact_sha_readonly_no_prediction_relabel(tmp_path, monkeypatch):
+    path, _, _ = previous_smoke_fixture(tmp_path, monkeypatch); before = path.read_bytes()
+    receipt = gate.validate_previous_smoke(tmp_path)
+    assert receipt["sha256"] == gate.PREVIOUS_SMOKE_SHA and before == path.read_bytes()
+    path.write_text("{}");
+    with pytest.raises(ValueError, match="SHA"): gate.validate_previous_smoke(tmp_path)
+
+
+@pytest.mark.parametrize("key,value", [("status", "pass"), ("phase", "native_rgb_inference"), ("producer_revision", "0" * 40),
+    ("script_sha256", "0" * 64), ("error", "different error"), ("sessions", [{"calls": []}]), ("private_prefix_removed", False),
+    ("native_cpu_abi_verified", True), ("gpu_used", True), ("own_feed_cast", True), ("oracle_modes", ["camera"]), ("adoption_authorized", True)])
+def test_prior_failed_receipt_guard_cannot_be_waived(tmp_path, monkeypatch, key, value):
+    _, data, write = previous_smoke_fixture(tmp_path, monkeypatch)
+    data[key] = value; write()
+    with pytest.raises(ValueError, match="Preserved v1"): gate.validate_previous_smoke(tmp_path)
+
+
 @pytest.mark.parametrize("failure", [False, True])
 def test_private_prefix_removed_and_reported_even_on_failure(failure):
     report = {}; snapshots = []
@@ -349,8 +395,8 @@ def test_all_four_output_artifacts_rehashed_before_pass(tmp_path, kind):
     with pytest.raises(ValueError): gate.validate_artifacts(tmp_path, sessions)
 
 
-@pytest.mark.parametrize("fail_native", [False, True])
-def test_full_session_orchestration_native_style_list_pipeline_and_cleanup(tmp_path, monkeypatch, fail_native):
+@pytest.mark.parametrize("failure", ["none", "native", "metadata"])
+def test_full_session_orchestration_native_style_list_pipeline_and_cleanup(tmp_path, monkeypatch, failure):
     """Own Python fixture + fake ORT exercises real driver; no actual model claim."""
     from PIL import Image
     monkeypatch.setattr(gate, "WIDTH", 8); monkeypatch.setattr(gate, "HEIGHT", 8)
@@ -376,21 +422,24 @@ def inference_pose(session, out_bbox, oriImg):
     class Session:
         def __init__(self, path, sess_options, providers):
             self.metadata = metadata_session(); self.options = sess_options
+            if failure == "metadata": self.metadata.get_outputs()[0].shape[1] = "unknown_dim"
             assert providers == ["CPUExecutionProvider"] and Path(path).name == gate.acquisition.ASSETS[0][0]
             constructed.append(self)
         def get_inputs(self): return self.metadata.get_inputs()
         def get_outputs(self): return self.metadata.get_outputs()
         def get_providers(self): return self.metadata.get_providers()
+        def get_modelmeta(self): return self.metadata.get_modelmeta()
         def get_session_options(self): return self.options
         def disable_fallback(self): self.fallback_disabled = True
         def run(self, names, feed):
-            assert self.fallback_disabled and type(feed["image"]) is list and feed["image"][0].dtype == np.float64
-            supplied.append(feed["image"][0].copy())
-            if fail_native: raise RuntimeError("own fixture native feed failure")
+            assert self.fallback_disabled and type(feed["input"]) is list and feed["input"][0].dtype == np.float64
+            supplied.append(feed["input"][0].copy())
+            if failure == "native": raise RuntimeError("own fixture native feed failure")
             x = np.zeros((1, 133, 576), np.float32); y = np.zeros((1, 133, 768), np.float32)
             x[..., 100] = 4.; y[..., 200] = 2.
             return [x, y]
     ort = SimpleNamespace(SessionOptions=lambda: SimpleNamespace(), ExecutionMode=SimpleNamespace(ORT_SEQUENTIAL="sequential"), InferenceSession=Session)
+    monkeypatch.setattr(gate, "validate_previous_smoke", lambda root: {"ownpreviousfixture": "stable"})
     monkeypatch.setattr(gate, "source_identity", lambda: {"ownfixture": "stable"})
     monkeypatch.setattr(gate, "validate_assets", lambda root: {"ownfixture": "stable"})
     monkeypatch.setattr(gate, "validate_public", lambda root: {"selected": selected})
@@ -400,11 +449,19 @@ def inference_pose(session, out_bbox, oriImg):
     monkeypatch.setattr(gate.subprocess, "run", lambda argv, **kwargs: pipcalls.append(argv))
     out = tmp_path / "own-output"; out.mkdir(); (out / "report.json").write_text("own mutable receipt fixture")
     report = {"sessions": []}; snapshots = []
-    if fail_native:
+    if failure == "native":
         with pytest.raises(RuntimeError, match="own fixture native feed failure"):
             gate.perform(tmp_path, out, report, lambda: snapshots.append(copy.deepcopy(report)), time.perf_counter())
         assert len(constructed) == len(supplied) == 1 and len(report["sessions"][0]["calls"]) == 1
         assert report["sessions"][0]["calls"][0]["run_completed"] is False and "native_cpu_abi_verified" not in report
+    elif failure == "metadata":
+        with pytest.raises(ValueError, match="exact pinned symbolic"):
+            gate.perform(tmp_path, out, report, lambda: snapshots.append(copy.deepcopy(report)), time.perf_counter())
+        assert len(constructed) == 1 and supplied == []
+        assert len(report["sessions"]) == 1 and report["sessions"][0]["calls"] == []
+        assert report["phase"] == "graph_metadata_validation"
+        assert report["sessions"][0]["graph"]["outputs"][0]["shape"][1] == "unknown_dim"
+        assert any(s["sessions"] and s["sessions"][0]["graph"]["outputs"][0]["shape"][1] == "unknown_dim" for s in snapshots)
     else:
         gate.perform(tmp_path, out, report, lambda: snapshots.append(copy.deepcopy(report)), time.perf_counter())
         assert len(constructed) == 2 and constructed[0] is not constructed[1] and len(supplied) == 4
@@ -425,3 +482,5 @@ def test_wrapper_syntax_exact_cpu_firewall_and_unknown_args():
     assert "src=$BASE/inputs,dst=" not in text and "src=$BASE,dst=" not in text
     assert "--kill-after=10s 183s" in text and "PYTHONDONTWRITEBYTECODE=1" in text
     assert gate.audit.IMAGE in text
+    assert gate.OUT in text and gate.PREVIOUS_SMOKE in text
+    assert '--mount "type=bind,src=$SMOKE_V1,dst=$SMOKE_V1,readonly"' in text

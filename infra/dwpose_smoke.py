@@ -24,7 +24,12 @@ import numpy as np
 import dwpose_acquire as acquisition
 import dwpose_wheel_audit as audit
 
-OUT = "validation/dwpose_smoke_v1"
+OUT = "validation/dwpose_smoke_v2"
+STAGE = "native_dwpose_rgb133_cpu_abi_and_replay_v2"
+PREVIOUS_SMOKE = "validation/dwpose_smoke_v1/report.json"
+PREVIOUS_SMOKE_SHA = "f95a4dbdb03bd02e9bd65a216bec233de2cb469bf78e71dd4162568bae41ca41"
+PREVIOUS_SMOKE_REVISION = "ee91a530398f2f8bc0aced813f94717c114f5ee7"
+PREVIOUS_SMOKE_SOURCE_SHA = "277ec36e23a19ba13e9637f6a0e03f56c0c23d3997336bf00d31125ee19b5447"
 PUBLIC = "validation/identity_rgb_v2"
 WIDTH, HEIGHT, BUDGET = 1024, 768, 180
 AUDIT_SHA = "e7fa6fce0397654ec5d1d2c07c49bd6f2a50655cda185d4297bfb8f0f4aae3e2"
@@ -55,6 +60,21 @@ def source_identity():
     if rows["dwpose_acquire.py"]["sha256"] != audit.SOURCE_SHA or rows["dwpose_wheel_audit.py"]["sha256"] != AUDIT_SOURCE_SHA:
         raise ValueError("Frozen read-only acquisition/audit source differs")
     return rows
+
+
+def validate_previous_smoke(root):
+    path = root / PREVIOUS_SMOKE; receipt = identity(path, sha=PREVIOUS_SMOKE_SHA)
+    data = json.loads(path.read_text())
+    expected = {"stage": "native_dwpose_rgb133_cpu_abi_and_replay", "status": "fail", "phase": "native_source_load",
+                "producer_revision": PREVIOUS_SMOKE_REVISION, "script_sha256": PREVIOUS_SMOKE_SOURCE_SHA, "image_id": audit.IMAGE,
+                "error_type": "ValueError", "error": "Require native two SimCC133 graph outputs", "sessions": [],
+                "private_prefix_packages_installed": True, "private_prefix_removed": True, "device": "cpu", "network": "none",
+                "native_cpu_abi_verified": False, "two_session_byte_replay_verified": False, "gpu_used": False,
+                "own_feed_cast": False, "native_source_modified": False, "private_truth_read": False, "ground_truth_used": False,
+                "challenge_inputs_used": False, "oracle_modes": [], "adoption_authorized": False}
+    if any(data.get(k) != v or type(data.get(k)) is not type(v) for k, v in expected.items()):
+        raise ValueError("Preserved v1 metadata-only failure provenance differs")
+    return receipt
 
 
 def validate_assets(root):
@@ -200,19 +220,21 @@ def array_identity(value):
     return {"dtype": str(value.dtype), "shape": list(value.shape), "sha256": hashlib.sha256(value.tobytes(order="C")).hexdigest()}
 
 
-def validate_session(session):
-    inputs, outputs = session.get_inputs(), session.get_outputs()
-    def batch(value): return value == 1 and type(value) is int or value is None or isinstance(value, str)
-    if (session.get_providers() != ["CPUExecutionProvider"] or len(inputs) != 1 or len(outputs) != 2
-            or inputs[0].type != "tensor(float)" or len(inputs[0].shape) != 4 or not batch(inputs[0].shape[0])
-            or inputs[0].shape[1:] != [3, 384, 288]):
-        raise ValueError("Require native float graph384x288 and CPU-only session")
-    for item, tail in zip(outputs, ([133, 576], [133, 768])):
-        if item.type != "tensor(float)" or len(item.shape) != 3 or not batch(item.shape[0]) or item.shape[1:] != tail:
-            raise ValueError("Require native two SimCC133 graph outputs")
-    if len({x.name for x in [*inputs, *outputs]}) != 3: raise ValueError("Unique actual graph input/output names required")
-    return {"input": {"name": inputs[0].name, "shape": inputs[0].shape, "type": inputs[0].type},
-            "outputs": [{"name": x.name, "shape": x.shape, "type": x.type} for x in outputs], "providers": session.get_providers()}
+def session_metadata(session):
+    def rows(values): return [{"name": x.name, "shape": x.shape, "type": x.type} for x in values]
+    return {"inputs": rows(session.get_inputs()), "outputs": rows(session.get_outputs()),
+            "providers": session.get_providers(), "custom_metadata": session.get_modelmeta().custom_metadata_map}
+
+
+def validate_session(session, *, graph=None):
+    graph = session_metadata(session) if graph is None else graph
+    expected = {"inputs": [{"name": "input", "type": "tensor(float)", "shape": ["batch", 3, 384, 288]}],
+                "outputs": [{"name": f"simcc_{axis}", "type": "tensor(float)",
+                             "shape": ["batch", f"MatMulsimcc_{axis}_dim_1", f"MatMulsimcc_{axis}_dim_2"]} for axis in ("x", "y")],
+                "providers": ["CPUExecutionProvider"], "custom_metadata": {}}
+    if graph != expected:
+        raise ValueError("Require exact pinned symbolic DWPose exported graph signature")
+    return graph  # Actual numeric SimCC shapes remain independently checked in SessionProxy.run.
 
 
 def validate_options(session, ort):
@@ -275,8 +297,9 @@ def validate_artifacts(out, sessions):
 
 
 def perform(root, out, report, persist, started):
-    sources = source_identity(); assets = validate_assets(root); public = validate_public(root)
-    report.update(sources=sources, assets=assets, public_inputs=public, phase="private_prefix_install", dependencies=dependency_identity()); persist()
+    previous = validate_previous_smoke(root); sources = source_identity(); assets = validate_assets(root); public = validate_public(root)
+    report.update(previous_failed_smoke_receipt=previous, sources=sources, assets=assets, public_inputs=public,
+                  phase="private_prefix_install", dependencies=dependency_identity()); persist()
     if any(name in sys.modules or util.find_spec(name) is not None for name in ("onnxruntime", "flatbuffers")):
         raise ValueError("Runtime packages must not preexist private-prefix installation")
     from PIL import Image
@@ -300,10 +323,12 @@ def perform(root, out, report, persist, started):
             options = ort.SessionOptions(); options.intra_op_num_threads = 4; options.inter_op_num_threads = 1
             options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
             session = ort.InferenceSession(str(root / acquisition.BASE / acquisition.ASSETS[0][0]), sess_options=options, providers=["CPUExecutionProvider"])
-            session.disable_fallback(); graph = validate_session(session); validate_options(session, ort)
+            session.disable_fallback(); graph = session_metadata(session)
             row = {"index": session_index, "fresh_constructor": True, "graph": graph, "intra_threads": 4, "inter_threads": 1,
-                   "execution": "sequential", "calls": [], "predictions": []}
-            report["sessions"].append(row); report["phase"] = "native_rgb_inference"; persist()
+                   "execution": "sequential", "checkpoint_sha256": acquisition.ASSETS[0][2], "calls": [], "predictions": []}
+            report["sessions"].append(row); report["phase"] = "graph_metadata_validation"; persist()
+            validate_session(session, graph=graph); validate_options(session, ort)
+            report["phase"] = "native_rgb_inference"; persist()
             proxy = SessionProxy(session, row["calls"], persist)
             for selected, (image, bbox) in zip(public["selected"], images):
                 points, scores = native.inference_pose(proxy, bbox.copy(), image)
@@ -320,7 +345,7 @@ def perform(root, out, report, persist, started):
             del proxy, session; gc.collect()
         validate_replay(report["sessions"])
         validate_artifacts(out, report["sessions"])
-        if assets != validate_assets(root) or public != validate_public(root) or sources != source_identity():
+        if previous != validate_previous_smoke(root) or assets != validate_assets(root) or public != validate_public(root) or sources != source_identity():
             raise ValueError("Frozen source/assets/notices/public inputs changed")
         report.update(final_inputs_source_assets_rehashed=True, native_cpu_abi_verified=True, two_session_byte_replay_verified=True)
     report.update(private_prefix_removed=not prefix.exists(), status="pass", phase="complete")
@@ -336,8 +361,9 @@ def main(argv=None):
             or not re.fullmatch(r"[0-9a-f]{40}", revision) or os.environ.get("WR_DWPOSE_SMOKE_RESERVED") != "1"
             or not out.is_dir() or any(out.iterdir()) or any(p.is_symlink() for p in (out, *out.parents))):
         raise ValueError("Require fresh reserved remote CPU/network-none pinned-image output")
-    report = {"stage": "native_dwpose_rgb133_cpu_abi_and_replay", "status": "fail", "phase": "public_assets_integrity",
+    report = {"stage": STAGE, "status": "fail", "phase": "public_assets_integrity",
               "producer_revision": revision, "script_sha256": acquisition.digest(Path(__file__)), "image_id": audit.IMAGE,
+              "previous_failed_smoke_sha256": PREVIOUS_SMOKE_SHA, "previous_failure_rewritten": False,
               "budget_seconds": BUDGET, "device": "cpu", "network": "none", "sessions": [], "selection_rule": "two_fixed_protocol_first_frames",
               "native_source_modified": False, "own_feed_cast": False, "channel_swap": False, "full_image_fallback": False,
               "raw_scores_clamped": False, "confidence_threshold_applied": False, "wrapper_neck134_used": False,
