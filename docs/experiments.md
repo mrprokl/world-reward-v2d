@@ -5227,3 +5227,19 @@ metadataJSON/24hash/ranks/Decimal20msmax17.203ms checked. Noacquisition/native
 prediction/eval yet. DifferentrecordingsNOTfullobject-disjointness/temporalHOI,
 K800prior~525sensormismatch andtrain-overlapunknownlimits recorded. Bounded
 independentprimaryliterature/card checks retainedonlyidentities/decisions.
+
+D107 implementationpreflight: acquisition46tinyPASS/noimagesensorvaluesdecode,
+complete24independentbytepins/source/filenameassociations/publicmanifestLAST;
+inputreader+blindinfer37newtests withoriginalcontracts156combinedPASS, numerical
+helper967140/d354/2ed48 unchanged. Pure sensorZAbsRel/RMSE helper21PASS checks
+rawuint16/5000/noextracorrection/identicalvalidity/1024&25sensor/95native/gain5/
+nosceneregression5. Rootfocused142PASS0.84s/bash-n beforecloudrun. No realTUM
+acquisition/prediction/qualityyet; freezebeforefirstAzureCPUdispatch.
+
+EP4independentalgorithmaudit: default16uniformwholeclipdetectionscomputed, only
+first3 usedforactor; closest2/3 passedcoverage.5 butfailedminimum3observations.
+DoNOTsubstitutefartherfullbystander. ExistingIoUlastboxonly mayfragmentwidely
+spacedobservations, notprovenEP4cause. Candidategeneralmethod usesALL16existing
+observations unchangedidentitythresholds, no adaptuntilpass/interpolatedbox,
+validatedfirstonnewnonchallengeproceduralmissing/crossing/distractor fixtures.
+Originalactor/safety suite240PASS0.81s; no newchallengealgorithm runyet.
