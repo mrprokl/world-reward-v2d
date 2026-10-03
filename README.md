@@ -21,11 +21,12 @@ No final Parquet, submission or verified CARI4D improvement yet.
   continuation exceeded the original time budget: provenance PASS is not a
   timing PASS. Its full native preparation, forward, refinement and export
   and original official packing now pass independently. The next 592-frame
-  episode completed automatic masks and all initializers, but its default
-  mesh-budget route failed before object tracking. A separately gated,
-  volume-preserving mesh proposal passed with all 8 components; its full
-  tracking continuation is now running from independently frozen pins. No frames,
-  components or trajectories were dropped to rescue it.
+  episode now passes full native preparation and forward; its unchanged
+  refinement is queued behind the existing GPU lock. The following 747-frame
+  episode rejected its default mesh simplification before tracking. Its
+  independently gated volume-preserving replacement keeps all 25 components;
+  full tracking is running from frozen pins. No frames, components or
+  trajectories were dropped to rescue either episode.
 - **Research:** a frozen DA3 depth hypothesis, anchored to MoGe by one
   scene-constant median ratio on the fixed 10% image border, gains **33.42%**
   median visible-object camera Chamfer on 12 external TUD-L frames. This is

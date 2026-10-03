@@ -567,3 +567,22 @@ structuralname withGTcalibration orrelabeltheoriginalvideo. The actualpublic
 exportformat needsfront_stereo_camera_left in clipinputspec AFTERreceipt.
 EP3CPUassemblystillactive550/592, noinputreportyet; EP4initializersactiveone
 939915GPUworker4420MiB. SchedulerdoesNOTstartEP3nativeGPUuntilEP4GPUisidle.
+
+
+2026-10-03 21:56:56UTC VM02 CPU preflight: workspace/data mounts UID1000
+mode755, /run/sshd UID0/755 and runtime UID0/700; no peer unit. Private
+sshd control will use new /run/world-reward-frontend-peer-v1, not a
+UID1000-owned ancestor (OpenSSH StrictModes); existing parents unchanged.
+VM01 initial client-key setup failed before key generation because its
+runtime parent does not exist. Fresh transfer/frontend-peer-client-v1
+actually created 21:52:48UTC: private600/public400, only public identity
+113B/2e2365faeb3b41f01ecd4657b6520617026874e2255c8dd698eab8181fee948b
+returned. No private bytes logged or copied.
+
+VM01 installed SAM2 source is VCS2b90b9f5ceec907a1c18123530e92e794ad901a4
+(actual distribution metadata, not guessed Git HEAD). Grounding environment
+uses transformers4.53.3/tokenizers0.21.4/safetensors0.6.2/hub0.36.2,
+numpy2.1.2 and OpenCV5.0.0.93; VM02 Body has transformers5.3.0/
+tokenizers0.22.2/safetensors0.8.0 and lacks SAM2/Objects. A new scoped
+Grounding child must pin dependencies and validate ABI; no current image
+parity or licensed submission eligibility inferred.

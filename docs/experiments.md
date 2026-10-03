@@ -5505,3 +5505,19 @@ own refinedoutput stillabsent. EP4 sole1886MiB worker/MainPID962210 continues
 full747 tracking; report/input namespace absent, no full tracking or native
 refinement PASS inferred. Unchanged solver releases cooperative lock before its
 CPUassembly; queued native job cannot duplicate/interrupt this GPU work.
+
+
+Private asset replica transport/extractor implemented with independent
+procedural audits: exact original archive SHA/size, fixed private peers,
+explicit supplied Ed25519 host identity, no TOFU/agent/SSH config inheritance,
+forced receiver with source/command/address checks, fresh private namespaces,
+no merge/promotion/extractall, full per-file/blob/link verification before
+completion. Disposable root-owned SSH server expires after2400s; pending
+NSG exception must be limited to10.0.0.4→10.0.0.9/TCP2222 and removed
+afterward. No actual transfer/extraction/replica-ready claim yet.
+Early wrapper tests caught outdated assertions after strengthening env-i
+and SSH-F/dev/null isolation; production source contract was not relaxed.
+
+Final peer/extractor/archive/runtime-closure focused296PASS; Bash-n and
+diffcheckPASS. Full prior c84558c suite10051PASS/2optionalSKIP remains
+separate; new wrappers not claimed fully deployed or numerically better.
