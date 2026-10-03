@@ -2153,6 +2153,21 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   rawmetadata savedbeforeguard; actualnumeric133contracts unchanged. AzureCPU
   dispatch started withv1failure mountedRO, no GPUjobs/heavyMac transfer.
 
+  D95v2actualPASS1.708719s/source9b0a4e19ac8a13b50417089e351913b2aacf0892,
+  receipt`d96eb5c8c4030bf2e16924093aef03a9636f12cc2f3d3a8b7475731fe49d9a79`,
+  scriptSHA`ea0beb43dd698261a5b2accdbd0432dcc8de82b56958b0e93cec8062089ce72c`.
+  ActualfourCPUcalls .061496/.060066/.060202/.059888s; nativefloat64CHWlist
+  accepted unchanged byORT1.30.0 with graphfloattensor contract, but internal
+  conversion mechanism NOTobserved/proven. ActualSimCCfloat32 dimensions133
+  anddecodedfloat64coordinates/rawfloat32scores/validity byte-identical across
+  twofreshsessions. Bothimages133positive scores, not semanticdetectionproof.
+  PerimageNPZSHA`f29821b51a120ccb1b8171cf8792c2aac885be155dd598332eb181fdccb7cb33`
+  and`e102d74ae5181cc825e5618afe950f87dbf256545f2436789a84e9e9097f8b29`,
+  identicalsessionreplay; all4artifacts/source/assets/notices/publicinputs/
+  priorv1FAILreceipt rehashed. Temporaryinstall removed, globalimageunchanged,
+  terminal0/MainPID0/GPU0%105MiBdriveronly. ABI/replayonly, no quality/3Dfit/
+  trainingrights/eligibility/adoption claim and no heavyMac transit.
+
 - D96 preregistered **fresh causal human-root refit in full human/object
   synthetic scenes**, not photorealistic/fullHOI-method/Track1 validation.
   New validation/keypoint_rgb_v1, schema world-reward-keypoint-rgb-v1, original

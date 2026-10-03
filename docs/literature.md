@@ -645,3 +645,16 @@ with face/handdetail deferred rather than pretending those uncertainlabels
 are exact. FreshCPUimage metadata confirmed pip24.2, cv2runtime4.11.0 with
 both opencv-python/opencv-contrib-python4.11.0.86; pinned-image provenance
 records this coexistence, not an assumed exclusiveopencvinstallation.
+
+ActualD95v2 AzureCPU runtime established on2026-10-03: exactpublisherONNX
+declares symbolicoutputdimensiontokens, notfixed133tails inmetadata; actual
+fourinferences nevertheless returnfloat32[1,133,576]/[1,133,768], decoded
+float64[1,133,2]/float32scores[1,133]. Nativefloat64-list feed accepted without
+owncast, byte-identicaltwo-session replay, .060s/call on4CPUthreads; internal
+ORTconversion/channelgraph/semanticaccuracy notproven. ImmutablePASSreceipt
+`d96eb5c8c4030bf2e16924093aef03a9636f12cc2f3d3a8b7475731fe49d9a79`.
+This removes runtime uncertainty for independent2D observations, not their
+trainingrights/challengeoverlap uncertainty or monocular3D ambiguity.
+Native root3 are EulerZYXcontrols (`roma.rotmat_to_euler("ZYX",...)` inhead),
+so futureoptimization should preserve nativeMHRforward and not assume an
+arbitrary rigidSE3increment converts back to those controls unchanged.
