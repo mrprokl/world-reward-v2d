@@ -3963,3 +3963,38 @@ Full Body668original frames actualPASS217.117887s, predictions
 db11c5eb14fdf43f400b01f64b1efc2367b5875c65876c4e68e821688b78b981;
 native geometry/input dataset5f683... verified. Fulldepth/adapter/objectpose/
 input-preparation still pending; no early numerical/fullchain or quality claim.
+
+Episode1 full depth actualPASS344.130609s for all668original frames, receipt
+487f2353dd7226a152125dfdeaca5ca2852fb9aa924af1e8a648845f61c17570(1,011,785B).
+Body-to-native adapter actualPASS8.617577s, receipt
+da9fc9ad12457915279888bc5de25bf0333f8c2b3dc9a13d0468663143425d14(2,540B).
+All seven initializer stages returned; full object pose now running, observed
+CUDA PID720064/1,886MiB. No second GPU job, completed input-preparation,
+new frozen input pins or all30 reconstruction claim.
+
+Private own-grasp capability implementation frozen for later execution, not run:
+77 tiny tests pass, including actual generic dispatcher namespace and host
+marker semantics. One fresh neutral native MHR state, full194V/384F own bottle,
+legal249 limits, fixed zero45/68/72 identity/scales/expression; only native named
+left thumb/index free controls and object rigid6DoF are manufactured. Full native
+neutral closure/embedding gate before anatomical patch selection or optimization;
+actual CUDA autograd checked against four legal five-point forwards. Bounded
+Gauss-Newton with uniform feasible updates, never control clipping; at most86
+objective states,93 planned batch1 native calls including diagnosis/replays,
+100-call/300s hard cap and reserved30s full-surface certificates. Both frozen
+output reread and native replay must reproduce original bytes. Actual native
+closure, reachability, differentiation and runtime remain unverified. Positive
+.5mm opposed surface gaps certify proximity only, not touching, force closure,
+full96 motion, RGB frontend capability, quality or adoption.
+
+Only readonly committed own-code/reference-MHR file and private output mounts;
+no public input, historical pose/results, render, vendor or private truth input.
+Canonical dispatch revision/archive markers and entire readonly source closure
+checked; original model/helpers/metadata/native-input bytes verified before/after.
+Failure leaves concise private0400 receipt only; own transient NPZ files removed.
+Numerical upstream/shared501 producers and conservative surface helper unchanged.
+
+Complete own-grasp/source regression suite **8164PASS/2same optionalSKIP124.83s**.
+No native/GPU execution or quality query during local tests. The corrected actual
+immutable source namespace is jobs/<revision>/run_own_grasp_capability/code;
+generic Azure dispatcher unchanged.
