@@ -82,6 +82,39 @@ def test_packaged_wheel_license_identity(tmp_path):
  bad=tmp_path/'missing.whl'
  with zipfile.ZipFile(bad,'w')as archive:archive.writestr('module.py',b'code')
  with pytest.raises(ValueError):build.wheel_notices(bad)
+ assert build.wheel_notices(bad,external_notice_verified=True)=={}
+
+@pytest.mark.parametrize('kind',['commit','version','license','url','permission','missing'])
+def test_external_notice_requires_exact_frozen_publisher_closure(pins,kind):
+ row=pins['wheels'][1];notice=row['publisher_notice']
+ if kind=='commit':notice['revision']='0'*40
+ elif kind=='version':notice['version_literal']='version = "0.0.0"'
+ elif kind=='license':notice['license']['sha256']='0'*64
+ elif kind=='url':notice['license']['url']='https://example.com/LICENSE'
+ elif kind=='permission':notice['packaged_notice_absence_permitted_with_external_pinned_publisher_notice']=False
+ elif kind=='missing':del row['publisher_notice']
+ with pytest.raises(ValueError):build.validate_pins(pins)
+
+def test_publisher_tag_version_and_license_evidence(pins,tmp_path,monkeypatch):
+ row=pins['wheels'][1];notice=row['publisher_notice'];captured=[]
+ responses={notice['release_ref_url']:json.dumps({'ref':'refs/tags/'+notice['release_tag'],'object':{'type':'commit','sha':notice['revision']}}).encode(),notice['license']['url']:b'procedural publisher LICENSE',notice['version_source']['url']:b'version = "0.21.4"'}
+ monkeypatch.setattr(build,'fetch',lambda url,maximum:responses[url])
+ monkeypatch.setattr(build,'verify_source',lambda raw,source:{'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'git_blob_sha1':source['git_blob_sha1']})
+ monkeypatch.setattr(build,'exclusive',lambda path,raw:captured.append((path,raw)))
+ evidence=build.publisher_notice(row,tmp_path)
+ assert evidence['release_tag_binding_verified']is True
+ assert evidence['wheel_bytes_equivalent_to_publisher_source_proven']is False
+ assert len(captured)==2 and all('publisher-notices/tokenizers'in str(path)for path,raw in captured)
+ responses[notice['release_ref_url']]=json.dumps({'ref':'refs/tags/'+notice['release_tag'],'object':{'type':'commit','sha':'0'*40}}).encode()
+ with pytest.raises(ValueError,match='changed'):build.publisher_notice(row,tmp_path)
+
+def test_original_failure_and_image_not_reused(pins):
+ source=(ROOT/'infra/frontend_grounding_build.py').read_text()
+ assert build.TARGET=='world-reward/frontend-grounding-v2:0.1'
+ assert "root/'results/frontend-grounding-build-v2'"in source
+ assert 'frontend-grounding-build-v1'not in source
+ recipe=build.dockerfile(pins,'a'*64,True).decode()
+ assert 'COPY publisher-notices /opt/world-reward-grounding/publisher-notices'in recipe
 
 def test_bounded_isolated_control_never_logs_process_output(monkeypatch):
  calls=[]

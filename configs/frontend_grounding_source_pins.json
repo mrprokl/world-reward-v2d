@@ -1,7 +1,7 @@
 {
-  "schema": "world_reward.frontend_grounding_source_pins.v1",
+  "schema": "world_reward.frontend_grounding_source_pins.v2",
   "base_image_id": "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3",
-  "target_image": "world-reward/frontend-grounding-v1:0.1",
+  "target_image": "world-reward/frontend-grounding-v2:0.1",
   "repositories": [
     {
       "repo": "facebookresearch/sam2",
@@ -306,8 +306,30 @@
       "pypi_url": "https://pypi.org/pypi/tokenizers/0.21.4/json",
       "primary_metadata_sha256": "247ee02744e3340fef9c0ecc6d396987a77b035361c07ad98bec4553b392575b",
       "license": "Apache-2.0",
-      "license_assurance": "primary_PyPI_classifier_and_Azure_wheel_notice_required",
-      "install_if_absent_only": false
+      "license_assurance": "primary_PyPI_classifier_and_independently_pinned_exact_release_publisher_LICENSE",
+      "install_if_absent_only": false,
+      "publisher_notice": {
+        "repo": "huggingface/tokenizers",
+        "release_tag": "v0.21.4",
+        "revision": "e892882fd4608b468dcf9dc33ea95283882b8e6d",
+        "release_ref_url": "https://api.github.com/repos/huggingface/tokenizers/git/ref/tags/v0.21.4",
+        "license": {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/huggingface/tokenizers/e892882fd4608b468dcf9dc33ea95283882b8e6d/LICENSE",
+          "bytes": 11357,
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "git_blob_sha1": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64"
+        },
+        "version_source": {
+          "path": "tokenizers/Cargo.toml",
+          "url": "https://raw.githubusercontent.com/huggingface/tokenizers/e892882fd4608b468dcf9dc33ea95283882b8e6d/tokenizers/Cargo.toml",
+          "bytes": 2429,
+          "sha256": "184ce7adb5bb723e2456da8d6003edba96bba8e73739fc0c06e64fccfe5e63aa",
+          "git_blob_sha1": "b6d6a2608ae12356aac2b49fdd714225c00b05d5"
+        },
+        "version_literal": "version = \"0.21.4\"",
+        "packaged_notice_absence_permitted_with_external_pinned_publisher_notice": true
+      }
     },
     {
       "name": "safetensors",
@@ -319,8 +341,30 @@
       "pypi_url": "https://pypi.org/pypi/safetensors/0.6.2/json",
       "primary_metadata_sha256": "b7fd4627f413e4cf8ba1e2bb06829bb0ca01376800fba543dff0be15cbca1141",
       "license": "Apache-2.0",
-      "license_assurance": "primary_PyPI_classifier_and_Azure_wheel_notice_required",
-      "install_if_absent_only": false
+      "license_assurance": "primary_PyPI_classifier_and_independently_pinned_exact_release_publisher_LICENSE",
+      "install_if_absent_only": false,
+      "publisher_notice": {
+        "repo": "huggingface/safetensors",
+        "release_tag": "v0.6.2",
+        "revision": "aa6c43d729868fc43918e862d42bfeaf60485d1d",
+        "release_ref_url": "https://api.github.com/repos/huggingface/safetensors/git/ref/tags/v0.6.2",
+        "license": {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/huggingface/safetensors/aa6c43d729868fc43918e862d42bfeaf60485d1d/LICENSE",
+          "bytes": 11357,
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "git_blob_sha1": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64"
+        },
+        "version_source": {
+          "path": "safetensors/Cargo.toml",
+          "url": "https://raw.githubusercontent.com/huggingface/safetensors/aa6c43d729868fc43918e862d42bfeaf60485d1d/safetensors/Cargo.toml",
+          "bytes": 1337,
+          "sha256": "60c54b42040686f892aed5fa49faadbfb16f09300c647034ba184acbe60ae7c4",
+          "git_blob_sha1": "de83c0efa10eaf370368a4db209c9980bfcbd4d5"
+        },
+        "version_literal": "version = \"0.6.2\"",
+        "packaged_notice_absence_permitted_with_external_pinned_publisher_notice": true
+      }
     },
     {
       "name": "huggingface_hub",
@@ -345,8 +389,30 @@
       "pypi_url": "https://pypi.org/pypi/decord/0.6.0/json",
       "primary_metadata_sha256": "00f849b1a23d583719b5bb3e348b070c078db315ffe0a67bf5dc4fa65c6fb482",
       "license": "Apache-2.0",
-      "license_assurance": "primary_PyPI_classifier_and_Azure_wheel_notice_required",
-      "install_if_absent_only": true
+      "license_assurance": "primary_PyPI_classifier_and_independently_pinned_exact_release_publisher_LICENSE",
+      "install_if_absent_only": true,
+      "publisher_notice": {
+        "repo": "dmlc/decord",
+        "release_tag": "v0.6.0",
+        "revision": "6a3617cef035535193f390f86399dde139fa2a53",
+        "release_ref_url": "https://api.github.com/repos/dmlc/decord/git/ref/tags/v0.6.0",
+        "license": {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/dmlc/decord/6a3617cef035535193f390f86399dde139fa2a53/LICENSE",
+          "bytes": 11357,
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "git_blob_sha1": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64"
+        },
+        "version_source": {
+          "path": "python/decord/_ffi/libinfo.py",
+          "url": "https://raw.githubusercontent.com/dmlc/decord/6a3617cef035535193f390f86399dde139fa2a53/python/decord/_ffi/libinfo.py",
+          "bytes": 3260,
+          "sha256": "93b8d28794dd05f9a89390edec7d477bd597cdf7ae453832a20ae904db528000",
+          "git_blob_sha1": "7dcf82c1e7f78fab6390be839e4b857e637aa71a"
+        },
+        "version_literal": "__version__ = \"0.6.0\"",
+        "packaged_notice_absence_permitted_with_external_pinned_publisher_notice": true
+      }
     }
   ],
   "gpu_model_runs": false,

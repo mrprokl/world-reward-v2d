@@ -24,5 +24,23 @@
   "independent_verification_receipt_identity": {
     "bytes": 1301,
     "sha256": "351bfbb323bce6e35808a2d5784990aab55960c83827a297d7f55d3a299d3fbf"
-  }
+  },
+  "private_Azure_transport_completed": true,
+  "transport_producer_revision": "f0eee7b1004aeb4852e6e44c3f37dbd2c1b72df9",
+  "sender_receipt_identity": {
+    "bytes": 862,
+    "sha256": "9bced4f493fbdf65459c1bb7eb2d695493d76128249a85b3ae54cb645719da6c"
+  },
+  "receiver_receipt_identity": {
+    "bytes": 642,
+    "sha256": "2b2d93f3eb588a58c95833a136ac2394fa72ca9dad1ad52727a453c9662c6521"
+  },
+  "private_extraction_completed": true,
+  "extraction_producer_revision": "75fdea08fb3b43f62f1c4b4f5e646674595cdd0b",
+  "extraction_receipt_identity": {
+    "bytes": 2119,
+    "sha256": "56023745e261417be2bb44504baea01772051e369df4bc51273b9f709b395bd8"
+  },
+  "extraction_relative_root": "frontend-assets-extracted-75fdea08fb3b43f62f1c4b4f5e646674595cdd0b",
+  "promotion_performed": false
 }

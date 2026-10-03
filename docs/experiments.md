@@ -5589,3 +5589,35 @@ OriginalVM01SAM2_C importFAILED onCPU metadata probe: upstream silently
 omittedextension. New child strict_C gate is intentionallydifferent runtime,
 not assertedhistoricalparity. Peer2clientprivate key removed22:19:23UTC;
 originalpublickey/provenance andfailedrun receipts remain.
+
+
+ActualprivateVM02 extractionPASS379.963558786s: producer75fdea08,
+receipt2119B/56023745e261417be2bb44504baea01772051e369df4bc51273b9f709b395bd8.
+ALL448files+3links19910803804B imported/rehashed; fulloriginalarchive+
+manifest verifiedbeforewrite/after, exactentriesdigestbdae2474..., no
+merge/promotion/images/models/GPU. Private20GBassetstaging nowready for
+next scopedruntimeverification, not declaredreplica/CUDA/licenceclearance.
+
+IndependentactualEP3queue source-cache auditPASS22:29:04UTC: all77
+originalGit sourcebytes/modes/closure verified; exacttwoPython3.10cache
+headers and recursivecodeobjectfields/constants equal freshlycompiled
+originalsources, no cacheexecution. Initialmarshalbytecomparison failed
+(encodingdiffers; refs/intern cause not proven), no source mutation or
+unjustifiedPASS. Onlytwoverifiedgeneratedcaches+emptydir removed, all77
+Gitbytes rehashedafter; receipt752B/290bbe877f23a48fbd25d41b1888b739329c7ed5d8d9d10d0025c0e7f589d584.
+OriginalqueuedFAIL remains; originalnativechildPASS independentlyauditable.
+Fullrefinementartifact pin inventory is next, not rerunningnativeoptimizer.
+
+NewGroundingv2 publisherLICENSE+release-version closure pinned for
+tokenizers/safetensors/decord; wheelwithoutnotice stays explicitlyempty,
+externalnotice copiedseparately. Newv2namespace/image preservesv1FAIL;
+40own testsPASS/94combinedPASS3.53s. Actualbuildpending.
+
+EP5 nextoriginalfrontend launchedonce768ff25/96files157408encodedB,
+actualactive981837; fixed_all16 globalautomaticpolicy unchanged. No
+EP5mask/input/trackingPASS inferred. No duplicateGPUjob launched.
+
+Finalscopedruntime/support/transport closure228PASS2.45s; support28own
+proceduraltestsPASS, unchanged40pixel observation threshold and allframe
+identity preserved. CPUwhole-support inventory next; PASS meansaudited
+coverage, not allframes observable or accuracy.

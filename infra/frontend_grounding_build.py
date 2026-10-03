@@ -23,7 +23,7 @@ import zipfile
 
 ROOT=Path('/srv/scenesmith/world-reward')
 BASE='sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3'
-TARGET='world-reward/frontend-grounding-v1:0.1'
+TARGET='world-reward/frontend-grounding-v2:0.1'
 CONFIG='configs/frontend_grounding_source_pins.json'
 HELPERS=('infra/frontend_grounding_build.py','infra/run_frontend_grounding_build.sh',CONFIG)
 SAM_REV='2b90b9f5ceec907a1c18123530e92e794ad901a4'
@@ -38,6 +38,10 @@ WHEEL_EXPECTED={
 COMMON=('__init__.py','broadcast.py','utils.py','datatypes.py','video.py','pyproject.toml')
 THIN=('__init__.py','datatypes.py','sam2_utils.py','video_to_masks.py','pyproject.toml')
 LABEL='world_reward_frontend_grounding_owner'
+NOTICE_RELEASES={
+ 'tokenizers':('huggingface/tokenizers','v0.21.4','e892882fd4608b468dcf9dc33ea95283882b8e6d'),
+ 'safetensors':('huggingface/safetensors','v0.6.2','aa6c43d729868fc43918e862d42bfeaf60485d1d'),
+ 'decord':('dmlc/decord','v0.6.0','6a3617cef035535193f390f86399dde139fa2a53')}
 SAFE_ENV={'PATH':'/usr/bin:/bin:/usr/sbin:/sbin','HOME':'/nonexistent','LANG':'C.UTF-8',
  'DOCKER_HOST':'unix://'+str(ROOT/'docker.sock'),'DOCKER_BUILDKIT':'0'}
 
@@ -83,7 +87,7 @@ def source_binding(code,revision):
  return {'markers':markers,'closure_sha256':sha.hexdigest(),'helpers':{n:identity(code/n,True)for n in HELPERS}}
 
 def validate_pins(pins):
- require(type(pins)is dict and pins.get('schema')=='world_reward.frontend_grounding_source_pins.v1' and pins.get('base_image_id')==BASE and pins.get('target_image')==TARGET,'Exact new child identity contract required')
+ require(type(pins)is dict and pins.get('schema')=='world_reward.frontend_grounding_source_pins.v2' and pins.get('base_image_id')==BASE and pins.get('target_image')==TARGET,'Exact new child identity contract required')
  repositories=pins.get('repositories');require(type(repositories)is list and len(repositories)==2,'Two public pinned source repositories required')
  for row,(repo,revision)in zip(repositories,(('facebookresearch/sam2',SAM_REV),('nvidia-isaac/video_to_data',NV_REV))):
   require(row.get('repo')==repo and row.get('revision')==revision,'Exact historical public source commit required')
@@ -102,6 +106,15 @@ def validate_pins(pins):
   name=row['name'];require((row.get('version'),row.get('bytes'),row.get('sha256'))==WHEEL_EXPECTED[name],'Independent exact wheel version/SHA/size required')
   safe_name(row['filename']);parsed=urllib.parse.urlsplit(row['url'])
   require(parsed.scheme=='https' and parsed.netloc=='files.pythonhosted.org' and not parsed.query and not parsed.fragment and parsed.path.endswith('/'+row['filename']) and row.get('pypi_url')==f'https://pypi.org/pypi/{name}/{row["version"]}/json' and row.get('install_if_absent_only')is(name=='decord'),'Pinned primary wheel URL and install policy required')
+  if name in NOTICE_RELEASES:
+   notice=row.get('publisher_notice',{});repo,tag,revision=NOTICE_RELEASES[name]
+   require((notice.get('repo'),notice.get('release_tag'),notice.get('revision'))==(repo,tag,revision) and notice.get('release_ref_url')==f'https://api.github.com/repos/{repo}/git/ref/tags/{tag}' and notice.get('packaged_notice_absence_permitted_with_external_pinned_publisher_notice')is True,'Exact independently pinned publisher release required')
+   for key in('license','version_source'):
+    source=notice.get(key,{});path=safe_name(source.get('path'))
+    require(source.get('url')==f'https://raw.githubusercontent.com/{repo}/{revision}/{path}' and type(source.get('bytes'))is int and 0<source['bytes']<=15000 and re.fullmatch('[0-9a-f]{64}',str(source.get('sha256','')))and re.fullmatch('[0-9a-f]{40}',str(source.get('git_blob_sha1',''))),'Frozen publisher source notice/version evidence required')
+   license=notice['license'];require(license['path']=='LICENSE' and license['bytes']==11357 and license['sha256']=='c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4','Primary Apache publisher LICENSE required')
+   require(notice.get('version_literal')==(f'__version__ = "{row["version"]}"'if name=='decord'else f'version = "{row["version"]}"'),'Publisher version literal must match exact wheel release')
+  else:require('publisher_notice'not in row,'No unpinned external notice fallback permitted')
  return pins
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -130,14 +143,29 @@ def wheel_metadata(raw,row):
  require(actual.get('url')==row['url'] and actual.get('size')==row['bytes'] and actual.get('digests',{}).get('sha256')==row['sha256'] and actual.get('yanked')is False,'Primary wheel identity contradicts frozen pins')
  return {'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'license_assurance':'primary_PyPI_classifier_plus_pinned_wheel_notices'}
 
-def wheel_notices(path):
+def wheel_notices(path,external_notice_verified=False):
  with zipfile.ZipFile(path)as archive:
   names=[n for n in archive.namelist()if re.search(r'(?i)(?:^|/)(?:license|notice)(?:[._-][^/]*)?$',n)and '.dist-info/'in n]
-  require(names,'Pinned wheel must retain packaged license/notice');result={}
+  require(names or external_notice_verified,'Pinned wheel must retain packaged notice or independently verified exact publisher LICENSE');result={}
   for name in names:
    member=archive.getinfo(name);require(0<member.file_size<=200000,'Bounded packaged public notice required');raw=archive.read(name)
    result[name]={'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}
   return result
+
+def publisher_notice(row,context):
+ notice=row['publisher_notice'];repo,tag,revision=NOTICE_RELEASES[row['name']]
+ ref=strict_json(fetch(notice['release_ref_url'],20000));require(ref.get('ref')=='refs/tags/'+tag,'Exact publisher release tag required')
+ obj=ref.get('object',{})
+ if obj.get('type')=='tag':
+  sha=obj.get('sha');require(re.fullmatch('[0-9a-f]{40}',str(sha)),'Exact annotated publisher tag required')
+  obj=strict_json(fetch(f'https://api.github.com/repos/{repo}/git/tags/{sha}',20000)).get('object',{})
+ require(obj.get('type')=='commit'and obj.get('sha')==revision,'Publisher tag changed from independently pinned release commit')
+ evidence={}
+ for key in('license','version_source'):
+  source=notice[key];raw=fetch(source['url'],source['bytes']);pin=verify_source(raw,source)
+  if key=='version_source':require(notice['version_literal'].encode()in raw,'Publisher source version disagrees with exact wheel version')
+  path='publisher-notices/'+row['name']+'/'+source['path'];exclusive(context/path,raw);evidence[key]={'context_path':path,**pin}
+ return {'repo':repo,'release_tag':tag,'revision':revision,'release_tag_binding_verified':True,'wheel_bytes_equivalent_to_publisher_source_proven':False,**evidence}
 
 def exclusive(path,raw):
  canonical(path);path.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
@@ -194,7 +222,7 @@ def dockerfile(pins,owner,decord_missing):
  sam='/opt/world-reward-grounding/sam2'
  env='env -i PATH=/opt/conda/bin:/usr/local/cuda/bin:/usr/bin:/bin HOME=/tmp CUDA_HOME=/usr/local/cuda PIP_CONSTRAINT=/dev/null PIP_DISABLE_PIP_VERSION_CHECK=1 TORCH_CUDA_ARCH_LIST=9.0 SAM2_BUILD_CUDA=1 SAM2_BUILD_ALLOW_ERRORS=0 MAX_JOBS=4 PYTHONDONTWRITEBYTECODE=1'
  install='python -m pip install --no-index --no-deps --no-build-isolation --disable-pip-version-check'
- return(f'FROM {BASE}\nLABEL {LABEL}="{owner}"\nCOPY sam2 {sam}\nCOPY nvidia /opt/world-reward-grounding/nvidia\nCOPY wheels /opt/world-reward-grounding/wheels\n'
+ return(f'FROM {BASE}\nLABEL {LABEL}="{owner}"\nCOPY sam2 {sam}\nCOPY nvidia /opt/world-reward-grounding/nvidia\nCOPY wheels /opt/world-reward-grounding/wheels\nCOPY publisher-notices /opt/world-reward-grounding/publisher-notices\n'
   +f'RUN {env} {install} '+' '.join('/opt/world-reward-grounding/wheels/'+n for n in wheels)+'\n'
   +f'RUN {env} {install} {sam} {common} {thin} && rm -r /opt/world-reward-grounding/wheels\n'
   +'ENV HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1\n').encode()
@@ -224,8 +252,10 @@ def build(code,revision,output,report):
   if row['name']=='decord'and prior['decord']is not None:continue
   metadata=wheel_metadata(fetch(row['pypi_url'],200000),row);raw=fetch(row['url'],row['bytes'])
   require(len(raw)==row['bytes']and hashlib.sha256(raw).hexdigest()==row['sha256'],'Downloaded wheel differs from independent primary SHA/bytes')
-  path=context/'wheels'/row['filename'];exclusive(path,raw);notices=wheel_notices(path)
-  wheels[row['name']]={'version':row['version'],'bytes':row['bytes'],'sha256':row['sha256'],'primary_metadata':metadata,'packaged_notice_identities':notices}
+  path=context/'wheels'/row['filename'];exclusive(path,raw)
+  external=publisher_notice(row,context)if'publisher_notice'in row else None
+  notices=wheel_notices(path,external_notice_verified=external is not None)
+  wheels[row['name']]={'version':row['version'],'bytes':row['bytes'],'sha256':row['sha256'],'primary_metadata':metadata,'packaged_notice_identities':notices,'packaged_notices_present':bool(notices),'external_publisher_notice':external}
  exclusive(context/'Dockerfile',dockerfile(pins,owner,prior['decord']is None))
  report.update(phase='offline_CPU_build',source_files=files,wheels=wheels,build_recipe_identity=identity(context/'Dockerfile'))
  require(source_binding(code,revision)==before,'Frozen builder source changed before build')
@@ -245,9 +275,9 @@ def main(argv=None):
  root=Path(os.environ['WR_ROOT']);code=Path(os.environ['WR_CODE']);revision=os.environ['WR_CODE_REVISION']
  require(root==ROOT and Path(__file__).resolve()==code/'infra/frontend_grounding_build.py','Actual frozen builder file required')
  source_binding(code,revision)
- output=canonical(root/'results/frontend-grounding-build-v1');require(output.parent.is_dir()and not output.exists(),'Fresh owned Grounding build namespace required; no overwrite or retry')
+ output=canonical(root/'results/frontend-grounding-build-v2');require(output.parent.is_dir()and not output.exists(),'Fresh owned Grounding build namespace required; no overwrite or retry')
  os.umask(0o077);output.mkdir(mode=0o700)
- report={'schema':'world_reward.frontend_grounding_build.v1','stage':'frontend_grounding_build','status':'fail','phase':'preflight','producer_revision':revision,
+ report={'schema':'world_reward.frontend_grounding_build.v2','stage':'frontend_grounding_build','status':'fail','phase':'preflight','producer_revision':revision,
   'budget_seconds':BUDGET,'GPU_used':False,'model_loaded':False,'challenge_data_read':False,'private_validation_read':False,'credential_material_read':False,
   'build_network':'none','base_pull_performed':False,'replica_ready':False,'license_eligibility_verified':False,'training_overlap_verified':False}
  started=time.monotonic()
