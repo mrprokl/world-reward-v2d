@@ -4398,3 +4398,36 @@ episode2volumecontinuationactive/250frames, no GPUdup. Noaccuracyclaim.
 Root complete tiny suite **8847PASS/2sameoptionalSKIP196.11s** before
 freeze; no localfullgeometry/model/video/render. Authorcode+CPUwrapper+
 strictdriver frozen, no neutralrepair or qualityadoption.
+
+
+Actual newauthorCPUreference **FAIL4.090519s** beforefullsurfacecertificate,
+phaseoriginal_author_primitive_digit_support: nearestoriginalvertex support
+gate failed. Producer00074fe8d7585219bdeb952cd305c466631c6932/publicexactHTTP200,
+25files32512encodedB/archive06a04f966733203aa9866494fcad44309b97ed6011d0ee7561be46c371de8dd8.
+Sole400report3655B/eef678c211714894934d6c0715efed2829cd809999c03e0225f59a9d6021f4c0;
+noNPZ/RGB/surfacecertificate/contact/quality. Stopthisprotocol withoutresweep/
+rerun/repair; no geometry/data/modeltransferredlocal.
+
+Independentread-only analytic audit identifies a coverage-contract limitation:
+neckcapsule endpoint coincides with headellipsoidcenter; neckradius.059+
+2*resolution.012=>.083m supportlimit, but headcontains.092m ball. An internal
+primitive neednot have nearbyexposedsurface. Genericreceipt lacksfailingname/
+distance; this example cannot identifyactualfailedprimitive. ThereforeFAILis
+thisprotocol's supportprerequisite, NOT evidence missingdigits/topology/
+embedding failure. PreserveoriginalFAIL; no posthocrelaxation or victoryclaim.
+Futureindependentreferenceprotocol wouldneed logicallyvalid exposedlandmark/
+interiorcontainment criteria declaredbefore a newmanufacture, not silentrepair.
+
+
+Actual episode1 readonly15inputinventoryPASS, originalce0519f/c529b240
+independently supplied; inventoryproducer00074fe8d7585219bdeb952cd305c466631c6932,
+31files51016encodedB. Allhashes before/after sixJSONchecks, noarray/video/mesh
+decode. Commitactualconfigs/cari_clip_000001_input_pins.json: finalinput3357B/
+af861948c1df195cc09b20da5ffbe106e43b136ad8cf64900e9b3121f7711637.
+Stagebootstrap remains unchanged; nativeprepare668 deferred while actualGPU
+volumeepisode2worker789526active (300/866frames at13:29:31UTC). No endpoint
+subset, prediction replacement or performance claim; allheavyartifactsAzure.
+
+Actualep1pins/nativeprepare/sourceclosure integration390PASS3.77s;
+complete8847PASS2optionalSKIP196.11s predatesactualpins only. Codeunchanged
+sincefrozenmanufacture; no newGPUlaunchwhile866trackingactive.

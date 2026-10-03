@@ -30,19 +30,22 @@ refinement and direct export now pass on96frames. Full501 shared preparation
 also passes, as do the fresh full501 HOI forward,301-update native
 refinement and full direct export. The complete pipeline now passes on one
 public video, including the source-bound CPU episode consumer. All30 original
-videos now pass the metadata/hash readiness audit; the first structurally clean
-new episode is running through the automatic frontends. The original official
+videos pass metadata/hash readiness. A second episode now completes its
+automatic frontends on all668frames, with source-bound inputs frozen for the
+native continuation. The original official
 packer also passes on the full501-frame source, with exact GLB-surface and native
 FP32 fidelity checks; its temporary one-episode Parquet is deleted after QA.
-The next episode's object trajectory passes all668originalframes; CPU input
-assembly is ongoing. The following episode failed the original fast-QEM mesh
+The next episode's object trajectory and CPU input assembly pass all668
+originalframes. The following episode failed the original fast-QEM mesh
 budget gate, then passed one independent volume-preserving proposal retaining
 all18components; its full866-frame tracking is now running from frozen pins.
 A fresh native near-grasp manufacture route remains stopped at neutral
 self-embedding; exact rational witnesses confirm eight flagged crossings.
 No geometry or thresholds are relaxed to rescue it. One separate authored
-full-human reference feasibility gate is predeclared; it is not a new prediction
-method or a quality result. All30 reconstruction and independent real/fullHOI accuracy
+full-human reference gate stopped at its support prerequisite before surface
+certification. An audit found that prerequisite can reject buried union
+primitives; this is a protocol limitation, not proof of defective geometry.
+No retry, RGB, new prediction method or quality result is claimed. All30 reconstruction and independent real/fullHOI accuracy
 validation remain separate.
 Detailed receipts and decisions: [experiments](docs/experiments.md).
 Heavy data and all GPU work remain onAzure.
