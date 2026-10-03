@@ -5483,3 +5483,17 @@ failure remainsunchanged, not successful; namespace newly absent permits frozen
 all25-component mesh continuation. Actual new6bce26f/77files127288encodedB
 unittrack1-episode4-volume-frontends-v1 activeMainPID962210; no trackingPASSyet.
 Root verified GPUempty before dispatch; EP3refinement must await releasedGPU.
+
+21:34:00UTC EP4 whole747tracking active, single1886MiB GPUworker and original
+cooperative lock actually held; no trackingPASS. EP3 independent forward stage
+inventory inactive/exit0 confirms exact71204B/326fe216... report and452909884B/
+009bb022... freshnativebundle before NEWshared_forward pinfreeze. No media local.
+
+Scheduling-only queued native-refinement wrapper waits on the existing scoped
+GPU lock, not EP4's later CPU input completion; own source/three producer pins/
+lock inode rechecked, GPUidle required after lock acquisition, unchanged native
+child7200s/300requested301updates. Earlyfocused308PASS/2FAIL19.49s caught local
+atime-sensitive stat_result comparison; fixed to existing stable identity fields
+(dev/inode/mode/size/mtime/ctime/nlink), not relaxing numerical/provenance gates.
+Finalqueue43PASS19.12s, explicit fixture environment prevents credential repr.
+No queued native dispatch/refinementPASS yet; metadata/scheduling change only.
