@@ -4228,3 +4228,29 @@ absent, frontendlockfree, GPUempty;609,312,354,304bytesdisk and~329GBRAM
 available. Currentcari_prepare/objectpose/launcher bytes equal priorce0519f
 frontendproducer, no numericalchange. Episode1 CPUdepth150/668inprogress;
 onlyepisode2 usesGPU. No fullfrontendPASS or inputpin yet for either newclip.
+
+Readonly CPU flag classification hashes original v2receipt plus native501export
+parameters (4ebc3a4c/1,826,138B), loads only human_faces, no model/vertices/GT.
+First exactdtype assumption failsclosed: exportI64hash differs nativeI32hash.
+Lossless I64→I32 values retain exact original native facehash51d08a7d; no file
+changed. Flags:108proper/zero sharedIDs,2proper/one sharedID;
+2boundary/zero IDs,2boundary/one ID; none sharetwo. Thus adjacency-exemption
+ambiguity alone cannot explain all flags. Source rehash unchanged; no GPU calls.
+First deterministic nonadjacent proper pair4439/4440, IDs
+[2179,2576,2180]/[2181,2341,2577]. No anatomical attribution or exactintersection
+claim until original neutral vertexhash is reproduced and independently checked.
+
+New independent pure stdlib exact IEEEtriangle witness helper and50tinytests
+PASS0.09s. Fraction arithmetic retains coordinates exactly, verifies transverse
+cuts, strict overlap, sharedpoint and positive barycentrics/zero plane residuals
+in both original triangles. Negative result is not separation or fullsurface
+certificate; caps≤5s/4096bits/10,000ops failclosed. No replacement predicate,
+neutralcontrol change, RGB/cohort or native job. Later bounded Azure-only
+diagnostic may re-decode ONE unchanged neutral, require exactv2 V/Fhash match,
+and inspect first≤8nonadjacent flags; originalFAIL remains immutable. GPU waits
+for episode2 completion/lockfree, never overlaps frontends.
+
+Root integration exactwitness/crosssurface/native/APIclosure260PASS2.70s;
+fullsuite **8410PASS/2same optionalSKIP137.86s**. Original crosssurface and
+all running numerical producers unchanged. Pure helper1881af80f85144585379ca4118fef81d524a595b5cd909349cdbedc5bef75812
+does not authorize another manufacture run or claim global exactembedding.
