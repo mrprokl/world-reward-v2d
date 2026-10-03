@@ -2124,3 +2124,25 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   all4predictionNPZ hashes/inventory and temporaryprefix cleanup evenfailure.
   FakeORT fixture covers actualdriverflow only, not realcheckpoint evidence.
   AzureCPUoffline dispatch started; no parallelGPU or heavyMac transfer.
+
+  D95v1 actualengineeringFAIL1.116425s/sourceee91a530398f2f8bc0aced813f94717c114f5ee7,
+  receipt`f95a4dbdb03bd02e9bd65a216bec233de2cb469bf78e71dd4162568bae41ca41`.
+  Exactisolated wheels/imports succeeded; graphmetadata guard failed before
+  any inference/prediction, temporaryprefixremovedTRUE, GPU0. Preservev1.
+  SeparateAzureCPU metadata-only query of exact724f4ff2...1843 checkpoint:
+  input `input: tensor(float) [batch,3,384,288]`; outputs `simcc_x:
+  tensor(float) [batch,MatMulsimcc_x_dim_1,MatMulsimcc_x_dim_2]` and `simcc_y:
+  tensor(float) [batch,MatMulsimcc_y_dim_1,MatMulsimcc_y_dim_2]`; custommetadata
+  empty, CPUprovideronly, isolatedprefixremoved. Export metadata is symbolic;
+  it does not prove actual output dimensions or successful nativefeed.
+
+- D95v2 preregistered structuralmetadata repair ONLY: new immutable
+  validation/dwpose_smoke_v2, bind preservedv1 FAILreceipt/SHA/source read-only.
+  Accept only exact observed symbolic input/output names/types/dimensiontokens
+  for the already pinned checkpoint, persist actual metadata before validating
+  so early failures remain diagnostic. Keep ACTUALfloat32 SimCC arrays exactly
+  [1,133,576]/[1,133,768], finite133nativecoordinates/scores, unchangedfloat64
+  nativefeed, fourcalls/twofreshCPUsessions/byte-replay, exactsame twoRGBinputs,
+  licenses/assets/source rehash and180sCPUbudget. No cast/channel/preprocessing
+  repair, confidence/quality threshold or semantic/3Daccuracy claim. No same-job
+  fallback; failedv1 remains unchanged, installprefix always disposable.
