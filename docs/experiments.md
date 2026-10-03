@@ -2612,3 +2612,44 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Capability source audit:164 focused tests PASS3.29s, full5901PASS/one
   optionaltrimeshSKIP83.64s, Bash syntax/diffcheck PASS. Statically complete
   25-file code-only closure97,152B encoded; no data/model/render transfer.
+  Actual native capability **PASS**33.913146s, source
+  1fc17325f2878405e24a3fc4dbef2871596fffd4, script
+  `735da6c9691f0450bb7882d8053d39c9ea1c9802bc537b34d01ffa01f54d4a87`,
+  receipt`2371fc2714a17c5a40d19f63110a48c4eb531b6309f9242d893ac7a40b0a2cdb`
+  (45,208B/0444), actual25-file dispatch97,560B. All15 attempted/returned/
+  validated heads and20 attempted/completed autograd rows. Observation-only
+  rank5 ratio.023670807; analyticXY max error6.50e-6, within declared tolerance.
+  Worst zero-state V/KP/J parity8.68e-7/6.24e-7/5.06e-7m, controls byte-exact,
+  SO3 max entry error2.38e-7. GPU peak allocated4,178,142,208B/reserved
+  4,192,206,848B; source/assets/all15 public inputs rehashed. Zero optimizer/
+  candidates/private reads; terminal0/MainPID0, GPUidle75MiB. This establishes
+  local native feasibility, NOT efficacy or full numerical optimization replay.
+
+  New H98 preparation frozen: validation/root5_rgb_v1, own new3×5 full-body
+  moving scenes/left-right-left interactions, changed native shape/scale/yaw/
+  motion/bottle offsets/textures. Actual manufacturing249 control+shape limits
+  checked for animated andneutral states; native truth face indices stay int32
+  and typed SHA retained on every frame. Own bottle geometry receives fixed1.04
+  manufacturing scale once; no prediction-dependent shrinking. TRUE focal1280
+  equals generic publicprior1280 in both branches intentionally: fixed-camera
+  isolation, NOT unknown-calibration validation. Public contract stdlib-only
+  exact readonly15 RGB+manifest; no recipe/camera/GT fields. Private rig/truth/
+  renderer receipt never mounted in observers. Two reference forwards and15
+  rasters onlyAzure; strict120s/32GiB/network-none preparation. Generic observers
+  take explicit immutable cohort, reuse existing native functions without their
+  old mains/globals. Freeze automatic Grounding/SAM human+object masks,15Body/
+  15MoGe+firstRGB identity native decode/reference,15nativeDWPose separately.
+  Own44prep tests/108combined PASS, independent44tests plus360 randomized tiny
+  scenes PASS;14-file prepare closure~48.9KB. This is new data manufacture,
+  not independent accuracy evaluation. No fresh fit/candidate/private score yet.
+  Generic observer audit:24 own/210 combined tests PASS1.12s, native fixed
+  F32 pointmap/K and automatic-mask pixel-area guards retained, actual complete
+  source_identity() succeeds without Torch import. Independent source+mount
+  review PASS: masks/baseline/DWPose containers mount only required public
+  inputs, pinned assets/notices/native sources; no private truth or alias mount.
+  Original loaders/decoders/validators reused, stage scripts/producer bindings
+  immutable; all outputs/inventories/sources/assets rehashed. Same frozen
+  observer source generates all3 public stages, renderer revision may differ.
+  32-file ordinary observer import closure116,464B encoded below128KB.
+  Frozen preparation+observer full source suite5969PASS/oneoptionaltrimesh
+  SKIP83.95s, Bash syntax/diffcheck PASS before immutable Azure dispatch.
