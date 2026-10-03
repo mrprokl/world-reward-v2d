@@ -183,9 +183,10 @@ def reset_seed(torch):
     torch.manual_seed(0);torch.cuda.manual_seed_all(0)
 
 
-def run_body(root,out,report,persist,revision,*,deterministic_algorithms=True,public_input_reader=None):
+def run_body(root,out,report,persist,revision,*,deterministic_algorithms=True,public_input_reader=None,native_model_loader=None):
     if type(deterministic_algorithms)is not bool:raise ValueError("Explicit native runtime mode required")
     if public_input_reader is None:public_input_reader=public_mask
+    if native_model_loader is None:native_model_loader=native.human.load_model
     record,inputs=public_input_reader(root,revision);report.update(public_inputs=inputs,phase="native_model_load");persist()
     if "torch"in sys.modules:raise ValueError("Strict CUBLAS setup must precede Torch")
     os.environ["CUBLAS_WORKSPACE_CONFIG"]=":4096:8"
@@ -197,7 +198,7 @@ def run_body(root,out,report,persist,revision,*,deterministic_algorithms=True,pu
     semantic_path=root/"results/mhr-finger-semantics-v4.json";semantic_id=native.regular(semantic_path)
     semantic=json.loads(semantic_path.read_text());native.regions_helper.require_semantic_report(semantic)
     if semantic.get("source_image_id")!=IMAGE:raise ValueError("Pinned semantic source image required")
-    model,estimator,faces,model_source=native.human.load_model(root,torch);model.eval();model.requires_grad_(False)
+    model,estimator,faces,model_source=native_model_loader(root,torch);model.eval();model.requires_grad_(False)
     if model.head_pose.enable_hand_model is not False:raise ValueError("Unmodified ordinary Body-only head required")
     load=model_source.get("checkpoint_loading")
     require_fields(load,dict(mode="strict_network_and_head_state_with_explicit_asset_buffer_retention",parameter_tensors_loaded=1101,unexpected_keys=[]))

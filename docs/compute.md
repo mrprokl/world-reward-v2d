@@ -6,7 +6,10 @@ H99 factorial manufacture, automatic masks, original Body, native DWPose and
 one private24-case diagnostic all completed. Execution passed; independent
 DWprompt-evidence hypothesis rejected (0/8supportinggroups). H97/H98root
 pilots remain rejected; no retuning or extra private score query.
-All5H99units terminal; lastH10027MiB/0%. Heavy models/RGB/arrays stayAzure.
+All5H99units terminal. H100/H100b photometric mechanism units also terminal
+failed: unsupported strictCUDA cumsum, then exact SHAM mismatch underordinary
+CUDA. No new quality run; next bounded scalar-only existing-artifact diagnosis.
+LastGPU131MiB/0%. Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
 [experiments](experiments.md). No final submission/CARI4D superiority yet.
 Older completed engineering records below are historical, not active jobs.

@@ -18,8 +18,11 @@ private labels were used only after frozen predictions, never for fitting.
 The untouched24-case factorial diagnostic now rejects external DWPose prompts:
 Body2D error2.34px vsDWPose5.11px, worse in all8groups. Appearance changes
 increased centered geometry error despite identical reference geometry.
-Next: appearance/temporal consistency under clip-constant native identity,
-then real-domain/fullHOI validation; no retuning any already-scored cohort.
+Photometric consistency is not yet mechanism-qualified: strict native CUDA
+failed an unsupported deterministic cumsum; ordinary CUDA then failed exact
+repeated-input SHAM. Both failures are frozen, with no quality query or
+tolerance relaxation. Diagnose native replay before any new photometric
+quality run, then real-domain/fullHOI validation; never retune a scored cohort.
 Detailed receipts and decisions: [experiments](docs/experiments.md).
 Heavy data and all GPU work remain onAzure.
 

@@ -3137,3 +3137,74 @@ Quality inference/decision guards must be fully preregistered separately first.
 H100b independent frozen/currentAST-source audit READY: historicalpublicreader/
 helperSHA unchanged, oldsource canonicalRO, complete34fileclosure108,016B,
 139focusedcombinedtestsPASS0.70s/bash/diffPASS. RuntimeactualSHAMstillunknown.
+
+Actual H100b execution FAIL20.478390s, sourcee83146a0a85f1530813228e2feb2a9b5a8f8a02b,
+driver32cd5626e77b272b70f3bb4dafe91b6a706d2dbcc4e4f1bf205cfc28cfde8ec6,
+complete34filearchive108,584B. Receipt110eebee952eb1fcd2c6db4b359a1756831ff1ad1d4549f8807f4f62c6a0e11c
+(22,005B/0444). FourBody/4parity/4KP/4fixed heads completed; firstRAWsham0
+failed allnativearraybyteequality despite boundednativeblockdecode parity;
+0selectedreplays/accuracyqueries. Unit terminalfailed/lastGPU131MiB0%.
+H100b remainsFAIL; no relaxedSHAMgate, H101 noexecution/privatequality.
+Next boundedscalar-only failure diagnosis compares existingfrozenraw/fixed
+original andsham array differences to localize learnedblocks vsnativegeometry.
+No learnedmodelcall, image/geometryquality scoring or recipechange. Fullsuite
+6379PASS/oneoptionaltrimeshSKIP83.96s beforethisresult; localchildtestRTKfix
+42PASS2.50s. Actualsemanticjointnames contain no `elbow`, so H101manufacturer
+currently fails its namedjoint preflight: correct only via actualsource/name
+evidence, not numericaljoint guessing or rendering tochoosea betterfixture.
+
+Scalar-only existing-artifact H100b diagnosis (no model/raster/quality calls):
+learnedblocks themselves differ, not just decoder vertices. OriginalvsrawSHAM
+maxabs globalEuler1.19209e−7, body1331.00210e−6, hands2.38419e−7,
+shape7.15256e−7, PCA1.90735e−6, Tcam9.53674e−7; expressionexactzero.
+RawV/KP1.43051e−6m, J9.53674e−7m, rotations2.20537e−6. Fixedcamera/
+identity/hands remainbyteequal byconstruction, but body133 andgeometrydo not.
+This localizes no unique cause: native intermediateMHRfeeds learneddecoder
+(sourceaudit), whileotherlearnedops/JITcould also differ. Do not dismiss
+smallactualdifferences or relaxstrictSHAM. No privateaccuracyqueried.
+Actualsemantic127jointnames show leftlower-arm origin `l_lowarm` (index76),
+not `l_elbow`; H101notdispatched source name corrected toactualjoint
+`l_lowarm`, not guessednumericindex or postrenderrecipetuning. Allframing/
+recipes/budgets/gates retained; originalunexecuted sourcecommit preserved.
+
+### H100c scoped native operational replay preregistration
+
+Same onepublicRGB+automaticmask, exactoriginalH100source/render/mask/failed
+strictreceipt pins; H100bfailedreceipt110e…e11c/22,005B bound too. Newunique
+`capability_scoped_v1`,180s/32GB/4CPUoffline, no private label/RGB download.
+Joint NEWexecution policy, not a causal attribution: learnedestimateCUDA
+ordinaryFalse/warnFalse (officialcumsum untouched); serialwrapper on EVERY
+`head_pose.mhr_forward` (includingintermediatedecoderheads) saves enabled/warn
+flags, enablesstrictTrue/warnFalse, delegates the exactoriginal boundmethod
+withunchangedargs/outputs inside JIToptimized_execution(False), synchronizes
+CUDA, validatesflags and restoresfinally. No concurrent/reentrant scope,
+unsupportedopfallback/warmup/kernel/sourcepatch. Intermediatenativegeometry
+feeds learneddecoder, so unchangedsource/weights do NOT imply numerical
+equivalence to H100b. Strict-vsJIT cause is not isolated by this jointpolicy.
+Allactualscopedhead attempts/returns/validated/restore phases retained; count
+includesnativeintermediateheadsplus21existingparity/KP/fixed/selectedheads.
+ExactoriginalRAWandFIXED SHAM3repeats/gamma1identitybytes, native≤1e−5full
+replay, positivefiniteSO3/fixedcontrols/medoid15NPZ/noaveraging andall6Body
+coverage unchanged. PASSwouldonlyempiricallyqualifythissixbranchfixture
+mechanism, notcrossprocess/allframes/nativeaccuracy/adoption. AnySHAM
+mismatch stops; no epsilon/gamma/privatequery rescue. H100/H100bFAILpreserved.
+111focuseddatafreeexecutionpolicy/provenance/core/bundle testsPASS0.46s,
+actualH100coutput notyetseen. H101staysunexecuted pending mechanism PASS.
+
+PreparedH101observer is public-only code, notlaunched: masks24DINO/SAM/encoders
+120s; Body600s6branches×24=144inferences/144parity/144KP/24frameanchors/
+144fixed/72selectedreplays, 360NPZ+actualnativeLBSmetadata. Clipfirstshape/PCA,
+frameoriginalroot/camera/hands fixed acrossmethods, exactSHAMandexistingVmedoid.
+Its ordinaryCUDA policy is currently NOTqualified (H100bfailed); do not dispatch
+it or claimthispreparationis a validatedqualityexperiment. Frozenhuman-only
+paireddecision purepolicy16testsPASS (8groups median5%gain/no>5%group/hand
+regression/every24frame automaticIoU−1pp); missingfinalqualityproducer pins,
+evaluator and mechanismroute prevent any adoption. Noobject/contactclaim.
+
+H100c independentaudit identifiedexceptioncleanupgap; fixedbeforefirstdispatch:
+CUDA drain attempted withinstrictscope even iforiginalraises, syncfailure
+recordedwithoutreplacingoriginalexception, nestedfinallyalwaysrestoresflags/
+method/busy. No retryoforiginaloperation; completePASStrace requires actual
+synchronizedTrue.112focusedtestsPASS0.50s incloriginalerror+syncfailure
+cleanup;266combinedresearch/core/bundle testsPASS3.90s beforethisguardfix.
+Completeordinarysourceclosure36files109,912B beforefinalcleanup addition.

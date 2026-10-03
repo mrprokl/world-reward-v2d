@@ -866,3 +866,22 @@ and metric grounding; no face deletion, object shrinking or GT templates.
 Sources: official CARI README7c0d and paper2512.11988v3(2026-04-19); existing
 infra/cari_forward.py executes the original pipeline. Proposal only, not a
 launched experiment, new acceptance threshold or verified license clearance.
+
+### Native reproducibility diagnosis after H100b SHAM failure
+
+H100b ordinaryCUDA failed exactSHAM, so gamma quality is not authorized.
+At7c0d sam3d_body.pyL464–508, intermediate head_pose predictions feed projected
+keypoint tokens back to the decoder. mhr_head.pyL163–295 contains PCA-to204,
+TorchScriptMHR, cm-to-metre geometry, quaternions and308mapping. A potential
+NEW bounded engineering diagnostic could scope PyTorchstrictTrue to EVERY
+head.mhr_forward call, leaving learned/prompt operations ordinaryCUDA; the
+unsupported prompt_encoder.pyL236–247 cumsum stays unchanged. This instruments
+execution policy, not checkpoint/source operations, and intermediate numerical
+changes may affect learned predictions. Do not call it a numerically unchanged
+H100b or adopt it before actual empiricalbyteSHAM succeeds.
+First compare existingfrozen raw original/SHAM block hashes vs V/J/KP: equal
+learnedblocks with differing geometry localizesdecode; differingblocks can also
+arise from intermediateMHR or otherlearnedops. Neither diagnosis nor1e−5parity
+proves cause or crossprocess determinism. No cumsum cache/CPU/arange replacement,
+no extra warmup, tolerance relaxation or accuracy query. JIT optimization policy
+is another explicit predeclared variable, not a hidden warmup rescue.
