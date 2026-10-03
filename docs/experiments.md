@@ -3393,3 +3393,51 @@ onH101/noadoption/noHOI/domain/CARIclaim. Keep exactruntime mechanism for
 future nativeexecution, not method-levelimprovement. Next minimum public
 96-realframe constrainednativeHOI pilot/generalproductionpath; independent
 FULL-HOIclearance still separate. Existingreports/privatearrays retainedAzure.
+
+## H102 — public96 shared-identity native HOI engineering pilot (preregistered)
+
+Purpose: unblock a complete native reconstruction/export path, **not** evaluate
+accuracy on challenge video. One untouched chronological prefix of episode15,
+original frames0..95, no padding/drop/reencoding. Reuse exactly15 SHA/size-bound
+automatic Track1 sources: original501 Body parameters, masks/RGB/depth, one
+inferredK1920, predicted common metric scale, fixed aligned object mesh and
+ICP/Viterbi rigid poses. No historical CoCoNet/refined outputs or private labels
+are inputs. Azure-only/offline fresh `validation/cari96_public_v1`; old outputs
+remain unchanged. Explicit source pins in `configs/cari96_input_pins.json`.
+
+Before native geometry/neutral-height/materialization/caches, choose shape45 and
+scalePCA28 from original frame0 and repeat byte-exactly across96; preserve all
+moving root/body/hands and zero expression. No quality-based identity selection.
+This is a **constrained-identity ablation**, not unchanged original CARI4D.
+Preparation does no learned inference, fitting, image rendering or scoring.
+
+Predeclared preparation gate:180s, four routes each six16-frame chunks: new native
+V18439/J127/KP70; direct native204 parameter replay; independently decode the
+saved shared initializer again; official reference FP32 model/FP64 residuals.
+Native/direct/saved-replay maximum point error≤.01mm. Official reference mean
+point error≤2mm **every original frame**, same earlier fidelity threshold;
+reference maximum point error retained as a diagnostic, never substituted for
+that gate. All geometry finite/positive cameraZ and exact native topology;
+expanded68 scales clip-constant. Complete attempt/return counts, source/model/
+helper/initializer and new artifact pre/post hashes, saved arrays/metadata/frame
+indices exact. Historical raw-initializer projection/roundtrip checks are labeled
+historical, not new shared-identity projection claims.
+
+Three independent source/ABI/firewall reviews READY, no concrete blocker.
+HDF5 tests initially exposed only a missing temporary parent in the tiny success
+fixture; corrected that fixture, production exclusive-output behavior unchanged.
+Actual tiny HDF5 read/write/payload-reread now executes locally after installing
+small pinned h5py3.14.0/joblib1.5.2 dev dependencies (no model/data download).
+Final90 focused testsPASS0.31s/noSKIP including all10HDF5 cases and historical-
+metadata/attempt-ledger regressions. Frozen full suite6601PASS/1optional-trimesh
+SKIP103.56s. Azurepreflight: namespace/unit/log absent; previousH101quality
+inactiveexit0, H100101MiB/0%,574GBfree. NoH102 GPU job, quality query,
+submission or efficacy claim yet; commit/code closure checked before dispatch.
+
+If preparation passes: one native96-frame CoCoNet window with original config/
+checkpoint and raw outputs unchanged; only identity deltas zeroed on an owned
+composition copy. Then unchanged native refinement and direct full consumer
+replay/export. Require fresh explicit preregistration/provenance for each stage,
+no reuse of prior predictions as a new result. Independent FULL-HOI validation,
+license eligibility, NVIDIA registration and accessible GitHub producing commit
+remain separate from an engineering PASS and required before final submission.
