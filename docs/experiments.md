@@ -2044,3 +2044,21 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Any repair requires a new read-only consumer/audit namespace, not modifying
   original acquisition or downloading identical158MB again. Terminalfailed1/
   noactiveGPU confirmed; no heavy Mac transit.
+
+  ActualZIPdiagnosis: ORT353members, version/tags/dependencies all exact,
+  embeddedLICENSE/ThirdPartyNotices present. Flatbuffers14members, exact
+  version25.12.19/tags py2-none-any+py3-none-any/noRequiresDist but **noembedded
+  licence**: our blanket embedded-licence guard correctly failed its contract.
+  This is a packaging mismatch, not proof of missing Apache rights; matching
+  pinned upstreamLICENSE was already acquired separately. PreserveD94FAIL.
+
+- D94v2 preregistered read-only **separate wheel audit**, no downloads/install:
+  bind originalfailedreceipt/exact9assets and oldsource; audit both safeZIPs/
+  exactMETADATA/WHEEL/deps. Require ORTembeddedLICENSE+notices; for ONLY exact
+  Flatbuffers25.12.19 wheelSHA/version allow absence of embeddedlicence and
+  retain separately pinned matching-source ApacheLICENSE with explicit
+  `embedded_license_present=False`, not inventing one or relabellingwheel.
+  Otherpaths/types/CRC/size/version/tag/dependency guards unchanged; new
+  immutable results/dwpose-wheel-audit-v2 namespace, oldassets/receipt RO,
+  own retainedtexts+primarylicence bindings rehashed, AzureCPU/offline120s.
+  PASSonlyintegrity/noticeretention, no runtime/eligibility/trainingclearance.
