@@ -798,7 +798,7 @@ TTA idea; `scale_align` is not legitimate metric correction for ourpipeline.
 
 Candidate for NEXT separate preregistration (NOT H99retune/startedexperiment):
 untouched24adjacentRGB frames/8clips, fixedgamma(.8,1,1.2), deterministic
-sRGBuint8 rounding+hases; originalRGB preserved, sameautomaticmask/bbox/K
+sRGBuint8 rounding+hashes; originalRGB preserved, sameautomaticmask/bbox/K
 (no spatialwarp/redetection).72originalBodycalls; first originalRGBshape45/
 PCA28 fixed allbranches, originalbaselineglobalrot/pred_cam_t/hands/face0
 fixedwhileeachgamma proposesbodycontrols. Candidate is an EXISTINGnative
@@ -812,13 +812,13 @@ labels or sampling scoredH99cases. Dense249hardbounds are NOT official
 kitconstraint; retain prior failedresearchgates and preregister any new
 physiological safeguard honestly, never silentlywaive baseline violations.
 
-Then new24qualityONCE: frozenalloutputs+fullnative replay, SAMEfirsthuman
-baseline-derivedproperSim3 for pairedcandidates, fixed3poses+objectproxy;
-not perframe/objectalignment. Proposedgate medianalignedhuman5%gain/
-no>5%group orhand-object regression/all24humanIoU≥−1pp; rawcamera/Z/
-centeredPVE andobject/contact/adjacenttime diagnostics disclosed. No fullHOI
-claim ifonlyvisibleproxy; challenge-style separatelyderivedeachmethod
-alignment must be labelled secondary, not substitutedfor failedpairedgate.
+Then new24 HUMAN-ONLY qualityONCE: frozenalloutputs+fullnative replay,
+SAMEfirsthuman baseline-derivedproperSim3 for pairedcandidates, fixed3poses;
+not perframe alignment. Proposedgate medianalignedhuman5%gain/no>5%group
+regression/all24humanIoU≥−1pp; rawcamera/Z/centeredPVE andadjacenttime
+diagnostics disclosed. No objectproxy/objectCD/contact/fullHOIclaim in
+this firsthumanpilot. Challenge-style separatelyderivedeachmethod
+alignment is secondary, never substitutedfor a failedpairedgate.
 Need exactnewpreregistration/implementation beforeacquisition/execution.
 
 GEM-X remainssecond-line: new~3.93GBassets, SOMA→MHRinverseunverified,
