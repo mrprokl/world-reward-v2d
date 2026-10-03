@@ -3373,3 +3373,23 @@ Explicit actualrender/mask/bodycommit/script/receiptSHA/bytepins nowrecorded
 in configs/human_photometric_quality_pins.json BEFORE any privateevaluation.
 Next ONE120s privatepaired diagnostic; all8groups/24frames/72rawrasters,
 sharedbaselineSim3/hands/gauge diagnostics and predeclaredsafeguards unchanged.
+
+H101 single private diagnostic actual **executionPASS/scienceREJECT26.073962s**,
+source`b745d797886aa1a813928ede19d9027a343f9830`, evaluator
+`9f9cf0e096735108988932607c47d3274c65b9a91b32dc3361f153377f9df57d`.
+Receipt`628a434b76d23b2b1c0b7e288854bc54067c5fcd25f615e8245b11e97bb912c4`
+(43,620B/0444), unitinactiveexit0/GPU101MiB0%. All24scored/72rawcamera
+rasters after fullpublic360/provenance/1392scope validation, zero learned/
+optimizercalls, allpublic/private/sourcehashrechecked. SHAMmetricsbaselineexact.
+Median pairedgroup humanPVEgain **0%** fails≥5% primary; group01 regresses
+0.0695632%, group06 regresses0.135115%, other6unchanged. Equalpose/group mean
+alignedhumanPVEbaseline[2.901889,2.601242,2.621744,2.610424,2.062002,2.244002,
+2.586449,2.669548]cm; TTAchangesonlygroup01→2.603051/group06→2.589943cm.
+Group/eachhand5%safeguards andeveryframe1ppIoUsafeguard pass; worstIoUdrop
+−0.00152953(−0.152953pp), maxhandabsoluteincrease0.0763622cm. Safeguards are
+not efficacy evidence: two changedproposals gotworse/no supportinggroups.
+Decision: abandon gamma-medoid as a useful accuracy method, no tuning/rescore
+onH101/noadoption/noHOI/domain/CARIclaim. Keep exactruntime mechanism for
+future nativeexecution, not method-levelimprovement. Next minimum public
+96-realframe constrainednativeHOI pilot/generalproductionpath; independent
+FULL-HOIclearance still separate. Existingreports/privatearrays retainedAzure.

@@ -14,7 +14,10 @@ testsPASS/1optionalSKIP. First manufacture/public predictions are nowready;
 H101manufacturePASS10.37s/24RGB, automaticmasksPASS17.32s/24masks,
 BodyPASS121.50s/144learnedcalls/1392nativeheads/all24exactSHAM, source05ef124….
 All3unitsinactiveexit0/GPU107MiB0%; actualqualityproducerpins frozen.
-Privatequality nextONCE120s, noaccuracy resultyet; all24count/no thresholdsearch.
+SingleprivatequalityPASS26.07s/all24/72rasters butscienceREJECT:0%mediangain,
+twochangedproposals slightregression. All4H101unitsinactiveexit0/GPU101MiB0%.
+Gamma-medoid abandoned withoutretuning/rescore; nextconstrainednativeHOI96
+publicmechanism/generalproductionroute. No finalsubmission/CARI4Dimprovement.
 Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
 [experiments](experiments.md). No final submission/CARI4D superiority yet.
