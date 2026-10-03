@@ -3441,3 +3441,65 @@ replay/export. Require fresh explicit preregistration/provenance for each stage,
 no reuse of prior predictions as a new result. Independent FULL-HOI validation,
 license eligibility, NVIDIA registration and accessible GitHub producing commit
 remain separate from an engineering PASS and required before final submission.
+
+H102 preparation actual **PASS19.676357s**, immutable source
+`03ccfa1de49b5b13605a304f4dfb394c16f54ea5`, script
+`ebd0378a92ba4474b65e4f7743499915a1dd7668a697c1bf24f64fb5ad8dad84`.
+Git-runtime closure16files34,112B encoded, SHA-XZ
+`e653c6708f391899edbdbe0c58f2375686f43019b6fe372ebe726f236f41c161`.
+Unitinactiveexit0/GPU95MiB0%; allfourroutes6attempts/6returns: all96 new native
+geometry, direct204, savedinitializer V/J/KP replay and official reference.
+Sharedidentity/sourceassets/helper/newoutput pre/post rehashPASS. Official
+mean/worstframe0.000419625/0.000843682mm; maxpoint0.002371742mm diagnostic.
+Allstoredpayloads/attributes reread, fixedK/metricobjectgeometry unchanged.
+Engineering ABI only; no accuracy or challenge quality claim. Next native
+one96-window composition-constrained forward; original AMP/ordinaryCUDA policy,
+no newly introduced class/factory hooks or claimed deterministic network replay.
+Prepare immutable receipt
+`26467461692e44ed5c4f595653b3e32a73d9e585ba2065a1565c77c36a0e9618`
+(8,090B/0444), all13 actual outputs pinned in `configs/cari96_prepare_pins.json`.
+The first readonly scalar-pin query had a Python dict syntax typo and returned
+no pins; corrected query verified all13 output SHA/size/readonly and receipt
+links, no producer rerun or geometry change. Source/public RGB never downloaded.
+
+H102 next-stage gates preregistered before dispatch:
+- Forward:360s, original commercial checkpoint/config/native96-window/stride96,
+  render32/crop8/buffer2/no input cache, native AMP thenFP32. One original
+  function-code clone overrides only composition lookup; shape45/PCA28 deltas
+  zeroed on a fresh copy, raw original deltas and original global unchanged.
+  All96 outputs, rigid object poses, original hands/face, clip-constant identity,
+  complete automatic masks/contact, checkpoint/decoder/K/mesh/source/pins/raw
+  pre/post hashes and saved bundle reread. OrdinaryCUDA/noWarn/TF32off;
+  no deterministic forward replay claim. Exact1attempt/return/verified/hook.
+- Refinement:1200s, unchanged native full96 public parity config300requested/
+  301actual updates. Optimize original body rotation controls and objectT only;
+  all rootT/rootR/hands/identity/face/internaltranslations/objectR/K/mesh fixed.
+  No new strict backward policy, original collision4000/hand assets. Exactone
+  optimizer attempt/return/verification; nativehistory0..300, savedreread,
+  source/raw/observations/mesh/pins/decoder pre/post hash and fixedblocks exact.
+- Direct export:180s, decode refined7blocks **without another identity change**,
+  six16-frame native V/J/KP/direct204, freeze pose136/scales68/shape45/zeroexpr
+  and same alignedlocalobject mesh/scale1/poses; six storednative and six
+  official-reference replays. Native maxpoint≤.01mm/reference mean≤2mm each
+  frame, complete attempt/return counters/source/output hashes and strict96
+  schema/object camera geometry checks. No LM/inverse fit/alignment/model
+  inference/quality query. Aligned local mesh frame is valid because human/
+  posedobject remain in onecamera metric frame; no object shrinking/remeshing.
+
+All outputs are public engineering96-prefix artifacts, **not** complete501
+episode predictions, independent accuracy validation, final Parquet or verified
+victory. Each subsequent dispatch must first bind actual preceding PASS receipts
+in immutable config, inspect gates, run tests and commit a clean source closure.
+
+Final H102 chain checks:240 focused testsPASS1.46s; fullsuite6750PASS/2SKIP
+106.29s. The two skips are absent optional local trimesh and the absent tiny
+official-kit fixture, independently confirmed by60PASS/2SKIP0.38s; neither
+skips any H102 contract. Independent pinned-primary-source ABI/mount audit READY
+(170,436B of source only, temporary cache removed), allthree wrappers bash-nPASS.
+Prelaunch corrections: accept owned nonmasked NumPy memmaps, cast actual native
+I64 faces to canonical I32 for topology hashing, replay allseven saved native
+blocks independently, and require exact refinement additions while preserving
+all observations/raw/contact/pr_initial/fixed blocks. These are algorithm-level
+ABI guards, not per-episode labels or quality adjustments. Azure preflight found
+forward namespace/unit/log absent, preparation inactiveexit0, H10095MiB/0%,
+573GBfree. Next one immutable forward dispatch after clean Git closure check.

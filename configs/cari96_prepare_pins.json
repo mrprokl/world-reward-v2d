@@ -1,0 +1,63 @@
+{
+  "schema": "world-reward-cari96-prepare-pins-v1",
+  "prepare": {
+    "sha256": "26467461692e44ed5c4f595653b3e32a73d9e585ba2065a1565c77c36a0e9618",
+    "bytes": 8090,
+    "producer_revision": "03ccfa1de49b5b13605a304f4dfb394c16f54ea5",
+    "script_sha256": "ebd0378a92ba4474b65e4f7743499915a1dd7668a697c1bf24f64fb5ad8dad84"
+  },
+  "prepare_files": {
+    "direct_parameters.npz": {
+      "sha256": "1da51abd94794552c75a3eaac39aef0d3de24051dacf7c0b160c1ad8524f7839",
+      "bytes": 50372
+    },
+    "inputs/aligned_depth.h5": {
+      "sha256": "03dd551a82c5d84a82f80227e8f6cbe9414bec5cc2c8eb073eb76b178bb4681f",
+      "bytes": 114417656
+    },
+    "inputs/export/episode_000015/edex": {
+      "sha256": "c1b9a52b71c7f33ab30338f540ec5b2a6d4e7ab6e1f7a8bf3419730a78301892",
+      "bytes": 541
+    },
+    "inputs/export/episode_000015/human_masks/front_stereo_camera_left.h5": {
+      "sha256": "3af2ac4a6660e9f529c8bfb7be9f6824adb2977712d598a68e1b207c9ebd0071",
+      "bytes": 2259721
+    },
+    "inputs/export/episode_000015/images/front_stereo_camera_left.h5": {
+      "sha256": "0630fc29d17a2dc97bf538715158b66b54488e0cebb0610e18eb22d411b4de1e",
+      "bytes": 83282856
+    },
+    "inputs/export/episode_000015/object_masks/front_stereo_camera_left.h5": {
+      "sha256": "22de8b4c4c3b6b71c0006e6de142f9f7d1da79daecb949823fe51cc93ed3ed85",
+      "bytes": 1996502
+    },
+    "inputs/export/episode_000015/object_mesh/output_aligned.glb": {
+      "sha256": "db97398bf5c1a45eca41ca42d6b521408a92a89d9618563b39b7c3ac889d7b32",
+      "bytes": 74596
+    },
+    "inputs/export/episode_000015/wild_export.json": {
+      "sha256": "996ce118a9b5f27c2570bdbd9f35848d9c9c69bcbf5f881bc36a39ae93fb6222",
+      "bytes": 4028
+    },
+    "inputs/manifest.json": {
+      "sha256": "c144748683701443cc43fca1972c2f31b4110b78021e98ae37eb8504af388cd9",
+      "bytes": 6043
+    },
+    "inputs/own_object_poses.pkl": {
+      "sha256": "8d88434991828b1d5b12aaeeee5cf09c1c645d56b7c559668b676bad27af6840",
+      "bytes": 8126
+    },
+    "report.json": {
+      "sha256": "26467461692e44ed5c4f595653b3e32a73d9e585ba2065a1565c77c36a0e9618",
+      "bytes": 8090
+    },
+    "shared_initializer.pkl": {
+      "sha256": "5b265972dcef091044125f050b7e3725a31a1df4995d2ebe941ad39c560b2e37",
+      "bytes": 430478
+    },
+    "target.npy": {
+      "sha256": "d1358bc384d2f9c66c3983809ca84365f045d712bf1368ef10c0ab8145578abe",
+      "bytes": 21241856
+    }
+  }
+}
