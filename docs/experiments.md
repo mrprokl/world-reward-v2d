@@ -5194,3 +5194,23 @@ closuretest hardcoded90KBestimate exceededby396B as retainedconfigsgrew.
 Test nowusesgenuineTAR/runtimeencoding/shared160KBcap andassertsALLconfigs
 kept; no source/provenanceomission ornumericalchange. Focused2PASS0.22s.
 Removed3owneddisposablepyc. Fullsuite recheckpending, notclaimedgreenyet.
+
+D106 privateevaluation actualPASS3.301009776s; producer
+5e9efd6c5cc49969e37a7007fb124b5a1e296957 /64files105496encodedB, allfrozen
+predpinspublicHTTP200 beforelaunch. Receipt15801B/
+d1dfcd85f5cbae93b74f17b4a99b9c00b9574e91a34a175b8e877d6ce862c6a8.
+VM02inactiveexit0 19:33:34UTC. GenuinepairedvisiblecameraChamferhalfcm scene1
+86.62023865→37.93907914, scene2 83.14075497→33.43961178, scene3
+78.44150793→37.35408541; gains56.2006758%,59.7795187%,52.3796949%,
+median56.2006758%, all12baseline/candidatevisibleobjectcoverage1.0/exactvalidity.
+Alloriginalinstances/integerBOP/+0.5pred/noalignment unchanged. Independent
+actual24helper/source/input13/pred12/all48private byteaudit+postrehashPASS
+19:35:18UTC. Scientificdecision SUPPORT_NARROW_WHOLE_SUPPORT_DEPTH_HYPOTHESIS.
+Absolute33–38cmerrors remain too large; newframes SAMEobjects/scenes withunknown
+pretrainingoverlap. Nohuman/contact/temporal/fullHOI/competitionaccuracy or
+verifiedCARIwin, noadoption. Closecohortwithoutretune/furthertestframe mining;
+next evidence must varyscenes/objects orjoint/temporalmotion, notanotherTUDLrank.
+
+Fullsuite afterrealTAR/testcontractrepair9654PASS/2unchangedoptionalSKIP268.17s.
+No backend/scorer/prediction changes. Replica-inventory files being authored
+disjointly were not part of collection; their focusedtests/audit remainseparate.

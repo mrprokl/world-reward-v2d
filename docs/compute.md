@@ -467,3 +467,18 @@ provider deletionpending, notclaimedyet. No heavydata downloadedlocally.
 Wrongzoneemptyowned disk deletionexit0 and independentResourceNotFound confirm
 cleanupDONE; no extraunusedmanageddisk retained. Only actualzone1/LUN0data disk
 wasformatted/attached. No VM02image/assets transfers or frontendclonePASS yet.
+
+D106 newTUDL acquisition8.860s, nativepublicdepth25.025s andprivateCPUquality
+3.301s allactualPASS in separatefrozenAzureVM02namespaces; originalmodelsand
+privateGPUisolation retained. No data/checkpoint/rendersdownloadedtoMac, only
+bounded13input/predictionpins andqualitydecision summaries. VM01full592EP3
+tracking stillactive19:32:51UTC,500framescomplete/one1886MiB895323worker; no
+finaltracking/assemblyPASSyet. EP4frontendchildrenabsent, no duplicateGPUjob.
+
+Nextclone prerequisite inventory frozenreport-only: actualminimalBody/Objects/
+Grounding/DINOv2/v3 publicsource+learnedweights+MoGe1 exactsinglesnapshot/relative
+blobgraph required. Hoststdlib/nice15/ionice3/600s, noDocker/GPUmutation/export/
+transfer/data/outputs/validationread. Fullindividualmanifest staysAzure, stdout
+bounded4KB. Rawimagebuildreceipts evidenceONLY/nevertransfereligible; projected
+actualID/platform/rootfs only, configgraph remainsunsealed, nolicense/CUDAclaim.
+Agent35tinyPASS0.32s/bash-n; no actualinventory or replicaPASS yet.

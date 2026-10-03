@@ -1220,3 +1220,12 @@ median5/nosceneregression>5. Newframes would NOT be independentobjects/scenes,
 fulltemporalHOI, train-overlapclearance or CARI4D superiority. This pilot is not yet
 implemented/frozen/launched; never reinterpret currentD105 as successfulvalidation
 or use its observedfailure/RGB/privategeometry to retune it.
+
+D106 follow-through: independent filename-onlyTUDL30/70/110/150 preregistered,
+source/publicpins frozenbeforeinference, predictionsfrozenbeforeprivateeval.
+Whole-valid-support mediananchor supported narrowly on12NEWrecords:
+scene-relativecameraChamfer gain median56.20%, allcoverage1.0. Absolute33–38cm,
+same3objects/scenes, nohuman/temporal/heldoutobject/trainoverlapclearance andno
+verifiedCARI4Dvictory. This validates one limitedhypothesis, notMegaSaM nor
+adoption. Do not mine moreTUDLrecords; seeknewscene/objects/sharedgauge or
+temporalfidelity validation with legallyverifiedsource. D105remainsclosedFAIL.
