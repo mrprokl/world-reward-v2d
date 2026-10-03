@@ -5497,3 +5497,11 @@ atime-sensitive stat_result comparison; fixed to existing stable identity fields
 (dev/inode/mode/size/mtime/ctime/nlink), not relaxing numerical/provenance gates.
 Finalqueue43PASS19.12s, explicit fixture environment prevents credential repr.
 No queued native dispatch/refinementPASS yet; metadata/scheduling change only.
+
+Final frozen scheduling+stage+volume focused310PASS19.75s/Bash-n/diffcheckPASS.
+Queued EP3 native refinement dispatched once from672b10e/77files144016encodedB,
+actual21:39:36UTC activeMainPID965420 waiting_for_gpu_lock (since21:37:25);
+own refinedoutput stillabsent. EP4 sole1886MiB worker/MainPID962210 continues
+full747 tracking; report/input namespace absent, no full tracking or native
+refinement PASS inferred. Unchanged solver releases cooperative lock before its
+CPUassembly; queued native job cannot duplicate/interrupt this GPU work.

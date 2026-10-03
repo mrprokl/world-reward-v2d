@@ -2,21 +2,27 @@
 
 ## Current jobs and gates
 
-Full501 shared prepare, captured native forward,301-update refinement, direct
-export and CPU episode consumer all pass in immutable new namespaces. These
-are engineering/fidelity results, not independent challenge accuracy.
-All30 original RGB/hash/container-metadata readiness passes:16,563frames,
-30Hz/1536x1152, no frame decode/model/GT access in that audit.
-First wholly absent frontend episode1/N668 is running fromce0519f under
-`world-reward-track1-episode1-frontends`. One serial H100 only; actual automatic
-masks, sparse Body/depth/shared gauge and grounded object generation pass,
-full Body668frames, depth668frames and native adapter pass; object-pose work continues. No implicit resume/overwrite or old learned
-trajectory use. Private own-grasp feasibility is frozen separately,
-not yet dispatched and cannot overlap this GPU work.
+Episodes15/1/2 full501/668/866 native shared preparation, forward,301-update
+refinement, direct export and official CPU packing all pass in immutable
+namespaces. These are engineering/fidelity results, not independent challenge
+accuracy. All30 original RGB/hash/container-metadata readiness passes:
+16,563frames,30Hz/1536x1152, no frame/model/GT decode in that readiness audit.
 
-H97/H98 root pilots, H99 DWPose prompt diagnostic and H101 gamma-medoid remain
-rejected without retuning/rescoring. Latest fullsuite8356PASS/2same optionalSKIP.
-No final Parquet or verified CARI4D improvement. Heavy models/RGB/arrays stayAzure.
+Episode3 full592 frontends/native shared preparation/forward have completed;
+independent source/prepare/forward pins are committed. Native refinement is
+queued behind episode4's scoped GPU phase, not its later CPU input preparation.
+Episode4 full747 automatic masks and initializers pass; original packingFAIL
+remains archived. The unchanged externally validated CPU volume proposal passes
+with all25 original components preserved. New frozen-mesh whole tracking is
+running, no tracking/input/full-chain PASS yet. One cooperating GPU job at a
+time; GPU lock is released before CPU preparation, allowing disjoint phase overlap.
+
+D107 real-depth independent validation is closedREJECT: median4.904632756%
+gain is below frozen5%; no retuning or rounded success. Native offline temporal
+depth is a new hypothesis, not acquired/adopted; OpenLORIS registration is not
+yet proved exact color-camera Z. Fullsuitec84558c10051PASS/2optionalSKIP277.13s;
+later scheduling/source focused310PASS19.75s. No final Parquet or verified CARI4D
+improvement. Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
 [experiments](experiments.md). No final submission/CARI4D superiority yet.
 Older completed engineering records below are historical, not active jobs.
@@ -38,9 +44,14 @@ all previous SceneSmith files, system Docker/containerd and resources untouched.
 | `jobs/<commit>/<entrypoint>/code` | Read-only committed runtime import closure |
 | `cache/`, `docker/`, `containerd/` | Task-isolated dependencies/runtime storage |
 
-Azure Run Command controls jobs; SSH tests failed and temporary22/443 ingress
-rules/listener were removed. Extra VM creation attempts failed before compute;
-task-created extra resource group/network resources were deleted. No new VM needed.
+Azure Run Command controls jobs; earlier SSH tests failed and temporary22/443
+ingress rules/listener were removed. Separate owned VM02 now exists on Azure
+with no publicIP, a byte-sealed equivalent Body runtime and1TB owned data disk
+mounted `/srv/world-reward-data`. Native model/data work remains remote. A
+19.91GB frontend asset-only archive passes independent extraction-free audit on
+VM01; no transfer yet, no Grounding/Objects runtime/source-parity/CUDA readiness
+or final licence/train-overlap eligibility claim. Earlier failed empty resources
+were cleaned; preserve all unrelated SceneSmith infrastructure.
 Private Docker socket `unix:///srv/scenesmith/world-reward/docker.sock`, with
 private dockerd/containerd data and state on managed disk. No bridge or iptables
 mutation. Inference uses `--network none`; acquisition downloads directly toAzure.
