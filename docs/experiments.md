@@ -4191,3 +4191,23 @@ No model/geometry/gradient execution locally. Frozen v2driver
 3ca1565892fc0d88eff7d3144fa0df05c841a4c0b2e69f6a08d371cc8a44aa07;
 wrapper7169ffe044de814b1c9377bc809e68e4127f73ec25bf0aaf38d1427b53790b33.
 Original crosssurface d808600c and directexport967b45eb unchanged.
+
+Actual own-grasp v2 **FAIL24.969206s**, producer
+a14860393d109d73f814b979218065ea0ab4e1aa, complete23file34,152encodedB closure,
+exactpublicproducerHTTP200. Tensor freezing now passes; one full original native
+forward attempted/returned/validated. Full neutral surface audit returnsFAIL
+within30s (22.063985s), nottimeout: topology closes/orients, but forbidden
+self-intersections block embedding. No patch selection/FD/solve/bottle/RGB/
+motion/privatequality execution. Sole400report
+38c56607f2abfbae7f53a1fce55e55970f97b2f4aca740773ddcc161f9ff5391
+(18,294B), no control/geometryNPZ; v1 retained. Stop this exact neutral manufacture
+route before any new cohort: no face deletion/body reposing/certificate weakening
+as a hidden rescue. Native capability/accuracy and physicalcontact remain unproved.
+
+While episode1 original CPUinput assembly proceeds, predeclare next structural
+episode2/N866 for identical unchanged frontend-only route, after actual namespace/
+targets/log/unit absence, freeGPU/scopedlock and resource checks. This overlaps
+CPU-only input assembly with one disjoint H100frontend, never duplicates GPU jobs
+or changes hypotheses/resolution/support/oracle/7200s budgets. Episode2 selected
+by index, not visual/performance inspection; full668 native-stage pins wait for
+actual episode1 inputPASS. No all30 completion or CARI4D superiority claim.

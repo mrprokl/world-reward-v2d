@@ -1013,3 +1013,27 @@ has no self-collision guarantee. Do not invent ocular/oral causes for a future
 closure failure; actual pinned neutral topology and embedding decide. Never
 delete or alter geometry to pass a certificate. This audit used primary small
 text only, no GT/model/media access or challenge scoring.
+
+### ContactPose minibundle feasibility follow-up — 2026-10-03
+
+Independent primary-text audit corrects the proposed sensor-reference claim:
+ContactPose21handjoints are OpenPose multiview/temporal estimates under rigid
+grasp assumptions (paper§3.2), not independent hand mocap; OptiTrack measures
+the object. Pinned[reader/docs](https://github.com/facebookresearch/ContactPose/tree/89cec790f2c7bdb3c81f4d9e98b337387ce6dda8)
+state MIT for non-mesh data, individual licenses for objectmeshes. Thermal
+contact is stored in per-vertex objectPLY colors, so no mesh-free contact-label
+product is established. GenericDataPortCC-BY4 metadata cannot clear these meshes.
+
+[DataPort part1](https://ieee-dataport.org/documents/contactpose-part-1)
+requires subscription and lists119.61MBgrasps.zip/596.2GBvideos_full.zip;
+no verified thin RGB+JSON delivery. The author's
+[Drive sample](https://drive.google.com/file/d/1paUAxXgHp6wDFBFw9MI1mxGElEl2KPew/view)
+is approximately1.98GB, but its archive inventory/embedded license terms remain
+unknown; README says former Dropbox links invalid. No asset/archive/annotation
+download. Current **NO-GO for acquisition or thermal validation**; conditional
+narrow RGB+estimated21joints study only after publisher delivers one-object/
+participant/camera originalRGB+annotationsJSON under verified nonmesh terms.
+Exclude MANO/depth/othercamera/meshes, own minimalJSONreader, Azure-only hashes/
+inventory before extraction; privateK/transforms/joints only after RGBpredictions
+freeze. Preserve indices/image rotations and validate MHR/OpenPose correspondence.
+Not full-body/dynamic96 quality; training_overlap_excluded=False remains honest.
