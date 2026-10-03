@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Original full native export only: exact public files and producer namespaces RO.
 set -euo pipefail
+export PYTHONDONTWRITEBYTECODE=1
 [[ $# == 2 && "$1" == --episode && "$2" =~ ^(0|[1-9]|[12][0-9])$ ]] || exit 2
 EPISODE="$2"
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"

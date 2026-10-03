@@ -5565,3 +5565,27 @@ Queuedfrontend scheduling validates explicitsuccessfulpredecessor, original
 lock and idleGPU then hands off to originalchild fixed_all16; nofakecode
 namespace/markers. Exactqueuedsource namespace accepted by child only with
 actualreadonlywrapper.235focusedPASS52.67s; noGPUqueueddispatchyet.
+
+
+ActualEP4volume-route tracking FAILED22:04:44UTC after300+frames:
+Insufficient inferred visible object points (unchanged40pixel support
+threshold). Mesh passedall25-component gates but does not cure absent
+observations. OriginalFAILlog2345B/57f62b198c1cff60e9e8cf04ea0fc10a076b1efef426bbd804232edb20f82028,
+partialcanonicalGLBretained. No trajectories emitted, no mask/depth threshold
+relaxed, no frame deletion or static fallback. Cheap whole-timeline
+support audit and externally gated latent temporal method are next.
+
+EP3 queuednative child actuallyPASS308.075973575s592frames/301updates:
+report14771B/06aca3d0a724f31fb0d9c5d07d2876ab83f97fdbea395dfc44ecd8a85619a389,
+refined452954464B/87cab50e0b8a5b2873c8de74462ae37ec87dc8b11347f30f2eba167d052481f7.
+WholequeuedwrapperFAILED postcheck (log1614B/3a227e03968cae1065f6b1ea8567d8f964cd920b9e04c10f033776662bbbd85d):
+hostPYPATHS created exactlytwoPython3.10 caches+directory under readonly
+code while runningasroot. New4hostwrappers explicitlydisablebytecode;
+16actualbootstraptests includingunsetenvironment/zero-cachePASS,
+383focusedPASS21.70s. Independentactualsource/cache equivalence audit
+pending beforeconsumingchild; never reinterpretoriginalwrapperassuccess.
+
+OriginalVM01SAM2_C importFAILED onCPU metadata probe: upstream silently
+omittedextension. New child strict_C gate is intentionallydifferent runtime,
+not assertedhistoricalparity. Peer2clientprivate key removed22:19:23UTC;
+originalpublickey/provenance andfailedrun receipts remain.
