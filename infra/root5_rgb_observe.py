@@ -32,9 +32,12 @@ native=body.native
 smoke=dw_helper.smoke
 STAGES={"masks":"public_root5_rgb_automatic_masks", "baseline":"public_root5_rgb_body_depth_first_rgb_identity_baseline",
         "dwpose":"public_root5_rgb_native_dwpose133_observations"}
-FOLDERS={"masks":"automatic_masks","baseline":"baseline_v1","dwpose":"dwpose_v1"}
+FOLDERS={"masks":"automatic_masks","baseline":"baseline_v2","dwpose":"dwpose_v1"}
 BUDGETS={"masks":180,"baseline":600,"dwpose":180}
 QUERIES=(("human","person."),("object","bottle."))
+MASK_REVISION="8084688a4d84bbad9ba8c0580e4d1b2803745511"
+MASK_SOURCE_SHA="cb48d7d0a53cfd7b9f5c7ebe9e0904af91e844d187813fd1f973538b158cd4b5"
+BASELINE_V1_FAIL_SHA="dfc9107594d1ea82ba9f1f3cb9c643d21fc6248e2185c43a3fb2ff83fa229f2c"
 
 
 def require_fields(row,expected):
@@ -53,6 +56,32 @@ def source_identity():
     modules={"protocol":protocol,"mask_helper":masks,"baseline_helper":body,
              "dwpose_helper":dw_helper,"depth_support":depth_camera}
     return {"observer":sha256(Path(__file__))}|{k:sha256(Path(m.__file__))for k,m in modules.items()}|body.helper_identities()|{"dwpose_runtime":smoke.source_identity()}
+
+
+def historical_mask_source(root):
+    path=Path(root)/"jobs"/MASK_REVISION/"run_root5_rgb_observe"/"code"/"infra"/"root5_rgb_observe.py"
+    identity=protocol.identity(path)
+    if identity["sha256"]!=MASK_SOURCE_SHA:raise ValueError("Exact immutable completed mask source required")
+    return path,identity
+
+
+def mask_source_helpers(root):
+    historical_mask_source(root)
+    # Metadata substitution only. The historical source is never imported/run.
+    return source_identity()|{"observer":MASK_SOURCE_SHA}
+
+
+def previous_baseline_failure(root,cohort):
+    path=Path(root)/cohort.base/"baseline_v1/report.json";receipt=protocol.identity(path)
+    if receipt["sha256"]!=BASELINE_V1_FAIL_SHA or receipt["bytes"]!=3971:raise ValueError("Exact original baseline bootstrap failure required")
+    row=json.loads(path.read_text())
+    require_fields(row,dict(stage=STAGES["baseline"],status="fail",phase="public_integrity",producer_revision=MASK_REVISION,
+        script_sha256=MASK_SOURCE_SHA,image_id=native.IMAGE_ID,network="none",frames=cohort.count,
+        private_truth_read=False,ground_truth_used=False,challenge_inputs_used=False,hand_labeled_test=False,oracle_modes=[],
+        body_calls_completed=0,MoGe_calls_completed=0,raw_parity_head_calls_completed=0,raw_keypoint_head_calls_completed=0,
+        shared_head_calls_completed=0,official_reference_calls=0,error_type="ValueError",error="Canonical immutable public regular file required"))
+    if any(k in row for k in("frame_metrics","clip_metrics","decision","body_model")):raise ValueError("Original failure must have no model/quality observations")
+    return receipt
 
 
 def completed_masks(report,cohort):
@@ -76,7 +105,7 @@ def public_inputs(root,cohort,labels=("human","object")):
     if labels not in (("human",),("human","object")):raise ValueError("Explicit public mask modalities required")
     path=base/"automatic_masks/report.json";receipt=protocol.identity(path);report=json.loads(path.read_text())
     require_fields(report,dict(stage=STAGES["masks"],status="pass",phase="complete",cohort=contract,frames=cohort.count,
-        script_sha256=sha256(Path(__file__)),source_helpers=source_identity(),network="none",private_truth_read=False,
+        script_sha256=MASK_SOURCE_SHA,source_helpers=mask_source_helpers(root),producer_revision=MASK_REVISION,network="none",private_truth_read=False,
         ground_truth_used=False,challenge_inputs_used=False,hand_labeled_test=False,oracle_modes=[],human_query="person.",object_query="bottle.",
         input_manifest_sha256=manifest["sha256"],input_manifest_bytes=manifest["bytes"],all_cases_retained=True,
         actual_automatic_inference_verified=True,confidence=masks.CONFIDENCE,text_threshold=masks.TEXT_THRESHOLD,
@@ -168,10 +197,12 @@ def run_masks(root,out,cohort,report,persist):
 
 def run_baseline(root,out,cohort,report,persist):
     records,inputs=public_inputs(root,cohort);K=np.asarray(cohort.fixed_K,np.float64)
+    failed=previous_baseline_failure(root,cohort)
+    report.update(previous_failed_baseline=failed,previous_failure_rewritten=False);persist()
     asset,acquisition,asset_identity=native.depth_model.model_asset(root)
     model_path=root/"weights/mhr/mhr_model.pt";tool=root/"vendor/v2d_submission_kit/tools/track1/mesh_to_mhr_params.py"
     native.regular(model_path,native.REFERENCE_MODEL_SHA256);native.regular(tool,native.CONVERTER_SHA256)
-    semantic_path=root/"results/mhr-finger-semantics-v4.json";semantic_id=protocol.identity(semantic_path)
+    semantic_path=root/"results/mhr-finger-semantics-v4.json";semantic_id=native.regular(semantic_path)
     semantic=json.loads(semantic_path.read_text());native.regions_helper.require_semantic_report(semantic)
     if semantic.get("source_image_id")!=native.IMAGE_ID:raise ValueError("Actual native semantic image required")
     report.update(public_inputs=inputs,acquisition_report=acquisition,MoGe_model_asset=asset_identity,semantic_report_sha256=semantic_id["sha256"],
@@ -254,7 +285,8 @@ def run_baseline(root,out,cohort,report,persist):
             or native.depth_model.model_asset(root)[1:]!=(acquisition,asset_identity)
             or native.depth_model.installed_source(Path(moge.__file__).parent,json.loads(direct)if direct else{})!=source):raise ValueError("Body/MoGe assets/source changed")
     native.regular(model_path,native.REFERENCE_MODEL_SHA256);native.regular(tool,native.CONVERTER_SHA256)
-    if protocol.identity(semantic_path)!=semantic_id:raise ValueError("Native semantic receipt changed")
+    if native.regular(semantic_path)!=semantic_id:raise ValueError("Native semantic receipt changed")
+    if previous_baseline_failure(root,cohort)!=failed:raise ValueError("Preserved original failure changed")
     if any(report[k]!=cohort.count for k in("body_calls_completed","MoGe_calls_completed","raw_parity_head_calls_completed","raw_keypoint_head_calls_completed","shared_head_calls_completed"))or report["official_reference_calls"]!=1:raise ValueError("All15 Body/depth/decode calls required")
     if {p.name for p in out.iterdir()}!={"raw","paired","report.json"}:raise ValueError("Exact baseline output inventory required")
     report.update(sources_assets_rechecked=True,conversion_fidelity_verified=True,actual_body_inference=True,actual_MoGe_inference=True,actual_shared_native_forward=True,

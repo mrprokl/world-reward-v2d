@@ -2674,3 +2674,43 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   A complete fit/safeguard rejection may still receive its ONE planned private
   scoring for scientific diagnosis; rejection stops this recipe on this cohort,
   no retuning. Native feasibility/2D objective decrease alone never imply adoption.
+  Actual fresh render **PASS**7.235268s, producing077a03910d3568634c3b0d0e0b8ae0978303ce28,
+  script`608ce90af1ed555e59bcdd8b4c984c86dc1f68c51e0be53b74fcc6392c64a265`,
+  private preparation receipt`3c3ac975eda3f0b7975a7f0ef210075d89b26b2c91f910d46e14945a93150a2a`
+  (30,085B/0400). All15 different new RGBs,2attempted/returned/geometry-accepted
+  MHR batches; manifest`16d909d206ea9a71f402c01a699e69d63603e5b1366e1e24d55ac208846f466b`
+  2,196B/0444, truth typedI32 faceSHAf6748e29…5eacd6 unchanged.14-file dispatch49,196B.
+  Actual automatic masks **PASS**16.095937s, observer8084688a4d84bbad9ba8c0580e4d1b2803745511,
+  script`cb48d7d0a53cfd7b9f5c7ebe9e0904af91e844d187813fd1f973538b158cd4b5`,
+  receipt`3f509385e3cf1e711580cd34e0f55de55d95a2cf75a5122141a6c94c202a0050`
+  22,415B/0444;30DINO/30SAM/15encoders, all15public cases, zero private reads.
+  Actual fresh baseline-v1 **FAIL**1.252773s BEFORE model/inference/private read,
+  receipt`dfc9107594d1ea82ba9f1f3cb9c643d21fc6248e2185c43a3fb2ff83fa229f2c`
+  (3,971B/0444), same808 observer.0Body/MoGe/native/reference calls. Exact traceback
+  identifies semantic receipt `results/mhr-finger-semantics-v4.json` at
+  protocol.identity(): original canonical file is0644, while public-only reader
+  requires no host write bits. PublicRGB/manifest/mask reports are0444 as required.
+  Preserve this packaging failure and original semantic bytes/mode. Explicitnew
+  baseline_v2 will use original native regular/hash/semantic validation for this
+  reference receipt ONLY under the existing read-only bind, never relaxing
+  immutable public outputs or changing predictions. Reuse frozen808 masks with
+  exact canonical historical observer-file SHA and unchanged helper hashes;
+  new observer revision generates baseline_v2 and firstDW, no mask regeneration,
+  old source patch, model/optimization/quality retuning or labels.32-file observer
+  dispatch117,008B each; all units terminal/GPUidle63MiB. No fit/quality executed.
+  Engineering-only complete code-control ceiling128→160KB for ordinary native
+  fit/public/replay/quality import closure (~133KB fitter). Do not hide imports,
+  duplicate validators or drop source checks to save4KB; no model/data/render
+  bytes transit locally and no scientific budget/gate/numerical policy changes.
+  Predeclared separate replay:60latents/projected-points/objectives/59gradients
+  reconstruct manualF64Adam and losses within atol1e-6/rtol1e-5, selected
+  candidate/physical delta byte-identical to first minimum;15full native best
+  state replays withgeometry≤1e-5m/controls fixed, before any private access.
+  Corrective observer-v2 implementation audit:26own/147combined tests PASS;
+  independent exactGit808 AST confirms existing prediction algorithms unchanged,
+  historicalsource/helperhash substitution is metadata only. Preserve exact
+  v1FAIL3971B/dfc910… and source cb48…; no model/private observations existed.
+  Read-only semantic reference regular/hash check restores original loader
+  behavior only, keeps all public artifacts strictly444; v2exclusive namespace.
+  Full corrective source suite5971PASS/oneoptionaltrimeshSKIP84.34s and
+  Bash syntax/diffcheck PASS before new baseline_v2 dispatch.

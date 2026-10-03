@@ -38,9 +38,9 @@ def inputs(gate,tmp_path):
 def mask_fixture(gate,tmp_path):
     cohort=gate.protocol.COHORT;base,records,manifest=inputs(gate,tmp_path);out=base/"automatic_masks";out.mkdir()
     report=dict(stage=gate.STAGES["masks"],status="pass",phase="complete",cohort=asdict(cohort),frames=15,
-        script_sha256=gate.sha256(Path(gate.__file__)),source_helpers=gate.source_identity(),network="none",private_truth_read=False,
+        script_sha256=gate.MASK_SOURCE_SHA,source_helpers=gate.source_identity()|{"observer":gate.MASK_SOURCE_SHA},network="none",private_truth_read=False,
         ground_truth_used=False,challenge_inputs_used=False,hand_labeled_test=False,oracle_modes=[],human_query="person.",object_query="bottle.",
-        producer_revision="a"*40,input_manifest_sha256=manifest["sha256"],input_manifest_bytes=manifest["bytes"],all_cases_retained=True,
+        producer_revision=gate.MASK_REVISION,input_manifest_sha256=manifest["sha256"],input_manifest_bytes=manifest["bytes"],all_cases_retained=True,
         actual_automatic_inference_verified=True,confidence=gate.masks.CONFIDENCE,text_threshold=gate.masks.TEXT_THRESHOLD,
         nms_iou=gate.masks.NMS_IOU,ambiguity_margin=gate.masks.AMBIGUITY_MARGIN,actual_detector_calls=30,actual_sam2_calls=30,
         actual_sam2_image_encoder_calls=15,model_assets={n:dict(path=str(tmp_path/"weights"/n),sha256=d,bytes=s)for n,(d,s)in gate.masks.ASSETS.items()},records=[])
@@ -54,7 +54,13 @@ def mask_fixture(gate,tmp_path):
     def save():
         if p.exists():p.chmod(0o644)
         p.write_text(json.dumps(report));p.chmod(0o444)
-    save();return base,records,report,save
+    save()
+    historical=tmp_path/"jobs"/gate.MASK_REVISION/"run_root5_rgb_observe/code/infra/root5_rgb_observe.py"
+    historical.parent.mkdir(parents=True);historical.write_text("synthetic historical source fixture");historical.chmod(0o444)
+    # Exact-source pin only is replaced for a synthetic byte fixture, never runtime.
+    actual=gate.protocol.identity(historical)["sha256"]
+    gate.MASK_SOURCE_SHA=actual;report["script_sha256"]=actual;report["source_helpers"]["observer"]=actual;save()
+    return base,records,report,save
 
 
 def test_explicit_cohort_reader_has_no_private_data(gate,tmp_path):
@@ -176,3 +182,33 @@ def test_native_pointmap_ABI_validator_is_reused(gate):
     source=Path(gate.__file__).read_text()
     assert "native.joint.pointmap_contract(z,points,valid,normalized,K)"in source
     assert "checks=validate_camera_pointmap"not in source
+
+
+def test_historical_mask_source_remains_required_and_never_executed(gate,tmp_path):
+    base,_,_,_=mask_fixture(gate,tmp_path)
+    path,_=gate.historical_mask_source(tmp_path)
+    assert gate.mask_source_helpers(tmp_path)["observer"]==gate.MASK_SOURCE_SHA
+    path.chmod(0o644)
+    with pytest.raises(ValueError):gate.public_inputs(tmp_path,gate.protocol.COHORT)
+    source=Path(gate.__file__).read_text()
+    assert 'FOLDERS={"masks":"automatic_masks","baseline":"baseline_v2"'in source
+    assert "semantic_id=native.regular(semantic_path)"in source
+    assert "protocol.identity(semantic_path)"not in source
+
+
+def test_preserved_premodel_failure_exact_structural_guard(gate,tmp_path):
+    c=gate.protocol.COHORT;path=tmp_path/c.base/"baseline_v1/report.json";path.parent.mkdir(parents=True)
+    row=dict(stage=gate.STAGES["baseline"],status="fail",phase="public_integrity",producer_revision=gate.MASK_REVISION,
+        script_sha256=gate.MASK_SOURCE_SHA,image_id=gate.native.IMAGE_ID,network="none",frames=15,private_truth_read=False,
+        ground_truth_used=False,challenge_inputs_used=False,hand_labeled_test=False,oracle_modes=[],body_calls_completed=0,
+        MoGe_calls_completed=0,raw_parity_head_calls_completed=0,raw_keypoint_head_calls_completed=0,shared_head_calls_completed=0,
+        official_reference_calls=0,error_type="ValueError",error="Canonical immutable public regular file required")
+    def write():
+        if path.exists():path.chmod(0o644)
+        raw=json.dumps(row).encode();assert len(raw)<3971;path.write_bytes(raw+b" "*(3971-len(raw)));path.chmod(0o444)
+        gate.BASELINE_V1_FAIL_SHA=gate.protocol.identity(path)["sha256"]
+    write();receipt=gate.previous_baseline_failure(tmp_path,c);assert receipt["bytes"]==3971
+    for key,value in(("body_calls_completed",1),("private_truth_read",True),("decision",{})):
+        original=row.copy();row[key]=value;write()
+        with pytest.raises(ValueError):gate.previous_baseline_failure(tmp_path,c)
+        row=original

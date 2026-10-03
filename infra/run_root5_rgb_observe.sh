@@ -13,7 +13,7 @@ test -f "$CODE/infra/run_keypoint_rgb_dwpose.sh"
 BASE="$ROOT/validation/root5_rgb_v1"
 case "$STAGE" in
  masks) FOLDER=automatic_masks; BUDGET=183; MEMORY=32g; TAG=world-reward/grounding:0.1 ;;
- baseline) FOLDER=baseline_v1; BUDGET=603; MEMORY=32g; TAG=world-reward/cari4d-source:0.1 ;;
+ baseline) FOLDER=baseline_v2; BUDGET=603; MEMORY=32g; TAG=world-reward/cari4d-source:0.1 ;;
  dwpose) FOLDER=dwpose_v1; BUDGET=183; MEMORY=8g; TAG=world-reward/cari4d-source:0.1 ;;
 esac
 OUT="$BASE/$FOLDER"
@@ -32,6 +32,11 @@ if [[ "$STAGE" == masks ]];then [[ "$IMAGE" =~ ^sha256:[0-9a-f]{64}$ ]];else
 mkdir "$OUT";chmod 755 "$OUT";chown scenesmith:scenesmith "$OUT"
 MOUNTS=(--mount "type=bind,src=$CODE,dst=$CODE,readonly" --mount "type=bind,src=$BASE/inputs,dst=$BASE/inputs,readonly")
 GPUTAGS=()
+if [[ "$STAGE" != masks ]];then
+ SOURCE="$ROOT/jobs/8084688a4d84bbad9ba8c0580e4d1b2803745511/run_root5_rgb_observe/code/infra/root5_rgb_observe.py"
+ [[ -f "$SOURCE" && ! -L "$SOURCE" ]]
+ MOUNTS+=(--mount "type=bind,src=$SOURCE,dst=$SOURCE,readonly")
+fi
 case "$STAGE" in
  masks)
   GPUTAGS=(--gpus all)
@@ -43,7 +48,7 @@ case "$STAGE" in
    "$ROOT/weights/cari4d/sam3d_body" "$ROOT/weights/mhr/mhr_model.pt" \
    "$ROOT/weights/cari4d/hf_home/hub/models--Ruicheng--moge-2-vitl-normal" \
    "$ROOT/weights/cari4d/hf_home/hub/blobs/9f/9f4c4857a8203605fd29a80f0e81e9ed52fc1654c1e657d437ab29b73d8db37c" \
-   "$ROOT/results/weights-acquisition.json" "$ROOT/results/mhr-finger-semantics-v4.json" "$BASE/automatic_masks";do
+   "$ROOT/results/weights-acquisition.json" "$ROOT/results/mhr-finger-semantics-v4.json" "$BASE/automatic_masks" "$BASE/baseline_v1/report.json";do
    [[ -e "$path" && ! -L "$path" ]];MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly");done ;;
  dwpose)
   for path in "$ROOT/weights/dwpose_native_v1" "$ROOT/results/dwpose-wheel-audit-v3" \
