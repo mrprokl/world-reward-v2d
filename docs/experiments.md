@@ -4809,3 +4809,24 @@ T-LESS acquisition-only dispatched once sameb1b1223 onVM02,
 36files37452encodedB; CPUhost600s/newimmutableprivate output, no GPU/model or
 heavy local transfer. No acquisition/accuracy outcome yet. Updated three old
 CPU closure-budget tests164PASS1.71s, same160000B runtime cap unchanged.
+
+Final complete suite **9391PASS/2sameoptionalSKIP260.67s** after the three
+obsolete CPU bundle assertions were aligned to the unchanged160000B launcher
+ceiling. Native source/model/anchor/evaluation parameters remain untouched;
+the new tiny stage pins were added during this run without source changes.
+
+T-LESS acquisition **FAIL0.993362s**, before any private JSON/image selection
+or825MB test download: pinned base layout has an unlisted `test_targets_bop18.json`.
+Original immutable400 failure5296B/
+c4f2ca0037c55594c5082384a1d0430cefe1c581f03f81a4d156a426d2823940;
+ZIPcleanup verified, no12RGB/newprediction/generalization score. Subsequent
+Azure-only readonly49597B exactSHA base metadata audit lists four original
+members (camera_primesense, dataset_info, BOP18/BOP19 targets), does not decode
+private JSON or media/write files. Original1816B dataset_info contains **no
+licence declaration**, so mandatory embedded explicitCC-BY4 would alsoSTOP.
+Do not widen layout or infer a waiver/retry merely to rescue this dataset.
+Publisher/card concordance alone does not satisfy the preregistered contract.
+
+Episode2 full866 native refinement dispatched once040e1b55a250de5086b5e4c8816cbff25f175297,
+55files119824encodedB/publicexactHTTP200, unitactiveMainPID871067. Original
+301effectiveupdates/7200s/all866 remain; no completion/quality claim yet.
