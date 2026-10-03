@@ -5125,3 +5125,41 @@ and scoregates must be frozen beforeprediction, no D105rescue; pilotnotimplement
 orlaunched. Actualfull592tracking stillactive19:07UTC. Finalall30/oneParquet/
 licenseoverlapclearance/NVIDIAregistration/quota/upload/verifiedCARIwin remain
 unachieved. No goalcomplete or false block whilemeaningfulresearch/productioncontinues.
+
+
+## D106 — preregistered whole-native-support frame pilot, 2026-10-03
+
+Separate hypothesis/cohort afterD105closedFAIL. Newfilename-onlyTUDLrank30/70/
+110/150 per3scene, excludeall21old(scene,frame)pairs andvalidateactualoldranks
+beforeANYprivateannotationvalues. OriginalTUDLarchive3byteSHA+primarylicense
+helpersunchanged; freshvalidation/tudl_whole_support_holdout_v1 only,600/603s
+hostCPUacquisition/disposableZIPcleanup. Fullprotocol5217B/
+cb2d194e042ddd3893a9c5531c436635f5cbb57fa54497f69b1136a2886c1b1c
+fixedbeforeacquisition: pair1024 ANDwholegrid25% nativeMoGevalidsupport,
+ALLnativevalidpositivepixels/nofilter, q10/q50/q90/logIQR diagnosticpersisted
+BEFOREgate. These newhypothesisgates are notthresholdrelaxation orrerun ofD105;
+its originalfailure/RGB/recipe/privategeometry unused. Onepositiveper-scene
+medianof4equalper-imageMoGe/nativeDA3Zratio; nooffset/cameraretune/perframefit/
+semanticexclusion/confidenceweight/baselinevaliditychange. Native2ed48a89/Grid
+d3541ce4 bytesunchanged, no newmodelstack. PreregisteredquerymaystillFAILdue
+foreground/background bias orinvalidsupport, notpresumedsuccess.
+
+SeparateblindGPU300/303s exact14infra/src closure, onlypublic13individualfiles+
+singleactualpin, NOT recipe/acquisition/eval/private. ALL12predictions+actual
+source/modelmetadata bytepin beforetruth. NewCPU180/183s privateeval genuinely
+reusesoriginalintegerBOPsensor/+0.5pred/8192PCG0/95objectcoverage/median5/no
+scene−5 gates, allinstances/privatefullinventory, noalignment/drop. Threeagents
+handledpurecontract/cohort/inference+readonlyauditdisjointly, rootownscontrol/
+evaluator/pins. Focused189PASS1.43s/syntax checks; tinytestsnotGPU/modelaccuracy.
+Noacquisition/nativeprediction/privatequalityoractualcoefficientsclaimedyet.
+NewframesstillSAMEdevelopmentobjects/scenes, unknowntrainoverlap, notindependent
+fullHOI/CARIvictory. Public freeze must precedefirstAzureacquisition; nooldoutput
+rescue orchallengehumanlabels. Full592EP3trackingactive19:11:25UTC8953231886MiB,
+noinputassemblyortrackingPASSyet.
+
+D106 final independent readonlyaudit: no concreteblockingsoftwareissue;114tiny
+PASS0.75s and3bash-nPASS. Exact14inferenceinfra/src closure, public-onlymounts,
+allpublic/predictionpins beforeprivatevalues, genuineunchanged8192PCG0/BOP
+scorerandgates, diagnosticsbeforeabstention allconfirmed. Sourceauditdoesnot
+establishGPUaccuracy/license/trainoverlap. Freeze unchangedmethod/cohort now
+beforefirstAzureCPUacquisition. No actualnewframeIDs orqualityresults yet.

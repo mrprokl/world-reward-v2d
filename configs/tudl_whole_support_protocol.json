@@ -1,0 +1,185 @@
+{
+  "schema": "world-reward-tudl-whole-support-protocol-v1",
+  "namespace": "validation/tudl_whole_support_holdout_v1",
+  "dataset": "bop-benchmark/tudl",
+  "revision": "6527f7d4b25d3e2e8dec84529284d9797b15f7b5",
+  "license": "CC-BY-SA-4.0",
+  "archives": {
+    "tudl_base.zip": {
+      "bytes": 3394,
+      "sha256": "963dc6044eaf575a0f458b2804152da552b7fbca385d0ab01c115c6285e500ad"
+    },
+    "tudl_models.zip": {
+      "bytes": 2484229,
+      "sha256": "e649682d78d8e1ea463633cd09421b49b43600b32d84587eec3bcbe4a63e6a0f"
+    },
+    "tudl_test_bop19.zip": {
+      "bytes": 372464733,
+      "sha256": "cc68c55004dc7822a10910033aedffb3d40bf5bb0a39497b13e566dedddbea14"
+    }
+  },
+  "license_sources": {
+    "huggingface_README": {
+      "url": "https://huggingface.co/datasets/bop-benchmark/tudl/raw/6527f7d4b25d3e2e8dec84529284d9797b15f7b5/README.md",
+      "sha256": "f35ac7b30195da3b9b01d156fe7f0626e0ae4ac7f6d5757eb0b6ee3b8f31dcab"
+    },
+    "BOP_TUDL_section": {
+      "url": "https://bop.felk.cvut.cz/datasets/#TUD-L",
+      "bytes": 447,
+      "sha256": "aeccefac103003c079c96b8963809a9267a5703f7448b4fa51619853e620b31a"
+    },
+    "embedded_source": "retain original dataset_info.md; reject non-commercial/by-nc/all-rights-reserved conflicts; no fabricated embedded license declaration"
+  },
+  "acquisition": {
+    "budget_seconds": 600,
+    "maximum_expanded_zip_bytes": 2000000000,
+    "maximum_zip_members": 10000,
+    "maximum_member_bytes": 128000000,
+    "gpu_used": false,
+    "all_heavy_data_on_Azure": true,
+    "fresh_namespace_only": true
+  },
+  "selection": {
+    "scene_ids": [
+      1,
+      2,
+      3
+    ],
+    "RGB_filenames_per_scene": 200,
+    "sorted_RGB_indices": [
+      30,
+      70,
+      110,
+      150
+    ],
+    "excluded_development_indices": [
+      0,
+      100,
+      199
+    ],
+    "excluded_prior_holdout_indices": [
+      40,
+      80,
+      120,
+      160
+    ],
+    "excluded_development_frame_ids": {
+      "1": [
+        0,
+        4074,
+        8227
+      ],
+      "2": [
+        3,
+        4013,
+        7710
+      ],
+      "3": [
+        4,
+        4028,
+        7969
+      ]
+    },
+    "excluded_prior_holdout_frame_ids": {
+      "1": [
+        1788,
+        3235,
+        5138,
+        6925
+      ],
+      "2": [
+        1566,
+        3137,
+        4894,
+        6490
+      ],
+      "3": [
+        1512,
+        3227,
+        4819,
+        6647
+      ]
+    },
+    "before_private_annotation_values": true,
+    "images": 12,
+    "selection": "sorted_RGB_indices_30_70_110_150_per_scene_before_private_values"
+  },
+  "public_inputs": {
+    "schema": "world-reward-tudl-whole-support-holdout-rgb-v1",
+    "width": 640,
+    "height": 480,
+    "RGB_files_only_plus_attributed_manifest": true,
+    "private_K_depth_masks_meshes_or_labels": false
+  },
+  "frozen_method": {
+    "performed_by_acquisition": false,
+    "fixed_camera_K": [
+      [
+        800.0,
+        0.0,
+        320.0
+      ],
+      [
+        0.0,
+        800.0,
+        240.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "prediction_pixel_convention": "centres_plus_0.5",
+    "ratio_support": "all original native MoGe valid pixels; no border or semantic exclusion; require positive finite native MoGe Z and DA3 Z without filtering",
+    "minimum_native_valid_pairs": 1024,
+    "minimum_native_valid_full_grid_coverage": 0.25,
+    "diagnostics_before_support_gate": [
+      "whole_grid_pixels",
+      "native_valid_pixels",
+      "paired_valid_pixels",
+      "paired_grid_coverage",
+      "ratio_median",
+      "log_ratio_q10",
+      "log_ratio_q50",
+      "log_ratio_q90",
+      "log_ratio_iqr",
+      "passed",
+      "reasons"
+    ],
+    "anchor": "one positive scene median of four equal-weight image-median native MoGe_Z/native DA3_Z ratios",
+    "candidate_validity": "exact unchanged native MoGe validity; no drop or expansion",
+    "apply_mask": false,
+    "force_projection": true,
+    "per_frame_anchor_fit": false,
+    "offset_fit": false,
+    "alignment_performed": false,
+    "private_camera_used_for_prediction": false
+  },
+  "future_private_evaluation": {
+    "all_selected_object_instances": true,
+    "visible_mask_union": true,
+    "native_depth_scale_per_frame": true,
+    "sensor_pixel_convention": "integer_BOP",
+    "samples_per_frame": 8192,
+    "sampling": "all_if_count<=8192_else_sorted_PCG64_seed0_choice_without_replacement",
+    "minimum_visible_object_pixels": 32,
+    "scene_score": "mean four paired frame camera Chamfer half cm, then scene relative gain",
+    "minimum_median_relative_gain": 0.05,
+    "maximum_any_scene_relative_regression": 0.05,
+    "minimum_each_frame_baseline_and_candidate_object_coverage": 0.95,
+    "exact_candidate_validity_matches_baseline": true,
+    "no_alignment": true
+  },
+  "claims": {
+    "new_filename_selected_frames": true,
+    "same_development_scenes_and_objects": true,
+    "independent_scenes_or_objects": false,
+    "training_overlap_verified": false,
+    "challenge_overlap_verified": false,
+    "real_world_generalization_beyond_these_scenes_verified": false,
+    "full_human_object_quality_verified": false,
+    "temporal_quality_verified": false,
+    "verified_victory_over_CARI4D": false
+  }
+}

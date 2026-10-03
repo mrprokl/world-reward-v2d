@@ -431,3 +431,39 @@ Firstrootfsprint exceeded Azure4KBtail; boundedsecondreadonlyinventory returned
 actual IDs+size. No image exports, data/modeltransfers, keys/network changes or
 storageattachment performed. VM02existing93GBfree is not yet validated for full
 frontendreplica capacity; minimumasset/auditedsourceclosure remains prerequisite.
+
+
+2026-10-03 frontendclone prerequisiteaudit: lib_mhr package __init__ transitively
+imports17files160540B, not onlybody_pose/mhr_layer/rotations; prep10files165589B
+plusbehave_data/toolsinitializers+video_reader/pipeline_timing11867B. SAMBodyall
+Python+LICENSE incl6dataPython code actualinstalledparity. No CARIcommercialckpt
+neededforfrontendsendingcari_inputs, but Body2.109GB+bundledMHR.696GB, Objects
+6ckpts12.449GB/7YAML, groundingSAM2nine1.832GB, DINOv2reg4twoactualpinnedckpts,
+DINOv2/v3cleanpublicsources, internalMoGe1 (constructedevenalignedpointmap)
+1.256GB atad326bfb61facd6c52b5a825bc1e34d7c97d9672/modelSHAda96b09a0485a3c45a5aa455e67743c8b4efc4dd8437c1f2aa93c2b4303d957f.
+Primarysize/hash doesnotproveactualVM01HFsnapshot/XETlinkbinding. Needreadonly
+actualwhitelistinventory, sealedimagesOCIplatformconfig+rootfs proof, newVM02
+cameraCUDAgate andnewscopedwrapper (oldposemountswholevalidationprivateTUDL)
+beforeclonefrontends. Nofilteredsource/weights/imageexports orAzurepeertransferyet.
+
+User-authorizedstorage preparation: newowned1TBPremium_LRSdisk firstcreation
+world-reward-vm02-data-v1 succeeded but attachFAILED because VM02zone1 anddisk
+hadnozone. Noexistingdiskformat/mount/replacement. Immediatedelete ofownempty
+unattachedwrongzone disk was refused due pendingattachoperation; preserveuntil
+providerstateconsistent. Newseparatezone1diskworld-reward-vm02-data-z1-v1
+creationPASS, subsequentVMshowprovesattachedLUN0/manageddiskid, cachingNone;
+OS/unrelatedresourcesuntouched. Stillmust inspectactualguestLUN/size/blank
+filesystem beforeformat/mount atcanonicalnewpath; no disk-successinference from
+CLIquietoutput. NoexistingrootDockerrelocation/symlink/credentials/networkchange.
+
+19:19:26UTC actual gueststoragePASS: newzone1/LUN0 device /dev/sdc,
+serial60022480b2eeb99d9fd9b5d85692cc3a, exact1099511627776B andnochildren/
+filesystem/signatures/mounts checkedbeforeformat. Newext4 UUID
+24df126a-5f5f-41d8-801c-9ddaa7a582d8 mounted /srv/world-reward-data rw,noatime;
+actualavailable1026108792832B. Ownedreceiptresults/vm02-data-z1-v1.json0444,
+UUIDfstabpersisted. ExistingOS/resource/data neverformatted, runtimenotrelocated.
+Wrongzoneownedunattacheddisk recheckedSucceeded/nullmanagedBy beforedeletion;
+provider deletionpending, notclaimedyet. No heavydata downloadedlocally.
+Wrongzoneemptyowned disk deletionexit0 and independentResourceNotFound confirm
+cleanupDONE; no extraunusedmanageddisk retained. Only actualzone1/LUN0data disk
+wasformatted/attached. No VM02image/assets transfers or frontendclonePASS yet.
