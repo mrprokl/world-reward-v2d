@@ -91,9 +91,24 @@ def main() -> None:
     fixed_mesh_path = output / "object_fixed_canonical.glb"
     if args.mesh_source=='volume':
         from volume_geometry_loader import load
+        from volume_mesh_pin_inventory import strict_json, identity
         import shutil
+        # Generic sources are independently frozen in committed, readonly code.
+        # Only historical episode0 may retain the exact legacy producer path.
+        pin_path = Path(__file__).resolve().parent.parent / "configs" / f"volume_mesh_{args.episode:06d}_pins.json"
+        pins = None
+        pin_identity = None
+        if pin_path.exists() or pin_path.is_symlink():
+            pin_identity = identity(pin_path)
+            if pin_path.stat().st_mode & 0o222:
+                raise ValueError("Immutable committed generic volume mesh pins required")
+            pins = strict_json(pin_path.read_text())
         vertices,faces,active_indices,geometry_cleanup,qualified_glb,topology_budget=load(
-            root,args.episode,inputs['video_sha256'],sha256(object_report_path),sha256(alignment_path),float(scale[0]))
+            root,args.episode,inputs['video_sha256'],sha256(object_report_path),sha256(alignment_path),float(scale[0]),pins=pins)
+        if pin_identity is not None:
+            if identity(pin_path) != pin_identity:
+                raise ValueError("Original committed volume pins changed during loading")
+            topology_budget['committed_pins_sha256'] = pin_identity['sha256']
         output.mkdir(exist_ok=False)
         shutil.copyfile(qualified_glb,fixed_mesh_path)  # remote only, canonical scale not applied here
     else:

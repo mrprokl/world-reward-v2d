@@ -4292,3 +4292,44 @@ Root volumeCLI/wrapper and diagnostic integration187PASS20.69s; fulltiny suite
 outputreservation on scopedlock/GPUbusy. Originalv2, crosssurface, volumeCPP/
 control/export helpers and ongoingep1numericproducer unchanged. All30 explicit
 CPUproposalnamespaces tested with tiny stubs; noGPU/geometry locally.
+
+Actual additive neutral diagnostic **PASS3.378421s**, producer
+3242cb23486726c9636ca66241020f6aa276be1b,26files44,312encodedB;
+one originalCUDAforward/fullV/Fhashmatched. Firsteight nonadjacentflags all
+have exact stricttransverse interiorwitnesses (4439/4440 through4430/4450),
+not tolerance-only flags. Originalv2FAILunchanged; no globaldiagnosis/anatomy,
+geometryrepair/fit/cohort/contact/quality claim. Sole400report4585ae0ff1da8384225df807a6c2095fbc1ff0bef5c1f09b45305b9f80356f43
+(31,736B), novertices/NPZ/modeltransferred locally.
+
+Episode2 standalone volumeproposal **PASS5.397416s**, sameproducer3242cb2,
+32files57,200encodedB; original18components retained,4096F, source/candidate/
+packedintersections0, sampledCD0.235404%<1%, netvolume0.506354%<5%,
+maxbirthface-matchedshellvolume4.998236%<5%, unchangedorigin/scale/poses.
+Report3b9ec8a123f873ca9dbd6728146cba4a67c9554f0519a00a02ce3d7119ca3d08
+(35,767B); geometryb7ee5fd43a7e49713b7d43e7749887b2a95530fd204edc1fb14a50d161d4ae64
+(62,884B), GLBeae7c0ff581eb9819c4a7693e0a59a10683ba45c1a681d10dab682d886946329
+(74,900B). PublicexactproducerHTTP200; notracking/accuracyadoptionyet.
+Generic7artifact SHA/bytes inventory/consumer retainslegacyepisode0only;
+explicitnewproducer/sourcepins before JSON, same numericalfidelitygates and
+rehashafterloading; noGPUresimplification.291focusedPASS21.21s.
+
+Genericvolumeconsumer sourceclosure/import/gates291PASS21.21s; readonlycode
+pin integration98PASS. Complete **8658PASS/2sameoptionalSKIP157.09s** before
+new continuationwrapper tests. Originalep0legacyproducer remainsbound;
+nonzeroepisodes require explicitactualpins, noselfreportedproducertrust.
+
+Predeclare pinned-volume continuation: existing8frontendreports+7CPUmeshsource
+artifacts/committedpins validatedhash/JSON-only, nooriginalinitializer rerun.
+Only identicalfull objecttracking866→CPUinputassembly, each7200s; scopedGPUlock
+released beforeCPU, exactb47image/immutableclosure/newoutputabsence. Original
+emptyfailedobject_pose_full may be removedONLY by root rmdir after failedunit/
+log/emptyinventory confirmation, never automaticwrapper cleanup or overwrite.
+No trajectoryhypothesis/support/resolution/scale change; no nativeforward yet.
+
+Pinned continuation+genericinventory+loader/objectpose/archive **258PASS38.17s**.
+An adversarial wrongimage fixture exposed localBash3.2 standaloneconditional
+_errexit_ behavior; explicit image mismatch now emitsfailure and exits, keeping
+exactexpectedb47. GPUidle staysa checkedfunction; no imagewhitelistrelaxation.
+No actualCPUmeshread/decode locally. Originaltrajectoryloops remainbyteidentical
+apartfrom loadingcommittedpins in volume branch; currentcari_prepareSHAc529b240
+unchanged. Fullsuite8658PASS2skip157.09s predates newcontinuation tests.

@@ -105,3 +105,39 @@ def test_float32_producer_scale_arithmetic_matches_exactly(qualified,monkeypatch
     np.savez_compressed(path,vertices=packed,faces=pf,episode_index=np.array(0),object_scale=np.array(1.),grounded_scale_baked=np.array(2.5))
     report['geometry_sha256']=module.sha256(path);(base/'report.json').write_text(json.dumps(report))
     assert np.array_equal(call(qualified)[0],packed)
+
+
+def test_legacy_pins_none_is_episode0_only_no_global_const_monkeypatch(qualified):
+    module,root,*_=qualified
+    with pytest.raises(ValueError,match='episode0 only'):
+        module.load(root,2,'1'*64,'2'*64,'3'*64,2.5)
+
+
+def test_generic_branch_calls_same_numeric_fidelity_and_posthash_gate(qualified,monkeypatch):
+    module,root,base,report,pv,pf=qualified
+    import volume_mesh_pin_inventory as inventory
+    pins={'report':{'producer_revision':'a'*40,'script_sha256':'b'*64},'files':{'tiny/pin':{'sha256':'c'*64,'bytes':1}}}
+    report.update(producer_revision='a'*40,script_sha256='b'*64)
+    (base/'report.json').write_text(json.dumps(report))
+    observed=pins['files'];events=[]
+    monkeypatch.setattr(inventory,'verify_pinned_artifacts',lambda *args:events.append('pins')or(report,observed))
+    monkeypatch.setattr(inventory,'identity',lambda path:observed['tiny/pin'])
+    v,f,*_,receipt=module.load(root,0,'1'*64,'2'*64,'3'*64,2.5,pins=pins)
+    assert np.array_equal(v,pv)and np.array_equal(f,pf)and events==['pins']
+    assert receipt['generic_artifact_pins_verified']and receipt['cpu_producer_revision']=='a'*40
+    monkeypatch.setattr(inventory,'identity',lambda path:{'sha256':'d'*64,'bytes':1})
+    with pytest.raises(ValueError,match='changed during numerical'):
+        module.load(root,0,'1'*64,'2'*64,'3'*64,2.5,pins=pins)
+
+
+def test_generic_branch_rejects_npz_extra_payload_even_if_report_pinned(qualified,monkeypatch):
+    module,root,base,report,pv,pf=qualified
+    import volume_mesh_pin_inventory as inventory
+    pins={'report':{'producer_revision':'a'*40,'script_sha256':'b'*64},'files':{}}
+    report.update(producer_revision='a'*40,script_sha256='b'*64)
+    np.savez_compressed(base/'geometry.npz',vertices=pv,faces=pf,episode_index=np.array(0),object_scale=np.array(1.),
+        grounded_scale_baked=np.array(2.5),unexpected_private=np.array([0]))
+    report['geometry_sha256']=module.sha256(base/'geometry.npz');(base/'report.json').write_text(json.dumps(report))
+    monkeypatch.setattr(inventory,'verify_pinned_artifacts',lambda *args:(report,{}))
+    with pytest.raises(ValueError,match='Exact original CPU proposal NPZ'):
+        module.load(root,0,'1'*64,'2'*64,'3'*64,2.5,pins=pins)

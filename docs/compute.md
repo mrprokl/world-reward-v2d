@@ -407,3 +407,9 @@ wholepipelinePASS or native668pins yet. Predeclare one separate report-only
 neutralexactwitnessGPUdiagnostic and one disjointCPUvolumeproposal afterfreeze;
 heavyassets stayAzure, no duplicatepredictions. Publicexactc37efc71351fe5e8c8536f87143b2ff8769b6cfe
 verifiedunauthHTTP200; no finalsubmission or codeeligibilityclaim.
+
+2026-10-03 actualneutraldiagnostic/CPUvolumeproposal bothinactiveexit0;
+originalproducer3242cb23486726c9636ca66241020f6aa276be1b. ONE neutralGPUcall,
+3.378421s/all8exactcrosswitnesses, no geometrypayload; disjointCPUproposal
+5.397416s/18originalcomponents/4096faces/fidelitygatesPASS. GPUemptyafterward,
+episode1scalarCPUdepth450/668active. NoVM02assettransfer or native668job yet.

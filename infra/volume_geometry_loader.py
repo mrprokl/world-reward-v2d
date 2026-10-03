@@ -23,14 +23,22 @@ def regular(path):
     return path
 
 
-def load(root,episode,input_sha,object_report_sha,alignment_sha,scale):
+def load(root,episode,input_sha,object_report_sha,alignment_sha,scale,*,pins=None):
     root=Path(root)
     if type(episode) is not int or not 0 <= episode < 30 or type(scale) is not float or not np.isfinite(scale) or scale <= 0:
         raise ValueError('Require selected episode and finite positive grounding scale')
+    pinned=None
+    if pins is None:
+        if episode!=0:raise ValueError('Legacy unpinned volume route is episode0 only; explicit generic pins required')
+        producer_revision,producer_sha=PRODUCER_REVISION,PRODUCER_SHA
+    else:
+        import volume_mesh_pin_inventory as inventory
+        r,pinned=inventory.verify_pinned_artifacts(root,pins,episode,input_sha,object_report_sha,alignment_sha,scale)
+        producer_revision,producer_sha=pins['report']['producer_revision'],pins['report']['script_sha256']
     base=root/f'outputs/episode_{episode:06d}/object_budget_volume';p=regular(base/'report.json')
-    r=json.loads(p.read_text())
+    if pins is None:r=json.loads(p.read_text())
     expected={'stage':'world_reward_cpu_volume_constrained_object_mesh','status':'pass','episode_index':episode,
-              'producer_revision':PRODUCER_REVISION,'script_sha256':PRODUCER_SHA,'input_track':'track_1',
+              'producer_revision':producer_revision,'script_sha256':producer_sha,'input_track':'track_1',
               'input_sha256':input_sha,'ground_truth_used':False,'hand_labeled_test':False,'oracle_modes':[],
               'target_faces':4096,'target_vertices':4096,'components_deleted':False,'holes_filled':False,
               'normals_repaired':False,'frame_poses_changed':False,'source_shell_volume_relative_limit':.05,
@@ -65,6 +73,8 @@ def load(root,episode,input_sha,object_report_sha,alignment_sha,scale):
     if sha256(geometry)!=r.get('geometry_sha256') or sha256(glb)!=r.get('canonical_glb_sha256'):
         raise ValueError('Frozen CPU volume geometry/export differs')
     with np.load(geometry,allow_pickle=False) as data:
+        if pins is not None and set(data.files)!={'vertices','faces','episode_index','object_scale','grounded_scale_baked'}:
+            raise ValueError('Exact original CPU proposal NPZ payload required')
         vertices,faces=data['vertices'].copy(),data['faces'].copy()
         if (data['episode_index'].shape!=() or data['episode_index'].dtype.kind not in 'iu'
                 or data['object_scale'].shape!=() or data['object_scale'].dtype.kind!='f'
@@ -87,4 +97,9 @@ def load(root,episode,input_sha,object_report_sha,alignment_sha,scale):
              'metric_scale_already_baked':True,'resimplification_performed':False,'actual_topology_verified':True,
              'metric_oriented_triangle_fidelity':fidelity,
              'independent_embedding_reverified_here':False,'upstream_packed_intersections':0}
+    if pins is not None:
+        if {name:inventory.identity(root/name) for name in sorted(pins['files'])}!=pinned:
+            raise ValueError('Pinned CPU proposal artifacts changed during numerical loading')
+        receipt.update(cpu_producer_revision=producer_revision,cpu_script_sha256=producer_sha,
+            generic_artifact_pins_verified=True,original_artifacts_rehashed=True)
     return vertices,faces,active,cleanup,glb,receipt

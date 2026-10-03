@@ -71,3 +71,16 @@ def test_volume_consumer_keeps_arrays_and_existing_native_chain(pose):
 @pytest.mark.parametrize("argument", ["--pointmap-directory", "--root", "--manual-mask", "--shape-fit", "--no-gt"])
 def test_pose_has_no_new_research_algorithm_or_arbitrary_input_modes(pose, argument):
     with pytest.raises(SystemExit): pose._argument_parser().parse_args([argument])
+
+
+def test_generic_volume_pins_are_immutable_code_bound_not_cli_or_receipt(pose):
+    source=Path(pose.__file__).read_text()
+    branch=source.split("if args.mesh_source=='volume':",1)[1].split('    else:',1)[0]
+    assert 'volume_mesh_{args.episode:06d}_pins.json' in branch
+    assert 'Path(__file__).resolve().parent.parent / "configs"' in branch
+    assert 'pins=pins' in branch and 'strict_json(pin_path.read_text())' in branch
+    assert "pin_path.stat().st_mode & 0o222" in branch
+    assert "identity(pin_path) != pin_identity" in branch
+    assert 'committed_pins_sha256' in branch
+    assert 'fit_topology_preserving_budget(' not in branch
+    with pytest.raises(SystemExit):pose._argument_parser().parse_args(['--volume-pins','arbitrary.json'])
