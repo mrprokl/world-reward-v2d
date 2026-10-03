@@ -97,13 +97,13 @@ def test_static_exact_source_archive_unit_and_no_private_key_reads(api):
    for target in node.targets:
     if isinstance(target,ast.Name) and target.id in('ARCHIVE_BYTES','ARCHIVE_SHA256'):literals[target.id]=ast.literal_eval(node.value)
  assert literals=={'ARCHIVE_BYTES':api['ARCHIVE_BYTES'],'ARCHIVE_SHA256':api['ARCHIVE_SHA']}
- assert api['UNIT']=='world-reward-frontend-peer-sshd-v1.service'
- assert api['CONTROL']==Path('/run/world-reward-frontend-peer-v1')
+ assert api['UNIT']=='world-reward-frontend-peer-sshd-v2.service'
+ assert api['CONTROL']==Path('/run/world-reward-frontend-peer-v2')
  assert "directory(ROOT,owner=1000)" in SOURCE and "directory(DISK,owner=1000)" in SOURCE
  assert api['UUID']=='24df126a-5f5f-41d8-801c-9ddaa7a582d8'
  assert "'--property=Type=exec','--property=Restart=no','--property=RuntimeMaxSec=2400'" in SOURCE
  assert "'/usr/sbin/sshd','-D','-e','-f'" in SOURCE
- assert "from=\"10.0.0.4\",restrict" in SOURCE
+ assert 'from="10.0.0.4",restrict,command="{forced}"' in SOURCE
  assert "45*1024**3" in SOURCE
  assert "'host_ed25519').read" not in SOURCE
  assert 'docker' not in SOURCE and 'nvidia-smi' not in SOURCE and 'iptables' not in SOURCE
@@ -180,6 +180,7 @@ def test_mocked_owned_setup_actual_control_command_sequence(api,monkeypatch,tmp_
  output=api['json'].loads(capsys.readouterr().out)
  assert output['status']=='pass' and output['replica_ready'] is False and output['private_key_read'] is False
  assert output['host_public_key']==key() and 'procedural placeholder' not in str(output)
+ assert (control/'authorized_keys').read_text()==f'from="10.0.0.4",restrict,command="/usr/bin/python3 -I -B {code}/infra/frontend_peer_receive.py --receive" {key()}\n'
  assert (control/'server-receipt.json').stat().st_mode&0o777==0o400
  assert list(destination.iterdir())==[]
  command=next(args for args in calls if args[0]=='/usr/bin/systemd-run')

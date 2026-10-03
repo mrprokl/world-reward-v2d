@@ -11,8 +11,8 @@ from pathlib import Path
 ROOT=Path('/srv/scenesmith/world-reward')
 DISK=Path('/srv/world-reward-data')
 DEST=DISK/'frontend-assets-v1'
-CONTROL=Path('/run/world-reward-frontend-peer-v1')
-UNIT='world-reward-frontend-peer-sshd-v1.service'
+CONTROL=Path('/run/world-reward-frontend-peer-v2')
+UNIT='world-reward-frontend-peer-sshd-v2.service'
 UUID='24df126a-5f5f-41d8-801c-9ddaa7a582d8'
 ARCHIVE_BYTES=19_911_464_960
 ARCHIVE_SHA='5b817ea15e98f1f18165529fcac3ca0b7fc9f88b96d22f2195396db6ffbf8342'
@@ -131,7 +131,10 @@ def main(arguments):
   # The private key is NEVER read, hashed, copied, printed or included in receipts.
   os.chmod(CONTROL/'host_ed25519.pub',0o400);raw,pub_pin=regular(CONTROL/'host_ed25519.pub',True)
   host_public=public_key(raw.decode().rstrip('\n'),True)
-  exclusive(CONTROL/'authorized_keys',(f'from="10.0.0.4",restrict {key}\n').encode())
+  # OpenSSH PermitRootLogin forced-commands-only inspects the *key* option,
+  # not global ForceCommand. Both bindings must name the same frozen receiver.
+  forced=f'/usr/bin/python3 -I -B {code}/infra/frontend_peer_receive.py --receive'
+  exclusive(CONTROL/'authorized_keys',(f'from="10.0.0.4",restrict,command="{forced}" {key}\n').encode())
   exclusive(CONTROL/'sshd_config',configuration(code/'infra/frontend_peer_receive.py').encode())
   public_control={name:regular(CONTROL/name,True)[1] for name in('authorized_keys','sshd_config','host_ed25519.pub')}
   phase='sshd_validation';run(['/usr/sbin/sshd','-t','-f',str(CONTROL/'sshd_config')])

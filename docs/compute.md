@@ -586,3 +586,11 @@ numpy2.1.2 and OpenCV5.0.0.93; VM02 Body has transformers5.3.0/
 tokenizers0.22.2/safetensors0.8.0 and lacks SAM2/Objects. A new scoped
 Grounding child must pin dependencies and validate ABI; no current image
 parity or licensed submission eligibility inferred.
+
+
+22:04:09UTC EP4 whole747tracking stillactive962210/single9623011886MiB;
+EP3queuednative965420 waits on existing lock, no reports. Failedpeer1
+transport usedzero incomingbytes, so sharedGPUresearch continued untouched.
+A diagnostic AzureRC was rejectedConflict before any execution while
+sender-dispatchRCstillrunning; later read-only dispatch waited for that
+client tocomplete. No unit/namespace blindlyrestarted.

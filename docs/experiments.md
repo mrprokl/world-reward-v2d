@@ -5521,3 +5521,26 @@ and SSH-F/dev/null isolation; production source contract was not relaxed.
 Final peer/extractor/archive/runtime-closure focused296PASS; Bash-n and
 diffcheckPASS. Full prior c84558c suite10051PASS/2optionalSKIP remains
 separate; new wrappers not claimed fully deployed or numerically better.
+
+
+Frozen0e8b9c6 fullsuite10226PASS/2optionalSKIP292.08s using existing
+Python3.11venv/PYTHONPATH=src. Earlier bareOSPython3.9 collection failed
+beforetests because package not installed there; not a regression score.
+Peer server1 actuallyPASS, receipt1857B/3f37edfe825968e00f78d7483a8460ee15b09552bcc06767678ad5bec44f73c5;
+sender1 actuallyFAIL12.503529475s, receipt833B/a58a0216403ac740e7c6e508564c94d6b33ca2cd7c6cbc2b5794202ee7087273.
+VM02incoming stayedEMPTY/0bytes. OpenSSH8.9 reported monitor request26
+after global ForceCommand-only authentication; primary auth.c proves
+PermitRootLogin forced-commands-only checks authorized-key force_command,
+not global setting. Freshserver2 will bind identical receiver in BOTH
+key command and global ForceCommand; strict root/address/key restrictions
+unchanged.94focusedPASS0.70s.
+22:07:20UTC ownedserver1 stopped, own hostprivate/auth removed, temporary
+NSGallow removed, failedEMPTYnamespace atomically archived500 without
+rewriting originalfailreceipt. No transfer/extraction/PASS rescue claim.
+
+Scoped prospective VM02 Grounding builder uses independently pinned SAM2
+2b90b9f32publicsource entries +thinNVIDIA7c0d12entries/licenses, offline
+no-deps wheels Tf4.53.3/tokens0.21.4/safe0.6.2/hub0.36.2 and optional
+decord0.6.0. NVCC12.4/H100arch9.0/SAM2extensionerrorsfatal; baseTorch/
+NumPy unchanged, new image rather than pretending original53b parity.
+32own tinytestsPASS, no actual acquisition/build/CUDA/model result yet.

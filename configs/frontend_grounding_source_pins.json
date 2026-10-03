@@ -1,0 +1,355 @@
+{
+  "schema": "world_reward.frontend_grounding_source_pins.v1",
+  "base_image_id": "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3",
+  "target_image": "world-reward/frontend-grounding-v1:0.1",
+  "repositories": [
+    {
+      "repo": "facebookresearch/sam2",
+      "revision": "2b90b9f5ceec907a1c18123530e92e794ad901a4",
+      "files": [
+        {
+          "path": "LICENSE",
+          "bytes": 11357,
+          "git_blob_sha1": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        },
+        {
+          "path": "MANIFEST.in",
+          "bytes": 254,
+          "git_blob_sha1": "794311fd9854453b134c828c0cb241a7cfdbfc65",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/MANIFEST.in"
+        },
+        {
+          "path": "README.md",
+          "bytes": 16249,
+          "git_blob_sha1": "85a7eb958bced5495ff990c2bcbe7d99662c660f",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/README.md"
+        },
+        {
+          "path": "pyproject.toml",
+          "bytes": 120,
+          "git_blob_sha1": "f84317dbbfa6ba4f2d972cab2e2e0d0bdf07f003",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/pyproject.toml"
+        },
+        {
+          "path": "sam2/__init__.py",
+          "bytes": 395,
+          "git_blob_sha1": "0712dd03cb280ab94ba04f8a32aa8ddc8aa3db4a",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/__init__.py"
+        },
+        {
+          "path": "sam2/automatic_mask_generator.py",
+          "bytes": 18461,
+          "git_blob_sha1": "065e469e27c2d3af40d51d072031e828692c799b",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/automatic_mask_generator.py"
+        },
+        {
+          "path": "sam2/benchmark.py",
+          "bytes": 2811,
+          "git_blob_sha1": "6519534c8619e04b9a632859a5128ad2cee34c13",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/benchmark.py"
+        },
+        {
+          "path": "sam2/build_sam.py",
+          "bytes": 6405,
+          "git_blob_sha1": "3a3bef1e566d86c3ba0fd75f425530bc6505e9bf",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/build_sam.py"
+        },
+        {
+          "path": "sam2/configs/sam2.1/sam2.1_hiera_l.yaml",
+          "bytes": 3798,
+          "git_blob_sha1": "23073ea7a95901be656b3c6d1a66ce8736ab7ad3",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/configs/sam2.1/sam2.1_hiera_l.yaml"
+        },
+        {
+          "path": "sam2/csrc/connected_components.cu",
+          "bytes": 7808,
+          "git_blob_sha1": "ced21eb32eaaadb818d441c1322b99d1bf068f45",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/csrc/connected_components.cu"
+        },
+        {
+          "path": "sam2/modeling/__init__.py",
+          "bytes": 197,
+          "git_blob_sha1": "5277f46157403e47fd830fc519144b97ef69d4ae",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/__init__.py"
+        },
+        {
+          "path": "sam2/modeling/backbones/__init__.py",
+          "bytes": 197,
+          "git_blob_sha1": "5277f46157403e47fd830fc519144b97ef69d4ae",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/backbones/__init__.py"
+        },
+        {
+          "path": "sam2/modeling/backbones/hieradet.py",
+          "bytes": 10003,
+          "git_blob_sha1": "19ac77b61d8e1345a301686d39ef2ab6e4b035fb",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/backbones/hieradet.py"
+        },
+        {
+          "path": "sam2/modeling/backbones/image_encoder.py",
+          "bytes": 4706,
+          "git_blob_sha1": "37e9266bc98596e97ca303118c910ed24f6cee2c",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/backbones/image_encoder.py"
+        },
+        {
+          "path": "sam2/modeling/backbones/utils.py",
+          "bytes": 3007,
+          "git_blob_sha1": "930b1b7622e7b0e7270120dcafccc242ef0f4f28",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/backbones/utils.py"
+        },
+        {
+          "path": "sam2/modeling/memory_attention.py",
+          "bytes": 5509,
+          "git_blob_sha1": "0b07f9d87e3d8194ca5e11fc20f01604d591a59d",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/memory_attention.py"
+        },
+        {
+          "path": "sam2/modeling/memory_encoder.py",
+          "bytes": 5657,
+          "git_blob_sha1": "f60202dfaba87232c3870fb2101b5322a119d985",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/memory_encoder.py"
+        },
+        {
+          "path": "sam2/modeling/position_encoding.py",
+          "bytes": 8980,
+          "git_blob_sha1": "2241d4cf1a4495b4c67dc35cbed1c606357b9b7a",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/position_encoding.py"
+        },
+        {
+          "path": "sam2/modeling/sam/__init__.py",
+          "bytes": 197,
+          "git_blob_sha1": "5277f46157403e47fd830fc519144b97ef69d4ae",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/sam/__init__.py"
+        },
+        {
+          "path": "sam2/modeling/sam/mask_decoder.py",
+          "bytes": 12657,
+          "git_blob_sha1": "9bebc0366b2703ffcb80a44bfd19cce8339b4fed",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/sam/mask_decoder.py"
+        },
+        {
+          "path": "sam2/modeling/sam/prompt_encoder.py",
+          "bytes": 7541,
+          "git_blob_sha1": "c57876264b51f8c5236867359350e32d590efcb5",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/sam/prompt_encoder.py"
+        },
+        {
+          "path": "sam2/modeling/sam/transformer.py",
+          "bytes": 10761,
+          "git_blob_sha1": "f9fe9a3fbc5cce4f1abe8ee0ae3a8602bbe2ff1b",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/sam/transformer.py"
+        },
+        {
+          "path": "sam2/modeling/sam2_base.py",
+          "bytes": 46983,
+          "git_blob_sha1": "d9f4e515b0d161942bf2bb64560056b3efbe6dac",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/sam2_base.py"
+        },
+        {
+          "path": "sam2/modeling/sam2_utils.py",
+          "bytes": 13173,
+          "git_blob_sha1": "e16caae3a9a49e451b2d03d1ee60c47f8e9ed23c",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/modeling/sam2_utils.py"
+        },
+        {
+          "path": "sam2/sam2_image_predictor.py",
+          "bytes": 19937,
+          "git_blob_sha1": "41ce53af5924504c07216df52b2d2eefaeec7ae9",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/sam2_image_predictor.py"
+        },
+        {
+          "path": "sam2/sam2_video_predictor.py",
+          "bytes": 58921,
+          "git_blob_sha1": "5a7e1a01c4d6e89db0453ce982ea8a31b16651c8",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/sam2_video_predictor.py"
+        },
+        {
+          "path": "sam2/sam2_video_predictor_legacy.py",
+          "bytes": 58777,
+          "git_blob_sha1": "c7e01ccf972491904b013526333826b337354db1",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/sam2_video_predictor_legacy.py"
+        },
+        {
+          "path": "sam2/utils/__init__.py",
+          "bytes": 197,
+          "git_blob_sha1": "5277f46157403e47fd830fc519144b97ef69d4ae",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/utils/__init__.py"
+        },
+        {
+          "path": "sam2/utils/amg.py",
+          "bytes": 12842,
+          "git_blob_sha1": "986842960cf5deca00614b7b1cde1ab77dad7e6e",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/utils/amg.py"
+        },
+        {
+          "path": "sam2/utils/misc.py",
+          "bytes": 13090,
+          "git_blob_sha1": "b65ee825732ff85137805be650edd4cbe8e6f6d4",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/utils/misc.py"
+        },
+        {
+          "path": "sam2/utils/transforms.py",
+          "bytes": 4885,
+          "git_blob_sha1": "cc17bebfab104b659c5469e8434cf357ae7e24b6",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/utils/transforms.py"
+        },
+        {
+          "path": "setup.py",
+          "bytes": 5051,
+          "git_blob_sha1": "78a634cddb19615c45601681ffbcd1f29af66f47",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/setup.py"
+        }
+      ]
+    },
+    {
+      "repo": "nvidia-isaac/video_to_data",
+      "revision": "7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80",
+      "files": [
+        {
+          "path": "LICENSE",
+          "bytes": 30209,
+          "git_blob_sha1": "c36a2d325fc82f18e30f653f38301dd5442de4d5",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/LICENSE",
+          "sha256": "e87dc2a40b553c5f52acb3909f479afbeac8c35a85328fceaa0cab15ed50b9fc"
+        },
+        {
+          "path": "reconstruction/modules/v2d_common/__init__.py",
+          "bytes": 392,
+          "git_blob_sha1": "1e0ba4dc47df346be65fd9e25a09a6054200a9d6",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_common/__init__.py"
+        },
+        {
+          "path": "reconstruction/modules/v2d_common/broadcast.py",
+          "bytes": 2465,
+          "git_blob_sha1": "3014ef02672b46e783987b2c0466cbbfdcc2b51d",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_common/broadcast.py"
+        },
+        {
+          "path": "reconstruction/modules/v2d_common/datatypes.py",
+          "bytes": 10850,
+          "git_blob_sha1": "cd5f2da9be23552d9a3c2ae742db7ea3197abb50",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_common/datatypes.py"
+        },
+        {
+          "path": "reconstruction/modules/v2d_common/pyproject.toml",
+          "bytes": 719,
+          "git_blob_sha1": "bb34280208636aab782fd637e772fa3324caed97",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_common/pyproject.toml"
+        },
+        {
+          "path": "reconstruction/modules/v2d_common/utils.py",
+          "bytes": 2983,
+          "git_blob_sha1": "1d41f13a1bb38807441c976786695a5959ae77a2",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_common/utils.py"
+        },
+        {
+          "path": "reconstruction/modules/v2d_common/video.py",
+          "bytes": 32466,
+          "git_blob_sha1": "c7d19fdddf1ac12c976a8658031baf32f23e3990",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_common/video.py"
+        },
+        {
+          "path": "reconstruction/modules/v2d_sam2/lib/__init__.py",
+          "bytes": 137,
+          "git_blob_sha1": "52a7a9daf028f654d6a02f65c99cc609a57b492f",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam2/lib/__init__.py"
+        },
+        {
+          "path": "reconstruction/modules/v2d_sam2/lib/datatypes.py",
+          "bytes": 235,
+          "git_blob_sha1": "a5c358690446c077782913a68419f302c62a0a01",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam2/lib/datatypes.py"
+        },
+        {
+          "path": "reconstruction/modules/v2d_sam2/lib/pyproject.toml",
+          "bytes": 677,
+          "git_blob_sha1": "cffe7399b380bb18322ad1a061368a81ade61d7e",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam2/lib/pyproject.toml"
+        },
+        {
+          "path": "reconstruction/modules/v2d_sam2/lib/sam2_utils.py",
+          "bytes": 57619,
+          "git_blob_sha1": "f7c2e29a1d0c637665590bb26189e28e734e3075",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam2/lib/sam2_utils.py"
+        },
+        {
+          "path": "reconstruction/modules/v2d_sam2/lib/video_to_masks.py",
+          "bytes": 5319,
+          "git_blob_sha1": "bb990ecf12005b21a1c7292bf478053524a04a21",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam2/lib/video_to_masks.py"
+        }
+      ]
+    }
+  ],
+  "wheels": [
+    {
+      "name": "transformers",
+      "version": "4.53.3",
+      "filename": "transformers-4.53.3-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/41/b1/d7520cc5cb69c825599042eb3a7c986fa9baa8a8d2dea9acd78e152c81e2/transformers-4.53.3-py3-none-any.whl",
+      "bytes": 10826382,
+      "sha256": "5aba81c92095806b6baf12df35d756cf23b66c356975fb2a7fa9e536138d7c75",
+      "pypi_url": "https://pypi.org/pypi/transformers/4.53.3/json",
+      "primary_metadata_sha256": "94ec82084aa928840cd012be70d72be6f93900048879111ee74b3cc2250bd2b2",
+      "license": "Apache-2.0",
+      "license_assurance": "primary_PyPI_classifier_and_Azure_wheel_notice_required",
+      "install_if_absent_only": false
+    },
+    {
+      "name": "tokenizers",
+      "version": "0.21.4",
+      "filename": "tokenizers-0.21.4-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/f2/90/273b6c7ec78af547694eddeea9e05de771278bd20476525ab930cecaf7d8/tokenizers-0.21.4-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 3115426,
+      "sha256": "51b7eabb104f46c1c50b486520555715457ae833d5aee9ff6ae853d1130506ff",
+      "pypi_url": "https://pypi.org/pypi/tokenizers/0.21.4/json",
+      "primary_metadata_sha256": "247ee02744e3340fef9c0ecc6d396987a77b035361c07ad98bec4553b392575b",
+      "license": "Apache-2.0",
+      "license_assurance": "primary_PyPI_classifier_and_Azure_wheel_notice_required",
+      "install_if_absent_only": false
+    },
+    {
+      "name": "safetensors",
+      "version": "0.6.2",
+      "filename": "safetensors-0.6.2-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/fe/5d/5a514d7b88e310c8b146e2404e0dc161282e78634d9358975fd56dfd14be/safetensors-0.6.2-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 485835,
+      "sha256": "8045db2c872db8f4cbe3faa0495932d89c38c899c603f21e9b6486951a5ecb8f",
+      "pypi_url": "https://pypi.org/pypi/safetensors/0.6.2/json",
+      "primary_metadata_sha256": "b7fd4627f413e4cf8ba1e2bb06829bb0ca01376800fba543dff0be15cbca1141",
+      "license": "Apache-2.0",
+      "license_assurance": "primary_PyPI_classifier_and_Azure_wheel_notice_required",
+      "install_if_absent_only": false
+    },
+    {
+      "name": "huggingface_hub",
+      "version": "0.36.2",
+      "filename": "huggingface_hub-0.36.2-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/a8/af/48ac8483240de756d2438c380746e7130d1c6f75802ef22f3c6d49982787/huggingface_hub-0.36.2-py3-none-any.whl",
+      "bytes": 566395,
+      "sha256": "48f0c8eac16145dfce371e9d2d7772854a4f591bcb56c9cf548accf531d54270",
+      "pypi_url": "https://pypi.org/pypi/huggingface_hub/0.36.2/json",
+      "primary_metadata_sha256": "994830dd3eeeb6590b07caac00b60f8a238fbedd1f0867daf5ba735c8a7e23bf",
+      "license": "Apache-2.0",
+      "license_assurance": "primary_PyPI_classifier_and_Azure_wheel_notice_required",
+      "install_if_absent_only": false
+    },
+    {
+      "name": "decord",
+      "version": "0.6.0",
+      "filename": "decord-0.6.0-py3-none-manylinux2010_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/11/79/936af42edf90a7bd4e41a6cac89c913d4b47fa48a26b042d5129a9242ee3/decord-0.6.0-py3-none-manylinux2010_x86_64.whl",
+      "bytes": 13602299,
+      "sha256": "51997f20be8958e23b7c4061ba45d0efcd86bffd5fe81c695d0befee0d442976",
+      "pypi_url": "https://pypi.org/pypi/decord/0.6.0/json",
+      "primary_metadata_sha256": "00f849b1a23d583719b5bb3e348b070c078db315ffe0a67bf5dc4fa65c6fb482",
+      "license": "Apache-2.0",
+      "license_assurance": "primary_PyPI_classifier_and_Azure_wheel_notice_required",
+      "install_if_absent_only": true
+    }
+  ],
+  "gpu_model_runs": false,
+  "license_eligibility_verified": false,
+  "training_overlap_verified": false
+}
