@@ -2033,3 +2033,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   flatbuffers26,661B, standalone11,608B, publisher28B, andprimarylicenses/
   ORTThirdPartyNotices338,088B; heavy bytes stayAzure. Own source closure
   remains below100KB, credential-freeenv-i hostPython acquisition only.
+
+  D94actualengineeringFAIL2.513977s/sourceb067acf9dbb8e463884dc58461d6f3dd03e77975,
+  receipt`9cff44a6fa41d7f9c54dac0c212b74057d4852686276e9cc740298e6b6bc3f82`.
+  All9files exact158,360,974B downloaded/published, failure during wheel audit
+  before any returnedwheel_audits, source execution/install/inference/GPU0.
+  OriginalFAILreceipt/assets preserved immutable; no download retry/overwrite.
+  Metadata-only Azure ZIP inspection now diagnoses which strict metadata/tag
+  contract differs; do not claim successful runtime, licences or source clear.
+  Any repair requires a new read-only consumer/audit namespace, not modifying
+  original acquisition or downloading identical158MB again. Terminalfailed1/
+  noactiveGPU confirmed; no heavy Mac transit.
