@@ -3650,3 +3650,70 @@ No old full501 CARI outputs reused; complete public sources remain Azure only.
 Future clean-episode input producer now records the dataset revision already
 verified by its input audit. Do not edit historical receipts or fabricate a
 missing historical field; legacy acceptance remains exact-hash-specific.
+
+Full501 shared preparation actual **PASS19.863002s**, producer78b9005,
+driverba5d431ace4a55f1bfcc3f5bb926685a5270fa206b8a7bef831aeeeaa7c1d0b6.
+All four routes32attempts/returns/validated, last chunk5, full original501
+coverage and source/model/helper/identity/savedpayload checksPASS. Native
+direct/replaymax0.002870950/0.000953791mm; officialmean/worstframe
+0.000425200/0.000843682mm, maxpoint0.002709790mm diagnostic. Receipt
+cd17771616be2f2aff97f840b750e6da4beee78b17e5dc614a2ca60ba495a7de(23,871B/0444).
+Unitinactiveexit0/H10085MiB0%; actual complete outputs pinned before forward.
+Preparation fidelity is not reconstruction accuracy or a submission result.
+
+## Full-video HOI production chain — preregistration 2026-10-03
+
+First execution: full original501 episode15, same automatic public sources,
+fresh exclusive outputs `cari_shared_forward_v1`, `cari_shared_refined_v1`,
+`cari_shared_export_v1` under that episode. No older predicted bundle is an input.
+Stage-specific complete pins bind each actual passing predecessor before the
+next dispatch; keep existing c96 helpers and prepared full-video generator intact.
+
+- Forward900s/outer903: original native96 windows/stride96/terminal405 and
+  first-occurrence ownership96/96/96/96/96/21; one overall native forward,
+  six composition/delegate/verifications, two offline DINO loads. Identity
+  fixed before construction. Original native initialization decoder batch8
+  (full501tail5), rendering32/crop8/buffer2/AMP and config/checkpoint unchanged,
+  no materialized input cache. Read actual pinned caller indices at sole
+  composition hook, corroborate all7 initialized blocks/object input poses and
+  decoder identity, capture untouched raw/composed/contact for each window,
+  compare exact owned assembly and saved reread. Only identity deltas on owned
+  composition copy become zero; native original global/network unchanged.
+  Ordinary CUDA, not a claimed exact deterministic network replay.
+- Refinement7200s/outer7203: one unchanged full501 native optimizer,
+  batch0/fullclip300requested301actual updates, report_every100. Preserve
+  original native floating history0/100/200/300, full batch at every record;
+  only original bodyrotationcontrols[:254] and objectT optimized. All remaining
+  params/root/hands/shape/PCA/face/objectR/internaltranslations/K/mesh/raw/
+  input/pr_initial/contact/observations fixed; original proxy4000/hand assets.
+  Saved full-bundle reread and source/assets/helper/predecessor hashes intact.
+- Export600s/outer603: no new identity choice/inference/optimizer/LM/alignment.
+  Full501 finite16frame chunks, last5, four32call routes: native V/J/KP,
+  direct204, stored native7blocks/V/J/KP/topology replay, official FP32-model/
+  FP64-residual replay. Native≤.01mm maximum point and official≤2mm mean
+  **every original frame**, same fixed gates. Freeze full pose136/scales68/
+  shape45/zeroexpression72 and actual aligned local object geometry/scale1/
+  nativeposes/inferredK, strictTrack1EpisodefullN and object camera roundtrip.
+
+All three drivers are generic explicit episode0..29/N>=96, not changed constants
+or stale prefix arrays. Public inputs/masks/depth/model weights remain onAzure;
+only new output writable/offline, no old CARI or other tracks/GT access. Separate
+source-bound stage consumers rehash original15, actual predecessors and code/
+native/reference/optimizer/model assets. Engineering PASS does not establish
+external accuracy, license clearance, finalParquet or a CARI4D victory.
+
+Independent disjoint implementation/source audits followed by root review;
+combined generic forward/refine/export262testsPASS1.75s/noSKIP, actual peer
+module imports included. All three wrappers BashPASS. Correct actual native
+history iteration dtype(float), original body asset location and fixed aligned
+object metadata were verified against primary source before dispatch, not
+repaired in predictions. Complete generic closures stay below160KB code-only
+control ceiling; archive regressions require previous producer provenance,
+shared identity/timeline and actual full501 preparation pins. Fullsuite and
+actual Git-metadata closure are checked before any full-forward GPU execution.
+
+Root fullsuite **7443PASS/2same optional SKIP120.47s**, no generic stage skipped;
+three added archive regressions plus generic gates337PASS2.65s. All ten actual
+full501 preparation helper bytes remain unchanged from its78b9005 generator.
+Forward fresh namespace/unit verified absent with actual frozen preparation
+inventory. Launch requires the clean producing commit, no uncertain retry.

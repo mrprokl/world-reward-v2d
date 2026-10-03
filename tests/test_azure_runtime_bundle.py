@@ -214,6 +214,25 @@ def test_full_shared_prepare_closure_preserves_all_source_bound_helpers():
     assert "infra/cari96_forward.py" not in selected
 
 
+@pytest.mark.parametrize("stage", ["forward", "refine", "export"])
+def test_full_video_runtime_closures_keep_previous_producers_and_core_contracts(stage):
+    root = Path(__file__).resolve().parents[1]
+    source = {str(p.relative_to(root)): p.read_bytes()
+              for folder in ("infra", "src", "configs") for p in (root / folder).rglob("*")
+              if p.is_file() and "__pycache__" not in p.parts}
+    source["pyproject.toml"] = (root / "pyproject.toml").read_bytes()
+    selected = set(launcher.runtime_bundle_paths(source, f"infra/run_cari_full_{stage}.sh"))
+    required = {"infra/cari_full_forward.py", "infra/run_cari_full_forward.sh",
+                "infra/cari_shared_prepare.py", "infra/run_cari_shared_prepare.sh",
+                "infra/cari_clip_inputs.py", "src/world_reward/shared_identity.py",
+                "src/world_reward/timeline.py", "configs/cari_clip_000015_shared_prepare_pins.json"}
+    if stage in {"refine", "export"}:
+        required |= {"infra/cari_full_refine.py", "infra/run_cari_full_refine.sh", "infra/cari_refine.py"}
+    if stage == "export":
+        required |= {"infra/cari_full_export.py", "src/world_reward/submission.py", "src/world_reward/contracts.py"}
+    assert required <= selected
+
+
 def test_h98_native_fit_bundle_includes_all_DW_source_only_wrappers():
     root = Path(__file__).resolve().parents[1]
     source = {str(p.relative_to(root)): p.read_bytes()
