@@ -677,3 +677,30 @@ These sources explain why a valid learned forward can still violate limits;
 they do NOT identify the actual failed control, certify the exact TorchScript
 getter semantics or authorize relaxing D96. Inspect frozen249 controls and
 native metadata separately, without optimization or held-out quality reads.
+
+### Translation-first follow-up and official validity boundary
+
+The source-hashed public Track1 kit rebuilds pose136/scales68/shape45 through
+parameter-transform/FK/skinning and rejects nonfinite inputs/geometry; no
+`get_parameter_limits` check occurs in the five scorers, submission loader or
+preflight. D96's dense249 hard-limit guard was an extra preregistered research
+policy, not a verified official schema rule. Its failure is retained unchanged.
+
+The native head/caller adds camera translation after decoding and YZ conversion.
+Therefore external translation-only fitting is exact additive geometry with no
+new native forward or reinterpretation of articulation limits. Analytic RGB
+projection provides a cheap observation-only rank3 test. [SLAHMR source](https://github.com/vye16/slahmr/tree/58518fec991877bc4911e260776589185b828fe9)
+initializes translation from2D evidence before orientation/pose optimization
+(`base_scene.py:130–136`, `optimizers.py:25–28,329`). This supports graduated
+optimization, NOT a SOTA translation-only accuracy claim. It cannot repair
+wrong focal/identity/articulation; held-out metric/interaction gates are required.
+
+Actual CPU inspection of exact696,110,248B MHR reference on2026-10-03:
+`get_parameter_limits` returns a cached tensor; all37[0,0] dense rows exist in
+the198-entry `character_torch.parameter_limits.minmax_parameter_index`, and
+the sparse min/max values exactly match the dense rows. Missing-sparse-entry
+sentinel interpretation is excluded for these rows. Combined with Momentum's
+soft-limit implementation, this is metadata evidence, not proof the forward
+hard-enforces these values or every learned prediction is physiologically invalid.
+Immutable inspection receipt `c78b5ec438f1ff91685bd0cf53b76658d718504e4ac25e36c26597ef3d7c713a`;
+zero forward/optimizer/GT, all source/input/model hashes rechecked.

@@ -1,5 +1,8 @@
 import importlib.util
 import io
+import base64
+import hashlib
+import lzma
 from pathlib import Path
 import tarfile
 
@@ -9,6 +12,20 @@ import pytest
 spec = importlib.util.spec_from_file_location("wr_azure_bundle_test", Path(__file__).resolve().parents[1] / "infra/azure_job.py")
 launcher = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(launcher)
+
+
+def test_explicit_code_only_control_ceiling_preserves_full_import_closure(monkeypatch):
+    source = b"tiny committed code"
+    encoded, digest = launcher.encoded_runtime_archive(source)
+    compressed = base64.b64decode(encoded)
+    assert lzma.decompress(compressed) == source
+    assert digest == hashlib.sha256(compressed).hexdigest()
+    assert launcher.MAX_CODE_CONTROL_BYTES == 128_000
+    monkeypatch.setattr(launcher, "MAX_CODE_CONTROL_BYTES", len(encoded))
+    assert launcher.encoded_runtime_archive(source)[0] == encoded
+    monkeypatch.setattr(launcher, "MAX_CODE_CONTROL_BYTES", len(encoded)-1)
+    with pytest.raises(RuntimeError, match="code-only control budget"):
+        launcher.encoded_runtime_archive(source)
 
 
 def files():

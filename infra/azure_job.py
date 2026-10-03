@@ -20,6 +20,20 @@ import tarfile
 
 DEFAULT_RESOURCE_GROUP = "SCENESMITH-H100"
 DEFAULT_VM_NAME = "scenesmith-ncc-h100-01"
+MAX_CODE_CONTROL_BYTES = 128_000
+
+
+def encoded_runtime_archive(source_archive: bytes) -> tuple[str, str]:
+    """Small code-only control message, independently capped from data artifacts.
+
+    The complete statically audited closure must remain present. Do not hide
+    imports or weaken provenance to meet the former arbitrary 100KB ceiling.
+    """
+    archive = lzma.compress(source_archive, preset=6)
+    encoded = base64.b64encode(archive).decode()
+    if len(encoded) > MAX_CODE_CONTROL_BYTES:
+        raise RuntimeError("Run Command payload exceeds the 128KB code-only control budget")
+    return encoded, hashlib.sha256(archive).hexdigest()
 
 
 def azure_resource_group(value: str) -> str:
@@ -200,13 +214,7 @@ def main(argv=None) -> None:
     git("cat-file", "-e", f"{revision}:{args.script}")
     source_archive, paths = runtime_archive(git("archive", "--format=tar", revision,
                                                "infra", "src", "configs", "pyproject.toml"), args.script)
-    archive = lzma.compress(source_archive, preset=6)
-    if len(archive) > 2_000_000:
-        raise RuntimeError("Code archive unexpectedly large; no heavy artifacts may transit locally")
-    archive_hash = hashlib.sha256(archive).hexdigest()
-    encoded = base64.b64encode(archive).decode()
-    if len(encoded) > 100_000:
-        raise RuntimeError("Run Command payload exceeds the small code-only control budget")
+    encoded, archive_hash = encoded_runtime_archive(source_archive)
     unit = "world-reward-" + args.name
     command_arguments = " ".join(shlex.quote(value) for value in args.arguments)
     bundle_id = args.script.removeprefix("infra/").removesuffix(".sh")

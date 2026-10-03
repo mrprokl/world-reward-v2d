@@ -2456,3 +2456,59 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   closure7,680B encoded;23 dedicated/66 combined tests and independent audit
   PASS. Getter delegation/cached tensors alone may leave zero-zero semantics
   unresolved; inspection PASS does not authorize bounds changes or adoption.
+
+  Actual isolated getter/state inspection **PASS**1.994215s, source
+  f4e8a0073f8722991c7f51cf69a60a9994db9180, script
+  `82ce61931d781d5d54bcc4da116ad7090f579b1135cc6195dc3003d942ce2d93`,
+  receipt`c78b5ec438f1ff91685bd0cf53b76658d718504e4ac25e36c26597ef3d7c713a`
+  (44,313B/0444). Actual dispatch5files7,864B; full5739PASS/1optionaltrimesh
+  SKIP75.82s before execution. Getter code/graph returns `self.parameter_limits`.
+  All37 dense[0,0] columns occur in the actual198 sparse minmax parameter-index
+  entries; all198 sparse bounds exactly match their dense returned rows. Thus
+  these37 are NOT missing-sparse-limit sentinels. This establishes metadata
+  membership/values, not a hard forward constraint or physiological/accuracy
+  verdict. Source/model/prior receipt snapshots rehashed; zero native forwards,
+  optimizer/private reads; terminal0/MainPID0. Original D96 FAIL unchanged.
+
+- **H97 — exact external camera-translation follow-up (preregistered).**
+  Use the same15 public RGB/DWPose/shared-body observations and the15 object
+  proxies already frozen before the unscored D96 failure. This cohort's private
+  geometry remains unread; this is a methodological follow-up, NOT a fresh
+  independent replication. No D96 rerun, native-bounds interpretation change,
+  clipping, root rotation, articulation, shape, scale, K or object-proxy change.
+  Source algebra establishes Vnew=Vshared+(Tnew-Toriginal), identically for
+  native308 keypoints/127 joints; native controls and global rotations remain
+  byte-identical. Multiplying individual vertex depths is explicitly forbidden.
+  Three zero-initialized latent variables: XY=.30tanh(u) metres and camera
+  Tz=Tz0*exp(log(1.25)*tanh(u_z)). Same binary-positive equal-weight10 training
+  landmarks,7 heldout RGB diagnostics,≥6 supported points/32px each-axis extent,
+  radial Huber/5 and physical-coordinate prior sigma.15. Exact float64 NumPy
+  pinhole/latent Jacobian2n×3 at zero, no prior rows, ratio≥1e-5; reject singular
+  or nonfinite/behind-camera states, no repair. Manual CPU Adam LR.01,betas.9/
+  .999,epsilon1e-8;60 EVALUATED states/59updates, first lowest total objective.
+  All60 latents/losses/59updates replayed from frozen public inputs BEFORE any
+  private read; all15 candidates serialized F32 with unchanged native identity
+  and one additive F64 deltaT (F32 translation-field rounding recorded).
+  Fit CPU60s/8GiB/4threads/network-none, zero Torch/model forwards or new rasters.
+  Separate CPU120s quality only after complete public/source/candidate/proxy
+  audit: shared-body camera-absolute PVE equal5-frame means perclip, median3
+  improvement≥5%, no clip regression>5%, no hand/clip relative-object-vector
+  regression>5%; original raw branch diagnostic. No alignment, fabricated GT
+  keypoints, frame removal or objective-only adoption. Evaluate ONCE; rejection
+  ends this recipe on these labels. Positive requires an untouched new cohort
+  for confirmation, then real-domain validation before production adoption.
+  Independent analytic math audit PASS (43 combined tests;30 additional
+  randomized finite-difference checks, worst3.67e-9). This freezes methodology,
+  not observed accuracy; implementation/integration checks still precede dispatch.
+  Engineering-only code-transfer ceiling explicitly changed100→128KB to retain
+  the complete ordinary import closure (~103KB evaluator) instead of introducing
+  opaque dynamic imports/duplicating validators to save3KB. No data/model/render
+  bytes transit locally and no experimental/challenge threshold is changed.
+  Implementation audit frozen:101 dedicated policy/fit/public/private tests
+  PASS, including a15-frame producer-shaped tiny fixture executing900 actual
+  NumPy objectives/885 Adam updates and full replay before its absent private
+  truth gate. Source/GT/schedule/rank/candidate/proxy/inventory mutation tests
+  refuse private reads;7 pure private-metric functions AST-identical to D96.
+  Independent source review/Bash syntax PASS. Complete closures27files each,
+  ~99.3KB fitter/~103.0KB evaluator, ordinary imports and historical source-only
+  canonical mounts. Lightweight fixtures are not a native or efficacy result.
