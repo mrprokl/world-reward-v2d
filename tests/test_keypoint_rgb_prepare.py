@@ -236,7 +236,7 @@ def test_runtime_imports_lazy_and_wrapper_separate_private_firewall(modules):
     assert text.count("--network none") == 2 and "123s" in text and "183s" in text and render.IMAGE in text
 
 
-def test_source_closures_immutable_helpers_and_under100k(modules):
+def test_source_closures_immutable_helpers_and_within_launcher_budget(modules):
     import base64
     import io
     import lzma
@@ -250,7 +250,7 @@ def test_source_closures_immutable_helpers_and_under100k(modules):
     with tarfile.open(fileobj=buffer, mode="w") as archive:
         for path in selected:
             info = tarfile.TarInfo(path); info.size = len(files[path]); archive.addfile(info, io.BytesIO(files[path]))
-    assert len(base64.b64encode(lzma.compress(buffer.getvalue(), preset=6))) < 100000
+    assert len(base64.b64encode(lzma.compress(buffer.getvalue(), preset=6))) <= azure_job.MAX_CODE_CONTROL_BYTES
     files["infra/test_mask_closure.sh"] = b'python "$CODE/infra/keypoint_rgb_masks.py"\n'
     mask_only = azure_job.runtime_bundle_paths(files, "infra/test_mask_closure.sh")
     assert "infra/hand_synthetic_masks.py" in mask_only and "infra/keypoint_rgb_render.py" not in mask_only

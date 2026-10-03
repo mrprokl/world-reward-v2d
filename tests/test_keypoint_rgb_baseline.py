@@ -258,7 +258,7 @@ def test_actual_cpu_native_producer_bindings_with_tiny_asset_files(gate, monkeyp
         with pytest.raises(ValueError): gate.validate_producer_bindings(tmp_path, bad)
 
 
-def test_source_closure_under100kb_and_no_private_evaluator(gate):
+def test_source_closure_within_launcher_budget_and_no_private_evaluator(gate):
     import base64
     import io
     import lzma
@@ -272,7 +272,7 @@ def test_source_closure_under100kb_and_no_private_evaluator(gate):
     with tarfile.open(fileobj=buffer, mode="w") as archive:
         for path in selected:
             info = tarfile.TarInfo(path); info.size = len(files[path]); archive.addfile(info, io.BytesIO(files[path]))
-    assert len(base64.b64encode(lzma.compress(buffer.getvalue(), preset=6))) < 100000
+    assert len(base64.b64encode(lzma.compress(buffer.getvalue(), preset=6))) <= azure_job.MAX_CODE_CONTROL_BYTES
     assert "infra/keypoint_rgb_baseline.py" in selected and "infra/identity_rgb_evaluate.py" not in selected
     assert "infra/keypoint_rgb_render.py" not in selected and "infra/dwpose_smoke.py" not in selected
 

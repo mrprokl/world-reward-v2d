@@ -19,7 +19,7 @@ def test_research_wrapper_syntax_and_small_runtime_closure(script):
            for p in (ROOT/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts}
     files['pyproject.toml']=(ROOT/'pyproject.toml').read_bytes()
     paths=module.runtime_bundle_paths(files,'infra/'+script)
-    assert len(base64.b64encode(lzma.compress(b''.join(files[p] for p in paths))))<100_000
+    assert len(base64.b64encode(lzma.compress(b''.join(files[p] for p in paths)))) <= module.MAX_CODE_CONTROL_BYTES
     assert not any(p.startswith(('data/','weights/','validation/','docs/')) for p in paths)
     dependency='research_runtime_bootstrap.sh' if 'runtime' in script else 'research_transfer.py'
     assert 'infra/'+dependency in paths

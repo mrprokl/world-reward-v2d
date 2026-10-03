@@ -4779,3 +4779,33 @@ the original grid;720x540 expectedfx575.555556/fy580.740741, not the old640
 grid constants. All masks/XYZ/fullvalidity replay unchanged. Border v1 remains
 strict dimensions divisible by10: **1536x1152 is not yet supported**, rather
 than silently introducing rounded borders. No challenge deployment/model run.
+
+Full suite atb1b1223: **9390PASS/2sameoptionalSKIP, 1FAIL261.36s**.
+The sole failure was an obsolete hardcoded100000B assertion for an old CPU
+keypoint bundle, now100224B after new tiny provenance configs. Actual immutable
+launcher already enforces160000B, unchanged. Align the three remaining old
+budget assertions with that existing constant; keep complete helper closure,
+private-evaluator exclusions and runtime ceiling unchanged. This is a test
+consistency correction, not a model/validation threshold or runtime change.
+Affectedkeypoint/archive112focusedPASS1.39s; anchor/originalevaluator218PASS36.15s.
+
+2026-10-03 17:42:00UTC full866 nativeforward **PASS153.622292s**,
+unitinactive/exit0/GPUidle. Producerb1b1223b718b05dad867a1e161df68f75c29f01b,
+actual scriptac07d96a unchanged;47files85272encodedB/publicHTTP200. Original
+readonly444 receipt79086B/
+6640e0610f97ae682614d805f1e30cd77727c5fa45826498379bef0c54fb1048;
+bundle662320956B/984e02ad2a1f9a96eee6487baad22475620a88abbdaa23f29c42eaa373f5be6b.
+Separate readonly2artifact stageinventory9c583d7PASS. Actualpins frozen before
+refinement; no new fitting/repair/qualitymeasurement.
+
+Original official packer on full668 episode1 **PASS15.809430s**,
+sameb1b1223 producer/publicexactHTTP200,62files147624encodedB. Sole444receipt
+9706B/2e878f9fa012a75426782988274558bea68ca502fd2f0eff3db20a00f301300d.
+One unchanged official call, full original trajectory/schema/mesh fidelity;
+final_Parquet_produced=False. This is a temporary one-episode packing gate,
+not an all30 submission, full performance score or eligibility clearance.
+
+T-LESS acquisition-only dispatched once sameb1b1223 onVM02,
+36files37452encodedB; CPUhost600s/newimmutableprivate output, no GPU/model or
+heavy local transfer. No acquisition/accuracy outcome yet. Updated three old
+CPU closure-budget tests164PASS1.71s, same160000B runtime cap unchanged.

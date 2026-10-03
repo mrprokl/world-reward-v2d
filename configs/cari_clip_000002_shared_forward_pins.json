@@ -1,0 +1,9 @@
+{
+  "schema": "world-reward-cari-shared-forward-pins-v1",
+  "clip_spec": {"episode_index": 2, "total_frames": 866, "camera_name": "front_stereo_camera_left", "height": 1152, "width": 1536},
+  "forward": {"sha256": "6640e0610f97ae682614d805f1e30cd77727c5fa45826498379bef0c54fb1048", "bytes": 79086, "producer_revision": "b1b1223b718b05dad867a1e161df68f75c29f01b", "script_sha256": "ac07d96a6bb8bad8aa8977b74f7b266600bbcc26fc92bf07ba6419be0142fd2f"},
+  "forward_files": {
+    "coconet.pth": {"sha256": "984e02ad2a1f9a96eee6487baad22475620a88abbdaa23f29c42eaa373f5be6b", "bytes": 662320956},
+    "report.json": {"sha256": "6640e0610f97ae682614d805f1e30cd77727c5fa45826498379bef0c54fb1048", "bytes": 79086}
+  }
+}
