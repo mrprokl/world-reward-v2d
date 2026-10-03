@@ -5709,3 +5709,48 @@ separates authenticatedhistorical77Gitfiles/markers from currentpinconsumer;
 no oldexecution or source/receipt rewrite; queue/exportFAILremainunchanged.
 Earlyfocused359PASS1fixtureFAIL caught readonlyfixture overwrite in audit
 case; fixed testpermissionsetup, no productiongate relaxation.
+
+
+2026-10-04 continuation (UTC Oct3): frozen3e7d391 fullsuite10446PASS/3FAIL/
+2optionalSKIP330.51s. All3failures concern historical body_smoke32390B/e4d659
+versus current selected-source-optin33592B/3f662f88; do not overwrite historical
+producer hashes or reinterpret prior receipts. Independent binder audit pending.
+
+VM02 selected Body/DINO CPU sourcegate4903345 actualPASS inactiveexit0:
+46BodyPython source digest14f583ce78e8e786cb77739addc2358a1245b23f79ab676c4094231694fe8f3c
+and172DINOv3Python files. No wholecheckout/GPU/model/readiness claim.
+Log917B/d0c77cc616a4f99d41964811d0a46a7521f9eb6e806e0c5c740f2fa778f9e273.
+
+EP3 historical CPU gate0cf865b actualPASS: all77 original672bGitfiles,
+original dispatchmarkers and separate752B cacheaudit, plus exact helper maps
+for actualprepare/forward/refine. Original queuedFAIL not reclassified; oldcode
+not executed. Log571B/5ee893c73b93124f3e6014009d6467e2808f4f2072bda39042db7c821b281de6.
+Failedfirst export report/log byteauthenticated and atomically moved to
+cari_shared_export_failed_v1 with renameat2NOREPLACE; no files deleted or
+predictions changed. Correctedexportv2 dispatched3e7d391/83files162312encodedB.
+
+EP5 sameexternallygated volumeproposal3e7d391 actualPASS45.215161040s:
+273704V/547396F to2054V/4096F; all3orientedclosedEuler2 shells retained,
+including2negativecavities, eachvolumeerror<=5%. Noholes/normals repaired,
+components removed, scale or poses changed. Report10822B/
+aacdb39690c8c2a67de227067f4322b29bab7a1f2dec799c59ff32ea24d30d21.
+Independenttiny inventory and fulltracking are next; notchallengeaccuracy.
+
+Groundingv5 actualFAIL145.564304173s atchild_CPU_import_probe after
+offline_build_exit_code0. Receipt19011B/01441b3724e7f54ab5e04d386f518bb8985142f4c13e2d3fe1b3917f75dd5ddd;
+privatebuildlog7177B/b25db72cef981ffa3354aabe868447ad0d4062cf7f1626d0b2c5336efa007ccd.
+Independent source audit finds missing ffv1_sidecar.py imported next to
+hdf5_transcode at the same public7c0dcommit (21771B/10384cccad9e5318d6524f92ed686ca07589bedb644a1bf6e4fea943e0f7b276).
+Newv6 sourceclosure planned, same algorithms/dependencies; v5FAIL preserved.
+
+NewGroundingv6 adds only samecommit ffv1 source and bounded privateCPUprobe
+log (128KiB/90s/exactexit/JSONgates); 47own/122runtimecombinedPASS0.87s.
+Independent3e7sourcebinding3FAIL corrected by retaining historicalBodySHA
+and separately hashing currenthelper; oldproducerbytes not claimedverified.
+112own/234combinedPASS1.03s; no numerical or receipt rewrites.
+
+Temporalresearch preflight audit: oldauthored/native closed-human references
+remain rejected; new17.45cm grazing-triangle raster diagnostic is not a
+passing depthreference. Next small independent FP64 nearest-triangle ray
+microgate before any4x48RGB/model job, pose-onlytriangle-soup explicitly
+notcontact/penetrationtruth. No previouscohort rescoring or GTalignment.

@@ -1,7 +1,7 @@
 {
-  "schema": "world_reward.frontend_grounding_source_pins.v5",
+  "schema": "world_reward.frontend_grounding_source_pins.v6",
   "base_image_id": "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3",
-  "target_image": "world-reward/frontend-grounding-v5:0.1",
+  "target_image": "world-reward/frontend-grounding-v6:0.1",
   "repositories": [
     {
       "repo": "facebookresearch/sam2",
@@ -232,6 +232,20 @@
           "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_common/datatypes.py"
         },
         {
+          "path": "reconstruction/modules/v2d_common/ffv1_sidecar.py",
+          "bytes": 21771,
+          "sha256": "10384cccad9e5318d6524f92ed686ca07589bedb644a1bf6e4fea943e0f7b276",
+          "git_blob_sha1": "b9712985923f9b1e2eb09e61ad6b338d07ae0795",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_common/ffv1_sidecar.py"
+        },
+        {
+          "path": "reconstruction/modules/v2d_common/hdf5_transcode.py",
+          "bytes": 12343,
+          "git_blob_sha1": "fdd1663df2760cd1772964fdbfb8cc68724ed8b6",
+          "sha256": "089f453a517e1dd4bde25fc0545164e92ccc563c83caf76e06d990ece215b63b",
+          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_common/hdf5_transcode.py"
+        },
+        {
           "path": "reconstruction/modules/v2d_common/pyproject.toml",
           "bytes": 719,
           "git_blob_sha1": "bb34280208636aab782fd637e772fa3324caed97",
@@ -278,13 +292,6 @@
           "bytes": 5319,
           "git_blob_sha1": "bb990ecf12005b21a1c7292bf478053524a04a21",
           "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam2/lib/video_to_masks.py"
-        },
-        {
-          "path": "reconstruction/modules/v2d_common/hdf5_transcode.py",
-          "bytes": 12343,
-          "git_blob_sha1": "fdd1663df2760cd1772964fdbfb8cc68724ed8b6",
-          "sha256": "089f453a517e1dd4bde25fc0545164e92ccc563c83caf76e06d990ece215b63b",
-          "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_common/hdf5_transcode.py"
         }
       ]
     }

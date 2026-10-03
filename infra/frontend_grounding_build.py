@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import re
+import resource
 import signal
 import stat
 import subprocess
@@ -23,7 +24,7 @@ import zipfile
 
 ROOT=Path('/srv/scenesmith/world-reward')
 BASE='sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3'
-TARGET='world-reward/frontend-grounding-v5:0.1'
+TARGET='world-reward/frontend-grounding-v6:0.1'
 CONFIG='configs/frontend_grounding_source_pins.json'
 HELPERS=('infra/frontend_grounding_build.py','infra/run_frontend_grounding_build.sh',CONFIG)
 SAM_REV='2b90b9f5ceec907a1c18123530e92e794ad901a4'
@@ -35,7 +36,7 @@ WHEEL_EXPECTED={
  'safetensors':('0.6.2',485835,'8045db2c872db8f4cbe3faa0495932d89c38c899c603f21e9b6486951a5ecb8f'),
  'huggingface_hub':('0.36.2',566395,'48f0c8eac16145dfce371e9d2d7772854a4f591bcb56c9cf548accf531d54270'),
  'decord':('0.6.0',13602299,'51997f20be8958e23b7c4061ba45d0efcd86bffd5fe81c695d0befee0d442976')}
-COMMON=('__init__.py','broadcast.py','utils.py','datatypes.py','video.py','hdf5_transcode.py','pyproject.toml')
+COMMON=('__init__.py','broadcast.py','utils.py','datatypes.py','video.py','hdf5_transcode.py','ffv1_sidecar.py','pyproject.toml')
 THIN=('__init__.py','datatypes.py','sam2_utils.py','video_to_masks.py','pyproject.toml')
 LABEL='world_reward_frontend_grounding_owner'
 NOTICE_RELEASES={
@@ -87,7 +88,7 @@ def source_binding(code,revision):
  return {'markers':markers,'closure_sha256':sha.hexdigest(),'helpers':{n:identity(code/n,True)for n in HELPERS}}
 
 def validate_pins(pins):
- require(type(pins)is dict and pins.get('schema')=='world_reward.frontend_grounding_source_pins.v5' and pins.get('base_image_id')==BASE and pins.get('target_image')==TARGET,'Exact new child identity contract required')
+ require(type(pins)is dict and pins.get('schema')=='world_reward.frontend_grounding_source_pins.v6' and pins.get('base_image_id')==BASE and pins.get('target_image')==TARGET,'Exact new child identity contract required')
  repositories=pins.get('repositories');require(type(repositories)is list and len(repositories)==2,'Two public pinned source repositories required')
  for row,(repo,revision)in zip(repositories,(('facebookresearch/sam2',SAM_REV),('nvidia-isaac/video_to_data',NV_REV))):
   require(row.get('repo')==repo and row.get('revision')==revision,'Exact historical public source commit required')
@@ -229,10 +230,31 @@ assert not torch.cuda.is_initialized()
 print(json.dumps(dict(extension_import_verified=True,CUDA_execution_verified=False,model_loaded=False,source_path=__import__('sam2').__file__),sort_keys=True))
 '''
 
-def probe(image,name,owner,child=False):
+def private_probe(arguments,log_path,report):
+ """CPU-only client output capped by the kernel; never print raw diagnostics."""
+ log_path=canonical(log_path);limit=128*1024
+ fd=os.open(log_path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o400)
+ def bound_log():resource.setrlimit(resource.RLIMIT_FSIZE,(limit,limit))
+ result=None;failed=False
+ with os.fdopen(fd,'wb')as log:
+  try:
+   result=subprocess.run(['/usr/bin/timeout','--signal=TERM','--kill-after=5s','90s',*arguments],env=SAFE_ENV,stdout=log,stderr=subprocess.STDOUT,timeout=97,check=False,preexec_fn=bound_log)
+  except(OSError,subprocess.TimeoutExpired):failed=True
+  finally:log.flush();os.fsync(log.fileno())
+ raw=log_path.read_bytes();require(len(raw)<=limit and log_path.lstat().st_mode&0o777==0o400,'Bounded private CPU probe log changed')
+ report['private_child_probe_log']={'relative_path':str(log_path.relative_to(ROOT)),'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest(),'maximum_bytes':limit,'terminal_output_disclosed':False}
+ report['child_probe_exit_code']=result.returncode if result is not None else None
+ require(not failed and result is not None and result.returncode==0,'Child CPU import probe failed; inspect owned private Azure probe log')
+ return raw.decode('utf-8',errors='replace')
+
+def probe(image,name,owner,child=False,*,log_path=None,report=None):
  require(re.fullmatch('[0-9a-f]{64}',owner)and re.fullmatch('wr-grounding-[a-z0-9-]+',name),'Exact owned probe identity required')
  args=['docker','run','--rm','--name',name,'--label',LABEL+'='+owner,'--network','none','--memory','6g','--cpus','2','--read-only','--tmpfs','/tmp:rw,noexec,nosuid,size=128m','--entrypoint','/usr/bin/env',image,'-i','PATH=/opt/conda/bin:/usr/local/cuda/bin:/usr/bin:/bin','HOME=/tmp','PYTHONDONTWRITEBYTECODE=1','HF_HUB_OFFLINE=1','TRANSFORMERS_OFFLINE=1','/opt/conda/bin/python','-I','-B','-c',CHILD_PROBE if child else PROBE]
- lines=command(args,90).splitlines();require(len(lines)==(2 if child else 1),'Bounded exact CPU package probe required')
+ if log_path is None:lines=command(args,90).splitlines()
+ else:
+  require(child and type(report)is dict,'Private log only for actual child CPU probe')
+  lines=[line for line in private_probe(args,log_path,report).splitlines()if line.startswith('{')and line.endswith('}')]
+ require(len(lines)==(2 if child else 1),'Bounded exact CPU package probe required')
  return [strict_json(line)for line in lines]
 
 def dockerfile(pins,owner,decord_missing):
@@ -288,7 +310,7 @@ def build(code,revision,output,report):
  child=inspect_image(TARGET);require(child['Id']!=BASE and child['RootFS']['Layers'][:44]==parent['RootFS']['Layers'],'New child must preserve exact ordered parent rootfs')
  label=command(['docker','image','inspect',child['Id'],'--format','{{index .Config.Labels "'+LABEL+'"}}']).strip();require(label==owner,'Owned new child label required')
  report['phase']='child_CPU_import_probe'
- after=probe(child['Id'],'wr-grounding-child-'+revision[:12],owner,True)
+ after=probe(child['Id'],'wr-grounding-child-'+revision[:12],owner,True,log_path=output/'child-CPU-probe.log',report=report)
  expected=dict(prior['versions']);expected.update({'transformers':'4.53.3','tokenizers':'0.21.4','safetensors':'0.6.2','huggingface-hub':'0.36.2'})
  require(after[0]['versions']==expected and after[0]['decord']=='0.6.0','Only four explicit dependency replacements and optional pinned decord permitted')
  require(inspect_image(BASE)==parent and probe(BASE,'wr-grounding-recheck-'+revision[:12],owner)[0]==prior and source_binding(code,revision)==before,'Original parent/packages or frozen source changed')
@@ -301,9 +323,9 @@ def main(argv=None):
  root=Path(os.environ['WR_ROOT']);code=Path(os.environ['WR_CODE']);revision=os.environ['WR_CODE_REVISION']
  require(root==ROOT and Path(__file__).resolve()==code/'infra/frontend_grounding_build.py','Actual frozen builder file required')
  source_binding(code,revision)
- output=canonical(root/'results/frontend-grounding-build-v5');require(output.parent.is_dir()and not output.exists(),'Fresh owned Grounding build namespace required; no overwrite or retry')
+ output=canonical(root/'results/frontend-grounding-build-v6');require(output.parent.is_dir()and not output.exists(),'Fresh owned Grounding build namespace required; no overwrite or retry')
  os.umask(0o077);output.mkdir(mode=0o700)
- report={'schema':'world_reward.frontend_grounding_build.v5','stage':'frontend_grounding_build','status':'fail','phase':'preflight','producer_revision':revision,
+ report={'schema':'world_reward.frontend_grounding_build.v6','stage':'frontend_grounding_build','status':'fail','phase':'preflight','producer_revision':revision,
   'budget_seconds':BUDGET,'GPU_used':False,'model_loaded':False,'challenge_data_read':False,'private_validation_read':False,'credential_material_read':False,
   'build_network':'none','base_pull_performed':False,'replica_ready':False,'license_eligibility_verified':False,'training_overlap_verified':False}
  started=time.monotonic()

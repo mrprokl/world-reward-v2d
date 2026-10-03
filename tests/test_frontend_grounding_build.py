@@ -20,7 +20,7 @@ def test_actual_complete_public_source_and_wheel_pins(pins):
  assert build.validate_pins(pins)==pins
  sam,nv=pins['repositories']
  assert len(sam['files'])==32 and sum(r['path'].endswith('.py')for r in sam['files'])==26
- assert len(nv['files'])==13
+ assert len(nv['files'])==14
  assert next(r for r in sam['files']if r['path']=='LICENSE')['sha256']=='c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4'
  assert next(r for r in nv['files']if r['path']=='LICENSE')['sha256']=='e87dc2a40b553c5f52acb3909f479afbeac8c35a85328fceaa0cab15ed50b9fc'
  assert not any('/data/'in r['path']or 'checkpoint'in r['path']or 'recording'in r['path']for repo in pins['repositories']for r in repo['files'])
@@ -111,8 +111,8 @@ def test_publisher_tag_version_and_license_evidence(pins,tmp_path,monkeypatch):
 
 def test_original_failure_and_image_not_reused(pins):
  source=(ROOT/'infra/frontend_grounding_build.py').read_text()
- assert build.TARGET=='world-reward/frontend-grounding-v5:0.1'
- assert "root/'results/frontend-grounding-build-v5'"in source
+ assert build.TARGET=='world-reward/frontend-grounding-v6:0.1'
+ assert "root/'results/frontend-grounding-build-v6'"in source
  assert 'frontend-grounding-build-v1'not in source and 'frontend-grounding-build-v2'not in source
  recipe=build.dockerfile(pins,'a'*64,True).decode()
  assert 'COPY publisher-notices /opt/world-reward-grounding/publisher-notices'in recipe
@@ -170,3 +170,29 @@ def test_offline_build_private_log_not_terminal_or_error(tmp_path,monkeypatch,st
  args,kwargs=calls[0];assert args[:4]==['/usr/bin/timeout','--signal=TERM','--kill-after=5s','1000s']
  assert kwargs['env']==build.SAFE_ENV and kwargs['stderr']==subprocess.STDOUT and kwargs['timeout']==1007
  with pytest.raises(FileExistsError):build.offline_build(['docker','build'],path,{})
+
+@pytest.mark.parametrize('status',[0,1,124])
+def test_child_CPU_probe_bounded_private_diagnostics(tmp_path,monkeypatch,status):
+ monkeypatch.setattr(build,'ROOT',tmp_path);calls=[]
+ def run(args,**kwargs):
+  calls.append((args,kwargs));kwargs['stdout'].write(b'procedural import traceback\n{"versions":{}}\n{"extension_import_verified":true}\n')
+  return subprocess.CompletedProcess(args,status)
+ monkeypatch.setattr(build.subprocess,'run',run);report={};path=tmp_path/'child.log'
+ if status:
+  with pytest.raises(ValueError,match='inspect owned private Azure probe log')as caught:build.private_probe(['docker','run'],path,report)
+  assert 'procedural import traceback'not in str(caught.value)
+ else:assert 'extension_import_verified'in build.private_probe(['docker','run'],path,report)
+ record=report['private_child_probe_log'];assert record['maximum_bytes']==128*1024 and record['terminal_output_disclosed']is False
+ assert record['sha256']==hashlib.sha256(path.read_bytes()).hexdigest()and report['child_probe_exit_code']==status
+ assert path.stat().st_mode&0o777==0o400
+ args,kwargs=calls[0];assert args[:4]==['/usr/bin/timeout','--signal=TERM','--kill-after=5s','90s']
+ assert kwargs['timeout']==97 and callable(kwargs['preexec_fn'])and kwargs['env']==build.SAFE_ENV
+ with pytest.raises(FileExistsError):build.private_probe(['docker','run'],path,{})
+
+def test_ffv1_complete_public_helper_pin(pins):
+ source=next(r for r in pins['repositories'][1]['files']if r['path'].endswith('ffv1_sidecar.py'))
+ assert source['bytes']==21771 and source['sha256']=='10384cccad9e5318d6524f92ed686ca07589bedb644a1bf6e4fea943e0f7b276'
+ assert source['git_blob_sha1']=='b9712985923f9b1e2eb09e61ad6b338d07ae0795'
+ assert '/'+build.NV_REV+'/'in source['url']
+ pins['repositories'][1]['files'].remove(source)
+ with pytest.raises(ValueError):build.validate_pins(pins)

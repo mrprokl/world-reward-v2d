@@ -35,6 +35,10 @@ BODY_REPORT_SHA = "d11d9caf37c8f1d2a92731799f6c05395f7b77cfdd200b01c98f778bf77e0
 PREDICTIONS_SHA = "7d0b67054ec6bf0dd07b9bb16ee5aa70626c91aef476d2e86987437ca762e6b2"
 MASK_REPORT_SHA = "2bb43c1ff04f0e8ad7ce5d95dddeb66f12096ce8ee79819684fd57298b4f01f0"
 BODY_SCRIPT_SHA = "e4d659de33bacff9d5c85c1cb2fedce34f4aa34bdbae93b3b9b7e08950613ce3"
+# BODY_SCRIPT_SHA belongs to the original receipt, not today's consumer helper.
+# Authenticate the helper actually imported without relabeling the producer.
+BODY_HELPER_BYTES = 33592
+BODY_HELPER_SHA = "3f662f88cd212ad1a04b59b66ccdb5e32a00829b52f5e224daadfbe519e1bc93"
 MASK_SCRIPT_SHA = "b6d5b543ace41c1cca6b327182ff23528328a1052ead0f4f1d7423dc7404e234"
 VIDEO_SHA = "1eb6293e4552397668a5013adbcee95e0bf230dd8c79a594aa7d7f8ea4991ab1"
 CHECKPOINT_SHA = "b5a2f9d305dd02626b967aa2e86021fba07065df66ce7a7e00ffb9664f150abf"
@@ -202,7 +206,7 @@ def decision(records):
 
 def source_inputs(root):
     frozen = []; base = root/"outputs/episode_000000"; masks_dir = base/"automatic_masks"
-    freeze_input(Path(body.__file__), frozen, digest=BODY_SCRIPT_SHA)
+    freeze_input(Path(body.__file__), frozen, digest=BODY_HELPER_SHA, size=BODY_HELPER_BYTES)
     raw_path = freeze_input(base/"body_full/report.json", frozen, digest=BODY_REPORT_SHA, size=BODY_REPORT_BYTES)
     masks_path = freeze_input(masks_dir/"report.json", frozen, digest=MASK_REPORT_SHA, size=MASK_REPORT_BYTES)
     raw, masks = json.loads(raw_path.read_text()), json.loads(masks_path.read_text()); validate_receipts(raw, masks)
@@ -285,7 +289,8 @@ def run(root, out, report, persist):
     report.update(phase="native_head_load", input_mask_records=mask_records, body_assets=asset_ids,
         inference_source_identity=installed, input_sha256=VIDEO_SHA,
         historical_inputs_modes={str(p.relative_to(root)) if p.is_relative_to(root) else str(p):
-            oct(stat.S_IMODE(p.stat().st_mode)) for p, _ in frozen}, historical_body_source_hash_matched=True,
+            oct(stat.S_IMODE(p.stat().st_mode)) for p, _ in frozen}, historical_body_source_hash_matched=False,
+        consumer_body_helper_hash_verified=True, historical_body_script_identity_verified_from_receipt=True,
         historical_receipt_hash_allowlist_verified=True); persist()
     torch = strict_torch()
     vendor = root/"vendor/video_to_data"; native = vendor/"reconstruction/modules/v2d_cari4d/lib/cari4d"
@@ -373,6 +378,8 @@ def main(argv=None):
         "anchor_indices": list(ANCHORS), "midpoint_indices": list(MIDPOINTS), "selected_frame_indices": list(SELECTED),
         "body_report_sha256": BODY_REPORT_SHA, "predictions_sha256": PREDICTIONS_SHA, "automatic_mask_report_sha256": MASK_REPORT_SHA,
         "historical_body_script_sha256": BODY_SCRIPT_SHA, "historical_mask_script_sha256": MASK_SCRIPT_SHA,
+        "consumer_body_helper_identity": {"bytes": BODY_HELPER_BYTES, "sha256": BODY_HELPER_SHA},
+        "consumer_body_helper_hash_verified": False, "historical_body_script_identity_verified_from_receipt": False,
         "historical_receipt_hash_allowlist_verified": False, "historical_body_source_hash_matched": False,
         "historical_body_producer_revision_available": False,
         "historical_producer_source_executed_by_this_gate": False, "input_video_read": False,

@@ -81,9 +81,11 @@ RECEIPTS = ("results/weights-acquisition.json", "results/auxiliary-assets.json",
 IMAGES = {"body": ("world-reward/cari4d-source:0.1", "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7", RECEIPTS[2]),
     "grounding": ("world-reward/grounding:0.1", "sha256:53b33bc4b60e0e3e8f83b401775b4701b18eef54408fd585fbe3a5d376c042e1", RECEIPTS[3]),
     "objects": ("world-reward/sam3d-runtime:0.1", "sha256:eb389b26358c49778a14303b5875c66d887824011388ce9f8666ed7cc1841ce5", RECEIPTS[4])}
-# Evidence only: not imported or shipped as GPU-driver dependencies.
+# Current binder evidence only: not imported or shipped as GPU dependencies.
+# Older reports retain their own immutable source pins; these do not replace
+# the producer of a historical Body receipt or authenticate its old bytes.
 CONSTANT_EVIDENCE = {
-    "body_smoke": (32390, "e4d659de33bacff9d5c85c1cb2fedce34f4aa34bdbae93b3b9b7e08950613ce3"),
+    "body_smoke": (33592, "3f662f88cd212ad1a04b59b66ccdb5e32a00829b52f5e224daadfbe519e1bc93"),
     "object_smoke": (10994, "1e249274153859150130be415203ae7cf4cb77862cba92d056493dbd51337407"),
     "hand_synthetic_infer": (20006, "10db2e23b4e76b0272ab038778de4ce87b25a66d82175ec477aab6be13fd156f"),
     "hand_synthetic_masks": (13491, "4694c3f61556dc60bb6b76b2b5ca328c7dd00308662bac651757c57ea92d3083"),
@@ -92,6 +94,8 @@ CONSTANT_EVIDENCE = {
     "acquire_auxiliary": (4256, "27b0887ffeec489117acdd44b3fdb711b47a436bebc5b5925c11d07d1e1bf8c3"),
     "acquire_weights": (4652, "f1a8cdc68963e6a65916df897a1acef21236ad840f5d537deff8f688aab63d20"),
     "official_track1_pack_gate": (38158, "1aa758e7a7de116172a479e3dd24b2aff845dc3f2330bc0adbbcbd6f00cb37b4")}
+HISTORICAL_CONSTANT_EVIDENCE = {
+    "body_smoke": (32390, "e4d659de33bacff9d5c85c1cb2fedce34f4aa34bdbae93b3b9b7e08950613ce3")}
 
 
 def safe_name(name):
@@ -307,6 +311,7 @@ def inventory(root):
     return dict(entries=entries, evidence_only_files=evidence, sources=sources, internal_moge1=moge, images=images,
         actual_prerequisites_unchanged=True, entries_sha256=digest_json(entries),
         constant_evidence={name: {"bytes": size, "sha256": sha, "repository_path": "infra/" + name + ".py"} for name, (size, sha) in CONSTANT_EVIDENCE.items()},
+        historical_constant_evidence={name: {"bytes": size, "sha256": sha, "repository_path": "infra/" + name + ".py", "source_bytes_verified_by_this_inventory": False} for name, (size, sha) in HISTORICAL_CONSTANT_EVIDENCE.items()},
         source_URLs={"upstream": "https://github.com/nvidia-isaac/video_to_data/tree/" + UPSTREAM,
             "body": "https://huggingface.co/facebook/sam-3d-body-dinov3/tree/" + BODY_REV, "objects": "https://huggingface.co/facebook/sam-3d-objects/tree/" + OBJECT_REV,
             "moge1": "https://huggingface.co/Ruicheng/moge-vitl/tree/" + MOGE_REV},

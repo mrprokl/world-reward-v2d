@@ -185,7 +185,12 @@ def receipts(gate):
 def test_receipts_actual_legacy_missing_revision_and_mask_network_not_invented(gate):
     raw, masks = receipts(gate); gate.validate_receipts(raw, masks)
     assert "producer_revision" not in raw and "network" not in masks
-    assert gate.BODY_SCRIPT_SHA == gate.sha256(Path(gate.body.__file__))
+    assert gate.BODY_SCRIPT_SHA == "e4d659de33bacff9d5c85c1cb2fedce34f4aa34bdbae93b3b9b7e08950613ce3"
+    helper = Path(gate.body.__file__)
+    assert (helper.stat().st_size, gate.sha256(helper)) == (gate.BODY_HELPER_BYTES, gate.BODY_HELPER_SHA)
+    assert gate.BODY_SCRIPT_SHA != gate.BODY_HELPER_SHA
+    raw["script_sha256"] = gate.BODY_HELPER_SHA
+    with pytest.raises(ValueError): gate.validate_receipts(raw, masks)
 
 
 @pytest.mark.parametrize("fault", ["track", "video", "dataset", "episodebool", "gtmissing", "gttrue", "labels", "oracle",
@@ -309,8 +314,37 @@ def test_real_source_consumer_hashes_selected_both_masks_no_video_or_private(gat
     assert len(masks) == len(mask_records) == 5 and len(arrays["global_rot"]) == 5
     assert len([p for p, h in frozen if p.suffix == ".png"]) == 10
     assert all(gate.sha256(p) == h for p, h in frozen)
+    assert (Path(gate.body.__file__), gate.BODY_HELPER_SHA) in frozen
+    assert not any(h == gate.BODY_SCRIPT_SHA for _, h in frozen)
     assert not any(".mp4" in str(p) or "eval_private" in str(p) for p, _ in frozen)
     assert all("decoded_rgb_sha256" in r and "object_mask_sha256" in r for r in mask_records)
+
+
+@pytest.mark.parametrize("fault", ["sha", "size", "symlink"])
+def test_current_consumer_helper_rejected_before_receipts_or_decode(gate, sources, monkeypatch, fault):
+    root, raw_path, _, _, _ = sources
+    helper = root/"consumer_body.py"; helper.write_bytes(Path(gate.body.__file__).read_bytes())
+    if fault == "sha":
+        raw = helper.read_bytes(); helper.write_bytes(b"#" + raw[1:])
+    elif fault == "size": helper.write_bytes(helper.read_bytes() + b"\n")
+    else:
+        alias = root/"alias.py"; alias.symlink_to(helper); helper = alias
+    monkeypatch.setattr(gate.body, "__file__", str(helper))
+    raw_path.unlink()  # A helper failure must precede even the receipt read.
+    with pytest.raises(ValueError): gate.source_inputs(root)
+
+
+def test_current_helper_verification_does_not_claim_historical_source_bytes(gate, sources, monkeypatch):
+    root, _, _, _, _ = sources
+    def stop_before_native(): raise RuntimeError("procedural stop before native imports")
+    monkeypatch.setattr(gate, "strict_torch", stop_before_native)
+    report = {}
+    with pytest.raises(RuntimeError, match="procedural stop"):
+        gate.run(root, root, report, lambda: None)
+    assert report["consumer_body_helper_hash_verified"] is True
+    assert report["historical_body_script_identity_verified_from_receipt"] is True
+    assert report["historical_receipt_hash_allowlist_verified"] is True
+    assert report["historical_body_source_hash_matched"] is False
 
 
 @pytest.mark.parametrize("fault", ["bodyreceipt", "objectbytes", "humansha", "maskindex", "maskextra", "objectsymlink",

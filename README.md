@@ -7,7 +7,7 @@ verify it. See [research audit](docs/audit.md), [literature](docs/literature.md)
 Third-party source/model terms and unresolved eligibility are documented in
 [licenses](docs/licenses.md); own code is Apache-2.0, not the external assets.
 
-## Research status — 2026-10-03
+## Research status — 2026-10-04
 
 No final Parquet, submission or verified CARI4D improvement yet.
 
@@ -23,11 +23,13 @@ No final Parquet, submission or verified CARI4D improvement yet.
   and original official packing now pass independently. The next 592-frame
   episode has independently verified preparation, forward and native refinement;
   the outer queue failed its source-cache postcheck and is not reclassified.
-  After a separate source audit, native export is running. The 747-frame
+  After a separate source audit, a corrected native export is running; the first
+  export stopped at its historical-source provenance check before model execution. The 747-frame
   episode keeps all 25 object components but tracking stopped at 18 frames
   with empty automatic object masks. The next 668-frame episode has complete
-  automatic masks and Body/depth initializers; its frontend continuation failed
-  and still needs diagnosis. No frames, components or
+  automatic masks and Body/depth initializers; its default topology reduction failed before object tracking. A separately
+  gated volume-constrained proposal retains its three shells, including two
+  cavities; full tracking remains unverified. No frames, components or
   trajectories were dropped to rescue either episode.
 - **Research:** a frozen DA3 depth hypothesis, anchored to MoGe by one
   scene-constant median ratio on the fixed 10% image border, gains **33.42%**
@@ -49,8 +51,12 @@ No final Parquet, submission or verified CARI4D improvement yet.
 
 A verified 19.91 GB asset-only transfer and extraction between Azure VMs
 completed without local checkpoint traffic. The second runtime is not yet
-ready: its minimal Grounding build failed, with no parity or eligibility claim.
+ready: the selected Body/DINO source binding passes, and the minimal Grounding
+image compiles offline, but its thin Python import gate still fails. No CUDA
+execution parity or eligibility claim.
 The full frozen `da2f3db` lightweight suite passed **10,394 tests, 2 optional skips**.
+The newer `3e7d391` suite has **10,446 passes, 3 failures, 2 optional skips**;
+historical-producer versus current-helper source binding is being corrected.
 
 Heavy data, models and computation remain on Azure. Only reproducibility pins,
 results and decisions are kept here; see [experiments](docs/experiments.md).

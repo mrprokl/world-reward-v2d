@@ -29,6 +29,9 @@ def test_fixed_constants_equal_genuine_existing_binders(gate, monkeypatch):
     for name, (size, digest) in gate.CONSTANT_EVIDENCE.items():
         raw = (root / "infra" / (name + ".py")).read_bytes()
         assert (len(raw), hashlib.sha256(raw).hexdigest()) == (size, digest)
+    assert gate.HISTORICAL_CONSTANT_EVIDENCE == {"body_smoke": (32390,
+        "e4d659de33bacff9d5c85c1cb2fedce34f4aa34bdbae93b3b9b7e08950613ce3")}
+    assert gate.CONSTANT_EVIDENCE["body_smoke"] != gate.HISTORICAL_CONSTANT_EVIDENCE["body_smoke"]
 
 
 @pytest.mark.parametrize("name", ["../secret", "/etc/passwd", "a//b", "a/./b", "a\\b", "", "a\x00b"])
