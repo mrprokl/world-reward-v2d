@@ -2116,3 +2116,11 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   stops unchanged; any explicitcast requires a separatelydeclaredcontract,
   not silent same-job fallback. No3Dfit/export/accuracy/adoption/eligibility
   clearance claim; source/training/teacher/overlap rights remain unverified.
+
+  D95sourcefreeze5407PASS/1optionaltrimeshSKIP73.07s,81newfocused and176
+  combinedfrontend testsPASS, independentreview/no-blocker. Actualcode
+  sourceee91a530398f2f8bc0aced813f94717c114f5ee7, bundle7files22,840B;
+  runtime driver never casts nativefloat64list, checksactualprovider/options,
+  all4predictionNPZ hashes/inventory and temporaryprefix cleanup evenfailure.
+  FakeORT fixture covers actualdriverflow only, not realcheckpoint evidence.
+  AzureCPUoffline dispatch started; no parallelGPU or heavyMac transfer.
