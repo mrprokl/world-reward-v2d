@@ -273,3 +273,11 @@ bundling/distribution; a manifestlabel alone isnotnoticeclosure. SAM-acquired
 MHR checkpoint remains its originalSAMMaterials provenance, neverrelabeldedup
 asApache. MANO/SMPL conversiontargets remainseparate. Continue research with
 permissiveown/MHR/MoGe/SAM2/P3Dblocks whilefinallicencepath staysunverified.
+
+
+Scope correction from actual ownsource: currentobject_pose_smoke.py doesNOTrun
+FoundationPose; its producer is `own_ICP_Viterbi_not_FoundationPose`. FP libraries
+in runtimeimage or documented possibleTAO route donotprove theirusebythisown
+tracker. Keep the existing clean tracker. ActualCARIforwardnvdiffrast inputrender
+remainsa separateunresolved NCdependency; SAMBody/Objects sourceexception and
+legacyCARIgrant also stillunresolved. No blanketeligible/runtimeclearedclaim.

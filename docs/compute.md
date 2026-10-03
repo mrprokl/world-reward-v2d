@@ -546,3 +546,13 @@ inputmanifest13081B/3df960ce0f594b8f51675b21bb070925de7aa87a583332674eb89b0e90fc
 and selectedoriginalEP4RGB/two publicmetadata hashesverified. No failurearchive
 ornewmaskrunyet. Archival CPU contract preservesoriginalFAIL/log/diagnostic via
 LinuxatomicNOREPLACE rename, never deletes/overwrites/reinterprets.
+
+
+ActualEP3structuralmetadata20:43:52UTC: originalpublicRGB1152×1536, length592;
+20:45:21UTC originalcamera labelleft_stereo_camera_left (hashverifiedpublicmeta).
+NativeCARI export intentionallynames its sole camerastream MHR_CAMERA_NAMES[0]
+(front_stereo_camera_left), independentofphysicalcamera label; do notconfuse
+structuralname withGTcalibration orrelabeltheoriginalvideo. The actualpublic
+exportformat needsfront_stereo_camera_left in clipinputspec AFTERreceipt.
+EP3CPUassemblystillactive550/592, noinputreportyet; EP4initializersactiveone
+939915GPUworker4420MiB. SchedulerdoesNOTstartEP3nativeGPUuntilEP4GPUisidle.

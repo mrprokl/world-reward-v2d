@@ -1229,3 +1229,44 @@ same3objects/scenes, nohuman/temporal/heldoutobject/trainoverlapclearance andno
 verifiedCARI4Dvictory. This validates one limitedhypothesis, notMegaSaM nor
 adoption. Do not mine moreTUDLrecords; seeknewscene/objects/sharedgauge or
 temporalfidelity validation with legallyverifiedsource. D105remainsclosedFAIL.
+
+
+## Post-D107 independent real-depth rejection: next priorities
+
+D107medianAbsRelgain4.904632756% failedunchanged5%gate despiteallnativecoverage
+1.0; absolute39–59%candidateAbsRel. DoNOTroundtoPASSorretuneTUM/TUDL.
+No futurevalidation truth maychange currentclip coefficients orK800.
+
+1. **Native offline metric temporal depth**, not another scalaranchor.
+[VDAcode4f5ae23172ba60fd7bc11ef671cca678842c7072](https://github.com/DepthAnything/Video-Depth-Anything/tree/4f5ae23172ba60fd7bc11ef671cca678842c7072)
+and [MetricSmall273d090f2ce17df50c2872d82c8322c45da5b4dd](https://huggingface.co/depth-anything/Metric-Video-Depth-Anything-Small/tree/273d090f2ce17df50c2872d82c8322c45da5b4dd)
+declareApache2; Base/LargeNCexcluded. Nativeoffline32-frame/10-overlap metric
+branch has scale1/shift0; relativedepthaffinebranch MUSTNOTbeused. ReportedScanNet
+TAE1.48 vsMoGe2 2.56 butNYUv2delta1 .850 vs .967 arguesfortemporaltest, not
+absoluteSOTA. Candidatepredeclarednew96-contiguous-frame3clipRGB-D validation
+needslicensedsource/registeredZ/units andtimestampassociation provenBEFORE
+acquisition. [OpenLORIS](https://github.com/lifelong-robotic-vision/OpenLORIS-Scene/blob/master/download.md)
+permitscommercialCCBYND, butoriginalarchive/subsetredistribution limits and
+depthregistration stillmustbeverified. Bonnprimarylicenceunfound→excluded.
+Requireallframes/sensorcoverage95%,medianAbsRelgain5/no-seq−5 ANDtemporal
+Z-changeerrorgain10 withoutsmoothingawayrealevents/occlusions; sparse/static
+outputs cannotpass. Thisisnotyet frozenprotocol/assetacquisition/overlapclearance.
+
+2. **IsolateRGBcamera-prior confound onnewrealrecords**, conditionalonvalue.
+K800vs~525 mayaffectDA3focal/300 andMoGefocal/shift, butcausalityunmeasured.
+D84nineactualabstentionsremainREJECT; ownTorchresize differedfrompinnednative
+[GeoCalibKornia](https://github.com/cvg/GeoCalib/blob/97b8968e7798a66bf04fcf791fb535624241bda7/geocalib/utils.py#L69-L140).
+Usefreshreal [DIODEMIT](https://diode-dataset.org/) RGBonly+privateK AFTERfreeze
+forcameraerror; preserveESS/conditioning/abstentiongates, noD84rescue. DIODE
+range-versus-Z ambiguitymustbeprovedbeforedepthscore. Cam-onlygate medfocal5%,
+worst15%/coverage80 doesnotestablishHOIgeometry orabsolute metricdepth.
+
+3. **Metric human/sharedgauge observability before expensivecontactoptimization**.
+[MegaSaM](https://arxiv.org/html/2412.04463v2) staticcamerareprojectioncannotresolve
+disparity; contact/2D/modelagreementmayjointlymis-scale. Seeknewauthorized
+referencehumanmetricvalidation, notchallengecamera/dimensions/GT. Requireraw
+humanANDobjectgain5/no−5/fulltrajectories/clipconstantshapegeometrygauge; no
+per-frameevalalignment. CurrentownrigidtrackingalreadyICP/Viterbi, notreplace
+itunnecessarilywithNCFoundationPose. nvdiffrast/SAM/license/trainoverlap
+remain independentfinaleligibility blockers. Allprimaryaudit text/metadataonly;
+no heavydataset/model downloads ornewGPUjobsfortheseproposals.
