@@ -482,3 +482,20 @@ transfer/data/outputs/validationread. Fullindividualmanifest staysAzure, stdout
 bounded4KB. Rawimagebuildreceipts evidenceONLY/nevertransfereligible; projected
 actualID/platform/rootfs only, configgraph remainsunsealed, nolicense/CUDAclaim.
 Agent35tinyPASS0.32s/bash-n; no actualinventory or replicaPASS yet.
+
+ActualreplicainventoryFAIL21.181993407s, producerf895e4a/43files38936encodedB:
+incorrectrequiredkitv2dlb/__init__.py absent. Receipt771B/
+3fc2a05902c88164023bac39639e96f7699580dc7d70b53cde1d214547dfd848.
+Readonlyactualkitlisting confirms namespace package with11genuinePythonfiles,
+notregularpackage; nonecreated/modified. Newdistinctinventory corrects only
+sourcecontract, rejectsfabricatedinitializer, retainsoriginal2KBmesh_budgetpin.
+36tinyPASS0.23s; noimage/assets/credentialtransfer/clonePASSclaimed.
+
+EP3objecttracking actualPASS592frames3360.15873205s; sameproducer6242389,
+originalwholegeometry/fulltimeline preserved; nowCPUcari_inputdepthassembly
+active50/592 19:48:34UTC. EP4frontenddispatch initiallyrejectedbyAzureRCConflict
+beforeunit/log/snapshot; readonlycount0/allabsent establishedbeforelaterdispatch.
+ActualfirstEP4frontendproducerf895e4a/83files139692encodedB ran919457 andFAILED
+automatic_masks19:43:55UTC, actoridentityclosest2/3observationscoverage2/3 failed
+unchangedgate. Nomanualidentity/label/thresholdrelax/restart. Preservefailureand
+diagnostics, auditgeneralalgorithm onnonchallengefixtures beforeanynewmethod.

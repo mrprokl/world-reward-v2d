@@ -73,7 +73,10 @@ FIXED = {BODY + "/model.ckpt": ("b5a2f9d305dd02626b967aa2e86021fba07065df66ce7a7
     **{OBJECT + "/checkpoints/" + n + ".yaml": v for n, v in YAMLS.items()},
     "vendor/v2d_submission_kit/v2dlb/mesh_budget.py": ("42ab8ab35f37b806fb1465eadd96abe43eaac04575da47a4855d08eefe6167b0", 2031)}
 CARDS = (BODY + "/model_config.yaml", BODY + "/LICENSE", BODY + "/README.md", OBJECT + "/LICENSE",
-    "weights/grounding_dino/README.md", "weights/sam2/README.md", "vendor/v2d_submission_kit/v2dlb/__init__.py")
+    "weights/grounding_dino/README.md", "weights/sam2/README.md")
+# The actual official kit is a Python namespace package, not a regular package.
+# Do not fabricate __init__.py to repair provenance; only mesh_budget.py is used.
+KIT_NAMESPACE = "vendor/v2d_submission_kit/v2dlb"
 RECEIPTS = ("results/weights-acquisition.json", "results/auxiliary-assets.json", "results/image-cari4d-source.json", "results/image-grounding.json", "results/image-sam3d-runtime.json")
 IMAGES = {"body": ("world-reward/cari4d-source:0.1", "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7", RECEIPTS[2]),
     "grounding": ("world-reward/grounding:0.1", "sha256:53b33bc4b60e0e3e8f83b401775b4701b18eef54408fd585fbe3a5d376c042e1", RECEIPTS[3]),
@@ -246,6 +249,9 @@ def image_record(tag, expected_id, receipt):
 
 def inventory(root):
     root = canonical(root); entries = {}; states = {}; receipts = {}; sources = []; evidence = {}
+    kit = canonical(root / KIT_NAMESPACE)
+    if not kit.is_dir() or (kit / "__init__.py").exists() or (kit / "__init__.py").is_symlink():
+        raise ValueError("Original official kit namespace package without fabricated initializer required")
     def add(name, expected=None, role="asset", allow_empty=False, maximum=7_000_000_000):
         safe_name(name); path = root / name; value = identity(path, maximum, allow_empty); states[name] = state(path)
         if expected and (value["sha256"], value["bytes"]) != expected: raise ValueError("Independent asset SHA/bytes differ: " + name)

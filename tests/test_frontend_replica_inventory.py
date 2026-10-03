@@ -36,6 +36,17 @@ def test_name_closed(gate, name):
     with pytest.raises(ValueError): gate.safe_name(name)
 
 
+def test_real_kit_namespace_not_fabricated_initializer(gate, tmp_path):
+    assert gate.KIT_NAMESPACE + "/__init__.py" not in gate.CARDS
+    assert gate.KIT_NAMESPACE + "/mesh_budget.py" in gate.FIXED
+    kit = tmp_path / gate.KIT_NAMESPACE
+    kit.mkdir(parents=True)
+    # Namespace is accepted up to the next independently missing prerequisite.
+    with pytest.raises(FileNotFoundError): gate.inventory(tmp_path)
+    (kit / "__init__.py").write_bytes(b"# invented")
+    with pytest.raises(ValueError, match="namespace package"): gate.inventory(tmp_path)
+
+
 def test_regular_identity_exact_before_after_empty_source_and_no_alias(gate, tmp_path, monkeypatch):
     path = tmp_path / "asset"; path.write_bytes(b"tiny")
     result = gate.identity(path, 4)

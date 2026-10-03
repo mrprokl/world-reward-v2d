@@ -1,0 +1,527 @@
+{
+  "schema": "world_reward.tum_rgbd_depth_protocol.v1",
+  "namespace": "validation/tum_rgbd_depth_holdout_v1",
+  "status": "preregistered_specification_only_not_acquired_or_executed",
+  "origin": "New external TUM RGB-D recordings selected by filename metadata only; no challenge/FORM-HOI assets.",
+  "primary": {
+    "dataset_url": "https://cvg.cit.tum.de/data/datasets/rgbd-dataset",
+    "dataset_page_observed": {
+      "bytes": 169200,
+      "sha256": "13ef013dddc6cd65f773e49d7f6c44dd2c23c590b4afce768bb1040200e44439"
+    },
+    "license_section": {
+      "selector": "HTML from <h2 id=\"license\">License</h2> through before next h1..h6 heading",
+      "bytes": 627,
+      "sha256": "04070bc137e1ebbb7fbb394fa7239403a5340ba30657990c38aa6a6bbd5f2d35",
+      "data_license": "CC-BY-4.0",
+      "source_license": "BSD-2-Clause",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "download_url": "https://cvg.cit.tum.de/data/datasets/rgbd-dataset/download",
+    "download_page_observed": {
+      "bytes": 610177,
+      "sha256": "f06baa9d318fb4c1e3b8ffd0623eb54d5bd0c0d7da7a83c72d72678c5dcbb6e4"
+    },
+    "format_url": "https://cvg.cit.tum.de/data/datasets/rgbd-dataset/file_formats",
+    "format_page_observed": {
+      "bytes": 155732,
+      "sha256": "8f72a7d8d82473570e17cf3f064f2453e5462cdc31a7e723c1dfbdc99b1b7d90"
+    },
+    "format_contract": "Original RGB PNG640x480 uint8 RGB and depth PNG640x480 uint16 already 1:1 registered; sensor camera Z=raw/5000 metres; zero means missing. Original depth correction was already applied, never apply 1.035/1.031 again.",
+    "attribution": "J. Sturm, N. Engelhard, F. Endres, W. Burgard, D. Cremers, A Benchmark for the Evaluation of RGB-D SLAM Systems, IROS 2012; original TUM RGB-D benchmark publisher; retain CC-BY-4.0 notices/source URLs.",
+    "commercial_data_permission_primary_verified": true,
+    "archive_embedded_terms_inspected": false,
+    "sequence_specific_exceptions_verified": false
+  },
+  "metadata_only_selection": {
+    "rgb_zero_based_sorted_filename_ranks": [
+      40,
+      80,
+      120,
+      160
+    ],
+    "rgb_values_inspected": false,
+    "depth_values_inspected": false,
+    "labels_choose_selection": false,
+    "association": "For each selected RGB filename timestamp, choose unique nearest original depth filename timestamp by exact Decimal arithmetic; equality ties STOP; reused depth file STOP; no offset fit.",
+    "maximum_absolute_timestamp_offset_seconds": "0.020000",
+    "derive_before_depth_decode": true,
+    "compare_primary_archive_member_lists_and_selected24_bytes_to_mirror_pins": true,
+    "mirror_is_independent_file_integrity_reference_not_primary_license_authority": true,
+    "mirror_repository": "voviktyl/TUM_RGBD-SLAM",
+    "mirror_revision": "76818471ae555dd6cd4e100b7cedcccda660448d",
+    "metadata_pages_retrieved_all_without_media": true,
+    "total_selected_file_bytes": 7358364
+  },
+  "acquisition": {
+    "azure_only": true,
+    "local_media_transfer": false,
+    "original_archive_sha256_independently_known": false,
+    "original_archive_sha256_observed_after_download_reproducibility_only": true,
+    "archive_content_must_be_authenticated_by_selected24_independent_LFS_SHA256_and_primary_headers": true,
+    "no_claim_whole_archive_preexisting_independent_SHA256_pin": true,
+    "consume_only_selected_RGB_and_depth_members": true,
+    "source_camera_calibration_or_trajectory_selected": false,
+    "private_depth_decoded_before_prediction_freeze": false,
+    "fail_on_any_primary_member_list_rank_or_timestamp_or_file_pin_mismatch": true,
+    "fail_on_changed_or_conflicting_primary_license_or_sequence_terms": true,
+    "publish_public13_and_private12_inventories_only_after_complete_acquisition_gates": true,
+    "delete_disposable_archives_after_verified_subset": true
+  },
+  "sequences": [
+    {
+      "name": "rgbd_dataset_freiburg1_desk",
+      "rgb_file_count": 613,
+      "depth_file_count": 595,
+      "mirror_metadata_pages": [
+        {
+          "channel": "rgb",
+          "page": 0,
+          "bytes": 203517,
+          "sha256": "19d18a233b80a101b7b175114c4d3d3843e9ccace28346059e59619d1ca49756"
+        },
+        {
+          "channel": "depth",
+          "page": 1,
+          "bytes": 198731,
+          "sha256": "ae01681642f278169b41dc28f20ac7f8ae06746ac39598b0dd4796ef7acf1c51"
+        }
+      ],
+      "selected": [
+        {
+          "rgb_zero_based_rank": 40,
+          "rgb_timestamp": "1305031454.127701",
+          "depth_timestamp": "1305031454.141030",
+          "timestamp_offset_seconds": "0.013329",
+          "rgb": {
+            "path": "rgb/1305031454.127701.png",
+            "bytes": 442006,
+            "sha256": "e7d9ebe77a418b083cad3d775cc8470ad3cb3fc99d3b8485f40e6c26ba60ad96"
+          },
+          "depth": {
+            "path": "depth/1305031454.141030.png",
+            "bytes": 126736,
+            "sha256": "e1ead03801f0a4df6da091e9d0f575f33df8ad8b540a0ff47a398f5d091c1213"
+          }
+        },
+        {
+          "rgb_zero_based_rank": 80,
+          "rgb_timestamp": "1305031455.459589",
+          "depth_timestamp": "1305031455.473168",
+          "timestamp_offset_seconds": "0.013579",
+          "rgb": {
+            "path": "rgb/1305031455.459589.png",
+            "bytes": 495514,
+            "sha256": "357216d1667c79d0def00c3fb05715eda04136e51901065162fdb40f30df5db0"
+          },
+          "depth": {
+            "path": "depth/1305031455.473168.png",
+            "bytes": 117250,
+            "sha256": "57195aa87af4aacb1fc487e03e37088ba40a106e5c83f8c4a260f62b202efdc4"
+          }
+        },
+        {
+          "rgb_zero_based_rank": 120,
+          "rgb_timestamp": "1305031456.791649",
+          "depth_timestamp": "1305031456.777218",
+          "timestamp_offset_seconds": "0.014431",
+          "rgb": {
+            "path": "rgb/1305031456.791649.png",
+            "bytes": 495764,
+            "sha256": "da8cb4c39a8b3322dc28431261629b48d8ebe179114ce6370a650c62feeffc98"
+          },
+          "depth": {
+            "path": "depth/1305031456.777218.png",
+            "bytes": 115486,
+            "sha256": "59802d58a5932bf4fb82ae4d2b7222116902bbf4f60d8120f1d37420bd91247e"
+          }
+        },
+        {
+          "rgb_zero_based_rank": 160,
+          "rgb_timestamp": "1305031458.127605",
+          "depth_timestamp": "1305031458.144808",
+          "timestamp_offset_seconds": "0.017203",
+          "rgb": {
+            "path": "rgb/1305031458.127605.png",
+            "bytes": 571425,
+            "sha256": "92b51a7c5d5543489b20982499ee65ca2ceda23e1a87e61353356d9d5e31818d"
+          },
+          "depth": {
+            "path": "depth/1305031458.144808.png",
+            "bytes": 131162,
+            "sha256": "3ba2a18670e1b1d5d49e82edcb02b14ad35902ad76c02839f500b412fd51693b"
+          }
+        }
+      ],
+      "sequence_id": 1,
+      "archive": {
+        "url": "https://cvg.cit.tum.de/rgbd/dataset/freiburg1/rgbd_dataset_freiburg1_desk.tgz",
+        "bytes": 344011403,
+        "etag": "\"1481328b-4ae2a151e2840\"",
+        "last_modified": "Fri, 30 Sep 2011 15:14:33 GMT",
+        "head_verified_200": true,
+        "sha256": null,
+        "sha256_status": "No independent primary checksum observed; calculate actual Azure download digest, not an a-priori authenticity pin."
+      }
+    },
+    {
+      "name": "rgbd_dataset_freiburg2_xyz",
+      "rgb_file_count": 3669,
+      "depth_file_count": 3666,
+      "mirror_metadata_pages": [
+        {
+          "channel": "rgb",
+          "page": 0,
+          "bytes": 331001,
+          "sha256": "cace3a2f75a2f08839772348a622cb9d8fe514840ca2defdbc267942bbd420e5"
+        },
+        {
+          "channel": "rgb",
+          "page": 1,
+          "bytes": 331001,
+          "sha256": "e475952047ae48aff05c4da8f9999ec71e49dce4b5ea77d8fb70de560f2dd959"
+        },
+        {
+          "channel": "rgb",
+          "page": 2,
+          "bytes": 331001,
+          "sha256": "577d5bbe5a207622903d2d6583e24a8154a4e7bf84aad7590cea8d4d19b6ff93"
+        },
+        {
+          "channel": "rgb",
+          "page": 3,
+          "bytes": 221440,
+          "sha256": "7161604e4ef072485b8a5bfd2a445c031b7f171792def0719b483b6bc10cbf89"
+        },
+        {
+          "channel": "depth",
+          "page": 4,
+          "bytes": 333001,
+          "sha256": "ffa198c177804240471ee3f2118cb17ec12d2fdc94ba188c36248af418e928a7"
+        },
+        {
+          "channel": "depth",
+          "page": 5,
+          "bytes": 333001,
+          "sha256": "41b640e5277cbf5345ae6404663eaacb36f87d6adc4be6440deb289d61512365"
+        },
+        {
+          "channel": "depth",
+          "page": 6,
+          "bytes": 333001,
+          "sha256": "95f8dbc2be452cf93785496f5b9c00440bc70c8801ee38877fc7af42ebe4e1d1"
+        },
+        {
+          "channel": "depth",
+          "page": 7,
+          "bytes": 221779,
+          "sha256": "164eb0f9245fabc93e62d845cff811758fd7975ed5ee48f347376b0cb6d1d4e2"
+        }
+      ],
+      "selected": [
+        {
+          "rgb_zero_based_rank": 40,
+          "rgb_timestamp": "1311867171.794171",
+          "depth_timestamp": "1311867171.787543",
+          "timestamp_offset_seconds": "0.006628",
+          "rgb": {
+            "path": "rgb/1311867171.794171.png",
+            "bytes": 468034,
+            "sha256": "7dc485e1231f0e5de58e59987545fc2d68dd256a5502cbd713fdc24e45cb7258"
+          },
+          "depth": {
+            "path": "depth/1311867171.787543.png",
+            "bytes": 120502,
+            "sha256": "f32dc73fee327758ac81d0a1bb554e970fc94dca0abadb274cbc98801874c7d8"
+          }
+        },
+        {
+          "rgb_zero_based_rank": 80,
+          "rgb_timestamp": "1311867173.126782",
+          "depth_timestamp": "1311867173.118688",
+          "timestamp_offset_seconds": "0.008094",
+          "rgb": {
+            "path": "rgb/1311867173.126782.png",
+            "bytes": 497967,
+            "sha256": "8d0ed1f7891e07a46169de80e44b9be4780962c239ff4b56751818610ce5d92b"
+          },
+          "depth": {
+            "path": "depth/1311867173.118688.png",
+            "bytes": 123152,
+            "sha256": "866505ce18a322220e128da8adfc9580bfb6e2c50a51581864e6a3c2dd05a198"
+          }
+        },
+        {
+          "rgb_zero_based_rank": 120,
+          "rgb_timestamp": "1311867174.463016",
+          "depth_timestamp": "1311867174.456817",
+          "timestamp_offset_seconds": "0.006199",
+          "rgb": {
+            "path": "rgb/1311867174.463016.png",
+            "bytes": 497982,
+            "sha256": "cb37b74e846c652aacf5882303797a6d4ea369ac1711686998797daf01803a74"
+          },
+          "depth": {
+            "path": "depth/1311867174.456817.png",
+            "bytes": 126036,
+            "sha256": "12bc5e9f77cf2a856a408b11ba55c589400c0235fba8e995c5ae928417c65d4e"
+          }
+        },
+        {
+          "rgb_zero_based_rank": 160,
+          "rgb_timestamp": "1311867175.794862",
+          "depth_timestamp": "1311867175.788225",
+          "timestamp_offset_seconds": "0.006637",
+          "rgb": {
+            "path": "rgb/1311867175.794862.png",
+            "bytes": 497932,
+            "sha256": "5690151e4ceec0aa387996e2d829a8d6fb49342c40a4ea95d21f23127f974379"
+          },
+          "depth": {
+            "path": "depth/1311867175.788225.png",
+            "bytes": 126646,
+            "sha256": "4a7d438d9af549415e93c57e9b1384b5e319153a32402aa4d72814651f52c975"
+          }
+        }
+      ],
+      "sequence_id": 2,
+      "archive": {
+        "url": "https://cvg.cit.tum.de/rgbd/dataset/freiburg2/rgbd_dataset_freiburg2_xyz.tgz",
+        "bytes": 2201854648,
+        "etag": "\"833da2b8-4ae2a3763f600\"",
+        "last_modified": "Fri, 30 Sep 2011 15:24:08 GMT",
+        "head_verified_200": true,
+        "sha256": null,
+        "sha256_status": "No independent primary checksum observed; calculate actual Azure download digest, not an a-priori authenticity pin."
+      }
+    },
+    {
+      "name": "rgbd_dataset_freiburg3_long_office_household",
+      "rgb_file_count": 2585,
+      "depth_file_count": 2509,
+      "mirror_metadata_pages": [
+        {
+          "channel": "rgb",
+          "page": 0,
+          "bytes": 349001,
+          "sha256": "b76926163fbeb9cb22fb6f3e1cafad123978c64d919b349230acf02274d2bdc3"
+        },
+        {
+          "channel": "rgb",
+          "page": 1,
+          "bytes": 349001,
+          "sha256": "dddf823aea2055fcde8b3681f52ff6b61cf957ce30a88f80c3ba7de4a0df678a"
+        },
+        {
+          "channel": "rgb",
+          "page": 2,
+          "bytes": 204166,
+          "sha256": "467bfcb6541eaf5dd0aa4151837d4a944df06c7af6ead5add74887a63c3c1ff4"
+        },
+        {
+          "channel": "depth",
+          "page": 3,
+          "bytes": 351001,
+          "sha256": "63a6669ce465213004fea5a1b3e2b9dac9a98ac40ac3b41fbd59b8efd5fb4209"
+        },
+        {
+          "channel": "depth",
+          "page": 4,
+          "bytes": 351001,
+          "sha256": "b1770c3943cbdbc1e468b98051b06a2c6405f3baf19c15630d3253e3fd53f298"
+        },
+        {
+          "channel": "depth",
+          "page": 5,
+          "bytes": 178660,
+          "sha256": "d3d01b19b3cf8fb14eac21162abba23637ebd5b250323121b0e4a6b9b19a2dd3"
+        }
+      ],
+      "selected": [
+        {
+          "rgb_zero_based_rank": 40,
+          "rgb_timestamp": "1341847982.062739",
+          "depth_timestamp": "1341847982.062794",
+          "timestamp_offset_seconds": "0.000055",
+          "rgb": {
+            "path": "rgb/1341847982.062739.png",
+            "bytes": 469554,
+            "sha256": "89a3bcb8ae140221c19e4d45b2b583b057e0f9a244db288a79fcc0a9f9c171c7"
+          },
+          "depth": {
+            "path": "depth/1341847982.062794.png",
+            "bytes": 124134,
+            "sha256": "9b8b1edcc0c803e494519aa354eb8ce5a9290e1bd2418ae19be1987abb7f8bae"
+          }
+        },
+        {
+          "rgb_zero_based_rank": 80,
+          "rgb_timestamp": "1341847983.402670",
+          "depth_timestamp": "1341847983.402685",
+          "timestamp_offset_seconds": "0.000015",
+          "rgb": {
+            "path": "rgb/1341847983.402670.png",
+            "bytes": 469003,
+            "sha256": "c3df0da7c96f39d638bbfcb10c94bcdcc0ee28309ba2e77ab67d55b877ff46b8"
+          },
+          "depth": {
+            "path": "depth/1341847983.402685.png",
+            "bytes": 124348,
+            "sha256": "4a4444ac67e829b70a490c6ca124848f45b86893953120d131c504d347ad6377"
+          }
+        },
+        {
+          "rgb_zero_based_rank": 120,
+          "rgb_timestamp": "1341847984.743352",
+          "depth_timestamp": "1341847984.743366",
+          "timestamp_offset_seconds": "0.000014",
+          "rgb": {
+            "path": "rgb/1341847984.743352.png",
+            "bytes": 466190,
+            "sha256": "a55c645df3d230382c221d4d369d6fcd4a584e4c2de121fefd4f3f95de3b25ea"
+          },
+          "depth": {
+            "path": "depth/1341847984.743366.png",
+            "bytes": 124735,
+            "sha256": "b39b6485b5c788d30af9ad5ceb246f38469514c4ee9e0b8a5645c8eb0ef3db05"
+          }
+        },
+        {
+          "rgb_zero_based_rank": 160,
+          "rgb_timestamp": "1341847986.082612",
+          "depth_timestamp": "1341847986.082622",
+          "timestamp_offset_seconds": "0.000010",
+          "rgb": {
+            "path": "rgb/1341847986.082612.png",
+            "bytes": 496459,
+            "sha256": "abb64c559b4ef277e400f8ba106490d62781679c6ff82f3a5a39c77628f863a9"
+          },
+          "depth": {
+            "path": "depth/1341847986.082622.png",
+            "bytes": 130347,
+            "sha256": "7cfe6f5e78140f9c71dfa52efdce420b0bdc12d4a4f7e2b863a9f4faba3777ba"
+          }
+        }
+      ],
+      "sequence_id": 3,
+      "archive": {
+        "url": "https://cvg.cit.tum.de/rgbd/dataset/freiburg3/rgbd_dataset_freiburg3_long_office_household.tgz",
+        "bytes": 1483556251,
+        "etag": "\"586d459b-4c6b17c31eb80\"",
+        "last_modified": "Tue, 07 Aug 2012 18:51:42 GMT",
+        "head_verified_200": true,
+        "sha256": null,
+        "sha256_status": "No independent primary checksum observed; calculate actual Azure download digest, not an a-priori authenticity pin."
+      }
+    }
+  ],
+  "frozen_method": {
+    "models": "Original native MoGe2 normal and DA3Metric-Large, same loaders/source/checkpoints/numerics as D106.",
+    "source_helpers": {
+      "infra/tudl_anchor_infer.py": "2ed48a897fb8f161ce761083d3014188aca0298464bcb5d833ba8c4101beeb16",
+      "infra/rgbd_anchor_contract.py": "d3541ce4deb02eff4c7e698425f045bfb246292a89b42d5b77ca2941216d0269",
+      "infra/whole_support_anchor_contract.py": "967140d43b6ca34ca2d5f2dbeaa39e9562c0851dded77ce6436907b25be1d484"
+    },
+    "grid": {
+      "width": 640,
+      "height": 480,
+      "K": [
+        [
+          800,
+          0,
+          320
+        ],
+        [
+          0,
+          800,
+          240
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "pixel_rays": "index_plus_0.5"
+    },
+    "MoGe": "fov_x from fixed K800; force_projection=True; apply_mask=False; original nearest64 focal solve support>=2; no native source patches.",
+    "DA3": "Original native392x518 FP32 camera Z; actual processed focal mean /300 once, native sky correction unchanged, bilinear align_corners=False resize to original grid.",
+    "support_rule": "All unchanged original MoGe valid finite positive pixels; per image median MoGe_Z/native_DA3_Z; one positive equal-frame median4 coefficient per sequence.",
+    "minimum_paired_pixels": 1024,
+    "minimum_whole_grid_paired_coverage": 0.25,
+    "diagnostic_before_every_gate": "paired counts, coverage, ratio median, log-ratio q10/q50/q90 and IQR, including failed row; dispersion is diagnostic only, no filtering.",
+    "no_semantic_mask_confidence_weight_offset_per_frame_scale_camera_fit": true,
+    "original_baseline_and_candidate_validity_byte_identical": true,
+    "predict_all12_complete_frames_before_private_depth_decode": true,
+    "output_contract": "same eleven original MoGe/DA3/anchored depth+points+validity/K/scene_id/frame_id/scene_anchor arrays",
+    "GPU_budget_seconds": 300,
+    "GPU_outer_timeout_seconds": 303
+  },
+  "private_evaluation": {
+    "scalar_sensor_Z_only_primary": true,
+    "raw_depth_dtype": "uint16",
+    "sensor_Z_metres": "raw uint16 /5000 using float64; no second dataset correction",
+    "invalid_sensor_depth": "raw==0 only, preregistered sensor missingness; no prediction-dependent filtering",
+    "minimum_sensor_valid_pixels_per_frame": 1024,
+    "minimum_sensor_valid_whole_grid_coverage": 0.25,
+    "minimum_native_MoGe_coverage_of_sensor_valid_pixels": 0.95,
+    "paired_pixel_set": "sensor raw>0 AND exact unchanged native MoGe validity; same set baseline and candidate; finite positive required on every evaluated prediction pixel",
+    "no_depth_range_clip_or_ROI_or_outlier_removal": true,
+    "metrics": [
+      "AbsRel=mean(abs(pred_Z-sensor_Z)/sensor_Z)",
+      "RMSE_m=sqrt(mean((pred_Z-sensor_Z)^2))",
+      "median signed and absolute camera-Z error diagnostics"
+    ],
+    "sequence_score": "equal mean of four per-frame AbsRel values",
+    "relative_gain": "(sequence_MoGe_AbsRel-sequence_candidate_AbsRel)/sequence_MoGe_AbsRel",
+    "minimum_median_sequence_relative_AbsRel_gain": 0.05,
+    "maximum_any_sequence_relative_AbsRel_regression": 0.05,
+    "zero_baseline_AbsRel_action": "STOP rather than division or perfect-score claim",
+    "confidence_interval_or_absolute_quality_threshold_claim": false,
+    "alignment_or_scale_shift_fit_or_private_camera_reprojection": false,
+    "private_values_only_after": "Independent committed all13 public and all12 prediction file/report/source/model/coeff pins audited before opening any private depth file.",
+    "CPU_budget_seconds": 180,
+    "CPU_outer_timeout_seconds": 183
+  },
+  "model_overlap_screen": {
+    "TUM_not_named_in_pinned_MoGe2_train_config": true,
+    "MoGe_train_config": {
+      "url": "https://raw.githubusercontent.com/microsoft/MoGe/925b8ed835a7a9cdb7578ba15c658a0afc969030/configs/train/v2.json",
+      "bytes": 14104,
+      "sha256": "dccee76a670f09ceafe47d79b6122799af3a35496d18b69539a841794aa8c5bb"
+    },
+    "MoGe_actual_checkpoint_card": {
+      "url": "https://huggingface.co/Ruicheng/moge-2-vitl-normal/raw/b135031bae30b5ac2ae141a0e68717795ce38340/README.md",
+      "bytes": 24,
+      "sha256": "d8d7a46d41a1a37fe4f0a5f637bf55c649310185329127d8a2204632e480be17",
+      "claim": "MIT metadata only; no exact training frame attestation"
+    },
+    "DA3_actual_checkpoint_card": {
+      "url": "https://huggingface.co/depth-anything/DA3METRIC-LARGE/raw/4010e39f3634a45bc60553321fb49fb760bd594e/README.md",
+      "bytes": 4789,
+      "sha256": "4fdd25492cf6401d1459483fd829f6abb399bda8218e1a3ef5ad4a66e9aa5a2a",
+      "claim": "Public academic datasets only, not frame exclusion"
+    },
+    "DA3_paper": {
+      "url": "https://arxiv.org/html/2511.10647v1",
+      "bytes": 365416,
+      "sha256": "91eddf477a43370247607370834be1503e03fdfa0a183a2a867bd7af802bedaa",
+      "claim": "Table1 and metric section4.4 do not name TUM; metric section says14 datasets but enumerates13; not an exhaustive frame-level proof"
+    },
+    "training_overlap_excluded": false,
+    "backbone_or_pseudolabel_overlap_excluded": false,
+    "challenge_overlap_excluded": false
+  },
+  "claims": {
+    "new_recordings_relative_to_TUDL": true,
+    "different_office_or_object_identity_fully_proven": false,
+    "three_original_sensor_groups": true,
+    "sparse_early_frames_not_complete_temporal_validation": true,
+    "RGB_depth_timestamp_misalignment_and_sensor_noise_remain": true,
+    "fixed_K800_differs_documented_TUM_camera_and_can_influence_model_Z": true,
+    "pixel_Z_validation_does_not_remove_all_calibration_bias": true,
+    "no_full_HOI_human_mesh_object_pose_contact_or_acceleration_validation": true,
+    "no_train_overlap_or_stack_license_eligibility_clearance": true,
+    "no_CARI4D_victory_or_adoption_claim": true
+  }
+}

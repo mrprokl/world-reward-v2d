@@ -5214,3 +5214,16 @@ next evidence must varyscenes/objects orjoint/temporalmotion, notanotherTUDLrank
 Fullsuite afterrealTAR/testcontractrepair9654PASS/2unchangedoptionalSKIP268.17s.
 No backend/scorer/prediction changes. Replica-inventory files being authored
 disjointly were not part of collection; their focusedtests/audit remainseparate.
+
+NextD107 frozenTUMspec: 3newrealrecordings/12filename-selectedRGB+12depth,
+independent24mirrorLFSbyteSHAmetadata pins checkedbeforeANYsensorvalues.
+PrimaryCCBY4exact627Blicensesection, originalarchive4.029GBHEAD/ETagnotSHA;
+actualfirstarchiveSHAreproonly, originalselected24mustcrosshashmirror. No
+sourceK/GTtrajectoryinputs, rawdepth/5000alreadycorrected/noalignment. Same
+D106whole-native support/K800method, sensorZAbsRelmedian5/no-seq−5/coverage
+95 unchangedbaseline. Newprotocol21939B/
+ed1f038546ac073d2b52f01874934a6683e05357f9730cbac1a5112930ded035;
+metadataJSON/24hash/ranks/Decimal20msmax17.203ms checked. Noacquisition/native
+prediction/eval yet. DifferentrecordingsNOTfullobject-disjointness/temporalHOI,
+K800prior~525sensormismatch andtrain-overlapunknownlimits recorded. Bounded
+independentprimaryliterature/card checks retainedonlyidentities/decisions.
