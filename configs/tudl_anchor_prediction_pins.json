@@ -1,0 +1,24 @@
+{
+  "schema": "world-reward-tudl-anchor-prediction-pins-v1",
+  "report": {
+    "bytes": 82113,
+    "sha256": "0088501462b4048347fdb513ef95a7d73e62dad47a2a77e080634a5e5b5191d6",
+    "producer_revision": "77b462eefb76adfff17474a341ac1226dd9accaf",
+    "script_sha256": "2ed48a897fb8f161ce761083d3014188aca0298464bcb5d833ba8c4101beeb16"
+  },
+  "outputs": {
+    "scene_000001_frame_001788.npz": {"bytes": 9111357, "sha256": "cb7daf4e054ca29bdb425870262434e730bf9dc865ec890316c0f549728b7074"},
+    "scene_000001_frame_003235.npz": {"bytes": 9080506, "sha256": "10a4561f4b89d9e330534f15e487a2c9657bd2032f8070eb44485ba5561f2fb3"},
+    "scene_000001_frame_005138.npz": {"bytes": 8807063, "sha256": "a876fe1731c84a5ab5971ae9e68f5220d5eb961c3182faf06501c6bb2f9c27d8"},
+    "scene_000001_frame_006925.npz": {"bytes": 8943498, "sha256": "2b5c00611cb9299b354fcb0362e7aca56f19efda151ad0073604ae51f50b0020"},
+    "scene_000002_frame_001566.npz": {"bytes": 9067269, "sha256": "b3c9679fbf233627bb2057473ed0096d4e145ee1cd98412a8bad8f40d9ed4911"},
+    "scene_000002_frame_003137.npz": {"bytes": 9126648, "sha256": "d80e3466bddd808cc5228f9ca77dd9e6f4606bf2d009f48d17d88c11a850483f"},
+    "scene_000002_frame_004894.npz": {"bytes": 8984514, "sha256": "2b8edb186727fcc32a8fd9504d946b4c272dfd6b1443e1db368ca6bbad45c180"},
+    "scene_000002_frame_006490.npz": {"bytes": 8990559, "sha256": "e73993ed805e49dc0e5d400cde007de0cd6e373daf1ad996d2288680cf352a7b"},
+    "scene_000003_frame_001512.npz": {"bytes": 8981029, "sha256": "d884ddcfea3b8e66e01b7e9270e1f1aa1871c809deed08e4fce6bb7b767f4aab"},
+    "scene_000003_frame_003227.npz": {"bytes": 8986187, "sha256": "50e0214262b2da4fa47c273d15bbded6c785d836d91115bb86d5223df36a7e70"},
+    "scene_000003_frame_004819.npz": {"bytes": 9087462, "sha256": "de34b1375e96ea78354ba3ca1746beb5f051f3ccaac3b060dbd11b6ad6eba0c1"},
+    "scene_000003_frame_006647.npz": {"bytes": 9086515, "sha256": "10a202bfe74e6c7700458f5a64357db1235dca874f2beedd6052f361a4fac348"}
+  },
+  "coefficients": [0.9755880287269835, 0.8846172835935665, 0.933185395427601]
+}

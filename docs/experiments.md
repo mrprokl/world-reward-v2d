@@ -4600,3 +4600,16 @@ Actual anchored-depth VM02 dispatch77b462eefb76adfff17474a341ac1226dd9accaf,
 Actual native668sharedprepare dispatch at same revision34files55808encodedB
 after verified VM01 GPUidle. No parallel jobs on the same GPU; VM02depth and
 VM01native are disjoint. Outcomes still pending, no predicted quality gain.
+
+16:54:07UTC actual new public depth inference **PASS24.533991s/12+12native
+calls**, unitinactive/exit0, source/assets reverified. Frozen400receipt82113B/
+0088501462b4048347fdb513ef95a7d73e62dad47a2a77e080634a5e5b5191d6.
+All12 ratio support1.0; one coefficient per scene=[0.9755880287269835,
+0.8846172835935665,0.933185395427601]. ExactMoGe validity/baseline preserved,
+12full camera-consistent predictions+rawDA3 saved444, no private truth read.
+Independent tiny inventory verifies all13 original immutable files against
+original77b462e/script2ed48a89 before/after, commitactual
+configs/tudl_anchor_prediction_pins.json BEFORE private evaluation. All~109MB
+pointmaps remainAzure; only~2KB byte identities return. No camera/scale accuracy
+or improvement claim until the frozen private gate runs; no training-overlap,
+semantic background, human/temporal/fullCARI4D eligibility claim.
