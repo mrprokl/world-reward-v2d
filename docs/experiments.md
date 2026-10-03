@@ -3717,3 +3717,17 @@ three added archive regressions plus generic gates337PASS2.65s. All ten actual
 full501 preparation helper bytes remain unchanged from its78b9005 generator.
 Forward fresh namespace/unit verified absent with actual frozen preparation
 inventory. Launch requires the clean producing commit, no uncertain retry.
+
+First full-forward dispatch fromfb727b7 failed **before output creation or GPU
+execution**: host bootstrap imported `cari_full_forward`, which imports NumPy;
+the VM's control-only Python3.8 has no NumPy. Unitexit1, no forward receipt,
+H10085MiB0%. Exact traceback established the cause; no predictions or prepared
+inputs were changed. Remove only the numerical producer import from the host
+path enumerator: original fifteen input pins remain checked there, and complete
+prepared-payload validation remains inside the pinned container before Torch.
+Do not install numerical/model dependencies on the control host or relax gates.
+Four actual stage bootstraps now execute with `python -S` and numerical/model
+imports forbidden; valid paths and invalid episode/hash gates covered12tests.
+Combined bootstrap/fullstage/archive **349PASS5.26s**. All prepared generator
+helpers and full forward Python driver are unchanged. Retry uses a new unit/
+log and clean producing commit, retaining the still-absent exclusive output.

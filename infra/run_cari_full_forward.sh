@@ -26,10 +26,11 @@ SOURCES="$(PYTHONPATH="$CODE/src:$CODE/infra" python3 - "$PIN" "$PREPARE_PIN" "$
 import json,sys
 from pathlib import Path
 from cari_clip_inputs import PublicClipSpec,source_paths,validate_pins
-from cari_full_forward import validate_artifact_pins
 pins=json.loads(Path(sys.argv[1]).read_text());spec=PublicClipSpec(**pins['clip_spec'])
 if spec.episode_index!=int(sys.argv[3]):raise ValueError('Explicit episode differs from full source pins')
-validate_pins(spec,pins);validate_artifact_pins(spec,json.loads(Path(sys.argv[2]).read_text()),'prepare')
+validate_pins(spec,pins)
+# Numerical producer/payload validation runs inside the pinned container,
+# before Torch/model construction. The VM bootstrap remains stdlib-only.
 print('\n'.join(sorted(source_paths(spec))))
 PYPATHS
 )"
