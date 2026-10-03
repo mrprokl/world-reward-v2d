@@ -1172,3 +1172,51 @@ source confirms +.5 pixel cells and view-space camera-Z, so an integer-pixel
 explanation is unsupported; FP32 grazing-triangle conditioning is a possible,
 not established, cause. One separate new scalar-only diagnostic is appropriate
 before selecting a future renderer/reference, not repeated reference rescue.
+
+
+## Post-D105 support failure: next depth hypothesis, 2026-10-03
+
+Actual analytic reference manufacture passed all12 nearest-ray precision gates,
+but public-only MoGe/DA3 inference stopped at first fixed-border support check.
+It does not distinguish failed count1024 from failedcoverage95%; no private
+score/ratio/finalprediction exists. Preserve failedcohort and original thresholds.
+This invalidates universal applicability of the peripheral-support assumption,
+not the nativeDA3 depthaccuracy or priorTUDL limited gain.
+
+Independent primary audit recommends ONE new whole-support robust clip-scale
+pilot, not another renderer/model stack. [MegaSaM CVPR2025](https://arxiv.org/html/2412.04463v2)
+§3.2.2/3.3 combines relative+metric disparity using global-video robust alignment
+and uncertainty-aware bundle adjustment. Its observability analysis warns that
+staticcamera reprojection cannot identify depth. A positive median depth-ratio
+anchor would be an independent simplification, NOT numerical MegaSaM replication;
+do not import its UniDepth/DepthAnything licensing closure or claim SLAM gains.
+
+[DA3](https://arxiv.org/abs/2511.10647),2025-11-13: currentMetric-Large configuration
+has no verified dedicated confidencehead; outputprocessorconfidence=None without
+depth_conf. Preserve nativefocal/300conversion. MoGevalidity is not a calibrated
+error confidence; modelagreement is not proof against shared bias. Defer
+confidenceweightedfusion until its reliability can be independently measured.
+
+[Video Depth Anything](https://arxiv.org/abs/2501.12375),CVPR2025, longwindow temporal
+head remains an offline candidate. [Metric Small card](https://huggingface.co/depth-anything/Metric-Video-Depth-Anything-Small)
+declaresApache2; Base/LargeCCBYNC. Source/modelclosure and challengeoverlap still
+unknown. Streaming's reportedScanNetdelta1 .926→.836 regression prevents a
+presumption of streaming superiority. No VDAassets acquired or inference done.
+
+[C2Dex v2](https://arxiv.org/abs/2608.07045v2),2026-09-06,
+[code](https://github.com/K-Jie/C2Dex_code): canonical-space contactaggregation
+inspires free/contact/sliding/regrasp states, but reconstructionmodules not yet
+verified available. Contact plausible while jointly mis-scaled remains possible;
+not a replacement for credible sharedhuman/object gauge and geometry. No source
+copied or contactscore/temporalperformance established.
+
+Candidate preregistration only: completely new filename-selectedrecords excluding
+ALL previously used TUDLframes,4per scene, no render. SameMoGe/DA3 models/native
+conversion, whole unchanged valid support instead of border, onepositive scene
+median-of-four-depth-ratios, nooffset/camera/perframe correction/drop. Declare
+support/dispersion gates AND persist their diagnostics before checks. Freeze all
+predictions beforeprivateannotations; samepairedvisible8192seed0/coverage95/
+median5/nosceneregression>5. Newframes would NOT be independentobjects/scenes,
+fulltemporalHOI, train-overlapclearance or CARI4D superiority. This pilot is not yet
+implemented/frozen/launched; never reinterpret currentD105 as successfulvalidation
+or use its observedfailure/RGB/privategeometry to retune it.

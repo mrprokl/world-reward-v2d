@@ -413,3 +413,21 @@ originalproducer3242cb23486726c9636ca66241020f6aa276be1b. ONE neutralGPUcall,
 3.378421s/all8exactcrosswitnesses, no geometrypayload; disjointCPUproposal
 5.397416s/18originalcomponents/4096faces/fidelitygatesPASS. GPUemptyafterward,
 episode1scalarCPUdepth450/668active. NoVM02assettransfer or native668job yet.
+
+
+2026-10-03 19:07UTC readonly actual production observation: EP3pinnedvolume
+full592tracking stillactive, MainPID895234, one895323GPUworker1886MiB; same
+18:41:43start, no stagePASS/inputassembly/nativechain completion yet. No duplicate
+GPUjob or failedunitrestart. Separate VM02analyticreferenceCPUgatePASS but
+blinddepthsupportFAIL13.608s; no containers/GPUworkers left19:04:53UTC.
+
+FreshVM01image inventory for possible Azure-only frontendworkerclone:
+world-reward/grounding:0.1 actualimage53b33bc4b60e0e3e8f83b401775b4701b18eef54408fd585fbe3a5d376c042e1,
+DockerSize10914551643B; world-reward/sam3d-runtime:0.1 image
+eb389b26358c49778a14303b5875c66d887824011388ce9f8666ed7cc1841ce5,
+DockerSize10141699500B. These are inspected IDs/size only, NOT sealed export
+TAR identities/classicconfig equivalence/licenseeligibility/CUDAproof onVM02.
+Firstrootfsprint exceeded Azure4KBtail; boundedsecondreadonlyinventory returned
+actual IDs+size. No image exports, data/modeltransfers, keys/network changes or
+storageattachment performed. VM02existing93GBfree is not yet validated for full
+frontendreplica capacity; minimumasset/auditedsourceclosure remains prerequisite.

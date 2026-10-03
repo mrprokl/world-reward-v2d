@@ -5087,3 +5087,41 @@ configs/analytic_rgbd_input_pins.json committedbeforeblindinference. First
 inventoryoutput was Azuretail-truncated due12fullcaseprint; boundedaggregate
 readonlysecondinventory completed, no manufacture rerun or overwritten output.
 No depth predictions/privatequality score yet, no real-HOI/CARIclaim.
+
+
+D105 blind native depth **FAIL13.608361966s**, original300s gate, producer
+c362cfb82a3224ce4b97d1ac4d26fffbd5f1f005, 50files68520encodedB/publicexactHTTP200.
+VM02unitfailedexit1, no live Docker/GPUworker at19:04:53UTC. MoGeall12native
+attempts/returns/validcamera-supportPASS; DA3firstnativeattempt/returnPASS,
+then fixedborder-proxy gateSTOP: "Insufficient fixed border-proxy support; no
+fallback/sweep" on firstpublicscene1frame0. This proves insufficient count1024
+OR coverage95%; precisefailedcount/coverage were not persisted, do notinvent
+which condition failed or blameDA3accuracy. No ratio diagnostics/anchor coeff/
+predictionNPZ, outputsole400failure33127B/
+4a22532d6e7b7d8e761a0920a471f2d558a6512335721515bc3fc88f69b60ef7.
+Independentactual producer/source13/public13 artifactrehashPASS; publicinputs,
+models/helpers, manifest and new manufacturedtruth unchanged. No privatequality
+namespace or evaluatorlaunch, no predictionpins, no score, no visualpreview,
+no rerender, no invalidpixel fill/thresholdrelaxation/per-framefallback.
+
+Decision **CLOSE analytic anchor cohort after original abstention**. Mathematical
+manufacturePASS is not modelaccuracy or anchorsuccess; priorTUDL12narrowrealgain
+still stands without cross-cohortrobustness proof. Request independentprimary-
+literature audit for next general hypothesis that does not assume >=95% valid
+image-border support. Must freeze trulynew protocol/validation before prediction;
+never rescue this observedcohort or replace its frozenfailure. Wholelocal suite
+9540PASS/2unchangedoptionalSKIP262.42s, no oldnumerical edits. Localdisposable3pyc
+removed, no heavydata/media/checkpointstethered. ProductionEP3stillseparatelyactive
+19:03:49UTC/one1886MiBworker; fulltracking/inputassembly/nativechainnotPASSyet.
+
+
+Next independent literaturedecision: whole-native-valid-support robust single
+clipscale, preservingoriginalMoGe/DA3 numerical chain, before confidencefusion
+(no calibratedDA3confidencehead) or contactgauge assumptions. MegaSaM disparity
+alignment only conceptualinspiration, not algorithmreplication; staticcamera
+SLAM cannot solveunobservabledepth. Newuntouchedfilename-onlyTUDLrecords would
+be newframes NOT independentobjects/scenes/temporalHOI. Protocol/support/dispersion
+and scoregates must be frozen beforeprediction, no D105rescue; pilotnotimplemented
+orlaunched. Actualfull592tracking stillactive19:07UTC. Finalall30/oneParquet/
+licenseoverlapclearance/NVIDIAregistration/quota/upload/verifiedCARIwin remain
+unachieved. No goalcomplete or false block whilemeaningfulresearch/productioncontinues.
