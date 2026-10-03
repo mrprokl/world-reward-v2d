@@ -2811,3 +2811,16 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Actual immutablefitpin written (completed SHA+producerrevision only);
   nofit/public/helper source edits after this observation. Next separate
  120s/15-native-head/zero-optimizer replay, then actualqualitypins ifPASS.
+  Actual independent public native-best replay **PASS**45.580706s, producer
+  bed76ef37596ef26588d449d8109e8be8b0ca254, unchangedfitdriver4ed1…,
+  receipt`b76d5b4bb28833a44cb223d6adfb457f1e9fb347df7b5a5c8d4718f27138a084`
+  (58,254B/0444).All15full60/59 continuous trace audits PASS;15selectednative
+  heads returned/validated, zero optimizer/backward/additionaltraining/raster/
+  private calls. WorstV/KP/J replay6.84805e-7/5.33589e-7/4.80548e-7m,
+  controls0/SO3entry2.98023e-7; peakGPU allocated/reservedsamefit~4.18GB.
+  Native replay verifies representation, not accuracy. Allsourceinputs/assets
+  rehashed; terminalunit. Actualten-field qualitypins nowbind bothcomplete
+  receipts/revisions/bytes/sources and publicconfigSHA. No placeholder/dynamic
+  fallback/source edits. One plannedCPUquality maynow scoreall15frozenframes;
+  silhouette FAIL stillforces recipe rejection regardless of private metrics.
+  Postactualfitconfig220focused tests PASS2.54s, no numericalpolicychanges.

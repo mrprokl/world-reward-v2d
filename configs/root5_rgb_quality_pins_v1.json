@@ -1,0 +1,12 @@
+{
+  "fit_report_bytes": 796553,
+  "fit_report_sha256": "3fd709d185e32412edb0d4a0325960e1ef63f535bfc992253178d04a55ac5aa1",
+  "fit_revision": "13720afb6f75bed59e449ff5e5f033d88e49a153",
+  "fit_script_sha256": "4ed1b4d60c89a47b083359815673f2e5a61d50dffdf25ca5bec2c15ec6efa03c",
+  "public_pins_sha256": "71c0bffa7c2fd3e8136b1e24a3cb77b9518c05cf03cfdc8e9f4847ad04f8450f",
+  "replay_report_bytes": 58254,
+  "replay_report_sha256": "b76d5b4bb28833a44cb223d6adfb457f1e9fb347df7b5a5c8d4718f27138a084",
+  "replay_revision": "bed76ef37596ef26588d449d8109e8be8b0ca254",
+  "replay_script_sha256": "4ed1b4d60c89a47b083359815673f2e5a61d50dffdf25ca5bec2c15ec6efa03c",
+  "schema": "world-reward-root5-quality-pins-v1"
+}
