@@ -222,6 +222,23 @@ def test_owned_failed_stream_removed_and_existing_never_overwritten(contract, co
     assert not failed.exists() and existing.read_bytes() == b"user work"
 
 
+def test_replaced_output_fails_without_chmod_or_deleting_foreign_work(contract, cohort, tmp_path, monkeypatch):
+    destination = tmp_path / "owned.tar"; displaced = tmp_path / "displaced.tar"
+    original = contract._check_inputs; calls = []
+    def replaced(*args):
+        result = original(*args); calls.append(True)
+        if len(calls) == 2:
+            destination.rename(displaced)
+            destination.write_bytes(b"foreign user work"); destination.chmod(0o640)
+        return result
+    monkeypatch.setattr(contract, "_check_inputs", replaced)
+    with pytest.raises(ValueError, match="replaced or changed"):
+        cohort["build"](destination)
+    assert destination.read_bytes() == b"foreign user work"
+    assert destination.stat().st_mode & 0o777 == 0o640
+    assert displaced.exists()
+
+
 @pytest.mark.parametrize("fault", ["file", "link", "source", "report"])
 def test_final_recheck_catches_stream_time_input_changes(contract, cohort, tmp_path, monkeypatch, fault):
     native = contract._Reader.finish; once = []

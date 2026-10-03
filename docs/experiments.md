@@ -5400,3 +5400,10 @@ pins must precede native shared-frame preparation/optimization.
 Final asset-archive focused94PASS2.13s including atomic0400 creation before first
 byte under umask0; duplicate final full-archive hashing removed without changing
 the strict verification contract. No heavy local transfer.
+
+Second independent archive review found output replacement could return PASS on
+a foreign inode and change its permissions. Fixed with owned-inode/private-mode
+checks before/after final hash and no late chmod; tiny replacement test preserves
+foreign bytes/mode and displaced archive while failing. New95focusedPASS follows.
+EP4 distinct CPU volume proposal dispatched once from f8f268b; actual unit active
+MainPID947301, full code59files/84400encodedB. No proposal result/adoption yet.

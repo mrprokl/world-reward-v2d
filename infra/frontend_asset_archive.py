@@ -316,7 +316,11 @@ def build_archive(root, inventory_report, inventory_code, inventory_pin, invento
             output.flush(); os.fsync(output.fileno())
         if _check_inputs(root, entries, gate) != states: raise ValueError("Original prerequisite state changed after archive")
         _source(inventory_code, inventory_source_pins); _read_pinned(inventory_report, {k: inventory_pin[k] for k in ("bytes", "sha256")}); _read_pinned(Path(__file__), exporter_pin)
-        destination.chmod(0o400); identity = _identity(destination, MAX_TOTAL + 10_000_000)
+        if (_canonical(destination) != destination or _state(destination)[:2] != owned
+                or not stat.S_ISREG(_state(destination)[2]) or _state(destination)[2] & 0o777 != 0o400):
+            raise ValueError("Owned private archive output was replaced or changed")
+        identity = _identity(destination, MAX_TOTAL + 10_000_000)
+        if _state(destination)[:2] != owned: raise ValueError("Owned archive output changed during final hashing")
         return dict(schema=SCHEMA, stage="frontend_asset_archive", status="pass", inventory=inventory_pin,
             inventory_source_helpers=inventory_source_pins, exporter_source_identity=exporter_pin,
             manifest_identity=dict(bytes=len(manifest_raw), sha256=hashlib.sha256(manifest_raw).hexdigest()),
