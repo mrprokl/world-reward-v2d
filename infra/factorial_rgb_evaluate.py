@@ -97,6 +97,10 @@ def public_observations(root,pins,quality):
                 **{k:24 for k in ("body_attempts","body_calls_completed","parity_head_attempts","parity_heads_completed","keypoint_head_attempts","keypoint_heads_completed")}))
             model=report.get("body_model")
             if not isinstance(model,dict):raise ValueError("Actual original Body loader evidence required")
+            loading=model.get("checkpoint_loading")
+            require_fields(loading,dict(mode="strict_network_and_head_state_with_explicit_asset_buffer_retention",parameter_tensors_loaded=1101,unexpected_keys=[]))
+            retained=loading.get("retained_mhr_asset_buffer_names")
+            if not isinstance(retained,list)or len(retained)!=113 or len(set(retained))!=113:raise ValueError("Exact113 immutable rig-buffer retention required")
             require_fields(model,dict(inference_source_identity=public.native.human.body._source_identity(root),body_assets=public.native.human.body._body_assets(root)[1]))
             semantic_path=Path(root)/"results/mhr-finger-semantics-v4.json";semantic=public.native.regular(semantic_path)
             public.native.regions_helper.require_semantic_report(json.loads(semantic_path.read_text()))
@@ -295,6 +299,8 @@ def run(root,report,public_path,quality_path,persist=lambda:None):
     if semantic["sha256"]!=producers["body"]["semantic_report_sha256"]:raise ValueError("Canonical semantic receipt changed")
     if "torch"in sys.modules:raise ValueError("Private CPU quality must not import or execute Torch")
     report.update(status="pass",phase="complete",frame_metrics=rows,group_metrics=groups,factor_contrasts=contrasts,decision=decision,
+        macro_group_means={k:float(np.mean([g[k]for g in groups]))if all(g[k]is not None for g in groups)else None for k in
+            ("body_paired_reprojection_px","dwpose_paired_reprojection_px","body_all17_reprojection_px","body_pve_cm","body_centered_pve_cm","body_signed_centroid_Z_cm","first_human_sim3_pve_cm")},
         first_human_sim3_transforms=transforms,first_human_sim3_scope="one proper positive full18439 firsthuman transform/group; same transform3poses, NOT official subset/HOI score",
         private_truth_used_for_evaluation_only=True,all_frames_scored=True,all_cases_retained=True,all_factors_geometry_independent_verified=True,
         derived_landmarks_definition="frozen checkpoint mapper on own reference V/J; not measured independent anatomical truth",

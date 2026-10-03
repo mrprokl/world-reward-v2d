@@ -2927,3 +2927,7 @@ Full suite6235PASS/oneoptionaltrimeshSKIP84.48s. Source-only closures
 prepare17files52,288B; observer33files115,488B; quality40files146,476B
 (<160KB). Three independent read-only audits complete. Commit beforedispatch;
 no actual H99 runtime/accuracy result has been observed at preregistration.
+Before any H99 quality/public outcome: original Body loader receipt audit
+requires1101 learned parameters and113 explicit immutable rig buffers, not
+only matching reported source hashes. Quality also reports preregistered
+equal8-group macro means.68 focused quality/observer tests PASS1.56s.
