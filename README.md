@@ -26,7 +26,7 @@ rejects gamma-medoid:0% median gain, two changed predictions slightly worse.
 No retuning/rescore. The native96 shared-identity preparation now passes;
 the actual HOI forward and saved-output validation now pass after an exact
 signed-zero ABI correction, without changing predictions. Next: native
-refinement/direct export and complete
+direct export after a passing native301-update refinement, then complete
 production outputs, with independent real/fullHOI validation separate.
 Detailed receipts and decisions: [experiments](docs/experiments.md).
 Heavy data and all GPU work remain onAzure.

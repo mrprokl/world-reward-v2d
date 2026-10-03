@@ -3575,3 +3575,53 @@ network determinism, independent accuracy or full501 submission claim. Next
 one unchanged full96 native300requested/301update refinement. Generic source
 audit156PASS1.70s separately; newfull501 inputpins referonlyexistingpublic
 15sourcefiles, neverold CARI predictions. No newfull501 GPU run yet.
+
+## Full-video shared initializer — preregistration 2026-10-03
+
+Additive full-N producer, first execution reserved for original episode15/501
+frames. Reuse the same fifteen SHA-bound public input files without copying
+RGB, masks or depth. Explicit episode and source pins; exclusive new Azure-only
+`outputs/episode_000015/cari_shared_prepare_v1`. No former CARI predictions,
+GT, inference, optimizer, rendering, inverse fit or quality-based selection.
+
+Choose original frame0 shape45/PCA28 before model construction, geometry,
+neutral-height or caches; preserve all other native blocks and original frame
+indices. Re-decode joints/keypoints, retaining previous projection/roundtrip
+claims as historical only. Budget600s; four actual routes over32chunks, the
+last containing exactly5frames: native V18439/J127/KP70, direct204 controls,
+frozen saved native replay, official FP32-model/FP64-residual replay. Same native
+max-point≤.01mm and official mean-point≤2mm **every frame**, exact topology,
+positive cameraZ, clip-constant expanded68 scales, source/helper/model/artifact
+pre/post hashes and saved-byte reread. No score, efficacy or submission claim.
+
+New payloads only: shared_initializer.pkl, direct_parameters.npz, target.npy,
+plus concise source-bound receipt. All three payloads frozen before replay.
+Original HDF5 and rigid object geometry/poses remain unchanged read-only inputs.
+43 tiny callback testsPASS0.23s, Bash syntaxPASS; root removes draft-only absolute
+test paths. Combined focused gates366PASS3.60s. An initial test command named
+the wrong Azure test file and executed no tests; corrected without source/gate
+changes. Additive archive regression requires all ten provenance helpers and
+fullclip pins. Independent final audit and fullsuite precede actual dispatch;
+H102 direct export remains separate and is executed first.
+
+Independent full-video review **READY**,419focused testsPASS1.87s; native
+20,514B primary decoder source SHA/constructor/direct-head/flip/translation ABI
+confirmed. No workspace/model/data writes or duplicate GPU jobs by auditor.
+Root fullsuite7180PASS/2same optional SKIP106.26s; no shared-prepare contract
+skipped. Actual source archive/clean commit is checked before dispatch.
+
+H102 native refinement actual **PASS48.828237s**, source
+`2feff1a8e2170da3312bfc26d961e37b977687ad`, driver
+`ece3ff2c42303c2f6e9237ab78cb53b61fba40af261ac744e511b170e8f11ed6`.
+26-file70,688B Gitclosure SHA-XZ
+`219aa4b4175cee603f60c8d38c889e9587d8ebd5b328230bc24b52b3720696d6`.
+One optimizer attempt/return/validated,300requested/301actualupdates, all96
+original frames. Every fixed parameter/raw/input/observation/contact/pr_initial
+and aligned object geometry preserved, saved bundle reread and source pre/post
+checksPASS. Unitinactiveexit0/H10097MiB0%. No empty automatic observations in
+this prefix. Receipt44d4a3dd5bc20a7f9be629ef1cad7a46d199a7447335af07fecee2e160e6cd2d
+(5,834B), refinedbundle07c614481fcdb9d13a930d39e0a4b6f34952f235686f10cb7b8bdb4128df2730
+(73,840,928B), all0444. Actual pins frozen before export. A readonly inventory
+query used unavailable Python3.8 hashlib.file_digest; rerun with streaming SHA256,
+no artifacts/producer changed. Export and full501prepare namespaces verified
+absent. Engineering execution, not independent quality/CARI4D improvement.

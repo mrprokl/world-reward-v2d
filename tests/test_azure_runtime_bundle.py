@@ -199,6 +199,21 @@ def test_h102_closures_keep_their_actual_producer_provenance_helpers():
         assert required <= set(launcher.runtime_bundle_paths(source, f"infra/run_cari96_{stage}.sh"))
 
 
+def test_full_shared_prepare_closure_preserves_all_source_bound_helpers():
+    root = Path(__file__).resolve().parents[1]
+    source = {str(p.relative_to(root)): p.read_bytes()
+              for folder in ("infra", "src", "configs") for p in (root / folder).rglob("*")
+              if p.is_file() and "__pycache__" not in p.parts}
+    source["pyproject.toml"] = (root / "pyproject.toml").read_bytes()
+    required = {"infra/cari_shared_prepare.py", "infra/run_cari_shared_prepare.sh", "infra/cari_clip_inputs.py",
+                "infra/cari96_prepare.py", "infra/run_cari96_prepare.sh", "infra/cari96_inputs.py", "infra/body_smoke.py",
+                "src/world_reward/shared_identity.py", "src/world_reward/timeline.py", "src/world_reward/data.py"}
+    selected = launcher.runtime_bundle_paths(source, "infra/run_cari_shared_prepare.sh")
+    assert required <= set(selected)
+    assert "configs/cari_clip_000015_input_pins.json" in selected
+    assert "infra/cari96_forward.py" not in selected
+
+
 def test_h98_native_fit_bundle_includes_all_DW_source_only_wrappers():
     root = Path(__file__).resolve().parents[1]
     source = {str(p.relative_to(root)): p.read_bytes()
