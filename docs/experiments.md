@@ -4868,3 +4868,11 @@ Separate5artifact stdlibinventory9c583d7 independently binds originale7d196d/
 script967b45eb, allhashesbefore/afterJSON. Commitactual exportpins before
 CPU originalpacking. Nativepipeline executionPASS does not erase the earlier
 frontend7200s timingFAIL or prove CARI4D improvement. No final Parquet/upload.
+
+Native full866 export/consumer/originalpacking/stage379focusedPASS3.51s.
+Actualfull866 original official packer dispatched0595a298acd86637573a94e9b946f5d81207a02e,
+65files148268encodedB/publicHTTP200, CPU-onlyunitMainPID877760. No final
+submission or performance score. Nextfirst-absent EP3/592 frontend dispatched
+sameimmutableproducer,76files132152encodedB, unitactiveMainPID878736. Existing
+exclusive-target/sourcechecks and scopedGPUlock apply; original600/5400/7200/
+7200 stage budgets unchanged. Heavy assets remainAzure, no duplicate GPUrun.
