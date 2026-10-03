@@ -44,6 +44,76 @@ def test_pins_load_requires_frozen_regular_bytes(gate,tmp_path):
     with pytest.raises(ValueError):gate.load_pins(path)
 
 
+def failed_fit_fixture(gate, tmp_path, monkeypatch):
+    """Actual zero-work producer schema; only sealed test-byte pins differ."""
+    row = dict(stage=gate.STAGE, status="fail", phase="public_integrity", operation="fit",
+        producer_revision=gate.FIT_V1_REVISION, script_sha256=gate.FIT_V1_SOURCE_SHA,
+        image_id=gate.native.IMAGE_ID, network="none", device="cuda", budget_seconds=300,
+        error_type="FileNotFoundError", error="[Errno 2] No such file or directory: '/srv/scenesmith/world-reward/jobs/"
+        +gate.FIT_V1_REVISION+"/run_root5_rgb_fit/code/infra/run_dwpose_smoke.sh'",
+        private_truth_read=False, ground_truth_used=False, challenge_inputs_used=False, hand_labeled_test=False,
+        oracle_modes=[], quality_verified=False, accuracy_verified=False, adoption_authorized=False, full_HOI_verified=False,
+        numerical_reproducibility_verified=False, object_proxies_frozen_before_fit=False, all_candidates_frozen=False,
+        native_arrays_verified=False, inputs_unchanged=False, all_cases_retained=False, candidate_outputs=[],
+        proxy_outputs=[], proxy_alignments=[], fit_records=[], records=[], trace_checks=[], all_training_traces_verified=False,
+        all_native_best_replays_verified=False, predictions_native_replay_verified=False, native_backwards=0,
+        optimizer_updates=0, source_inputs_assets_rehashed=False,
+        counters=dict.fromkeys(("proxy_rasters_attempted", "proxy_rasters_completed", "safeguard_rasters_attempted",
+            "safeguard_rasters_completed", "objective_native_heads_attempted", "objective_native_heads_returned",
+            "objective_native_heads_validated", "final_native_heads_attempted", "final_native_heads_returned",
+            "final_native_heads_validated", "initial_jacobian_rows_attempted", "initial_jacobian_rows_completed",
+            "optimizer_backwards_attempted", "optimizer_backwards_returned", "adam_updates"), 0))
+    path = tmp_path/gate.BASE/"root_fit_v1/report.json"; path.parent.mkdir(parents=True, exist_ok=True)
+    def seal():
+        if path.exists(): path.chmod(0o644)
+        path.write_text(json.dumps(row)); path.chmod(0o444)
+        receipt = gate.native.regular(path, immutable=True)
+        monkeypatch.setattr(gate, "FIT_V1_FAIL_SHA", receipt["sha256"])
+        monkeypatch.setattr(gate, "FIT_V1_FAIL_BYTES", receipt["bytes"])
+        return receipt
+    return row, path, seal
+
+
+def test_exact_preserved_bootstrap_failure_identity(gate, tmp_path, monkeypatch):
+    row, path, seal = failed_fit_fixture(gate, tmp_path, monkeypatch); receipt = seal()
+    before = path.read_bytes()
+    assert gate.previous_fit_failure(tmp_path) == receipt
+    assert path.read_bytes() == before and gate.OUT.endswith("/root_fit_v2")
+    path.chmod(0o644)
+    with pytest.raises(ValueError): gate.previous_fit_failure(tmp_path)
+
+
+@pytest.mark.parametrize("fault", ["phase", "revision", "script", "error", "boolcounter", "counter", "extra_counter",
+    "missing_counter", "candidate", "trace", "private", "model", "quality", "GPU", "proxy"])
+def test_bootstrap_failure_cannot_hide_actual_work(gate, tmp_path, monkeypatch, fault):
+    row, path, seal = failed_fit_fixture(gate, tmp_path, monkeypatch)
+    if fault == "phase": row["phase"] = "native_fit"
+    elif fault == "revision": row["producer_revision"] = "a"*40
+    elif fault == "script": row["script_sha256"] = "a"*64
+    elif fault == "error": row["error"] = "another missing file"
+    elif fault == "boolcounter": row["counters"]["adam_updates"] = False
+    elif fault == "counter": row["counters"]["objective_native_heads_attempted"] = 1
+    elif fault == "extra_counter": row["counters"]["unknown"] = 0
+    elif fault == "missing_counter": row["counters"].pop("adam_updates")
+    elif fault == "candidate": row["candidate_outputs"] = [{}]
+    elif fault == "trace": row["fit_records"] = [{}]
+    elif fault == "private": row["private_truth_read"] = True
+    elif fault == "model": row["body_model"] = {}
+    elif fault == "quality": row["decision"] = {}
+    elif fault == "GPU": row["torch_version"] = "2.5.1+cu124"
+    else: row["object_proxies_frozen_before_fit"] = True
+    seal()
+    with pytest.raises(ValueError): gate.previous_fit_failure(tmp_path)
+
+
+def test_missing_or_modified_failure_stops_before_public_artifact_io(gate, tmp_path, monkeypatch):
+    monkeypatch.setattr(gate, "observer_sources", lambda *_: pytest.fail("Bootstrap history was not checked first"))
+    with pytest.raises(ValueError): gate.public_predictions(tmp_path, pins(gate))
+    row, path, seal = failed_fit_fixture(gate, tmp_path, monkeypatch); seal()
+    path.chmod(0o644); path.write_bytes(b"changed"); path.chmod(0o444)
+    with pytest.raises(ValueError): gate.public_predictions(tmp_path, pins(gate))
+
+
 def frame(gate,monkeypatch,clip=0,index=0):
     n=gate.native;monkeypatch.setattr(n,"WIDTH",16);monkeypatch.setattr(n,"HEIGHT",8);monkeypatch.setattr(n,"VERTICES",100)
     yy,xx=np.indices((8,16));z=np.full((8,16),2.,np.float32);K=gate.baseline.CAMERA_K.copy()
@@ -208,6 +278,7 @@ def full_public_fixture(gate,tmp_path,monkeypatch):
     """15 real NPZs; only remote model/package attestations use explicit test doubles."""
     from PIL import Image
     base=tmp_path/gate.BASE
+    _, _, seal_failed = failed_fit_fixture(gate, tmp_path, monkeypatch); seal_failed()
     for folder in("inputs","automatic_masks","baseline_v1","baseline_v2/raw","baseline_v2/paired","dwpose_v1"):
         (base/folder).mkdir(parents=True,exist_ok=True)
     records=[];raw=[];pairs=[];rgb=np.zeros((8,16,3),np.uint8);mask=np.full((8,16),255,np.uint8)
@@ -297,6 +368,8 @@ def test_fifteen_real_npz_artifacts_audited_without_private_read(gate,tmp_path,m
     assert len(r)==len(raw)==len(pairs)==len(dw)==15 and lineage["public_pins"]==value
     assert not any("eval_private"in row["path"]for row in lineage["frozen_files"])
     assert lineage["observer_revisions"]["masks"]!=lineage["observer_revisions"]["baseline"]
+    failed = gate.previous_fit_failure(tmp_path)
+    assert lineage["previous_failed_fit"] == failed and failed in lineage["frozen_files"]
 
 
 @pytest.mark.parametrize("fault",["reference","frameorder","bbox","rawmask","pairidentity","DWdtype","simcc","rawRGB","source","extra"])

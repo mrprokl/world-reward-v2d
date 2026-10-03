@@ -6,7 +6,7 @@ ROOT="${WR_ROOT:-/srv/scenesmith/world-reward}";CODE="${WR_CODE:?}";REV="${WR_CO
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$CODE" == /* && "$REV" =~ ^[0-9a-f]{40}$ ]]
 export DOCKER_HOST="unix://$ROOT/docker.sock"
 BASE="$ROOT/validation/root5_rgb_v1"
-if [[ "$OPERATION" == fit ]];then OUT="$BASE/root_fit_v1";TIMEOUT=303;else OUT="$BASE/root_replay_v1";TIMEOUT=123;fi
+if [[ "$OPERATION" == fit ]];then OUT="$BASE/root_fit_v2";TIMEOUT=303;else OUT="$BASE/root_replay_v1";TIMEOUT=123;fi
 PINARGS=(--public-pins "$CODE/configs/root5_rgb_public_pins_v1.json")
 if [[ "$OPERATION" == replay ]];then PINARGS+=(--fit-pins "$CODE/configs/root5_rgb_fit_pins_v1.json");fi
 python3 - "$ROOT" "$OUT" <<'PYSAFE'
@@ -28,12 +28,12 @@ for path in "$ROOT/vendor/video_to_data" "$ROOT/vendor/v2d_submission_kit/tools/
  "$ROOT/weights/grounding_dino" "$ROOT/weights/sam2" "$ROOT/results/image-grounding.json" \
  "$ROOT/results/dwpose-wheel-audit-v3" "$ROOT/results/dwpose-acquisition-v1.json" \
  "$ROOT/results/dwpose-wheel-audit-v2/report.json" "$ROOT/validation/dwpose_smoke_v1/report.json" \
- "$ROOT/validation/dwpose_smoke_v2/report.json" "$BASE/inputs" "$BASE/automatic_masks" "$BASE/baseline_v1/report.json" "$BASE/baseline_v2" "$BASE/dwpose_v1" \
+ "$ROOT/validation/dwpose_smoke_v2/report.json" "$BASE/inputs" "$BASE/automatic_masks" "$BASE/baseline_v1/report.json" "$BASE/baseline_v2" "$BASE/dwpose_v1" "$BASE/root_fit_v1/report.json" \
  "$ROOT/jobs/8084688a4d84bbad9ba8c0580e4d1b2803745511/run_root5_rgb_observe/code/infra/root5_rgb_observe.py" \
  "$ROOT/jobs/feae71ea16a1d942f08e95ccafc131b6467dffb9/run_root5_rgb_observe/code/infra";do
  [[ -e "$path" && ! -L "$path" ]];MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
 done
-if [[ "$OPERATION" == replay ]];then MOUNTS+=(--mount "type=bind,src=$BASE/root_fit_v1,dst=$BASE/root_fit_v1,readonly");fi
+if [[ "$OPERATION" == replay ]];then MOUNTS+=(--mount "type=bind,src=$BASE/root_fit_v2,dst=$BASE/root_fit_v2,readonly");fi
 timeout --signal=TERM --kill-after=10s "${TIMEOUT}s" docker run --rm --network none --cpus 4 --memory 32g --gpus all \
  --user "$(id -u scenesmith):$(id -g scenesmith)" --entrypoint python \
  --env "WR_ROOT=$ROOT" --env "WR_CODE_REVISION=$REV" --env "WR_IMAGE_ID=$IMAGE" --env "WR_CODE=$CODE" \

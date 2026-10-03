@@ -12,6 +12,7 @@ import base64
 import hashlib
 import io
 import lzma
+from pathlib import Path
 import re
 import shlex
 import subprocess
@@ -54,7 +55,9 @@ def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
     """Select committed entrypoint/import closure, never data or unused tooling.
 
     Follow all static imports, including inside functions, for infra and the
-    world_reward package. Keep package initializers, config and pyproject; omit
+    world_reward package. Include committed literal sibling source filenames
+    (also in finite lists/dicts used by source-hash checks), not only imports.
+    Keep package initializers, config and pyproject; omit
     unrelated experiments. Literal own-package dynamic imports are supported;
     computed own-package names and dynamic infra plugins are unsupported. This
     is not a general Python dependency resolver: external/vendor imports stay
@@ -114,6 +117,22 @@ def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
                 if isinstance(node, ast.Import):
                     package_aliases.update(alias.asname or alias.name for alias in node.names if alias.name == "world_reward")
             for node in ast.walk(tree):
+                if isinstance(node, ast.Constant) and isinstance(node.value, str) and re.fullmatch(
+                    r"[a-z0-9_]+\.(?:py|sh|cpp)|Dockerfile\.[a-z0-9_]+", node.value,
+                ):
+                    sibling = str(Path(path).with_name(node.value))
+                    # External/vendor filenames are not fabricated as our code.
+                    # Known committed siblings must be frozen even when read as
+                    # provenance only, e.g. Path(module.__file__).with_name(name).
+                    if sibling in files:
+                        dependencies.add(sibling)
+                if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                        and node.func.attr == "with_name" and node.args
+                        and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str)
+                        and re.fullmatch(r"[a-z0-9_]+\.(?:py|sh|cpp)|Dockerfile\.[a-z0-9_]+", node.args[0].value)):
+                    sibling = str(Path(path).with_name(node.args[0].value))
+                    if sibling not in files:
+                        raise ValueError(f"Literal sibling source dependency is not committed: {sibling}")
                 if isinstance(node, ast.Import):
                     for alias in node.names:
                         dependencies.update(module_paths(alias.name))

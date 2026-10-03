@@ -2741,3 +2741,30 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Full frozen public+fit source suite6060PASS/oneoptionaltrimeshSKIP84.34s;
   actual-pin complete static closure34files134,268B encoded control, Bash
   syntax/diffcheck PASS before first immutable native fit dispatch.
+  First public native fit-v1 actual **FAIL**.010366s in public_integrity,
+  sourceb248f129e79c0bfcc5e5ef2a05d59999e6e91aee, fitdriver
+  `df60eb9990fbdcb8931f7a508f808bf73121de5ea4bd5d97b48e98d1680067d9`,
+  receipt`ceb6a65fbdc59d78872737901b08fc182accfa1a18abef4b5de41b04fb77d4b8`
+  (2,811B/0444). Exact missing CODE/infra/run_dwpose_smoke.sh source-only
+  provenance dependency: static import closure did not include .with_name()
+  source-hash targets. ZERO model/proxy/native/Jacobian/Adam/candidate/private
+  work, no scientific rejection or tuning observation. Preserve v1 bytes/source.
+  Engineering-only v2 correction: explicit unique root_fit_v2 output, strict
+  original failure SHA/bytes/revision/source/error/zero counters/lists required
+  before public input/model access and rehashed after; old receipt RO bind.
+  Runtime bundler now retains committed literal sibling source filenames,
+  including finite source-hash lists and their ordinary transitive closure;
+  absent explicit .with_name source dependencies fail before Azure dispatch.
+  External/vendor names are not invented as own code.68bundle tests PASS,
+  including actualH98 wrapper closure; independent109public/fit tests PASS,
+  scientific helper ASTs match b248 exactly. No optimization/mask/camera/rank/
+  prior/budget/tolerance/quality-gate changes; replay remains firstroot_replay_v1.
+  Corrective36-file complete fit closure136,392B before finalGitmetadata.
+  Corrective full-suite first audit6081PASS/2FAIL/oneSKIP80.05s: two historical
+  bundle tests expected source-only fit references to be omitted. New complete
+  closure correctly retains these hashes; update ONLY source-inventory assertions,
+  preserve their128KB control caps (measured119,528/121,052B), all scientific
+  metric/helper/oldproducer bytes unchanged.164focused legacy+bundle PASS9.18s;
+  final177corrective bundle/public/fit PASS2.15s.
+  Final frozen corrective fullsuite6083PASS/oneoptionaltrimeshSKIP78.19s,
+  no scientific recipe/producer changes; readyuniquev2 nativefit dispatch.

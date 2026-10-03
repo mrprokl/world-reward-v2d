@@ -150,6 +150,40 @@ def test_literal_source_file_reference_includes_unimported_hash_dependency():
     assert "src/world_reward/check.py" in launcher.runtime_bundle_paths(source, "infra/run_smoke.sh")
 
 
+def test_literal_sibling_source_hash_inputs_include_transitive_shell_closure():
+    source = files()
+    source["infra/helper.py"] += b'from pathlib import Path\nPath(__file__).with_name("run_audit.sh").read_bytes()\n'
+    source["infra/run_audit.sh"] = b'python "$CODE/infra/audit.py"\n'
+    source["infra/audit.py"] = b'from world_reward import check\n'
+    selected = launcher.runtime_bundle_paths(source, "infra/run_smoke.sh")
+    assert {"infra/run_audit.sh", "infra/audit.py", "src/world_reward/check.py"} <= set(selected)
+    source.pop("infra/run_audit.sh")
+    with pytest.raises(ValueError, match="Literal sibling source dependency is not committed"):
+        launcher.runtime_bundle_paths(source, "infra/run_smoke.sh")
+
+
+def test_finite_sibling_hash_list_is_frozen_without_inventing_vendor_files():
+    source = files()
+    source["infra/helper.py"] += b'from pathlib import Path\nfor name in ("run_audit.sh", "audit.py", "build_sam.py"):\n Path(__file__).with_name(name)\n'
+    source["infra/run_audit.sh"] = b'echo audited\n'
+    source["infra/audit.py"] = b'VALUE=1\n'
+    selected = launcher.runtime_bundle_paths(source, "infra/run_smoke.sh")
+    assert {"infra/run_audit.sh", "infra/audit.py"} <= set(selected)
+    assert "infra/build_sam.py" not in selected
+
+
+def test_h98_native_fit_bundle_includes_all_DW_source_only_wrappers():
+    root = Path(__file__).resolve().parents[1]
+    source = {str(p.relative_to(root)): p.read_bytes()
+              for folder in ("infra", "src", "configs") for p in (root/folder).rglob("*")
+              if p.is_file() and "__pycache__" not in p.parts}
+    source["pyproject.toml"] = (root/"pyproject.toml").read_bytes()
+    selected = launcher.runtime_bundle_paths(source, "infra/run_root5_rgb_fit.sh")
+    assert {"infra/run_dwpose_smoke.sh", "infra/run_keypoint_rgb_dwpose.sh",
+            "infra/dwpose_smoke.py", "infra/keypoint_rgb_dwpose.py"} <= set(selected)
+    assert not any(path.endswith((".npz", ".png", ".onnx")) for path in selected)
+
+
 def test_shell_dockerfile_and_child_references_included():
     source = files()
     source["infra/run_smoke.sh"] += b'bash "$CODE/infra/run_child.sh"\ndocker build --file "$CODE/infra/Dockerfile.runtime" "$CODE/infra"\n'

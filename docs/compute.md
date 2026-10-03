@@ -28,7 +28,7 @@ mutation. Inference uses `--network none`; acquisition downloads directly toAzur
 ## Reproducible jobs
 
 `infra/azure_job.py` requires a clean committed worktree, sends only source import
-closure plus small package/config as SHA-verified XZ (≤128KB base64), extracts
+closure plus small package/config as SHA-verified XZ (≤160KB base64), extracts
 read-only, and creates one unique systemd unit/log. Never replace active readers,
 restart on an observation timeout, or reuse a failed result path. Earlier legacy
 snapshots under `jobs/<commit>/code` remain unchanged. Status observations alone

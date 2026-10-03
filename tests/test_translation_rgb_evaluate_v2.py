@@ -243,7 +243,7 @@ def test_full_static_v2_code_only_closure_budget(gate):
     files["pyproject.toml"]=(root/"pyproject.toml").read_bytes()
     paths=azure_job.runtime_bundle_paths(files,"infra/run_translation_rgb_evaluate_v2.sh")
     assert "infra/translation_rgb_evaluate.py"in paths and"infra/translation_rgb_public.py"in paths
-    assert "infra/translation_rgb_fit.py"not in paths
+    assert "infra/translation_rgb_fit.py"in paths  # frozen source-hash dependency, never executed
     stream=io.BytesIO()
     with tarfile.open(fileobj=stream,mode="w",format=tarfile.PAX_FORMAT)as archive:
         for path in paths:

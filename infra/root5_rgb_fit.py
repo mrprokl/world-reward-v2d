@@ -24,7 +24,7 @@ from world_reward.data import sha256
 native=public.native
 baseline=public.baseline
 BASE=public.protocol.COHORT.base
-OUT=BASE+"/root_fit_v1"
+OUT=BASE+"/root_fit_v2"
 STAGE="public_root5_rgb_native_fixed_depth_refit"
 BUDGET=300
 BOUNDS=np.array((.30,.30,.30/np.sqrt(3.),.30/np.sqrt(3.),.30/np.sqrt(3.)),np.float64)
@@ -295,7 +295,8 @@ def replay_perform(root,report,persist,pins,fit_pins):
     required=dict(stage=STAGE,status="pass",phase="complete",producer_revision=fit_pins["producer_revision"],image_id=native.IMAGE_ID,
         script_sha256=sha256(Path(__file__)),source_helpers=helper_identities(),network="none",device="cuda",budget_seconds=300,
         optimizer=OPTIMIZER,lineage=lineage,private_truth_read=False,ground_truth_used=False,challenge_inputs_used=False,hand_labeled_test=False,
-        oracle_modes=[],quality_verified=False,accuracy_verified=False,adoption_authorized=False,all_candidates_frozen=True,
+        oracle_modes=[],quality_verified=False,accuracy_verified=False,adoption_authorized=False,
+        previous_failed_fit=public.previous_fit_failure(root),previous_failure_rewritten=False,all_candidates_frozen=True,
         native_arrays_verified=True,object_proxies_frozen_before_fit=True,inputs_unchanged=True,all_cases_retained=True,root_bounds_only=True,
         dense_fixed_remainder_bounds_checked=False,camera_Z_fixed=True,intrinsics_fixed=True,shared_identity_constant=True,body_hands_fixed=True)
     if any(type(producer.get(k))is not type(v)or producer[k]!=v for k,v in required.items()):raise ValueError("Exact completed source-bound root5 fit required before replay")
@@ -393,8 +394,11 @@ def main(argv=None):
         alarm=signal.signal(signal.SIGALRM,expired);term=signal.signal(signal.SIGTERM,expired);signal.alarm(budget)
         try:
             persist()
+            previous_failure=public.previous_fit_failure(root)
+            report.update(previous_failed_fit=previous_failure,previous_failure_rewritten=False);persist()
             if operation=="fit":perform(root,out,report,persist,pins)
             else:replay_perform(root,report,persist,pins,fit_pins)
+            if public.previous_fit_failure(root)!=previous_failure:raise ValueError("Original zero-call bootstrap failure changed")
             if native.regular(args.public_pins,immutable=True)!=pin_identity or(args.fit_pins is not None and native.regular(args.fit_pins,immutable=True)!=fit_pin_identity):
                 raise ValueError("Immutable explicit source/prediction pin configuration changed")
         except Exception as error:report.update(status="fail",error_type=type(error).__name__,error=str(error));raise

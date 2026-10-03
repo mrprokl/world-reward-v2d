@@ -105,7 +105,8 @@ def test_source_freezes_before_safeguard_and_unchanged_GPU_recipe(gate):
     assert 'initial_observation_jacobian_values'in source and 'evaluated_projected_points'in source and 'update_gradients'in source
     shell=REPO/"infra/run_root5_rgb_fit.sh";subprocess.run(["bash","-n",str(shell)],check=True)
     text=shell.read_text();assert "eval_private"not in text and "TIMEOUT=303"in text and "TIMEOUT=123"in text and "--network none"in text and "--gpus all"in text
-    assert '--public-pins'in text and '--fit-pins'in text and 'root_fit_v1,readonly'in text
+    assert '--public-pins'in text and '--fit-pins'in text and 'root_fit_v2,readonly'in text
+    assert '"$BASE/root_fit_v1/report.json"'in text
 
 
 def trace_fixture(gate):
@@ -279,3 +280,49 @@ def test_fit_top_level_updates_are_real_not_replay_zero_claim(gate):
     assert increments['report[\'optimizer_updates\']']=="1"and increments['report[\'native_backwards\']']=="1"
     replay=next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=="replay_perform")
     assert "optimizer_updates=0"in ast.unparse(replay)and"native_backwards=0"in ast.unparse(replay)
+
+
+def test_v2_changes_only_bootstrap_provenance_not_scientific_functions(gate):
+    original=subprocess.check_output(["git","show",gate.public.FIT_V1_REVISION+":infra/root5_rgb_fit.py"],cwd=REPO,text=True)
+    before=ast.parse(original);after=ast.parse(Path(gate.__file__).read_text())
+    for name in("optimization_schedule","strict_forward","root_contract","parity","jacobian_evidence","analytic_xy_evidence",
+                 "differentiable_native","fit_frame","mask_iou","silhouette_safeguard","perform"):
+        a=next(n for n in before.body if isinstance(n,ast.FunctionDef)and n.name==name)
+        b=next(n for n in after.body if isinstance(n,ast.FunctionDef)and n.name==name)
+        assert ast.dump(a,include_attributes=False)==ast.dump(b,include_attributes=False)
+    assert gate.OUT==gate.public.OUT==gate.BASE+"/root_fit_v2"
+    assert gate.REPLAY_OUT==gate.BASE+"/root_replay_v1"
+
+
+@pytest.mark.parametrize("operation",["fit","replay"])
+def test_previous_failure_preflight_stops_both_operations_before_public_models(gate,monkeypatch,tmp_path,operation):
+    # Exercise real main/report lifecycle in a tiny mapped Linux layout. No model/backend is mocked as successful.
+    code=tmp_path/"code";config=code/"configs/root5_rgb_public_pins_v1.json";config.parent.mkdir(parents=True)
+    public_pins=dict(schema=gate.public.PIN_SCHEMA,producer_revision=dict(masks=gate.public.PRODUCER_REVISION,baseline=gate.public.NATIVE_PRODUCER_REVISION,dwpose=gate.public.NATIVE_PRODUCER_REVISION),
+        manifest_sha256=gate.public.MANIFEST_SHA,automatic_masks_sha256="a"*64,baseline_sha256="b"*64,dwpose_sha256="c"*64)
+    config.write_text(json.dumps(public_pins));config.chmod(0o444)
+    root=tmp_path/"root";output=root/(gate.OUT if operation=="fit"else gate.REPLAY_OUT);output.mkdir(parents=True)
+    net=tmp_path/"net";net.mkdir();(net/"lo").mkdir()
+    real_path=Path
+    def mapped_path(value):
+        if str(value)=="/srv/scenesmith/world-reward":return root
+        if str(value)=="/sys/class/net":return net
+        return real_path(value)
+    monkeypatch.setattr(gate,"Path",mapped_path);monkeypatch.setattr(gate.platform,"system",lambda:"Linux");monkeypatch.setattr(gate.os,"geteuid",lambda:1000)
+    monkeypatch.setenv("WR_ROOT","/srv/scenesmith/world-reward");monkeypatch.setenv("WR_CODE",str(code));monkeypatch.setenv("WR_CODE_REVISION","d"*40)
+    monkeypatch.setenv("WR_IMAGE_ID",gate.native.IMAGE_ID)
+    calls=[]
+    def invalid_previous(_):calls.append("previous_failure");raise ValueError("Historical zero-work evidence invalid")
+    monkeypatch.setattr(gate.public,"previous_fit_failure",invalid_previous)
+    monkeypatch.setattr(gate.public,"public_predictions",lambda *a:pytest.fail("Public models cannot be read after invalid failure evidence"))
+    argv=[operation,"--public-pins",str(config)]
+    if operation=="replay":
+        fit_pins=code/"configs/root5_rgb_fit_pins_v1.json";fit_pins.write_text(json.dumps(dict(sha256="e"*64,producer_revision="f"*40)));fit_pins.chmod(0o444)
+        argv+=['--fit-pins',str(fit_pins)]
+    with pytest.raises(ValueError,match="zero-work evidence"):gate.main(argv)
+    report=json.loads((output/"report.json").read_text())
+    assert calls==["previous_failure"]and report["status"]=="fail"and report["phase"]=="public_integrity"
+    assert all(type(v)is int and v==0 for v in report["counters"].values())
+    assert report["proxy_outputs"]==report["candidate_outputs"]==report["fit_records"]==[]
+    assert report["private_truth_read"]is False and report["optimizer_updates"]==0
+    assert not(output/"report.json").stat().st_mode&0o222

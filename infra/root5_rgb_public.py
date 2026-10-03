@@ -18,8 +18,12 @@ from world_reward.data import sha256
 protocol, baseline, native = observe.protocol, observe.body, observe.native
 body = baseline
 COHORT = protocol.COHORT
-BASE, OUT = COHORT.base, COHORT.base+"/root_fit_v1"
+BASE, OUT = COHORT.base, COHORT.base+"/root_fit_v2"
 STAGE, BUDGET = "public_root5_rgb_native_fixed_depth_refit", 300
+FIT_V1_REVISION = "b248f129e79c0bfcc5e5ef2a05d59999e6e91aee"
+FIT_V1_SOURCE_SHA = "df60eb9990fbdcb8931f7a508f808bf73121de5ea4bd5d97b48e98d1680067d9"
+FIT_V1_FAIL_SHA = "ceb6a65fbdc59d78872737901b08fc182accfa1a18abef4b5de41b04fb77d4b8"
+FIT_V1_FAIL_BYTES = 2811
 PRODUCER_REVISION = "8084688a4d84bbad9ba8c0580e4d1b2803745511"
 NATIVE_PRODUCER_REVISION = "feae71ea16a1d942f08e95ccafc131b6467dffb9"
 NATIVE_SOURCE_SHA = "0e034078bf9026b338783867293aa5f95f8c1955b5b21760b7916408ec496018"
@@ -59,6 +63,39 @@ def helper_identities(fit_source=None):
         root_refit=sha256(Path(policy.__file__)), metric_alignment=sha256(Path(metric_alignment.__file__)))
     if fit_source is not None: result["fit"] = native.regular(fit_source)["sha256"]
     return result
+
+
+def previous_fit_failure(root):
+    """Preserve the exact zero-work v1 dependency-packaging failure, not a verdict."""
+    path = Path(root)/BASE/"root_fit_v1/report.json"
+    receipt = native.regular(path, FIT_V1_FAIL_SHA, immutable=True)
+    if receipt["bytes"] != FIT_V1_FAIL_BYTES: raise ValueError("Exact original root5 bootstrap failure required")
+    row = json.loads(path.read_text())
+    missing = "/srv/scenesmith/world-reward/jobs/"+FIT_V1_REVISION+"/run_root5_rgb_fit/code/infra/run_dwpose_smoke.sh"
+    require_fields(row, dict(stage=STAGE, status="fail", phase="public_integrity", operation="fit",
+        producer_revision=FIT_V1_REVISION, script_sha256=FIT_V1_SOURCE_SHA, image_id=native.IMAGE_ID,
+        network="none", device="cuda", budget_seconds=300, error_type="FileNotFoundError",
+        error="[Errno 2] No such file or directory: '"+missing+"'", private_truth_read=False,
+        ground_truth_used=False, challenge_inputs_used=False, hand_labeled_test=False, oracle_modes=[],
+        quality_verified=False, accuracy_verified=False, adoption_authorized=False, full_HOI_verified=False,
+        numerical_reproducibility_verified=False, object_proxies_frozen_before_fit=False,
+        all_candidates_frozen=False, native_arrays_verified=False, inputs_unchanged=False, all_cases_retained=False,
+        candidate_outputs=[], proxy_outputs=[], proxy_alignments=[], fit_records=[], records=[], trace_checks=[],
+        all_training_traces_verified=False, all_native_best_replays_verified=False,
+        predictions_native_replay_verified=False, native_backwards=0, optimizer_updates=0,
+        source_inputs_assets_rehashed=False))
+    names = ("proxy_rasters_attempted", "proxy_rasters_completed", "safeguard_rasters_attempted", "safeguard_rasters_completed",
+        "objective_native_heads_attempted", "objective_native_heads_returned", "objective_native_heads_validated",
+        "final_native_heads_attempted", "final_native_heads_returned", "final_native_heads_validated",
+        "initial_jacobian_rows_attempted", "initial_jacobian_rows_completed", "optimizer_backwards_attempted",
+        "optimizer_backwards_returned", "adam_updates")
+    counters = row.get("counters")
+    if (not isinstance(counters, dict) or set(counters) != set(names)
+        or any(type(v) is not int or v != 0 for v in counters.values())
+        or any(k in row for k in ("body_model", "native_head_source", "torch_version", "CUDA_version", "lineage",
+            "frame_metrics", "clip_metrics", "decision", "quality", "trace_checks_completed"))):
+        raise ValueError("Original failed bootstrap must contain no model/proxy/optimizer/quality work")
+    return receipt
 
 
 def observer_sources(root, revisions):
@@ -192,7 +229,8 @@ def dw_bound_files(root, report):
 def public_predictions(root, pins):
     """Audit every frozen public artifact/model/source before any fit/private IO."""
     pins = validate_pins(pins); root = Path(root); base = root/BASE
-    paths = observer_sources(root, pins["producer_revision"]); sources = observe.source_identity()
+    failed_fit = previous_fit_failure(root)
+    paths = [Path(failed_fit["path"]), *observer_sources(root, pins["producer_revision"])]; sources = observe.source_identity()
     reports = {}; receipts = {}
     for stage, key in (("masks", "automatic_masks_sha256"), ("baseline", "baseline_sha256"), ("dwpose", "dwpose_sha256")):
         path = base/observe.FOLDERS[stage]/"report.json"; receipts[stage] = protocol.identity(path)
@@ -260,7 +298,7 @@ def public_predictions(root, pins):
     frozen = [native.regular(path) for path in dict.fromkeys(paths)]
     return records, raw, pairs, dw, dict(input_manifest_sha256=pins["manifest_sha256"], mask_report_sha256=pins["automatic_masks_sha256"],
         baseline_report_sha256=pins["baseline_sha256"], dwpose_report_sha256=pins["dwpose_sha256"], observer_revisions=pins["producer_revision"],
-        public_pins=pins, frozen_files=frozen)
+        public_pins=pins, previous_failed_fit=failed_fit, frozen_files=frozen)
 
 
 def object_sample(raw, scale):

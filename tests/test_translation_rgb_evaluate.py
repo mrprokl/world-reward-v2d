@@ -374,7 +374,9 @@ def test_complete_static_code_closure_within_explicit_control_budget(quality):
     files["pyproject.toml"]=(root/"pyproject.toml").read_bytes()
     paths=azure_job.runtime_bundle_paths(files,"infra/run_translation_rgb_evaluate.sh")
     assert "infra/translation_rgb_public.py" in paths and "src/world_reward/translation_refit.py" in paths
-    assert "infra/translation_rgb_fit.py" not in paths and "infra/keypoint_rgb_render.py" not in paths
+    # Literal source-hash dependencies are source-only, not executed fit/GT IO.
+    # The complete static closure now retains them even on unused branches.
+    assert "infra/translation_rgb_fit.py" in paths
     stream=io.BytesIO()
     with tarfile.open(fileobj=stream,mode="w",format=tarfile.PAX_FORMAT)as archive:
         for path in paths:
