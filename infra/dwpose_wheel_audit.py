@@ -1,4 +1,4 @@
-"""Offline v2 audit of intact D94 assets, retaining an external Flatbuffers license.
+"""Offline v3 audit of intact D94 assets, retaining an external Flatbuffers license.
 
 The original failed acquisition is evidence, never repaired or overwritten.
 This is byte/notice integrity only, not installation, legal clearance or accuracy.
@@ -19,7 +19,9 @@ import zipfile
 SOURCE_SHA = "9a5c24de16fe6ec9169b836f1cba8e435e3d9cbb3e1ac159ca416b42363246ea"
 FAILED_SHA = "9cff44a6fa41d7f9c54dac0c212b74057d4852686276e9cc740298e6b6bc3f82"
 FAILED_REVISION = "b067acf9dbb8e463884dc58461d6f3dd03e77975"
-OUT = "results/dwpose-wheel-audit-v2"
+OUT = "results/dwpose-wheel-audit-v3"
+PREVIOUS_REPORT = "results/dwpose-wheel-audit-v2/report.json"
+PREVIOUS_SHA = "de8486168bbbe7bb8e27fb5be44bd3d6bb61e1f02093bb33a107b4eff91ea21e"
 IMAGE = "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7"
 BUDGET_SECONDS = 120
 
@@ -50,7 +52,7 @@ def validate_failed(root, acquisition, *, expected_sha=FAILED_SHA):
             or data.get("producer_revision") != FAILED_REVISION or data.get("script_sha256") != SOURCE_SHA
             or data.get("source_revision") != acquisition.SOURCE_REV or data.get("model_revision") != acquisition.MODEL_REV
             or data.get("flatbuffers_source_revision") != acquisition.FLATBUFFERS_REV or data.get("ort_source_revision") != acquisition.ORT_REV
-            or data.get("wheel_audits") != []):
+            or "wheel_audits" in data):
         raise ValueError("Original failed acquisition provenance/phase mismatch")
     for key in ("gpu_used", "inference_performed", "packages_installed", "source_executed", "image_used",
                 "global_image_modified", "credentials_used", "private_truth_read", "challenge_inputs_used"):
@@ -66,6 +68,15 @@ def validate_failed(root, acquisition, *, expected_sha=FAILED_SHA):
         if path.stat().st_size != size or acquisition.digest(path) != sha:
             raise ValueError("Original asset bytes/SHA changed")
     return data
+
+
+def validate_previous(root, acquisition):
+    path = regular(root / PREVIOUS_REPORT)
+    if acquisition.digest(path) != PREVIOUS_SHA: raise ValueError("Preserved v2 failed audit receipt SHA mismatch")
+    data = json.loads(path.read_text())
+    if data.get("stage") != "pinned_dwpose_wheels_notice_audit_v2" or data.get("status") != "fail" or data.get("phase") != "failed_receipt_validation":
+        raise ValueError("Preserved v2 failure stage/status/phase mismatch")
+    return PREVIOUS_SHA
 
 
 def audit_flatbuffers(wheel, primary_license, retained, acquisition):
@@ -120,7 +131,8 @@ def audit_flatbuffers(wheel, primary_license, retained, acquisition):
 
 
 def perform(root, out, report, persist, acquisition):
-    validate_failed(root, acquisition); report["phase"] = "wheel_audit"; persist()
+    validate_previous(root, acquisition); validate_failed(root, acquisition)
+    report.update(phase="wheel_audit", legacy_wheel_audits_omitted=True); persist()
     base = root / acquisition.BASE
     ort = next(r for r in acquisition.ASSETS if r[0].startswith("wheels/onnxruntime-"))
     row = acquisition.audit_wheel(base / ort[0], "onnxruntime", out / "onnxruntime")
@@ -135,6 +147,7 @@ def perform(root, out, report, persist, acquisition):
             if path.stat().st_size != item["bytes"] or acquisition.digest(path) != item["sha256"]:
                 raise ValueError("Final retained text bytes/SHA changed")
     validate_failed(root, acquisition)
+    validate_previous(root, acquisition)
     if acquisition.digest(Path(acquisition.__file__)) != SOURCE_SHA: raise ValueError("Final original source SHA changed")
     report.update(status="pass", phase="complete", final_assets_receipt_source_rehashed=True)
 
@@ -149,9 +162,10 @@ def main(argv=None):
             or os.environ.get("WR_IMAGE_ID") != IMAGE or os.environ.get("WR_DWPOSE_AUDIT_RESERVED") != "1"
             or not out.is_dir() or any(out.iterdir()) or any(p.is_symlink() for p in (out, *out.parents))):
         raise ValueError("Require fresh reserved offline pinned-image audit directory")
-    report = {"stage": "pinned_dwpose_wheels_notice_audit_v2", "status": "fail", "phase": "failed_receipt_validation",
+    report = {"stage": "pinned_dwpose_wheels_notice_audit_v3", "status": "fail", "phase": "failed_receipt_validation",
               "producer_revision": revision, "script_sha256": acquisition.digest(Path(__file__)), "image_id": IMAGE,
               "original_receipt_sha256": FAILED_SHA, "original_producer_revision": FAILED_REVISION,
+              "previous_failed_audit_sha256": PREVIOUS_SHA, "legacy_wheel_audits_omitted": False,
               "original_acquisition_script_sha256": SOURCE_SHA, "wheel_audits": [], "budget_seconds": BUDGET_SECONDS,
               "network": "none", "device": "cpu", "gpu_used": False, "assets_redownloaded": False,
               "original_assets_modified": False, "original_failure_rewritten": False, "packages_installed": False,
@@ -169,7 +183,7 @@ def main(argv=None):
         try: persist(); perform(root, out, report, persist, acquisition)
         except Exception as error:
             report.update(status="fail", error_type=type(error).__name__, error="Pinned offline wheel audit failed; original evidence unchanged")
-            raise RuntimeError("DWPose v2 wheel audit failed; inspect fresh immutable receipt") from None
+            raise RuntimeError("DWPose v3 wheel audit failed; inspect fresh immutable receipt") from None
         finally:
             signal.alarm(0); signal.signal(signal.SIGALRM, old); signal.signal(signal.SIGTERM, term); persist(); path.chmod(0o444)
             for item in out.rglob("*"):

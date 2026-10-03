@@ -99,7 +99,7 @@ def failed_fixture(tmp_path):
             "producer_revision": gate.FAILED_REVISION, "script_sha256": gate.SOURCE_SHA,
             "source_revision": old.SOURCE_REV, "model_revision": old.MODEL_REV,
             "flatbuffers_source_revision": old.FLATBUFFERS_REV, "ort_source_revision": old.ORT_REV,
-            "wheel_audits": [], "oracle_modes": [], "files": rows}
+            "oracle_modes": [], "files": rows}
     for key in ("gpu_used", "inference_performed", "packages_installed", "source_executed", "image_used", "global_image_modified", "credentials_used", "private_truth_read", "challenge_inputs_used"): data[key] = False
     path = tmp_path / old.REPORT; path.parent.mkdir(parents=True); path.write_text(json.dumps(data))
     sizes = {str(base / r[0]): r[1] for r in old.ASSETS}; hashes = {str(base / r[0]): r[2] for r in old.ASSETS}
@@ -131,7 +131,7 @@ def test_failed_receipt_invalid_provenance_rejects_before_asset_reads(tmp_path, 
     elif field == "sha": data["files"][0]["sha256"] = "0" * 64
     elif field == "bytes": data["files"][0]["bytes"] = True
     elif field == "oracle": data["oracle_modes"] = ["ground_truth"]
-    elif field == "wheel_audits": data["wheel_audits"] = [{}]
+    elif field == "wheel_audits": data["wheel_audits"] = []  # Actual fixed receipt omits this key; even empty is different.
     path.write_text(json.dumps(data))
     with pytest.raises(ValueError): gate.validate_failed(tmp_path, old, expected_sha=old.digest(path))
 
@@ -139,6 +139,16 @@ def test_failed_receipt_invalid_provenance_rejects_before_asset_reads(tmp_path, 
 def test_failed_receipt_exact_sha_rejects(tmp_path):
     path, _, _, _ = failed_fixture(tmp_path)
     with pytest.raises(ValueError, match="receipt SHA"): gate.validate_failed(tmp_path, old)
+
+
+def test_previous_failed_audit_is_hash_bound_not_rewritten(tmp_path):
+    path = tmp_path / gate.PREVIOUS_REPORT; path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({"stage": "pinned_dwpose_wheels_notice_audit_v2", "status": "fail", "phase": "failed_receipt_validation"}))
+    original = path.read_bytes()
+    acq = SimpleNamespace(digest=lambda p: gate.PREVIOUS_SHA)
+    assert gate.validate_previous(tmp_path, acq) == gate.PREVIOUS_SHA
+    assert path.read_bytes() == original
+    with pytest.raises(ValueError, match="SHA"): gate.validate_previous(tmp_path, old)
 
 
 def test_source_pinned_import_own_module_only():
@@ -165,4 +175,6 @@ def test_wrapper_offline_cpu_new_scope_only():
     text = path.read_text()
     assert "--network none --memory 8g --cpus 4" in text and "--gpus" not in text
     assert 'src=$ASSETS,dst=$ASSETS,readonly' in text and 'src=$RECEIPT,dst=$RECEIPT,readonly' in text
+    assert 'src=$PREVIOUS,dst=$PREVIOUS,readonly' in text
+    assert gate.OUT == "results/dwpose-wheel-audit-v3"
     assert '"$CODE/infra/dwpose_wheel_audit.py"' in text
