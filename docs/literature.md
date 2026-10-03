@@ -1061,3 +1061,24 @@ occlusion, fullcoverage and comparativequalitygates beforemanufacture. This is
 NOT an implementedcohort or verifiedTrack1gain. [Quaternius Universal Base](https://quaternius.com/packs/universalbasecharacters.html)
 (Aug2025) declaresCC0/commercial sixriggedhumanoids; embeddedterms/topology/
 fingers remain uninspected, so no assetacquisition/adoption claimed.
+
+### Next reference feasibility, not new prediction method
+
+After exactnative-neutral witnesses, prioritize ONE author-human smooth-union
+implicit restsurface over restricted benchmark/unknownQuaterniusmesh. Capsule/
+ellipsoid primitives are field terms only, never intersecting finalparts.
+[scikit-image v0.25.2 Lewiner](https://github.com/scikit-image/scikit-image/blob/v0.25.2/skimage/measure/_marching_cubes_lewiner.py)
+falls under BSD3 defaultsource terms; pinnedLICENSE/moduleaudited, actualAzure
+availability unverified. Extractone connectedclosedwholemesh, certify current
+embedding, thenfreeze restgeometry/topology/rig/weights; repose+two fixedextreme
+states onlybeforeanyRGB, fixedresolution/timegate20min. No reposing/reparing
+nativeprediction or changing failedneutralcontrols. Any topology/intersection/
+framechange failure stops route, notanothermeshingrepair loop.
+
+OnlyaftergeometryPASS: ONE observableowncarryRGB, unchangedautomaticCARI
+frontends/no privateK/bbox/masks; predictedactor/objectdetect+completefinitebody,
+projectednamed-jointmedianerror≤4%imageheight afterpredictionfreeze. Detection
+failure meansproxyinadequate, not a victory. Novel96dynamiccohort and baseline/
+candidate accuracy follow onlyafterthisgate; fullhumanChamfer/namedjoints, NOT
+MHRindexPVE. InitialsharedSim3/noindependentobject/perframealignment remain.
+No field/geometry/RGB/referenceacquisition or evaluation implemented yet.

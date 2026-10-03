@@ -4340,3 +4340,16 @@ and scriptbb6b1769 independentlysupplied; inventories by35ea9e0021414eb994945668
 committedconfigs/volume_mesh_000002_pins.json recordsactualsha/bytes/scalar,
 not inferredprediction/sample. Currentep1CPUdepth550/668, nofinalinputreport.
 Complete **8744PASS/2sameoptionalSKIP189.69s** includingnewcontinuation.
+
+Actualroot removes ONLY originalemptyfailed episode2/object_pose_full via
+rmdir after failedunitexit1/log/freshnamespace/qualifiedproposal exactSHAchecks;
+oldfailedlog SHA faa315019f53178de2554b139a5acf4036ab3a305bd62354f1379b6c118b0d4b
+unchanged. No geometry/frames/prediction deleted. Actualfresh pinned-volume
+continuation dispatched a45a7db1226a0589966628d0ed5f8753c72d99a2,
+46files98,664encodedB/exactpublicHTTP200; unitactiveMainPID789439.
+FixedCPUproposal pin1697B/78fd51628a20a2b50e87bf8cc1654866c66397b5173b95ba1d9f9bd328dfda01.
+Postpin gate167PASS29.04s; no fulltrackingPASS/accuracy/native866 yet.
+
+13:00:45UTC actualvolumecontinuationactive/MainPID789439, GPU789526/1886MiB,
+noGPUduplication; originalep1scalarCPUdepth600/668. Bothinputreceipts stillabsent,
+nofull866trackingPASS or 668nativechainclaim. Runtimeheavydata remainAzure.
