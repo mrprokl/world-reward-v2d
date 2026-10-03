@@ -637,3 +637,11 @@ policy/poseprior and reservedkeypoints/frames. No proof2Didentifiesdepth/
 Feet17..22 map native15..20. Handroots91→62/112→41 and fingertips are
 semanticallyverified; intermediateproximal/distal conventions and fullface68
 mapping remainunverified, so do not guess a full133→70correspondence.
+
+MHR70 itself warns some proximalfinger `third_joint` landmarks «doesnt match
+with wholebody»; avoid a full21hand map inferred from anatomical ordinal
+names. Verified body17 is enough for the first independentreprojection trial,
+with face/handdetail deferred rather than pretending those uncertainlabels
+are exact. FreshCPUimage metadata confirmed pip24.2, cv2runtime4.11.0 with
+both opencv-python/opencv-contrib-python4.11.0.86; pinned-image provenance
+records this coexistence, not an assumed exclusiveopencvinstallation.
