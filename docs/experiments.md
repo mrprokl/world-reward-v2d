@@ -2220,3 +2220,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   explicit; reportcentroidZ/centeredPVE/heldout2D without Procrustes/alignment.
   Rejectrecipe onanygate; no samecohortretune/realadoption, objectrigidmesh/
   contact/penetration accuracy or challengewin claim.
+
+  D96prepare sourcefreeze5475PASS/1optionaltrimeshSKIP72.88s,47own/161combined
+  focusedPASS and47independentreviewPASS, bashsyntax/diffcheckPASS. Source
+  42f457fc46fbeb814befb48b8104403b06922f63, bundle16files58,056B; existing
+  primitiveforeground_truth already gatesbothentities≥64, no duplicatechanged
+  algorithm. ActualAzure prepare-only dispatch120srender+180smasks started;
+  no privateevaluation, Body/DWPose inference/refit or qualitydecision yet.
