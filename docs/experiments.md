@@ -5621,3 +5621,26 @@ Finalscopedruntime/support/transport closure228PASS2.45s; support28own
 proceduraltestsPASS, unchanged40pixel observation threshold and allframe
 identity preserved. CPUwhole-support inventory next; PASS meansaudited
 coverage, not allframes observable or accuracy.
+
+
+22:38:23UTC EP3 independent full-refinement inventoryPASS inactiveexit0;
+tiny655B/834c86e878e4b1b4e3450ff799ef5ced81e6a8f9cd979c196af8cb441398c2ad
+pins exact original672bchild14771B/06aca...+452954464B/87cab... full592
+indices/unchanged301updates andABI/source receipts. NEWshared_refined pins
+frozen; queuedunitFAIL remainsseparate. Nativeexport pendinguntilGPUfree.
+
+ActualwholeEP4support inventoryPASS all747frames, report366534B/
+6e4da2b5d9b93b8e51d19566062d0316145b119c97fe020561bdb65075a27df2.
+Exactly18unsupportedframes302..319, everyone empty_segmentation; no
+otherframeunder40. This describes unavailableautomaticobservations, not
+assertedrealocclusion/labels. No thresholdrelax/deletion/lastposefallback.
+Newgenericwhole-temporalalgorithm needsinferredhand/object validation.
+
+Frozenhand-conditionedSE3initializermechanics:16unitPASS; 12×48new
+proceduralcohort(seed310427) PASS, SHA05453436f09687c8fddb2202afbe62f911ed38bdbd7c5c6f44249ee7dcfecf63.
+Carrygain≈1 is deliberatelycontrolledhand-consistentfixture, notSOTA/RGB/
+CARI/adoption proof. Fixed3anchors/.03m/.15rad, endpoint/free/slip/regrasp
+branches, fullindices+observedbytes preserved; unboundedleading/trailing
+abstain. Hiddenregraspunidentifiable; masks-overlapnotcontact. No retuning
+or challengeuse. See occlusion_bridge_protocol.md; nextbodycamera-hand
+conventionaudit plus NEW inferred-observation validation, notEP4manualfits.
