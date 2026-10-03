@@ -4040,3 +4040,21 @@ manylinux2.28x86_64 pinned wheel42,084,055B/SHA
 from public PyPI metadata; wheel fetch/build staysAzure, no dependency upgrade.
 Actualnewimage/receipt binding must precede dispatch. GPUfrontend continues;
 this CPUruntime work can overlap without GPU duplication.
+
+Separate CPU image builder ready:41 mocked testsPASS0.13s, actual primary
+PyPI metadata revalidated against the literal pinned42084055B wheel before any
+download. Source-bound exactAzurehost entrypoint, noGPU/records/modelreads;
+120s actual acquisition alarm including blocking reads,300s whole driver.
+Offline/no-pull/no-deps build from verified unchangedCARI parent, own unique
+childtag, original5packageversions plusArrow19.0.1 CPU import required. Original
+parent reverified. Canonicalreadonly code/archive markers, deterministic recipe
+owner label, exclusive444 receipt, temporary download/context cleaned. Timeout
+cleanup targets own labeled classic-builder containers only; hard daemon
+termination is explicitly not proven, so inspect failed build workers before
+any retry. No global prune/tag replacement/sourceimage mutation. Nativepacking
+stays blocked until actualnewimage/receipt pinned; no GPUjob duplicate.
+
+Complete CPU image builder/source suite **8253PASS/2same optionalSKIP127.34s**;
+unchanged directexport/sharedconsumer/crosssurface/own-grasp sources verified.
+Freeze builder before its first AzureCPUdispatch; one exclusive image tag/report,
+no implicit repair/rebuild.

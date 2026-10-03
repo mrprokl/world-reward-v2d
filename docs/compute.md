@@ -15,7 +15,7 @@ trajectory use. Private own-grasp feasibility is frozen separately,
 not yet dispatched and cannot overlap this GPU work.
 
 H97/H98 root pilots, H99 DWPose prompt diagnostic and H101 gamma-medoid remain
-rejected without retuning/rescoring. Latest fullsuite8164PASS/2same optionalSKIP.
+rejected without retuning/rescoring. Latest fullsuite8212PASS/2same optionalSKIP.
 No final Parquet or verified CARI4D improvement. Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
 [experiments](experiments.md). No final submission/CARI4D superiority yet.
