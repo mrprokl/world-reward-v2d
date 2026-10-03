@@ -1,0 +1,42 @@
+{
+  "episode_index": 2,
+  "files": {
+    "outputs/episode_000002/object_budget_volume/geometry.npz": {
+      "bytes": 62884,
+      "sha256": "b7ee5fd43a7e49713b7d43e7749887b2a95530fd204edc1fb14a50d161d4ae64"
+    },
+    "outputs/episode_000002/object_budget_volume/object_fixed_canonical.glb": {
+      "bytes": 74900,
+      "sha256": "eae7c0ff581eb9819c4a7693e0a59a10683ba45c1a681d10dab682d886946329"
+    },
+    "outputs/episode_000002/object_budget_volume/report.json": {
+      "bytes": 35767,
+      "sha256": "3b9ec8a123f873ca9dbd6728146cba4a67c9554f0519a00a02ce3d7119ca3d08"
+    },
+    "outputs/episode_000002/object_grounded/report.json": {
+      "bytes": 15648,
+      "sha256": "fd2da469e7fd5b23c99e71dc4fab5bfd68e74c516b885b6335ffd0f7e52e2fdc"
+    },
+    "outputs/episode_000002/scale_smoke/report.json": {
+      "bytes": 9429,
+      "sha256": "2573b82382bdbf77ea201513271bae86438666f40289a46f9f9e1a0dcca3a944"
+    },
+    "results/image-volume-qem.json": {
+      "bytes": 3429,
+      "sha256": "8c5441162603260fb768dad688ed7d47ddf29a79de6de53fde603c84994c28ec"
+    },
+    "validation/volume_qem_v1/report.json": {
+      "bytes": 19887,
+      "sha256": "5fcea041873ff54a4c116224a86d6ac0a3ca2c4699584c4699d615b7703f0500"
+    }
+  },
+  "input_sha256": "2ccb43dd362c2a430d341611e888ef1ea79e3a3989e8af2a015d34e0b2196747",
+  "metric_scale_baked_once": 0.9048317670822144,
+  "report": {
+    "bytes": 35767,
+    "producer_revision": "3242cb23486726c9636ca66241020f6aa276be1b",
+    "script_sha256": "bb6b17696ed928b749e805ed6405fb9144419421fbef70691a2dd8235cc714e9",
+    "sha256": "3b9ec8a123f873ca9dbd6728146cba4a67c9554f0519a00a02ce3d7119ca3d08"
+  },
+  "schema": "world-reward-volume-mesh-pins-v1"
+}

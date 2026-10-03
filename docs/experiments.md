@@ -4333,3 +4333,10 @@ exactexpectedb47. GPUidle staysa checkedfunction; no imagewhitelistrelaxation.
 No actualCPUmeshread/decode locally. Originaltrajectoryloops remainbyteidentical
 apartfrom loadingcommittedpins in volume branch; currentcari_prepareSHAc529b240
 unchanged. Fullsuite8658PASS2skip157.09s predates newcontinuation tests.
+
+Actual episode2 readonly7artifact pin inventoryPASS, originalproducer3242cb2
+and scriptbb6b1769 independentlysupplied; inventories by35ea9e0021414eb9949456686dd516c35b31238b,
+33files61,356encodedB, exactpubliccommitHTTP200. AllsourceIDs before/after;
+committedconfigs/volume_mesh_000002_pins.json recordsactualsha/bytes/scalar,
+not inferredprediction/sample. Currentep1CPUdepth550/668, nofinalinputreport.
+Complete **8744PASS/2sameoptionalSKIP189.69s** includingnewcontinuation.
