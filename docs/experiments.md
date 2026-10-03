@@ -4211,3 +4211,20 @@ CPU-only input assembly with one disjoint H100frontend, never duplicates GPU job
 or changes hypotheses/resolution/support/oracle/7200s budgets. Episode2 selected
 by index, not visual/performance inspection; full668 native-stage pins wait for
 actual episode1 inputPASS. No all30 completion or CARI4D superiority claim.
+
+Completev2 compactreceipt confirms full18,439V/36,874F singlecomponent,
+positivevolume0.084108809807m3; neutral audit240,760candidatepairs,
+226,454proved sharedsimplexpairs,114forbiddenrelations (110float transverse,
+4boundary), nonestedcomponents. These are conservative float64 predicates,
+not exact rational witnesses or anatomical diagnoses. Original geometryhash
+4f862130b7bafffd983cc776cf19a82de4d27085a7c58c501d55d88269bc00de;
+faces51d08a7d2e92893ca42c7525bda768afd5c223a33d8302b6674c832e943e8788.
+Private outputs stillreportonly; no negative-result geometry retained locally.
+
+Next identical episode2 frontend actually dispatched from
+300949bc04df9322210cd13b563d3a724ee87f65,54files103,864encodedB;
+publicexactcommitHTTP200, actualunitactive/MainPID767939. Newtargets/log/unit
+absent, frontendlockfree, GPUempty;609,312,354,304bytesdisk and~329GBRAM
+available. Currentcari_prepare/objectpose/launcher bytes equal priorce0519f
+frontendproducer, no numericalchange. Episode1 CPUdepth150/668inprogress;
+onlyepisode2 usesGPU. No fullfrontendPASS or inputpin yet for either newclip.
