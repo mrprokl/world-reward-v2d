@@ -1954,3 +1954,38 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   bitdeterminismFALSE, originalD91FAILpreserved. No reconstruction/GT/quality
   adoption. Fullsource suite5173PASS/1optionaltrimeshSKIP73.46s,53newfocused
   PASS, source-onlybundle8files23,776B, terminal0/noGPUjob active.
+
+- D93 preregistered **actual public-video coupled XY consistency**, distinct
+  from rejected D90 fixed-pose identity substitution. Episode15 has501frames;
+  twelve rint-uniform anchors and eleven disjoint floor-midpoints, sorted23.
+  M0=firstRGB identity; M1=full-neutral-native-vertex RMSmedoid among actual
+  anchors, first-protocol tie, no silhouette choice/averaging. Both decoded
+  geometries/masks/identities frozen BEFORE optimization. All original pose,
+  rootrotation, hands, expression, K=RGBdiagonal1920, Z and object fixed. Each
+  branch learns ONLY per-frame metricXY: w=0, delta=.05*tanh(w/.05),30Adam
+  steps lr=.005m, orderM0thenM1, no best-checkpoint selection or relaunch.
+  This changes projected/physical human-object XY relation; no contact claim.
+
+  Soft256x192 edge-coordinateK/6, sigma/gamma1e-4,FPP8 asD92. Human6x6
+  blocks require>=19/36pixels; exclude a block if ANY automaticobjectpixel.
+  Fixed8x8low/48x48full checkerboard even=train/odd=heldout, same exclusions
+  for both branches. Equal-frame train MSEalpha plus .001*mean((delta/.02m)^2);
+  no reservedpixel enters loss. Every23frame needs>32observedhumanpixels on
+  both full train/heldout and positive lowtrain support; no frame omission.
+  Only each native backward permits CUDAatomic-add, synchronized and original
+  deterministic flags/hook restored immediately asD92; all forward strict.
+  Numeric/bit gradient reproducibility on this video is NOT verified.
+
+  Freeze BOTH finalparameters before full-resolution hard scoring: raw23,
+  M0initial23,M1initial23,M0final23,M1final23=115hardrasters; initial/final
+  baselines diagnostic, no selection. Gates coverage/finite/±.05mXYbounds,
+  each branch finaltrainobjective<=initial; paired finalheldout M1minusM0
+  mean>=.005, median>=.01, worst>=-.01 across all23. Spatial checkerboard
+  is correlated, not independent 3D or generalization validation. PASSonly
+  authorizes a new hypothesis to pursue, no adoption/export/fullHOI/score.
+  FAIL preserves output and stops this policy without gate/medoid retuning.
+  Azure-only offline600s total,32GiB peak allocated/reserved GPU limit and
+  immutable own outputs/episode_000015/identity_xy_fit_v1. Historical0644
+  Body/masks remain unchanged read-only; exact original receipts, assets
+  and current audited manifest/source establish provenance, without inventing
+  dataset-revision/forward-basis fields omitted in legacy receipts.
