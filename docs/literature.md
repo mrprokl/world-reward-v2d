@@ -595,3 +595,24 @@ pretending native code already castsF32. Invalidscore<=0 sets a−1 coordinate
 BEFORE SimCC/2 and crop→image transformation, so finalinvalidcoords are not
 necessarily−1; keep rawcoords/scores, validity from finitepositivescores.
 No runtime/inference or embeddedwheelmetadata verification yet implied.
+
+AcquisitionD94 actual packaging audit revealed noLICENSE in the exact
+Flatbuffers25.12.19 wheel14members; ORT1.30.0 wheel353members embedsLICENSE
+andThirdPartyNotices, with allversion/tags/dependencies matching metadata.
+A separately pinned matching-source FlatbuffersApacheLICENSE exists; preserve
+the failed original embedded-notice contract, and explicitly audit external
+primary-notice binding in a new read-only namespace. This is not a blanket
+waiver of third-party rights or wheel/binary eligibility.
+
+NextD95 ABI plan (not yet executable/passed): offlineCPU isolatedtemporary
+ORT+Flatbuffers install only afterD94v2integrityPASS; old synthetic public
+RGB clip_00_frame_000/clip_01_frame_000 and automaticSAM2humanmasks, noprivate
+geometry/K/depth/modelassets. Signedmanifest2199B/SHA
+`2c584ea633a958c737520d53c68c12b1429b8358f182c07bf46e53627b8f8267`;
+maskreceipt19818B/SHA`aa1c8346cfd7609a58d055f71762060aca238c216100bd8aa990ca1de79ea909`.
+BBox fromnonemptyautomaticmaskmin/max+1, nofullimagefallback. TwofreshCPUsessions
+with4threads, each2images; actualnames/types/133SimCCoutputs, nativeRGB
+preprocess/postprocess, rawscorevalidity and exactreplay,180smaximumincluding
+isolatedinstall. Existingcohort alreadyprivatelyevaluated: this is ABI/replay
+only, neverfresh independentquality or D87retuning. Nativefloat64list feed
+conversion mustbe observed, not silentlyadvertisedasnativefloat32casting.
