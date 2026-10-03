@@ -1,0 +1,43 @@
+{
+  "files": {
+    "object_clip_000000_frame_000000.png": {
+      "bytes": 635,
+      "sha256": "c3ca47ffb6c405af97d11df5c373e1b12b85ed88453b59a604f2be975a6980f7"
+    },
+    "object_clip_000001_frame_000000.png": {
+      "bytes": 624,
+      "sha256": "9a5322db948dadd2d4730d8bc973cc9d5049c009fe9684702ec3ba9d09ef2355"
+    },
+    "object_clip_000002_frame_000000.png": {
+      "bytes": 624,
+      "sha256": "8cd50a31919bf11755227e67807c61ff25df4d557a68c423f5f04c84b09f6f71"
+    },
+    "object_clip_000003_frame_000000.png": {
+      "bytes": 649,
+      "sha256": "f2b73386ca0ca148b8287859d8358e94317a9b488a6541d21c675f0ddaafafd6"
+    },
+    "person_clip_000000_frame_000000.png": {
+      "bytes": 2298,
+      "sha256": "64a02a7e7bb9d921891a0ad90bccd8e24b0f8876cef81ed71c76c35bc0755695"
+    },
+    "person_clip_000001_frame_000000.png": {
+      "bytes": 2268,
+      "sha256": "fc263796f7bb4739d22e1d7ecd703a7775885a6ddd900704602294215b5aa3fb"
+    },
+    "person_clip_000002_frame_000000.png": {
+      "bytes": 2272,
+      "sha256": "9edbe474d8a5f8a82aeacc81afe91ab05a34f8b0ab23f808fd4381b894c24e99"
+    },
+    "person_clip_000003_frame_000000.png": {
+      "bytes": 2261,
+      "sha256": "f6b94d34b2cdf508d4dee7086b0e3a9272a9747478ce6058c18bc58751d008cc"
+    },
+    "report.json": {
+      "bytes": 10055,
+      "sha256": "cdf91676d4d1bd69afe0dc3b6f8f48a4b53c7eb62d9ce454fbba823111fb7924"
+    }
+  },
+  "producer_revision": "001aa0f1b4cfcabcc9861909031059809b3f853b",
+  "schema": "world_reward.bridge_rgb_anchor_mask_pins.v1",
+  "script_sha256": "533bf95b42ba20e1b2144296a66d254c0c0d8e342b0b3eccaac37904838b4229"
+}

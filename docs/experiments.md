@@ -5866,3 +5866,14 @@ Independentfivepublicfileinventory frozen bridge_rgb_anchor_input_pins.json,
 manifest843B/54e3369361c1785d930ad40b4f245de50a1183258ac1c1cbd66e424daae6a9a2.
 Only134725B fourRGB+manifest retained remotely; no media copied locally.
 Masks/modelrecognizability unknown; 192frames/bridge NOTrun/adopted.
+
+NEW four-anchor automatic frontend001aa0f: 218focusedtinytestsPASS1.21s and
+BashsyntaxPASS; 69-file mask and72-file inference closures retain allconfigs
+but do not import renderer/ray/private recipes. Actual mask runPASS
+14.529441668s/inactiveexit0, exactly8Grounding+8SAM2calls. Receipt10055B/
+cdf91676d4d1bd69afe0dc3b6f8f48a4b53c7eb62d9ce454fbba823111fb7924.
+Every fixed person./bottle. query yields one detection; human22310..22491px,
+object1037..1842px, no manualprompt/fallback/retuning. Independent exactnine
+0400file inventory verified original producer/script/receipt/mask byteids;
+freeze bridge_rgb_anchor_mask_pins.json before Body/MoGe. No private/render
+truth in model mounts, localmedia, accuracy/bridgeadoption or eligibility claim.
