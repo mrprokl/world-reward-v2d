@@ -2320,3 +2320,27 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   transfer. Baseline+independentobservations NOWfrozen; freshprivatequality
   remains UNREAD. Next run ONLYalready-frozen sixparamroot policy, not retune
   optimizer after viewingobservations or declare these ABIchecks a3Dgain.
+
+  D96finalfit prereg implementation details BEFORE fitting/privatescore:
+  commonobjectproxy uses15 SHAREDfirstRGBidentity baseline human hardrasters
+  atK1280, not originalperframeidentity geometry. Visiblehuman=sharedsilhouette
+  &automaticperson &~automaticobject &MoGevalidity. Exactlyoneequal-frame
+  robustpositive depthscale perclip/all5frames,≥32validcorrespondences/frame,
+  all5supported (no optionalframe rejection). Fixedautomaticobject&MoGevalid
+  points×thatclipscale,≥32points/frame, max8192 uniformlysampledseed0/sorted
+  indices inoriginalpixelorder; serializeall15proxyarrays/bindings read-only
+  BEFORE firstoptimizerforward. No proxychange/rerender/rescale/recenter afterfit.
+  Exactly15baselineproxyhardrasters plus915nativefitheads; 180stotal budget
+  includinginput/modelintegrity/load/proxy/Jacobian/fit/finalfreeze, no retries.
+  Entireinput/producer/NPZ/SHA/identity/frame/source audit beforefirstforward
+  andafterfinal15exports. Newroot_fit_v1 namespace; no privatefolder mounted.
+  SeparateCPU120squalityreadsprivate ONLY afterfitcomplete/frozenaudit, compares
+  sharedbaselinevsrefit (originalraw additionallydiagnostic). PerframePVEmean
+  vertices→equal5framemean/clip, median3clipgain≥5%, noclipregression>5%;
+  perhandrelativevector usesPREDproxy median minuspredLBS handregionmean vs
+  TRUEvisibleobjectmedian minustruecorrespondinghandregionmean, normcm,
+  equal5framemean/clip,≤5%regression foreachhand+clip, zero-baseline exactrule.
+  NativewristsnotavailableinrenderGT: do NOTinventgroundtruth308/127landmarks;
+  handregionvertexPVE maybediagnostic, labelledasregionnotjointaccuracy.
+  Qualityprotocolsuccess distinctfromhypothesisacceptance; anygateFAILrejects
+  recipe withoutsamecohortretune/realadoption. No alignment/contact/Track1win.
