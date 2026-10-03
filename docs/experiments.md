@@ -2284,3 +2284,9 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   reversegradrows reusessameinitialforward, 180sCUDAfit/32GiB4CPU inclmodel
   load/integrity. Freezeall15candidateblocks/controls/V/KP/J/rotations+source
   beforeprivate; numericalreplay/qualitydecision separate, not predictedwin.
+
+  Data-freepolicy implemented aa57daf20testsPASS, independentmathreviewPASS
+  after two concrete fixes: rejectMaskedArray targets BEFORE np.asarray,
+  andfiniteoutput arithmetic/physicalbound guards preventoverflow fromfinite
+  extremes. No clipping/loss repair. NativeTorchautograd/Jacobian/runtime not
+  yetverified; policytests do not establish3D/HOI gain or privacy-stage completion.
