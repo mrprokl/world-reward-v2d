@@ -2512,3 +2512,41 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Independent source review/Bash syntax PASS. Complete closures27files each,
   ~99.3KB fitter/~103.0KB evaluator, ordinary imports and historical source-only
   canonical mounts. Lightweight fixtures are not a native or efficacy result.
+  Full5840PASS/1optionaltrimeshSKIP79.14s before execution. Producing source
+  2799e8d2c468aff9230b422beea33779e640f325; actual code-only closures fitter
+  99,760B/evaluator103,496B. Actual H97 public fit **PASS**19.228492s CPU,
+  script`4248a26be67b89267f0780bd9565e60eab1c80f4e5fbefd800d901060f3f74bf`,
+  receipt`a9108a7409912783926eb4fffe6103a97a4c304d3cb57c8a21d72e1b2664a812`
+  (133,374B/0444): all15 candidates/900 evaluated states/885updates/300
+  observation-Jacobian rows, zero model/raster/private reads; all input/source
+  hashes unchanged. All15 rank ratios .40105..40873 and objective decreases
+  establish numerical RGB consistency only, NOT independent3D improvement.
+  Actual H97 quality-v1 **FAIL**6.018066s at first private topology validation,
+  script`b45e34d071c36724eb5acedf61441e9ba5df3a19924febfb26674a886c67bba0`,
+  receipt`733b7ba34bf8703782a8aa703a6fdc5fed379372b582807962287aeabedca38b`
+  (35,320B/0444). All15 candidates/proxies/sources and900-state replay audited
+  before the first private read, but `Truth topology differs`: NO frame/clip
+  quality metrics or decision were computed. Private topology had been opened;
+  no longer describe this cohort as entirely unread. Original failure remains.
+  Read-only source + stdlib ZIP/NPY-header/face-index inspection established
+  actual truth human_faces int32[36874,3], baseline int64[36874,3], EXACT same
+  integer indices (0..18438), truth typed-face SHA
+  `f6748e290ef37fbb6877c4cc5bd7287105db9e98252b0ba170ae9ac3c45eacd6`.
+  Object faces remain int64[384,3],0..193/nondegenerate; all coordinate payloads
+  were excluded from this diagnostic. First host query lacked NumPy and read
+  nothing; the successful inspection used stdlib only. Renderer preserves native
+  face dtype whereas the Body loader casts baseline faces to int64. The quality
+  validator had an incorrect packaging assumption, not different geometry.
+  NEW quality-v2 may accept ONLY actual int32 truth human faces with identical
+  pinned indices; no cast/reindex/mesh/candidate/optimizer/gate modification.
+  Reuse the exact2799 frozen fit and preserve v1FAIL SHA, source/proxy/candidate
+  hashes; no refitting. This is the first quality scoring attempt after an ABI
+  correction, not a performance-driven second evaluation or new independent set.
+  V2 source audit: exact int32 human-face bytes SHA required on every frame,
+  exact integer indices equal the immutable int64 baseline; all other truth
+  checks unchanged (whole-validator AST parity after that explicit dtype delta
+  and added guards). Reuse v1 metrics/aggregation/private producer checks without
+  calling its failed run; original fit2799 revision is distinct from new v2
+  evaluator revision. Pin/recheck original fitPASS and quality-v1FAIL, all source
+  consumers/policy/fit hashes and complete900/885 replay before private scoring.
+  Independent audit PASS;28-file closure~104.6KB, no data/model transfer.
