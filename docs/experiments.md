@@ -4613,3 +4613,19 @@ configs/tudl_anchor_prediction_pins.json BEFORE private evaluation. All~109MB
 pointmaps remainAzure; only~2KB byte identities return. No camera/scale accuracy
 or improvement claim until the frozen private gate runs; no training-overlap,
 semantic background, human/temporal/fullCARI4D eligibility claim.
+
+16:57:28UTC episode1 full native shared preparation **PASS21.490028s/668**,
+unitinactive/exit0; all42actual chunks for nativegeometry/direct/storedreplay/
+officialreference validated. No subset/occlusion drop; fixed first-frame
+identity/expanded68scale frozen, original600s/16chunk controls unchanged.
+Readonly444receipt28596B/16c3dc242c85bef700c790593300dbb4e08284655a5c85bbc1b562f39b429453,
+producer77b462e/scriptba5d431a unchanged. Originalfrontend sourcepins preserved.
+Next exact stage inventory before full668network; no trajectory quality claim.
+
+Final suite including all evaluator35 tests **9276PASS/2sameoptionalSKIP261.60s**
+at410c473 (new actual prediction pins were added during this run, source itself
+unchanged); actualpins/evaluator/wrapper/archive194focusedPASS41.27s. No local
+model/geometry/media execution. Actual frozen private evaluation dispatched
+410c4733c57348ed217ef102c4fc35dc93f042d9,36files66640encodedB/publicHTTP200,
+unitactiveMainPID141865. All baseline/candidate hashes committed beforehand;
+private labels remain evaluation-only, no fit or rerun after labels.
