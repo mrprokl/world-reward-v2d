@@ -35,8 +35,8 @@ new episode is running through the automatic frontends. The original official
 packer also passes on the full501-frame source, with exact GLB-surface and native
 FP32 fidelity checks; its temporary one-episode Parquet is deleted after QA.
 The next episode's object trajectory passes all668originalframes; CPU input
-assembly is ongoing, with the following episode's disjoint GPU frontends in
-progress. A fresh native near-grasp manufacture route is stopped at neutral
+assembly is ongoing; the following episode stopped before tracking at its
+topology-preserving mesh-budget gate. A fresh native near-grasp manufacture route is stopped at neutral
 self-embedding, before optimization/rendering; no geometry or thresholds are
 relaxed to rescue it. All30 reconstruction and independent real/fullHOI accuracy
 validation remain separate.

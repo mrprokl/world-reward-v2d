@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
-[[ $# == 2 && $1 == --episode && $2 == 0 ]] || exit 2
+[[ $# == 2 && $1 == --episode && $2 =~ ^(0|[1-9]|[12][0-9])$ ]] || exit 2
+EPISODE="$2"
 ROOT="${WR_ROOT:?}"
 CODE="${WR_CODE:?}"
 # Source closure: /infra/mesh_volume_qem.cpp and /infra/mesh_guarded_qem.cpp.
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-BASE="$ROOT/outputs/episode_000000"
+printf -v PADDED '%06d' "$EPISODE"
+BASE="$ROOT/outputs/episode_$PADDED"
 OUT="$BASE/object_budget_volume"
 [[ ! -L "$ROOT/outputs" && ! -L "$BASE" && ! -e "$OUT" && ! -L "$OUT" ]]
 mkdir "$OUT"

@@ -4254,3 +4254,41 @@ Root integration exactwitness/crosssurface/native/APIclosure260PASS2.70s;
 fullsuite **8410PASS/2same optionalSKIP137.86s**. Original crosssurface and
 all running numerical producers unchanged. Pure helper1881af80f85144585379ca4118fef81d524a595b5cd909349cdbedc5bef75812
 does not authorize another manufacture run or claim global exactembedding.
+
+
+Episode2 original frontend **FAIL before tracking** at12:23:08UTC:
+all eight fixed fast-QEM attempts violate closed manifold edges or original
+component orientation/Euler. Masks82.657901s/866, groundedobject35.990256s,
+body330.349625s/866, depth440.951156s/866 and adapter9.012349s allPASS.
+Depthreceiptf541f89d9b9e4780d9df5fb91841b0d8853e5b54daac9e649b465eb272385d2a
+(1,311,420B); adapter816845dd40020923f0e3422082079a1502b51bda467ab3b0087541c5827af368
+(2,539B). Originalfailedunit/log retained; object_pose_full empty, noinputreceipt.
+Do not rerun fast-QEM targets, discard components or shrink. Predeclare ONE
+standalone existing volume-constrained QEM proposal on episode2, extending only
+explicit episode selection/namespace0..29. Existing two independent controls,
+compiledbinary and thresholds remain identical:900s,4096V/F, sampledCD1%,
+net/per-original-shell volume5%, independentembedding and exactfloat32export/
+officialpack. Newobject_budget_volume output only, not loader/adoption change;
+failure abandons this decoded source under that protocol.
+
+One separate Azure-only original-neutral exact-witness diagnostic is now frozen:
+originalv2FAILreceiptSHA38c56607/18,294B beforeJSON, originalhelpers/model/runtime/
+metadata bound; exactlyONE unchanged strictCUDAforward, literalzero45/204/72,
+fullV/Fhash identical before firsteight nonadjacent properflags.120s total,
+2s rationalpair; soleprivate400report/noNPZ, fit, rendering or manufacture.
+Negative does not prove separation, successfuldiagnostic does not reclassify
+v2FAIL or certify embedding/contact/quality. Root253focusedPASS3.02s;
+launch onlyafter actualfreeGPU/scopedlock/newnamespaceabsence, never frontenddup.
+
+IndependentCPUaudit identifies synchronouswrite_frame's one-future wait despite
+eightworkers, followedbytwoH5flushes/frame. ExistingR92procedural3.963827x is
+writer-only; actualR96 remainsFAIL240s, noadoption. Preserveongoingep1scalar;
+fullassembly includes NPZ inflate/export/RGB/masks/finalvalidation absent from
+writer gates. A future distinctfullclipbatch integration can prove logicalparity
+not wholefileSHA or pairedthroughput; defer under sharedCPU/disks, no thirdretry.
+
+Root volumeCLI/wrapper and diagnostic integration187PASS20.69s; fulltiny suite
+**8595PASS/2same optionalSKIP163.69s**. Neutral wrapper additionally fails before
+outputreservation on scopedlock/GPUbusy. Originalv2, crosssurface, volumeCPP/
+control/export helpers and ongoingep1numericproducer unchanged. All30 explicit
+CPUproposalnamespaces tested with tiny stubs; noGPU/geometry locally.

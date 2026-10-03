@@ -386,3 +386,24 @@ sourceoriginalmodels/inputs/outputs/notices unchanged, alltransferreceipts kept.
 TotaltransientTARcleanup31,942,768,640B acrossAzure; nothing downloadedtoMac.
 Sealedconverterrefined0diagnosticcb75806 active, no simultaneousVM01GPUjob.
 J3fullcohort hypothesisREJECT−6.6042%median, engineeringallstagesPASS.
+
+
+2026-10-03 readonly re-inventory: VM02 is stillrunning in
+WORLD-REWARD-RESEARCH (notVM01resourcegroup), private10.0.0.9/H100NVL95830MiB,
+GPUempty. ExistingprivateDocker/runtime/import unchanged; noVMcreation/rebuild.
+Runtime1424B/dea57d51f7edb1b9313a430578f28b2821cb3e4810b2cfa0c859226160d5e0dc;
+import4272B/c98fb4ec995f2cbaecaeabecb0e1b35a5192e6a828efb5710f599197fd67b549;
+imageidentity3778B/9bf4d946b2ad116c57c2fb88cdb37f92535df5b3238a069deec1a592cffb80af.
+Importproducer43d7c4f8fd77f32b9a701b6fac2ba274994d231a proves originalOCIindex
+b47e4450→platformde690d04→config7ebfff18, all44rootfslayers and actualCUDA.
+Never pretend classicconfig is originalindexID. MHR/v2receipt/CARIsource/Track1
+inputs absent; cannot run originalVM01neutraljob there without distinctproper
+binding/assettransfer. NSGonlyexplicitdeny-all-inbound4096; originalSSHrevoked.
+No transfers/network/keychanges made; 93,890,007,040B free,128GBOSdisk.
+
+12:29:39UTC VM01episode2failedatobject-topology preflight after866body/depth;
+GPUempty/scopedlockfree; episode1CPUdepth350/668active. NoCPUbatchrewrite,
+wholepipelinePASS or native668pins yet. Predeclare one separate report-only
+neutralexactwitnessGPUdiagnostic and one disjointCPUvolumeproposal afterfreeze;
+heavyassets stayAzure, no duplicatepredictions. Publicexactc37efc71351fe5e8c8536f87143b2ff8769b6cfe
+verifiedunauthHTTP200; no finalsubmission or codeeligibilityclaim.

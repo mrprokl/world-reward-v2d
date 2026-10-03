@@ -239,3 +239,15 @@ GeoCalib/SegNeXt licenses and publisher README CC-BY-4.0 statement. This does
 not clear PerspectiveFields/LM/full-package code or prove weight-training
 overlap exclusion. Runtime excludes those imports; native strict load and
 independent analytic calibration require separate engineering checks.
+
+
+2026-10-03 primary-source recheck: officialmain remains7c0d3b94, releasev0.4.0
+(Sep23); exactFAQa1e569e1c83eeac2584de34e9503f1226e20ab369d53d2c67c2e243deb1a4d7a
+unchanged. No new explicit source exception for SAMcustomnonOSI, legacyCARI/
+FoundationPose or mandatorynvdiffrastNC, nor FORMpretraining-overlap waiver.
+NvdiffrastLICENSE latest1f95925cdad6e792961f0d4a077950bb14b785d8 unchanged;
+commercialCARIcard remains6e064f8b261599a4e563d72cb8457256929d7455.
+KaggleliveJSshell did not expose rules text; this check does NOT replace the
+Oct2browser rule audit/acceptance. No written clarification received, outgoing
+organizer question/registration notsent. Research engineering continues;
+finalrelease/awardeligibility remains unresolved, not an asserted waiver.

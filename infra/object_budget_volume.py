@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import signal
 import time
 
@@ -13,6 +14,29 @@ from mesh_link_gate import _write
 from world_reward.data import sha256
 
 STAGE='world_reward_cpu_volume_constrained_object_mesh'
+
+
+def _episode(value):
+    if type(value) is not str or not re.fullmatch(r'0|[1-9]|[12][0-9]',value):
+        raise argparse.ArgumentTypeError('Explicit canonical Track1 episode0..29 required')
+    return int(value)
+
+
+def _argument_parser():
+    class Once(argparse.Action):
+        def __call__(self,parser,namespace,value,option_string=None):
+            if getattr(namespace,self.dest,None) is not None:
+                parser.error('Episode must occur exactly once')
+            setattr(namespace,self.dest,value)
+    parser=argparse.ArgumentParser(description=__doc__,allow_abbrev=False)
+    parser.add_argument('--episode',type=_episode,choices=range(30),required=True,action=Once)
+    return parser
+
+
+def output_relative(episode):
+    if type(episode) is not int or not 0<=episode<30:
+        raise ValueError('Explicit Track1 episode integer0..29 required')
+    return f'outputs/episode_{episode:06d}/object_budget_volume'
 
 
 def prerequisites(root,episode):
@@ -32,11 +56,10 @@ def prerequisites(root,episode):
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__,allow_abbrev=False)
-    parser.add_argument('--episode',type=int,choices=(0,),required=True);args=parser.parse_args(argv)
+    args=_argument_parser().parse_args(argv)
     if platform.system()!='Linux' or {p.name for p in Path('/sys/class/net').iterdir()}!={'lo'}:
         raise RuntimeError('Require remote CPU network-none')
-    root=Path(os.environ['WR_ROOT']);out=root/f'outputs/episode_{args.episode:06d}/object_budget_volume';path=out/'report.json'
+    root=Path(os.environ['WR_ROOT']);out=root/output_relative(args.episode);path=out/'report.json'
     if out.is_symlink() or not out.is_dir() or any(out.iterdir()):raise FileExistsError('Require reserved fresh volume-constrained proposal')
     report={'stage':STAGE,'status':'fail','episode_index':args.episode,'producer_revision':os.environ['WR_CODE_REVISION'],
             'image_id':os.environ['WR_IMAGE_ID'],'script_sha256':sha256(Path(__file__)),

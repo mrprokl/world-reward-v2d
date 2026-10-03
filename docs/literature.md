@@ -1037,3 +1037,27 @@ Exclude MANO/depth/othercamera/meshes, own minimalJSONreader, Azure-only hashes/
 inventory before extraction; privateK/transforms/joints only after RGBpredictions
 freeze. Preserve indices/image rotations and validate MHR/OpenPose correspondence.
 Not full-body/dynamic96 quality; training_overlap_excluded=False remains honest.
+
+
+### Independent full-HOI validation fallback screen — 2026-10-03
+
+No thin, commerciallycleared realfullbody/objectminibenchmark confirmed.
+[CORE4D](https://github.com/leolyliu/CORE4D-Instructions/tree/96b9084b9516af3ec4382a65d79e892d3e5c22b9)
+preexports127joints/10475vertices, permitting label-only evaluation without
+SMPLXforward, but dataset MIT/HF vs CC-BY/NC scope/derivedrights and RGB103.9GB
+plus motions34.2GB prevent immediate acquisition. [KIT Extended Bimanual](https://motion-database.humanoids.kit.edu/details/datasets/3521)
+requires login with movement/mesh/RGBscope unverified; neighboringKITBimanual
+RGB-D is scientific-use-only and has2DOpenPose/objectbbox, notfullHOItruth.
+[D3D-HOI](https://github.com/facebookresearch/d3d-hoi) sourceCC-BY-NC4/PartNetCAD
+restriction plus monocularEFTestimatedhumans make it NO-GOindependentreference.
+No assets acquired, challenge/FORMmatching excluded but pretrainingoverlapunknown.
+
+Conditional new author reference could avoid nativeMHRneutral's failedembedding:
+one own articulated, connectedclosedfullbody mesh/object, allframes certified
+before RGB, then frozenbaseline/candidate RGB-only and labels-afterprediction.
+Not capsules leftintersecting, not repairednative predictions; noCARIrecognition
+failure counted as victory. Anyfuture protocol needs predeclaredmovement,
+occlusion, fullcoverage and comparativequalitygates beforemanufacture. This is
+NOT an implementedcohort or verifiedTrack1gain. [Quaternius Universal Base](https://quaternius.com/packs/universalbasecharacters.html)
+(Aug2025) declaresCC0/commercial sixriggedhumanoids; embeddedterms/topology/
+fingers remain uninspected, so no assetacquisition/adoption claimed.
