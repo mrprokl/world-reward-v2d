@@ -737,3 +737,50 @@ priors with video evidence; [CARI4D v3](https://arxiv.org/html/2512.11988v3)
 motivates coupled temporal/depth/interaction constraints. GEM-X remains a
 higher-cost temporal alternative until SOMA→MHR export and source eligibility
 are resolved. These are hypotheses, no execution/adoption/Track1 gain claims.
+
+### H99 native landmark/point-prompt source audit (cutoff2026-09-30)
+
+Pinned7c0d MHRHead SHA62af48b1f33462bc445d7f342009fcbceabd221f2a6e9bcd1d3739d582bc9fd6
+(14,148B) defines frozen checkpoint `head_pose.keypoint_mapping`
+[308,18439+127], applies it to own raw reference V/J after cm/100, before
+head YZflip/camera transform. No unit-row-sum assumption/normalization.
+MHR70metadata SHA695c2c7d472e32757c480114fdb054d54ee4af53f69b2a6e040b00a55b270dc9
+(26,326B) gives COCO17map[0,1,2,3,4,5,6,7,8,62,41,9,10,11,12,13,14].
+Reference rig vs SAM bundled rig compatibility now ACTUALLY verified in H99
+manufacture (byte-identical352e…; names/topology, six-pose V/Jerrors0).
+Derived KP truth shares a learned mapper definition; not independently
+measured anatomy or proof of licensing exemption.
+
+[Native SAMBody source](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam3d_body/lib/sam_3d_body/models/meta_arch/sam3d_body.py)
+80,820B SHA851b7475f18b56891aa02606e7c0ee9e03120fa208cc85df5127b792e1abfeee:
+L1649–1681 `run_keypoint_prompt(batch,output,[B,N,3])` is actual inference,
+reuses image embeddings/condition info, assembles previous BODY estimate,
+mutates output in place and reruns ALLMHRparameters+camerahead. Estimator
+`process_one_image` has no pointprompt keyword/cache; own adapter must retain
+exact original prepare_batch/transform/_initialize_batch/explicitK/output.
+L892–915 full→crop nativeaffine maps original homogeneouspixels to imagecrop,
+/actual img_size−.5; add.5 for prompt[0,1], notdivideoriginal image width/height.
+PromptEncoder9,542B SHAa9160aa5ccdd4d5e2ae047605d86eee9e0e558344b85f716d963fd091f9a33d1
+L108–129 uses category+randomFourierposition; elbowsCOCO7/8 are native7/8;
+−2invalidmasked, −1active negative. Do not clip outsidecrop/guesslabels.
+
+[Paper2602.15989v1](https://arxiv.org/abs/2602.15989v1),17Feb2026, Table7:
+3DB-H EMDB MPJPE63.3→60.1→58.9mm for0/1/2 ORACLE-largest-error prompts.
+Onepromptnoise.05 yields63.3(no gain),.1 yields67.8(worse). Not evidence
+for DINOv3+automaticDW/frozenidentity; `_get_keypoint_prompt`/sampler/eval
+error-basedclicks consumeGT and MUST NOT be used. Cumulative2clickpaper
+history differs from oneN=2 simultaneous newhypothesis.
+
+Conditional future hypothesis ONLY if preregistered H99 independentDW
+evidence passes: new untouched24RGB pilot, exact baseline +N2dummySHAM
+(−2,−2) +N2DWleft/rightelbows. Deepcopy samebaselineoutput for bothmutating
+promptcalls; freeze root/camera/K/shape45/PCA28/hands/expressions/object
+geometry acrossbranches; transfer verified namedarmrotations only (full
+body133 includes translations/length, not articulation-only).24backbones,
+72decodercalls; no additional weights. Fixed nativepositive/finite/crop[0,1]
+eligibility, invalid[0,0,−2], all24retained, noGTworst-clickselection.
+Need separate preregistration, initial mechanism/replay guard, heldoutface/
+wrists and full3D/interaction/silhouette gates before quality. Suggested
+≥5%gain vs baselineANDSHAM/no>5%group orhandrelative regression/−1ppIoU,
+not yet authorized/preregistered here. SHAM distinguishes prior recurrence
+from useful2Dconditioning. Never retune H99 or score it again to testprompts.
