@@ -225,3 +225,28 @@ print('actual peer API PASS')
 """
     result=subprocess.run([sys.executable,"-c",source],check=True,capture_output=True,text=True)
     assert result.stdout.strip()=="actual peer API PASS"
+
+@pytest.mark.parametrize('fault',[None,'binding','old_source'])
+def test_historical_source_explicit_binding_before_trajectory(gate,tmp_path,monkeypatch,fault):
+    from types import SimpleNamespace
+    root,code,spec,pins,report,data,chain,save=fixture(gate,tmp_path,monkeypatch)
+    path=code/f"configs/cari_clip_{spec.episode_index:06d}_historical_source_pins.json"
+    path.write_text('{"independently_pinned":"fixture"}');path.chmod(0o444)
+    old=tmp_path/'old-code';old.mkdir();proof={'files_verified':77,'queue_status_reclassified':False}
+    report['historical_source_binding']=proof.copy()
+    if fault=='binding':report['historical_source_binding']['files_verified']=76
+    pins=save();calls=[]
+    def verify(root_arg,path_arg):
+        calls.append((root_arg,path_arg))
+        if fault=='old_source':raise ValueError('Original historical file changed')
+        return old,proof
+    monkeypatch.setitem(sys.modules,'cari_historical_source',SimpleNamespace(verify_historical_source=verify))
+    def lineage(*args,**kwargs):
+        assert args[:2]==(root,code) and kwargs=={'source_code':old}
+        return chain
+    monkeypatch.setattr(gate.export.lineage,'verify_refined_artifacts',lineage)
+    if fault:
+        with pytest.raises(ValueError):gate.load_shared_track1_episode(root,code,spec,pins)
+    else:
+        loaded=gate.load_shared_track1_episode(root,code,spec,pins)
+        assert loaded.episode.total_video_frames==spec.total_frames and len(calls)==2
