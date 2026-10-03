@@ -4964,3 +4964,29 @@ alreadyvalidated standalonevolumeproposal asEP2 is the next automaticfallback,
 with unchangedoriginal900s/component/shellvolume/CD/embedding gates; commit
 its independentlyobserved pins before any separatetrackingcontinuation.
 No nativechain/inputassembly or performance score for EP3 yet.
+
+Actual newprecisionprobe **PASS2.471568297s**, VM02unitinactive/exit0,
+GPUidle/no containers. Original8ced7425283852f1fda7b762d3f03ff414688b00,
+37files25724encodedB, exactpublicHTTP200. Sole400receipt16426B/
+327fefca4be0f1b98c699a571e296706bccf0e8ad29d97fdff21237f17ad1c3a.
+Full307200positivepixels. Wide21500pixels idealFP64max8.1830386e-7m,
+background285420pixels max9.5367432e-7m; no2e-5violations. Distinct grazing
+triangle280pixels idealFP64max0.174549003m/p990.171288466m, ALL280violate;
+castFP32max0.219493605m and actualprojectedFP32max0.089346884m alsoALLviolate.
+This establishes a conditioning/rasteraccuracy problem on this NEW probe,
+not merely a halfpixel mistake or proof of the earliercohort's failurecause.
+No renderingthreshold relaxed/oldcohort rerun/models/qualityscore. Before any
+future authoredgroundtruth use a separately validated independent exact
+ray/triangle or analytic convex renderer, not assumed accurateFP32zbuf.
+
+Productionthroughput read-onlyaudit: a second frontend worker needs independent
+sealed grounding+SAM3Dobject runtimes, exactbody/object/DINO/MoGe1assets and
+filteredsource checkout; existingVM02 has onlybaseimage/MoGe2/DA3. Aligned
+objectpointmap stillconstructsMoGe1 internally, so its frozenassets cannot be
+omitted. Broadlegacyvalidationmounts would expose privateexternalGT onVM02;
+scope exactpublic evidence+geometrycontrols beforeanyfutureclone. Classic7ebf
+image is the sealedb47content with differentDockeridentity, not permission to
+fakea tag or waive existingstrictb47 continuationgates. No wholeuserdisk/vendor/
+weights/cache/validationcopy, model/data localtransfer or secondGPUjob duplicate.
+No provisioning performed in this audit; root will measure sourcebytes/images
+and actualeligiblepaths before any Azure-only transfer/storage attachment.
