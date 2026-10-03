@@ -5366,3 +5366,37 @@ frameorder andfrozen decisionrecomputedfromrecordedscalars, originalsensorPNG
 valuesnotdecodedbyaudit. ALLartifacts/helperrehashesafterPASS; originalreceipt
 13188B/96bd70959eb55ab4c391b0afce58cef3d9051145d252f7072aeed4091ba8790d intact.
 ScientificREJECT confirmed4.904632756%, no reinterpretation or rescue.
+
+EP4 fixed_all16 seven subsequent initializers completed on the full 747-frame
+timeline, then original QEM object packing failed 20:48:23UTC: all global
+candidates violate boundary/manifold checks; all componentwise candidates change
+orientation or Euler characteristic. No downstream GPU tracking started; actual
+unit failed/exit1/MainPID0 and GPU empty 20:48:46UTC. Original failed log107227B/
+25cc63a48443a39992826b33bf22032cbcd592bd38ad40743b5a6754143c3034 is retained;
+object_pose_full exists but is empty, not implicitly absent/resumable. Next may
+use the already externally validated general CPU volume-constrained proposal,
+unchanged 4096 budgets/5% shell-volume/1% distance gates; no threshold loosening,
+component deletion, per-episode hand-fitting or geometry shrinking. Proposal
+output must be new and independently pinned before any continuation.
+
+Frontend asset-only archive contract: 214PASS/1unchanged optionalSKIP22.65s with
+inventory and existing CPU-volume controls. Independent audit found a genuine
+temporary0644 archive exposure under permissive umask; fix creates the file
+atomically0400 before its first byte, with an explicit umask0 regression test.
+Two provenance receipts are preserved exactly; three raw Docker build receipts
+are excluded. Hash-pinned original helper/receipt whitelist, exact HF link graph,
+streamed source checks and extraction-free archive verification; no actual
+export/transfer or replica/licence/overlap eligibility claim yet.
+
+20:55:52UTC EP3 public CPU input assembly actually completed: original producer
+624238921936746f03b48cfb855331a0c204d2f7, full592frames, input receipt3358B/
+01425547bc2f676badc8c4e1644dcd28fc7676256b3912f973004ad6df468195;
+cari_prepare.py SHA c529b2409a600cd4599f38276a5275ac0c85e645c7cb5712482b4c928e67a283
+independently equals its dispatched Git source. Unit inactive/exit0; both units
+GPU-empty. This is frontend/input execution, not native full-chain, accuracy or
+final eligibility. Next hash/JSON-only fifteen public input audit and committed
+pins must precede native shared-frame preparation/optimization.
+
+Final asset-archive focused94PASS2.13s including atomic0400 creation before first
+byte under umask0; duplicate final full-archive hashing removed without changing
+the strict verification contract. No heavy local transfer.
