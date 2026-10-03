@@ -584,3 +584,14 @@ Missingdependency [Flatbuffers25.12.19](https://pypi.org/pypi/flatbuffers/25.12.
 wheel26661B/SHA256`7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4`,
 published2025-12-19, no Requires-Dist. [SourceApacheLICENSE](https://github.com/google/flatbuffers/blob/7e163021e59cca4f8e1e35a7c828b5c6b7915953/LICENSE)
 11358B/SHA256`cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`.
+
+Native low-level source refreshed at pin/SHA unchanged: `preprocess(img,
+out_bbox,input_size=(192,256))` returns three lists (normalizedHWC crops,
+centres,scales); `inference_pose(session,out_bbox,oriImg)` returns133joint
+keypoints[B,K,2]/scores[B,K]. Critical runtime gate detail: source usesNumPy
+float64 means/std, **no float32 cast**, then supplies a Pythonlist of one
+CHWarray toORT. Actual list→tensor conversion must be verified rather than
+pretending native code already castsF32. Invalidscore<=0 sets a−1 coordinate
+BEFORE SimCC/2 and crop→image transformation, so finalinvalidcoords are not
+necessarily−1; keep rawcoords/scores, validity from finitepositivescores.
+No runtime/inference or embeddedwheelmetadata verification yet implied.
