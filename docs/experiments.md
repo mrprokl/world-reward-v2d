@@ -2085,3 +2085,34 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   independent95focusedPASS. Failedv1/v2evidence remains intact. Terminal0/
   GPUinactive; all158MBheavyassetsAzure-only. Next: isolatedCPU runtimeABI
   and two automatic-mask-cropped publicRGBs, not another policy-fit retune.
+
+- D95 preregistered **actual independentRGB2D runtime/ABI**: two original
+  syntheticpublicimages clip_00_frame_000/clip_01_frame_000, automaticSAM2
+  humanmask bbox minxy/max+1, exactD87publicmanifest/maskreceipts. Oldcohort
+  already privatelyevaluated: this is not fresh quality or D87retuning.
+  No privategeometry/depth/K/challenge/modelassets exposed. Require D94v3
+  receipt e7fa6fce0397654ec5d1d2c07c49bd6f2a50655cda185d4297bfb8f0f4aae3e2
+  and all9pinnedassets/notices intact. Installonly pinnedCPUORT1.30.0 and
+  Flatbuffers25.12.19 wheels into isolatedtemporary/tmp prefix, offline
+  pip--no-index--no-deps--target, no resolver/globalenvironment modification.
+  Runtimeversions/importorigins/dependencies/providers verified explicitly.
+
+  Use unmodified low-level onnxpose.py pinned16fb69ab...291a2, RGBuint8
+  and one automaticallyderivedbox perimage, no fullimagefallback/ControlNet/
+  syntheticneck. Nativepreprocess float64normalized listNCHW feed retained
+  unchanged on FIRSTtest; record actual suppliedtype/dtype/shape andORT
+  acceptance, never inventing nativefloat32cast or a channelgraph proof.
+  TwofreshCPUsessions, intra4/inter1/sequential/CPUExecutionProvideronly,
+  eachtwoimages=4nativecalls. Actualmodel inputoneRGBcrop[1,3,384,288],
+  twoSimCC[1,133,576]and[1,133,768], allfinite native133keypoints/scores,
+  rawscoresunclamped, invalidityfromscore<=0 (sentinel transformed toimage).
+  Compare perimage nativeoutputs/rawSimCChashes byte-identical betweensessions;
+  preserve all133outputs, no confidence/quality thresholds or sample dropping.
+  Success only means ABI/CPUreplay, not meaningful2Daccuracy/generalization.
+
+  Failfast180s INCLUDINGisolatedinstall, CPU4/8GiB, Azureoffline/noGPU,
+  exclusive validation/dwpose_smoke_v1. Freezeinputs/source priorrun and
+  rehashafter, temporaryprefixremoved, no heavyMac transit. NativefeedFAIL
+  stops unchanged; any explicitcast requires a separatelydeclaredcontract,
+  not silent same-job fallback. No3Dfit/export/accuracy/adoption/eligibility
+  clearance claim; source/training/teacher/overlap rights remain unverified.
