@@ -2961,3 +2961,13 @@ completed;24outputs immutable/reread, sources/assets rehashed, nofit/private.
 Terminalunit/H10027MiB0%; fullsuite6242PASS/oneoptionaltrimeshSKIP82.36s.
 NextnativeDWCPUstage sameobserver/source/image/actualmaskconfig, separate
 unit/output, no private mount. No accuracy results seen at this point.
+Actual native H99 DWPose CPU PASS3.861546s, producingcommit
+15508652c0b92fbd3cac0b577ba06ad06f247e4c, unchangedobserver9c69…d667,
+receiptde4804dc7140adbdda430cac1b23b2c5c06ebe3f48f37001b80f976f079c7fe1
+(54,127B/0444).OnefreshCPUORTsession/all24originalnativecalls completed,
+F64coordinates/native133 validity preserved, disposableprefixremoved;
+no private labels/model-fitting. Terminalunit. All24BodyandDWfrozen before
+actual qualitypins nowcommitted (exact3producerrev/source/SHA/bytes +public
+configSHA). One120s private diagnostic next, all24cases/all8groups retained;
+no model/optimizer/private labels passed to any producer. No scienceoutcome
+observed beforetheseactualpins; preregisteredruleunchanged.

@@ -1,0 +1,22 @@
+{
+  "schema": "world-reward-factorial-quality-pins-v1",
+  "public_pins_sha256": "54bb2c449b351678d913da8f85d33e74deae85cd50e0b212a2f51f4ea1572edc",
+  "render": {
+    "producer_revision": "dbd888b7711729e3672e56ea127616c1b517c070",
+    "report_sha256": "75ca10272ac7d15a0d39081bbf424b51141e4aca072899d6df6bb0dcc77a3b36",
+    "report_bytes": 27428,
+    "script_sha256": "b2731a6bf4971ec2b112cdd489c51bff437b77b7ac77f0519603424bb4a948be"
+  },
+  "body": {
+    "producer_revision": "7133a59c0617dc48d3afeceb27f73466c8767396",
+    "report_sha256": "cca29fa08c4ba442118a6ac8742b5d008e7e29e66f8f30c99ed6dc6f28827e82",
+    "report_bytes": 33893,
+    "script_sha256": "9c69c9d8f7951ef03db2cad73d45766c95b605de70fdcaa907b13bf67142d667"
+  },
+  "dwpose": {
+    "producer_revision": "15508652c0b92fbd3cac0b577ba06ad06f247e4c",
+    "report_sha256": "de4804dc7140adbdda430cac1b23b2c5c06ebe3f48f37001b80f976f079c7fe1",
+    "report_bytes": 54127,
+    "script_sha256": "9c69c9d8f7951ef03db2cad73d45766c95b605de70fdcaa907b13bf67142d667"
+  }
+}
