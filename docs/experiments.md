@@ -1989,3 +1989,17 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Body/masks remain unchanged read-only; exact original receipts, assets
   and current audited manifest/source establish provenance, without inventing
   dataset-revision/forward-basis fields omitted in legacy receipts.
+
+- D94 preregistered **minimal independent2D acquisition only** while D93 uses
+  theGPU: no image inference, install, fitting, provider fallback or new global
+  environment. Azure-only acquire exact pinned DWPose low-level133joint ONNX,
+  standalone source/Apache notice, publishercard; ONNXRuntime1.30.0CPU wheel
+  and Flatbuffers25.12.19wheel plus primary notices at cutoff-safe revisions.
+  Validate SHA/bytes, reject invalid ZIP paths/symlinks, audit wheelMETADATA
+  dependencies and retain embedded third-party textual notices. BoundedHTTPS
+  streaming, no credentials, exclusive own namespace, no mutable resolver or
+  heavy Mac transit. Failure leaves immutablereceipt and stops, no same-path
+  overwrite/retry. PASS=source/model/wheel integrity only: training/teacher/
+  COCO/UBody rights/overlap, actualONNX channelgraph/runtimeABI, CPU cost and
+  2D accuracy remain unverified. Future isolated offline installation and
+  actual133-output image smoke need their own gates, not implied by acquisition.

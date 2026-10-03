@@ -571,3 +571,16 @@ packaging24.1,protobuf7.36.2 present, **flatbuffers absent**. FutureORT install
 therefore additionally needs its own pinned flatbuffers wheel/source notice;
 no install attempted and no existing image modified. GPU0%,111MiB while this
 metadata-only check ran, no competing inference.
+
+DWPose low-level channel contract clarified by author/publisher `yzd-v`,
+2023-08-29: [«The input is rgb.»](https://github.com/IDEA-Research/DWPose/issues/25#issuecomment-1696943489).
+The unchangedBGR `cv2.imread` example conflicts with this; use decodedRGB or
+ONE explicitBGR→RGB conversion, never two. [Author export pointer](https://github.com/IDEA-Research/DWPose/issues/15#issuecomment-1683218589)
+and [MMDeploy source](https://github.com/open-mmlab/mmdeploy/blob/6cd29e2152d6935bde2f9252b47170724bac20ac/mmdeploy/apis/pytorch2onnx.py#L63-L67)
+execute preprocessing before export, consistent with normalizedRGB input.
+No actual publisherONNX graph audited yet; this is primary intent/source
+evidence, not a graph-proof or image-accuracy claim.
+Missingdependency [Flatbuffers25.12.19](https://pypi.org/pypi/flatbuffers/25.12.19/json),
+wheel26661B/SHA256`7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4`,
+published2025-12-19, no Requires-Dist. [SourceApacheLICENSE](https://github.com/google/flatbuffers/blob/7e163021e59cca4f8e1e35a7c828b5c6b7915953/LICENSE)
+11358B/SHA256`cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`.
