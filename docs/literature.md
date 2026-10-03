@@ -869,6 +869,47 @@ launched experiment, new acceptance threshold or verified license clearance.
 
 ### Native reproducibility diagnosis after H100b SHAM failure
 
+Independent next-path audit after H101 source freeze: do not turn NC external
+GT into supposedly permitted competitive use merely by keeping it private and
+not training. [BEHAVE actual licence](https://virtualhumans.mpi-inf.mpg.de/behave/license.html)
+(15,593B/SHAf5ba537b429c1f3e91ef95ce34577e0dbb7ff9b1ef1999c341251c170a1ffe14)
+and [InterCap actual licence](https://intercap.is.tue.mpg.de/license.html)
+(14,569B/SHA1a13747439996bf95d55784511a5dbcfa977c839033d75483240429589cd9d7c)
+explicitly restrict the purpose to noncommercial scientific research. The
+[Creative Commons FAQ](https://creativecommons.org/faq/#does-my-use-violate-the-noncommercial-clause-of-the-licenses)
+explains that intent/context, not nonprofit/for-profit identity alone, decides
+NC; no automatic legal conclusion for WorldReward. Kaggle6.c concerns code
+used to generate the model/submission, not an explicit blanket ban on every
+private evaluation tool; its Apache rerelease exception is not a licensor's
+commercial-use waiver. Seek specific written permission before real NC-GT
+acquisition; none requested or received. No verified full-body/rigid-object96
+real benchmark with independent commercially-cleared MHR reference is ready.
+
+Shortest execution path meanwhile: reuse episode15 public automatic Body/
+metric-inferred mesh/depth/object-pose producers, freeze contiguous0..95 in a
+NEW source-bound namespace, preserving originalindices and the common existing
+jauge/K/objectmesh (no regenerated/rescaled object). This is challenge
+engineering/video-only adaptation, NOT independent validation or CARI4D gain.
+Do not reuse oldCoCoNet/refined results or native caches as new outcomes.
+At pinned7c0d, `run_mhr_wild_inference.py`545–580 decodes initializer and
+neutralheight/builds caches before network;623 composes deltas,634–636 stores
+raw. Config168–170 predicts shape, so a shared initializer alone cannot enforce
+shared output identity. Explicit ablation: construct identical sharedshape45/
+PCA28 initializer BEFOREcache, reddecode all96poses, then compose a COPY of
+network outputs with ONLYdelta_mhr_shape/delta_mhr_scale zero. Preserve raw
+outputs/checkpoint/config; label it constrainedCoCoNet, not unchangedCARI4D.
+Compare constrainedinitializer/CoCoNet/nativeparityrefine with sharedinputs;
+reuse native301updates/bodyrotations+objecttranslations and direct204→kit
+reference≤2mm EVERYframe from existingtested infra, no newinverse workaround.
+
+Priority stays one valid reproducible30clip video-only Parquet. In parallel,
+permission-cleared FULL-HOI reference or a separately preregistered NEW own96
+temporal interaction can assess quality; human-onlyH101 cannot. No synthetic
+truth mesh/camera/poses to inference, tinyclip padding or static acceleration
+gaming. All5actualscores, licences, codeaccess and registration remain necessary
+before claiming a verified improvement. This follow-up used primary small
+documents/source only, no dataset/models/GT acquisition, contacts or GPUjobs.
+
 H100b ordinaryCUDA failed exactSHAM, so gamma quality is not authorized.
 At7c0d sam3d_body.pyL464–508, intermediate head_pose predictions feed projected
 keypoint tokens back to the decoder. mhr_head.pyL163–295 contains PCA-to204,
