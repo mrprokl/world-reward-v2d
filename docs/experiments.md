@@ -2073,3 +2073,15 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   evidence; same exactall9asset/source/license/ZIPguards and120scontract.
   Add regression fixture matching realomission and reject invented emptylist.
   No metadata, licence exception, numericalgate or sourcepin relaxation.
+
+  D94v3 actualPASS .230968s/sourceb04cfe24e11b5469ca7d12a2747ed6c51643044e,
+  receipt`e7fa6fce0397654ec5d1d2c07c49bd6f2a50655cda185d4297bfb8f0f4aae3e2`.
+  OriginalD94 omission validated exactly; both oldFAILreceipts/all9assets/
+  originalsource rehashedbefore+after. ORT353members embeddedlicenceTRUE;
+  Flatbuffers14members embeddedFALSE, externalmatchingprimaryTRUE; safeZIP/
+  exactMETADATA/tags/dependencies/retainedtextCRC+SHA PASS. No redownload,
+  upstreamexecution/install/inference/GPU or runtime/eligibility/accuracyclaim.
+  Sourcebundle6files14,108B, full5326PASS/1optionaltrimeshSKIP73.19s,
+  independent95focusedPASS. Failedv1/v2evidence remains intact. Terminal0/
+  GPUinactive; all158MBheavyassetsAzure-only. Next: isolatedCPU runtimeABI
+  and two automatic-mask-cropped publicRGBs, not another policy-fit retune.
