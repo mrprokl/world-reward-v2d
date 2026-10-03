@@ -1,6 +1,6 @@
 """The cloud chain preserves each stage's isolation and failure boundary."""
-import base64
-import lzma
+import io
+import tarfile
 from pathlib import Path
 import subprocess
 import sys
@@ -26,8 +26,20 @@ def test_chain_order_and_code_closure():
     closure = azure_job.runtime_bundle_paths(files, entry)
     assert all("infra/run_perspective_rgb_" + stage + ".sh" in closure
                for stage in ("import", "infer", "evaluate"))
-    # Conservative compressed code-only size; the launcher also checks its TAR.
-    assert len(base64.b64encode(lzma.compress(b"".join(files[p] for p in closure)))) < 90_000
+    # Exercise the real TAR/encoding contract, not a stale 90KB estimate. All
+    # configurations/provenance remain present under the launcher's shared cap.
+    buffer = io.BytesIO()
+    with tarfile.open(fileobj=buffer, mode="w", format=tarfile.PAX_FORMAT) as archive:
+        for name, data in sorted(files.items()):
+            member = tarfile.TarInfo(name)
+            member.size = len(data)
+            archive.addfile(member, io.BytesIO(data))
+    runtime, selected = azure_job.runtime_archive(buffer.getvalue(), entry)
+    assert selected == closure
+    assert {name for name in files if name.startswith("configs/")} <= set(selected)
+    encoded, digest = azure_job.encoded_runtime_archive(runtime)
+    assert len(encoded) <= azure_job.MAX_CODE_CONTROL_BYTES
+    assert len(digest) == 64
 
 
 def test_chain_rejects_missing_untrusted_sha_before_work():

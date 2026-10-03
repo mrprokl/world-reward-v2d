@@ -1,0 +1,64 @@
+{
+  "schema": "world_reward.tudl_whole_support_prediction_pins.v1",
+  "report": {
+    "bytes": 88370,
+    "sha256": "1d6ffe04525e0587343c7c904a6cf680ee0f14874babde7a227ad9d84d2a7b13",
+    "producer_revision": "b1042f7b3748316ab43ec0ecb1cae00969865e99",
+    "script_sha256": "027c4a59735869280bc58750d3e47a3f3305d0d88df17849d3665aba7c09e413"
+  },
+  "outputs": {
+    "scene_000001_frame_001257.npz": {
+      "bytes": 9128738,
+      "sha256": "f596f787f5f76abc7c34797202f0bdefe75f979af60b1342da0901f38609ce73"
+    },
+    "scene_000001_frame_002823.npz": {
+      "bytes": 8821936,
+      "sha256": "e961405c0421537cf887ff73eb624b3ee54a9357b222371a2adc1b67743833e8"
+    },
+    "scene_000001_frame_004480.npz": {
+      "bytes": 9038915,
+      "sha256": "76acae12d4365418ab8c0d2018f54c29276d2d1124359bf30ebd5392b4524310"
+    },
+    "scene_000001_frame_006442.npz": {
+      "bytes": 9109165,
+      "sha256": "def98f5ac7858b74e307d4fd62bd9756470e5b5a23a099a7e884f4c2de1df195"
+    },
+    "scene_000002_frame_001164.npz": {
+      "bytes": 8752281,
+      "sha256": "a6d2064813b33997bcb13ed8fa2398bda1a3e902afe244df6a0622b69b258878"
+    },
+    "scene_000002_frame_002821.npz": {
+      "bytes": 8981849,
+      "sha256": "4c7fa3c73999df147850559bc3d215ecc40235697183cfae2f6cb51a4f29f65b"
+    },
+    "scene_000002_frame_004508.npz": {
+      "bytes": 8885044,
+      "sha256": "5b3d355d1ad2a6d8dfbf7826cbfd53fd4fe45f83fea8be69caf0cdaf8e4ead1f"
+    },
+    "scene_000002_frame_006003.npz": {
+      "bytes": 9153684,
+      "sha256": "a92c80a46d09e0281b84e9a8132fbaa9bd96a7dd6d836e727e8ea67d73adee26"
+    },
+    "scene_000003_frame_001113.npz": {
+      "bytes": 8895555,
+      "sha256": "ffde8757b32d7855e53bad87a233c8c8e93af98a817c56eba71841196b470a6e"
+    },
+    "scene_000003_frame_002780.npz": {
+      "bytes": 8880137,
+      "sha256": "921b28aad63d88ac5e8826f25ae49570eb02ab040f5b961438535db3466f701d"
+    },
+    "scene_000003_frame_004412.npz": {
+      "bytes": 8917684,
+      "sha256": "5b359ce62007a5c3cc360c0be0bbf193519627e6436d2171a9d3064a97b3504e"
+    },
+    "scene_000003_frame_006067.npz": {
+      "bytes": 9131102,
+      "sha256": "950a8fd4d5bf028e5f8c2c8831ea8b46bf750f0f2b351ba50b72f4df720f2a18"
+    }
+  },
+  "coefficients": [
+    0.9462027302337968,
+    0.8595423683346557,
+    0.9862800488409197
+  ]
+}

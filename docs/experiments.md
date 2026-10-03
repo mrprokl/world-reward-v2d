@@ -5175,3 +5175,22 @@ instancesvalidated andallsource/outputbytesrehashedafter. Actualnewordered
 frameIDs committedin configs/tudl_whole_support_input_pins.json beforeblindGPU;
 no annotations/media transferredlocally. Originalarchivesremoved. No predictions,
 coefficient/privatequality yet; sameobjects/scenes andunverifiedtrainoverlap.
+
+D106 actualblindnativeinference PASS25.025229311s, all12MoGe+12DA3returns,
+producerb1042f7b3748316ab43ec0ecb1cae00969865e99/53files73484encodedB/public
+actualinputpinHTTP200. VM02inactiveexit0/GPUempty19:29:41UTC. All12support
+307200pairs/wholegridcoverage1.0; logratioIQR .05232372.. .43436748 recorded
+withoutfilter. Frozen3scenecoeff[.9462027302337968,.8595423683346557,
+.9862800488409197]; report88370B/
+1d6ffe04525e0587343c7c904a6cf680ee0f14874babde7a227ad9d84d2a7b13.
+Independentactual14helper/public13/pred12 bytes/counters/frameorder/source/
+metadata auditPASS andallrehashafter; no privatepathopened. Firstverbosepublic
+diagnosticsread exceededAzure4KBtail, then boundedaggregateaudit completed;
+no inference rerun. Commitall12predictions/reportcoeffpins BEFOREprivateeval.
+No accuracy/CARI/adoptionclaim; largeunfiltereddispersionremainsa risk.
+
+Wholelocal suite9653PASS/2optionalSKIP/1FAIL271.17s: solefailureoldperspective
+closuretest hardcoded90KBestimate exceededby396B as retainedconfigsgrew.
+Test nowusesgenuineTAR/runtimeencoding/shared160KBcap andassertsALLconfigs
+kept; no source/provenanceomission ornumericalchange. Focused2PASS0.22s.
+Removed3owneddisposablepyc. Fullsuite recheckpending, notclaimedgreenyet.
