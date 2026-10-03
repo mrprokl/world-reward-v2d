@@ -249,4 +249,7 @@ def test_full_static_v2_code_only_closure_budget(gate):
         for path in paths:
             info=tarfile.TarInfo(path);info.size=len(files[path]);archive.addfile(info,io.BytesIO(files[path]))
     encoded,_=azure_job.encoded_runtime_archive(stream.getvalue())
-    assert len(encoded)<=128000
+    # The launcher enforces its current code-only transport bound. A stale
+    # experiment-local ceiling must not silently contradict that contract as
+    # committed source pins grow; no import/source dependency may be omitted.
+    assert len(encoded)<=azure_job.MAX_CODE_CONTROL_BYTES

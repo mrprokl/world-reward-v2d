@@ -4431,3 +4431,57 @@ subset, prediction replacement or performance claim; allheavyartifactsAzure.
 Actualep1pins/nativeprepare/sourceclosure integration390PASS3.77s;
 complete8847PASS2optionalSKIP196.11s predatesactualpins only. Codeunchanged
 sincefrozenmanufacture; no newGPUlaunchwhile866trackingactive.
+
+
+### Two separate evidence-enabling gates — predeclared 2026-10-03
+
+Originalauthorv1FAIL preserved. ONEv2 measurement correction is allowed only
+if actualV19982/F39960, restV02aad005/faces0806cae2/weights6e6b8913/rig
+allhash identical to originalimmutable3655B/eef678c2 receipt. Originalfield
+385e9c6a/resolution12mm/49primitives/61joints/LBSweights/threefixedposes and
+crosssurface d808600c unchanged. Original30s/2Mpairs/1e-8component1closed
+outwardembedding certificate FIRST, then allface continuouspointdistance plus
+originalwinding (notvertex-only) for49primitiveendpoints inside,10predetermined
+anteriorfingertip probes outside and8interdigitmidpoints outside=67queries.
+Nontrivialdistalweight>.1, nohit<=1e-8/ambiguous/wrongwinding. Existingwinding
+1e-6integrationguard unchanged. Gapminanalytic2.864mm mayfail12mmgrid; STOP
+withoutresolution/geometry/posechange. Same20min/privateCPU/noRGB untilPASS;
+noanatomical/recognition/forceclosure/Track1quality claim. Source-parity
+vectorizedpointtriangle verifiedagainstoriginalmicroface/edge/vertex distances;
+not embeddingproofbyitself. Neverrerun/overwritev1 orhideitsFAIL.
+
+Separate TUD-L frameholdout acquisition: sameauditedCC-BY-SA4/pinnedHF6527f7d4
+and threeZIPidentities, AzureONLY newvalidation/tudl_frame_holdout_v1.
+Select12originalRGB sortedfilename indices40/80/120/160 per3scenes before
+ANYprivateannotationvalues, explicitlydisjoint developmentindices0/100/199.
+Originalautomaticinference has not seen these selectedRGB underthisprotocol.
+Publicinputs only12RGB+manifest; calibration/depth/masks/models private with
+allinstances retained, hash/permissions/license/attribution/source evidence.
+Same3scenes/objects are NOT a scene/object-independent or verifiedtrain-unseen
+benchmark, no temporallydense accelerationgroundtruth. Archives~375MB fetched
+only onAzure thenalltransientZIPs removed; no modelinference/acquisitionhere.
+600s onegate/noretry/nootherdataset assets. Newholdout enables afrozen single
+relativeDA3objectdepth hypothesis test; it doesnot itselfproveaccuracy.
+
+
+Rootv2author/continuousquery/sourceclosure integration319PASS18.82s;
+originalauthorfield/manufacture/rig/crosssurface bytes unchanged andactual
+v1receipt pins independentlybound. Separateholdout focused106PASS7.01s
+incloriginalacquisition; initialwrapper30PASS. Privateparentpermissions fix
+uses restrictiveumask077 during onlynewprivateacquisition/restoration,
+public13files remain444+inputs755; originalsourcehelpers untouched. No
+actualnewholdout/RGB/mesh/cohort yet. VM01volume fulltracking stillactive
+400/866 at13:39:51UTC; no native668GPUjob while worker789526live.
+
+
+Finalholdout117focusedPASS8.08s including57ownedfault/permission/cleanup
+fixtures. Rootfullsuite9030tests: **9029PASS/2optionalSKIP/1FAIL214.51s**:
+historicaltranslationclosure test encoded128808B exceeded stale128000Blocal
+assertion, whilelauncher authoritativecode-onlylimit hasalreadybeen160000B
+andtestedstrictboundary. Correct ONLYthis stale test to actuallauncherconstant;
+no transportlimit/sourceclosure/import/prediction/gate relaxed or changed.
+Newentrypoints independently≤code-onlylimit; do not omitprovenance toshrink.
+
+Authorv2/holdout frozen fullsuite **9041PASS/2sameoptionalSKIP214.40s**;
+209posttransport-assertfocusedPASS11.77s. OriginalGPUpredictions unchanged;
+freeze/push bothdisjointCPUentrypoints beforeactualAzure-onlygates.
