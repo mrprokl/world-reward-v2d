@@ -2824,3 +2824,41 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   fallback/source edits. One plannedCPUquality maynow scoreall15frozenframes;
   silhouette FAIL stillforces recipe rejection regardless of private metrics.
   Postactualfitconfig220focused tests PASS2.54s, no numericalpolicychanges.
+  Actual H98 paired private quality execution **PASS**22.739052s, source
+ 4c18295726b43f3d6728a87370faa797bfe9005e, driver
+ `c75e68a8bdaa870154072402f885c504cebbd0fb7cf393828964d52893960c47`,
+ receipt`7c48b7b73c827786799a4273c20c164fa2747b3abedfd2aa2e74a035a95201f1`
+ (58,099B/0444).Complete15frames scored ONCE after all public60/59trace and
+ independent15-native-best replays PASS; zero private optimizer/model calls,
+ noGTalignment, fullprivate/public/source/asset rehash; no frame omission.
+ **H98 scientific hypothesis REJECTED, not adopted.** Camera-PVE clipmean(cm)
+ baseline20.542976/13.786135/9.077390 → refit20.737680/14.087849/9.775683;
+ relative gains−.947786%/−2.188538%/−7.692662%, median−2.188538%.
+ Median≥5% and no clipregression>5% gates FAIL; all6 perhand/clip relative
+ object-vector regression≤5% PASS. Automatic silhouette no-loss>1pp FAIL as
+ alreadyobserved. HeldoutRGB mean1.809558→3.004909px (worse), neverusedforfit.
+ Native feasibility, clean replay and training objective decrease did NOT
+ improve heldoutgeometry; no victory over CARI4D/fullHOI/real-domain claim.
+ Stop root-only recipe onthisscoredcohort; no retuning orsecondqualityquery.
+ Nextpriority is observation/model-bias diagnosis on untouched factorialRGB,
+ distinguishing2D detectorbias frommorphology/articulation/globaldepth error
+ BEFORE new optimizer freedom. Prompt-conditionedbodyarticulation conditional
+ onusefulindependent2D evidence; notmoreZ freedom orGEM-X installation first.
+ Final postactualreceiptconfigs fullsuite6126PASS/oneoptionaltrimeshSKIP81.61s,
+111focusedquality/bundlePASS2.68s; qualityactual43-filearchive156,200B<160KB.
+  Frozen-score scalar diagnosis (no extra private labels/model/fit/score):
+  common objective mean .442975→.351758, while centeredPVEclipmeans(cm)
+  3.733301/3.901715/4.055680→4.050873/4.319675/4.442132 worsened too.
+  Baseline signedcentroid-Z errors(cm)20.411840/13.649304/8.159291 dominate
+  cameraPVE; nativefixedZ root rotation cannot remove this metric depth bias.
+  CandidateZ centroid20.532886/13.787849/8.333527 (externalZ was bytefixed,
+  not every vertexZ underorientation). Avoid inferring detector vs articulation
+  cause fromthese15cases alone; factorial diagnosis remains necessary.
+  Challenge primaryCD uses first-human-only Sim3 shared withobject (audit),
+  unlike this deliberately camera-space isolated gate. Future new-cohort
+  quality must also preregister that actual global evaluation convention and
+  object/contact/temporal quantities; do not retrospectively replace H98
+  failedgates or score it again undera favorable alignment. CameraPVEalone
+  is usefuldepth diagnosis, not evidence ofchallenge ranking superiority.
+  All exact H98publicfitFAIL/fitPASS/replayPASS/qualityPASS receipts unchanged;
+  lastGPUidle45MiB/0%,451GBused/574GBfree. Noheavyartifact downloaded locally.

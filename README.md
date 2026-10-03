@@ -7,6 +7,19 @@ verify it. See [research audit](docs/audit.md), [literature](docs/literature.md)
 Third-party source/model terms and unresolved eligibility are documented in
 [licenses](docs/licenses.md); own code is Apache-2.0, not the external assets.
 
+## Research status — 2026-10-03
+
+No final Parquet or verified CARI4D improvement yet. Two independent synthetic
+RGB pilots rejected root-only correction despite valid execution/replay:
+translation XYZ worsened median camera PVE32.26%; fixed-depth native XY/Euler
+worsened2.19% and failed the silhouette safeguard. All frames were retained;
+private labels were used only after frozen predictions, never for fitting.
+
+Next: an untouched morphology/appearance/occlusion factorial diagnostic to
+separate independent2D observation bias from articulation/depth errors before
+trying prompt-conditioned body refinement. Detailed receipts and decisions:
+[experiments](docs/experiments.md). Heavy data and all GPU work remain onAzure.
+
 ## Layout
 
 - `src/world_reward/`: input firewall and strict reconstruction contracts.

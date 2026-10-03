@@ -1,4 +1,13 @@
-# Azure runtime — current state 2026-10-02
+# Azure runtime — current state 2026-10-03
+
+## Latest research gate
+
+H98 native fixed-depth root5 fit and independent native replay completed;
+private all15-frame quality completed once and **rejected the hypothesis**.
+All units terminal; H100 idle45MiB/0%, disk451GBused/574GBfree. Frozen receipts,
+actual producing commits, exact budgets and scientific decisions are in
+[experiments](experiments.md). No final submission or CARI4D superiority yet.
+Older completed engineering records below are historical, not active jobs.
 
 ## Isolation and data flow
 
