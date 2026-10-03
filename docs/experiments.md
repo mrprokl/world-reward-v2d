@@ -2586,3 +2586,29 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   Final complete source suite5888PASS/1optionaltrimeshSKIP83.96s; Bash syntax/
   diffcheck PASS. Remove disposable local test/bytecode caches; immutable Azure
   failures, successful predictions and scalar receipts preserved for reproduction.
+
+- **H98 — fixed-depth native XY/root-Euler feasibility, fresh quality pilot pending.**
+  Before new RGB synthesis, freeze a small native CUDA capability gate on the
+  already-scored H97 PUBLIC baseline/DWPose only. This is engineering feasibility,
+  never a new quality experiment, retuning or evidence of 3D improvement. Exactly
+  15 zero-latent full-body native heads; first graph supplies 2n×5 observation-only
+  autograd Jacobian (at most20 rows), minimum/maximum singular ratio≥1e-5, analytic
+  XY derivative check. No optimizer/candidate/proxy/new raster or private read.
+  New contract: bounded XY=.30tanh and three native Euler increments
+  .30/sqrt(3)*tanh; camera Z/identity/articulation/expression/K fixed byte-exact.
+  Check actual native root-Euler limits[3:6] and complete V18439/KP308/J127/204
+  controls/SO3 ABI, zero parity≤1e-5m. Do NOT reapply or waive the failed D96
+  all249 dense-limit policy: fixed remainder is unchanged, not clamped or claimed
+  physiologically valid. Head must be body-only, all weights frozen while input
+  autograd remains enabled. No rigid-centroid shortcut: actual root pivot/axes/
+  parameter transform/LBS affine proof is missing, so retain the full native head.
+  Whole load/hash/forward/gradient budget120s H100/32GiB/4threads/network-none;
+  exact Torch2.5.1+cu124, deterministic algorithms without warn-only, TF32 off,
+  no kernel relaxation. Count attempts BEFORE head, returns and validations
+  separately; retain failed partial receipt. Source/model/all15 public inputs
+  rehashed before/after. New results/root5-native-capability-v1, no overwrite.
+  New untouched synthetic recipe and generic explicit-cohort public observers
+  are prepared separately; no H98 quality read or fit is authorized by API PASS.
+  Capability source audit:164 focused tests PASS3.29s, full5901PASS/one
+  optionaltrimeshSKIP83.64s, Bash syntax/diffcheck PASS. Statically complete
+  25-file code-only closure97,152B encoded; no data/model/render transfer.
