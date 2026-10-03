@@ -365,6 +365,37 @@ def test_consumer_exact_lineage_and_consumed_asset_union(gate,tmp_path,monkeypat
     with pytest.raises(ValueError):gate.verify_refined_artifacts(root,code,spec,pins)
 
 
+@pytest.mark.parametrize('tamper',[None,'historical','writable','alias','currentpin'])
+def test_refined_explicit_historical_sources_and_current_pin_ownership(gate,tmp_path,monkeypatch,tamper):
+    root=tmp_path/'root';historical=tmp_path/'historical'
+    spec=gate.inputs.PublicClipSpec(15,501,'front_stereo_camera_left',1152,1536)
+    _,pins,_,checked,_,_=verifier_fixture(gate,root,historical,spec,monkeypatch)
+    monkeypatch.setattr(gate,'source_helpers',lambda c:{
+        'infra/cari_full_refine.py':gate.identity(c/'infra/cari_full_refine.py')})
+    consumer=tmp_path/'current';(consumer/'configs').mkdir(parents=True);(consumer/'infra').mkdir()
+    for path in(historical/'configs').iterdir():write(consumer/'configs'/path.name,path.read_bytes())
+    write(consumer/'infra/cari_full_refine.py',b'new current consumer code, not original producer')
+    calls=[]
+    def preceding(r,c,s,p,source_code=None):
+        calls.append((c,source_code));return checked
+    monkeypatch.setattr(sys.modules['cari_full_forward'],'verify_forward_artifacts',preceding)
+    with pytest.raises(ValueError):gate.verify_refined_artifacts(root,consumer,spec,pins)
+    path=historical/'infra/cari_full_refine.py'
+    if tamper=='historical':write(path,b'changed historical producer')
+    elif tamper=='writable':path.chmod(0o644)
+    elif tamper=='alias':path.unlink();path.symlink_to(consumer/'infra/cari_full_refine.py')
+    elif tamper=='currentpin':write(consumer/'configs/cari_clip_000015_shared_refined_pins.json',{})
+    if tamper:
+        with pytest.raises(ValueError):gate.verify_refined_artifacts(root,consumer,spec,pins,source_code=historical)
+        return
+    selected=gate.verify_refined_artifacts(root,consumer,spec,pins,source_code=historical)
+    assert calls[-1]==(consumer,historical)
+    assert historical/'infra/cari_full_refine.py'in selected['bindings']
+    assert consumer/'infra/cari_full_refine.py'not in selected['bindings']
+    assert consumer/'configs/cari_clip_000015_shared_refined_pins.json'in selected['bindings']
+    assert consumer/'configs/cari_clip_000015_shared_forward_pins.json'in selected['bindings']
+
+
 def test_wrapper_and_runtime_no_private_inputs_or_hyperparameter_rewrite():
     shell=ROOT/"infra/run_cari_full_refine.sh";source=(ROOT/"infra/cari_full_refine.py").read_text()
     subprocess.run(["rtk","proxy","bash","-n",str(shell)],check=True)

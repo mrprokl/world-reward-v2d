@@ -20,7 +20,7 @@ def test_actual_complete_public_source_and_wheel_pins(pins):
  assert build.validate_pins(pins)==pins
  sam,nv=pins['repositories']
  assert len(sam['files'])==32 and sum(r['path'].endswith('.py')for r in sam['files'])==26
- assert len(nv['files'])==12
+ assert len(nv['files'])==13
  assert next(r for r in sam['files']if r['path']=='LICENSE')['sha256']=='c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4'
  assert next(r for r in nv['files']if r['path']=='LICENSE')['sha256']=='e87dc2a40b553c5f52acb3909f479afbeac8c35a85328fceaa0cab15ed50b9fc'
  assert not any('/data/'in r['path']or 'checkpoint'in r['path']or 'recording'in r['path']for repo in pins['repositories']for r in repo['files'])
@@ -111,8 +111,8 @@ def test_publisher_tag_version_and_license_evidence(pins,tmp_path,monkeypatch):
 
 def test_original_failure_and_image_not_reused(pins):
  source=(ROOT/'infra/frontend_grounding_build.py').read_text()
- assert build.TARGET=='world-reward/frontend-grounding-v4:0.1'
- assert "root/'results/frontend-grounding-build-v4'"in source
+ assert build.TARGET=='world-reward/frontend-grounding-v5:0.1'
+ assert "root/'results/frontend-grounding-build-v5'"in source
  assert 'frontend-grounding-build-v1'not in source and 'frontend-grounding-build-v2'not in source
  recipe=build.dockerfile(pins,'a'*64,True).decode()
  assert 'COPY publisher-notices /opt/world-reward-grounding/publisher-notices'in recipe

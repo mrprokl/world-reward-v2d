@@ -5683,3 +5683,29 @@ Next proposed4×48newauthoredRGBmodel-inferred availability ablation is NOT
 natural occlusion validation or challenge adoption. Camera hand axes/joint
 semantics and embedding limitations must settle first; do not rescore prior
 cohorts or substitute idealhand poses for model observations.
+
+
+ActualGroundingv4 outerFAIL145.244589387s; offlineDockerbuildexit0 really
+created14d89c907671ac34512b9cebf970ffdb873ee8151a804d0961134b73cad54a4b
+(owner58f664c9...). Native_C CPUimportactuallyPASS; laterthinmaskimportFAIL:
+v2d.common.video imports missing hdf5_transcode.py. Privatebuildlog7177B/
+5a55527d06bca20147dffe7ca4b09eab36597819eb6123ad3d4c8d70cdcb1b85.
+No compiler/cuda failure; v4wholeunit remainsFAIL. Newv5 includes ONEpublic
+12343B/089f453a... source atsame7c0dcommit; no GT/data reads or algorithm
+change. More specific childprobephase nowrecorded. ExistingVM02MoGe2model
+reverified1323815904B/280741fd... atoriginalinternalHFblob; no newtransfer.
+
+EP5 originaltrackingFAIL22:39:36UTC beforeposes: defaulttopologyQEMcouldnot
+retaincomponent/orientation/Euler atbudget. Fullinitializersnotatfault; exact
+FAILlog81931B/92aa5eeae33c260286e1b3b3cccdddffa0c4919fab3760a075fb08f55fe9ff27.
+Next sameexternallygatedvolumeproposal only, no geometrydeletion/shrinking.
+
+EP3 nativeexportactuallyFAIL1.377044720s beforeallnative/LM/network/optimizer
+calls. Receipt1323B/67e3858e04f5ed62763837db7b0a2059723826af49a5b34a2cbbe75983f8f135;
+FAILlog1819B/4805b9b38ae7457e33b1a0513f3aa8104c443b31d3317dd528bfa896653db0a2.
+Sourceprovenance bug: generatorhelpers comparedoldreceipts toCURRENTcode,
+so laterwrapperbytecodedisable invalidatedoldsourceequality. Newsource_code
+separates authenticatedhistorical77Gitfiles/markers from currentpinconsumer;
+no oldexecution or source/receipt rewrite; queue/exportFAILremainunchanged.
+Earlyfocused359PASS1fixtureFAIL caught readonlyfixture overwrite in audit
+case; fixed testpermissionsetup, no productiongate relaxation.

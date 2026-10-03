@@ -23,7 +23,7 @@ import zipfile
 
 ROOT=Path('/srv/scenesmith/world-reward')
 BASE='sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3'
-TARGET='world-reward/frontend-grounding-v4:0.1'
+TARGET='world-reward/frontend-grounding-v5:0.1'
 CONFIG='configs/frontend_grounding_source_pins.json'
 HELPERS=('infra/frontend_grounding_build.py','infra/run_frontend_grounding_build.sh',CONFIG)
 SAM_REV='2b90b9f5ceec907a1c18123530e92e794ad901a4'
@@ -35,7 +35,7 @@ WHEEL_EXPECTED={
  'safetensors':('0.6.2',485835,'8045db2c872db8f4cbe3faa0495932d89c38c899c603f21e9b6486951a5ecb8f'),
  'huggingface_hub':('0.36.2',566395,'48f0c8eac16145dfce371e9d2d7772854a4f591bcb56c9cf548accf531d54270'),
  'decord':('0.6.0',13602299,'51997f20be8958e23b7c4061ba45d0efcd86bffd5fe81c695d0befee0d442976')}
-COMMON=('__init__.py','broadcast.py','utils.py','datatypes.py','video.py','pyproject.toml')
+COMMON=('__init__.py','broadcast.py','utils.py','datatypes.py','video.py','hdf5_transcode.py','pyproject.toml')
 THIN=('__init__.py','datatypes.py','sam2_utils.py','video_to_masks.py','pyproject.toml')
 LABEL='world_reward_frontend_grounding_owner'
 NOTICE_RELEASES={
@@ -87,7 +87,7 @@ def source_binding(code,revision):
  return {'markers':markers,'closure_sha256':sha.hexdigest(),'helpers':{n:identity(code/n,True)for n in HELPERS}}
 
 def validate_pins(pins):
- require(type(pins)is dict and pins.get('schema')=='world_reward.frontend_grounding_source_pins.v4' and pins.get('base_image_id')==BASE and pins.get('target_image')==TARGET,'Exact new child identity contract required')
+ require(type(pins)is dict and pins.get('schema')=='world_reward.frontend_grounding_source_pins.v5' and pins.get('base_image_id')==BASE and pins.get('target_image')==TARGET,'Exact new child identity contract required')
  repositories=pins.get('repositories');require(type(repositories)is list and len(repositories)==2,'Two public pinned source repositories required')
  for row,(repo,revision)in zip(repositories,(('facebookresearch/sam2',SAM_REV),('nvidia-isaac/video_to_data',NV_REV))):
   require(row.get('repo')==repo and row.get('revision')==revision,'Exact historical public source commit required')
@@ -284,8 +284,10 @@ def build(code,revision,output,report):
  report.update(phase='offline_CPU_build',source_files=files,wheels=wheels,build_recipe_identity=identity(context/'Dockerfile'))
  require(source_binding(code,revision)==before,'Frozen builder source changed before build')
  offline_build(['docker','build','--network','none','--pull=false','--force-rm','--memory','12g','--cpu-period','100000','--cpu-quota','400000','--tag',TARGET,'--file',str(context/'Dockerfile'),str(context)],output/'offline-build.log',report)
+ report['phase']='built_child_identity'
  child=inspect_image(TARGET);require(child['Id']!=BASE and child['RootFS']['Layers'][:44]==parent['RootFS']['Layers'],'New child must preserve exact ordered parent rootfs')
  label=command(['docker','image','inspect',child['Id'],'--format','{{index .Config.Labels "'+LABEL+'"}}']).strip();require(label==owner,'Owned new child label required')
+ report['phase']='child_CPU_import_probe'
  after=probe(child['Id'],'wr-grounding-child-'+revision[:12],owner,True)
  expected=dict(prior['versions']);expected.update({'transformers':'4.53.3','tokenizers':'0.21.4','safetensors':'0.6.2','huggingface-hub':'0.36.2'})
  require(after[0]['versions']==expected and after[0]['decord']=='0.6.0','Only four explicit dependency replacements and optional pinned decord permitted')
@@ -299,9 +301,9 @@ def main(argv=None):
  root=Path(os.environ['WR_ROOT']);code=Path(os.environ['WR_CODE']);revision=os.environ['WR_CODE_REVISION']
  require(root==ROOT and Path(__file__).resolve()==code/'infra/frontend_grounding_build.py','Actual frozen builder file required')
  source_binding(code,revision)
- output=canonical(root/'results/frontend-grounding-build-v4');require(output.parent.is_dir()and not output.exists(),'Fresh owned Grounding build namespace required; no overwrite or retry')
+ output=canonical(root/'results/frontend-grounding-build-v5');require(output.parent.is_dir()and not output.exists(),'Fresh owned Grounding build namespace required; no overwrite or retry')
  os.umask(0o077);output.mkdir(mode=0o700)
- report={'schema':'world_reward.frontend_grounding_build.v4','stage':'frontend_grounding_build','status':'fail','phase':'preflight','producer_revision':revision,
+ report={'schema':'world_reward.frontend_grounding_build.v5','stage':'frontend_grounding_build','status':'fail','phase':'preflight','producer_revision':revision,
   'budget_seconds':BUDGET,'GPU_used':False,'model_loaded':False,'challenge_data_read':False,'private_validation_read':False,'credential_material_read':False,
   'build_network':'none','base_pull_performed':False,'replica_ready':False,'license_eligibility_verified':False,'training_overlap_verified':False}
  started=time.monotonic()

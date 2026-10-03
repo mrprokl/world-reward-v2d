@@ -1,0 +1,322 @@
+{
+  "files": {
+    "configs/actor_observation_policy_v1.json": {
+      "bytes": 719,
+      "sha256": "61095e1dab681338b2cce1c57369f2a4b7dab1cf6d4ff933df8ac4f38ef5ce6a"
+    },
+    "configs/analytic_rgbd_input_pins.json": {
+      "bytes": 2331,
+      "sha256": "e81b80ae4af24b118919da9ffcb8ed5ed91eebe9c7ef861dd8afe68f8e609459"
+    },
+    "configs/analytic_rgbd_protocol.json": {
+      "bytes": 4821,
+      "sha256": "4ff1631da8a59c4bdf075e2ba59be7d7196f1608ff43c157c851c40bafd3c7c4"
+    },
+    "configs/authored_rgbd_protocol.json": {
+      "bytes": 4316,
+      "sha256": "5d53806c3737aa1b15288628ba2fc364bbeb9dc95731075c2f3821ef5a2c053e"
+    },
+    "configs/cari96_forward_pins.json": {
+      "bytes": 627,
+      "sha256": "df3221aa798165f9ce61d69c49c88dd93e2caeadebe1d75070b3e7d78e11a83c"
+    },
+    "configs/cari96_input_pins.json": {
+      "bytes": 3220,
+      "sha256": "b8a426fab96e4c9980ead8b938828b3612789f11f043e21043b3f82dfb053b77"
+    },
+    "configs/cari96_prepare_pins.json": {
+      "bytes": 2423,
+      "sha256": "dadd82cb2a2d893f6d82cf523e4b512a551505f324de911f7a0d452199d81a01"
+    },
+    "configs/cari96_refined_pins.json": {
+      "bytes": 625,
+      "sha256": "00b26edea452ec243a358bff14f1c0cef31bd4e90e5706d4958696f805089f9b"
+    },
+    "configs/cari_clip_000001_input_pins.json": {
+      "bytes": 3335,
+      "sha256": "1541cd367d40db6fb51ef47edc5c41bcd085f3a37aab5714a6e277ff80a53f4b"
+    },
+    "configs/cari_clip_000001_shared_export_pins.json": {
+      "bytes": 1073,
+      "sha256": "061b743f1cbbddf6bf9c958d02a787b43579a6da4efd9bd139d767ead3447923"
+    },
+    "configs/cari_clip_000001_shared_forward_pins.json": {
+      "bytes": 709,
+      "sha256": "f5d00a56ecdc201225e6ef76dbff37a5ffecc9d005d87db60f6a04fd6493ac0c"
+    },
+    "configs/cari_clip_000001_shared_prepare_pins.json": {
+      "bytes": 962,
+      "sha256": "d8f9953f74308ab74616a5940b0371025850c744806f429fd4d24fd6794f4797"
+    },
+    "configs/cari_clip_000001_shared_refined_pins.json": {
+      "bytes": 709,
+      "sha256": "aa6b9ce28818074e75e76729fd21ecbe0fa14794efbea85edc80c7dd3d5906ac"
+    },
+    "configs/cari_clip_000002_input_pins.json": {
+      "bytes": 3021,
+      "sha256": "bf94307164805cbd291490aab2ad17c3a63d666591abcf61b2be38f9639287da"
+    },
+    "configs/cari_clip_000002_shared_export_pins.json": {
+      "bytes": 1073,
+      "sha256": "798323240ba8caf5ab50c508434150d70999c90273a93c938edb7cbe1dbc01d9"
+    },
+    "configs/cari_clip_000002_shared_forward_pins.json": {
+      "bytes": 709,
+      "sha256": "a4f243a32472b624cac7e490666cf9058481bbaf1baec314a7f7c2d9baacd8a6"
+    },
+    "configs/cari_clip_000002_shared_prepare_pins.json": {
+      "bytes": 962,
+      "sha256": "988eaef5eb8ab610476bc6456bbc6a4eb3f1b38c24e6c6db0590b59976196ca0"
+    },
+    "configs/cari_clip_000002_shared_refined_pins.json": {
+      "bytes": 709,
+      "sha256": "5808c9f676c9b3bede170b5d3bb2ee5686e23004400ec919f141d65d45d3e369"
+    },
+    "configs/cari_clip_000003_input_pins.json": {
+      "bytes": 3334,
+      "sha256": "6692121edf9bb63a49d46a8047d7c3b4051fc45e40eb0e4b7007786c535647dd"
+    },
+    "configs/cari_clip_000003_shared_forward_pins.json": {
+      "bytes": 789,
+      "sha256": "4501e2f8609c8981ee1fa59ff878aa6fea264bcdd2dd93cb004be73f5d1180f2"
+    },
+    "configs/cari_clip_000003_shared_prepare_pins.json": {
+      "bytes": 1078,
+      "sha256": "0ff371aacb8ce7cb8d84643723e83f2a8a5389b449e317d4e4bbd6ac84bb4144"
+    },
+    "configs/cari_clip_000015_input_pins.json": {
+      "bytes": 3335,
+      "sha256": "19249ae56f7933487b653c6cb7075d52ddba7987afda0c9876326fca3445e042"
+    },
+    "configs/cari_clip_000015_shared_export_pins.json": {
+      "bytes": 1208,
+      "sha256": "b89aeaba7d31e3d0b0ebcc1c5f69f643d3946f2399251988b6de8b5d9c3c5135"
+    },
+    "configs/cari_clip_000015_shared_forward_pins.json": {
+      "bytes": 790,
+      "sha256": "32dc7720282cce2658935bbd047b38c640c74d290db6f3ad6e2de4c2359c81c1"
+    },
+    "configs/cari_clip_000015_shared_prepare_pins.json": {
+      "bytes": 1079,
+      "sha256": "114d795aaf7b094984556e744d56e6bada43a271ae190838d6587105de8a47c9"
+    },
+    "configs/cari_clip_000015_shared_refined_pins.json": {
+      "bytes": 790,
+      "sha256": "5bb02dcc64bd2be7e5d1866b5a28bd567135baf9442eed255f29ed0bd0d1ae0a"
+    },
+    "configs/factorial_rgb_manifest_pins_v1.json": {
+      "bytes": 171,
+      "sha256": "2a8d28605826deab893f3337536d3105050029a4a4d53c409a642ce5ecb52ee1"
+    },
+    "configs/factorial_rgb_public_pins_v1.json": {
+      "bytes": 472,
+      "sha256": "54bb2c449b351678d913da8f85d33e74deae85cd50e0b212a2f51f4ea1572edc"
+    },
+    "configs/factorial_rgb_quality_pins_v1.json": {
+      "bytes": 1023,
+      "sha256": "5a1e3f0c1613c2c1e008ff2f72a7c0e74c02a9454c13fcd3c341d3602cff80ef"
+    },
+    "configs/failed_masks_transition_pins.json": {
+      "bytes": 2390,
+      "sha256": "1d1e76a31fcbf1d12f6510f55b887bde55c6ab11cf4e328fa1b66236259deb6b"
+    },
+    "configs/frontend_asset_archive_pins.json": {
+      "bytes": 1022,
+      "sha256": "52c46ef63a4b4dd7e368fdcd4aceaae22a738921b10446ccfb41b1abb968808b"
+    },
+    "configs/frontend_replica_inventory_pins.json": {
+      "bytes": 1155,
+      "sha256": "312a10621c02c02449d0786649eac137abc6d9d314236f851848942fb4bff72e"
+    },
+    "configs/human_photometric_quality_pins.json": {
+      "bytes": 939,
+      "sha256": "046b12a4f85027f86636ef89a8df1710aa11bc4dbf5480a37d0c0b32964ea36a"
+    },
+    "configs/official_pack_runtime_pins.json": {
+      "bytes": 1256,
+      "sha256": "2acd8ab2a7160cb4ac6e2f85e58b44a8e90564aa0e270ce073f4b5eabf0323a6"
+    },
+    "configs/root5_rgb_fit_pins_v1.json": {
+      "bytes": 150,
+      "sha256": "ae96fe1f4e384ce246a6cdf258b90fb0d02e50c5f824379874c452877fed003c"
+    },
+    "configs/root5_rgb_public_pins_v1.json": {
+      "bytes": 617,
+      "sha256": "71c0bffa7c2fd3e8136b1e24a3cb77b9518c05cf03cfdc8e9f4847ad04f8450f"
+    },
+    "configs/root5_rgb_quality_pins_v1.json": {
+      "bytes": 704,
+      "sha256": "963b0a107773f2d951765e07859e47daffda130cf00b18a0e9b2a2aa8c5aaa1c"
+    },
+    "configs/sources.json": {
+      "bytes": 1258,
+      "sha256": "e99698da70fa71d6b45ae9ea58bbc0323637d58fff86d383e75abb57add4457e"
+    },
+    "configs/tless_frame_holdout_protocol.json": {
+      "bytes": 3563,
+      "sha256": "cff213716625f4070d4547f8a4cb0f361692d93f19aaebad8eac1cc0d0e9bd1c"
+    },
+    "configs/tudl_anchor_prediction_pins.json": {
+      "bytes": 2058,
+      "sha256": "5bb0043fec46130cf13a24d9225c71479b2b675787a5d4391fb0e382322d061c"
+    },
+    "configs/tudl_frame_holdout_input_pins.json": {
+      "bytes": 2102,
+      "sha256": "69eec0bb9b43ae912059cf91b8595a229a589c69a981fb58547496de5d1a746d"
+    },
+    "configs/tudl_whole_support_input_pins.json": {
+      "bytes": 2758,
+      "sha256": "5f4bc2af49f3e28188b9f49afd4c0f9f2b5671dce67752763a25ca0521a600c6"
+    },
+    "configs/tudl_whole_support_prediction_pins.json": {
+      "bytes": 2298,
+      "sha256": "7d7427364a0532596f6ae853c8dcf0002b6f87cbda5080e90f1ef862505c75cb"
+    },
+    "configs/tudl_whole_support_protocol.json": {
+      "bytes": 5217,
+      "sha256": "cb2d194e042ddd3893a9c5531c436635f5cbb57fa54497f69b1136a2886c1b1c"
+    },
+    "configs/tum_rgbd_depth_input_pins.json": {
+      "bytes": 2844,
+      "sha256": "ea7692e3258c4928620d466c5202114bc8484ae69ca833b8e90e9dbb77982492"
+    },
+    "configs/tum_rgbd_depth_prediction_pins.json": {
+      "bytes": 2402,
+      "sha256": "0cf2246107b8045c4ebe21a27cd5fcafe91fd3082a17833d1446a7cafb38698a"
+    },
+    "configs/tum_rgbd_depth_protocol.json": {
+      "bytes": 21939,
+      "sha256": "ed1f038546ac073d2b52f01874934a6683e05357f9730cbac1a5112930ded035"
+    },
+    "configs/tum_rgbd_depth_transport_v2.json": {
+      "bytes": 1801,
+      "sha256": "467adfda9eb0539be5d94e5182291622c475e28e7e65e8ebc7502902190581dc"
+    },
+    "configs/volume_mesh_000002_pins.json": {
+      "bytes": 1697,
+      "sha256": "78fd51628a20a2b50e87bf8cc1654866c66397b5173b95ba1d9f9bd328dfda01"
+    },
+    "configs/volume_mesh_000003_pins.json": {
+      "bytes": 1697,
+      "sha256": "4d670726dbb37f3e2a04824d9612066d88719105dde85ce7878660932b85e708"
+    },
+    "configs/volume_mesh_000004_pins.json": {
+      "bytes": 1698,
+      "sha256": "9a12c3cc3b5b740ac96521679f809b4a43795f0163a24c0f60965a6b4fe0c257"
+    },
+    "infra/body_smoke.py": {
+      "bytes": 32390,
+      "sha256": "e4d659de33bacff9d5c85c1cb2fedce34f4aa34bdbae93b3b9b7e08950613ce3"
+    },
+    "infra/cari96_forward.py": {
+      "bytes": 33206,
+      "sha256": "37ade3cc40cd06f7857934445beea9175286df33162e13cb7e58a70e96c2bcf7"
+    },
+    "infra/cari96_inputs.py": {
+      "bytes": 25320,
+      "sha256": "be9daf176f46f56afd79d0f06aacac76691626a54a8e4a9046054051d8678f49"
+    },
+    "infra/cari96_native.py": {
+      "bytes": 10168,
+      "sha256": "5fabd5e99cd80221fa66bce100f148dde55cc1fa7ec49f738efb31d0d4781d80"
+    },
+    "infra/cari96_prepare.py": {
+      "bytes": 16584,
+      "sha256": "ebd0378a92ba4474b65e4f7743499915a1dd7668a697c1bf24f64fb5ad8dad84"
+    },
+    "infra/cari_clip_inputs.py": {
+      "bytes": 18538,
+      "sha256": "aaf58299e86b5baf3751fce27141774bc4d95ae2a899845827f5cccad14782d4"
+    },
+    "infra/cari_converter.py": {
+      "bytes": 40746,
+      "sha256": "39c5ac17f46e8d7c34b6f7099c5437e31f8a4fbc4eb58f4f48be5e0c095a6001"
+    },
+    "infra/cari_converter_diagnostic.py": {
+      "bytes": 12413,
+      "sha256": "d11a489c89f84c8ffb6798091b85bbbc86328404f9a49c79f37504e03c3fc434"
+    },
+    "infra/cari_full_forward.py": {
+      "bytes": 45760,
+      "sha256": "ac07d96a6bb8bad8aa8977b74f7b266600bbcc26fc92bf07ba6419be0142fd2f"
+    },
+    "infra/cari_full_refine.py": {
+      "bytes": 28549,
+      "sha256": "b874a91cd0754e88c758daac2863ca6a621eedcc320e627dba8aadaddc5060b6"
+    },
+    "infra/cari_refine.py": {
+      "bytes": 23622,
+      "sha256": "3e6207733c9abd01298959a6664cfc6b10ad4460c1539c84e2ec226a42701ab9"
+    },
+    "infra/cari_runner.py": {
+      "bytes": 9970,
+      "sha256": "35863ec6be12d4d15322dff86db3ca93c28990f0eb2fb0aa4c77b441598e60ba"
+    },
+    "infra/cari_shared_prepare.py": {
+      "bytes": 24051,
+      "sha256": "ba5d431ace4a55f1bfcc3f5bb926685a5270fa206b8a7bef831aeeeaa7c1d0b6"
+    },
+    "infra/run_cari96_prepare.sh": {
+      "bytes": 2491,
+      "sha256": "e6e3d08507bac20f40b1346e18c13c446c1723567aff0a71120bbe6abe745a3c"
+    },
+    "infra/run_cari_full_forward.sh": {
+      "bytes": 3729,
+      "sha256": "e82470375834da594c16d9e3a479c11287782f067291fc791314c7f25d022627"
+    },
+    "infra/run_cari_full_refine.sh": {
+      "bytes": 3495,
+      "sha256": "976b9c6b7a7e68b2d4fac084529a5eac9d6e91922241cbffb759a1a9fa803651"
+    },
+    "infra/run_cari_full_refine_queued.sh": {
+      "bytes": 6252,
+      "sha256": "51f7451b50400799d64776cd7c50d001bdd64b661f4c2f0ffe8720d967e824d7"
+    },
+    "infra/run_cari_shared_prepare.sh": {
+      "bytes": 3128,
+      "sha256": "b70e444d1c4a8bf77288be4a6fce0078b8d7de931890ebd09e67df8aaef61e49"
+    },
+    "pyproject.toml": {
+      "bytes": 609,
+      "sha256": "f2fac065fc31d48160a9b3a7f81c71d0f8f40beaeeadf8cd0ef3d68533f3a68b"
+    },
+    "src/world_reward/__init__.py": {
+      "bytes": 81,
+      "sha256": "1ac8c64041277f0c3cf4d8838b3153210d7076dd86a5121d1e6ef494b64b36a1"
+    },
+    "src/world_reward/contracts.py": {
+      "bytes": 3451,
+      "sha256": "8717c48729db10769eb47a15c3b6c25e49df355fce8254eee7d4a61acbe00d4a"
+    },
+    "src/world_reward/data.py": {
+      "bytes": 5181,
+      "sha256": "c8200e28900a88394f2821c558cd3693225ae8547331f12f2aff7d225c008a30"
+    },
+    "src/world_reward/mesh_geometry.py": {
+      "bytes": 5746,
+      "sha256": "7e1fbeec221665cef1f419459ebe2aa68da4acc39bc5e7475d615c20a980399b"
+    },
+    "src/world_reward/shared_identity.py": {
+      "bytes": 8394,
+      "sha256": "2755cdfe617b82eab71e145b5bc91d053b3a6618a73fb3ce68159a6e6a050156"
+    },
+    "src/world_reward/submission.py": {
+      "bytes": 23563,
+      "sha256": "7df1e9902deba9f4e5684811c33178fb30c4bde3ab7807dc50331c81e41b63ae"
+    },
+    "src/world_reward/timeline.py": {
+      "bytes": 6519,
+      "sha256": "b37c18c401d31c5e4c1f2dff984780378d39eaef7bcf0652bc2a80227c5322fe"
+    }
+  },
+  "job": "run_cari_full_refine_queued",
+  "producer_revision": "672b10ee5d8b8532686cf39ccd44134adc26178b",
+  "queue_status_reclassified": false,
+  "schema": "world_reward.historical_native_source_pins.v1",
+  "separate_queue_failure_receipt": {
+    "bytes": 752,
+    "relative_path": "results/episode3-queued-source-cache-audit.json",
+    "sha256": "290bbe877f23a48fbd25d41b1888b739329c7ed5d8d9d10d0025c0e7f589d584"
+  },
+  "source_archive_sha256": "375e5cb49d9dcedd642f02fcec549923b10888e1d3e0455b9f11a35c0a046efd"
+}

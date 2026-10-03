@@ -36,6 +36,16 @@ while IFS= read -r relative; do
  path="$ROOT/$relative"; [[ -f "$path" && ! -L "$path" ]]
  MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
 done <<< "$SOURCES"
+# Explicit authenticated historical source is provenance only, never imported.
+HISTORICAL_PIN="$CODE/configs/cari_clip_${PADDED}_historical_source_pins.json"
+if [[ -f "$HISTORICAL_PIN" ]];then
+ HISTORICAL="$ROOT/jobs/672b10ee5d8b8532686cf39ccd44134adc26178b/run_cari_full_refine_queued/code"
+ for path in "$HISTORICAL" "${HISTORICAL%/code}/revision" "${HISTORICAL%/code}/source-sha256" \
+  "$ROOT/results/episode3-queued-source-cache-audit.json";do
+  [[ -e "$path" && ! -L "$path" ]]
+  MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
+ done
+fi
 for stage in prepare forward refined; do
  [[ -f "$CODE/configs/cari_clip_${PADDED}_shared_${stage}_pins.json" ]]
  path="$BASE/cari_shared_${stage}_v1"; [[ -d "$path" && ! -L "$path" ]]

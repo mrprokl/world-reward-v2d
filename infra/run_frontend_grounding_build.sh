@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Azure VM02 CPU-only immutable source/wheel/notice acquisition and NEW v4 child.
+# Azure VM02 CPU-only immutable source/wheel/notice acquisition and NEW v5 child.
 # Source closure: /infra/frontend_grounding_build.py /configs/frontend_grounding_source_pins.json
 set +x
 set -euo pipefail

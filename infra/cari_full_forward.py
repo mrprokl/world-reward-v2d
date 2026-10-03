@@ -117,8 +117,14 @@ def validate_prepare_report(report, spec, pins, input_pins):
         warn_only=False,jit_optimized_execution=False,tf32=False,cudnn_benchmark=False,seed=0,chunk=16),"Prepared native runtime differs")
 
 
-def verify_prepare_artifacts(root, code, spec, pins, input_pins):
-    """Verify all four payload identities and source closure, without unpickling."""
+def verify_prepare_artifacts(root, code, spec, pins, input_pins, source_code=None):
+    """Verify payloads against explicit producer sources; current code owns pins.
+
+    The caller authenticates a historical source_code before passing it. Only
+    readonly source bytes are checked here; historical code is never executed.
+    Omitting source_code retains the original current-source contract.
+    """
+    source_code=code if source_code is None else source_code
     validate_artifact_pins(spec,pins,"prepare");inputs.validate_pins(spec,input_pins)
     directory=root/prepare.output_relative(spec.episode_index)
     files=_frozen_inventory(directory,pins["prepare_files"])
@@ -127,8 +133,8 @@ def verify_prepare_artifacts(root, code, spec, pins, input_pins):
     report=json.loads((directory/"report.json").read_text());validate_prepare_report(report,spec,pins,input_pins)
     pin_path=code/f"configs/cari_clip_{spec.episode_index:06d}_input_pins.json"
     if (json.loads(pin_path.read_text())!=input_pins or report.get("input_pins")!=identity(pin_path,immutable=True)
-            or report.get("source_helpers")!=prepare.source_helpers(code)
-            or identity(code/"infra/cari_shared_prepare.py",immutable=True)["sha256"]!=pins["prepare"]["script_sha256"]):
+            or report.get("source_helpers")!=prepare.source_helpers(source_code)
+            or identity(source_code/"infra/cari_shared_prepare.py",immutable=True)["sha256"]!=pins["prepare"]["script_sha256"]):
         raise ValueError("Current immutable actual preparation generator/pins differ")
     paths={name:str(root/path) for name,path in inputs.relative_paths(spec).items()}
     if report.get("original_input_paths")!=paths:raise ValueError("Original public input path binding differs")
@@ -149,7 +155,7 @@ def verify_prepare_artifacts(root, code, spec, pins, input_pins):
         raise ValueError("Producer sources changed during audit")
     bound={str(directory/name):row for name,row in files.items()}
     bound.update({str(root/name):row for name,row in source_files.items()})
-    bound.update({str(code/name):row for name,row in report["source_helpers"].items()})
+    bound.update({str(source_code/name):row for name,row in report["source_helpers"].items()})
     bound[str(pin_path)]=identity(pin_path,immutable=True)
     bound.update({row["path"]:{key:row[key] for key in ("sha256","bytes")} for row in bindings})
     return dict(directory=directory,report=report,files=files,source_files=source_files,bindings=bound)
@@ -410,11 +416,13 @@ def validate_forward_report(report,spec):
     if report.get("owner_window")!=fingerprint(owner) or report.get("owner_local")!=fingerprint(local):raise ValueError("Exact full original-frame ownership fingerprints required")
 
 
-def verify_forward_artifacts(root,code,spec,pins):
+def verify_forward_artifacts(root,code,spec,pins,source_code=None):
     """Hash/JSON-only downstream gate; no Torch, Joblib or model loading.
 
     Rehashes original fifteen, preparation four, forward two and immutable
-    code/native/reference generator bindings. Inference-only DINO/checkpoint
+    code/native/reference generator bindings. An explicit authenticated historical
+    source_code changes source checks only, never current pin ownership or code
+    execution. Inference-only DINO/checkpoint
     assets are recorded in the forward receipt, not reloaded by this gate.
     """
     validate_artifact_pins(spec,pins,"forward")
@@ -424,11 +432,13 @@ def verify_forward_artifacts(root,code,spec,pins):
     input_path=code/f"configs/cari_clip_{spec.episode_index:06d}_input_pins.json"
     prepare_path=code/f"configs/cari_clip_{spec.episode_index:06d}_shared_prepare_pins.json"
     input_pins=json.loads(input_path.read_text());prepare_pins=json.loads(prepare_path.read_text())
-    checked=verify_prepare_artifacts(root,code,spec,prepare_pins,input_pins)
+    checked=(verify_prepare_artifacts(root,code,spec,prepare_pins,input_pins)if source_code is None else
+        verify_prepare_artifacts(root,code,spec,prepare_pins,input_pins,source_code=source_code))
+    source_code=code if source_code is None else source_code
     if (report.get("input_pins")!=identity(input_path,immutable=True) or report.get("prepare_pins")!=identity(prepare_path,immutable=True)
             or report.get("prepare_report_sha256")!=prepare_pins["prepare"]["sha256"] or report.get("prepare_files")!=checked["files"]
-            or report.get("public_source_files")!=checked["source_files"] or report.get("source_helpers")!=source_helpers(code)
-            or report.get("script_sha256")!=identity(code/"infra/cari_full_forward.py",immutable=True)["sha256"]
+            or report.get("public_source_files")!=checked["source_files"] or report.get("source_helpers")!=source_helpers(source_code)
+            or report.get("script_sha256")!=identity(source_code/"infra/cari_full_forward.py",immutable=True)["sha256"]
             or report.get("original_input_paths")!=checked["report"]["original_input_paths"]
             or report.get("decoder_identity")!=checked["report"]["decoder_identity"]
             or report.get("body_assets")!=checked["report"]["body_assets"]
@@ -462,7 +472,7 @@ def verify_forward_artifacts(root,code,spec,pins):
     if _frozen_inventory(directory,files)!=files:raise ValueError("Forward producer changed during audit")
     bound=dict(checked["bindings"])
     bound.update({str(directory/name):row for name,row in files.items()})
-    bound.update({str(code/name):row for name,row in report["source_helpers"].items()})
+    bound.update({str(source_code/name):row for name,row in report["source_helpers"].items()})
     bound[str(prepare_path)]=identity(prepare_path,immutable=True)
     return dict(directory=directory,report=report,files=files,prepare=checked,bindings=bound)
 

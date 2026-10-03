@@ -250,8 +250,8 @@ assert Path(forward.__file__).resolve() == root/'infra/cari_full_forward.py'
 assert Path(refine.__file__).resolve() == root/'infra/cari_full_refine.py'
 assert Path(export.__file__).resolve() == root/'infra/cari_full_export.py'
 assert export.lineage is refine
-assert list(inspect.signature(forward.verify_forward_artifacts).parameters) == ['root','code','spec','pins']
-assert list(inspect.signature(refine.verify_refined_artifacts).parameters) == ['root','code','spec','pins']
+assert list(inspect.signature(forward.verify_forward_artifacts).parameters) == ['root','code','spec','pins','source_code']
+assert list(inspect.signature(refine.verify_refined_artifacts).parameters) == ['root','code','spec','pins','source_code']
 assert list(inspect.signature(refine.validate_result).parameters) == ['source','result','count']
 assert list(inspect.signature(refine.validate_source_bundle).parameters) == ['bundle','mesh','count']
 assert list(inspect.signature(refine.validate_refinement_report).parameters) == ['report','spec']

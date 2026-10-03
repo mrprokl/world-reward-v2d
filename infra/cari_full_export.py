@@ -296,7 +296,15 @@ def run(root, out, code, episode, report, persist):
     spec = public.PublicClipSpec(**pins["clip_spec"])
     if spec.episode_index != episode:
         raise ValueError("Explicit episode differs from frozen refined clip")
-    chain = lineage.verify_refined_artifacts(root, code, spec, pins)
+    historical_path=code/f"configs/cari_clip_{episode:06d}_historical_source_pins.json"
+    historical=None
+    if historical_path.exists():
+        from cari_historical_source import verify_historical_source
+        historical,historical_proof=verify_historical_source(root,historical_path)
+        report["historical_source_binding"]=historical_proof
+        chain=lineage.verify_refined_artifacts(root,code,spec,pins,source_code=historical)
+    else:
+        chain=lineage.verify_refined_artifacts(root,code,spec,pins)
     producer = chain["report"]; lineage.validate_refinement_report(producer, spec)
     frozen = {Path(path): row for path, row in chain["bindings"].items()}
     original_pin = code / f"configs/cari_clip_{episode:06d}_input_pins.json"
@@ -401,7 +409,12 @@ def run(root, out, code, episode, report, persist):
             or {name: public.identity(out / name) for name in outputs} != outputs):
         raise ValueError("Frozen full native source/prediction/assets/exports changed")
     # Recheck complete producer inventories, not just the files opened above.
-    lineage.verify_refined_artifacts(root, code, spec, pins)
+    if historical is not None:
+        if verify_historical_source(root,historical_path)!=(historical,historical_proof):
+            raise ValueError("Original historical source changed after replay")
+        lineage.verify_refined_artifacts(root,code,spec,pins,source_code=historical)
+    else:
+        lineage.verify_refined_artifacts(root,code,spec,pins)
     report.update(status="pass", phase="complete", source_inputs_assets_rehashed=True, source_helpers_rehashed=True,
         raw_masks_contacts_object_pose_unchanged=True, full_original_native_export_verified=True,
         final_Parquet_produced=False, quality_verified=False, submission_eligible=False)

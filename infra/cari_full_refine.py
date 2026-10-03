@@ -222,12 +222,19 @@ def pinned_refined_report(root, spec, pins):
     return dict(directory=directory,report=report,files=dict(files),bindings=frozen)
 
 
-def verify_refined_artifacts(root, code, spec, pins):
-    """Hash/JSON-only downstream full-chain gate; no Torch or Joblib loads."""
+def verify_refined_artifacts(root, code, spec, pins, source_code=None):
+    """Hash/JSON-only full-chain gate; current code owns consumer pins.
+
+    Explicit historical source_code must be independently authenticated by the
+    caller. It is read as readonly provenance only, never imported or executed.
+    Default behavior remains exact current-code equivalence.
+    """
     import cari_full_forward as forward
     selected = pinned_refined_report(root,spec,pins)
     fp = code/f"configs/cari_clip_{spec.episode_index:06d}_shared_forward_pins.json"
-    preceding = forward.verify_forward_artifacts(root,code,spec,json.loads(identity_and_read(fp)))
+    preceding=(forward.verify_forward_artifacts(root,code,spec,json.loads(identity_and_read(fp)))if source_code is None else
+        forward.verify_forward_artifacts(root,code,spec,json.loads(identity_and_read(fp)),source_code=source_code))
+    source_code=code if source_code is None else source_code
     prepared = preceding["prepare"]
     report,fr,pr = selected["report"],preceding["report"],prepared["report"]
     if (report.get("forward_report_sha256") != identity(preceding["directory"]/"report.json")["sha256"]
@@ -246,7 +253,7 @@ def verify_refined_artifacts(root, code, spec, pins):
     mesh=str(root/inputs.relative_paths(spec)["mesh"])
     if report.get("object_mesh_sha256")!=pr["source_files"][str(Path(mesh).relative_to(root))]["sha256"]:
         raise ValueError("Refinement must preserve the exact original aligned mesh")
-    helpers = source_helpers(code)
+    helpers = source_helpers(source_code)
     if (report.get("source_helpers") != helpers
             or report.get("script_sha256") != helpers["infra/cari_full_refine.py"]["sha256"]):
         raise ValueError("Refinement helper source changed")
@@ -274,7 +281,7 @@ def verify_refined_artifacts(root, code, spec, pins):
     contract.require_asset_receipt(json.loads((root/"results/cari-refinement-assets.json").read_text()))
     for path in (fp,ownpin):
         frozen[path]=identity(path)
-    frozen.update({code/name:row for name,row in helpers.items()})
+    frozen.update({source_code/name:row for name,row in helpers.items()})
     selected.update(bindings=frozen,forward=preceding,prepare=prepared)
     return selected
 

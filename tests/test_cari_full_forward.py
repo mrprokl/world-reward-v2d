@@ -476,3 +476,39 @@ def test_full_chain_strict_actual_generator_asset_source_bindings(gate,tmp_path,
     else:report["prepare_report_sha256"]="0"*64
     pins=save()
     with pytest.raises(ValueError):gate.verify_forward_artifacts(root,code,spec,pins)
+
+
+@pytest.mark.parametrize('tamper',[None,'prepare','forward','writable','alias','currentpin'])
+def test_explicit_historical_sources_current_pins_and_tamper_rejection(gate,tmp_path,monkeypatch,tamper):
+    """Historical sources are byte checked, not imported; current owns configs."""
+    root,historical,spec,prepare_pins,input_pins,forward_pins,_,_=full_chain_fixture(gate,tmp_path,monkeypatch)
+    # Replace the fixture's constant callback with genuine per-directory hashes.
+    monkeypatch.setattr(gate.prepare,'source_helpers',lambda c:{
+        'infra/cari_shared_prepare.py':gate.identity(c/'infra/cari_shared_prepare.py',immutable=True)})
+    monkeypatch.setattr(gate,'source_helpers',lambda c:gate.prepare.source_helpers(c)|{
+        'infra/cari_full_forward.py':gate.identity(c/'infra/cari_full_forward.py',immutable=True)})
+    consumer=tmp_path/'current';(consumer/'configs').mkdir(parents=True);(consumer/'infra').mkdir()
+    for path in(historical/'configs').iterdir():
+        target=consumer/'configs'/path.name;target.write_bytes(path.read_bytes());target.chmod(0o444)
+    for path in(historical/'infra').iterdir():
+        target=consumer/'infra'/path.name;target.write_bytes(b'new consumer source must not replace original producer');target.chmod(0o444)
+    with pytest.raises(ValueError):gate.verify_forward_artifacts(root,consumer,spec,forward_pins)
+    if tamper in('prepare','forward'):
+        path=historical/'infra'/('cari_shared_prepare.py'if tamper=='prepare'else'cari_full_forward.py')
+        path.chmod(0o644);path.write_bytes(b'historical source changed');path.chmod(0o444)
+    elif tamper=='writable':(historical/'infra/cari_shared_prepare.py').chmod(0o644)
+    elif tamper=='alias':
+        path=historical/'infra/cari_shared_prepare.py';path.unlink();path.symlink_to(consumer/'infra/cari_shared_prepare.py')
+    elif tamper=='currentpin':
+        path=consumer/'configs/cari_clip_000015_input_pins.json';path.chmod(0o644);path.write_text('{}');path.chmod(0o444)
+    if tamper:
+        with pytest.raises(ValueError):gate.verify_forward_artifacts(root,consumer,spec,forward_pins,source_code=historical)
+        return
+    selected=gate.verify_forward_artifacts(root,consumer,spec,forward_pins,source_code=historical)
+    first=gate.verify_prepare_artifacts(root,consumer,spec,prepare_pins,input_pins,source_code=historical)
+    assert selected['prepare']['files']==first['files']
+    assert str(historical/'infra/cari_shared_prepare.py')in selected['bindings']
+    assert str(historical/'infra/cari_full_forward.py')in selected['bindings']
+    assert str(consumer/'infra/cari_full_forward.py')not in selected['bindings']
+    assert str(consumer/'configs/cari_clip_000015_input_pins.json')in selected['bindings']
+    assert str(consumer/'configs/cari_clip_000015_shared_prepare_pins.json')in selected['bindings']
