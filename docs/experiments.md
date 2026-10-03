@@ -4841,3 +4841,13 @@ contradicts BOP/HF CC-BY-SA4; LINEMOD publisher/embedded terms remain unverified
 No asset acquisition or changed T-LESS protocol. Seek a genuinely new external
 holdout only after source terms resolve, or separately preregister a new authored
 object-camera fixture; never rescore observed TUD-L12 or D88 as fresh validation.
+
+2026-10-03 17:54:18UTC full866 native refinement **PASS533.275096s**,
+unitinactive/exit0/GPUidle, one original native optimizer returned/validated,
+all301effectiveupdates/full866 retained. Original040e1b5/b874a91c producer;
+readonly444 receipt16140B/
+5d1f21af3c7f50a00d9a6bdabf9d2014c01096cf6cafb9dfdee15ee3c86496e3,
+nativebundle662383904B/
+5446d249204545978fca8f8ad2eb7f978de13a0853e73c779df86b98f7d6fa92.
+Separate readonly2artifactinventory9c583d7PASS before actualrefinedpins. No
+final Parquet, object/human/contact/motion metric or eligibility clearance.
