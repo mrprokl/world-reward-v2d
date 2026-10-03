@@ -2653,3 +2653,24 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   32-file ordinary observer import closure116,464B encoded below128KB.
   Frozen preparation+observer full source suite5969PASS/oneoptionaltrimesh
   SKIP83.95s, Bash syntax/diffcheck PASS before immutable Azure dispatch.
+  Fixed-depth fitting policy frozen before observing new labels:5 zero-initialized
+  native XY/Euler latents withZ fixed, same10 training/7heldout landmarks, binary
+  positive equal-confidence support≥6/32px each axis; radialHuber5 plus physical
+  prior sigma.15.60 evaluated states/59Adam updates perframe, LR.01/.9/.999/
+  eps1e-8, first minimum total objective. Full native head only; per-frame
+  observation-only rank5≥1e-5, zero-state parity≤1e-5m, root bounds only; fixed
+  remainder/Z/shape45/PCA28/K/object proxy byte-identical. Freeze15 common
+  metric-aligned MoGe object proxies using shared baseline hard rasters BEFORE
+  optimization.900 objective native heads+15final replay/candidate heads,
+  885updates/≤300 initial Jacobian rows,15baseline+15final hard rasters;
+  whole300sH100/32GiB/4threads/netnone, strict same native CUDA/TF32/determinism.
+  Keep60 evaluated latents/projected training points/objectives and59gradients
+  perframe, for schedule validation and separate final native replay BEFORE
+  any private geometry access; no900-step duplicate optimization. Automatic
+  human silhouette IoU safeguard requires every frame degradation≤.01;
+  evaluate only after all15 candidates frozen, never select via heldout/IoU.
+  Safeguard outcome joins unchanged primary camera-PVE median gain≥5%, no
+  clip regression>5%, all per-hand/clip relative-object error regression≤5%.
+  A complete fit/safeguard rejection may still receive its ONE planned private
+  scoring for scientific diagnosis; rejection stops this recipe on this cohort,
+  no retuning. Native feasibility/2D objective decrease alone never imply adoption.
