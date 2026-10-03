@@ -4851,3 +4851,9 @@ nativebundle662383904B/
 5446d249204545978fca8f8ad2eb7f978de13a0853e73c779df86b98f7d6fa92.
 Separate readonly2artifactinventory9c583d7PASS before actualrefinedpins. No
 final Parquet, object/human/contact/motion metric or eligibility clearance.
+
+Full866 refined/export/stage/archive434focusedPASS2.43s after actualpins;
+all-source9391PASS/2SKIP precedes only new tiny stagepins/docs, no runtime
+numerical source change. Full866 export dispatched oncee7d196dd30726323eaa45af5006ab21ca33462b4,
+58files125568encodedB/publicexactHTTP200; original600s/16chunks/source967b45eb,
+unitactiveMainPID875527. No native rerun, new algorithm or score claim.
