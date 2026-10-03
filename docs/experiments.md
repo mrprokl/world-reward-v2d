@@ -2062,3 +2062,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   immutable results/dwpose-wheel-audit-v2 namespace, oldassets/receipt RO,
   own retainedtexts+primarylicence bindings rehashed, AzureCPU/offline120s.
   PASSonlyintegrity/noticeretention, no runtime/eligibility/trainingclearance.
+
+  D94v2actualengineeringFAIL .004679s/sourcee6237186b80ac1eefceceb5843f84aa5869cf2b8,
+  receipt`de8486168bbbe7bb8e27fb5be44bd3d6bb61e1f02093bb33a107b4eff91ea21e`.
+  OriginalD94 `wheel_audits` assignment failed while building its list, so the
+  key is **omitted**, not an explicitly emptylist. Diagnostic printing used
+  default[] and our consumer incorrectly required[]; stoppedbeforeassetread/
+  wheel audit/install/inference. Preservefailedv2. Separatev3namespace must
+  require REALkeyomission under originalreceiptSHA, not synthesize empty
+  evidence; same exactall9asset/source/license/ZIPguards and120scontract.
+  Add regression fixture matching realomission and reject invented emptylist.
+  No metadata, licence exception, numericalgate or sourcepin relaxation.
