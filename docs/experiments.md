@@ -2931,3 +2931,13 @@ Before any H99 quality/public outcome: original Body loader receipt audit
 requires1101 learned parameters and113 explicit immutable rig buffers, not
 only matching reported source hashes. Quality also reports preregistered
 equal8-group macro means.68 focused quality/observer tests PASS1.56s.
+Actual H99 preparation PASS13.422197s, producingcommit
+dbd888b7711729e3672e56ea127616c1b517c070, renderer
+b2731a6bf4971ec2b112cdd489c51bff437b77b7ac77f0519603424bb4a948be,
+private receipt75ca10272ac7d15a0d39081bbf424b51141e4aca072899d6df6bb0dcc77a3b36
+(27,428B/0400), public manifest7b0ae37ebd6009d24887b999558f86cbd8e2b85d5eb164128ae6ac38326c4664
+(3,511B/0444). All3native batches/24rasters returned; bundled/reference
+V/J maxerrors0.0m, names/topology exact. All12front/backpairs useful,
+minimum994 newlyvisiblehuman pixels. No inference/quality performed.
+Terminalunit/H10039MiB0%. Actual manifestpins onlynow committed, nofactor
+labels or geometry in publicmanifest; nextseparate48DINO/48SAM inference.
