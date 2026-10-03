@@ -4990,3 +4990,27 @@ fakea tag or waive existingstrictb47 continuationgates. No wholeuserdisk/vendor/
 weights/cache/validationcopy, model/data localtransfer or secondGPUjob duplicate.
 No provisioning performed in this audit; root will measure sourcebytes/images
 and actualeligiblepaths before any Azure-only transfer/storage attachment.
+
+EP3standalonevolumeproposal **PASS44.629198728s**, producer
+4adbe37b0668491f9c1b0e3db8a0f86584135133/originalbb6b1769,
+47files67376encodedB/exactpublicHTTP200, unitinactiveexit0/GPUidle.
+All8sourcecomponents retained, source/candidate/packedintersections0,
+sampledCD0.6145435%<1%, netvolume0.0265685%<5%, allbirthface-shelllimits
+passoriginal5%gate; no scale/pose fit or deletion. Originalsource arrays
+unchanged; sourcegroundedscale0.3566955029964447 appliedonce, notsecond
+MoGedepthscale1.0225689589370155. Report19147B/
+560c3db204ad3a047eece406d3249448a1fbd09bb71dfe54ac330ba0466b750c;
+geometry65603B/bbb2bacc67388519206ff2d38db0b768fc04ad668db3846dfd7f727393f60dd3;
+GLB74680B/a2f76e00ac137d90b7fd3a8e24c0d3121d0ab8246a9ea104782e5c8fd7ab0d54.
+Originalfrontendfailedlog73876B/
+174f1d6e95c5bb72463b1da032e01342db1b34f0540f9844bd4c80b1aa668756
+retained; originalfailedtrackingdirectoryempty, no prediction existedthere.
+
+Separate readonly7artifactinventory35ea9e0 independently suppliedactual
+producer/source/video/object/alignment/scale beforehashingALL7/JSON/rehash;
+PASS and actualconfigs/volume_mesh_000003_pins.json committedbeforetracking.
+No numeric/source/gate change. Proposal+inventory/loader/continuation286PASS
+50.08s, probe/authored/grid/camera171PASS0.73s; originalcomplete9468PASS/2SKIP
+precededonlynewprobeandtinyactualpins. Separateprecisionaudit verifies ideal
+grazingplane FP64 against70digitDecimal max4.24e-10m, supporting measured
+NEWfixture rasterproblem, notpreviousfailurecause norcohortrescuepermission.
