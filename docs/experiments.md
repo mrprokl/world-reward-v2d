@@ -2768,3 +2768,29 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   final177corrective bundle/public/fit PASS2.15s.
   Final frozen corrective fullsuite6083PASS/oneoptionaltrimeshSKIP78.19s,
   no scientific recipe/producer changes; readyuniquev2 nativefit dispatch.
+  Corrective fit-v2 dispatched13720afb6f75bed59e449ff5e5f033d88e49a153,
+  actual36-file code archive136,984B. First bounded observation at108s:
+  7candidates/8traces,443nativeattempts,435Adam/backwards,15proxy rasters,
+  no private reads; running report not immutable, no PASS/quality inferred.
+  Separate quality source frozen before private execution: required actual
+  fit+native-best-replay report revisions/SHA/bytes/source/config pins (no
+  placeholder); all15traces reconstruct continuousAdam/objectives/rank, strict
+ 15native selected-state replay gate, source/checkpoint/region/clipfixedABI.
+  QualityCPU120s/8GiB/netnone, all15frames scored ONCE evenIoU safeguard fails;
+  no oraclefit/alignment/frameomission. Seven unchanged historical own metric
+  functions extracted to reusable root_rgb_metrics (exactAST/constants from
+  own5124edad…source); do not import obsolete stage drivers/transitive fit.
+  Complete quality41files155,144B before futureactualpinconfigs, no codecapraise.
+  Native model/reference host0644 stays under oldcanonicalRO validators;
+  ownedcandidate/proxy/replay/private/config/source files remain strictly444/400.
+  Entire public lineage is validated beforeGT and rehashed after; no blanket
+  strict444 reader applied to alreadyauditedreference0644. Paired-baseline
+  depth is not bitidentical to actual zero-native points (parity≤1e-5m), so
+  paired analyticXY comparison is diagnostic, never an extra inconsistent gate;
+  actualnative analyticXY/Jacobian gate remains source/receiptbound unchanged.
+ 43qualitytests/220combined PASS4.41s; full6126PASS/oneoptionaltrimeshSKIP81.48s,
+  Bashsyntax/diffcheck PASS. No private H98 quality read yet.
+  Independent read-only qualityaudit PASS43tests: Git077render+5helpers
+  exactbytes, legacy7metrics exactAST, fit/replay4ed1…field compatibility,
+  full249 manufacturing/private topology/source/mount provenance; no blocker
+  found. Only actual fit/replay PASS and realqualitypins authorizeGT scoring.
