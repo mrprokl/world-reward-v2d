@@ -5447,3 +5447,16 @@ unchanged, failed object_pose_full empty. Continuation NOT run or adopted yet.
 Actual asset-only archive c84558c/53files62668encodedB dispatched once;
 21:15:13UTC activeMainPID954648/archive exists/no receipt. No archivePASS,
 transfer/clone/CUDA/source-parity/eligibility claim yet. All heavy bytes Azure.
+
+21:19:48UTC independent EP3 prepare stage inventory inactive/exit0 confirms
+all four artifacts/input-frame/source contracts without numerical arrays; NEW
+shared_prepare pins frozen before forward. Exactproducer remainsc84558c.
+Asset-only archive actuallyPASS268.822073602s, own0400receipt3191B/
+4c552c18ccb35e76efe40754a5c45d92703506bebc1f8bef2c355075543af0bf;
+archive19911464960B/5b817ea15e98f1f18165529fcac3ca0b7fc9f88b96d22f2195396db6ffbf8342,
+firstderivedmanifest131666B/16a6b5314b205c5ad526df2340ab99e46873fd5d62b1c8811f9a210184bfb0f8.
+Same-run operational extraction-free verifyPASS; independent external verify
+is still pending and explicitlyFalse in committed byte pins. No media local,
+rawbuildreceipts/images/private/challenge data exported, no transfer/replicaready
+claim. Grounding/Objects image transfer/build deferred pending actual installed
+source/dependency audit; do not copy old privateTUDL exporter or invent OCIIDs.

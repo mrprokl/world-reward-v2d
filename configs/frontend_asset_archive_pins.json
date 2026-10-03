@@ -1,0 +1,24 @@
+{
+  "schema": "world_reward.frontend_asset_archive.pins.v1",
+  "producer_revision": "c84558c673ef8af299dfa187eeb8fde8ce9fc8e1",
+  "archive_pathrelative": "results/frontend-asset-archive-c84558c673ef8af299dfa187eeb8fde8ce9fc8e1/archive.tar",
+  "archive_identity": {
+    "bytes": 19911464960,
+    "sha256": "5b817ea15e98f1f18165529fcac3ca0b7fc9f88b96d22f2195396db6ffbf8342"
+  },
+  "manifest_identity": {
+    "bytes": 131666,
+    "sha256": "16a6b5314b205c5ad526df2340ab99e46873fd5d62b1c8811f9a210184bfb0f8"
+  },
+  "report_identity": {
+    "bytes": 3191,
+    "sha256": "4c552c18ccb35e76efe40754a5c45d92703506bebc1f8bef2c355075543af0bf"
+  },
+  "files": 448,
+  "links": 3,
+  "payload_bytes": 19910803804,
+  "replica_ready": false,
+  "license_eligibility_verified": false,
+  "training_overlap_verified": false,
+  "independent_external_archive_verification_completed": false
+}
