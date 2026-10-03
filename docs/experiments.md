@@ -2445,3 +2445,14 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   invalid from this audit. Next cheap decisive check is CPU-only JIT getter code/
   graph and minmax metadata introspection, still without forward/GT. No new
   fitting protocol is frozen until this distinction is resolved.
+
+  Separate getter/state inspection source frozen BEFORE execution: CPU60s/
+  8GiB/4threads, exact native reference SHA/size and uniquely read-only VFS
+  file mount; only the unchanged bounds-audit-v2 PASS receipt is an input.
+  Preserve actual TorchScript `get_parameter_limits` code/graph, all249 names/
+  dense limits and bounded limit/minmax buffer metadata. Repeat snapshots and
+  rehash model/source/prior receipt; zero model forwards, optimizer or private
+  geometry reads. New `results/mhr-limits-semantics-v1` namespace, five-file
+  closure7,680B encoded;23 dedicated/66 combined tests and independent audit
+  PASS. Getter delegation/cached tensors alone may leave zero-zero semantics
+  unresolved; inspection PASS does not authorize bounds changes or adoption.
