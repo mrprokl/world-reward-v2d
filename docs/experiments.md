@@ -2263,8 +2263,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   exactly60evaluatedstates/59Adamupdates lr.01/betas(.9,.999)/eps1e-8, select
   LOWESTtotalobjective EVALUATEDstate (firsttie), neverunevaluatedlaststep.
   Sixdimensionlesslatentzeros: Δxy=.30tanh(u[:2]); ΔlogZ=ln1.25tanh(u[2]);
-  Tz=Tz0exp(ΔlogZ); ΔnativeEuler=.30tanh(||u[3:]||)u[3:]/||u[3:]|| with
-  analyticzeroextension, finitegradient/norm≤.30rad. Allnativeglobal_trans0.
+  Tz=Tz0exp(ΔlogZ); ΔnativeEuler_i=(.30/sqrt3)tanh(u_i), i3..5, giving
+  norm≤.30rad andfinitegradientat0, fixedaxis-boxsubsetofrotationball.
+  This source-only simplification is BEFORE anyfreshpublicBody/DWPose output,
+  avoidsradial0/0 and is not observation-drivenretuning. Allnativeglobal_trans0.
   DataL=mean_valid h(||reproject−DWPosepixel||2/5px), h(q)=.5q² ifq≤1 elseq−.5;
   priorL=.5[(Δx/.15m)²+(Δy/.15m)²+(ΔlogZ/.15)²+||ΔEuler/.15rad||²], coefficient1.
   Equalbinaryfinitepositive observations; no prior multiplied bylandmarkcount,
