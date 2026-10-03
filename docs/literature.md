@@ -1149,3 +1149,17 @@ explicitly declaresCC-BY-NC-SA4. Do not acquire its153745625B RGB-D validation
 ZIP without written clarification. LINEMOD publisher/embedded terms and exact
 archive pins remain unverified despite BOP/HF750b2f78 CC-BY4 metadata, so no
 acquisition yet. No assets or label values were inspected in this text audit.
+
+Separate readonly feasibility audit permits one **conditional**, newly authored
+object-camera depth fixture, not a rerun of observedD88 or failed native-human
+geometry. Three convex ellipsoids, distinct constant shapes/materials/lights,
+four fixed rigid-motion instants each,640x480/K800 and physical textured finite-Z
+backgrounds; all12RGB and private truth must be manufactured and pinned before
+unchanged MoGe/DA3 inference. Reuse camera/raster source only, not old MHR/IDs/
+labels/globals. Require closed oriented positive-volume meshes, same actualFP32
+RGB/Z/visibility fragments and independent ray/triangle-Z check before prediction.
+The fixed10% border/median4/1024pairs/95%coverage and existing paired cameraCD
+gates stay unchanged. Actual VM02 CUDA raster preflight and a separate
+source-bound predictor namespace are prerequisites; no manufacture/inference
+implemented. This could test new **synthetic object-depth** transfer only,
+never real/fullHOI/human/contact/CARI superiority or checkpoint leakage clearance.
