@@ -3216,3 +3216,26 @@ Finalread-onlyexecutionauditREADY; fullsuite6440PASS/oneoptionaltrimeshSKIP
 policytestsPASS5.39s. Dispatch/active status alone is not a mechanism PASS.
 Only own local disposable Python/pytest caches removed; all Azure frozen
 failures/nativeartifacts/historicalsource preserved, no heavy data here.
+
+IndependentpreparedH101consumer audit85testsPASS: strictinventories reject
+hiddenextras, clip/frameidentity/SHAM/medoid+allmetricgates coherent. Two
+metadata-only preexecution gaps identified: topology dimensions/ranges lacked
+typednativeSHA, frozenarrays did not yetvalidate6branch/3replay/bbox/K
+metadata. Fixthese before anyqualityconsumer; neither gap authorizesH101
+execution or weakens actualcall/SHAM requirements. No new quality observed.
+
+Actual H100c mechanism PASS23.146740s, producer18c605dcf0b045db1472d6de6e5d9b95dd17283f,
+driverf14b882e5074d5dd59d2b76d179ce0f96d05ae0c3acc0269fe84338156bad0bd,
+receipt09434f40e41f772f8e718465a16c720d8eedfebc5d74f8a80334208083f4ba50
+(51,610B/0444). Actual6Body/6parity/6KP/6fixed/3selected and57scopednative
+heads complete/validated/synchronized/restored; methodrestored, fullsource/
+asset/RGB/mask rehash and15frozenartifacts reread. All3RAW+FIXED SHAMexact
+byteidentity; index0/scores0. OriginalRGB medoid index0/gamma1; pairwiseVmean
+square distancesoriginal→gamma.8=8.263913e−6m²,→gamma1.2=1.932132e−5m².
+Mechanism works but thissinglecase makes nochange andprovides NOaccuracy
+evidence. JointstrictMHR+unoptimizedJIToperationalroute qualifiesfixtureonly,
+notcausalattribution/crossprocess/allframes/quality/adoption. H100/H100bFAIL
+remainimmutable; no rescoring/privatetruth. Unit inactiveexit0/lastGPU125MiB0%.
+Next actualscience requires NEW24human-only pairedquality preregistration,
+SAMEscopedexecution on every method/nativehead, all24/8groups retained and
+existingSHAM/native/sourcegates; never use thisindex0 toadjustgammas.
