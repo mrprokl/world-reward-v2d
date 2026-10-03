@@ -784,3 +784,45 @@ wrists and full3D/interaction/silhouette gates before quality. Suggested
 ≥5%gain vs baselineANDSHAM/no>5%group orhandrelative regression/−1ppIoU,
 not yet authorized/preregistered here. SHAM distinguishes prior recurrence
 from useful2Dconditioning. Never retune H99 or score it again to testprompts.
+
+### After H99 rejection — lower-cost photometric consistency hypothesis
+
+NoDWpromptpilot: H99preregisteredrule failed0/8groups, fullCOCO17coverage.
+The next useful small hypothesis is photometric multi-view consistency
+under the SAME clip identity, not freeing rootZ or installing anotherdetector.
+[NLF source at NeurIPS2024 pin](https://github.com/isarandi/nlf/blob/f8611fc76ff60f262eb0ab2c6abc3947e42a954a/src/nlf/pt/multiperson/multiperson_model.py)
+43,390B SHA19baac0f1856f332c206a4b3eac58212cdff3ee0290ee16af3099843d9806c35
+L463–512/795–798 implements gamma/crop/rotation/flip TTA. CodeMIT; NLF
+pretrainedREADME NC, no NLFasset/import proposed. Borrow only photometric
+TTA idea; `scale_align` is not legitimate metric correction for ourpipeline.
+
+Candidate for NEXT separate preregistration (NOT H99retune/startedexperiment):
+untouched24adjacentRGB frames/8clips, fixedgamma(.8,1,1.2), deterministic
+sRGBuint8 rounding+hases; originalRGB preserved, sameautomaticmask/bbox/K
+(no spatialwarp/redetection).72originalBodycalls; first originalRGBshape45/
+PCA28 fixed allbranches, originalbaselineglobalrot/pred_cam_t/hands/face0
+fixedwhileeachgamma proposesbodycontrols. Candidate is an EXISTINGnative
+geometry medoid of3replayedproposals (fullVcameraL2distance toothers,
+identitygamma1firsttie), notEuler/rotation/scaleaveraging orGT/IoUselection.
+This deliberately tests articulatedappearanceconsistency, not gaugefixing.
+A matched3×identitygammaSHAM/seedreset verifies recurrence/aggregation
+cannotimprove by changing identity/camera; exactbaselineparitybeforeGT.
+Firstguard is a NEW public-only native mechanism/replay test, no quality
+labels or sampling scoredH99cases. Dense249hardbounds are NOT official
+kitconstraint; retain prior failedresearchgates and preregister any new
+physiological safeguard honestly, never silentlywaive baseline violations.
+
+Then new24qualityONCE: frozenalloutputs+fullnative replay, SAMEfirsthuman
+baseline-derivedproperSim3 for pairedcandidates, fixed3poses+objectproxy;
+not perframe/objectalignment. Proposedgate medianalignedhuman5%gain/
+no>5%group orhand-object regression/all24humanIoU≥−1pp; rawcamera/Z/
+centeredPVE andobject/contact/adjacenttime diagnostics disclosed. No fullHOI
+claim ifonlyvisibleproxy; challenge-style separatelyderivedeachmethod
+alignment must be labelled secondary, not substitutedfor failedpairedgate.
+Need exactnewpreregistration/implementation beforeacquisition/execution.
+
+GEM-X remainssecond-line: new~3.93GBassets, SOMA→MHRinverseunverified,
+mandatorySAMcustomsource eligibility unresolved, nativeglobal_scaleclamp
+[.7,1] evenpostprocFalse. FullCARI objectmesh/pose/contact/temporal quality
+remains necessary; photometricpilot doesnotreplace it or establish victory.
+No newweights, RGB, GT or proxy downloaded/run during this literatureaudit.

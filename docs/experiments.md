@@ -3007,3 +3007,10 @@ no newstack assets just because H100available, no promisedCARIvictory.
 All5H99units terminal; lastH10027MiB0%, noheavydata/model/RGBtransferred
 locally.143focusedtestsPASS1.73s immediatelybeforeactualqualitydispatch;
 actualqualityarchive43files148,268B<160KB.
+PostactualH99quality/sourceconfig184focusedtestsPASS1.86s; cleanworking
+source and historicalrecipes retained. Next concrete action is a NEW
+public-only photometric/native-medoid mechanism test, before preregistering
+newquality; not resurrectDWelbow-only prompts or addrootfreedom. Literature
+audit supplies exactAPI/coordinate/SHAM/nativeidentity constraints; no extra
+checkpoint required, allGPUdata remainsAzure. H99marksPROGRESS (actual
+scientificrejection changesnextmethod), not a blocker or completedsubmission.
