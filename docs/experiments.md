@@ -3341,3 +3341,22 @@ observer36files116,008B, evaluator40files134,188B, allbelow160KBcontrolbudget.
 H101 ready for first manufacture/public inference; no private quality or scores
 yet. Launch manufacture/masks/body from the same frozen source revision; record
 their immutable scalar receipts only after body dispatch, preserving that pin.
+
+H101 first manufacture **PASS10.372355s**, source
+`05ef12488cc10bce68c233a92ea73a71005c44de`, renderer
+`359e1fe495fa5ac7dc87d482a8ad90a6074455a9f68690099549eb2433da3eee`.
+Receipt`62960a7f30d1ea7c58a4c1fba320b9f06ae01e8d889a0c836a0d73ddf91010bc`
+(29,468B/0400):24RGB/24rasters,2reference+1bundled native forwards,
+allfactorsgeometryindependent/sourceassetsrechecked, actualnamedl_lowarm76.
+Public manifest`2e100730f0d32fcc29fca9c5f317de7afc28e2f63cbd8e1f7218d6319abbe0d4`
+(3,515B). Unitinactiveexit0; no RGB/geometry copied locally/privatequality.
+
+H101 automatic masks **PASS17.316456s**, SAMEsource05ef124…/observer
+`2c68d9b12da166b36cc28c29ab93cfebca5960ed917339d19b12f524e0f553da`.
+Receipt`4ac9cb33bf5478d62430d6346a925d776116895472c79511d9a819131a44276d`
+(19,433B/0444):all24automaticpersonDINO/SAM2/encodercalls andmaskoutputs,
+fullpublic/source/assetsrehash, no privateinput. Unitinactiveexit0/GPU113MiB0%.
+Body observer nowdispatched from SAMEimmutable05ef124…bundle116,024B,
+unit`world-reward-h101-human-photometric-body`;600sbudget/144learnedcalls/
+1392strictnative scopes required. Quality pins NOTyetcreated; waitallpublic
+mechanism/replay/provenancePASS, noaccuracyquery orproducerrestart.
