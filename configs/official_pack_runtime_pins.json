@@ -1,0 +1,35 @@
+{
+  "schema": "world-reward-official-pack-runtime-pins-v1",
+  "image_id": "sha256:1a04b1930f713ef9ffb411489e80ddebbce59a5ce26e713add4095cd9b5303f0",
+  "base_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "build_receipt": {
+    "sha256": "ce9a8ba45b14b3faefbdeb43a6f18e410f1bd1a95f0dd19e17727871a71812a2",
+    "bytes": 3563,
+    "producer_revision": "764c3bce2f8c8a6192d5f68b455a45274e59efd8",
+    "script_sha256": "8b380376230c7439ba058a27e6acc5a0911d55600ba71f737264c28bb113a717"
+  },
+  "wheel": {
+    "filename": "pyarrow-19.0.1-cp311-cp311-manylinux_2_28_x86_64.whl",
+    "sha256": "49a3aecb62c1be1d822f8bf629226d4a96418228a42f5b40835c1f10d42e4db6",
+    "bytes": 42084055,
+    "version": "19.0.1"
+  },
+  "source_helpers": {
+    "infra/official_pack_image_build.py": {
+      "sha256": "8b380376230c7439ba058a27e6acc5a0911d55600ba71f737264c28bb113a717",
+      "bytes": 18419
+    },
+    "infra/run_official_pack_image_build.sh": {
+      "sha256": "2a81d511bc6755aab0faeb924d4f0289bee2c38697120f4436cdff4f4227ca79",
+      "bytes": 2155
+    }
+  },
+  "versions": {
+    "numpy": "1.26.3",
+    "scipy": "1.16.3",
+    "pandas": "3.0.6",
+    "trimesh": "5.1.0",
+    "fast-simplification": "0.2.0",
+    "pyarrow": "19.0.1"
+  }
+}

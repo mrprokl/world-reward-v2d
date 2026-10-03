@@ -26,7 +26,18 @@ import time
 from types import SimpleNamespace
 
 ROOT = Path("/srv/scenesmith/world-reward")
-IMAGE = "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7"
+BASE_ID = "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7"
+RUNTIME_PINS = "configs/official_pack_runtime_pins.json"
+BUILD_RECEIPT = "results/official-pack-image-build.json"
+BUILDER_REVISION = "764c3bce2f8c8a6192d5f68b455a45274e59efd8"
+BUILDER_HELPERS = {
+    "infra/official_pack_image_build.py": {"bytes": 18419, "sha256": "8b380376230c7439ba058a27e6acc5a0911d55600ba71f737264c28bb113a717"},
+    "infra/run_official_pack_image_build.sh": {"bytes": 2155, "sha256": "2a81d511bc6755aab0faeb924d4f0289bee2c38697120f4436cdff4f4227ca79"},
+}
+ARROW_WHEEL = {"filename": "pyarrow-19.0.1-cp311-cp311-manylinux_2_28_x86_64.whl", "version": "19.0.1",
+    "sha256": "49a3aecb62c1be1d822f8bf629226d4a96418228a42f5b40835c1f10d42e4db6", "bytes": 42084055}
+PARENT_VERSIONS = {"numpy": "1.26.3", "scipy": "1.16.3", "pandas": "3.0.6", "trimesh": "5.1.0", "fast-simplification": "0.2.0"}
+RUNTIME_VERSIONS = dict(PARENT_VERSIONS, pyarrow="19.0.1")
 STAGE = "world_reward_one_episode_unmodified_official_track1_packer_smoke"
 BUDGET = 300
 PUBLIC_REPOSITORY = "https://github.com/mrprokl/world-reward-v2d"
@@ -98,6 +109,91 @@ def source_helpers(code):
     names = ("infra/official_track1_pack_gate.py", "infra/run_official_track1_pack_gate.sh",
              "infra/cari_shared_episode_loader.py", "src/world_reward/submission.py")
     return {name: identity(code / name) for name in names}
+
+
+def validate_runtime_pins(pins):
+    """Strict committed observed runtime pin schema, no unknown IDs or secrets."""
+    import cari_clip_inputs as public
+    expected = {"schema", "image_id", "base_id", "build_receipt", "wheel", "source_helpers", "versions"}
+    if (type(pins) is not dict or set(pins) != expected
+            or pins["schema"] != "world-reward-official-pack-runtime-pins-v1"
+            or type(pins["image_id"]) is not str or not re.fullmatch(r"sha256:[0-9a-f]{64}", pins["image_id"])
+            or pins["image_id"] == BASE_ID or pins["base_id"] != BASE_ID
+            or pins["wheel"] != ARROW_WHEEL or pins["source_helpers"] != BUILDER_HELPERS
+            or pins["versions"] != RUNTIME_VERSIONS):
+        raise ValueError("Exact observed new CPU image/unchanged parent/wheel/source/runtime pins required")
+    public._receipt(pins["build_receipt"], producer=True)
+    if (pins["build_receipt"]["producer_revision"] != BUILDER_REVISION
+            or pins["build_receipt"]["script_sha256"] != BUILDER_HELPERS["infra/official_pack_image_build.py"]["sha256"]):
+        raise ValueError("Runtime receipt must bind the actual immutable CPU builder")
+    for row in pins["source_helpers"].values():
+        public._receipt(row)
+    if type(pins["wheel"]["bytes"]) is not int:
+        raise ValueError("Exact independently pinned Arrow wheel byte count required")
+
+
+def validate_runtime(pins, receipt):
+    """Pure actual build-receipt checks; external parent/native reports stay b47e."""
+    validate_runtime_pins(pins)
+    required = dict(stage="world_reward_official_pack_CPU_image_build", status="pass", phase="complete",
+        producer_revision=BUILDER_REVISION, script_sha256=pins["build_receipt"]["script_sha256"],
+        image_id=pins["image_id"], image_tag="world-reward/official-pack-cpu:0.1", base_image_id=BASE_ID,
+        source_helpers=BUILDER_HELPERS, budget_seconds=300, download_budget_seconds=120,
+        GPU_used=False, Torch_loaded=False, Joblib_loaded=False, challenge_inputs_used=False,
+        data_or_models_read=False, secret_material_used=False, build_network="none", base_pull_performed=False,
+        parent_unchanged_verified=True, temporary_wheel_context_removed=True,
+        runtime_dependency_installation=False, only_pyarrow_added=True,
+        source_helpers_rehashed=True, wheel_download_verified=True)
+    if type(receipt) is not dict or any(type(receipt.get(key)) is not type(value) or receipt[key] != value
+            for key, value in required.items()):
+        raise ValueError("Actual successful Arrow-only CPU build receipt/provenance required")
+    wheel = receipt.get("wheel")
+    if (type(wheel) is not dict or any(type(wheel.get(key)) is not type(value) or wheel[key] != value
+            for key, value in ARROW_WHEEL.items() if key != "version")):
+        raise ValueError("Actual CPU build must use the independent exact Arrow wheel")
+    for name, arrow, verified in (("parent_versions", None, False), ("CPU_probe", "19.0.1", True)):
+        probe = receipt.get(name)
+        if (type(probe) is not dict or set(probe) != {"versions", "pyarrow", "python", "CPU_import_verified", "Torch_loaded", "Joblib_loaded"}
+                or probe["versions"] != PARENT_VERSIONS or probe["pyarrow"] != arrow
+                or probe["CPU_import_verified"] is not verified or probe["Torch_loaded"] is not False
+                or probe["Joblib_loaded"] is not False or type(probe["python"]) is not str
+                or not re.fullmatch(r"3\.11\.[0-9]+", probe["python"])):
+            raise ValueError("Actual original parent/new Arrow CPU package probe differs")
+    if receipt["parent_versions"]["python"] != receipt["CPU_probe"]["python"]:
+        raise ValueError("Packaging image must preserve the original Python version")
+    return dict(image_id=pins["image_id"], base_id=BASE_ID, versions=dict(RUNTIME_VERSIONS),
+        only_pyarrow_added=True, parent_unchanged_verified=True, GPU_used=False)
+
+
+def load_runtime(root, code):
+    """Hash JSON/helper bytes only; never import or execute the image builder."""
+    path = code / RUNTIME_PINS
+    pin_id = identity(path)
+    pins = strict_json(path)
+    validate_runtime_pins(pins)
+    receipt_path = root / BUILD_RECEIPT
+    receipt_id = identity(receipt_path)
+    if receipt_id != {key: pins["build_receipt"][key] for key in ("sha256", "bytes")}:
+        raise ValueError("Actual frozen CPU build receipt differs from committed runtime pins")
+    receipt = strict_json(receipt_path)
+    summary = validate_runtime(pins, receipt)
+    helpers = {name: identity(code / name) for name in BUILDER_HELPERS}
+    if helpers != BUILDER_HELPERS or helpers != receipt["source_helpers"]:
+        raise ValueError("Current hash-only CPU builder source differs from actual build")
+    if identity(path) != pin_id or identity(receipt_path) != receipt_id:
+        raise ValueError("Frozen runtime pins/build receipt changed during validation")
+    return dict(pins=pins, pins_identity=pin_id, receipt_identity=receipt_id, summary=summary)
+
+
+def check_runtime_packages(versions):
+    """Installed-distribution metadata only, no CPU/GPU models or builder imports."""
+    import importlib.metadata
+    actual = {name: importlib.metadata.version(name) for name in RUNTIME_VERSIONS}
+    if actual != versions or actual != RUNTIME_VERSIONS:
+        raise ValueError("Actual CPU packer package versions differ from unchanged parent plus Arrow")
+    if any(name in sys.modules for name in ("torch", "joblib")):
+        raise ValueError("Packaging runtime must not import model/Torch/Joblib execution")
+    return actual
 
 
 def official_sources(root):
@@ -330,6 +426,11 @@ def run(root, out, code, episode, report, persist, *, consumer=None, packer=None
         raise ValueError("Explicit episode differs from original full export pins")
     validate_export_pins(spec, pins)
     own = source_helpers(code)
+    runtime = load_runtime(root, code)
+    if report["image_id"] != runtime["pins"]["image_id"]:
+        raise ValueError("Actual packer report image differs from committed CPU runtime pins")
+    report.update(runtime_pins=runtime["pins_identity"], runtime_build_receipt=runtime["receipt_identity"],
+                  packaging_runtime=runtime["summary"], actual_package_versions=check_runtime_packages(runtime["pins"]["versions"]))
     official = official_sources(root)
     export_directory = root / f"outputs/episode_{episode:06d}/cari_shared_export_v1"
     export_files = {export_directory / name: value for name, value in pins["export_files"].items()}
@@ -373,6 +474,8 @@ def run(root, out, code, episode, report, persist, *, consumer=None, packer=None
         report["scratch_removed"] = not scratch.exists()
         persist()
     if (identity(pins_path) != pin_id or strict_json(pins_path) != pins or source_helpers(code) != own
+            or load_runtime(root, code) != runtime
+            or check_runtime_packages(runtime["pins"]["versions"]) != report["actual_package_versions"]
             or official_sources(root) != official or identity(sample_path, immutable=False) != sample_id
             or any(identity(path) != value for path, value in export_files.items())
             or any(name in sys.modules for name in ("torch", "joblib"))
@@ -381,16 +484,18 @@ def run(root, out, code, episode, report, persist, *, consumer=None, packer=None
     report.update(status="pass", phase="complete", frames=spec.total_frames,
                   unmodified_official_packer_verified=True, original_row_id_order_verified=True,
                   source_helpers_rehashed=True, official_sources_rehashed=True, export_pins_rehashed=True,
-                  complete_export_payloads_rehashed=True,
+                  complete_export_payloads_rehashed=True, runtime_pins_build_receipt_rehashed=True,
                   complete_challenge_submission_created=False, final_Parquet_produced=False)
 
 
 def execute(root, out, code, episode, revision, **callbacks):
     if not out.is_dir() or any(out.iterdir()):
         raise ValueError("Fresh exclusive one-receipt smoke output required")
+    runtime = load_runtime(root, code)
     report = dict(stage=STAGE, status="fail", phase="public_integrity", episode_index=episode,
                   producer_revision=revision, script_sha256=identity(code / "infra/official_track1_pack_gate.py")["sha256"],
-                  image_id=IMAGE, input_track="track_1", network="none", budget_seconds=BUDGET,
+                  image_id=runtime["pins"]["image_id"], parent_image_id=BASE_ID,
+                  input_track="track_1", network="none", budget_seconds=BUDGET,
                   ground_truth_used=False, hand_labeled_test=False, oracle_modes=[], GPU_used=False,
                   model_calls=0, optimizer_calls=0, render_calls=0, Kaggle_upload_calls=0,
                   official_packer_attempts=0, official_packer_returns=0, official_packer_validated=0,
@@ -440,13 +545,16 @@ def main(argv=None):
     out = root / output_relative(args.episode)
     if (platform.system() != "Linux" or root != ROOT or os.geteuid() != 1000
             or {path.name for path in Path("/sys/class/net").iterdir()} != {"lo"}
-            or os.environ["WR_IMAGE_ID"] != IMAGE or not re.fullmatch(r"[0-9a-f]{40}", revision)
+            or not re.fullmatch(r"[0-9a-f]{40}", revision)
             or code != root / "jobs" / revision / "run_official_track1_pack_gate/code"
             or Path(__file__).resolve() != code / "infra/official_track1_pack_gate.py"
             or any(path.resolve() != path.absolute() or any(p.is_symlink() for p in (path, *path.parents)) for path in (root, code, out))):
         raise ValueError("Actual immutable offline CPU official packer launcher/image required")
+    runtime = load_runtime(root, code)
+    if os.environ["WR_IMAGE_ID"] != runtime["pins"]["image_id"]:
+        raise ValueError("Actual immutable CPU image ID differs from runtime pins")
     kit = root / "vendor/v2d_submission_kit"
-    require_readonly_mounts((code, *(kit / name for name in OFFICIAL_SOURCES), root / SAMPLE_RELATIVE))
+    require_readonly_mounts((code, *(kit / name for name in OFFICIAL_SOURCES), root / SAMPLE_RELATIVE, root / BUILD_RECEIPT))
     execute(root, out, code, args.episode, revision)
 
 

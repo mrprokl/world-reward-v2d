@@ -4058,3 +4058,28 @@ Complete CPU image builder/source suite **8253PASS/2same optionalSKIP127.34s**;
 unchanged directexport/sharedconsumer/crosssurface/own-grasp sources verified.
 Freeze builder before its first AzureCPUdispatch; one exclusive image tag/report,
 no implicit repair/rebuild.
+
+Actual original CPU imports NumPy/SciPy/pandas/trimesh/fast-simplification pass
+in sourceimageb47e with noTorch/Joblib loaded; pandas tinyframe(1,2). First
+separateArrowCPUbuilder dispatched from764c3bce2f8c8a6192d5f68b455a45274e59efd8,
+21files16,672encodedB, unitworld-reward-official-pack-cpu-image-build-v1.
+Actualbuild outcome pending. The existing frontend retains its GPU; no model or
+dataset transferred locally, no extra H100 or replacementCARI image.
+
+Arrow CPUchild actualbuildPASS68.365245s, unitinactive/dead/exit0. Producer
+764c3bce2f8c8a6192d5f68b455a45274e59efd8/driver8b380376230c7439ba058a27e6acc5a0911d55600ba71f737264c28bb113a717.
+Actualimage sha256:1a04b1930f713ef9ffb411489e80ddebbce59a5ce26e713add4095cd9b5303f0,
+receiptce9a8ba45b14b3faefbdeb43a6f18e410f1bd1a95f0dd19e17727871a71812a2(3,563B/444).
+Python3.11.10; Arrow19.0.1actualCPUimport, fiveoriginalpackages preserved,
+parentb47e unchanged; onlyArrowadded and scratchremoved verified. NoGPU/
+Torch/Joblib/records/models read. Root runtimepins now record actualobservations;
+officialpacking checks exactreceipt/source/image before first invocation.
+Episode1 stillactive300/668objectframesat1,935.131503s, nofulloutcomeclaimed.
+
+Full actual build receipt inspected; committed runtimepins bind its exact bytes,
+builder revision/helpers, Arrow wheel and immutable childimage. Pure runtime
+validator accepts observed fields; launch will hash-check the original receipt.
+Parent/native export pins remain b47e, no fabricated relabeling. Runtime-bound
+official gate tests77PASS; complete **8282PASS/2same optionalSKIP124.02s**.
+No actual official packing yet; freeze/push the actual producing code before
+one CPU-only episode15 smoke. No benchmark accuracy or all30 submission claim.

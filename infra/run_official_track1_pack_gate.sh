@@ -12,6 +12,8 @@ printf -v PADDED '%06d' "$EPISODE"
 BASE="$ROOT/outputs/episode_$PADDED";OUT="$BASE/official_track1_pack_smoke_v1"
 PIN="$CODE/configs/cari_clip_${PADDED}_input_pins.json"
 EXPORT_PIN="$CODE/configs/cari_clip_${PADDED}_shared_export_pins.json"
+RUNTIME_PIN="$CODE/configs/official_pack_runtime_pins.json"
+[[ -f "$RUNTIME_PIN" && ! -L "$RUNTIME_PIN" ]]
 python3 -I -B - "$ROOT" "$CODE" "$OUT" "$PIN" "$EXPORT_PIN" "$REV" "${BASH_SOURCE[0]}" <<'PYSAFE'
 from pathlib import Path
 import re,stat,sys
@@ -34,8 +36,19 @@ for path in (pin,exported,code/'infra/official_track1_pack_gate.py',code/'infra/
   raise ValueError('Committed actual readonly consumer/pins required')
 PYSAFE
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-IMAGE="$(docker image inspect world-reward/cari4d-source:0.1 --format '{{.Id}}')"
-[[ "$IMAGE" == sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7 ]]
+# Entire runtime JSON/receipt/helper binding is stdlib-only, before Docker or
+# output reservation. The builder is never imported or executed here.
+PINNED_IMAGE="$(python3 -I -B - "$ROOT" "$CODE" <<'PYRUNTIME'
+import sys
+from pathlib import Path
+root,code=map(Path,sys.argv[1:])
+sys.path[:0]=[str(code/'infra'),str(code/'src')]
+from official_track1_pack_gate import load_runtime
+print(load_runtime(root,code)['pins']['image_id'])
+PYRUNTIME
+)"
+IMAGE="$(docker image inspect world-reward/official-pack-cpu:0.1 --format '{{.Id}}')"
+[[ "$IMAGE" == "$PINNED_IMAGE" ]]
 # Host source-list bootstrap stays stdlib-only: no NumPy/consumer/model import.
 SOURCES="$(PYTHONPATH="$CODE/src:$CODE/infra" PYTHONDONTWRITEBYTECODE=1 python3 - "$PIN" "$EPISODE" <<'PYPATHS'
 import json,sys
@@ -47,7 +60,8 @@ validate_pins(spec,pins)
 print('\n'.join(sorted(source_paths(spec))))
 PYPATHS
 )"
-MOUNTS=(--mount "type=bind,src=$CODE,dst=$CODE,readonly")
+MOUNTS=(--mount "type=bind,src=$CODE,dst=$CODE,readonly"
+ --mount "type=bind,src=$ROOT/results/official-pack-image-build.json,dst=$ROOT/results/official-pack-image-build.json,readonly")
 while IFS= read -r relative;do
  path="$ROOT/$relative";[[ -f "$path" && ! -L "$path" ]]
  MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")

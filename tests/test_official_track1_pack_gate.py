@@ -189,9 +189,47 @@ def test_packer_fail_or_mutation_never_validated(gate, tmp_path, fault):
     assert report.get("official_packer_validated", 0) == 0
 
 
+def runtime_fixture(gate, tmp_path, monkeypatch):
+    """Synthetic actual-observation-shaped JSON only, never production config."""
+    helpers = {}
+    for name in gate.BUILDER_HELPERS:
+        path = tmp_path / "fixture_sources" / name
+        path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(("own builder fixture " + name).encode()); path.chmod(0o444)
+        helpers[name] = gate.identity(path)
+    monkeypatch.setattr(gate, "BUILDER_HELPERS", helpers)
+    image = "sha256:" + "e" * 64
+    probe = dict(versions=gate.PARENT_VERSIONS.copy(), pyarrow="19.0.1", python="3.11.11",
+                 CPU_import_verified=True, Torch_loaded=False, Joblib_loaded=False)
+    parent = dict(probe, pyarrow=None, CPU_import_verified=False)
+    wheel = {key: value for key, value in gate.ARROW_WHEEL.items() if key != "version"}
+    receipt = dict(stage="world_reward_official_pack_CPU_image_build", status="pass", phase="complete",
+        producer_revision=gate.BUILDER_REVISION, script_sha256=helpers["infra/official_pack_image_build.py"]["sha256"],
+        image_id=image, image_tag="world-reward/official-pack-cpu:0.1", base_image_id=gate.BASE_ID,
+        source_helpers=helpers, budget_seconds=300, download_budget_seconds=120,
+        GPU_used=False, Torch_loaded=False, Joblib_loaded=False, challenge_inputs_used=False,
+        data_or_models_read=False, secret_material_used=False, build_network="none", base_pull_performed=False,
+        parent_unchanged_verified=True, temporary_wheel_context_removed=True, runtime_dependency_installation=False,
+        only_pyarrow_added=True, source_helpers_rehashed=True, wheel_download_verified=True,
+        wheel=wheel, parent_versions=parent, CPU_probe=probe)
+    raw = json.dumps(receipt).encode(); receipt_id = dict(sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw))
+    pins = dict(schema="world-reward-official-pack-runtime-pins-v1", image_id=image, base_id=gate.BASE_ID,
+        build_receipt=receipt_id | dict(producer_revision=gate.BUILDER_REVISION, script_sha256=receipt["script_sha256"]),
+        wheel=gate.ARROW_WHEEL.copy(), source_helpers=helpers, versions=gate.RUNTIME_VERSIONS.copy())
+    return pins, receipt, raw
+
+
 def lifecycle_fixture(gate, tmp_path, monkeypatch):
     for name in ("torch", "joblib"): monkeypatch.delitem(sys.modules, name, raising=False)
     root = tmp_path / "root"; root.mkdir(); code = tmp_path / "code"; code.mkdir()
+    runtime_pins, runtime_receipt, runtime_raw = runtime_fixture(gate, tmp_path, monkeypatch)
+    for name in gate.BUILDER_HELPERS:
+        path = code / name; path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes((tmp_path / "fixture_sources" / name).read_bytes()); path.chmod(0o444)
+    runtime_path = code / gate.RUNTIME_PINS; runtime_path.parent.mkdir(parents=True, exist_ok=True)
+    runtime_path.write_text(json.dumps(runtime_pins)); runtime_path.chmod(0o444)
+    receipt_path = root / gate.BUILD_RECEIPT; receipt_path.parent.mkdir(parents=True, exist_ok=True)
+    receipt_path.write_bytes(runtime_raw); receipt_path.chmod(0o444)
+    monkeypatch.setattr(gate, "check_runtime_packages", lambda expected: expected.copy())
     for name in ("infra/official_track1_pack_gate.py", "infra/run_official_track1_pack_gate.sh", "infra/cari_shared_episode_loader.py", "src/world_reward/submission.py"):
         p = code / name; p.parent.mkdir(parents=True, exist_ok=True); p.write_bytes((ROOT / name).read_bytes()); p.chmod(0o444)
     mesh = root / "outputs/episode_000015/cari_shared_export_v1/object_aligned.glb"; mesh.parent.mkdir(parents=True)
@@ -201,7 +239,7 @@ def lifecycle_fixture(gate, tmp_path, monkeypatch):
     spec = dict(episode_index=15, total_frames=501, camera_name="front_stereo_camera_left", height=1152, width=1536)
     pins = dict(schema="world-reward-cari-shared-export-pins-v1", clip_spec=spec, export_files=files,
         export=files["report.json"] | dict(producer_revision="b" * 40, script_sha256="c" * 64))
-    pin = code / "configs/cari_clip_000015_shared_export_pins.json"; pin.parent.mkdir(); pin.write_text(json.dumps(pins)); pin.chmod(0o444)
+    pin = code / "configs/cari_clip_000015_shared_export_pins.json"; pin.parent.mkdir(exist_ok=True); pin.write_text(json.dumps(pins)); pin.chmod(0o444)
     sample = root / gate.SAMPLE_RELATIVE; sample.parent.mkdir(parents=True); sample.write_bytes(b"opaque own sample fixture"); sample.chmod(0o444)
     monkeypatch.setattr(gate, "SAMPLE_SHA", gate.identity(sample)["sha256"])
     monkeypatch.setattr(gate, "SAMPLE_BYTES", sample.stat().st_size)
@@ -227,6 +265,8 @@ def test_frozen_receipt_cleanup_and_engineering_only_claims(gate, tmp_path, monk
     report = gate.execute(root, out, code, 15, "d" * 40, consumer=consumer, packer=packer, template_reader=reader)
     assert report["status"] == "pass" and report["scratch_removed"] and set(p.name for p in out.iterdir()) == {"report.json"}
     assert report["frames"] == 501 and report["official_packer_validated"] == 1
+    assert report["image_id"] != gate.BASE_ID and report["parent_image_id"] == gate.BASE_ID
+    assert report["actual_package_versions"] == gate.RUNTIME_VERSIONS and report["runtime_pins_build_receipt_rehashed"]
     assert report["original_sample_prediction_columns_read"] is False
     assert all(report[key] is False for key in ("GPU_used", "numerical_geometry_independently_reverified", "quality_verified", "submission_eligible", "final_Parquet_produced", "complete_challenge_submission_created"))
     assert report["Kaggle_upload_calls"] == report["model_calls"] == report["optimizer_calls"] == report["render_calls"] == 0
@@ -303,6 +343,9 @@ def test_bash_syntax_exact_selected_mounts_no_GPU_originalsample_official_reader
     text = path.read_text()
     assert "--gpus" not in text and "--network none --memory 4g --cpus 2" in text
     assert "303s docker run" in text and "BASH_SOURCE[0]" in text and "source-sha256" in text
+    assert "world-reward/official-pack-cpu:0.1" in text and "official_pack_runtime_pins.json" in text
+    assert text.index("load_runtime(root,code)") < text.index('mkdir "$OUT"')
+    assert "src=$ROOT/results/official-pack-image-build.json" in text
     assert "data/track_1_sample_submission.parquet" in text and "v2dlb/mhr_metrics.py" in text
     assert "src=$ROOT/data" not in text and "src=$ROOT/vendor/v2d_submission_kit,dst=" not in text
     assert "prepare forward refined export" in text and "src=$OUT,dst=$OUT" in text
@@ -332,7 +375,7 @@ def test_actual_runtime_archive_closure_control_cap():
     files = {str(p.relative_to(ROOT)): p.read_bytes() for base in ("infra", "src", "configs") for p in (ROOT / base).rglob("*") if p.is_file() and "__pycache__" not in p.parts}
     files["pyproject.toml"] = (ROOT / "pyproject.toml").read_bytes()
     selected = launcher.runtime_bundle_paths(files, "infra/run_official_track1_pack_gate.sh")
-    assert set(selected) >= {"infra/official_track1_pack_gate.py", "infra/run_official_track1_pack_gate.sh", "infra/cari_shared_episode_loader.py", "infra/cari_full_export.py", "infra/cari_full_refine.py", "infra/cari_full_forward.py", "infra/run_cari96_prepare.sh", "src/world_reward/submission.py"}
+    assert set(selected) >= {"infra/official_track1_pack_gate.py", "infra/run_official_track1_pack_gate.sh", "infra/cari_shared_episode_loader.py", "infra/cari_full_export.py", "infra/cari_full_refine.py", "infra/cari_full_forward.py", "infra/run_cari96_prepare.sh", "src/world_reward/submission.py", "infra/official_pack_image_build.py", "infra/run_official_pack_image_build.sh"}
     stream = io.BytesIO()
     with tarfile.open(fileobj=stream, mode="w") as archive:
         for name in selected:
@@ -383,3 +426,93 @@ def test_original_futureannotated_pack_signature_and_lazy_module_binding(gate, t
         for name in tuple(sys.modules):
             if name == "v2dlb" or name.startswith("v2dlb."):
                 sys.modules.pop(name)
+
+
+def test_runtime_template_strict_new_image_build_and_unchanged_parent(gate, tmp_path, monkeypatch):
+    pins, receipt, _ = runtime_fixture(gate, tmp_path, monkeypatch)
+    gate.validate_runtime_pins(pins)
+    summary = gate.validate_runtime(pins, receipt)
+    assert summary["image_id"] == pins["image_id"] != gate.BASE_ID
+    assert summary["versions"] == gate.RUNTIME_VERSIONS and summary["GPU_used"] is False
+
+
+@pytest.mark.parametrize("fault", ["baseimage", "imagesecret", "schema", "extra", "revision", "script", "wheelbytes", "wheelsha", "helper", "arrowversion", "parentversion", "flagint", "parentarrow", "noarrow", "GPU", "Torch", "Joblib", "changedparent", "dependencies", "network", "sourcehash", "wrongstage", "failed", "python"])
+def test_runtime_provenance_failclosed_no_fake_image_or_version(gate, tmp_path, monkeypatch, fault):
+    pins, receipt, _ = runtime_fixture(gate, tmp_path, monkeypatch)
+    if fault == "baseimage": pins["image_id"] = gate.BASE_ID
+    elif fault == "imagesecret": pins["image_id"] = "Bearer do-not-accept-secret-looking-image"
+    elif fault == "schema": pins["schema"] = "old"
+    elif fault == "extra": pins["token"] = "forbidden"
+    elif fault == "revision": pins["build_receipt"]["producer_revision"] = "a" * 40
+    elif fault == "script": pins["build_receipt"]["script_sha256"] = "a" * 64
+    elif fault == "wheelbytes": pins["wheel"]["bytes"] = True
+    elif fault == "wheelsha": pins["wheel"]["sha256"] = "a" * 64
+    elif fault == "helper": pins["source_helpers"] = {}
+    elif fault == "arrowversion": pins["versions"]["pyarrow"] = "19.0.2"
+    elif fault == "parentversion": receipt["parent_versions"]["versions"]["numpy"] = "2.0.0"
+    elif fault == "flagint": receipt["only_pyarrow_added"] = 1
+    elif fault == "parentarrow": receipt["parent_versions"]["pyarrow"] = "19.0.1"
+    elif fault == "noarrow": receipt["CPU_probe"]["pyarrow"] = None
+    elif fault in ("GPU", "Torch", "Joblib"): receipt[fault + "_used" if fault == "GPU" else fault + "_loaded"] = True
+    elif fault == "changedparent": receipt["parent_unchanged_verified"] = False
+    elif fault == "dependencies": receipt["runtime_dependency_installation"] = True
+    elif fault == "network": receipt["build_network"] = "host"
+    elif fault == "sourcehash": receipt["source_helpers"] = {}
+    elif fault == "wrongstage": receipt["stage"] = "different_build"
+    elif fault == "failed": receipt["status"] = "fail"
+    else: receipt["CPU_probe"]["python"] = "3.11.12"
+    with pytest.raises(ValueError): gate.validate_runtime(pins, receipt)
+
+
+def test_actual_package_metadata_check_no_model_import(gate, monkeypatch):
+    import importlib.metadata
+    calls = []
+    def version(name): calls.append(name); return gate.RUNTIME_VERSIONS[name]
+    monkeypatch.setattr(importlib.metadata, "version", version)
+    for name in ("torch", "joblib"): monkeypatch.delitem(sys.modules, name, raising=False)
+    assert gate.check_runtime_packages(gate.RUNTIME_VERSIONS) == gate.RUNTIME_VERSIONS
+    assert calls == list(gate.RUNTIME_VERSIONS)
+    monkeypatch.setattr(importlib.metadata, "version", lambda _: "wrong")
+    with pytest.raises(ValueError): gate.check_runtime_packages(gate.RUNTIME_VERSIONS)
+
+
+def test_runtime_pin_and_receipt_hash_before_json_no_builder_execution(gate, tmp_path, monkeypatch):
+    root, out, code, *_ = lifecycle_fixture(gate, tmp_path, monkeypatch)
+    runtime = gate.load_runtime(root, code)
+    assert runtime["summary"]["only_pyarrow_added"]
+    path = root / gate.BUILD_RECEIPT; path.chmod(0o644); path.write_bytes(b"changed"); path.chmod(0o444)
+    read = gate.strict_json
+    def guarded(path):
+        if path == root / gate.BUILD_RECEIPT: pytest.fail("Receipt JSON read before exact hash")
+        return read(path)
+    monkeypatch.setattr(gate, "strict_json", guarded)
+    with pytest.raises(ValueError): gate.load_runtime(root, code)
+    assert "official_pack_image_build" not in sys.modules
+
+
+def test_missing_runtime_config_fails_before_receipt_or_callback(gate, tmp_path, monkeypatch):
+    root, out, code, _, _, _, _, consumer, packer, reader = lifecycle_fixture(gate, tmp_path, monkeypatch)
+    (code / gate.RUNTIME_PINS).unlink()
+    with pytest.raises(FileNotFoundError):
+        gate.execute(root, out, code, 15, "d" * 40, consumer=consumer, packer=packer, template_reader=reader)
+    assert not list(out.iterdir())
+
+
+def test_actual_runtime_host_bootstrap_all_stdlib_no_builder_import(gate, tmp_path, monkeypatch):
+    root, out, code, *_ = lifecycle_fixture(gate, tmp_path, monkeypatch)
+    text = (ROOT / "infra/run_official_track1_pack_gate.sh").read_text()
+    source = text.split("<<'PYRUNTIME'\n", 1)[1].split("\nPYRUNTIME", 1)[0]
+    # Execute the actual snippet against the owned helper with only its pure
+    # source maps swapped for generated fixture identities, no fake producer.
+    import builtins
+    real = builtins.__import__
+    def guarded(name, *a, **k):
+        if name.split('.')[0] in {'numpy', 'scipy', 'torch', 'joblib', 'pyarrow', 'pandas', 'trimesh', 'official_pack_image_build'}:
+            raise AssertionError(name)
+        return real(name, *a, **k)
+    monkeypatch.setattr(builtins, '__import__', guarded)
+    monkeypatch.setitem(sys.modules, 'official_track1_pack_gate', gate)
+    monkeypatch.setattr(sys, 'argv', ['bootstrap', str(root), str(code)])
+    namespace = {}
+    exec(source, namespace)
+    assert namespace['load_runtime'] is gate.load_runtime
