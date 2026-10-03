@@ -5857,3 +5857,12 @@ validated call. Receipt10526B/dd57e2757b36b2bc6a1760d4e0dff0277e12c9333fbf9742aa
 Originalrow_idorder retained, samplepredictioncolumns NOTread, fullsource/
 export/runtime rehashed. ScratchoneepisodeParquet deleted; ONLYreport.json
 remains. No finalall30Parquet, upload, reconstructionquality or eligibility PASS.
+
+NewfourRGBanchor manufacture5536090 actualPASS16.472052532s/4CPUreference
+forwards, inactiveexit0. Receipt7003B/a9cfc0f287fd8d068233cd97791d93c64c65400e8743074c4181efb748144365.
+Fullplane max<=1.065814104e-14m and64stratified rays<=5.773159728e-15m;
+37116originalfaces tested/ray. Visiblehuman22525..22679/object1030..1844.
+Independentfivepublicfileinventory frozen bridge_rgb_anchor_input_pins.json,
+manifest843B/54e3369361c1785d930ad40b4f245de50a1183258ac1c1cbd66e424daae6a9a2.
+Only134725B fourRGB+manifest retained remotely; no media copied locally.
+Masks/modelrecognizability unknown; 192frames/bridge NOTrun/adopted.

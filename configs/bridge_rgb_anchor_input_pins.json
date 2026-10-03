@@ -1,0 +1,25 @@
+{
+  "schema": "world_reward.bridge_rgb_anchor_input_pins.v1",
+  "public_files": {
+    "clip_000000_frame_000000.png": {
+      "bytes": 33067,
+      "sha256": "036a1a6a3c8ed3a296897fa861cfe0165c00eebf12d6f31c5a47d42854b85beb"
+    },
+    "clip_000001_frame_000000.png": {
+      "bytes": 33467,
+      "sha256": "9a63064fc365e2536381e35e5f00e55d52b1e70d39758abe6d1a28b1afeb9f4c"
+    },
+    "clip_000002_frame_000000.png": {
+      "bytes": 33470,
+      "sha256": "6215b6bea5c58cd76aae57dd918296573420c015e7e89bd29b0e1baaf8ddc60f"
+    },
+    "clip_000003_frame_000000.png": {
+      "bytes": 33878,
+      "sha256": "f6c7cfc16c2482695855f93c51215976aa0e2272999254697a4f17bc3d08d11f"
+    },
+    "manifest.json": {
+      "bytes": 843,
+      "sha256": "54e3369361c1785d930ad40b4f245de50a1183258ac1c1cbd66e424daae6a9a2"
+    }
+  }
+}
