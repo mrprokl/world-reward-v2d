@@ -18,6 +18,7 @@ def module_at(name, path):
 
 @pytest.fixture
 def gate(monkeypatch):
+    monkeypatch.delenv("WR_ANCHOR_EVALUATION_V2", raising=False)
     repo = Path(__file__).resolve().parents[1]
     monkeypatch.syspath_prepend(str(repo / "src")); monkeypatch.syspath_prepend(str(repo / "infra"))
     module = module_at("wr_anchor_evaluate_test", repo / "infra/tudl_anchor_evaluate.py")
@@ -342,3 +343,100 @@ def test_literal12_no_old_run_or_monkeyglobal_and_no_assets_acquisition(gate):
     assert "scoring.run(" not in source and "scoring.FRAMES =" not in source and "inputs.FRAME_IDS =" not in source
     assert "moge_bindings(root)" not in source and "pinned_assets(root)" not in source
     assert "signal.alarm(BUDGET)" in source and "path.chmod(0o400)" in source and gate.BUDGET == 180
+
+
+def test_actual_five_empty_native_initializers_allowed_without_inventory_filter(gate, frozen):
+    root, code, _, receipt, sync = frozen
+    files = receipt["MoGe_bindings"]["python_source_files"]
+    for name in gate.EMPTY_MOGE_INIT_FILES:
+        files[name] = {"bytes": 0, "sha256": gate.EMPTY_SHA256}
+    metadata = receipt["MoGe_bindings"]["model_source"]
+    metadata["python_files"] = len(files)
+    metadata["python_source_sha256"] = hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()
+    sync()
+    arrays, _, _, _ = gate.public_predictions(root, code)
+    assert len(arrays) == 12 and len(files) == 7
+    assert all(files[name] == {"bytes": 0, "sha256": gate.EMPTY_SHA256} for name in gate.EMPTY_MOGE_INIT_FILES)
+
+
+@pytest.mark.parametrize("name,value", [
+    ("__init__.py", {"bytes": -1, "sha256": "a" * 64}),
+    ("__init__.py", {"bytes": False, "sha256": "a" * 64}),
+    ("__init__.py", {"bytes": 0, "sha256": "a" * 64}),
+    ("other/__init__.py", {"bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}),
+    ("model/v2.py", {"bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}),
+])
+def test_native_empty_identity_scope_negative_bool_wrong_SHA_name_rejected(gate, name, value):
+    with pytest.raises(ValueError): gate.native_python_identity_record(name, value)
+
+
+def test_zero_remains_forbidden_for_general_pins_reports_predictions_private(gate, frozen):
+    zero = {"bytes": 0, "sha256": gate.EMPTY_SHA256}
+    with pytest.raises(ValueError): gate.identity_record(zero)
+    pins = json.loads((frozen[1] / gate.PREDICTION_PINS).read_bytes())
+    pins["outputs"][next(iter(pins["outputs"]))] = zero
+    with pytest.raises(ValueError): gate.validate_prediction_pins(pins)
+
+
+def corrected_measurement_fixture(gate, frozen):
+    root, code, _, prediction, sync = frozen
+    prediction.update(producer_revision="77b462eefb76adfff17474a341ac1226dd9accaf",
+        script_sha256="2ed48a897fb8f161ce761083d3014188aca0298464bcb5d833ba8c4101beeb16")
+    sync()
+    prediction_path = root / gate.BASE / "anchor_predictions_v1/report.json"
+    gate.ORIGINAL_PREDICTION_REPORT = gate.inputs.identity(prediction_path)
+    failure = dict(stage=gate.STAGE, status="fail", phase="integrity",
+        producer_revision="410c4733c57348ed217ef102c4fc35dc93f042d9",
+        script_sha256="7087cb014362d2c649573a14624e61f2a1039755528902ae28bcfc8a57783966",
+        image_id=gate.IMAGE_ID, challenge_inputs_used=False, hand_labeled_test=False, oracle_modes=[],
+        adoption_performed=False, full_v2d_score_verified=False, source_markers_after_reverified=True,
+        error_type="ValueError", error="Exact independent SHA256/positive byte identity required")
+    path = root / gate.BASE / "quality_anchor_v1/report.json"
+    gate.ORIGINAL_FAILURE = write_json(path, failure, 0o400)
+    return root, code, path, failure
+
+
+def test_sealed_original_failure_absence_flags_and_original_blind_receipt(gate, frozen, monkeypatch):
+    root, code, path, failure = corrected_measurement_fixture(gate, frozen)
+    original = gate.inputs.identity
+    def no_private(path):
+        assert "eval_private" not in str(path)
+        return original(path)
+    monkeypatch.setattr(gate.inputs, "identity", no_private)
+    identities = gate.original_failed_measurement(root, code)
+    assert len(identities) == 3 and identities[0][0] == path
+    assert "frames" not in failure and "predictions_frozen_before_private_truth_read" not in failure
+    assert stat.S_IMODE(path.stat().st_mode) == 0o400
+    for key, value in (("frames", []), ("predictions_frozen_before_private_truth_read", True)):
+        wrong = {**failure, key: value}; gate.ORIGINAL_FAILURE = write_json(path, wrong, 0o400)
+        with pytest.raises(ValueError): gate.original_failed_measurement(root, code)
+
+
+@pytest.mark.parametrize("fault", ["failure_sha", "failure_status", "failure_error", "prediction_pin", "prediction_sha"])
+def test_v2_rejects_original_failure_or_blind_prediction_tamper_before_private(gate, frozen, monkeypatch, fault):
+    root, code, path, failure = corrected_measurement_fixture(gate, frozen)
+    if fault == "failure_sha": write(path, b"altered", 0o400)
+    elif fault == "failure_status": failure["status"] = "pass"; gate.ORIGINAL_FAILURE = write_json(path, failure, 0o400)
+    elif fault == "failure_error": failure["error"] = "other"; gate.ORIGINAL_FAILURE = write_json(path, failure, 0o400)
+    elif fault == "prediction_sha": write(root / gate.BASE / "anchor_predictions_v1/report.json", b"altered", 0o400)
+    else:
+        pinpath = code / gate.PREDICTION_PINS; pins = json.loads(pinpath.read_bytes())
+        pins["report"]["sha256"] = "a" * 64; write_json(pinpath, pins)
+    monkeypatch.setenv("WR_ANCHOR_EVALUATION_V2", "1")
+    write(code / gate.V2_WRAPPER, b"own v2 source identity")
+    original = gate.inputs.identity
+    def no_private(path):
+        assert "eval_private" not in str(path)
+        return original(path)
+    monkeypatch.setattr(gate.inputs, "identity", no_private)
+    with pytest.raises(ValueError): gate.run(root, {}, code=code)
+
+
+def test_v2_source_closure_and_explicit_mode_only(gate, frozen, monkeypatch):
+    root, code, _, _, _ = frozen; before = gate.source_identities(code)
+    write(code / gate.V2_WRAPPER, b"own v2 source identity")
+    monkeypatch.setenv("WR_ANCHOR_EVALUATION_V2", "1")
+    after = gate.source_identities(code)
+    assert set(after) == {*before, gate.V2_WRAPPER} and all(after[name] == value for name, value in before.items())
+    monkeypatch.setenv("WR_ANCHOR_EVALUATION_V2", "0")
+    with pytest.raises(ValueError): gate.v2_mode()

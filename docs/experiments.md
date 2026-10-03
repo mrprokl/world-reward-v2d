@@ -4629,3 +4629,38 @@ model/geometry/media execution. Actual frozen private evaluation dispatched
 410c4733c57348ed217ef102c4fc35dc93f042d9,36files66640encodedB/publicHTTP200,
 unitactiveMainPID141865. All baseline/candidate hashes committed beforehand;
 private labels remain evaluation-only, no fit or rerun after labels.
+
+Original private evaluator **FAIL0.101860s**, before private read/any scored
+frame: blanket positive-byte metadata check rejects actual MoGe empty Python
+package initializers. Sole400receipt2928B/
+079bf028d2cc8f8b219b7ac726429b1402a4475f58b3e1647e51b2dad795a4ef.
+Read-only full trace identifies validate_asset_metadata/nativePythonidentity,
+not a model/prediction/scoring failure. Exact original blind82113B/008850receipt
+contains five zero-byte `__init__.py` files (root/scripts/test/train/utils), all
+SHA256(empty)=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
+No labels/scores were inspected. Predeclare separate quality_anchor_v2 protocol
+which permits ONLY those five exact empty native source identities; all other
+media/prediction/model/private/receipt/pin identities remain positive-size.
+Keep complete native inventory digest/count/source pins, unchanged12blind
+predictions/coefficients/masks/scoring/adoption thresholds. Original v1FAIL
+and code410c473 remain immutable; new wrapper mounts only its sealed receipt
+RO, hashes before/after, and requires exact old blind receipt before private.
+No retune, rerun inference, hidden repair or metric-gate relaxation.
+
+Episode1 originalprepare stage inventory now **PASS**, producer77b462e/
+ba5d431a independently supplied; inventorysource9c583d79bd508b2d51395360f699fbf796f66800,
+52files126872encodedB. Exactall4payloads before/after strictJSON/42chunk
+scalars. Commitactual configs/cari_clip_000001_shared_prepare_pins.json before
+native668forward. The first read-only attempt invoked a nonbundled inventory
+wrapper from prepare closure and failed with missingfile (no write/compute);
+proper independent immutable inventory entrypoint succeeded. No native rerun,
+prediction/media transferred or accuracy claim.
+
+V2 measurement correction + actualnativeprepare integration457focusedPASS39.13s;
+v2wrapper40PASS11.05s, evaluator49tests plusoriginalwrapper84PASS10.40s.
+Only five original upstream empty Python initializer metadata accepted with
+exactemptySHA; still reject zero-size predictions/private/media/pins, altered
+failure/old prediction/producer/source/coefficients. Original source/scoring/
+MoGe/DA3/12NPZ+ratio settings byte-identical, no private labels seen. Source
+closure38files68304encodedB for separatev2 and42files81916B native668forward,
+within original160000B code-onlycontrol. No v2evaluation/forward result yet.

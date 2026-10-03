@@ -32,6 +32,14 @@ IMAGE_ID = "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c
 BUDGET = 180
 SOURCE_FILES = tuple(dict.fromkeys(("infra/tudl_anchor_evaluate.py", "infra/tudl_evaluate.py",
     "infra/run_tudl_anchor_evaluate.sh", *inference.SOURCE_FILES)))
+V2_WRAPPER = "infra/run_tudl_anchor_evaluate_v2.sh"
+EMPTY_MOGE_INIT_FILES = frozenset({"__init__.py", "scripts/__init__.py", "test/__init__.py",
+    "train/__init__.py", "utils/__init__.py"})
+EMPTY_SHA256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+ORIGINAL_FAILURE = {"bytes": 2928,
+    "sha256": "079bf028d2cc8f8b219b7ac726429b1402a4475f58b3e1647e51b2dad795a4ef"}
+ORIGINAL_PREDICTION_REPORT = {"bytes": 82113,
+    "sha256": "0088501462b4048347fdb513ef95a7d73e62dad47a2a77e080634a5e5b5191d6"}
 
 
 def exact(value, expected):
@@ -52,6 +60,22 @@ def require_fields(value, expected, reason):
 def identity_record(value):
     inputs._identity_record(value)
     return value
+
+
+def native_python_identity_record(name, value):
+    """Only the five actual upstream empty package initializers may be zero."""
+    if (type(value) is dict and set(value) == {"sha256", "bytes"}
+            and type(value["bytes"]) is int and value["bytes"] == 0):
+        if name not in EMPTY_MOGE_INIT_FILES or not exact(value["sha256"], EMPTY_SHA256):
+            raise ValueError("Only exact original empty MoGe package initializer identities allowed")
+        return value
+    return identity_record(value)
+
+
+def v2_mode():
+    value = os.environ.get("WR_ANCHOR_EVALUATION_V2")
+    if value not in (None, "1"): raise ValueError("Only explicit immutable measurement correction v2 is allowed")
+    return value == "1"
 
 
 def pinned_json(path, expected):
@@ -86,7 +110,8 @@ def validate_prediction_pins(pins):
 
 
 def source_identities(code):
-    return {name: inputs.identity(code / name) for name in SOURCE_FILES}
+    names = (*SOURCE_FILES, V2_WRAPPER) if v2_mode() else SOURCE_FILES
+    return {name: inputs.identity(code / name) for name in names}
 
 
 def marker_identity(path):
@@ -101,9 +126,10 @@ def marker_identity(path):
 
 def bound_source(root, code, revision, executing):
     root, code = Path(root), Path(code)
+    job = "run_tudl_anchor_evaluate_v2" if v2_mode() else "run_tudl_anchor_evaluate"
     if (root != ROOT or root.resolve() != root or not root.is_dir()
             or type(revision) is not str or re.fullmatch(r"[0-9a-f]{40}", revision) is None
-            or code != root / "jobs" / revision / "run_tudl_anchor_evaluate/code"
+            or code != root / "jobs" / revision / job / "code"
             or code.resolve() != code or not code.is_dir() or Path(executing) != code / SOURCE_FILES[0]):
         raise ValueError("Actual immutable CPU evaluation dispatch/source namespace required")
     modules = {"infra/tudl_anchor_infer.py": inference, "infra/tudl_holdout_inputs.py": inputs,
@@ -167,7 +193,7 @@ def validate_asset_metadata(receipt, root):
         if (type(name) is not str or PurePosixPath(name).is_absolute() or str(PurePosixPath(name)) != name
                 or ".." in PurePosixPath(name).parts or not name.endswith(".py")):
             raise ValueError("Canonical relative Python source records required")
-        identity_record(value)
+        native_python_identity_record(name, value)
     require_fields(files, {"model/v2.py": {**files.get("model/v2.py", {}), "sha256": assets.SOURCE_V2_SHA},
         "utils/geometry_torch.py": {**files.get("utils/geometry_torch.py", {}), "sha256": inference.moge_native.GEOMETRY_SHA}},
         "Original MoGe infer/focal source inventory differs")
@@ -406,10 +432,48 @@ def decision(frames):
         "verified_victory_over_CARI4D": False}
 
 
+def original_failed_measurement(root, code):
+    """Seal the unmodified pre-private v1 FAIL before the separate v2 query."""
+    path = root / BASE / "quality_anchor_v1/report.json"
+    receipt = pinned_json(path, ORIGINAL_FAILURE)
+    if stat.S_IMODE(path.stat().st_mode) != 0o400:
+        raise ValueError("Original failed measurement receipt must remain0400")
+    require_fields(receipt, dict(stage=STAGE, status="fail", phase="integrity",
+        producer_revision="410c4733c57348ed217ef102c4fc35dc93f042d9",
+        script_sha256="7087cb014362d2c649573a14624e61f2a1039755528902ae28bcfc8a57783966",
+        image_id=IMAGE_ID, challenge_inputs_used=False, hand_labeled_test=False, oracle_modes=[],
+        adoption_performed=False, full_v2d_score_verified=False, source_markers_after_reverified=True,
+        error_type="ValueError", error="Exact independent SHA256/positive byte identity required"),
+        "Exact original failed metadata-only measurement receipt required")
+    if "frames" in receipt or "predictions_frozen_before_private_truth_read" in receipt:
+        raise ValueError("Original failure must precede all completed public validation/private scoring")
+    pin_path = code / PREDICTION_PINS; pin_identity = inputs.identity(pin_path)
+    pins = pinned_json(pin_path, pin_identity); validate_prediction_pins(pins)
+    if {k: pins["report"][k] for k in ("sha256", "bytes")} != ORIGINAL_PREDICTION_REPORT:
+        raise ValueError("Measurement correction must retain exactly the original blind prediction receipt")
+    expected = dict(producer_revision="77b462eefb76adfff17474a341ac1226dd9accaf",
+        script_sha256="2ed48a897fb8f161ce761083d3014188aca0298464bcb5d833ba8c4101beeb16")
+    require_fields(pins["report"], expected, "Original frozen blind prediction producer/source required")
+    prediction_path = root / BASE / "anchor_predictions_v1/report.json"
+    prediction = pinned_json(prediction_path, ORIGINAL_PREDICTION_REPORT)
+    require_fields(prediction, {**expected, "stage": inference.STAGE, "status": "pass", "phase": "complete",
+        "private_truth_read": False, "ground_truth_used": False, "challenge_inputs_used": False,
+        "hand_labeled_test": False, "oracle_modes": []}, "Original successful blind prediction receipt required")
+    return [(path, ORIGINAL_FAILURE), (prediction_path, ORIGINAL_PREDICTION_REPORT), (pin_path, pin_identity)]
+
+
 def run(root, report, *, code=None):
     root = Path(root); code = Path(code) if code is not None else Path(os.environ["WR_CODE"])
     source_before = source_identities(code)
+    correction_frozen = original_failed_measurement(root, code) if v2_mode() else []
+    if correction_frozen:
+        report.update(measurement_correction_only=True, original_failed_measurement_identity=ORIGINAL_FAILURE,
+            original_failed_measurement_preserved=True, original_failure_preceded_private_truth_read=True,
+            original_failure_completed_private_frames=0, original_blind_prediction_report_identity=ORIGINAL_PREDICTION_REPORT,
+            correction="accept_five_original_zero_byte_MoGe_package_initializers_with_exact_empty_SHA_only",
+            predictions_models_geometry_hyperparameters_or_scoring_changed=False)
     arrays, records, frozen, hashes = public_predictions(root, code)
+    frozen += correction_frozen
     report.update(**hashes, predictions_frozen_before_private_truth_read=True, frames=[])
     private = root / BASE / "eval_private"
     scenes, private_frozen, acquisition_identity = private_inputs(private, records, hashes["public_manifest_sha256"])
@@ -453,7 +517,7 @@ def main(argv=None):
     root, code = Path(os.environ["WR_ROOT"]), Path(os.environ["WR_CODE"])
     revision, image = os.environ["WR_CODE_REVISION"], os.environ["WR_IMAGE_ID"]
     bound = bound_source(root, code, revision, Path(__file__))
-    out = root / BASE / "quality_anchor_v1"
+    out = root / BASE / ("quality_anchor_v2" if v2_mode() else "quality_anchor_v1")
     if (image != IMAGE_ID or out.resolve() != out or not out.is_dir() or any(out.iterdir())
             or stat.S_IMODE(out.stat().st_mode) != 0o700):
         raise ValueError("Exact original VM02 image and exclusively reserved0700 quality output required")
