@@ -5424,3 +5424,26 @@ old caller-pinned40fd inventory149203B/95d09454.../448files+3links retained.
 Same-run archive verification is explicitly operational, not independent or
 replica/licence/CUDA/training eligibility. Timeout can leave partial0400 archive
 without receipt, never PASS; owned cleanup requires checking that failure first.
+
+Frozen c84558c fullsuite10051PASS/2unchanged optionalSKIP277.13s, no concurrent
+source edits. Later wrapper test fixture stripped inherited local credentials,
+30focusedPASS; production algorithm/wrapper unchanged. EP3 native shared prepare
+actualPASS20.449488928s, receipt26510B/
+d66c2d8436cb767eb99f2aab6639b11a747d22c76a14794aea95cca4292b1b98,
+producerc84558c/scriptba5d431a...; independent stage inventory is next, no
+forward/refinement/export PASS. Full592 original frames retained.
+
+EP4 standalone CPU volume proposal actualPASS48.328407131s, producerf8f268b,
+report47498B/0f577522e44833960784aba8b83f9fcdcb7e306ea3d3dfb6b6fa9cc4e29548c8.
+All25source components remain25, manifold/orientation/topology intact;
+sampled bidirectional Chamfer/diagonal .006340648732 and net-volume relative
+error .002323830269, frozen per-shell5%/distance1%/4096 budgets unchanged.
+Independent pin inventory c84558c inactive/exit0 confirms seven actual artifact
+identities and source ancestry; NEW volume_mesh_000004_pins.json freezes them.
+No poses fitted/deletions/shrinking/holes filled; raw grounded scale
+0.30061233043670654 baked once. Original QEMFAILlog107227B/25cc63a4... remains
+unchanged, failed object_pose_full empty. Continuation NOT run or adopted yet.
+
+Actual asset-only archive c84558c/53files62668encodedB dispatched once;
+21:15:13UTC activeMainPID954648/archive exists/no receipt. No archivePASS,
+transfer/clone/CUDA/source-parity/eligibility claim yet. All heavy bytes Azure.

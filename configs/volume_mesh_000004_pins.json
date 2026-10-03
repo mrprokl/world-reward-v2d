@@ -1,0 +1,42 @@
+{
+  "schema": "world-reward-volume-mesh-pins-v1",
+  "episode_index": 4,
+  "input_sha256": "f1cadfa308b37dc91a3f296c2e5a2b538236cbe8a76d76d651df19554386cce6",
+  "metric_scale_baked_once": 0.30061233043670654,
+  "report": {
+    "sha256": "0f577522e44833960784aba8b83f9fcdcb7e306ea3d3dfb6b6fa9cc4e29548c8",
+    "bytes": 47498,
+    "producer_revision": "f8f268b3471e22ae17958cf77e8a52c3f80800fc",
+    "script_sha256": "bb6b17696ed928b749e805ed6405fb9144419421fbef70691a2dd8235cc714e9"
+  },
+  "files": {
+    "outputs/episode_000004/object_budget_volume/geometry.npz": {
+      "sha256": "2128978c0d3c04786b7a805b4dae365c80466aeb98e2ff849f9a8a9e019f9737",
+      "bytes": 63985
+    },
+    "outputs/episode_000004/object_budget_volume/object_fixed_canonical.glb": {
+      "sha256": "683d4e05b1b55c7868bab6b645cbeb48467ea2a96d2849368783c74b42a58481",
+      "bytes": 75044
+    },
+    "outputs/episode_000004/object_budget_volume/report.json": {
+      "sha256": "0f577522e44833960784aba8b83f9fcdcb7e306ea3d3dfb6b6fa9cc4e29548c8",
+      "bytes": 47498
+    },
+    "outputs/episode_000004/object_grounded/report.json": {
+      "sha256": "f171736c21e1cda401b49631b19a4f3d98ffa1b5e1dc80f76ce903b535b6ac64",
+      "bytes": 15648
+    },
+    "outputs/episode_000004/scale_smoke/report.json": {
+      "sha256": "ead143a4feda494dabbbc01e91dc2818af10ef098f8bb0e51b0074b35d921305",
+      "bytes": 9427
+    },
+    "results/image-volume-qem.json": {
+      "sha256": "8c5441162603260fb768dad688ed7d47ddf29a79de6de53fde603c84994c28ec",
+      "bytes": 3429
+    },
+    "validation/volume_qem_v1/report.json": {
+      "sha256": "5fcea041873ff54a4c116224a86d6ac0a3ca2c4699584c4699d615b7703f0500",
+      "bytes": 19887
+    }
+  }
+}

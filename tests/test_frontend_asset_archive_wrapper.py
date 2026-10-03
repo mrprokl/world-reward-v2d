@@ -75,7 +75,9 @@ def verify_archive(path,archive,manifest,oldcode,pins):
     def fingerprint(): return execute(integrity, args)
     def reserve(): return execute(block("PYRESERVE"), [root, out, revision])
     def control(before): return execute(block("PYCONTROL"), [root, code, revision, out, config_identity["bytes"], config_identity["sha256"], before])
-    env = dict(os.environ, WR_ROOT=str(root), WR_CODE=str(code), WR_CODE_REVISION=revision)
+    # Never carry local credentials into pytest fixtures/failure representations.
+    env = dict(PATH=os.environ.get("PATH", "/usr/bin:/bin"), HOME=str(tmp_path),
+        WR_ROOT=str(root), WR_CODE=str(code), WR_CODE_REVISION=revision)
     def run(*args): return subprocess.run(["rtk", "proxy", "bash", str(wrapper), *args], env=env, text=True, capture_output=True, timeout=10)
     return dict(root=root, code=code, out=out, wrapper=wrapper, oldcode=oldcode, oldreceipt=original,
         config=config_path, fingerprint=fingerprint, reserve=reserve, control=control, env=env, run=run)
