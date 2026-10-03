@@ -2026,3 +2026,10 @@ test; parallelize independent hypotheses only after shared contracts are sound.
   suite5231PASS/1optionaltrimeshSKIP71.84s,183independentfocusedPASS,
   terminal0/GPUinactive confirmed. Next independentRGB2D observations need
   actualruntime/ABI gates before another coupled identity/pose hypothesis.
+
+  D94 sourcefreeze gates:62focusedCPUfixturesPASS (synthetic HTTP/ZIP, no
+  networkmodelcalls), full5293PASS/1optionaltrimeshSKIP72.34s andbashsyntaxPASS.
+  Exactly9assets158,360,974B planned: ONNX134,399,116B, CPUORT23,561,046B,
+  flatbuffers26,661B, standalone11,608B, publisher28B, andprimarylicenses/
+  ORTThirdPartyNotices338,088B; heavy bytes stayAzure. Own source closure
+  remains below100KB, credential-freeenv-i hostPython acquisition only.
