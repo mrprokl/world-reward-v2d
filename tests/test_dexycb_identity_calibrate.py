@@ -6,6 +6,7 @@ import io
 import json
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 
 import numpy as np
 from PIL import Image
@@ -388,3 +389,49 @@ def test_fixed_protocol_has_no_best_hand_tuning_or_full_timeline_quality_claim()
         if name in ("masks", "tracks"): args += ["--" + name + "-producer-revision", "b" * 40, "--" + name + "-script-sha256", "c" * 64]
     assert gate.parser().parse_args(args).stage == "public_features"
     with pytest.raises(SystemExit): gate.parser().parse_args(args + ["--minimum-gap", "1"])
+
+
+def reserved_env(monkeypatch):
+    monkeypatch.setenv("WR_DEXYCB_CPU_OUTPUT_RESERVED", "1")
+    monkeypatch.setenv("WR_CPU_IMAGE_ID", gate.binding.IMAGE)
+    monkeypatch.setenv("WR_HOST_PROOF_SHA256", "a" * 64)
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "-1")
+    monkeypatch.setattr(gate.sys, "platform", "linux")
+    monkeypatch.setattr(gate.os, "geteuid", lambda: 0)
+    original = Path.iterdir
+    monkeypatch.setattr(Path, "iterdir", lambda p: iter([Path("lo")]) if str(p) == "/sys/class/net" else original(p))
+    return original
+
+
+def test_verified_wrapper_empty_root_output_does_not_recreate_or_broaden(tmp_path, monkeypatch):
+    out = tmp_path / "reserved"; out.mkdir(mode=0o700)
+    reserved_env(monkeypatch)
+    original = Path.lstat
+    def stat_root(p):
+        s = original(p)
+        return SimpleNamespace(st_mode=s.st_mode, st_uid=0) if p == out else s
+    monkeypatch.setattr(Path, "lstat", stat_root)
+    before = out.stat().st_ino
+    gate.reserve_output(out)
+    assert out.stat().st_ino == before and not list(out.iterdir())
+    seal(out / "foreign.txt", b"preserve")
+    with pytest.raises(ValueError, match="empty root-owned"): gate.reserve_output(out)
+    assert (out / "foreign.txt").read_bytes() == b"preserve"
+
+
+@pytest.mark.parametrize("fault", ["flag", "image", "proof", "gpu", "uid", "mode", "owner"])
+def test_reserved_output_rejects_unverified_flags_permissions_and_runtime(tmp_path, monkeypatch, fault):
+    out = tmp_path / "reserved"; out.mkdir(mode=0o700)
+    reserved_env(monkeypatch)
+    if fault == "flag": monkeypatch.setenv("WR_DEXYCB_CPU_OUTPUT_RESERVED", "0")
+    if fault == "image": monkeypatch.setenv("WR_CPU_IMAGE_ID", "wrong")
+    if fault == "proof": monkeypatch.setenv("WR_HOST_PROOF_SHA256", "invalid")
+    if fault == "gpu": monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "0")
+    if fault == "uid": monkeypatch.setattr(gate.os, "geteuid", lambda: 1000)
+    if fault == "mode": out.chmod(0o755)
+    original = Path.lstat
+    def fake(p):
+        s = original(p)
+        return SimpleNamespace(st_mode=s.st_mode, st_uid=1000 if fault == "owner" else 0) if p == out else s
+    monkeypatch.setattr(Path, "lstat", fake)
+    with pytest.raises(ValueError): gate.reserve_output(out)

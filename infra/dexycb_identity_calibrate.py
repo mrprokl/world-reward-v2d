@@ -348,6 +348,22 @@ def private_calibration(out, clips, arrays, report, frozen, pins):
     else: report["hypothesis_supported"] = False
 
 
+def reserve_output(out):
+    """Only the source-bound wrapper may supply an empty, narrowly RW-mounted leaf."""
+    flag = os.environ.get("WR_DEXYCB_CPU_OUTPUT_RESERVED")
+    if flag is None:
+        out.mkdir(mode=0o700)
+        return
+    require(flag == "1" and sys.platform == "linux" and os.geteuid() == 0
+        and os.environ.get("WR_CPU_IMAGE_ID") == binding.IMAGE
+        and re.fullmatch(r"[0-9a-f]{64}", os.environ.get("WR_HOST_PROOF_SHA256", ""))
+        and os.environ.get("CUDA_VISIBLE_DEVICES") in ("", "-1")
+        and {p.name for p in Path("/sys/class/net").iterdir()} == {"lo"}, "Verified restricted CPU wrapper required")
+    s = out.lstat()
+    require(stat.S_ISDIR(s.st_mode) and s.st_uid == 0 and s.st_mode & 0o777 == 0o700
+        and not tuple(out.iterdir()), "Exclusive empty root-owned output reservation required")
+
+
 def run(stage, code, revision, pins):
     require(stage in FOLDERS, "Explicit public/private CPU stage required")
     validate_pins(pins, stage == "private_calibration")
@@ -355,7 +371,7 @@ def run(stage, code, revision, pins):
     clips, arrays, frozen, historical = public_evidence(code, pins)
     if stage == "private_calibration": frozen.update(frozen_features(pins, clips, arrays))
     else: require(not (ROOT / BASE / "eval_private").exists(), "Public feature container must not mount private annotations")
-    out = binding.canonical(ROOT / BASE / FOLDERS[stage]); out.mkdir(mode=0o700)
+    out = binding.canonical(ROOT / BASE / FOLDERS[stage]); reserve_output(out)
     report = dict(stage=stage, status="fail", phase="frozen_public_audit", producer_revision=revision,
         script_sha256=source["helpers"]["infra/dexycb_identity_calibrate.py"]["sha256"], source_binding=source,
         pins=pins, recipe=RULE, historical_sources=historical, budget_seconds=BUDGET, network="none", device="cpu",
@@ -409,7 +425,11 @@ def parser():
 def main(argv=None):
     args = parser().parse_args(argv); code, revision = Path(os.environ["WR_CODE"]), os.environ["WR_CODE_REVISION"]
     require(sys.platform == "linux" and os.environ.get("WR_ROOT") == str(ROOT)
-        and os.environ.get("CUDA_VISIBLE_DEVICES") in ("", "-1") and {p.name for p in Path("/sys/class/net").iterdir()} == {"lo"}, "Offline CPU-only Azure container required")
+        and os.geteuid() == 0 and os.environ.get("WR_CPU_IMAGE_ID") == binding.IMAGE
+        and os.environ.get("WR_DEXYCB_CPU_OUTPUT_RESERVED") == "1"
+        and re.fullmatch(r"[0-9a-f]{64}", os.environ.get("WR_HOST_PROOF_SHA256", ""))
+        and os.environ.get("CUDA_VISIBLE_DEVICES") in ("", "-1")
+        and {p.name for p in Path("/sys/class/net").iterdir()} == {"lo"}, "Offline CPU-only Azure container required")
     pins = {}
     for name in ("manifest", "acquisition", "masks", "tracks", "features"):
         item = {key: getattr(args, name + "_" + key) for key in ("bytes", "sha256")}
