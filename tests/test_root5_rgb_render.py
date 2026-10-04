@@ -141,4 +141,4 @@ def test_render_only_static_closure_complete_small(renderer):
         for path in paths:
             info=tarfile.TarInfo(path);info.size=len(files[path]);archive.addfile(info,io.BytesIO(files[path]))
     encoded,_=azure_job.encoded_runtime_archive(stream.getvalue())
-    assert len(encoded)<=128000
+    assert len(encoded)<=azure_job.MAX_CODE_CONTROL_BYTES

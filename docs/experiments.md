@@ -7630,3 +7630,21 @@ EP14prepare2538242 ACKqueued behind originalEP16 lock, not inferredPASS.
 Focused baseline/paired-mask release root353tiny tests PASS3.48s. Turn-owned
 temporary test roots removed without following symlinks; remote heavydata remain
 onAzure. No private mask metric used for tuning or adoption.
+
+Paired masks first actualattempt fe95889 stops technicalTypeError before any
+model/RGB inference. All173sourcefiles/archive exact, source/protocol/scan/native
+asset read-only preflights PASS; proof serialization contains selected-contract
+PosixPath destination. Empty ownpredictions directory only, no native/report.
+Independent audit confirms missing realisticfrontend fixture; fix explicit
+path projection on both host/native comparisons, not algorithm/prompts/cohort.
+Original failure remains intact; no private mask metrics read or quality decision.
+
+Full tiny suite13177PASS8optionalSKIP/1FAIL494.11s: old render-only static
+closure128KB test budget obsolete after additional committed protocol/pins
+(current140800B). Align test to existing256KB transport cap, no skippedsource
+or numerical changes. EP13 directexport full425 actualPASS31.882319s/reference
+maxmean0.000817568mm; EP14 sharedprepare full442 PASS18.842805s/reference
+maxmean0.000805222mm. Independent CPU-only input/native geometry/wholechain
+posthash PASS, frozen before pack/forward. EP16 original topologybudget FAIL:
+none of eight automatic closed-component preserving approximations fit;
+closed before pose, no face/component deletion or seed/threshold rescue.
