@@ -1359,3 +1359,21 @@ error compares real same-pixel variation, not jitter or 3D motion; any RGB-flow
 alternative must be frozen before sensor evaluation. Joint AbsRel/temporal gates
 must reject static smoothing. New data does not certify training-overlap absence,
 human/object/contact accuracy or CARI4D superiority. No assets downloaded.
+
+## October4 integrated object/framework audit (September30 cutoff)
+
+[TRELLIS source442aa1e](https://github.com/microsoft/TRELLIS/tree/442aa1e1afb9014e80681d3bf604e8d728a86ee7)
+MIT: raw outputs[mesh][0] provides a genuinely independent canonical proposal;
+default GLB simplification is not raw generation. FlexiCubes supplies no
+verified general closed/oriented/embedded guarantee. Checkpoint terms and overlap
+remain unverified; no acquisition/inference.
+[Hunyuan3D2.1 licence82920d6](https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1/blob/82920d643c0dc2f7bfd7255f45f62d386edfe60c/LICENSE)
+excludes EU/UK/Korea including output use outside territory: not a France-user shortcut.
+[BundleSDF2303.14158](https://arxiv.org/abs/2303.14158) inspires joint canonical
+shape/SE3 fitting on all observations, but uses realRGBD and NC research code.
+Our proposed independent fixed-topology positive-J deformation needs a valid
+seed and cannot repair topology. SameRGB/sharedK/gauge, visible silhouette,
+robust inferredZ/safe free-space/tracks; unknown human occlusion is not foreground
+subtraction. Fresh paired controls and lawfully qualified realHOI required.
+General exact orientedforest certification is an admissibility tool, not
+shape/pose quality or a verifiedCARI4D win. See framework_architecture.md.

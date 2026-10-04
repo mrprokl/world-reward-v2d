@@ -207,7 +207,7 @@ avec commit accessible, règles acceptées et quota vérifié ; aucune victoire
 annoncée à partir d'un proxy, d'un gate CPU ou d'un packing PASS.
 
 
-## 6. Next integrated experiment decision — October4
+## 8. Next integrated experiment decision — October4
 
 The fixed-chart compiler has passed four procedural geometry controls, not a
 production/adoption gate. Before large predicted meshes, evaluate an exact
@@ -221,8 +221,12 @@ That implementation regression has now passed eight real-collapse arms on the
 four previously successful procedural sources; the immutable qualified cached
 binary is retained on Azure. See mesh_conditioned_cache_protocol.md. This
 establishes measured byte parity for those controls, not production mesh or HOI
-accuracy. The first production attempt stopped before geometry because its
-container lacked publication-marker mounts; one packaging-only replay is frozen.
+accuracy. The sole marker-only technical replay authenticated its inputs but
+rejected the production source component arrangement before QEM. That scientific
+failure is closed. A readonly diagnostic found nine manifold components (six
+outward, three inward), not a certificate that these are valid cavities. The
+new general oriented-forest adjudicator preserves every component and requires
+independently certified embedding/containment; it cannot repair an invalid seed.
 
 The next substantive reconstruction hypothesis is **joint persistent actor/object
 association plus explicit visible ownership** over one shared automatic evidence
@@ -266,6 +270,39 @@ body-wrist association, the proposed experiment is conditional hand-object only.
 Keep stationary/common-motion/symmetric ambiguity explicit, with no nearest
 fallback. Neither a likelihood implementation nor licensed training data is
 available from this audit alone.
+
+### Two source-level routes, not a generator shopping list
+
+1. Raw TRELLIS is an independent canonical-mesh proposal, not a repair of SAM.
+   The pre-cutoff source is MIT; use raw `outputs['mesh'][0]`, not its default
+   simplify/GLB postprocessor. FlexiCubes does not itself certify a closed,
+   consistently oriented embedded solid. Checkpoint terms and challenge overlap
+   remain unverified. No checkpoint downloaded or native run performed.
+2. On an already valid seed, jointly fit a single bijectively deformed canonical
+   shape and full-T proper SE3 using the existing automatic observations and
+   renderer. Keep the human/shared gauge and K fixed; visible silhouette,
+   robust inferred depth, safe free-space and reserved point evidence are
+   complementary signals. A positive-Jacobian deformation cannot fix a bad
+   seed topology. BundleSDF is methodological inspiration, not a drop-in:
+   its experiment uses real RGB-D and its code has noncommercial restrictions.
+
+Hunyuan3D-2.1 is not an eligible shortcut for this France-based user: its primary
+licence excludes the EU and also restricts outputs outside its territory.
+4DAnyone remains a human-only sequence-reference inspiration, not an object
+geometry/interaction solution. Never enable bundled mesh cleanup as if it were
+source-generation novelty. Fresh procedural controls test operators first;
+lawfully qualified real full-HOI evaluation is still required for an accuracy
+claim and adoption.
+
+For the cheaper relation hypothesis, specialist wrist/palm point queries plus
+one full-video Boots inference avoid the rejected SAM2 hand-mask contamination.
+Use SAM2 for objects only. Fresh DexYCB subjects06/07 were identified before
+acquisition, but rights are unresolved and those references cannot establish
+full-body actor identity. This is a conditional target-selection experiment,
+not persistent person association or full-HOI validation. The modern SAM2 API
+can add automatic births between propagation slices on the same state; it does
+not decide whether a birth is a new physical instance or a duplicate/reappearance.
+Neither this audit nor another contract substitutes for an actual paired run.
 
 Two attributable comparisons: same-bank independence versus learned dependence;
 then identical relation model without/with rigid reprojection on reserved queries

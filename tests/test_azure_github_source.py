@@ -263,8 +263,8 @@ def test_explicit_github_cli_one_invocation_without_local_http(monkeypatch):
     assert len(calls) == 1 and "github-published-dispatched" in calls[0][1]
 
 
-@pytest.mark.parametrize("github_source", [False, True])
-def test_cli_caps_actual_transport_not_unused_inline_archive(monkeypatch, github_source):
+@pytest.mark.parametrize("mode", ["inline", "github", "reuse"])
+def test_cli_caps_actual_transport_not_unused_inline_archive(monkeypatch, mode):
     raw, _, _, _ = fixture_archive(large=True); calls = []
     source_archive, paths = launcher.runtime_archive(raw, "infra/run_smoke.sh")
     encoded, sha = launcher.encoded_runtime_archive(source_archive)
@@ -282,12 +282,17 @@ def test_cli_caps_actual_transport_not_unused_inline_archive(monkeypatch, github
     monkeypatch.setattr(launcher.subprocess, "check_output", git)
     monkeypatch.setattr(launcher, "invoke_transport", lambda *args: calls.append(args))
     argv = ["--name", "test", "--script", "infra/run_smoke.sh", "--revision", REV]
-    if github_source:
+    if mode != "inline":
         monkeypatch.setattr(launcher, "encoded_runtime_archive", lambda *_: pytest.fail("unused inline encoding"))
-        launcher.main([*argv, "--github-source"])
-        assert len(calls) == 1 and "github-published-dispatched" in calls[0][1]
-        assert sha in calls[0][0] and '"configs/payload.json"' in calls[0][0]
+        launcher.main([*argv, "--github-source" if mode == "github" else "--reuse-published"])
+        assert len(calls) == 1
+        assert ("github-published-dispatched" if mode == "github" else "published-reused-dispatched") in calls[0][1]
+        assert sha in calls[0][0]
+        if mode == "github":
+            assert '"configs/payload.json"' in calls[0][0]
         assert len(calls[0][0].encode()) <= launcher.STAGED_SCRIPT_BYTES
+        if mode == "reuse":
+            assert all(x not in calls[0][0] for x in ("base64 -d", "PY_PUBLISH", "mkdir ", "chmod "))
     else:
         with pytest.raises(RuntimeError, match="256KB"):
             launcher.main(argv)

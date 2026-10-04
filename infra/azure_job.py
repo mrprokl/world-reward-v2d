@@ -611,10 +611,11 @@ def main(argv=None) -> None:
     git("cat-file", "-e", f"{revision}:{args.script}")
     source_archive, paths = runtime_archive(git("archive", "--format=tar", revision,
                                                "infra", "src", "configs", "pyproject.toml"), args.script)
-    if args.github_source:
+    if args.github_source or args.reuse_published:
         # Only the bounded descriptor crosses this connection in explicit
         # GitHub mode. Hash the identical XZ archive without constructing or
         # imposing the inline-payload cap on bytes that are never transmitted.
+        # Published reuse likewise transmits only the bounded integrity script.
         encoded = ""
         archive_hash = hashlib.sha256(lzma.compress(source_archive, preset=6)).hexdigest()
     else:

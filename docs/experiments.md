@@ -8071,3 +8071,42 @@ descriptor is39023B. Fix transport to cap the actual descriptor/script in explic
 GitHub mode while retaining exact full TAR/XZ SHA and per-file verification.
 Inline/reuse default caps remain unchanged; no dropped closure, increased cap,
 algorithm/rule/budget change or Azure launch occurred from that local failure.
+
+Transport fix local172PASS21.89s; a new test initially compared the unfiltered
+fixture TAR hash to the actual closure TAR and failed its assertion only. Fixed
+test to independently compute runtime_archive first; no producer logic change.
+Two owned1129entry testroots removed. Exact unchanged queued producer0444f56
+then dispatch ACK under repaired local transport; independent actual209files,
+archive d05f7ef3738dc073dfeb1da89ae6e4feebdc5b1bb666706962c966417f030067,
+ledger1952b7f76a55665e1394928b40ff2526fe4950b28e41d822cf01c3d09dd80705
+verify PASS. EP23 MainPID1534777 waitingterminalEP22 since16:28:37UTC,
+new episode output absent, no model execution/adoption presumed. EP21 actual
+500/563fullposeframes at2582.038972s active/no failure; original jobs untouched.
+
+Readonly EP09 source-component inventory PASS:106956 activeV/213876F, nine
+closed oriented vertex-manifold components, all Euler2, six positive and three
+negative. Source4171828B SHA87a36b591f1e76485d808af1e60d6bcbaae94e94bfde272dab2c672c4009e891
+unchanged; zeroQEM/modelcalls/geometrychanges. This does NOT qualify embedding,
+containment or valid cavities; original conditioned source-policy FAIL stays closed.
+General forest adjudicator preserves all keys/signs with independent containment
+preconditions. Root78 tiny forest/source/chart tests PASS0.11s; no nativeCGAL
+compile/run yet, no fixtures/temp created. Native source macro uses verified
+CGAL_VERSION_NR1060011000, not nonexistent version-string macro. PrimaryCGAL
+6.0.1 library5077192B publisherSHAc752737f91d1af71fa96038f0e37945ce82a5f1fffb6200172cfcdd77755a356;
+PMP/Side GPL3-or-commercial terms stay separate from Apache glue. Runtime lacks
+CGAL/GMP/MPFR, no eligibility or performance presumed. EP21 original full563
+pose PASS2872.496811s; CPU inputassembly active/no final input receipt.
+
+Azure CPU dependency metadata PASS: GMP2:6.2.1+dfsg-3ubuntu1/MPFR4.1.0-3build3
+installed runtime pins, three new header DEBs pinned from apt index. No package
+installed on original parent; disposable metadata container removed. EP24 fresh
+original420-frame initializer preflight PASS, GPUidle/free515076603904B. Explicit
+reuse dispatch first stopped LOCALLY on unused inline archive cap (267368B);
+fix only local reuse transport to hash sameXZ and bound actual metadata script.
+Default inline cap/allsource/postverification unchanged. Root173 transporttests
+PASS22.21s; first newtest assertion assumed GitHub JSON rather than existing
+reuse script quoting, fixed test only. Both own1129-entry temps removed.
+Root94 forest/native-source/procedural-driver tinytests PASS0.15s, mocks not
+CGAL execution; own25-entry fixture root removed with internal aliases checked.
+EP24 initializer lock-only original0444f56 source dispatch in progress, ACK
+or model execution not yet presumed. This does not reclassify earlier jobs.

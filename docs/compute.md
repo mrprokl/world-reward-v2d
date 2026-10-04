@@ -23,7 +23,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 0 | 790 | Full native refinement and direct export PASS42.687162s, whole source chain/four outputs pinned. Official packing PASS16.896468s/all790 frames, scratch removed; old conversion failure separate. |
 | 4 | 747 | Tracking stops at18 empty automatic object masks; full trajectory unavailable. |
 | 7 | — | Empty automatic fixed anchor; closed without reroll. |
-| 9 | 415 | Geometry/topology failures before pose; no face deletion or threshold rescue. |
+| 9 | 415 | Geometry/topology failures before pose. New conditioned proposal authenticates after its sole marker-only replay, then rejects an unqualified component arrangement; zero native calls, no repair or threshold rescue. |
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
 | 12 | 405 | Full native refinement and direct export PASS31.726037s, whole source chain/four outputs pinned. Official packing PASS13.521699s/all405, scratch removed. |
@@ -34,7 +34,9 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 18 | 535 | Original source boundary/nonmanifold rejection before object pose; closed, no repair. |
 | 19 | 443 | Original topology-budget FAIL before object pose; all eight fixed whole/component candidates rejected, no repair. |
 | 20 | 549 | Original topology-budget FAIL before object pose at15:24:39UTC; all eight fixed whole/component candidates rejected after full body/depth/initializers. Closed without repair. |
-| 21 | 563 | Original full body PASS193.100529s at15:40:28UTC; CPU depth running, no complete inputs or prediction PASS presumed. |
+| 21 | 563 | Original full body/depth/initializers PASS; full object pose PASS2872.496811s/all563 at16:33:58UTC. CPU input assembly active (50 depth frames at last query); no complete inputs or accuracy presumed. |
+| 22 | — | Original full frontend unit queued behind EP21; no model execution presumed. |
+| 23 | 552 | New initializer-only scheduler source209files independently verified under0444f56. Unit waiting for terminal EP22 since16:28:37UTC, no output/model execution yet. Future pose-only may run on VM02 after actual initializer input pins/transfer. |
 
 Eleven complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
