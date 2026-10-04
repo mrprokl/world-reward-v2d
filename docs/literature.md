@@ -63,7 +63,8 @@ configurations are global and externally selected, never per-episode repairs.
 4. Symmetry-aware multi-hypothesis sequence optimization: include 180° hypotheses explicitly, scoring visible evidence + short-term continuity + hand contact. Select global sequence paths rather than greedy top1. Do not average symmetry-equivalent rotations or smooth through genuine fast motion. AgentSTAR is a useful difficult-case procedural shape/pose teacher.
 5. Fine hands: first activate the already available SAM3D Body hand decoder;
    fit its articulation proposals under fixed full-clip identity. Do not add
-   HaMeR/WiLoR/Dyn-HaMR/MANO source with unresolved NC/redistribution eligibility.
+   HaMeR/WiLoR/Dyn-HaMR/MANO pipelines with unresolved checkpoint/dependency/
+   redistribution eligibility. HaMeR source is MIT; do not call it NC by itself.
    C2Dex supplies canonical-contact ideas; its implementation is not released.
 6. Metric depth: MoGe2 for stable global scale, compare MoGe3 detail as alternate; its fine detail gains do not guarantee better metric calibration. Cross-frame shared scale and focal consensus, calibrating from RGB/allowed priors only.
 7. Physics RL refinement RePHO only after above, not default: original results trade worse 3D accuracy for physics and score successful rollout frames only. All challenge frames must remain reconstructed.

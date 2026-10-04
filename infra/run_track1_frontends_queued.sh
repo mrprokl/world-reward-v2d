@@ -14,6 +14,9 @@ while (( $# ));do
    if (( wait_seen || $# < 2 )) || [[ ! "$2" =~ ^world-reward-[a-z0-9][a-z0-9-]{0,80}(\.service)?$ ]];then exit 2;fi
    if [[ "$1" == --after-terminal ]];then WAIT_MODE=terminal;fi
    WAIT_FOR="${2%.service}.service";wait_seen=1;shift 2 ;;
+  --after-gpu-lock)
+   (( ! wait_seen )) || exit 2
+   WAIT_MODE=lock;wait_seen=1;shift ;;
   *) exit 2 ;;
  esac
 done
@@ -133,19 +136,23 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 phase preflight
 BEFORE="$(integrity)";targets_absent
-LOAD="$(systemctl show "$WAIT_FOR" --property=LoadState --value)"
-[[ "$LOAD" == loaded ]] || { echo 'Explicit preceding unit is not loaded' >&2;exit 1; }
+if [[ "$WAIT_MODE" != lock ]];then
+ LOAD="$(systemctl show "$WAIT_FOR" --property=LoadState --value)"
+ [[ "$LOAD" == loaded ]] || { echo 'Explicit preceding unit is not loaded' >&2;exit 1; }
+fi
 LOCK_BEFORE="$(lock_identity)"
 START=$SECONDS;UNIT_READY=0
-if [[ "$WAIT_MODE" == terminal ]];then phase waiting_for_terminal_predecessor;else phase waiting_for_successful_predecessor;fi
-while :;do
- unit_state
- (( UNIT_READY )) && break
- REMAINING=$((43200-(SECONDS-START)))
- (( REMAINING>0 )) || { echo 'Queued frontend wait budget exceeded' >&2;exit 1; }
- DELAY=15;(( REMAINING>=DELAY )) || DELAY=$REMAINING
- sleep "$DELAY"
-done
+if [[ "$WAIT_MODE" != lock ]];then
+ if [[ "$WAIT_MODE" == terminal ]];then phase waiting_for_terminal_predecessor;else phase waiting_for_successful_predecessor;fi
+ while :;do
+  unit_state
+  (( UNIT_READY )) && break
+  REMAINING=$((43200-(SECONDS-START)))
+  (( REMAINING>0 )) || { echo 'Queued frontend wait budget exceeded' >&2;exit 1; }
+  DELAY=15;(( REMAINING>=DELAY )) || DELAY=$REMAINING
+  sleep "$DELAY"
+ done
+fi
 [[ "$(integrity)" == "$BEFORE" && "$(lock_identity)" == "$LOCK_BEFORE" ]] || exit 1
 targets_absent
 # Readonly opening neither creates nor truncates the independently checked lock.
@@ -156,7 +163,8 @@ REMAINING=$((43200-(SECONDS-START)))
 phase waiting_for_gpu_lock
 flock --timeout "$REMAINING" 9
 [[ "$(lock_identity fd)" == "$LOCK_BEFORE" && "$(integrity)" == "$BEFORE" ]] || exit 1
-targets_absent;unit_state;(( UNIT_READY )) || exit 1
+targets_absent
+if [[ "$WAIT_MODE" != lock ]];then unit_state;(( UNIT_READY )) || exit 1;fi
 if [[ "$WAIT_MODE" == terminal ]];then
  printf '{"stage":"track1_frontends_queued","phase":"predecessor_terminal","episode_index":%s,"predecessor_unit":"%s","predecessor_state":"%s","predecessor_result":"%s","exec_main_status":%s}\n' \
   "$EPISODE" "$WAIT_FOR" "$UNIT_ACTIVE" "$UNIT_RESULT" "$UNIT_MAIN"

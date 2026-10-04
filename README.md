@@ -22,6 +22,8 @@ inferred automatically; no hand-labeling of challenge records.
   gate or a reversal of its old conversion failure. EP13 queue failed before
   inference because its terminal predecessor was collected; a separately checked
   technical replay is active, with full425 Body PASS at10:43:36UTC.
+  EP0/full790 and EP12/full405 shared preparation now pass with original native
+  controls/reference replay; their independently measured receipts are frozen.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
   development scenes/objects and33–38cm absolute errors prevent a generalization
   claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.
@@ -46,6 +48,13 @@ inferred automatically; no hand-labeling of challenge records.
   through model callbacks, preserving empty masks and outside-union background.
   These are tiny-tested primitives, **not an operational new framework,
   integrated learned method or measured improvement**.
+- **Automatic identity micro-test:** twelve external DexYCB clips/872original
+  RGB frames acquired only onAzure, with opaque annotations separated. The real
+  generic hand-grounding bank **REJECTS** atclip0 in13.13s (no detected hand).
+  No tracking or private annotation values read, no prompt/threshold rescue.
+  Specialist [hand methods](docs/hand_specialists_audit.md) and
+  [MediaPipe](docs/mediapipe_hands_audit.md) have independent feasibility audits;
+  neither is adopted or presumed robust to object occlusion.
 
 Detailed receipts, producing revisions and decisions live in
 [experiments](docs/experiments.md). [Compute](docs/compute.md) is the compact

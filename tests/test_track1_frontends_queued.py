@@ -287,3 +287,62 @@ def test_terminal_predecessor_does_not_hide_or_retry_successor_failure(runtime,s
     assert sum(row[0]=='child'for row in runtime['calls']())==1
     phases=[json.loads(line)['phase']for line in result.stdout.splitlines()]
     assert phases[-1]=='fail'and'child_complete'not in phases
+
+
+def lock_args(runtime):
+    return [*runtime['args'][:2],'--after-gpu-lock']
+
+
+@pytest.mark.parametrize('status',[0,7,124,137])
+def test_explicit_gpu_lock_only_is_independent_of_collected_units_and_preserves_child(runtime,status):
+    runtime['env'].update(FAKE_LOAD='not-found',FAKE_SYSTEM_STATUS='9',FAKE_STATUS=str(status))
+    before=runtime['lock'].read_bytes();result=runtime['run'](*lock_args(runtime))
+    assert result.returncode==status,result.stderr
+    calls=runtime['calls']();assert [row[0]for row in calls]==['flock','nvidia-smi','flock','child']
+    assert calls[0][1]=='--timeout'and 43195<=int(calls[0][2])<=43200 and calls[0][3]=='9'
+    assert calls[-1][1:]==['--episode','5','--actor-policy','fixed_all16',True]
+    assert runtime['lock'].read_bytes()==before and not runtime['base'].exists()
+    phases=[json.loads(line)for line in result.stdout.splitlines()]
+    assert [row['phase']for row in phases[:3]]==['preflight','waiting_for_gpu_lock','running_original_frontends']
+    assert not any('predecessor_unit'in row or row['phase']=='predecessor_terminal'for row in phases)
+    assert phases[-1]['phase']==('child_complete'if status==0 else'fail')
+
+
+@pytest.mark.parametrize('tail',[
+    ['--after-gpu-lock',''],['--after-gpu-lock','world-reward-any'],
+    ['--after-gpu-lock','--after-gpu-lock'],
+    ['--after-gpu-lock','--wait-for','world-reward-test'],
+    ['--after-gpu-lock','--after-terminal','world-reward-test'],
+    ['--wait-for','world-reward-test','--after-gpu-lock'],
+    ['--after-terminal','world-reward-test','--after-gpu-lock'],
+    ['--after-gpu-lock=true'],['--after-gpu-lock','--actor-policy','default_three'],
+    ['--after-gpu-lock','--oracle','true'],
+])
+def test_lock_only_flag_has_no_value_and_cannot_mix_policies_or_override_child(runtime,tail):
+    result=runtime['run']('--episode','5',*tail)
+    assert result.returncode==2 and not runtime['calls']()
+
+
+@pytest.mark.parametrize('fault',['missing','alias','hardlink','locktimeout','gpu','query','wait_target','wait_lock','source','occupied'])
+def test_gpu_lock_only_retains_all_existing_source_target_and_lock_guards(runtime,fault,tmp_path):
+    if fault=='missing':runtime['lock'].unlink()
+    elif fault=='alias':
+        original=runtime['lock'].with_name('retained');runtime['lock'].rename(original);runtime['lock'].symlink_to(original)
+    elif fault=='hardlink':os.link(runtime['lock'],tmp_path/'alias')
+    elif fault=='locktimeout':runtime['env']['FAKE_FLOCK_STATUS']='1'
+    elif fault=='gpu':runtime['env']['FAKE_APPS']='12345'
+    elif fault=='query':runtime['env']['FAKE_GPU_STATUS']='9'
+    elif fault=='wait_target':runtime['env']['FAKE_WAIT_TARGET']='1'
+    elif fault=='wait_lock':runtime['env']['FAKE_WAIT_LOCK']='1'
+    elif fault=='source':(runtime['code']/'infra/run_episode_initializers.sh').chmod(0o644)
+    else:
+        occupied=runtime['base']/'object_pose_full';occupied.mkdir(parents=True);(occupied/'retained').write_text('preserve')
+    assert runtime['run'](*lock_args(runtime)).returncode!=0
+    assert not any(row[0]in('systemctl','child')for row in runtime['calls']())
+    if fault=='occupied':assert (occupied/'retained').read_text()=='preserve'
+
+
+def test_gpu_lock_only_uses_same_bounded_wait_and_never_marks_unknown_unit_pass(runtime):
+    wrapper=runtime['wrapper'];wrapper.chmod(0o644)
+    wrapper.write_text(wrapper.read_text().replace('43200','0'));wrapper.chmod(0o444)
+    assert runtime['run'](*lock_args(runtime)).returncode!=0 and not runtime['calls']()
