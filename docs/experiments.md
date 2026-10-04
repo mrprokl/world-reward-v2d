@@ -7660,3 +7660,12 @@ Original algorithms unchanged technical replay uses14cb625 newsource/newowned
 namespace after no learned/private execution in first attempt; CPUsource/runtime
 preflight and data-free CUDA gate remain independently satisfied. EP13 official
 packer66f6138 dispatchedACK only.
+
+Paired native mask actualPASS21.279172s/full218frames under14cb625, native
+14.729328s. Same103encodes/103A calls,98B calls;5nativepoints-unusable explicitly
+reuseA,115noproposalframes retainempty slots. All219immutable artifacts1,261,315B
+independently frozen with175-file source, frozenMP7/acquisition/protocol/image/
+assets/fullRGBindices/counters/exclusiveoutputs pre/posthash. Host123452B
+SHA9d45149afddd760c4158948cb23a9883d591bc9db9db8188571a27404fea3cb8.
+No private values, quality/physicalID/contact/3D inferred; pins precede separate
+CPUprivate mask evaluation. Originalfirstattempt technicalfail retained.

@@ -1,0 +1,8 @@
+{
+  "schema": "world_reward.hand_mask_infer_pins.v1",
+  "producer_revision": "14cb62572405536377f2c215aa3ddf525d5f6645",
+  "report": {
+    "bytes": 123452,
+    "sha256": "9d45149afddd760c4158948cb23a9883d591bc9db9db8188571a27404fea3cb8"
+  }
+}
