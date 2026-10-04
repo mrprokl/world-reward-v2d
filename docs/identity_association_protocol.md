@@ -73,6 +73,33 @@ les régimes de co-mouvement ne doivent pas être nommés contact/prise/relâche
 Stationnarité ou mouvement caméra commun ne permet pas toujours l'identité.
 Un score calibré n'est pas encore un gain de pose absolue.
 
+### Calibration implémentée, sans labels réels lus
+
+`identity_calibration` apporte une régression logistique L2=1 fixe, Newton/Armijo
+déterministe, standardisation fit-only et poids égaux par clip puis identité
+privée d'entraînement ; les variantes exactes partagent leur masse. Les labels
+inconnus/unsupported ne deviennent pas des zéros crédibles. Chaque clip fit doit
+contenir positif et négatif exploitables, sinon aucune calibration utilisable.
+Scores/logits bruts, pas des probabilités calibrées ; grouping d'inférence par
+proposition **automatique seulement**, jamais classes GT. Root159 tests combinés
+PASS0.27s, dont optimum contre référence SciPy indépendante ; pas un gain vidéo.
+
+Décision préfixée avant acquisition/valeurs privées : winner strict score>0 et
+gap>0, tous les concurrents supportés ; sinon ABSTAIN. Sujet02 décision : les
+trois identités initiales doivent être correctes et couvertes (majorité stricte
+et recall>1/2), sans hausse de wrong-ID face au bras A fixé. Aucun grid-search,
+nouveau clip, prompt ou seuil après échec. Sujet01 : au moins une identité
+initiale correcte/couverte supplémentaire sur les six clips, aucune hausse de
+wrong-ID ; cela qualifie seulement le mécanisme de sélection, pas la pose3D ou
+la persistance full-T. Toutes les frames/gaps restent au bilan de couverture.
+Sans masques ultérieurs réels, ne pas inventer un score de segmentation full-T.
+
+Convention DexYCB privée : segmentation0=fond,255=mains fusionnées,1..21=classes
+YCB (pas lignes de pose). Matching strict majorité>1/2 des pixels du masque ;
+recall>1/2 est un gate séparé. Cible=`ycb_ids[ycb_grasp_ind]` constante, pas vérité
+de contact/main active. Fragment propre peut avoir identité sans couverture ;
+mixed/unknown et absent restent échecs, jamais clips retirés du dénominateur.
+
 Ne pas appeler le minimum de chemins `temporal_identity` une vraisemblance HMM
 marginalisée : MAP/profilage et log-sum-exp des chemins diffèrent, et des banques
 de nuisance de tailles différentes peuvent biaiser le minimum. Comparabilité,
