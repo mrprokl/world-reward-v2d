@@ -6205,3 +6205,13 @@ held GPU lock before atomicNOREPLACE archiving ONLY the original empty directory
 no geometry/trajectory deletion or historical PASS reinterpretation. Root
 combined271 focused tests PASS2.06s; these are control tests, not executed
 transition, transferred data or reconstruction results.
+
+EP6 unchanged volume proposal855caff **PASS46.640112s**: report24,135B SHA
+`f673750589c9418f3c991be2963f477c56b2b578265cd212a3daaec7db4dfd4f`.
+All seven actual artifact/source/control/build identities independently verified
+by bc9258d report-only inventory before freezing new episode6 pins. Original
+metric scale1.0737398862838745 stays baked once; topology/intersections/surface/
+shell-volume gates unchanged. Original a06b703 FAIL, log and empty pose directory
+still preserved; no pose/native/full-HOI accuracy inferred. EP8 initializers now
+actually retain all634 body/depth/adapter frames; GPU idle after completion,
+not an object pose or reconstruction quality success.
