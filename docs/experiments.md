@@ -8429,3 +8429,17 @@ all4globalbudgets boundary/nonmanifold, all4componentwise orientation/Eulerchang
 and full222sourcepreserved; no fulltrajectory, repair or gate retune. FreshEP29
 allinitializertargets absentchecked19:08UTC; originalfixedall16initializers
 queued underf6a4fd1, ACK/completion stillseparate.
+
+Actualfinal rootqualification38876 PASS: host==nativecompleteproof, all4QEM and
+40actualquery_attempted/returned/return0, frozencontrolhashes and6fullforests,
+source/post/buildbinary/runtime/official0644/cleanup unchanged. Native16.728774168s,
+237991B SHA0239977d579339be8c5a12be980bbfc3feaa63287f9be0da0b438ea8f304d3af;
+source210JSON digest3c7e982aae2fb4ae610d39450817f137deec1b33f783ab8ff8daf9db1eeced32.
+Fouractualcollapses304/304/668/668, maxCD ratios .0012690576/.0012691265/
+.0030402757/.0030678795; maxshellvolume .0004723591/.0004727854/.0137153866/
+.0134965021. Actual tinyqualificationpins frozen AFTERindependentaudit, notlearned
+froma simulatedreceipt. ProceduralgeometryPASS only; no production/adoption/HOI.
+EP21 full563 originalnativeforward queued underbeb339b afteractualpreparepins;
+own196sourcefiles archive26e9de35e495ee10e8298fe6683025d07f60bf0220408bcc98f4996e77f763e8
+ledger2cfe56bdff8504ddba07890e1aeb27120b5c25158ee2a5eb18879996fc3f12e3,
+no nativecompletion presumed fromdispatch.

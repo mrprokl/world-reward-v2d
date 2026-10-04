@@ -1,4 +1,4 @@
-# Whole-oriented-solid compiler: prepared, not qualified
+# Whole-oriented-solid compiler: v2 procedural qualification, not adoption
 
 This branch extends the general representation contract to multiple cavities,
 islands and independent roots. It does not change a prediction, select an
@@ -40,7 +40,7 @@ QEM and cannot retry origins according to observed performance. Complete-source
 range and inverse-exactness remain mandatory. This is a conditioning hypothesis,
 not a guarantee of QEM quality, metric identifiability or HOI accuracy.
 
-## Separate v2 hypothesis: prepared only
+## Separate v2 hypothesis: four procedural controls qualified
 
 `mesh_conditioning_v2.py` and the source-bound native header implement the
 predeclared per-axis sufficient Sterbenz predicate, otherwise exactly zero.
@@ -74,3 +74,13 @@ The separate packaging-only replay authenticates that historical mode and bytes
 before/after and keeps the input bind RO; no historical chmod, source reroll,
 budget/gate change or qualification claim. Actual independent source210 and
 receipt hashes are recorded in experiments.
+
+The separate mode-only replay `c8b57be` now passes the **actual native complete
+qualification** on Azure:16.728774s native/18.102985s host,4 QEM calls and40 exact
+CGAL queries, all four original control fingerprints and six complete material
+forests/fidelity stages retained. Root independently verifies actual source,
+build/receipt/binary/runtime/official bytes, query census, posthashes and cleanup.
+Maximum sampled CD/diagonal0.003068 and shell-volume error0.013716 meet the
+unchanged0.01/0.05 gates. Actual build+qualification pins are frozen separately.
+This qualifies the numerical compiler on procedural sources, **not production
+geometry, RGB accuracy, HOI, legal eligibility, adoption or CARI4D superiority**.
