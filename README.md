@@ -39,16 +39,19 @@ No final Parquet, submission or verified CARI4D improvement yet.
   (134.23 s). Its unchanged full native301update refinement passes (392.97 s);
   directexport passes all668 frames (39.57 s); original official CPU packing
   passes (16.31 s), with scratch Parquet deleted. The next full816-frame volume tracker
-  also passes (4,794.56 s); its CPU CARI input assembly is active. The634-frame
+  also passes (4,794.56 s); its CPU CARI input assembly now passes all816frames (6,148.76 s). The634-frame
   episode has complete initializers. Its first private Azure full-pose run
   stopped before poses on the unchanged topology gate. A separately qualified
   volume proposal and its full634-frame input archive now pass provenance and
   fidelity checks. The unchanged isolated volume tracker now passes all634
   original frames on VM02 (4,743.69 s), with independent source/full-input/output
-  byte seals. Its output return and CPU assembly remain separate unrun gates.
+  byte seals. Its private Azure result return passes with unchanged bytes;
+  independent129/133source+output seals, listener/clientkey cleanup and
+  temporary NSG rule removal also pass. Original CPU assembly is the next gate.
   The next415-frame episode has complete automatic Body/depth initializers;
-  its default topology gate failed before poses. One unchanged CPU
-  volume-constrained proposal is running, not yet accepted.
+  its default topology gate failed before poses. The unchanged CPU
+  volume proposal also rejects zero-area source faces; both failures stay
+  closed without face deletion or threshold relaxation.
   The original
   default-backend failures remain closed.
   No frames, components or

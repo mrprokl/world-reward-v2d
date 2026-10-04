@@ -6737,3 +6737,46 @@ SHAfae0b125568942cde70e959c5fe9da2283c98e0b48ad7f8f466ea7e8a5e91067;
 manifestSHA06741712f354b1513567cb6cf398a44713b7b7f6b329f68f51f1cb62d479814e.
 Only834B measuredtransportpins local; original634framepose outputs remainAzure.
 ActualprivateSSHreturn/NOREPLACE/cleanup still required, no qualityPASS.
+
+EP9 original empty predriverFAIL directory independentlyauthenticated against
+ALL101originalGitfiles, exactarchive/markers/191B log/unitexit2 and noactivePID.
+AtomicNOREPLACE preserved sameemptyUID1000inode as
+object_budget_volume_access_failed_v1;675B transitionreceipt
+SHAb5cf97538c7a7db6ddbcb30ed0774c3df888c250bb3966b3363f08288fd4a1dd.
+No historical source modes/files changed. A separate newecd6e7a unchanged900s
+proposal invocation uses corrected immutable publication, never unloggedretry.
+
+New EP8 private return listener dispatch frozenecd6e7a after actualsource/archive
+pins. Root created one fresh root0700/0600 clientkey on VM01 without reading
+privatebytes; only publicEd25519 transportauth retained. NSG exactlyone newly
+owned source10.0.0.4/32→10.0.0.9/32TCP2222Allow beforeexisting4096Deny, never
+Internet/wholeVNet. Listener/source/return and ownedrule/keycleanup not inferred
+from controltransport ACK; each requires actualindependent checks.
+
+Full frozenecd6e7af00f4a12d1c53cea823df7f3653df3233 repository check:
+12051PASS5SKIP437.21s. Includes51newreturn/publicationfixtures; no actual
+benchmark/modelquality inferred. Disposablepytestretentionnone preserved,
+allheavydata/models/renders remainAzure; localtests onlytinyproceduralfixtures.
+
+EP6 actualCPUassembly originale655eed74e55b479e52c104914a4da4fc01d63f6
+PASS816/8166,148.758605s,3359B receipt
+SHA0c0cf3ed65ff1508338fcbf4531431b253121c7957675c29e7d9cceef1c6aac0;
+full15input independentpin inventory stillrequiredbefore learnedstages.
+EP8 privateAzurepull actualecd6e7a PASS1.915181s,1844B receipt
+SHAef6f578b41fb670d42a1d045c083141875081d81c3a932782858aac85de6e34a.
+All634poseframes native3files copiedunchanged; independent source/output/
+cleanupseal remainsrequired, noqualityclaim. EP9 actualunchangedCPUvolume
+proposal FAIL0.419930s oncollapsed/numericallyzeroarea sourcefaces,2848B
+receiptSHA277049bbb4d13448d40d286d83f94908d441025ad7dc7998fa8c1f9ecb48ffda.
+Do not delete/repairfaces/relaxthresholds or relabelFAIL; thisglobalbackend does
+not supportthatinput. No geometryfailure disguised as CARI4Dimprovement.
+
+Independent EP8 return sealPASS: all129actualpull and133server committed
+sourcefilebytes/modes/markers, exactfullarchive/firstmanifest/oldproducer
+receipt/full634nativeframeorder and3originaloutputSHA verified aftertransfer.
+Nativecanonical UID1000/0755 and only3files0444; not newlypredicted/re-encoded.
+Exactownedlistener stopped/privatehostkeycontrol removed, VM01clientkey removed
+withoutprivatebyte reads; original NSG4096Denyonly restored. Server462B cleanup
+SHAd2cd27b40f500559bcae11ee4af9bd64c8a902008f6ce19726f281de5b06098c;
+pull798B cleanupSHA76b03dd12cd474ca1a272c0eeab587125957bf704181011e1f1c242ef00577cd.
+OriginalCPUassembly separatelydispatchedecd6e7a, noGPU/numericchanges/qualityclaim.
