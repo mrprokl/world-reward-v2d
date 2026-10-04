@@ -7239,3 +7239,15 @@ data/model overlap remains unknown. Native masks stage dispatched from frozen
 dd3d9e8997b6cd8ccbb105b97a9d7e4e8f209551; no actual inference PASS yet.
 EP12 sharedprepare queued using exactly the published4d4a049 source, one
 explicit GPU-lock wait, no duplicate frontend/geometry fit or numerical retuning.
+
+DexYCB automatic bankv1 dd3d9e8 CLOSED scientific FAIL13.134305s atclip0:
+fixed GroundingDINO hand. yielded no retained hand, object. yielded two objects.
+Two real detector calls, one native SAM2 encoder/batch; retained object masks
+9728/4178pixels, querycounts9/13, background61. Initial bank diagnostic sealed
+before required-class gate. Native report5662B SHA006c4689e9b77040e53404032c4173314517f31c7e2ff4ee3b7a58ef94be9bb8;
+host report565B SHA0f86499913e9a4666b57ec74fd4586393b36b4b6504a6803dc4ef98ea821db69.
+Source/model/public bytes rehashed, owned container cleanup verified, GPU idle.
+No tracking, CPU feature/calibration, GT segmentation/target values or quality
+evaluation. Do not alter query/threshold/selection or reopen this cohort to make
+the gate pass. Generic text grounding is insufficient automatic hand evidence;
+next audit specializes observations, then needs a new independent protocol.
