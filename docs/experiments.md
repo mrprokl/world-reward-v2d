@@ -7601,3 +7601,9 @@ exclusiveinventory/posthash PASS; pins precede unchanged CPU scan. Report67297B
 SHA183d2ce0e68844c2b085e0533eac75e826146140611a2b7b8a0321648521da4b;
 manifest64934B SHA8b8eee48cc78da3be619a64bfdbf5a66a92414f2b5ab90a7b4244a08711f44c0.
 CC-BY-NC4/unknown overlap remain diagnostic-only; no performance claim.
+
+EP14 independent15-public-input freeze PASS using exact queued ea26eda source
+and separately exact155-file6fb9441 auditor closure. All bytes authenticated
+before JSON and posthashed after; no HDF5/GLB/pickle values interpreted or
+prediction replay. Full442 original timeline pinned before shared preparation.
+Fresh-hand source/scan/eval focused regression root156PASS3.38s.
