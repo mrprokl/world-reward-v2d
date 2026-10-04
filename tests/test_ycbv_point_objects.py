@@ -284,6 +284,7 @@ def test_runtime_mount_graph_only_exact_snapshot_and_repoblobs(tmp_path):
 
 def test_exact_docker_argv_blind_mounts_no_private_or_full_assets(tmp_path,monkeypatch):
     pins=pin_fixture();code=tmp_path/'code';out=tmp_path/'out'
+    json_file(code/gate.PIN_FILE,pins)
     monkeypatch.setattr(gate,'runtime_mounts',lambda root,pins:[root/'exact_public_model'])
     for mode in('probe','gpu'):
         args=gate.docker_arguments(tmp_path,code,'b'*40,pins,out,'c'*64,10.,mode,'owned')
@@ -448,3 +449,128 @@ def test_full_native_grid_K_is_unrounded_normalized_FP32_no_geometry_fill(monkey
 def test_image_receipt_only_safe_measured_projection_namespace(path):
     pins=pin_fixture();pins['runtime']['image_receipt']['path']=path
     with pytest.raises(ValueError):gate.validate_pins(pins)
+
+
+def reference_fixture(tmp_path):
+    """Tiny Azure metadata stand-ins; original producer is never executed."""
+    full=pin_fixture();revision='b'*40;prefix='results/ycbv-objects-runtime-'+revision
+    code=tmp_path/'current-code';old=tmp_path/'jobs'/revision/'run_ycbv_objects_runtime_inventory'/'code'
+    helpers=('infra/ycbv_objects_runtime_inventory.py','infra/run_ycbv_objects_runtime_inventory.sh',*gate.HELPERS)
+    for name in(*helpers,'configs/original_other_pin.json'):write(old/name,('# original '+name+'\n').encode())
+    for path in(old,*old.rglob('*')):
+        if path.is_dir():path.chmod(0o555)
+    markers={n:write(old.parent/n,(revision+'\n'if n=='revision'else'd'*64+'\n').encode())for n in('revision','source-sha256')}
+    digest=hashlib.sha256()
+    for name in('revision','source-sha256'):digest.update((old.parent/name).read_bytes())
+    rows={}
+    for path in sorted(old.rglob('*')):
+        if path.is_file():
+            name=str(path.relative_to(old));row=gate.identity(path,True,True);rows[name]=row
+            digest.update(name.encode()+b'\0'+bytes.fromhex(row['sha256']))
+    binding=dict(closure_sha256=digest.hexdigest(),helpers={n:rows[n]for n in helpers},markers=markers)
+    manifest=json_file(tmp_path/prefix/'runtime.json',full['runtime'])
+    report=dict(stage='CPU_existing_Objects_runtime_inventory',status='pass',phase='complete',producer_revision=revision,
+        script_sha256=rows[helpers[0]]['sha256'],source_helpers=binding,GPU_used=False,models_loaded=False,RGB_or_labels_read=False,
+        source_rehashed_after=True,owned_cleanup_verified=True,all_selected_models_receipts_source_and_image_after_reverified=True,
+        budget_seconds=300,cleanup_grace_seconds=30,image_id=gate.IMAGE,runtime_manifest=manifest,
+        CPU_inventory_elapsed_seconds=4.5,elapsed_seconds=4.8)
+    report_pin=json_file(tmp_path/prefix/'report.json',report)
+    tiny=dict(schema=full['schema'],inputs=full['inputs'],runtime_ref=dict(manifest=dict(path=prefix+'/runtime.json',**manifest),
+        inventory_report=dict(path=prefix+'/report.json',**report_pin,producer_revision=revision,script_sha256=report['script_sha256'])))
+    json_file(code/gate.PIN_FILE,tiny)
+    return code,old,tiny,full,report
+
+
+def test_reference_resolves_azure_only_manifest_with_original_cpu_source_proof(tmp_path):
+    code,_,tiny,full,_=reference_fixture(tmp_path)
+    assert len((code/gate.PIN_FILE).read_bytes())<32768 and 'runtime'not in tiny
+    assert gate.load_pins(tmp_path,code)==full
+    assert gate.original_inventory_proof(tmp_path,tiny['runtime_ref'],full['runtime'])['manifest']=={k:tiny['runtime_ref']['manifest'][k]for k in('bytes','sha256')}
+
+
+def test_blind_ref_reader_never_reads_inventory_report_or_historical_source(tmp_path,monkeypatch):
+    code,old,tiny,full,_=reference_fixture(tmp_path)
+    (tmp_path/tiny['runtime_ref']['inventory_report']['path']).unlink()
+    original=Path.open;opened=[]
+    def blind(path,*args,**kwargs):
+        assert path!=tmp_path/tiny['runtime_ref']['inventory_report']['path']and old not in path.parents
+        opened.append(path);return original(path,*args,**kwargs)
+    monkeypatch.setattr(Path,'open',blind)
+    assert gate.load_pins(tmp_path,code,False)==full
+    assert set(opened)=={code/gate.PIN_FILE,tmp_path/tiny['runtime_ref']['manifest']['path']}
+
+
+@pytest.mark.parametrize('fault',['missing','bytes','sha','traversal','different_producer','extra','embedded_runtime','different_image','unwritable_pin'])
+def test_tiny_runtime_refs_fail_closed_before_models(tmp_path,monkeypatch,fault):
+    code,_,tiny,_,_=reference_fixture(tmp_path)
+    if fault=='missing':(tmp_path/tiny['runtime_ref']['manifest']['path']).unlink()
+    elif fault=='bytes':tiny['runtime_ref']['manifest']['bytes']+=1
+    elif fault=='sha':tiny['runtime_ref']['manifest']['sha256']='f'*64
+    elif fault=='traversal':tiny['runtime_ref']['manifest']['path']='results/../runtime.json'
+    elif fault=='different_producer':tiny['runtime_ref']['inventory_report']['producer_revision']='e'*40
+    elif fault=='extra':tiny['runtime_ref']['private_labels']={}
+    elif fault=='embedded_runtime':tiny['runtime']={}
+    elif fault=='different_image':
+        path=tmp_path/tiny['runtime_ref']['manifest']['path'];runtime=json.loads(path.read_bytes())
+        runtime['image_receipt']['path']='results/ycbv-objects-runtime-'+('e'*40)+'/image.json'
+        tiny['runtime_ref']['manifest'].update(json_file(path,runtime))
+    json_file(code/gate.PIN_FILE,tiny)
+    if fault=='unwritable_pin':(code/gate.PIN_FILE).chmod(0o644)
+    monkeypatch.setattr(gate,'runtime_proof',lambda *args:pytest.fail('Invalidrefs reached model evidence'))
+    with pytest.raises((ValueError,FileNotFoundError)):gate.load_pins(tmp_path,code)
+
+
+@pytest.mark.parametrize('role',['manifest','inventory_report'])
+def test_runtime_refs_require_readonly_original_metadata(tmp_path,role):
+    code,_,tiny,_,_=reference_fixture(tmp_path)
+    (tmp_path/tiny['runtime_ref'][role]['path']).chmod(0o644)
+    with pytest.raises(ValueError):gate.load_pins(tmp_path,code)
+
+
+@pytest.mark.parametrize('field,value',[('status','fail'),('phase','incomplete'),('GPU_used',True),('models_loaded',True),
+    ('RGB_or_labels_read',True),('source_rehashed_after',False),('owned_cleanup_verified',False),
+    ('all_selected_models_receipts_source_and_image_after_reverified',False),('budget_seconds',300.),
+    ('CPU_inventory_elapsed_seconds',301.),('elapsed_seconds',331.),('runtime_manifest',dict(bytes=1,sha256='a'*64)),
+    ('script_sha256','e'*64),('source_helpers',{})])
+def test_original_inventory_report_contract_not_asserted_or_current_source_substituted(tmp_path,field,value):
+    code,_,tiny,_,report=reference_fixture(tmp_path);report[field]=value
+    spec=tiny['runtime_ref']['inventory_report'];spec.update(json_file(tmp_path/spec['path'],report));json_file(code/gate.PIN_FILE,tiny)
+    with pytest.raises(ValueError):gate.load_pins(tmp_path,code)
+
+
+@pytest.mark.parametrize('fault',['helper','marker','extra_source','source_mode'])
+def test_original_inventory_source_and_markers_rehashed_not_recomputed_self_attestation(tmp_path,fault):
+    code,old,_,_,_=reference_fixture(tmp_path)
+    if fault=='helper':write(old/'infra/ycbv_objects_runtime_inventory.py',b'# changed original\n')
+    elif fault=='marker':write(old.parent/'source-sha256',('e'*64+'\n').encode())
+    elif fault=='source_mode':(old/'infra/ycbv_objects_runtime_inventory.py').chmod(0o644)
+    else:
+        (old/'infra').chmod(0o755);write(old/'infra/unrecorded.py',b'# new file')
+    with pytest.raises(ValueError):gate.load_pins(tmp_path,code)
+
+
+def test_runtime_ref_manifest_tamper_detected_before_json_parse(tmp_path,monkeypatch):
+    code,_,tiny,_,_=reference_fixture(tmp_path);path=tmp_path/tiny['runtime_ref']['manifest']['path']
+    write(path,b'notjson')
+    original=gate.strict
+    def only_config(raw):
+        assert raw!=b'notjson';return original(raw)
+    monkeypatch.setattr(gate,'strict',only_config)
+    with pytest.raises(ValueError):gate.load_pins(tmp_path,code)
+
+
+def test_ref_runtime_container_has_only_one_readonly_metadata_leaf_no_inventory_report(tmp_path,monkeypatch):
+    code,_,tiny,full,_=reference_fixture(tmp_path)
+    monkeypatch.setattr(gate,'runtime_mounts',lambda *args:[])
+    for mode in('probe','gpu'):
+        args=gate.docker_arguments(tmp_path,code,'b'*40,full,tmp_path/'out','c'*64,1.,mode,'owned')
+        mounts=[args[i+1]for i,v in enumerate(args)if v=='--mount']
+        manifest=str(tmp_path/tiny['runtime_ref']['manifest']['path'])
+        assert mounts.count('type=bind,src='+manifest+',dst='+manifest+',readonly')==1
+        assert not any(tiny['runtime_ref']['inventory_report']['path']in m or 'image.json'in m or 'ycbv_objects_runtime_inventory.py'in m for m in mounts)
+        assert not any('src='+str(tmp_path/'results')+','in m for m in mounts)
+
+
+def test_blind_ref_reader_rejects_host_inventory_report_presence(tmp_path):
+    code,_,_,_,_=reference_fixture(tmp_path)
+    with pytest.raises(ValueError,match='must not enter'):gate.load_pins(tmp_path,code,False)

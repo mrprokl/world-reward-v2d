@@ -145,6 +145,71 @@ def validate_pins(value):
     return value
 
 
+def runtime_reference(value):
+    """Tiny independently frozen Azure metadata refs, never an arbitrary path."""
+    require(type(value)is dict and set(value)=={'schema','inputs','runtime_ref'}and value['schema']=='world_reward.ycbv_point_objects.pins.v1','Exact tiny Objects input/runtime reference config required')
+    refs=value['runtime_ref'];require(type(refs)is dict and set(refs)=={'manifest','inventory_report'},'Exactly manifest and original CPU inventory refs required')
+    report=refs['inventory_report'];require(type(report)is dict and set(report)=={'path','bytes','sha256','producer_revision','script_sha256'},'Independent original CPU inventory producer pin required')
+    revision=report['producer_revision'];require(type(revision)is str and re.fullmatch('[0-9a-f]{40}',revision)and type(report['script_sha256'])is str and re.fullmatch('[0-9a-f]{64}',report['script_sha256']),'Actual full original inventory producer required')
+    prefix='results/ycbv-objects-runtime-'+revision+'/'
+    for name,filename in(('manifest','runtime.json'),('inventory_report','report.json')):
+        row=refs[name];require(type(row)is dict and set(row)==({'path','bytes','sha256'}if name=='manifest'else set(report))and row['path']==prefix+filename,'Same exact original inventory output namespace required')
+        pin({k:row[k]for k in('bytes','sha256')});require(row['bytes']<=2_000_000,'Bounded Azure-only runtime metadata required')
+    return refs
+
+
+def original_inventory_proof(root,refs,runtime):
+    """Host-only byte ancestry; no import/execution of historical producer."""
+    spec=refs['inventory_report'];wanted={k:spec[k]for k in('bytes','sha256')}
+    require(identity(root/spec['path'],True)==wanted,'Readonly original CPU inventory receipt required before JSON')
+    report=bound_json(root/spec['path'],wanted)
+    required=dict(stage='CPU_existing_Objects_runtime_inventory',status='pass',phase='complete',producer_revision=spec['producer_revision'],script_sha256=spec['script_sha256'],
+        GPU_used=False,models_loaded=False,RGB_or_labels_read=False,source_rehashed_after=True,owned_cleanup_verified=True,
+        all_selected_models_receipts_source_and_image_after_reverified=True,budget_seconds=300,cleanup_grace_seconds=30,image_id=IMAGE,
+        runtime_manifest={k:refs['manifest'][k]for k in('bytes','sha256')})
+    require(type(report)is dict and all(type(report.get(k))is type(v)and report[k]==v for k,v in required.items()),'Original completed CPU/no-model/no-RGB inventory/post-cleanup proof required')
+    require(type(report.get('CPU_inventory_elapsed_seconds'))in(int,float)and 0<report['CPU_inventory_elapsed_seconds']<=300 and
+        type(report.get('elapsed_seconds'))in(int,float)and report['CPU_inventory_elapsed_seconds']<=report['elapsed_seconds']<=330,'Original frozen CPU inventory budget required')
+    revision=spec['producer_revision'];code=canonical(root/'jobs'/revision/'run_ycbv_objects_runtime_inventory'/'code')
+    binding=report.get('source_helpers');helpers=('infra/ycbv_objects_runtime_inventory.py','infra/run_ycbv_objects_runtime_inventory.sh',*HELPERS)
+    require(type(binding)is dict and set(binding)=={'closure_sha256','helpers','markers'}and type(binding['helpers'])is dict and set(binding['helpers'])==set(helpers)
+        and binding['helpers'][helpers[0]].get('sha256')==spec['script_sha256'],'Exact original inventory helper closure required')
+    digest=hashlib.sha256();markers={};rows={}
+    for name in('revision','source-sha256'):
+        path=code.parent/name;markers[name]=identity(path);raw=path.read_bytes()
+        require(dict(bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())==markers[name],'Original inventory marker changed before validation')
+        require(raw==(revision+'\n').encode()if name=='revision'else bool(re.fullmatch(b'[0-9a-f]{64}\n',raw)),'Original unchanged inventory dispatch marker required');digest.update(raw)
+    require(markers==binding['markers'],'Independent original inventory marker bytes differ')
+    for path in(code,*sorted(code.rglob('*'))):
+        canonical(path);mode=path.lstat().st_mode;require(not mode&0o222 and(stat.S_ISREG(mode)or stat.S_ISDIR(mode)),'Complete original readonly code-only inventory closure required')
+        if path.is_file():
+            name=str(path.relative_to(code));row=identity(path,True,True);rows[name]=row;digest.update(name.encode()+b'\0'+bytes.fromhex(row['sha256']))
+    require(set(helpers)<=set(rows)and {n:rows[n]for n in helpers}==binding['helpers']and digest.hexdigest()==binding['closure_sha256'],'Original inventory source/whole-closure byte identity differs')
+    require(runtime['image_receipt']['path']=='results/ycbv-objects-runtime-'+revision+'/image.json','Runtime image projection must come from the same pinned CPU inventory')
+    return dict(report=wanted,source=binding,manifest={k:refs['manifest'][k]for k in('bytes','sha256')})
+
+
+def pin_config(code):
+    path=code/PIN_FILE;wanted=identity(path,True)
+    value=bound_json(path,wanted)
+    if 'runtime_ref'in value:require(wanted['bytes']<=32768,'Tiny committed config only; full runtime manifest stays Azure')
+    return value
+
+
+def load_pins(root,code,host=True):
+    """Resolve one independently pinned Azure runtime JSON; GPU sees no report."""
+    value=pin_config(code)
+    if 'runtime_ref'not in value:return validate_pins(value)
+    refs=runtime_reference(value);wanted={k:refs['manifest'][k]for k in('bytes','sha256')}
+    require(identity(root/refs['manifest']['path'],True)==wanted,'Readonly independently pinned Azure runtime manifest required before JSON')
+    runtime=bound_json(root/refs['manifest']['path'],wanted)
+    resolved=validate_pins(dict(schema=value['schema'],inputs=value['inputs'],runtime=runtime))
+    require(runtime['image_receipt']['path']=='results/ycbv-objects-runtime-'+refs['inventory_report']['producer_revision']+'/image.json','Same original inventory image projection required')
+    if host:original_inventory_proof(root,refs,runtime)
+    else:require(not (root/refs['inventory_report']['path']).exists(),'CPU inventory receipt must not enter blind runtime container')
+    return resolved
+
+
 def runtime_proof(root,pins,host=True):
     runtime=pins['runtime'];image=None
     if host:
@@ -316,7 +381,9 @@ def observe(root,pins,out,report,persist,native):
 
 
 def run(root,code,revision,out,report,persist):
-    pins=validate_pins(strict((code/PIN_FILE).read_bytes()));before=source(code,revision,True)
+    before=source(code,revision,True);pins=load_pins(root,code,False)
+    tiny=pin_config(code)
+    if 'runtime_ref'in tiny:require(not (root/tiny['runtime_ref']['inventory_report']['path']).exists(),'Original CPU inventory receipt must stay host-only')
     require(not any((root/name).exists()for name in(BASE+'/eval_private','data',BASE+'/report.json','vendor','results/image-sam3d-runtime.json')),'NoGT/acquisition/challengepaths mayenterGPU')
     started=float(os.environ['WR_OBJECTS_STARTED']);remaining=BUDGET-(time.monotonic()-started);require(remaining>0,'Whole GPU budget exhausted before native model load')
     signal.alarm(max(1,int(remaining)));runtime=runtime_proof(root,pins,False);receipts=inputs_proof(root,pins,False);installed=installed_proof(pins)
@@ -335,7 +402,7 @@ def run(root,code,revision,out,report,persist):
         require(report['native_calls_attempted']==report['native_calls_returned']==report['native_calls_completed']==3,'All three actualnativecallsrequired')
     finally:
         torch.hub.load=original
-        require(runtime_proof(root,pins,False)==runtime and installed_proof(pins)==installed and source(code,revision,True)==before and inputs_proof(root,pins,False)==receipts,'Originalnativeassets/sourcechangedafterinference')
+        require(load_pins(root,code,False)==pins and runtime_proof(root,pins,False)==runtime and installed_proof(pins)==installed and source(code,revision,True)==before and inputs_proof(root,pins,False)==receipts,'Originalnativeassets/sourcechangedafterinference')
         # Acquisition receipt is host-only; publicbundle receipts mounted below.
         report['GPU_budget_elapsed_seconds']=time.monotonic()-started;signal.alarm(0)
         require(report['GPU_budget_elapsed_seconds']<=BUDGET,'Whole3anchorGPUbudgetincludesproof/hash/post');report['source_rehashed_after']=True;persist()
@@ -344,8 +411,11 @@ def run(root,code,revision,out,report,persist):
 
 
 def host_proof(root,code,revision):
-    before=source(code,revision);pins=validate_pins(strict((code/PIN_FILE).read_bytes()));receipts=inputs_proof(root,pins);runtime=runtime_proof(root,pins)
-    return pins,dict(source=before,receipts={name:{k:pins['inputs'][name][k]for k in('bytes','sha256')}for name in receipts},runtime=runtime)
+    before=source(code,revision);pins=load_pins(root,code);receipts=inputs_proof(root,pins);runtime=runtime_proof(root,pins)
+    proof=dict(source=before,receipts={name:{k:pins['inputs'][name][k]for k in('bytes','sha256')}for name in receipts},runtime=runtime)
+    value=pin_config(code)
+    if 'runtime_ref'in value:proof['runtime_reference']=value['runtime_ref']
+    return pins,proof
 
 
 
@@ -394,6 +464,8 @@ def lock_identity(root,fd):
 
 def docker_arguments(root,code,revision,pins,out,proof,started,mode,name):
     paths=[code/n for n in(*HELPERS,PIN_FILE)]+[code.parent/n for n in ('revision','source-sha256')]
+    value=pin_config(code)
+    if 'runtime_ref'in value:paths.append(root/runtime_reference(value)['manifest']['path'])
     if mode=='gpu':
         paths+=runtime_mounts(root,pins)
         paths+=[root/BASE/'inputs/manifest.json',root/BASE/'automatic_masks_v1/report.json',root/BASE/'depth_init_v1/report.json']
@@ -435,7 +507,7 @@ def launch(root,code,revision):
     source_before=source(code,revision);out=canonical(root/BASE/OUTPUT)
     require(out.parent.is_dir()and not out.exists()and not out.is_symlink(),'Fresh external output namespace required; no overwrite/resume')
     # Unknown runtime/input pins fail here, before creating an output or GPU job.
-    validate_pins(strict((code/PIN_FILE).read_bytes()))
+    load_pins(root,code)
     out.mkdir(mode=0o700);started=time.monotonic();deadline=started+BUDGET;name='world-reward-ycbv-point-objects-'+revision[:12]
     report=dict(stage=STAGE,status='fail',phase='host_provenance',producer_revision=revision,script_sha256=source_before['helpers'][HELPERS[0]]['sha256'],
         budget_seconds=BUDGET,outputs=[],native_calls_attempted=0,native_calls_returned=0,native_calls_completed=0,ground_truth_used=False,private_annotations_read=False,
@@ -492,7 +564,7 @@ def main(argv=None):
     if os.environ.get('WR_OBJECTS_MODE')=='host':return launch(root,code,revision)
     if os.environ.get('WR_OBJECTS_MODE')=='probe':
         require(os.geteuid()==0 and os.environ.get('WR_IMAGE_ID')==IMAGE and {p.name for p in Path('/sys/class/net').iterdir()}=={'lo'},'Exact offline root source-only probe required')
-        source(code,revision,True);installed_proof(validate_pins(strict((code/PIN_FILE).read_bytes())));print('native_installed_sources_verified');return
+        source(code,revision,True);installed_proof(load_pins(root,code,False));print('native_installed_sources_verified');return
     require(os.geteuid()==0 and os.environ.get('WR_IMAGE_ID')==IMAGE and re.fullmatch('[0-9a-f]{64}',os.environ.get('WR_HOST_PROOF',''))and {p.name for p in Path('/sys/class/net').iterdir()}=={'lo'},'ActualofflineObjectscontainerrequired')
     out=canonical(root/BASE/OUTPUT);require(out.is_dir()and {p.name for p in out.iterdir()}=={'.container.cid','.probe.cid','probe.log','gpu.log'},'Freshreservedoutputrequired')
     report=dict(stage=STAGE,status='fail',producer_revision=revision,script_sha256=identity(Path(__file__))['sha256'],image_id=IMAGE,budget_seconds=BUDGET,
