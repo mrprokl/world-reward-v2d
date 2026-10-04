@@ -38,7 +38,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 22 | — | Original predecessor-wait failure preserved. New full initializers complete, then native geometry rejects boundary/nonmanifold or orientation/Euler changes18:57:32UTC; no trajectory. |
 | 23 | 552 | Full original initializers actual PASS17:56:49UTC. Unchanged31ff94d first default fullpose rejects all eight topology-budget candidates; empty reserved directory only, no trajectory/repair. |
 | 24 | — | Automatic actor ambiguity rejected before frontends; no manual selection. |
-| 25 | 365 | Original exact query SIGSEGV(-11), zeroQEM preserved. Independently qualified15-query/4-QEM controls authorize a fresh balanced-query technical replay under84fad21, dispatched only; original QEM/geometry/gates unchanged. No trajectory or accuracy PASS presumed. |
+| 25 | 365 | Original exact query SIGSEGV(-11), zeroQEM preserved. Fresh balanced query under84fad21 returns categorical `Exact component self-intersection` before QEM; runtime/source/cleanup checked. No mesh repair, trajectory or accuracy gain. Closed source, not a parameter-rescue target. |
 | 26 | 399 | Full original initializers pass, no object trajectory yet. |
 | 27 | 440 | Full original initializers pass, no object trajectory yet. |
 | 28 | 366 | Full original initializers pass18:04:45UTC, no object trajectory yet. |

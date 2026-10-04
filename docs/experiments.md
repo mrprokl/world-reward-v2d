@@ -8899,3 +8899,25 @@ Weight0/scale1/reference runtime-only-no-calibration is not a tuned positive
 fit or accuracy test. Root219PASS11optionalSKIP1.72s; no actualGPU PASS yet.
 Rootownedscratch removed; initialmissingtestfilename/readonlycleanup failures
 changed no sources or runtime gates.
+
+EP09 original15inputpins independently frozen after232-source hash-only inventory
+and identical actualinventorylog2879B SHA15c90a19105e2aa5596dcedc443b83b7d7c597936e23bcc1be677ea6002f9290.
+Solid-only v2 schema, full415, producerf5e6030 retained. Root500input/inventory/
+wrapper testsPASS24.06s. Sharedprepare c80ee35 scheduled underoriginalFD9 lock;
+same10purehelper closure, freshcanonicaloutput, no alternative objective.
+
+EP25 balancedtechnicalreplay actualFAIL17.080402s: exactsource query returns1,
+categorical `Exact component self-intersection`, zeroQEM. No silent repair,
+component deletion or geometryfit. Host194525B SHA3e6939ea924dabb36881ad9dbaaed90c18d6a9df2f8d357c70ad4ca3254c751c.
+Independent221-source/immutablefailure/cleanup/containerabsence checksPASS;
+fullconcise qualificationproof recheck follows. FormerSIGSEGV andgenericASan
+evidence remain separate: recovereddiagnostic does not prove earliercrashcause.
+Originalpredictedsource CLOSED, no reroll/tolerancechange to turn this intoPASS.
+
+Explicit balancedprofile now traverses SAME objectpose/nativeprepare paths
+underf0e858f. Canonicalobject_pose_full_solid/cari_inputs andexact15sourcepaths
+stayunchanged. FixedCPUproposal/qualnamespace selectedONLYbystrictsinglebool;
+pose/nativeprepare both trace identical independentqueryproof. Default rejects
+balancedprovenance, oldEP09producer untouched. NoICP/Viterbi/F32roundtrip/camera/
+geometrymath or acceptancegatechanged. Agent296PASS35.46s/root130PASS14.42s;
+allrootownedfixtures12343+11239entries cleaned, noproductionPASS implied.
