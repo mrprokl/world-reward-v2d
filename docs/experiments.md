@@ -7705,3 +7705,22 @@ Full tiny regression suite13186PASS8optionalSKIP494.65s after explicit Path
 proof fix and existing transport-cap test correction; no algorithm changes.
 Turn-owned exclusive test root removed without following symlinks or touching
 foreign work. This verifies code correctness only, not held-out reconstruction.
+
+EP14 original full442 refinement actualPASS224.287833s/301updates under00335b1.
+First independent freeze encountered its in-progress nonPASS receipt and stopped;
+no producer rerun. Actual complete receipt then checked before CPU-only wholechain
+freezePASS:165-file exact source/archive, input/prepare/forward/native assets and
+all output posthashes. Report14022B SHA1989d9d340ef56e0394174f918969aa8a2e0ba07c499ecd86b72364f21b51644;
+bundle338303264B SHAae7fb688813d2f1547a105cfc8a0aa86fabefaf5fc88c2ca0a4b98e34e07d9bd.
+Geometry unchanged, no held-out quality claim; frozen before export.
+EP17 unchanged original frontend ea26eda reuse-source dispatchedACK only, after
+released cooperative GPU lock; EP16 failure remains closed, no reroll.
+
+New temporal-hand availability protocol preregisters distinct Dex05/full-T,
+lex4/39/74, IMAGEbox-only versus nativeSAM2memory with two independent automatic
+anchor states. No new tracker novelty or physicalidentity claim; native defaults
+preserved. v3 acquisition/CPUscan reuse existing operators, historicalv1/v2
+values unchanged; mandatory future acquisition pins not fabricated. Pure streaming
+operator has32proceduraltests; root605integratedPASS6.76s. Actual data-free native
+CUDA API gate dispatched separately, not presumedPASS. No new dataset/private
+values yet; unknown overlap/CC-BY-NC4 retains diagnostic-only scope.
