@@ -22,13 +22,13 @@ def jpeg(width=640):
     return b'\xff\xd8\xff\xc0'+struct.pack('>H',17)+struct.pack('>BHHB',8,480,width,3)+bytes(9)+b'\xff\xd9'
 
 
-def tar_bytes(change=None):
+def tar_bytes(change=None, subject=hand.SUBJECT):
     rows = []
     for i in range(100):
-        prefix = f'{hand.SUBJECT}/20200820_{i:06d}/{hand.CAMERA}/'
+        prefix = f'{subject}/20200820_{i:06d}/{hand.CAMERA}/'
         rows += [(prefix+f'color_{f:06d}.jpg', jpeg(), tarfile.REGTYPE) for f in range(2)]
         rows += [(prefix+f'labels_{f:06d}.npz', b'OPAQUE_NO_NPZ_PARSE', tarfile.REGTYPE) for f in range(2)]
-        rows.append((f'{hand.SUBJECT}/20200820_{i:06d}/meta.yml', b'NEVER_PARSED_OR_RETAINED', tarfile.REGTYPE))
+        rows.append((f'{subject}/20200820_{i:06d}/meta.yml', b'NEVER_PARSED_OR_RETAINED', tarfile.REGTYPE))
         rows.append((prefix+'aligned_depth_to_color_000000.png', b'NOT_RETAINED', tarfile.REGTYPE))
     if change: rows = change(rows)
     stream = io.BytesIO()
@@ -52,14 +52,17 @@ class Response:
     def read(self, count): return self.raw.read(count)
 
 
-def fixture(tmp_path, monkeypatch, raw=None):
+def fixture(tmp_path, monkeypatch, raw=None, protocol_path=hand.PROTOCOL_V1):
     root=tmp_path/'root';root.mkdir();(root/'validation').mkdir()
-    incoming=tmp_path/'incoming';output=root/hand.BASE
+    incoming=tmp_path/'incoming';output=root/hand.expected_protocol(protocol_path)['base']
     incoming.mkdir(mode=0o700);output.mkdir(mode=0o700);incoming.chmod(0o700);output.chmod(0o700)
     os.chown(incoming,os.getuid(),os.getgid());os.chown(output,os.getuid(),os.getgid())
     monkeypatch.setattr(hand,'INCOMING',incoming)
-    raw=raw or tar_bytes(); protocol=copy.deepcopy(hand.EXPECTED_PROTOCOL)
-    protocol['archive']['bytes']=len(raw); monkeypatch.setattr(hand,'EXPECTED_PROTOCOL',protocol)
+    raw=raw or tar_bytes(subject=hand.expected_protocol(protocol_path)['subject'])
+    protocol=copy.deepcopy(hand.expected_protocol(protocol_path));protocol['archive']['bytes']=len(raw)
+    if protocol_path == hand.PROTOCOL_V1: monkeypatch.setattr(hand,'EXPECTED_PROTOCOL',protocol)
+    else: monkeypatch.setattr(hand,'expected_protocol',lambda selected=hand.PROTOCOL_V1: protocol if selected==protocol_path else hand.EXPECTED_PROTOCOL)
+    monkeypatch.setattr(hand,'profile_paths',lambda root,selected=hand.PROTOCOL_V1:[output,incoming])
     # Linux NOREPLACE is unavailable on macOS; publication ABI is already tested by its owner.
     def publish(part,target):
         assert not target.exists();part.rename(target)
@@ -183,31 +186,37 @@ def test_no_labels_values_numpy_models_or_external_url_cli():
     source=Path(hand.__file__).read_text()
     assert all(s not in source for s in ('import numpy','import torch','np.load','pickle.load','yaml.load','gdown'))
     assert 'dex.members(' in source and 'dex.extract_archive(' in source and 'download.fetch(' in source
-    assert 'parser.parse_args()' in source and 'signal.alarm(SCAN_BUDGET)' in source
+    assert 'parser.parse_args(argv)' in source and 'signal.alarm(SCAN_BUDGET)' in source
 
 
-def test_real_source_binding_actual_paths_helper_pins_and_dispatch_markers(tmp_path,monkeypatch):
+@pytest.mark.parametrize('protocol_path',[hand.PROTOCOL_V1,hand.PROTOCOL_V2])
+def test_real_source_binding_actual_paths_helper_pins_and_dispatch_markers(tmp_path,monkeypatch,protocol_path):
     root=tmp_path/'root';root.mkdir();rev='b'*40;code=root/'jobs'/rev/hand.JOB/'code'
     (code/'infra').mkdir(parents=True);(code/'configs').mkdir()
     for module in (hand,hand.dex,hand.download,hand.lease):
         original=Path(module.__file__);dest=code/'infra'/original.name
         dest.write_bytes(original.read_bytes());dest.chmod(0o444);monkeypatch.setattr(module,'__file__',str(dest))
     wrapper=code/'infra/run_dexycb_hand_acquire.sh';wrapper.write_bytes(b'fixture wrapper only');wrapper.chmod(0o444)
-    protocol=copy.deepcopy(hand.EXPECTED_PROTOCOL);evidence=root/hand.dex.EVIDENCE;evidence.mkdir(parents=True)
+    protocol=copy.deepcopy(hand.expected_protocol(protocol_path));evidence=root/hand.dex.EVIDENCE;evidence.mkdir(parents=True)
     for name,data in [('publisher.html',b'DexYCB is licensed under by-nc/4.0'),
                       ('dex_ycb.py',b"color_{:06d}.jpg np.arange(meta['num_frames'])")]:
         path=evidence/name;path.write_bytes(data);path.chmod(0o444)
         protocol['primary_sources'][name].update(bytes=len(data),sha256=hashlib.sha256(data).hexdigest())
-    monkeypatch.setattr(hand,'EXPECTED_PROTOCOL',protocol)
-    config=code/'configs/dexycb_hand_protocol_v1.json';config.write_text(json.dumps(protocol));config.chmod(0o444)
+    if protocol_path==hand.PROTOCOL_V1:monkeypatch.setattr(hand,'EXPECTED_PROTOCOL',protocol)
+    else:monkeypatch.setattr(hand,'expected_protocol',lambda selected=hand.PROTOCOL_V1:protocol if selected==protocol_path else hand.EXPECTED_PROTOCOL)
+    config=code/protocol_path;config.write_text(json.dumps(protocol));config.chmod(0o444)
     for name,data in [('revision',(rev+'\n').encode()),('source-sha256',('c'*64+'\n').encode())]:
         path=code.parent/name;path.write_bytes(data);path.chmod(0o444)
     for path in (code/'infra',code/'configs',code):path.chmod(0o555)
-    before=hand.source_binding(root,code,rev)
+    before=hand.source_binding(root,code,rev,protocol_path)
     assert before['producer_revision']==rev and before['helpers']==hand.HELPER_PINS
-    assert before==hand.source_binding(root,code,rev)
+    assert before['protocol_file']==protocol_path and before['profile']==protocol['base']
+    assert before==hand.source_binding(root,code,rev,protocol_path)
+    config.chmod(0o644);config.write_text(json.dumps({**protocol,'camera':'different'}));config.chmod(0o444)
+    with pytest.raises(ValueError):hand.source_binding(root,code,rev,protocol_path)
+    config.chmod(0o644);config.write_text(json.dumps(protocol));config.chmod(0o444)
     wrapper.chmod(0o644)
-    with pytest.raises(ValueError,match='Readonly'):hand.source_binding(root,code,rev)
+    with pytest.raises(ValueError,match='Readonly'):hand.source_binding(root,code,rev,protocol_path)
 
 
 def test_download_partial_pruned_without_fabricating_archive_or_private(tmp_path,monkeypatch):
@@ -221,3 +230,90 @@ def test_download_partial_pruned_without_fabricating_archive_or_private(tmp_path
     assert report['phase']=='download' and report['error_type']=='TimeoutError'
     assert report['status']=='fail' and not list(incoming.iterdir())
     assert set(p.name for p in out.iterdir())=={'report.json'}
+
+
+def test_two_exact_profiles_and_no_mutation_of_legacy():
+    legacy=copy.deepcopy(hand.EXPECTED_PROTOCOL);v2=hand.expected_protocol(hand.PROTOCOL_V2)
+    config=Path(__file__).parents[1]/hand.PROTOCOL_V2
+    hand.dex.exact(json.loads(config.read_bytes()),v2)
+    assert v2['subject']=='20200903-subject-04' and v2['base']=='validation/dexycb_hand_v2'
+    assert v2['archive']==dict(file='20200903-subject-04.tar.gz',bytes=12792618020,
+        url='https://drive.google.com/file/d/14up6qsTpvgEyqOQ5hir-QbjMB_dHfdpA')
+    for key in set(legacy)-{'subject','base','schema','archive'}: assert v2[key]==legacy[key]
+    assert hand.EXPECTED_PROTOCOL==legacy and hand.expected_protocol() is hand.EXPECTED_PROTOCOL
+    assert hand.profile_paths(Path('/srv/scenesmith/world-reward'),hand.PROTOCOL_V2)==[
+        Path('/srv/scenesmith/world-reward/validation/dexycb_hand_v2'),Path('/srv/world-reward-data/dexycb_hand_v2')]
+    for invalid in ('../configs/dexycb_hand_protocol_v2.json','configs/other.json',str(config.resolve())):
+        with pytest.raises(ValueError):hand.expected_protocol(invalid)
+
+
+def test_v2_whole_header_selection_and_subject_mismatch_fail_closed(tmp_path):
+    protocol=hand.expected_protocol(hand.PROTOCOL_V2);path=tmp_path/'subject04.gz'
+    path.write_bytes(tar_bytes(subject=protocol['subject']))
+    selected,wanted,audit=hand.inspect_archive(path,time.monotonic()+10,protocol)
+    assert [r['sequence_lex_index'] for r in selected]==[4,39,74]
+    assert all(r['subject']==protocol['subject'] and r['frames']==2 for r in selected)
+    assert len(wanted)==12 and audit['gzip_crc_verified']
+    with pytest.raises(ValueError):hand.inspect_archive(path,time.monotonic()+10)
+    with pytest.raises(TimeoutError):hand.inspect_archive(path,0,protocol)
+
+
+def test_v2_real_reused_download_and_extraction_keeps_v1_untouched(tmp_path,monkeypatch):
+    root,out,incoming,lease,opener=fixture(tmp_path,monkeypatch,protocol_path=hand.PROTOCOL_V2)
+    historical=root/hand.BASE;historical.mkdir();(historical/'original').write_bytes(b'closed v1 unchanged')
+    report=hand.acquire(root,tmp_path/'code','b'*40,lease,opener=opener,protocol_path=hand.PROTOCOL_V2)
+    assert report['status']=='pass' and report['frames']==6 and report['annotation_values_parsed'] is False
+    assert report['protocol_file']==hand.PROTOCOL_V2 and report['acquisition_profile']=='validation/dexycb_hand_v2'
+    assert (historical/'original').read_bytes()==b'closed v1 unchanged'
+    manifest=json.loads((out/'inputs/manifest.json').read_bytes())
+    assert manifest['schema']=='world-reward-dexycb-hand-rgb-v1' and manifest['subject']=='20200903-subject-04'
+    assert len(manifest['images'])==6 and all(r['source_frame_id']==r['frame_position'] for r in manifest['images'])
+    assert len(list((out/'eval_private').rglob('*.npz')))==6 and not list((out/'eval_private').rglob('meta.yml'))
+    assert out.stat().st_mode&0o777==0o755 and (out/'eval_private').stat().st_mode&0o777==0o700
+    with pytest.raises(ValueError):hand.acquire(root,tmp_path/'code','b'*40,lease,opener=opener,protocol_path=hand.PROTOCOL_V2)
+
+
+@pytest.mark.parametrize('arguments',[['--protocol','configs/no.json'],['--protocol',hand.PROTOCOL_V2,'--protocol',hand.PROTOCOL_V1],['--base','validation/other']])
+def test_driver_rejects_unknown_or_duplicate_profile_before_host_io(monkeypatch,arguments):
+    monkeypatch.setattr(hand.platform,'system',lambda:pytest.fail('must reject arguments before runtime I/O'))
+    with pytest.raises(SystemExit):hand.main(arguments)
+
+
+@pytest.mark.parametrize('arguments',[[],['--protocol',hand.PROTOCOL_V2]])
+def test_wrapper_forwards_exact_profile_to_bootstrap_and_native_driver_without_network(tmp_path,arguments):
+    import subprocess
+    repo=Path(__file__).parents[1];bins=tmp_path/'bin';bins.mkdir();log=tmp_path/'calls'
+    for name,body in [('uname','echo Linux'),('python3','printf "%s\\n" "$*" >> "$CALLS";cat >/dev/null;echo namespace-lease'),
+                      ('timeout','printf "%s\\n" "$*" >> "$CALLS";cat >/dev/null')]:
+        path=bins/name;path.write_text('#!/bin/bash\n'+body+'\n');path.chmod(0o755)
+    root='/srv/scenesmith/world-reward';rev='b'*40
+    environment={'PATH':str(bins)+':/usr/bin:/bin','CALLS':str(log),'WR_ROOT':root,
+                 'WR_CODE':root+'/jobs/'+rev+'/run_dexycb_hand_acquire/code','WR_CODE_REVISION':rev}
+    wrapper=repo/'infra/run_dexycb_hand_acquire.sh'
+    # macOS has no Linux RLIMIT_AS; only its builtin is emulated, not profile logic.
+    prefix='ulimit(){ :; }; wrapper="$1"; shift; source "$wrapper"'
+    result=subprocess.run(['bash','-c',prefix,'fixture',str(wrapper),*arguments],env=environment,capture_output=True)
+    assert result.returncode==0,result.stderr
+    lines=log.read_text().splitlines();assert len(lines)==2
+    protocol=arguments[-1] if arguments else hand.PROTOCOL_V1
+    assert lines[0].endswith(protocol) and protocol in lines[1] and '9140s' in lines[1]
+    assert 'runuser -u scenesmith' in lines[1] and 'WR_NAMESPACE_LEASE=namespace-lease' in lines[1]
+    # Argument errors precede canonical/runtime bootstrap, with no output reservation.
+    result=subprocess.run(['bash','-c',prefix,'fixture',str(wrapper),'--protocol','configs/unknown.json'],env=environment,capture_output=True)
+    assert result.returncode==2 and log.read_text().splitlines()==lines
+
+
+@pytest.mark.parametrize('arguments,protocol',[([],hand.PROTOCOL_V1),(['--protocol',hand.PROTOCOL_V2],hand.PROTOCOL_V2)])
+def test_main_selects_profile_before_actual_acquisition_only(monkeypatch,arguments,protocol):
+    import types
+    captured=[]
+    monkeypatch.setattr(hand.platform,'system',lambda:'Linux')
+    monkeypatch.setattr(hand.pwd,'getpwnam',lambda name:types.SimpleNamespace(pw_uid=os.getuid()))
+    monkeypatch.setenv('WR_ROOT',str(hand.ROOT));monkeypatch.setenv('WR_CODE','/immutable/code')
+    monkeypatch.setenv('WR_CODE_REVISION','b'*40);monkeypatch.setenv('WR_NAMESPACE_LEASE','{}')
+    monkeypatch.setattr(hand.signal,'signal',lambda *args:None)
+    def acquire(*args,**kwargs):
+        captured.append((args,kwargs));return dict(stage='fixture',status='pass',frames=6,elapsed_seconds=0)
+    monkeypatch.setattr(hand,'acquire',acquire)
+    hand.main(arguments)
+    assert len(captured)==1 and captured[0][1]==dict(watchdog=True,protocol_path=protocol)

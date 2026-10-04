@@ -11,14 +11,14 @@ inferred automatically; no hand-labeling of challenge records.
 **No final Parquet, submission or verified CARI4D improvement yet.**
 
 - **Engineering:** all30 original videos pass byte/metadata readiness. Episodes
-  **1,2,3,5,6,8,15** pass full native shared preparation, forward,301-update
-  refinement, direct export and original official packing. These are seven
+  **0,1,2,3,5,6,8,12,15** pass full native shared preparation, forward,301-update
+  refinement, direct export and original official packing. These are nine
   complete engineering checks, not held-out accuracy; scratch Parquets deleted.
   EP0's legacy conversion failure stays separate. EP4 missing masks, EP7 empty
   anchor, EP9 invalid geometry and EP10/EP11 actor identity failures remain closed.
   EP11 stops before SAM2/later frontends. EP0/full790 and EP12/full405 now pass
   native301-update refinement and direct export; EP0 official packing also passes,
-  EP12 packing dispatched only. EP0's
+  EP12 official packing also passes. EP0's
   exact historical metadata omission is authenticated, not a relaxed legacy
   gate or a reversal of its old conversion failure. EP13 full425 inputs and
   shared preparation and full native forward pass; collected-predecessor scheduling failures remain

@@ -7534,3 +7534,26 @@ union quality, before introducing tracking/contact/3D. A distinct subject04
 DexYCB cohort lex4/39/74, fullT/camera836212060125, is proposed; no acquisition,
 annotations or accuracy gate evaluated. Same unchanged scan/native settings,
 no tuning Dex03/04. CC-BY-NC4/unknown overlap prevent challenge adoption.
+
+Fresh mask ablation preregistered before subject04 byte acquisition/inference:
+3lex4/39/74 full original clips, identical frozen MediaPipe propositions for
+Abox-only/Bsamebox+17points. Primary mean unionDice over ALL annotated positives,
+including missing/empty zeros; forward only if pooled paired delta>0, each clip
+delta>=0 and each clip has B intervention. No threshold search; failures close
+cohort. Intervention/reuse, object1..21/background0 pixel contamination and
+coverage reported separately. No255 means unscorable, not negative. Pure streaming
+evaluator root144tests PASS0.14s; fresh acquisition root93PASS1optionalSkip2.52s.
+Existing acquisition/CPU scan now explicit two-profile opt-ins, no copied runner,
+source/model/opaque-label separation and original budgets retained. Archive
+subject04 size12,792,618,020B publisherDriveID14up6qsTpvgEyqOQ5hir-QbjMB_dHfdpA;
+no publisher archivechecksum verified. DiagnosticNC4/unknown overlap, no adoption.
+
+Exact-source GitHub transport actualPASS6fb9441:129readonly files, original
+TAR/XZ SHA f974cf9cc42989f2dcd9cd02bd8506f405601a9c901eb096dd4f3aa952f87018,
+independent exactmember/mode/digest/markers/stagecleanup recheck PASS. Source-only
+readonly Track1 readiness2.202773s, log31332B SHA79cb927987160e8ce7fbdcf8a18b6b3e63d7bb6fd5f711c394267c52b4c45bae.
+One ACKed RunCommand not five; wall speedup not measured. EP12 packing actual
+PASS13.521699s/all405, report9853B SHAd2f7232ae9d610694fd3222c1ece38a3e9e57b38f6167e1ac1853208d92db39a,
+scratch_removed=true. EP14 original full442 CPUinputs PASS3319.999303s underea26eda,
+report3360B SHA85dfc8f6f213f81181d20875443cb7d13cc655b4f1494109d580cd4e101d6968;
+independent completeinput freeze next, no later pipeline/accuracy claim.

@@ -1,0 +1,82 @@
+{
+  "all_original_frames": true,
+  "arms": {
+    "a": "all21_landmark_box_only",
+    "b": "same_box_plus_positive_native_indices_0_5_to_20"
+  },
+  "boxes_policy": "min_max_all21_finite_available_pixelXY_clip_to_original_grid_keep_unusable",
+  "budgets_seconds": {
+    "cpu_scan": 600,
+    "private_mask_evaluation": 300,
+    "sam2_inference": 900
+  },
+  "camera": "836212060125",
+  "challenge_adoption": false,
+  "challenge_overlap_verified": false,
+  "cohort": "v2",
+  "evaluation": {
+    "contact_3D_identity_adoption": false,
+    "mask_forward_gate": "pooled_B_minus_A_Dice_strictly_positive_and_each_clip_delta_nonnegative_and_each_clip_B_intervention_present",
+    "primary": "equal_original_positive_frame_mean_union_Dice_including_missing_zero",
+    "secondary": [
+      "union_IoU",
+      "object_label_pixels_1_to_21",
+      "background_label_pixels_0",
+      "all_T_proposal_coverage",
+      "positive_empty_unions",
+      "B_interventions_and_A_reuse"
+    ],
+    "unlabelled_without_255": "unscorable_not_true_negative"
+  },
+  "input_track": "external_dexycb_rgb",
+  "license": "CC-BY-NC-4.0",
+  "license_eligibility_verified": false,
+  "mediapipe": {
+    "min_hand_detection_confidence": 0.5,
+    "min_hand_presence_confidence": 0.5,
+    "min_tracking_confidence": 0.5,
+    "num_hands": 4,
+    "running_mode": "IMAGE"
+  },
+  "original_image_size": [
+    480,
+    640
+  ],
+  "point_indices": [
+    0,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+  ],
+  "proposal_identity": "frame_local_all_native_slots_no_physical_ID",
+  "sam2": {
+    "apply_postprocessing": true,
+    "autocast": "bfloat16",
+    "model": "sam2.1_hiera_large",
+    "multimask_output": false,
+    "seed": 0,
+    "tf32": false
+  },
+  "schema": "world-reward-hand-mask-protocol-v1",
+  "sequence_lex_indices": [
+    4,
+    39,
+    74
+  ],
+  "subject": "20200903-subject-04",
+  "training_overlap_verified": false,
+  "unusable_points_policy": "reuse_A_explicitly_no_refill"
+}

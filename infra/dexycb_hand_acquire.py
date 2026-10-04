@@ -1,4 +1,4 @@
-"""Fresh Dex03 byte acquisition only; no annotation values, images or models decoded."""
+"""Explicit fresh DexYCB byte profiles; no annotation values or models decoded."""
 import argparse
 import hashlib
 import json
@@ -23,6 +23,8 @@ INCOMING = Path('/srv/world-reward-data/dexycb_hand_v1')
 JOB = 'run_dexycb_hand_acquire'
 SUBJECT, CAMERA, INDICES = '20200820-subject-03', '836212060125', [4, 39, 74]
 DOWNLOAD_BUDGET, SCAN_BUDGET, CLEANUP_GRACE = 7200, 1800, 120
+PROTOCOL_V1 = 'configs/dexycb_hand_protocol_v1.json'
+PROTOCOL_V2 = 'configs/dexycb_hand_protocol_v2.json'
 HELPER_PINS = {
     'dexycb_acquire.py': {'bytes': 21916, 'sha256': '6078c54a862f98ee4aa9790a39387e2e89922789fce5ca4ee63edbc075834554'},
     'dexycb_download.py': {'bytes': 10680, 'sha256': '8ead4771dd49d6a0f0332c840bd0fa68aef00d6588fc0d41a3c12e433fe47591'},
@@ -44,18 +46,36 @@ EXPECTED_PROTOCOL = {
 }
 
 
-def source_binding(root, code, revision):
+def expected_protocol(protocol_path=PROTOCOL_V1):
+    """Only two frozen whole-cohort profiles, never arbitrary paths or overrides."""
+    if protocol_path == PROTOCOL_V1: return EXPECTED_PROTOCOL
+    dex.require(protocol_path == PROTOCOL_V2, 'Unknown immutable acquisition profile')
+    subject = '20200903-subject-04'
+    return {**EXPECTED_PROTOCOL, 'schema': 'world-reward-dexycb-hand-acquisition-v2',
+        'base': 'validation/dexycb_hand_v2', 'subject': subject,
+        'archive': {'file': subject+'.tar.gz', 'bytes': 12792618020,
+                    'url': 'https://drive.google.com/file/d/14up6qsTpvgEyqOQ5hir-QbjMB_dHfdpA'}}
+
+
+def profile_paths(root, protocol_path=PROTOCOL_V1):
+    protocol = expected_protocol(protocol_path)
+    return [root/protocol['base'], INCOMING if protocol_path == PROTOCOL_V1
+            else Path('/srv/world-reward-data/dexycb_hand_v2')]
+
+
+def source_binding(root, code, revision, protocol_path=PROTOCOL_V1):
+    expected = expected_protocol(protocol_path)
     code = dex.canonical(code)
     dex.require(re.fullmatch('[0-9a-f]{40}', revision) and code == root/'jobs'/revision/JOB/'code'
                 and Path(__file__) == code/'infra/dexycb_hand_acquire.py', 'Canonical source-bound producer required')
-    config = code/'configs/dexycb_hand_protocol_v1.json'
-    protocol = dex.strict_json(config.read_bytes()); dex.exact(protocol, EXPECTED_PROTOCOL)
+    config = code/protocol_path
+    protocol = dex.strict_json(config.read_bytes()); dex.exact(protocol, expected)
     closure = {}
     for path in (code, *sorted(code.rglob('*'))):
         dex.canonical(path); dex.require(not path.lstat().st_mode & 0o222, 'Readonly full source closure required')
         closure[str(path.relative_to(code))] = {'directory': True} if path.is_dir() else dex.identity(path, readonly=True, empty=True)
     required = ['infra/dexycb_hand_acquire.py', 'infra/run_dexycb_hand_acquire.sh',
-                'configs/dexycb_hand_protocol_v1.json', *('infra/'+name for name in HELPER_PINS)]
+                protocol_path, *('infra/'+name for name in HELPER_PINS)]
     dex.require(all(name in closure and 'sha256' in closure[name] for name in required), 'Incomplete own source closure')
     for module in (dex, download, lease):
         path = Path(module.__file__)
@@ -73,7 +93,8 @@ def source_binding(root, code, revision):
                     else all(x in text for x in ('color_{:06d}.jpg', "np.arange(meta['num_frames'])")),
                     'Primary license/format assertion absent')
         primary[name] = actual
-    return {'producer_revision': revision, 'protocol': dex.identity(config, readonly=True),
+    return {'producer_revision': revision, 'protocol_file': protocol_path, 'profile': protocol['base'],
+            'protocol': dex.identity(config, readonly=True),
             'markers': markers, 'helpers': HELPER_PINS, 'primary_sources': primary,
             'closure_sha256': hashlib.sha256(json.dumps(closure, sort_keys=True).encode()).hexdigest()}
 
@@ -82,10 +103,12 @@ def check(deadline):
     if time.monotonic() > deadline: raise TimeoutError('Acquisition phase budget exceeded')
 
 
-def inspect_archive(path, deadline):
+def inspect_archive(path, deadline, protocol=None):
     """Whole header inventory before selection; label member bytes stay opaque."""
+    protocol = protocol if protocol is not None else EXPECTED_PROTOCOL
+    subject, camera = protocol['subject'], protocol['camera']
     names, parents, sequences, audit = {}, set(), set(), {}
-    for name, entry, _ in dex.members(path, SUBJECT, audit):
+    for name, entry, _ in dex.members(path, subject, audit):
         check(deadline); pure = PurePosixPath(name)
         dex.require(name not in names and len(names) < 1000000, 'Duplicate/inventory cap')
         dex.require(not any(str(p) in names and names[str(p)][1] for p in pure.parents)
@@ -96,14 +119,14 @@ def inspect_archive(path, deadline):
             sequences.add(pure.parts[1])
     ordered = sorted(sequences); dex.require(len(ordered) == 100, 'Exactly100 lexical publisher sequences required')
     selected, wanted = [], {}
-    for index in INDICES:
-        sequence = ordered[index]; prefix = f'{SUBJECT}/{sequence}/{CAMERA}/'
+    for index in protocol['sequence_lex_indices']:
+        sequence = ordered[index]; prefix = f'{subject}/{sequence}/{camera}/'
         matching = lambda regex: {int(PurePosixPath(n).stem.split('_')[-1]): n for n, (_, regular) in names.items()
             if regular and n.startswith(prefix) and re.fullmatch(regex, n[len(prefix):])}
         colors, labels = matching(r'color_[0-9]{6}\.jpg'), matching(r'labels_[0-9]{6}\.npz')
         ids = sorted(colors)
         dex.require(ids and ids == list(range(len(ids))) and sorted(labels) == ids, 'Full matching original RGB/label IDs required')
-        selected.append(dict(subject=SUBJECT, sequence=sequence, sequence_lex_index=index, camera=CAMERA, frames=len(ids)))
+        selected.append(dict(subject=subject, sequence=sequence, sequence_lex_index=index, camera=camera, frames=len(ids)))
         for frame in ids:
             wanted[colors[frame]] = ('rgb', f'sequence_{index:03d}_frame_{frame:06d}.jpg')
             wanted[labels[frame]] = ('private', labels[frame])
@@ -117,22 +140,25 @@ def write_report(path, report):
         output.flush(); os.fsync(output.fileno()); os.fchmod(output.fileno(), 0o444)
 
 
-def acquire(root, code, revision, namespace_lease, *, opener=None, watchdog=False):
-    started = time.monotonic(); before = source_binding(root, code, revision)
-    folders = [root/BASE, INCOMING]
+def acquire(root, code, revision, namespace_lease, *, opener=None, watchdog=False, protocol_path=PROTOCOL_V1):
+    protocol = expected_protocol(protocol_path)
+    subject, camera = protocol['subject'], protocol['camera']
+    started = time.monotonic(); before = source_binding(root, code, revision, protocol_path)
+    folders = profile_paths(root, protocol_path)
     lease.validate_namespace_lease(namespace_lease, folders, before['closure_sha256'])
     output, incoming = folders
     report = dict(stage='external_dexycb_hand_rgb_private_byte_acquisition', status='fail', phase='download',
-        producer_revision=revision, source_before=before, archive_sha_publisher_verified=False,
+        producer_revision=revision, source_before=before, protocol_file=protocol_path,
+        acquisition_profile=protocol['base'], archive_sha_publisher_verified=False,
         annotation_values_parsed=False, inference_performed=False, gpu_used=False,
         training_overlap_verified=False, challenge_overlap_verified=False,
         download_budget_seconds=DOWNLOAD_BUDGET, scan_extract_budget_seconds=SCAN_BUDGET)
     owned, directories, partials, proof, archive_state, failure = {}, [], [], None, None, None
-    path = incoming/EXPECTED_PROTOCOL['archive']['file']; scan_started = None
+    path = incoming/protocol['archive']['file']; scan_started = None
     try:
         if watchdog: signal.alarm(DOWNLOAD_BUDGET)
         opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler({}), download.PublicRedirect())
-        row = EXPECTED_PROTOCOL['archive']; progress = {row['file']: {'bytes_received': 0}}
+        row = protocol['archive']; progress = {row['file']: {'bytes_received': 0}}
         downloaded = download.fetch(row, incoming, opener, started+DOWNLOAD_BUDGET,
                                     threading.Event(), partials, progress)
         check(started+DOWNLOAD_BUDGET); report['download'] = downloaded
@@ -140,17 +166,17 @@ def acquire(root, code, revision, namespace_lease, *, opener=None, watchdog=Fals
         report['download_elapsed_seconds'] = time.monotonic()-started
         scan_started = time.monotonic(); deadline = scan_started+SCAN_BUDGET
         if watchdog: signal.alarm(SCAN_BUDGET)
-        report['phase'] = 'inventory'; selected, wanted, audit = inspect_archive(path, deadline)
+        report['phase'] = 'inventory'; selected, wanted, audit = inspect_archive(path, deadline, protocol)
         report['selected_sequences'] = selected; report['archive_inventory'] = audit
         report['phase'] = 'extract'
         (output/'inputs').mkdir(mode=0o755); (output/'eval_private').mkdir(mode=0o700)
-        identities, retained = dex.extract_archive(path, SUBJECT, wanted, output, owned, directories)
+        identities, retained = dex.extract_archive(path, subject, wanted, output, owned, directories)
         check(deadline)
         records = [dict(file=f"sequence_{s['sequence_lex_index']:03d}_frame_{i:06d}.jpg",
             **identities[f"sequence_{s['sequence_lex_index']:03d}_frame_{i:06d}.jpg"], width=640, height=480,
-            sequence=s['sequence'], sequence_lex_index=s['sequence_lex_index'], camera=CAMERA,
+            sequence=s['sequence'], sequence_lex_index=s['sequence_lex_index'], camera=camera,
             frame_position=i, source_frame_id=i) for s in selected for i in range(s['frames'])]
-        manifest = dict(schema='world-reward-dexycb-hand-rgb-v1', subject=SUBJECT, sequences=selected,
+        manifest = dict(schema='world-reward-dexycb-hand-rgb-v1', subject=subject, sequences=selected,
             images=records, source_archive=proof, license='CC-BY-NC-4.0', timestamps_available=False,
             training_overlap_verified=False, challenge_overlap_verified=False)
         manifest_path = output/'inputs/manifest.json'; write_report(manifest_path, manifest)
@@ -161,7 +187,7 @@ def acquire(root, code, revision, namespace_lease, *, opener=None, watchdog=Fals
             dest = output/('inputs' if relative.endswith('.jpg') else 'eval_private')/relative
             dex.require(dex.identity(dest, readonly=True) == identities[relative], 'Retained original bytes differ')
         dex.require(dex.identity(path, readonly=True) == proof and dex.state(path) == archive_state, 'Original archive changed')
-        dex.require(source_binding(root, code, revision) == before, 'Source changed before archive cleanup')
+        dex.require(source_binding(root, code, revision, protocol_path) == before, 'Source changed before archive cleanup')
         check(deadline)
         path.unlink(); report['disposable_archive_removed'] = True
         report.update(status='pass', phase='complete', public_manifest=dex.identity(manifest_path, readonly=True),
@@ -189,7 +215,7 @@ def acquire(root, code, revision, namespace_lease, *, opener=None, watchdog=Fals
         except BaseException as cleanup_error:
             failure = failure or cleanup_error; report['status'] = 'fail'
             report['cleanup_error_type'] = type(cleanup_error).__name__
-        try: report['source_rehashed_after'] = source_binding(root, code, revision) == before
+        try: report['source_rehashed_after'] = source_binding(root, code, revision, protocol_path) == before
         except Exception: report['source_rehashed_after'] = False
         report['elapsed_seconds'] = time.monotonic()-started
         if scan_started is not None: report['scan_extract_elapsed_seconds'] = time.monotonic()-scan_started
@@ -200,18 +226,24 @@ def acquire(root, code, revision, namespace_lease, *, opener=None, watchdog=Fals
         write_report(output/'report.json', report)
         if report['status'] == 'pass': output.chmod(0o755)
         if watchdog: signal.alarm(0)
-    if failure: raise ValueError('Dex03 acquisition failed; inspect sealed receipt') from None
+    if failure: raise ValueError('DexYCB acquisition failed; inspect sealed receipt') from None
     return report
 
 
-def main():
-    parser = argparse.ArgumentParser(); parser.parse_args()
+def main(argv=None):
+    parser = argparse.ArgumentParser(allow_abbrev=False)
+    parser.add_argument('--protocol', choices=(PROTOCOL_V1, PROTOCOL_V2), default=PROTOCOL_V1)
+    import sys
+    supplied = list(sys.argv[1:] if argv is None else argv)
+    if sum(value == '--protocol' or value.startswith('--protocol=') for value in supplied) > 1:
+        parser.error('Protocol may be supplied only once')
+    args = parser.parse_args(argv)
     dex.require(platform.system() == 'Linux' and os.environ.get('WR_ROOT') == str(ROOT)
                 and os.getuid() == pwd.getpwnam('scenesmith').pw_uid, 'Azure CPU scenesmith required')
     signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError('Acquisition phase timeout')))
     signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(TimeoutError('Acquisition terminated')))
     result = acquire(ROOT, Path(os.environ['WR_CODE']), os.environ['WR_CODE_REVISION'],
-                     dex.strict_json(os.environ['WR_NAMESPACE_LEASE'].encode()), watchdog=True)
+                     dex.strict_json(os.environ['WR_NAMESPACE_LEASE'].encode()), watchdog=True, protocol_path=args.protocol)
     print(json.dumps({k: result[k] for k in ('stage', 'status', 'frames', 'elapsed_seconds')}))
 
 
