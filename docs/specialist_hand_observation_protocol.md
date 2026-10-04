@@ -1,7 +1,10 @@
 # Specialist hand observations: proposed full-timeline CPU pilot
 
-**Status: preregistration draft, 2026-10-04. Not implemented or adopted.**
-No new RGB, annotations, model, or runtime has been acquired for this pilot.
+**Status: preregistered pilot, 2026-10-04. Not adopted.**
+Public model/source bytes and offline dependency notices have been acquired and
+qualified. The full-T native adapter and pure private-array evaluator are
+implemented; CPU graph qualification is dispatched but not yet verified.
+Fresh subject-03 RGB/opaque labels and actual hand predictions are not acquired.
 It tests automatic 2D observation availability, not identity, tracking, contact,
 shared metric geometry, full HOI, or superiority over CARI4D.
 
@@ -134,8 +137,9 @@ Primary links and exact audited pins are in
 [fresh hand validation audit](hand_validation_sources_audit.md).
 Those cite the publisher, toolkit split/format, native Tasks API/graph, original
 task metadata, wheel metadata, and model card; none proves current inference.
-MediaPipe source/card declare Apache-2.0; exact bundle/dependency licenses still
-need acquisition audit. DexYCB is CC-BY-NC-4.0: research permission is not an
+MediaPipe source/card declare Apache-2.0; dependency embedded notices are now
+qualified, but exact task-constituent rights and submission eligibility remain
+unverified. DexYCB is CC-BY-NC-4.0: research permission is not an
 unconditional commercial/prize/submission waiver. Subject-03 appears in other
 DexYCB training splits, and exact MediaPipe training membership is unpublished.
 Neither dataset/model challenge overlap nor leakage-free validation is established.

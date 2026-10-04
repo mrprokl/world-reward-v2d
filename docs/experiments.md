@@ -7413,3 +7413,12 @@ Independent remote source, prior7assets, downloadlineage andall51 posthashes PAS
 directories unchangedreadonly/noGPU/private/model/installation. Actual pins now
 precede a distinct offline CPU child construction/native graph-load-only gate.
 Root134 integrated tests PASS1.88s, not learned quality/licence/overlap evidence.
+
+Full-T native hand adapter and pure private-array diagnostic: root185 tiny tests
+PASS1.24s. Native snapshot mount includes code and both immutable markers only;
+all3 complete observations must seal before private evaluation. One CPU graph,
+one call per original RGB frame, no crop/flip/retry/smoothing, full raw21 slots
+and numeric availability retained. Diagnostic uniquely associates overlapping
+boxes, excludes unverified thumb mapping from17-joint EPE, and reports missing,
+ambiguous and valid/scored denominators. These tests use fixtures/API spies,
+not actual model/media/GT; runtime, useful observations and accuracy unverified.
