@@ -106,8 +106,16 @@ def qualified(code, build, certificate):
     cache_paths, cache = cache_leaves(code, build)
     image_receipt = ROOT/'results/image-volume-qem.json'
     source_pins = build.strict_json((code/'configs/mesh_serialization_compiler_protocol_v1.json').read_bytes())['source_authentication']
-    require(build.identity(image_receipt, readonly=True) == source_pins['original_build_receipt'], 'Historical image receipt differs')
-    return pins, (*paths.values(), *cache_paths.values(), image_receipt), dict(cgal=measured, cache=cache,
+    # Original 0644 metadata predates this job. Authenticate/recheck its bytes
+    # and expose a RO bind; do not chmod or relabel the historical producer.
+    require(build.identity(image_receipt, readonly=False) == source_pins['original_build_receipt'], 'Historical image receipt differs')
+    # A file bind does not retain the parent directory's authenticated mode.
+    # Preserve only these two narrow code/build-only namespaces as RO dirs.
+    directories = tuple(dict.fromkeys(p.parent for p in (*paths.values(), *cache_paths.values())))
+    require(len(directories) == 2 and all(p.resolve() == p and not p.is_symlink()
+            and stat.S_IMODE(p.lstat().st_mode) == 0o555 for p in directories),
+            'Two original immutable build directories required')
+    return pins, (*directories, image_receipt), dict(cgal=measured, cache=cache,
         historical_image_receipt=source_pins['original_build_receipt'])
 
 
@@ -250,7 +258,7 @@ def host(code, revision, build, certificate):
                 '--cpus', '4', '--memory', '16g', '--tmpfs', '/tmp:rw,nosuid,nodev,noexec,size=512m', *mounts,
                 '--mount', f'type=bind,src={work},dst={work}', '--entrypoint', '/usr/bin/env', pins['child_image_id'], '-i',
                 'PATH=/opt/conda/bin:/usr/local/bin:/usr/bin:/bin', 'HOME=/tmp', 'TMPDIR=/tmp', 'CUDA_VISIBLE_DEVICES=-1',
-                'WR_NATIVE_NETWORK=none', 'WR_CODE='+str(code), 'WR_CODE_REVISION='+revision, 'WR_CPU_IMAGE_ID='+pins['child_image_id'],
+                'WR_NATIVE_NETWORK=none', 'WR_ROOT='+str(ROOT), 'WR_CODE='+str(code), 'WR_CODE_REVISION='+revision, 'WR_CPU_IMAGE_ID='+pins['child_image_id'],
                 'OMP_NUM_THREADS=1', 'OPENBLAS_NUM_THREADS=1', 'PYTHONDONTWRITEBYTECODE=1',
                 'python3', '-I', '-B', str(code/'infra/solid_chart_v2_build.py'), '--native']
         build.run(argv, min(NATIVE_SECONDS+10, left()), out/'native.log')

@@ -8332,3 +8332,11 @@ existing qualified CPU image/headers,600s native900s host, no QEM/data/GPU;
 immutable retainedbinary and actualbuildinfo required before new qualification.
 Static Azure closure now includes committed .hpp/.h and local include chains,
 not fabricated vendor/generated files; original payload cap unchanged.
+
+Root239 build/closure/compiler regression testsPASS19.63s, owned1799-entry
+fixturesremoved. Independent pre-build audit detects missing WR_ROOT in cleared
+nativeenv and metadata loss from mounting only qualified leaves: fix before any
+realbuild by explicit own WR_ROOT and mounting two original narrow0555 build
+directories RO. Original image-volume receipt is actually0644/3429B: rehash its
+original bytes and mountRO, never change historicalmode/producer. Newtests
+cover these runtime contracts; previousdraft neverexecuted/relabelledPASS.

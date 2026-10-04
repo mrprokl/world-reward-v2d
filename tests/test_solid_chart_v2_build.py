@@ -149,6 +149,32 @@ def test_actual_cache_leaf_host_preflight_pins_and_modes_without_numpy(tmp_path,
     with pytest.raises(ValueError, match='mode'): gate.cache_leaves(code, build)
 
 
+def test_qualified_mounts_original_build_directories_and_readonly_receipt_bind(tmp_path, monkeypatch):
+    root = tmp_path/'root'; code = root/'code'
+    cgal = root/'results/certified-solid-build-test'
+    cache = root/'results/mesh-conditioned-cache-test'
+    paths = {k:cgal/n for k,n in (('report','report.json'),('native','native.json'),('binary','certified_solid_query'))}
+    cachepaths = {n:cache/n for n in ('report.json', 'native.json', 'mesh_conditioned_qem')}
+    for p in (*paths.values(), *cachepaths.values()): write(p)
+    cgal.chmod(0o555); cache.chmod(0o555)
+    image = root/'results/image-volume-qem.json'; imagepin = write(image, b'historical metadata', 0o644)
+    write(code/'configs/mesh_serialization_compiler_protocol_v1.json',
+          json.dumps({'source_authentication':{'original_build_receipt':imagepin}}).encode())
+    # Executable mode is part of the original certificate, not synthesized by
+    # Docker creating ancestors for independent file mounts.
+    paths['binary'].chmod(0o555)
+    monkeypatch.setattr(gate, 'ROOT', root)
+    cert = SimpleNamespace(qualification=lambda *_: ({}, paths, {}))
+    monkeypatch.setattr(gate, 'cache_leaves', lambda *_: (cachepaths, {}))
+    _, mounts, proof = gate.qualified(code, build, cert)
+    assert mounts == (cgal, cache, image)
+    assert proof['historical_image_receipt'] == imagepin
+    assert stat.S_IMODE(image.stat().st_mode) == 0o644
+    cache.chmod(0o755)
+    with pytest.raises(ValueError, match='immutable build directories'):
+        gate.qualified(code, build, cert)
+
+
 def test_current_image_is_cgal_child_historical_cache_parent_not_spoofed(monkeypatch):
     parent, child = build.PARENT, 'sha256:'+'a'*64
     layers = {parent: ['sha256:'+'b'*64], child: ['sha256:'+'b'*64, 'sha256:'+'c'*64]}
@@ -208,6 +234,7 @@ def test_host_pass_seals_only_build_preserves_source_no_gpu(tmp_path, monkeypatc
     assert stat.S_IMODE((out/'report.json').stat().st_mode) == 0o444
     assert stat.S_IMODE((out/'mesh_conditioned_chart_v2').stat().st_mode) == 0o555
     argv = calls[0]
+    assert 'WR_ROOT='+str(root) in argv
     assert '--gpus' not in argv and argv[argv.index('--user')+1] == '1000:1000'
     assert argv[argv.index('--network')+1] == 'none' and '--read-only' in argv
     assert str(code.parent/'revision') in ' '.join(argv) and str(code.parent/'source-sha256') in ' '.join(argv)
