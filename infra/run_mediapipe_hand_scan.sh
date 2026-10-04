@@ -3,7 +3,7 @@
 # Source closure: /src/world_reward/hand_scan.py /src/world_reward/hand_observations.py
 set +x
 set -euo pipefail
-[[ $# == 0 || ( $# == 2 && "$1" == --cohort && "$2" == v2 ) ]] || exit 2
+[[ $# == 0 || ( $# == 2 && "$1" == --cohort && ( "$2" == v2 || "$2" == v3 ) ) ]] || exit 2
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_mediapipe_hand_scan/code" \

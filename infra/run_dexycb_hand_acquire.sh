@@ -7,7 +7,8 @@ if [[ $# != 0 ]]; then
  [[ $# == 2 && "$1" == --protocol ]] || exit 2
  PROTOCOL="$2"
 fi
-[[ "$PROTOCOL" == configs/dexycb_hand_protocol_v1.json || "$PROTOCOL" == configs/dexycb_hand_protocol_v2.json ]] || exit 2
+[[ "$PROTOCOL" == configs/dexycb_hand_protocol_v1.json || "$PROTOCOL" == configs/dexycb_hand_protocol_v2.json \
+ || "$PROTOCOL" == configs/dexycb_hand_protocol_v3.json ]] || exit 2
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_dexycb_hand_acquire/code" && "$(uname -s)" == Linux ]] || exit 2

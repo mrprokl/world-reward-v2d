@@ -1,0 +1,66 @@
+{
+  "schema": "world-reward-hand-temporal-mask-protocol-v1",
+  "cohort": "v3",
+  "subject": "20200908-subject-05",
+  "camera": "836212060125",
+  "sequence_lex_indices": [4, 39, 74],
+  "selection": "first_published_subject_not_previously_evaluated_excluding_01_to_04",
+  "all_original_frames": true,
+  "original_image_size": [480, 640],
+  "input_track": "external_dexycb_rgb",
+  "license": "CC-BY-NC-4.0",
+  "license_eligibility_verified": false,
+  "training_overlap_verified": false,
+  "challenge_overlap_verified": false,
+  "challenge_adoption": false,
+  "mediapipe": {
+    "running_mode": "IMAGE",
+    "num_hands": 4,
+    "min_hand_detection_confidence": 0.5,
+    "min_hand_presence_confidence": 0.5,
+    "min_tracking_confidence": 0.5
+  },
+  "sam2": {
+    "model": "sam2.1_hiera_large",
+    "native_source_revision": "2b90b9f5ceec907a1c18123530e92e794ad901a4",
+    "apply_postprocessing": true,
+    "autocast": "bfloat16",
+    "tf32": false,
+    "seed": 0,
+    "image_multimask_output": false,
+    "video_head_policy": "unchanged_native_build_sam2_video_predictor_defaults_no_extra_overrides"
+  },
+  "arms": {
+    "a": "IMAGE_per_frame_all_usable_native21XY_boxes_only",
+    "b": "native_video_memory_two_independent_states_same_first_automatic_anchor_boxes"
+  },
+  "boxes_policy": "min_max_all21_finite_available_pixelXY_clip_to_original_grid_keep_unusable",
+  "anchor": "first_original_frame_with_at_least_one_usable_automatic_box",
+  "seed_slots": "all_usable_original_anchor_slots_in_original_order_in_both_states",
+  "native_ids": "anchor_slot_indices_not_physical_identity",
+  "branch_ownership": "reverse_before_anchor_forward_anchor_and_after",
+  "native_foreground": "logits_strictly_greater_than_zero",
+  "no_anchor": "all_original_frames_explicit_abstention_no_video_model_calls",
+  "points": false,
+  "reseed": false,
+  "manual_prompts": false,
+  "late_birth_recovery": false,
+  "state_fusion": false,
+  "frame_conversion": "exact_original_JPEG_byte_copy_to_numeric_position_names_no_recompression",
+  "budgets_seconds": {
+    "data_free_native_API_gate": 90,
+    "cpu_scan": 600,
+    "all_three_clip_inference": 900,
+    "private_mask_evaluation": 300
+  },
+  "evaluation": {
+    "primary": "equal_original_annotated_positive_frame_mean_union_Dice_including_missing_zero",
+    "unlabelled_without_255": "unscorable_not_true_negative",
+    "no_positive_clip": "inconclusive_stop_no_drop",
+    "gate": "pooled_B_minus_A_Dice_positive_each_clip_delta_nonnegative_positive_empty_union_count_strictly_lower_and_object_label_pixel_count_not_higher",
+    "secondary": ["union_IoU", "all_T_proposal_coverage", "positive_empty_unions", "object_label_pixels_1_to_21", "background_label_pixels_0"],
+    "contact_3D_identity_adoption": false,
+    "quality_measurements_are_diagnostic_only": true
+  },
+  "failure_policy": "stop_no_anchor_change_reseed_threshold_clip_drop_or_closed_cohort_rescue"
+}

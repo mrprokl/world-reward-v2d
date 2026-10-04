@@ -189,7 +189,7 @@ def test_no_labels_values_numpy_models_or_external_url_cli():
     assert 'parser.parse_args(argv)' in source and 'signal.alarm(SCAN_BUDGET)' in source
 
 
-@pytest.mark.parametrize('protocol_path',[hand.PROTOCOL_V1,hand.PROTOCOL_V2])
+@pytest.mark.parametrize('protocol_path',[hand.PROTOCOL_V1,hand.PROTOCOL_V2,hand.PROTOCOL_V3])
 def test_real_source_binding_actual_paths_helper_pins_and_dispatch_markers(tmp_path,monkeypatch,protocol_path):
     root=tmp_path/'root';root.mkdir();rev='b'*40;code=root/'jobs'/rev/hand.JOB/'code'
     (code/'infra').mkdir(parents=True);(code/'configs').mkdir()
@@ -247,8 +247,9 @@ def test_two_exact_profiles_and_no_mutation_of_legacy():
         with pytest.raises(ValueError):hand.expected_protocol(invalid)
 
 
-def test_v2_whole_header_selection_and_subject_mismatch_fail_closed(tmp_path):
-    protocol=hand.expected_protocol(hand.PROTOCOL_V2);path=tmp_path/'subject04.gz'
+@pytest.mark.parametrize('protocol_path',[hand.PROTOCOL_V2,hand.PROTOCOL_V3])
+def test_fresh_whole_header_selection_and_subject_mismatch_fail_closed(tmp_path,protocol_path):
+    protocol=hand.expected_protocol(protocol_path);path=tmp_path/'fresh.gz'
     path.write_bytes(tar_bytes(subject=protocol['subject']))
     selected,wanted,audit=hand.inspect_archive(path,time.monotonic()+10,protocol)
     assert [r['sequence_lex_index'] for r in selected]==[4,39,74]
@@ -258,19 +259,23 @@ def test_v2_whole_header_selection_and_subject_mismatch_fail_closed(tmp_path):
     with pytest.raises(TimeoutError):hand.inspect_archive(path,0,protocol)
 
 
-def test_v2_real_reused_download_and_extraction_keeps_v1_untouched(tmp_path,monkeypatch):
-    root,out,incoming,lease,opener=fixture(tmp_path,monkeypatch,protocol_path=hand.PROTOCOL_V2)
+@pytest.mark.parametrize('protocol_path',[hand.PROTOCOL_V2,hand.PROTOCOL_V3])
+def test_fresh_real_reused_download_and_extraction_keeps_history_untouched(tmp_path,monkeypatch,protocol_path):
+    root,out,incoming,lease,opener=fixture(tmp_path,monkeypatch,protocol_path=protocol_path)
     historical=root/hand.BASE;historical.mkdir();(historical/'original').write_bytes(b'closed v1 unchanged')
-    report=hand.acquire(root,tmp_path/'code','b'*40,lease,opener=opener,protocol_path=hand.PROTOCOL_V2)
+    previous=root/'validation/dexycb_hand_v2'
+    if protocol_path==hand.PROTOCOL_V3:previous.mkdir();(previous/'original').write_bytes(b'closed v2 unchanged')
+    report=hand.acquire(root,tmp_path/'code','b'*40,lease,opener=opener,protocol_path=protocol_path)
     assert report['status']=='pass' and report['frames']==6 and report['annotation_values_parsed'] is False
-    assert report['protocol_file']==hand.PROTOCOL_V2 and report['acquisition_profile']=='validation/dexycb_hand_v2'
+    assert report['protocol_file']==protocol_path and report['acquisition_profile']==hand.expected_protocol(protocol_path)['base']
     assert (historical/'original').read_bytes()==b'closed v1 unchanged'
     manifest=json.loads((out/'inputs/manifest.json').read_bytes())
-    assert manifest['schema']=='world-reward-dexycb-hand-rgb-v1' and manifest['subject']=='20200903-subject-04'
+    assert manifest['schema']=='world-reward-dexycb-hand-rgb-v1' and manifest['subject']==hand.expected_protocol(protocol_path)['subject']
+    if protocol_path==hand.PROTOCOL_V3:assert(previous/'original').read_bytes()==b'closed v2 unchanged'
     assert len(manifest['images'])==6 and all(r['source_frame_id']==r['frame_position'] for r in manifest['images'])
     assert len(list((out/'eval_private').rglob('*.npz')))==6 and not list((out/'eval_private').rglob('meta.yml'))
     assert out.stat().st_mode&0o777==0o755 and (out/'eval_private').stat().st_mode&0o777==0o700
-    with pytest.raises(ValueError):hand.acquire(root,tmp_path/'code','b'*40,lease,opener=opener,protocol_path=hand.PROTOCOL_V2)
+    with pytest.raises(ValueError):hand.acquire(root,tmp_path/'code','b'*40,lease,opener=opener,protocol_path=protocol_path)
 
 
 @pytest.mark.parametrize('arguments',[['--protocol','configs/no.json'],['--protocol',hand.PROTOCOL_V2,'--protocol',hand.PROTOCOL_V1],['--base','validation/other']])
@@ -279,7 +284,7 @@ def test_driver_rejects_unknown_or_duplicate_profile_before_host_io(monkeypatch,
     with pytest.raises(SystemExit):hand.main(arguments)
 
 
-@pytest.mark.parametrize('arguments',[[],['--protocol',hand.PROTOCOL_V2]])
+@pytest.mark.parametrize('arguments',[[],['--protocol',hand.PROTOCOL_V2],['--protocol',hand.PROTOCOL_V3]])
 def test_wrapper_forwards_exact_profile_to_bootstrap_and_native_driver_without_network(tmp_path,arguments):
     import subprocess
     repo=Path(__file__).parents[1];bins=tmp_path/'bin';bins.mkdir();log=tmp_path/'calls'
@@ -303,7 +308,7 @@ def test_wrapper_forwards_exact_profile_to_bootstrap_and_native_driver_without_n
     assert result.returncode==2 and log.read_text().splitlines()==lines
 
 
-@pytest.mark.parametrize('arguments,protocol',[([],hand.PROTOCOL_V1),(['--protocol',hand.PROTOCOL_V2],hand.PROTOCOL_V2)])
+@pytest.mark.parametrize('arguments,protocol',[([],hand.PROTOCOL_V1),(['--protocol',hand.PROTOCOL_V2],hand.PROTOCOL_V2),(['--protocol',hand.PROTOCOL_V3],hand.PROTOCOL_V3)])
 def test_main_selects_profile_before_actual_acquisition_only(monkeypatch,arguments,protocol):
     import types
     captured=[]
@@ -317,3 +322,19 @@ def test_main_selects_profile_before_actual_acquisition_only(monkeypatch,argumen
     monkeypatch.setattr(hand,'acquire',acquire)
     hand.main(arguments)
     assert len(captured)==1 and captured[0][1]==dict(watchdog=True,protocol_path=protocol)
+
+
+def test_v3_exact_primary_archive_diagnostic_contract_and_no_fake_future_receipt():
+    repo=Path(__file__).parents[1];legacy=copy.deepcopy(hand.EXPECTED_PROTOCOL);v2=copy.deepcopy(hand.expected_protocol(hand.PROTOCOL_V2))
+    v3=hand.expected_protocol(hand.PROTOCOL_V3);hand.dex.exact(json.loads((repo/hand.PROTOCOL_V3).read_bytes()),v3)
+    assert v3['subject']=='20200908-subject-05'and v3['base']=='validation/dexycb_hand_v3'
+    assert v3['archive']==dict(file='20200908-subject-05.tar.gz',bytes=12815420651,
+        url='https://drive.google.com/file/d/1NBA_FPyGWOQF5-X9ueAat5g8lDMz-EmS')
+    assert v3['license']=='CC-BY-NC-4.0'and not v3['training_overlap_verified']and not v3['challenge_overlap_verified']
+    assert not v3['timestamps_available']and v3['all_original_frames']and v3['sequence_lex_indices']==[4,39,74]
+    for key in set(legacy)-{'subject','base','schema','archive'}:assert v3[key]==legacy[key]
+    assert hand.EXPECTED_PROTOCOL==legacy and hand.expected_protocol(hand.PROTOCOL_V2)==v2
+    assert hand.profile_paths(Path('/srv/scenesmith/world-reward'),hand.PROTOCOL_V3)==[
+        Path('/srv/scenesmith/world-reward/validation/dexycb_hand_v3'),Path('/srv/world-reward-data/dexycb_hand_v3')]
+    # Acquisition emits no consumer pin config; only the later independent freeze may create it.
+    assert 'dexycb_hand_acquire_v3_pins.json'not in Path(hand.__file__).read_text()

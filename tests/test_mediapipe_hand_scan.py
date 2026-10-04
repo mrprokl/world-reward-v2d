@@ -135,7 +135,7 @@ def controls(host,monkeypatch,fault='',cohort='v1'):
         report=dict(stage='external_dexycb_full_t_mediapipe_hand_scan',status='pass',phase='complete',native_graphs=1,native_calls=9,
           outputs=[{}]*3,producer_revision=rev,source_binding=source,gpu_used=False,private_values_read=False,accuracy_verified=False,
           availability_is_visibility=False,handedness_is_detection_confidence=False,actor_identity_inferred=False)
-        if cohort=='v2':report.update(cohort='v2',public_base=gate.profile(cohort)['base'],protocol_identity=proof['acquisition']['protocol'])
+        if cohort!='v1':report.update(cohort=cohort,public_base=gate.profile(cohort)['base'],protocol_identity=proof['acquisition']['protocol'])
         if fault=='incomplete':report['native_calls']=8
         seal(out/'report.json',json.dumps(report).encode())
         for i in(4,39,74):
@@ -190,10 +190,10 @@ def test_data_free_bootstrap_and_actual_static_closure(monkeypatch):
     assert not any(Path(n).name in('dexycb_hand_evaluate.py','hand_synthetic_render.py','hand_gauge_evaluate.py')for n in closure)
 
 
-@pytest.mark.parametrize('cohort',['v1','v2'])
+@pytest.mark.parametrize('cohort',['v1','v2','v3'])
 def test_native_full_three_scans_reuse_one_graph_once_per_original_frame(host,monkeypatch,tmp_path,cohort):
-    if cohort=='v2':
-        host=v2_host(host,monkeypatch);root,code,_,evidence=host;profile=gate.profile('v2')
+    if cohort!='v1':
+        host=fresh_host(host,monkeypatch,cohort);root,code,_,evidence=host;profile=gate.profile(cohort)
         path=code/profile['protocol'];path.chmod(0o644)
         evidence['acquisition']['protocol']=seal(path,json.dumps(dict(base=profile['base'],subject=profile['subject'],all_original_frames=True)).encode())
         path=code/profile['acquire'];path.chmod(0o644);config=json.loads(path.read_bytes())
@@ -215,7 +215,7 @@ def test_native_full_three_scans_reuse_one_graph_once_per_original_frame(host,mo
     out=gate.control_path(root,revision,cohort)/'predictions';out.mkdir(mode=0o700,parents=True)
     proof=dict(source_binding=rt.source(root,code,revision,gate.ENTRY,gate.source_helpers(cohort)),manifest=evidence['acquisition']['manifest'],
                task=evidence['task_pin'],versions=evidence['versions'],image_id=evidence['image']['Id'],remaining_seconds=10.)
-    if cohort=='v2':proof.update(cohort='v2',public_base=profile['base'],protocol_identity=evidence['acquisition']['protocol'])
+    if cohort!='v1':proof.update(cohort=cohort,public_base=profile['base'],protocol_identity=evidence['acquisition']['protocol'])
     proof_path=root/'proof.json';proof_pin=seal(proof_path,json.dumps(proof).encode())
     original_identity=rt.identity
     monkeypatch.setattr(rt,'identity',lambda p,*a,**kw:evidence['task_pin']if str(p)=='/opt/mediapipe-task/hand_landmarker.task'else original_identity(p,*a,**kw))
@@ -279,7 +279,7 @@ def test_snapshot_markers_available_native_and_unknown_parent_files_refused(host
     assert calls==[]
 
 
-@pytest.mark.parametrize('cohort',['v1','v2'])
+@pytest.mark.parametrize('cohort',['v1','v2','v3'])
 def test_public_profile_whitelist_and_wrong_subject_rejected(tmp_path,cohort):
     manifest,pin=public(tmp_path,cohort)
     assert gate.public_inputs(rt,tmp_path,REPO,{'manifest':pin},cohort)[0]==manifest
@@ -288,48 +288,51 @@ def test_public_profile_whitelist_and_wrong_subject_rejected(tmp_path,cohort):
     with pytest.raises(ValueError):gate.public_inputs(rt,tmp_path,REPO,{'manifest':pin},cohort)
 
 
-def v2_host(host,monkeypatch):
-    root,code,rev,evidence=host;profile=gate.profile('v2');code.chmod(0o755);(code/'configs').chmod(0o755)
-    protocol_pin=seal(code/profile['protocol'],b'future actual frozen v2 protocol tinyfixture')
-    manifest,pin=public(root,'v2');evidence['manifest']=manifest;evidence['acquisition']={'manifest':pin,'protocol':protocol_pin}
+def fresh_host(host,monkeypatch,cohort='v2'):
+    root,code,rev,evidence=host;profile=gate.profile(cohort);code.chmod(0o755);(code/'configs').chmod(0o755)
+    protocol_pin=seal(code/profile['protocol'],b'future actual frozen protocol tinyfixture')
+    manifest,pin=public(root,cohort);evidence['manifest']=manifest;evidence['acquisition']={'manifest':pin,'protocol':protocol_pin}
     seal(code/profile['acquire'],json.dumps(dict(schema='world_reward.dexycb_hand_acquire_pins.v1',producer_revision='b'*40,
         report=dict(bytes=1,sha256='c'*64),manifest=pin,helper=dict(bytes=1,sha256='d'*64),protocol=protocol_pin)).encode())
     (code/'configs').chmod(0o555);code.chmod(0o555)
     return host
 
 
-def test_v2_selected_namespace_source_and_native_cli_no_v1_media_mount(host,monkeypatch):
-    host=v2_host(host,monkeypatch);root,code,rev,evidence=host;calls=controls(host,monkeypatch,cohort='v2')
-    report=gate.run(root,code,rev,'v2');command=calls[0]
-    assert command[-2:]==['--cohort','v2']and report['cohort']=='v2'and report['public_base']=='validation/dexycb_hand_v2'
-    assert report['source_binding']['helpers'][gate.profile('v2')['protocol']]==evidence['acquisition']['protocol']
+@pytest.mark.parametrize('cohort',['v2','v3'])
+def test_fresh_selected_namespace_source_and_native_cli_no_other_cohort_media_mount(host,monkeypatch,cohort):
+    host=fresh_host(host,monkeypatch,cohort);root,code,rev,evidence=host;calls=controls(host,monkeypatch,cohort=cohort)
+    report=gate.run(root,code,rev,cohort);command=calls[0]
+    assert command[-2:]==['--cohort',cohort]and report['cohort']==cohort and report['public_base']=='validation/dexycb_hand_'+cohort
+    assert report['source_binding']['helpers'][gate.profile(cohort)['protocol']]==evidence['acquisition']['protocol']
     assert gate.PROTOCOL not in report['source_binding']['helpers']and gate.ACQUIRE_PINS not in report['source_binding']['helpers']
     mounts=[command[i+1]for i,v in enumerate(command)if v=='--mount']
-    assert any('/validation/dexycb_hand_v2/inputs'in m for m in mounts)
+    assert any('/validation/dexycb_hand_'+cohort+'/inputs'in m for m in mounts)
     assert not any('/validation/dexycb_hand_v1'in m or 'eval_private'in m for m in mounts)
-    assert gate.control_path(root,rev,'v2')!=gate.control_path(root,rev,'v1')
+    assert len({gate.control_path(root,rev,c)for c in('v1','v2','v3')})==3
+    if cohort=='v3':assert not any('/validation/dexycb_hand_v2'in m for m in mounts)
 
 
-@pytest.mark.parametrize('args',[[],['--cohort','v2']])
-def test_default_legacy_and_explicit_v2_main_arguments(host,monkeypatch,args):
+@pytest.mark.parametrize('args',[[],['--cohort','v2'],['--cohort','v3']])
+def test_default_legacy_and_explicit_fresh_main_arguments(host,monkeypatch,args):
     root,code,rev,_=host;observed=[]
     monkeypatch.setattr(gate.sys,'argv',['scan.py',*args]);monkeypatch.setenv('WR_CODE',str(code));monkeypatch.setenv('WR_CODE_REVISION',rev)
     monkeypatch.setattr(gate,'run',lambda *a:observed.append(a))
-    gate.main();assert observed==[(root,code,rev,'v2'if args else'v1')]
+    gate.main();assert observed==[(root,code,rev,args[-1]if args else'v1')]
 
 
-@pytest.mark.parametrize('args',[['--cohort','v1'],['--cohort','v3'],['--cohort'],['--cohort','v2','--cohort','v2'],
-                               ['--cohort','v2','--threshold','0.1']])
+@pytest.mark.parametrize('args',[['--cohort','v1'],['--cohort','v4'],['--cohort'],['--cohort','v2','--cohort','v2'],
+                               ['--cohort','v2','--threshold','0.1'],['--cohort','v3','--cohort','v3']])
 def test_cli_rejects_arbitrary_duplicate_or_malformed_cohort_before_runtime(monkeypatch,args):
     monkeypatch.setattr(gate.sys,'argv',['scan.py',*args])
     with pytest.raises(ValueError):gate.main()
 
 
 @pytest.mark.parametrize('fault',['','protocol','producer','source','subject'])
-def test_v2_historical_acquisition_binding_matches_real_pure_source_contract(tmp_path,monkeypatch,fault):
+@pytest.mark.parametrize('cohort',['v2','v3'])
+def test_fresh_historical_acquisition_binding_matches_real_pure_source_contract(tmp_path,monkeypatch,fault,cohort):
     import dexycb_hand_acquire as acquirer
     root=tmp_path/'root';revision='b'*40;original=root/'jobs'/revision/acquirer.JOB/'code'
-    code=root/'consumer';p=gate.profile('v2');protocol=acquirer.expected_protocol(acquirer.PROTOCOL_V2)
+    code=root/'consumer';p=gate.profile(cohort);protocol=acquirer.expected_protocol(p['protocol'])
     for name in('infra/dexycb_hand_acquire.py','infra/run_dexycb_hand_acquire.sh',*('infra/'+n for n in acquirer.HELPER_PINS)):
         seal(original/name,(REPO/name).read_bytes())
     protocol_pin=seal(original/p['protocol'],json.dumps(protocol).encode());seal(code/p['protocol'],json.dumps(protocol).encode())
@@ -349,7 +352,7 @@ def test_v2_historical_acquisition_binding_matches_real_pure_source_contract(tmp
     monkeypatch.setattr(acquirer,'__file__',str(original/'infra/dexycb_hand_acquire.py'))
     for module in(acquirer.dex,acquirer.download,acquirer.lease):monkeypatch.setattr(module,'__file__',str(original/'infra'/Path(module.__file__).name))
     binding=acquirer.source_binding(root,original,revision,p['protocol'])
-    manifest,manifest_pin=public(root,'v2')
+    manifest,manifest_pin=public(root,cohort)
     receipt=dict(stage='external_dexycb_hand_rgb_private_byte_acquisition',status='pass',phase='complete',producer_revision=revision,
         source_before=binding,source_rehashed_after=True,annotation_values_parsed=False,inference_performed=False,gpu_used=False,
         disposable_archive_removed=True,sequences=3,protocol_file=p['protocol'],acquisition_profile=p['base'],public_manifest=manifest_pin,
@@ -370,8 +373,22 @@ def test_v2_historical_acquisition_binding_matches_real_pure_source_contract(tmp
         return actual(*args)
     monkeypatch.setattr(gate,'pins',stop_after_acq)
     if fault:
-        with pytest.raises((ValueError,FileNotFoundError)):gate.authenticate(rt,root,code,'v2')
+        with pytest.raises((ValueError,FileNotFoundError)):gate.authenticate(rt,root,code,cohort)
         assert not reached
     else:
-        with pytest.raises(RuntimeError,match='CPU qualification next'):gate.authenticate(rt,root,code,'v2')
+        with pytest.raises(RuntimeError,match='CPU qualification next'):gate.authenticate(rt,root,code,cohort)
         assert reached==[True]
+
+
+def test_v3_explicit_new_profile_does_not_create_or_substitute_future_pins(tmp_path):
+    p=gate.profile('v3')
+    assert p==dict(base='validation/dexycb_hand_v3',subject='20200908-subject-05',
+        protocol='configs/dexycb_hand_protocol_v3.json',acquire='configs/dexycb_hand_acquire_v3_pins.json',
+        manifest_schema='world-reward-dexycb-hand-rgb-v1')
+    helpers=gate.source_helpers('v3')
+    assert p['protocol']in helpers and p['acquire']in helpers
+    assert not any(gate.profile(c)['protocol']in helpers or gate.profile(c)['acquire']in helpers for c in('v1','v2'))
+    with pytest.raises(FileNotFoundError):gate.authenticate(rt,tmp_path,tmp_path/'code','v3')
+    assert not(tmp_path/'code').exists()
+    for invalid in('v4','../v3','subject05'):
+        with pytest.raises(ValueError):gate.profile(invalid)

@@ -25,6 +25,7 @@ SUBJECT, CAMERA, INDICES = '20200820-subject-03', '836212060125', [4, 39, 74]
 DOWNLOAD_BUDGET, SCAN_BUDGET, CLEANUP_GRACE = 7200, 1800, 120
 PROTOCOL_V1 = 'configs/dexycb_hand_protocol_v1.json'
 PROTOCOL_V2 = 'configs/dexycb_hand_protocol_v2.json'
+PROTOCOL_V3 = 'configs/dexycb_hand_protocol_v3.json'
 HELPER_PINS = {
     'dexycb_acquire.py': {'bytes': 21916, 'sha256': '6078c54a862f98ee4aa9790a39387e2e89922789fce5ca4ee63edbc075834554'},
     'dexycb_download.py': {'bytes': 10680, 'sha256': '8ead4771dd49d6a0f0332c840bd0fa68aef00d6588fc0d41a3c12e433fe47591'},
@@ -46,21 +47,27 @@ EXPECTED_PROTOCOL = {
 }
 
 
+PROFILE_ARCHIVES = {
+    PROTOCOL_V2: ('v2', '20200903-subject-04', 12792618020, '14up6qsTpvgEyqOQ5hir-QbjMB_dHfdpA'),
+    PROTOCOL_V3: ('v3', '20200908-subject-05', 12815420651, '1NBA_FPyGWOQF5-X9ueAat5g8lDMz-EmS'),
+}
+
+
 def expected_protocol(protocol_path=PROTOCOL_V1):
-    """Only two frozen whole-cohort profiles, never arbitrary paths or overrides."""
+    """Frozen whole-cohort opt-ins, never arbitrary paths or source overrides."""
     if protocol_path == PROTOCOL_V1: return EXPECTED_PROTOCOL
-    dex.require(protocol_path == PROTOCOL_V2, 'Unknown immutable acquisition profile')
-    subject = '20200903-subject-04'
-    return {**EXPECTED_PROTOCOL, 'schema': 'world-reward-dexycb-hand-acquisition-v2',
-        'base': 'validation/dexycb_hand_v2', 'subject': subject,
-        'archive': {'file': subject+'.tar.gz', 'bytes': 12792618020,
-                    'url': 'https://drive.google.com/file/d/14up6qsTpvgEyqOQ5hir-QbjMB_dHfdpA'}}
+    dex.require(protocol_path in PROFILE_ARCHIVES, 'Unknown immutable acquisition profile')
+    version, subject, size, file_id = PROFILE_ARCHIVES[protocol_path]
+    return {**EXPECTED_PROTOCOL, 'schema': 'world-reward-dexycb-hand-acquisition-'+version,
+        'base': 'validation/dexycb_hand_'+version, 'subject': subject,
+        'archive': {'file': subject+'.tar.gz', 'bytes': size,
+                    'url': 'https://drive.google.com/file/d/'+file_id}}
 
 
 def profile_paths(root, protocol_path=PROTOCOL_V1):
     protocol = expected_protocol(protocol_path)
     return [root/protocol['base'], INCOMING if protocol_path == PROTOCOL_V1
-            else Path('/srv/world-reward-data/dexycb_hand_v2')]
+            else Path('/srv/world-reward-data')/Path(protocol['base']).name]
 
 
 def source_binding(root, code, revision, protocol_path=PROTOCOL_V1):
@@ -232,7 +239,7 @@ def acquire(root, code, revision, namespace_lease, *, opener=None, watchdog=Fals
 
 def main(argv=None):
     parser = argparse.ArgumentParser(allow_abbrev=False)
-    parser.add_argument('--protocol', choices=(PROTOCOL_V1, PROTOCOL_V2), default=PROTOCOL_V1)
+    parser.add_argument('--protocol', choices=(PROTOCOL_V1, PROTOCOL_V2, PROTOCOL_V3), default=PROTOCOL_V1)
     import sys
     supplied = list(sys.argv[1:] if argv is None else argv)
     if sum(value == '--protocol' or value.startswith('--protocol=') for value in supplied) > 1:

@@ -19,12 +19,14 @@ HELPERS=('infra/mediapipe_hand_scan.py','infra/run_mediapipe_hand_scan.sh','infr
 BUDGET=600
 
 
+PROFILE_SUBJECTS={'v1':'20200820-subject-03','v2':'20200903-subject-04','v3':'20200908-subject-05'}
+
+
 def profile(cohort='v1'):
-    if cohort not in('v1','v2'):raise ValueError('Only explicitly frozen v1/v2 cohorts permitted')
-    return dict(base=BASE if cohort=='v1'else 'validation/dexycb_hand_v2',
-        subject='20200820-subject-03'if cohort=='v1'else '20200903-subject-04',
-        protocol=PROTOCOL if cohort=='v1'else 'configs/dexycb_hand_protocol_v2.json',
-        acquire=ACQUIRE_PINS if cohort=='v1'else 'configs/dexycb_hand_acquire_v2_pins.json',
+    if cohort not in PROFILE_SUBJECTS:raise ValueError('Only explicitly frozen v1/v2/v3 cohorts permitted')
+    return dict(base='validation/dexycb_hand_'+cohort,subject=PROFILE_SUBJECTS[cohort],
+        protocol='configs/dexycb_hand_protocol_'+cohort+'.json',
+        acquire=ACQUIRE_PINS if cohort=='v1'else 'configs/dexycb_hand_acquire_'+cohort+'_pins.json',
         manifest_schema='world-reward-dexycb-hand-rgb-v1')
 
 
@@ -34,7 +36,8 @@ def source_helpers(cohort='v1'):
 
 
 def control_path(root,revision,cohort='v1'):
-    return root/'results'/('mediapipe-hand-scan-'+('v2-'if cohort=='v2'else '')+revision)
+    profile(cohort)
+    return root/'results'/('mediapipe-hand-scan-'+(cohort+'-'if cohort!='v1'else '')+revision)
 
 
 def runtime(code):
@@ -100,13 +103,13 @@ def authenticate(rt,root,code,cohort='v1'):
     rt.require(primary=={n:{k:p[k]for k in('bytes','sha256')}for n,p in protocol['primary_sources'].items()},'Primary license/source identity differs')
     original_binding=dict(producer_revision=acq['producer_revision'],protocol=protocol_pin,markers=snapshot['markers'],
                          helpers=protocol['helper_pins'],primary_sources=primary,closure_sha256=snapshot['closure_sha256'])
-    if cohort=='v2':original_binding.update(protocol_file=protocol_path,profile=base)
+    if cohort!='v1':original_binding.update(protocol_file=protocol_path,profile=base)
     rt.require(all(snapshot['helpers']['infra/'+n]==p for n,p in protocol['helper_pins'].items()),'Original reusable acquisition helpers differ')
     receipt=rt.pinned(root/base/'report.json',acq['report'],4<<20)
     expected=dict(stage='external_dexycb_hand_rgb_private_byte_acquisition',status='pass',phase='complete',
       producer_revision=acq['producer_revision'],source_before=original_binding,source_rehashed_after=True,
       annotation_values_parsed=False,inference_performed=False,gpu_used=False,disposable_archive_removed=True,sequences=3)
-    if cohort=='v2':expected.update(protocol_file=protocol_path,acquisition_profile=base)
+    if cohort!='v1':expected.update(protocol_file=protocol_path,acquisition_profile=base)
     rt.require(all(type(receipt.get(k))is type(v)and receipt[k]==v for k,v in expected.items())
         and receipt.get('public_manifest')==acq['manifest'],'Genuine unmodified acquisition PASS required')
     manifest,files=public_inputs(rt,root,code,acq,cohort)
@@ -178,15 +181,15 @@ def run_native(rt,root,code,out,proof_path,proof_pin,cohort='v1'):
                and out==control_path(root,os.environ['WR_CODE_REVISION'],cohort)/'predictions'
                and Path(__file__).resolve()==code/HELPERS[0],'Exact native source namespace required')
     proof=rt.pinned(proof_path,proof_pin,64<<10)
-    rt.require((cohort=='v1'and 'cohort'not in proof)or(cohort=='v2'and proof.get('cohort')=='v2'
+    rt.require((cohort=='v1'and 'cohort'not in proof)or(cohort!='v1'and proof.get('cohort')==cohort
         and proof.get('public_base')==base),'Immutable native proof cohort mismatch')
-    if cohort=='v2':
+    if cohort!='v1':
         native_acq,_=pins(rt,code,p['acquire'],'world_reward.dexycb_hand_acquire_pins.v1',('report','manifest','helper','protocol'))
         rt.require(native_acq['protocol']==proof['protocol_identity']and native_acq['manifest']==proof['manifest'],
-                   'Native independently frozen v2 input/protocol differs')
+                   'Native independently frozen input/protocol differs')
         protocol=rt.pinned(code/p['protocol'],proof['protocol_identity'])
         rt.require(protocol['base']==base and protocol['subject']==p['subject']and protocol['all_original_frames']is True,
-                   'Frozen native v2 protocol mismatch')
+                   'Frozen native protocol mismatch')
     manifest=rt.pinned(root/base/'inputs/manifest.json',proof['manifest'],16<<20)
     rt.require(manifest['schema']==p['manifest_schema']and manifest['subject']==p['subject'],'Immutable native manifest/profile mismatch')
     rt.require(out.is_dir()and out.resolve()==out and out.stat().st_uid==0 and out.stat().st_mode&0o777==0o700 and not tuple(out.iterdir()),
@@ -233,14 +236,14 @@ def run_native(rt,root,code,out,proof_path,proof_pin,cohort='v1'):
         and {n:metadata.version(n)for n in proof['versions']}==proof['versions']
         and rt.source(root,code,os.environ['WR_CODE_REVISION'],ENTRY,helpers)==proof['source_binding'],
         'Native task/proof/manifest/versions/source changed')
-    if cohort=='v2':rt.require(rt.identity(code/p['protocol'])==proof['protocol_identity'],'Native frozen v2 protocol changed after scan')
+    if cohort!='v1':rt.require(rt.identity(code/p['protocol'])==proof['protocol_identity'],'Native frozen protocol changed after scan')
     check();report=dict(stage='external_dexycb_full_t_mediapipe_hand_scan',status='pass',phase='complete',outputs=outputs,
       producer_revision=os.environ['WR_CODE_REVISION'],source_binding=proof['source_binding'],
       native_graphs=1,native_calls=call_count,gpu_used=False,private_values_read=False,accuracy_verified=False,
       protocol=dict(running_mode='IMAGE',num_hands=4,min_hand_detection_confidence=.5,min_hand_presence_confidence=.5,min_tracking_confidence=.5),
       raw_values_basis='native_Python_landmark_floats_without_rounding',availability_is_visibility=False,
       handedness_is_detection_confidence=False,actor_identity_inferred=False,elapsed_seconds=time.monotonic()-started)
-    if cohort=='v2':report.update(cohort='v2',public_base=base,protocol_identity=proof['protocol_identity'])
+    if cohort!='v1':report.update(cohort=cohort,public_base=base,protocol_identity=proof['protocol_identity'])
     rt.write(out/'report.json',(json.dumps(report,sort_keys=True)+'\n').encode());return report
 
 
@@ -250,19 +253,19 @@ def run(root,code,revision,cohort='v1'):
         and root==ROOT and Path(__file__).resolve()==code/HELPERS[0],'Actual immutable VM02 CPU adapter required')
     start=time.monotonic();deadline=start+BUDGET;source=rt.source(root,code,revision,ENTRY,helpers)
     rt.require({p.name for p in code.parent.iterdir()}=={'code','revision','source-sha256'},'Exact own source snapshot inventory required')
-    evidence=authenticate(rt,root,code,cohort)if cohort=='v2'else authenticate(rt,root,code)
+    evidence=authenticate(rt,root,code,cohort)if cohort!='v1'else authenticate(rt,root,code)
     rt.require(time.monotonic()<deadline,'Inclusive prehash budget exceeded')
     control=control_path(root,revision,cohort);rt.canonical(control);rt.require(not control.exists(),'Fresh scan namespace required')
     control.mkdir(mode=0o700);out=control/'predictions';out.mkdir(mode=0o700)
     proof=dict(source_binding=source,manifest=evidence['acquisition']['manifest'],task=evidence['task_pin'],versions=evidence['versions'],
                image_id=evidence['image']['Id'],remaining_seconds=deadline-time.monotonic())
-    if cohort=='v2':proof.update(cohort='v2',public_base=base,protocol_identity=evidence['acquisition']['protocol'])
+    if cohort!='v1':proof.update(cohort=cohort,public_base=base,protocol_identity=evidence['acquisition']['protocol'])
     rt.write(control/'native-proof.json',(json.dumps(proof,sort_keys=True)+'\n').encode());proof_pin=rt.identity(control/'native-proof.json')
-    name='world-reward-mediapipe-hand-scan-'+('v2-'if cohort=='v2'else '')+revision[:12];failure=None;owned=False;report=dict(stage='mediapipe_hand_scan_host_seal',status='fail',
+    name='world-reward-mediapipe-hand-scan-'+(cohort+'-'if cohort!='v1'else '')+revision[:12];failure=None;owned=False;report=dict(stage='mediapipe_hand_scan_host_seal',status='fail',
       producer_revision=revision,source_binding=source,acquisition_pins=evidence['acquisition'],runtime_pins=evidence['runtime'],
       budget_seconds=BUDGET,budget_scope='source_inputs_model_load_all_three_full_scans_serialization_posthash',gpu_used=False,private_values_read=False,
       accuracy_verified=False,source_rehashed_after=False,owned_cleanup_verified=False)
-    if cohort=='v2':report.update(cohort='v2',public_base=base,protocol_identity=evidence['acquisition']['protocol'])
+    if cohort!='v1':report.update(cohort=cohort,public_base=base,protocol_identity=evidence['acquisition']['protocol'])
     def interrupted(*_):raise TimeoutError('CPU scan interrupted; owned cleanup only')
     handlers={s:signal.signal(s,interrupted)for s in(signal.SIGTERM,signal.SIGINT)}
     try:
@@ -277,7 +280,7 @@ def run(root,code,revision,cohort='v1'):
           f'PATH={rt.VENV}/bin:/usr/bin:/bin','HOME=/tmp','CUDA_VISIBLE_DEVICES=-1','JAX_PLATFORMS=cpu','MPLBACKEND=Agg','XDG_CACHE_HOME=/tmp',
           'OPENBLAS_NUM_THREADS=1','OMP_NUM_THREADS=1','MKL_NUM_THREADS=1',f'WR_CODE_REVISION={revision}',str(rt.VENV/'bin/python'),'-I','-B',str(code/HELPERS[0]),
           '--native',str(root),str(code),str(out),str(proof_pin['bytes']),proof_pin['sha256']]
-        if cohort=='v2':command+=['--cohort','v2']
+        if cohort!='v1':command+=['--cohort',cohort]
         owned=True
         with(control/'native.log').open('xb')as log:
             os.fchmod(log.fileno(),0o400);result=subprocess.run(command,stdout=log,stderr=log,timeout=max(.001,deadline-time.monotonic()))
@@ -288,8 +291,8 @@ def run(root,code,revision,cohort='v1'):
             and native['source_binding']==source and native['producer_revision']==revision
             and all(native.get(k)is False for k in('gpu_used','private_values_read','accuracy_verified','availability_is_visibility',
                 'handedness_is_detection_confidence','actor_identity_inferred')),'Full3 native scan gate required')
-        if cohort=='v2':rt.require(native.get('cohort')=='v2'and native.get('public_base')==base
-            and native.get('protocol_identity')==evidence['acquisition']['protocol'],'Native immutable v2 profile proof differs')
+        if cohort!='v1':rt.require(native.get('cohort')==cohort and native.get('public_base')==base
+            and native.get('protocol_identity')==evidence['acquisition']['protocol'],'Native immutable profile proof differs')
         output_names={'report.json',*(f'sequence_{i:03d}'+suffix for i in(4,39,74)for suffix in('.npz','.npz.json'))}
         rt.require({p.name for p in out.iterdir()}==output_names,'Exact full scan output inventory required')
         report['outputs']={p.name:rt.identity(p,32<<20)for p in out.iterdir()};report['native_report']=native
@@ -301,7 +304,7 @@ def run(root,code,revision,cohort='v1'):
             report['owned_cleanup_verified']=True
             rt.require({p.name for p in code.parent.iterdir()}=={'code','revision','source-sha256'}
                 and rt.source(root,code,revision,ENTRY,helpers)==source
-                and (authenticate(rt,root,code,cohort)if cohort=='v2'else authenticate(rt,root,code))==evidence,'Source/public/runtime changed after scan')
+                and (authenticate(rt,root,code,cohort)if cohort!='v1'else authenticate(rt,root,code))==evidence,'Source/public/runtime changed after scan')
             report['source_rehashed_after']=True
             if 'outputs'in report:rt.require(all(rt.identity(out/n,32<<20)==p for n,p in report['outputs'].items()),'Output bytes changed before host seal')
             rt.require(time.monotonic()<=deadline,'Inclusive all3 scan posthash budget exceeded')
@@ -314,7 +317,7 @@ def run(root,code,revision,cohort='v1'):
 
 def main():
     args=sys.argv[1:];cohort='v1'
-    if args[-2:]==['--cohort','v2']:cohort='v2';args=args[:-2]
+    if len(args)>=2 and args[-2]=='--cohort'and args[-1]in('v2','v3'):cohort=args[-1];args=args[:-2]
     if args[:1]==['--native']:
         if len(args)!=6:raise ValueError('Exact internal native arguments required')
         root,code,out=map(Path,args[1:4]);rt=runtime(code)
