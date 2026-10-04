@@ -7209,3 +7209,20 @@ Public features and all twelve raw scores/proposals freeze before decisionlabels
 decisionFAIL forbids subject01 labels. Onlyseg andtwo targetmetafields constructed;
 safe YAML syntax node audit never constructs other private camera/MANO values.
 No acquired private labels or actualtrainedmodel/accuracy evidence yet.
+
+04Oct 11:11UTC integration: native automatic masks/tracks driver and sealed
+CPU public-features/private-calibration wrappers are committed. Inclusive native
+budget now includes post-verification; CPU isolated host bootstrap includes
+both infra/src (regression under python-I-B-S, no NumPy). Root142 targeted tests
+PASS6.01s; this is not a new full-suite or actual model-quality result.
+Synthetic permission probe on the actual VM02 frontend image PASS0.617023s:
+UID0, capdropALL plus ONLY DAC_READ_SEARCH reads a readonly manufactured0400
+UID1000 leaf, CapEff=4, offline, noGPU or private annotations. The private-only
+CPU capability is therefore executable without rewriting original file modes;
+public CPU and both GPU stages retain capdropALL with no added capability.
+
+Actual EP0 preparation under4d4a049 loaded and waiting for the existing GPU
+lock. EP13 unchanged v2 still active, object tracking300/425 at1065.138512s.
+DexYCB byte acquisition3b178742 loadedactive, no passing receipt yet; archives
+and selected namespaces stay onAzure. No private values, trained identity model
+or measured initial-identity improvement has been read/claimed.
