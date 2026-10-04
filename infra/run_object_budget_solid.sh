@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-[[ $# == 2 && $1 == --episode && $2 =~ ^(0|[1-9]|[12][0-9])$ ]] || exit 2
+[[ ( $# == 2 || ( $# == 3 && $3 == --query-requalification ) ) && $1 == --episode && $2 =~ ^(0|[1-9]|[12][0-9])$ ]] || exit 2
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ && "$CODE" == "$ROOT/jobs/$REV/run_object_budget_solid/code" ]] || exit 2
 export DOCKER_HOST="unix://$ROOT/docker.sock"
