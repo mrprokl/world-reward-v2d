@@ -79,6 +79,26 @@ les diagnostics de tous les slots. Moins de8 témoins ou ambiguïté ⇒ FAIL, s
 refill. La route legacy et les jobs historiques ne sont pas changés/adoptés.
 Root289tests PASS ; la mesure est de disponibilité/représentation, pas de qualité3D.
 
+### Next integration gate, not a new model stack
+
+The useful seam is `joint_point_native_qualify.numerical_control`: allocate
+mask quantiles on the actual native-loaded F32 mesh using the original PNG,
+inferred K/depth and constructor's frame0 object state. Freeze face IDs and
+barycentrics before any future tracker result; bind unchanged full-T Boots
+observations through `joint_point_evidence`. The legacy `fixed_shape_point_pose`
+selector must not be implicitly substituted, and the failed EP21 cohort stays
+closed. No per-video rescue or point-weight choice is justified by availability.
+
+Before a positive-weight experiment, a fresh preregistered native-bundle control
+must exercise real MHR/contact/render kernels and the original versus weight0
+subclass pair: identical seeds/config, loss/gradient probes0/181, all301 updates,
+byte-exact state/history/result. Supplied manufactured bundles qualify runtime,
+not inferred RGB geometry or held-out HOI accuracy. A subsequent real tracker
+control remains separate; previous authored/analytic cohorts are not fresh
+validation. Do not manufacture more wrappers while this underlying seam is
+unqualified. Full-HOI calibration/held-out rights remain unresolved; see the
+October5 targeted licence audit. No positive weight or backend adoption yet.
+
 ### Première migration réalisée
 
 `world_reward.shared_scene` ajoute des adaptateurs explicites

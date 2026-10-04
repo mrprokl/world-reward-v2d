@@ -331,6 +331,32 @@ also prevent assuming a clean shared SE3 reference. HIMO is explicitly NC;
 HUMOTO public animations are not verified synchronized real RGB. No model
 overlap or derived-label rights are inferred from downloadable files.
 
+### October5 — targeted BEHAVE/InterCap private-evaluation recheck
+
+Primary text only, no registration, RGB/annotation/archive acquisition or email.
+[InterCap licence](https://intercap.is.tue.mpg.de/license.html):14,569B,
+SHA256 `1a13747439996bf95d55784511a5dbcfa977c839033d75483240429589cd9d7c`;
+allows non-commercial scientific research/education/artistic projects and
+restricts commercial artefacts/third-party disclosure. Download redirects to
+login; registration asks email/password and licence/privacy acceptance. Contacts
+`intercap@tue.mpg.de`; licence `ps-license@tue.mpg.de` differs from site's
+`ps-licensing@tue.mpg.de` and must not be silently conflated.
+[BEHAVE licence](https://virtualhumans.mpi-inf.mpg.de/behave/license.html):15,593B,
+SHA256 `f5ba537b429c1f3e91ef95ce34577e0dbb7ff9b1ef1999c341251c170a1ffe14`;
+allows non-commercial scientific research, restricts commercial artefacts and
+third-party disclosure, requires face blurring in published images. Original
+Date01–Date07 archives and RHOBIN evaluation packages are linked, not acquired.
+
+Neither text categorically bans all competitions, but prize-bearing V2D method
+selection/development is not explicitly covered. Private GT, no training and
+term acceptance alone do not settle that intended use. Decision: defer
+acquisition/adoption until targeted clarification; not a blanket illegality
+claim. Body-model/reference rights and model training overlap remain separate.
+Unsent question: authorize private Azure evaluation, monocular RGB-only predictor
+with annotations isolated to metrics, to choose a prize-eligible World Reward
+V2D method, without data redistribution/commercial exploitation, and publication
+of aggregate results? Human approval for outbound email is still outstanding.
+
 ## Experimental general solid certificate (October4, not adoption)
 
 The independently written certified_solid_query.cpp glue is Apache-2.0.
