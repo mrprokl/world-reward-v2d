@@ -121,7 +121,7 @@ def validate_pins(value):
         expected=dict(rgb=f'{BASE}/inputs/scene_{scene:06d}_frame_000000.png',mask=f'{BASE}/automatic_masks_v1/scene_{scene:06d}/masks/1/000000.png',depth=f'{BASE}/depth_init_v1/scene_{scene:06d}_frame_000000.npz')
         for kind,name in expected.items():require(set(row[kind])=={'path','bytes','sha256'}and row[kind]['path']==name,'Only original public RGB/automaticmask/nativeMoGe2 NPZ allowed');pin({k:row[kind][k]for k in('bytes','sha256')})
     runtime=value['runtime'];require(set(runtime)=={'image_receipt','model_files','source_files','moge_links','installed_sources','acquisition_receipts'},'Exact frozen existing runtime evidence required')
-    image=runtime['image_receipt'];require(set(image)=={'path','bytes','sha256'}and image['path']=='results/image-sam3d-runtime.json','Original Objects image receipt required');pin({k:image[k]for k in('bytes','sha256')})
+    image=runtime['image_receipt'];require(set(image)=={'path','bytes','sha256'}and type(image['path'])is str and re.fullmatch(r'results/ycbv-objects-runtime-[0-9a-f]{40}/image\.json',image['path']),'Exact independently hashed safe Objects image projection required');pin({k:image[k]for k in('bytes','sha256')})
     required={OBJECT+'/checkpoints/'+n+'.ckpt'for n in CKPTS}|{OBJECT+'/checkpoints/'+n+'.yaml'for n in YAMLS}|{OBJECT+'/LICENSE',*(WEIGHTS+'/torch_home/hub/checkpoints/'+n for n in REG4)}
     for name,row in runtime['model_files'].items():safe(name);pin(row)
     require(required<=set(runtime['model_files'])and all(n in required or re.fullmatch(re.escape(MOGE)+r'/blobs/[0-9a-f]{40,64}',n)or re.fullmatch(re.escape(HF)+r'/blobs/[0-9a-f]{2}/[0-9a-f]{40,64}',n)for n in runtime['model_files']),'Exact Objects/DINO/MoGe1 model allowlist required')
@@ -149,7 +149,7 @@ def runtime_proof(root,pins,host=True):
     runtime=pins['runtime'];image=None
     if host:
         image=bound_json(root/runtime['image_receipt']['path'],{k:runtime['image_receipt'][k]for k in('bytes','sha256')})
-        require(image.get('Id')==IMAGE and image.get('Architecture')=='amd64'and image.get('Os')=='linux'and image.get('RootFS',{}).get('Type')=='layers','Original exact Objects runtime image receipt required')
+        require(type(image)is dict and set(image)=={'Id','Architecture','Os','RootFS'}and image['Id']==IMAGE and image['Architecture']=='amd64'and image['Os']=='linux'and type(image['RootFS'])is dict and set(image['RootFS'])=={'Type','Layers'}and image['RootFS']['Type']=='layers'and type(image['RootFS']['Layers'])is list and image['RootFS']['Layers']and all(type(n)is str and re.fullmatch('sha256:[0-9a-f]{64}',n)for n in image['RootFS']['Layers']),'Exact safe immutable Objects image projection required; no raw configuration')
     for group in('model_files','source_files','acquisition_receipts'):
         for name,row in runtime[group].items():require(identity(root/name,empty=group=='source_files')==row,'Independently pinned runtime asset/source differs')
     links=runtime['moge_links'];seen=set()

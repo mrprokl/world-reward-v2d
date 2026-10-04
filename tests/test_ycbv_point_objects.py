@@ -70,7 +70,7 @@ def pin_fixture():
     models.update({gate.OBJECT+'/checkpoints/'+n+'.yaml':dict(bytes=z,sha256=h)for n,(z,h)in zip(gate.YAMLS,gate.YAML_PINS)})
     models.update({gate.OBJECT+'/LICENSE':gate.SOURCE_LICENSE_PIN,**{gate.WEIGHTS+'/torch_home/hub/checkpoints/'+n:pin for n in gate.REG4},gate.MOGE+'/blobs/'+'d'*64:dict(bytes=1256823446,sha256='da96b09a0485a3c45a5aa455e67743c8b4efc4dd8437c1f2aa93c2b4303d957f'),gate.MOGE+'/blobs/'+'e'*40:pin})
     return dict(schema='world_reward.ycbv_point_objects.pins.v1',inputs=dict(manifest=pin,acquisition_report=producers,mask_report=producers,depth_report=producers,bundles=bundles),
-        runtime=dict(image_receipt=dict(path='results/image-sam3d-runtime.json',**pin),model_files=models,
+        runtime=dict(image_receipt=dict(path='results/ycbv-objects-runtime-'+('b'*40)+'/image.json',**pin),model_files=models,
             source_files={gate.DINO+'/'+n:pin for n in ('hubconf.py','LICENSE','MODEL_CARD.md','dinov2/__init__.py')},
             installed_sources={n:{'__init__.py':pin}for n in gate.MODULES},
             acquisition_receipts={n:pin for n in ('results/weights-acquisition.json','results/auxiliary-assets.json')},
@@ -429,3 +429,9 @@ def test_full_native_grid_K_is_unrounded_normalized_FP32_no_geometry_fill(monkey
     assert actual['points']is points and actual['depth']is depth and actual['mask']is valid
     assert before=={k:hashlib.sha256(v.tobytes()).hexdigest()for k,v in arrays.items()}
     assert mask.shape==(480,640)and rgb.shape==(480,640,3)
+
+
+@pytest.mark.parametrize('path',['results/image-sam3d-runtime.json','results/ycbv-objects-runtime-main/image.json','results/ycbv-objects-runtime-'+('B'*40)+'/image.json','results/ycbv-objects-runtime-'+('b'*40)+'/../image.json','results/ycbv-objects-runtime-'+('b'*40)+'/image.json/extra',True])
+def test_image_receipt_only_safe_measured_projection_namespace(path):
+    pins=pin_fixture();pins['runtime']['image_receipt']['path']=path
+    with pytest.raises(ValueError):gate.validate_pins(pins)
