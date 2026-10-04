@@ -200,3 +200,18 @@ def test_shell_syntax_sanitized_environment_and_actual_source_closure():
     selected=set(azure_job.runtime_bundle_paths(files,'infra/run_dexycb_identity_calibrate.sh'))
     assert {'infra/dexycb_identity_calibrate.py','infra/dexycb_identity_infer.py',
             'src/world_reward/identity_calibration.py','src/world_reward/relational_motion.py'}<=selected
+
+
+def test_isolated_bare_host_bootstrap_finds_math_without_importing_numpy(tmp_path):
+    source=WRAPPER.read_text().split("<<'PYWRAPPER'\n",1)[1].rsplit('\nPYWRAPPER',1)[0]
+    prefix=[]
+    for node in ast.parse(source).body:
+        prefix.append(node)
+        if isinstance(node,ast.Import)and any(alias.name=='dexycb_identity_infer'for alias in node.names):break
+    bootstrap=ast.unparse(ast.Module(body=prefix,type_ignores=[]))
+    check="\nassert 'numpy' not in sys.modules\nassert Path(infer.__file__).resolve() == code/'infra/dexycb_identity_infer.py'\nimport world_reward.prompt_selection\nprint('bare-host-bootstrap-pass')\n"
+    env=dict(PATH='/usr/bin:/bin',HOME=str(tmp_path),WR_CODE=str(REPO),WR_CODE_REVISION='a'*40)
+    result=subprocess.run([sys.executable,'-I','-B','-S','-c',bootstrap+check],env=env,
+                          capture_output=True,text=True,timeout=10,cwd=tmp_path)
+    assert result.returncode==0,result.stderr
+    assert result.stdout=='bare-host-bootstrap-pass\n'

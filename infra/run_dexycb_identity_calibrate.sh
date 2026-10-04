@@ -14,7 +14,7 @@ exec /usr/bin/env -i PATH=/usr/bin:/bin HOME=/nonexistent DOCKER_HOST="unix://$R
 import hashlib,json,os,re,signal,stat,subprocess,sys,time
 from pathlib import Path
 ROOT=Path('/srv/scenesmith/world-reward');code=Path(os.environ['WR_CODE']);rev=os.environ['WR_CODE_REVISION']
-sys.path.insert(0,str(code/'infra'));import dexycb_identity_infer as infer
+sys.path[:0]=[str(code/'infra'),str(code/'src')];import dexycb_identity_infer as infer
 binding=infer.binding;require=binding.require
 ENTRY='run_dexycb_identity_calibrate';IMAGE=infer.IMAGES['masks'];BASE=ROOT/infer.BASE
 FOLDERS={'public_features':'public_features_v1','private_calibration':'private_calibration_v1'}
