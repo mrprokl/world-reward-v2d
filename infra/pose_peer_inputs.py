@@ -174,12 +174,19 @@ def validate_source_pins(value, index, revision, entry, script_sha):
     expected = set(TRACKER_HELPERS) | (set(VOLUME_HELPERS) if value['mesh_source'] == 'volume' else set())
     required_producer = {f'infra/{entry}.sh', *(f'infra/{name}.py' for name in
         ('automatic_masks', 'body_smoke', 'depth_smoke', 'object_smoke', 'scale_smoke'))}
+    if entry == 'run_track1_frontends_queued':
+        # The queue executes these genuine children in its OWN immutable code
+        # namespace; their independent pins must not pretend a child dispatch.
+        required_producer.update(('infra/run_track1_frontends.sh',
+            'infra/run_track1_initializers_only.sh'))
     require(value['mesh_source'] in ('default', 'volume') and set(value['tracker_helpers']) == expected and
         set(value['reports']) == set(reports(index)) and required_producer <= set(value['producer_helpers']) and
         value['producer_helpers'].get(f'infra/{entry}.sh', {}).get('sha256') == script_sha,
         'Exact reader/helpers/reports/mesh branch pins required')
     for rows in (value['producer_helpers'], value['tracker_helpers'], value['reports']):
         for name, row in rows.items(): safe_name(name); pin(row, True)
+    if entry == 'run_track1_frontends_queued':
+        for name in required_producer: pin(value['producer_helpers'][name])
     require(value['volume_pins'] is None if value['mesh_source'] == 'default' else type(value['volume_pins']) is dict, 'Explicit volume pins required for volume branch')
     return value
 

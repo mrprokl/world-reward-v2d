@@ -81,6 +81,71 @@ def test_minimal_whitelist_no_body_or_models(cohort):
         'outputs/episode_000008/object_budget_volume/'+name for name in('report.json','geometry.npz','object_fixed_canonical.glb')}|{'validation/volume_qem_v1/report.json','results/image-volume-qem.json'}
 
 
+def queued_cohort(cohort):
+    """A genuine queued snapshot, not a fabricated initializer child job."""
+    manifest=copy.deepcopy(cohort['manifest']);source=manifest['source_pins'];entry='run_track1_frontends_queued'
+    parent=cohort['producer'].parent;queued=parent.with_name(entry);parent.rename(queued)
+    producer=queued/'code';directory=producer/'infra';directory.chmod(0o755)
+    for name in ('infra/run_track1_frontends_queued.sh','infra/run_track1_frontends.sh'):
+        source['producer_helpers'][name]=put(producer,name,('original queued child '+name).encode())
+        (producer/name).chmod(0o444)
+    directory.chmod(0o555)
+    source['producer_entrypoint']=entry
+    manifest['producer']['entrypoint']=entry
+    manifest['producer']['script_sha256']=source['producer_helpers']['infra/'+entry+'.sh']['sha256']
+    manifest['source_pins_identity']=digest(inputs.digest_json(source))
+    manifest['producer_source_binding']=inputs.code_binding(producer,source['producer_revision'],source['producer_helpers'])
+    return producer,manifest
+
+
+def test_queued_initializers_retain_actual_namespace_and_exact_full_inputs(cohort):
+    original=cohort['manifest'];producer,manifest=queued_cohort(cohort)
+    assert 'run_track1_frontends_queued' in inputs.PRODUCERS
+    assert producer.parent.name=='run_track1_frontends_queued'
+    assert not producer.parent.with_name('run_track1_initializers_only').exists()
+    assert inputs.validate_manifest(manifest,8) is manifest
+    assert inputs.provenance(cohort['root'],8,manifest['source_pins'])==original['clip_spec']
+    assert manifest['files']==original['files'] and manifest['tracker_helpers']==original['tracker_helpers']
+    assert manifest['source_pins']['reports']==original['source_pins']['reports']
+
+
+@pytest.mark.parametrize('name',[
+    'infra/run_track1_frontends_queued.sh','infra/run_track1_frontends.sh',
+    'infra/run_track1_initializers_only.sh'])
+@pytest.mark.parametrize('fault',['missing','empty','wrong_sha'])
+def test_queued_wrapper_and_both_children_require_independent_nonempty_pins(cohort,name,fault):
+    _,manifest=queued_cohort(cohort);source=manifest['source_pins'];producer=manifest['producer']
+    if fault=='missing':del source['producer_helpers'][name]
+    elif fault=='empty':source['producer_helpers'][name]=digest(b'')
+    else:source['producer_helpers'][name]['sha256']='f'*64
+    if fault=='wrong_sha' and name!='infra/run_track1_frontends_queued.sh':
+        # Pin shape alone cannot authenticate content: the original source
+        # binding, used by inventory before report parsing, must reject it.
+        with pytest.raises(ValueError):
+            inputs.code_binding(cohort['root']/'jobs'/producer['revision']/producer['entrypoint']/'code',
+                producer['revision'],source['producer_helpers'])
+    else:
+        with pytest.raises(ValueError):
+            inputs.validate_source_pins(source,8,producer['revision'],producer['entrypoint'],producer['script_sha256'])
+
+
+@pytest.mark.parametrize('fault',['mutated','writable','symlink','hardlink'])
+def test_queued_actual_child_bytes_and_readonly_closure_are_authenticated(cohort,tmp_path,fault):
+    producer,manifest=queued_cohort(cohort);child=producer/'infra/run_track1_initializers_only.sh'
+    if fault=='mutated':child.chmod(0o644);child.write_bytes(b'changed child');child.chmod(0o444)
+    elif fault=='writable':child.chmod(0o644)
+    elif fault=='hardlink':os.link(child,tmp_path/'foreign-child-alias')
+    else:
+        child.parent.chmod(0o755);child.unlink();child.symlink_to('run_track1_frontends.sh');child.parent.chmod(0o555)
+    with pytest.raises(ValueError):
+        inputs.code_binding(producer,manifest['producer']['revision'],manifest['source_pins']['producer_helpers'])
+
+
+def test_direct_initializer_producer_does_not_require_queued_children(cohort):
+    manifest=cohort['manifest'];assert inputs.validate_manifest(manifest,8) is manifest
+    assert 'infra/run_track1_frontends_queued.sh' not in manifest['source_pins']['producer_helpers']
+
+
 @pytest.mark.parametrize('name',['../escape','/absolute','a/../b','a//b','a\\b','./a',''])
 def test_paths_fail_closed(name):
     with pytest.raises(ValueError):inputs.safe_name(name)
