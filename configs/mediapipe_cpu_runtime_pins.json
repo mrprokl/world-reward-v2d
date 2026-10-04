@@ -1,0 +1,9 @@
+{
+  "schema": "world_reward.mediapipe_cpu_runtime_pins.v1",
+  "producer_revision": "e49a5b4f7a41d6fa43c1307b6c71bfe4b645217d",
+  "report": {
+    "bytes": 33358,
+    "sha256": "06ba19e150530c089c02ebdd7b7239e1c9e6870c31c58affd5138ffd280d598a"
+  },
+  "image_id": "sha256:6cff9fd51941ba506c8adea3854a4238a4c06976f3cc7cfb407979552a469c48"
+}

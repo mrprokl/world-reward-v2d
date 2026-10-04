@@ -3,7 +3,7 @@
 **Status: preregistered pilot, 2026-10-04. Not adopted.**
 Public model/source bytes and offline dependency notices have been acquired and
 qualified. The full-T native adapter and pure private-array evaluator are
-implemented; CPU graph qualification is dispatched but not yet verified.
+implemented; the offline CPU graph qualification is independently verified.
 Fresh subject-03 RGB/opaque labels and actual hand predictions are not acquired.
 It tests automatic 2D observation availability, not identity, tracking, contact,
 shared metric geometry, full HOI, or superiority over CARI4D.

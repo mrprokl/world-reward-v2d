@@ -7422,3 +7422,14 @@ and numeric availability retained. Diagnostic uniquely associates overlapping
 boxes, excludes unverified thumb mapping from17-joint EPE, and reports missing,
 ambiguous and valid/scored denominators. These tests use fixtures/API spies,
 not actual model/media/GT; runtime, useful observations and accuracy unverified.
+
+Offline CPU runtime actual PASS101.550092s undere49a5b4: new child image
+6cff9fd51941ba506c8adea3854a4238a4c06976f3cc7cfb407979552a469c48,
+26 exact isolated dependencies/pip-check, native HandLandmarker create/close
+PASS0.967879s, **zero detect calls/images/GPU/private reads**. Build/copy/child
+qualification99.046815s; owned context/container removed, original base unchanged.
+Independent remote source/receipts/all assets/child projection posthash PASS.
+Report33358B SHA06ba19e150530c089c02ebdd7b7239e1c9e6870c31c58affd5138ffd280d598a;
+runtime pins freeze before fresh RGB acquisition. Package/source integrity and
+native load are not useful-observation accuracy, license eligibility or overlap
+clearance. Fresh subject03 acquisition can now proceed without GPU use.
