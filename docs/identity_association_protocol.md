@@ -34,7 +34,7 @@ d'une abstention scientifique. Un concurrent all-missing/peu soutenu reste class
 automatiquement. `source_ref` référence une preuve, mais ne l'authentifie pas.
 Le module n'apprend rien, n'exécute aucun modèle et ne produit ni scène ni contact.
 
-Manquent : candidats automatiques, coûts d'apparence/points/reprojection,
+Manquent : exécution des candidats automatiques, coûts d'apparence/points/reprojection,
 association à une géométrie canonique, calibration et décision d'abstention.
 Forme, échelle, K et jauge sont hors graph, clip-constants. Indices de mains
 conditionnels, pas attraction universelle ni rigidité main–objet imposée.
@@ -54,12 +54,16 @@ conservées ; aucune proximité ne choisit l'identité. OLS est sensible au fond
 mobile, aux outliers/parallaxe ; une rotation symétrique peut annuler la médiane.
 Les tests exposent ces limites : **189 tests intégrés PASS0.44s**, pas gain vidéo.
 
-L'étape suivante doit produire une même banque automatique complète pour A/B :
+L'orchestrateur à callbacks `automatic_candidate_bank` est implémenté :
 DINO `hand.`/`object.` fixes, propositions SAM2 et queries Boots par grille de
 masque automatique, plus fond hors de l'union de toutes les instances. Pas de
 requête cible privée, point oracle RoboTAP ou sélection top1. Les anciens outputs
 `automatic_masks` ne contiennent que deux entités sélectionnées : cette banque
-n'existe pas déjà et ne peut être fabriquée depuis leurs diagnostics incomplets.
+n'existe pas dans ces artifacts et ne peut être fabriquée depuis leurs diagnostics
+incomplets. Un seul encodeur SAM2 et batch de toutes les boxes ; masques Q=0
+conservés, pas de point inventé/refill. Root215 tests combinés PASS0.20s avec
+callbacks factices. L'exécution réelle sur RGB et le tracking full-T restent
+nécessaires, sans revendication de gain à partir de ces tests.
 
 Choix scientifique proposé : contraste discriminatif de faible dimension appris
 sur sujet02 externe **après gel des features automatiques**, puis modèle/règle

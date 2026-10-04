@@ -19,6 +19,7 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 | Association pose/image | `point_pose_comparison.compare`, `rgb_pose_tracking.track_rgb_pose` | Coût ou suivi image, pas preuve de précision3D. |
 | Identité temporelle | `temporal_identity.IdentityGraph`, `rank_identity_paths` | Ranking global et min-marginales de coûts fournis ; aucun générateur de candidats/costs appris, identité acceptée ou probabilité. |
 | Evidence relationnelle | `relational_motion.relational_motion_features` | Résidus 2D après nuisance affine du fond, comptages/support ; tracks fournis, pas génération/identité/contact/confiance ni caméra physique. |
+| Banque automatique | `automatic_candidate_bank.build_automatic_candidate_bank` | Callbacks DINO/SAM2 : toutes les propositions retenues, un encodeur et batch de masques, queries + fond ; pas encore une exécution de modèles ou une identité acceptée. |
 | Lacunes | `occlusion_bridge.initialize_occluded_gaps` | Initialiseur conditionnel ; pas contact observé ni validation RGB complète. |
 | Baseline complète | `cari_shared_prepare`, `cari_full_forward`, `cari_full_refine`, `cari_full_export` | Adaptateurs natifs séparés, preuve et exécution souvent imbriquées. |
 | Évaluation externe | `point_motion_evaluation`, `point_bop_evaluation`, `ycbv_point_evaluate` | Portée rigide relative ; pas validation HOI globale. |
@@ -71,6 +72,15 @@ des **extensions proposées**, pas des interfaces déjà exécutables.
 acteur/objet sur des observations référencées, sans fabriquer de géométrie.
 Voir `docs/identity_association_protocol.md` pour la portée et la validation
 encore proposée de cette primitive.
+
+`automatic_candidate_bank` réalise désormais l'orchestration frame0 via callbacks
+de modèles : requêtes fixes `hand.`/`object.`, NMS classwise existante (.3/.7),
+tous les candidats retenus sans top1/cap/nearest, un `SAM2.set_image` puis un
+`predict` batch. Queries 4×4 par masque et fond 8×8 hors union de tous les masques,
+sans refill ; les masques vides restent Q=0. Coordonnées originales continues
+`[0,row+.5,col+.5]`, copies readonly ; scores bruts non calibrés. Root215 tests
+combinés PASS0.20s. Ce sont des tests à callbacks factices, pas une exécution GPU,
+une licence/absence d'overlap certifiée ou un gain d'identité/3D.
 
 | Champ | Invariant |
 |---|---|
