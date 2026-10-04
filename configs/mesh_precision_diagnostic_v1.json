@@ -1,0 +1,35 @@
+{
+  "schema": "world-reward-mesh-precision-diagnostic-pins-v1",
+  "episode_index": 9,
+  "diagnostic_image_id": "sha256:a34cdf72b862f97a7177be0b920842d637e812e0fe5b98c56fe940ffd8d67d81",
+  "image_source_id": "sha256:eb389b26358c49778a14303b5875c66d887824011388ce9f8666ed7cc1841ce5",
+  "original_producer_revision": "5355582584396b41e0861e58d9e55758153ca109",
+  "image_evidence_format": "json_image_identity",
+  "files": {
+    "glb": {
+      "path": "outputs/episode_000009/object_grounded/object.glb",
+      "bytes": 4171828,
+      "sha256": "87a36b591f1e76485d808af1e60d6bcbaae94e94bfde272dab2c672c4009e891"
+    },
+    "object_report": {
+      "path": "outputs/episode_000009/object_grounded/report.json",
+      "bytes": 15637,
+      "sha256": "3a05ce239f0489130434564fca6729a00fe297fd62ef548ed338317f3ec8dc41"
+    },
+    "original_producer": {
+      "path": "jobs/5355582584396b41e0861e58d9e55758153ca109/run_track1_frontends/code/infra/object_smoke.py",
+      "bytes": 10994,
+      "sha256": "1e249274153859150130be415203ae7cf4cb77862cba92d056493dbd51337407"
+    },
+    "image_evidence": {
+      "path": "results/image-sam3d-runtime.json",
+      "bytes": 6735,
+      "sha256": "a0a27cdc5a58faa95d95c22b4cca36c24a578d19a0ca8902a90de85c037dbe26"
+    },
+    "failed_report": {
+      "path": "outputs/episode_000009/object_budget_volume/report.json",
+      "bytes": 2848,
+      "sha256": "277049bbb4d13448d40d286d83f94908d441025ad7dc7998fa8c1f9ecb48ffda"
+    }
+  }
+}
