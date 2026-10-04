@@ -6269,3 +6269,21 @@ YCBV source revisions, full-test archive, publisher/embedded MIT evidence,
 first3×96 contiguous RGB filenames and private all-instance retention are fixed
 before any acquisition or inference. No real-data3D/native comparison, GPU job
 or held-out performance claim follows from these control/operator tests.
+
+EP8 archive4d8f607 **actualPASS14.426474s**,1915allowlisted files2,787,209,466B.
+Independent remote rehash verifies report2432B SHA`f549368afe354515f4286e7ee54542db766762f00129ee09c8b6e0a554b61ad9`,
+archive2,788,925,440B SHA`3b5cece4e25f63f568ed65a79ac07280be3710333e9535b4e568036494449136`
+and Azure-only manifest287,649B SHA`868a37e814023b972b1d3c351d55640b74c05fb3d2ab6278cd305ab50f9170c2`.
+Only tiny measured pins enter Git; no arrays/manifest archive enter the laptop.
+No transfer/native pose success inferred. An initial rehash assertion compared
+atime-sensitive full stat values; corrected checks explicitly compare immutable
+inode/mode/size/mtime/ctime/link/ownership fields, not access time. Inputs were
+unchanged and original successful inventory remains authoritative.
+
+Native shared candidate generation and private relative-motion evaluation are
+pure tested operators, root250combined PASS0.59s. The previous greedy seed,
+sampling, ICP defaults, IoU/residual gate and tie ordering match a separate
+literal native reference. CPU evaluation fixes unique95% mask association,
+all valid initial sensor-Z pixels, every frame and three-distinct-scene gates;
+BOP integer-ray convention independently verified from primary source. No
+private labels, model run, candidate quality or3D gain has been evaluated.

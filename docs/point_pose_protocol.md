@@ -29,10 +29,14 @@ raycasts all original triangles at192 fixed pixel centres, selecting the first
 ambiguous supported rays explicitly; it does not repair/clip geometry or infer
 surface correctness. No real-video raycast or model integration has run.
 
+`world_reward.point_candidate_pool` now reproduces the native24+1 generation
+loop as a sequential pure operator. The25th seed is the previous native greedy
+winner, never point/Viterbi feedback. Exact original observation sampling,
+default ICP, image/residual acceptance and tie order are tested independently.
 One shared native24+1 candidate pool must be generated and frozen for both
 branches. Baseline uses current `1-IoU` and Viterbi translation1/rotation0.1;
 candidate adds only the point unary with identical pool/transitions. The helper
-does not yet generate candidates, run Boots or alter the challenge
+has not generated a real-video pool, run Boots or altered the challenge
 pipeline. Its numerical arrays do not certify provenance or metric units.
 
 ## Proposed independent real-data gate
@@ -64,10 +68,21 @@ optimized alignment, not absolute CD, shape or global-scale accuracy.
 
 Accept only median of three mean-error gains≥10%, no scene regression>5%,
 100% trajectory coverage, proper rotations, and report absolute displacement,
-rotation and reacquisition errors. Missing candidates/queries/purity or budget
+rotation errors. Reacquisition lacks a frozen definition and is explicitly
+unsupported; do not invent it after reading validation errors.
+Missing candidates/queries/purity or budget
 failure stops the whole pilot without frame deletion, fallback or retuning.
 Current native `observed<40` fails before candidates: ranking alone cannot
 solve fully hidden EP4. Any common occlusion bridge is a distinct experiment.
+
+The independently tested `world_reward.point_motion_evaluation` CPU operator
+selects the sole95%-pure initial instance before selecting its GT trajectory.
+All initial matched visible sensor-Z pixels contribute, minimum8; BOP uses
+integer pixel coordinates (verified `misc.py` at the frozen format revision).
+Both branches retain every original frame and share one initial frame gauge.
+The three-distinct-sequence gate rejects zero-baseline unidentified gains and
+uses only one float64 ULP on error ratios to avoid threshold cancellation.
+Truth points/poses are not output, and no private evaluation has run.
 
 No acquisition/native comparison has run. Even future PASS would demonstrate
 limited external rigid camera-motion gain, not articulated hand-object contact,
