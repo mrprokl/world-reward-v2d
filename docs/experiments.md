@@ -8652,3 +8652,17 @@ reference rights (InterCap registration/research-use; competition evaluation
 unresolved). ExistingBOP/TUM/Dex research cannot establish fullbodyHOI gain.
 TripoSR volumetric prior notprioritized: marchingcubes doesnot guarantee
 wholeembeddedsolid/cavities or address EP25nativecrash; noacquisition/adoption.
+
+Standalone numerical diagnostic freezes131072genericdyadic±1 terms, two
+separate EPECK processes sequentialversusbalanced, exactforcingandteardown
+phases. SameprimaryCGAL6.0.1archive/headerpins andqualifiedCPUimage; sanitizer
+stack-overflow with repeatedlazy/handleframes plus balancedexactzero required
+for mechanistic support. Productioncause/adoption alwaysfalse; inconclusive
+results retained. Nochallengegeometry, GPU, model, revisedquery or production
+replay. Independent43testsPASS0.53s; threeowned tinyfixtures701nodes removed.
+EP21 originalsource-bound CPUloader205files andofficialpack208files dispatched
+under2b08ce514ace666954ac090458b218ca3b4e71d3, ACKonly; actualPASS awaits
+fullsource/native receipts. Prepare3588b8d223file source-only publication
+verifiedonAzure, no nativeprepare dispatched untilfullsolidposecompletion.
+Rootcombinednumeric/source/preparetransport tests128PASS2.73s,1223exclusive
+fixtureentries removed; qualification/productionbinary/source unchanged.
