@@ -7524,3 +7524,13 @@ race no-replace and owned cleanup. Fetch fixed public commit closure on Azure,
 4workers/90s global, no proxy/auth/redirect/retry/fallback; existing256KB archive
 cap retained. Offline real closure controls36.5–39.1KB/oneRPC vs current staged
 publication5RPC. No actual remote new-mode qualification or speedup measured yet.
+
+Paired hand-mask primitive: root152procedural tests PASS0.15s, same SAM2 encoder
+and box prompts A/B, B adds17 native positive points only when all in-grid/
+available; otherwise explicit A reuse. Raw/clipped/FP32 coordinates, all slots,
+empty observed masks versus unsupported and raw predicted scores preserved.
+No model execution/GT/tracking or identity claim. Next bounded question is mask
+union quality, before introducing tracking/contact/3D. A distinct subject04
+DexYCB cohort lex4/39/74, fullT/camera836212060125, is proposed; no acquisition,
+annotations or accuracy gate evaluated. Same unchanged scan/native settings,
+no tuning Dex03/04. CC-BY-NC4/unknown overlap prevent challenge adoption.

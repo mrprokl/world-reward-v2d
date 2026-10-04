@@ -23,6 +23,7 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 | Mains spécialisées | `hand_observations.HandObservations`, `HandInstances`, `LandmarkEvidence` | Contrat readonly full-T/ragged/21 points, coordonnées et handedness séparés ; pas de modèle exécuté, identité ou visibilité certifiée. |
 | Scan de mains | `hand_scan.scan_hands`, `NativeHandResult`, `HandScanResult` | Callback streaming une fois par frame originale, sorties natives et saturation conservées ; aucun modèle importé, paramètre natif ou précision vérifié par la primitive. |
 | Pilote natif de mains | `infra/mediapipe_hand_scan.py`, `hand_evaluation.evaluate_hand_clip` | Exécution CPU full-T et diagnostic séparé vérifiés sur3 clips externes/216 frames ;171/177 positives associées, EPE conditionnelle17 joints9.65px. Ni identité/contact/3D ni adoption challenge. |
+| Propositions de masques mains | `hand_mask_proposals.propose_hand_masks` | Callback apparié A=box/B=mêmebox+17points, slotsfullT explicites ;152tests procéduraux, pas modèle réel/masque validé/tracking/ID. |
 | Lacunes | `occlusion_bridge.initialize_occluded_gaps` | Initialiseur conditionnel ; pas contact observé ni validation RGB complète. |
 | Baseline complète | `cari_shared_prepare`, `cari_full_forward`, `cari_full_refine`, `cari_full_export` | Adaptateurs natifs séparés, preuve et exécution souvent imbriquées. |
 | Évaluation externe | `point_motion_evaluation`, `point_bop_evaluation`, `ycbv_point_evaluate` | Portée rigide relative ; pas validation HOI globale. |
