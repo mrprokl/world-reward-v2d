@@ -6319,3 +6319,12 @@ point/ray/pool/private-motion/native-selection combined PASS0.63s. Both native
 Viterbi paths retain identical original25-slot pool/validity/transition weights;
 any originally valid nonfront witness stops both, preventing a pruning confound.
 Only the point unary differs. No model run or private3D evaluation yet.
+
+EP8 new senderd729ec4 completed private Azure transport to the unchanged40ee2cb
+receiver: actual receive/extraction **PASS**,1915files2,787,209,466B, all634frames.
+Independent remote rehash verifies the whole archive, sealed full manifest and
+every received original file before freezing receipt1164B SHA
+`43f8272e21726dd57240e548bcf390fb17d83398efd637a874c026eea7419d32`.
+New canonical output parents are UID1000 and absent for pose output; no existing
+files were overwritten or original private parent permissions changed. No
+native pose/quality success inferred; VM02 GPU is idle, native execution next.
