@@ -2,9 +2,10 @@
 # Sourced by immutable CARI wrappers. No Docker, artifact mutation or retries.
 
 wr_parse_cari_arguments() {
-  local mode="$1" episode_seen=0 wait_seen=0 kernel_seen=0 no_wait_seen=0 bundle_seen=0
+  local mode="$1" episode_seen=0 wait_seen=0 kernel_seen=0 no_wait_seen=0 bundle_seen=0 mesh_seen=0
   shift
   WR_EPISODE=15 WR_WAIT_FOR='' WR_KERNEL_ONLY=0 WR_BUNDLE_SOURCE=forward
+  WR_MESH_SOURCE=default
   while (( $# )); do
     case "$1" in
       --episode)
@@ -32,6 +33,11 @@ wr_parse_cari_arguments() {
           echo 'Require a single converter-only --bundle-source forward|refined' >&2; return 2
         fi
         WR_BUNDLE_SOURCE="$2"; bundle_seen=1; shift 2 ;;
+      --mesh-source)
+        if [[ "$mode" != prepare ]] || (( mesh_seen || $# < 2 )) || [[ "$2" != default && "$2" != solid ]]; then
+          echo 'Require one prepare-only --mesh-source default|solid' >&2; return 2
+        fi
+        WR_MESH_SOURCE="$2"; mesh_seen=1; shift 2 ;;
       *) echo "Unsupported wrapper argument: $1" >&2; return 2 ;;
     esac
   done
@@ -47,7 +53,7 @@ wr_parse_cari_arguments() {
   # Serial orchestrators validate each producer before invoking its consumer.
   # Explicit report-only mode avoids historical episode15 units, but does NOT
   # bypass report presence or the Python consumer's full provenance validation.
-  if [[ -z "$WR_WAIT_FOR" && "$WR_EPISODE" == 15 && "$WR_KERNEL_ONLY" == 0 && "$no_wait_seen" == 0 ]]; then
+  if [[ -z "$WR_WAIT_FOR" && "$WR_EPISODE" == 15 && "$WR_KERNEL_ONLY" == 0 && "$no_wait_seen" == 0 && "$WR_MESH_SOURCE" == default ]]; then
     case "$mode" in
       prepare) WR_WAIT_FOR=world-reward-object-pose-full.service ;;
       forward) WR_WAIT_FOR=world-reward-cari-prepare-v2.service ;;
@@ -93,7 +99,7 @@ wr_cari_dependency() {
   local mode="$1" stage
   printf -v WR_EPISODE_PADDED '%06d' "$WR_EPISODE"
   case "$mode" in
-    prepare) stage=object_pose_full ;;
+    prepare) if [[ "$WR_MESH_SOURCE" == solid ]]; then stage=object_pose_full_solid; else stage=object_pose_full; fi ;;
     forward) if (( WR_KERNEL_ONLY )); then stage=body_full; else stage=cari_inputs; fi ;;
     converter) if [[ "$WR_BUNDLE_SOURCE" == forward ]]; then stage=cari_forward; else stage=cari_refined; fi ;;
     refine) stage=cari_forward ;;

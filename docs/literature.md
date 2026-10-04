@@ -1387,3 +1387,23 @@ FlexiCubesApache submodule imports Kaolin; customattention/sparseconvolution
 Torch2.5.1cu124 ABI and transitive licences remain unqualified. Do not install
 upstream allflags/renderers/cleanup or call it ready because H100 has memory.
 Defer newstack unless seed validity is independently measured bottleneck.
+
+### October4 — volumetric proposal alternatives, not adopted
+
+Primary audit separates representation from lawful source/runtime and accuracy.
+[TripoSR](https://github.com/VAST-AI-Research/TripoSR/tree/107cefdc244c39106fa830359024f6a2f1c78871)
+code and [weights](https://huggingface.co/stabilityai/TripoSR/tree/5b521936b01fbe1890f6f9baed0254ab6351c04a)
+MIT; torchmcubes MPL2 separate. Native density iso25/grid256 gives a cheap proposed
+whole-shape prior diagnostic, NOT2026 SOTA. Preserve rawarrays before upstream
+implicit Trimeshprocessing; no iso sweep/componentselection/repair.
+[TripoSG](https://github.com/VAST-AI-Research/TripoSG/tree/fc5c40990181e2a756c4e0b1c2f4d6b5202faf8c)
+SDF/code/weights MIT but unconditional diso import uses
+[NCdependency](https://github.com/SarahWeiii/diso/blob/9792ad928ccb09bdec938779651ee03e395758a6/LICENSE);
+nonflash skimage extraction is a separately auditable path, not a ready MITstack.
+[TRELLIS.2](https://github.com/microsoft/TRELLIS.2/tree/75fbf0183001ed9876c8dbb35de6b68552ee08bd)
+O-Voxel intentionallysupports open/nonmanifold surfaces; moderndetail doesnot
+solve ourfullsolidcontract. No modelacquisition, runtimequalification,
+trainingoverlapclearance or experiment/adoption. EP25's actual querySIGSEGV is
+a technicalcertificatefailure, not evidenceagainst its shape or a reason to
+replace it by anothergenerator. Diagnose nativecrash first; externalproposal
+family tests need a distinct frozen cohort and allcomponent/cavity preservation.

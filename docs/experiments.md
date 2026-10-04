@@ -8586,3 +8586,33 @@ was an incomplete manufacturedarchivefixture missing.hpp afterprepareextension,
 not actualGit transport. Completeallsourcefixture correction and originalinline
 256KB cap preservation/GitHubbounded120KBdescriptor control2PASS. Owned17994root
 fixtureentries removed; no source/provenancetrimming toforce inline size.
+
+Independent source-only CGAL crash hypothesis: sequential EPECK volume sum
+certified_solid_query.cpp221-223 grows a lazy expression chain perwholecomponent;
+sign231/to_double234 may recursively force it before PMP243. PrimaryCGAL6.0.1
+Lazy_exact_nt.h46566B SHAa02d707ddf05cdd14126dca87f74181ebad8398c7c7f6a25a18ede49c9739576
+documents recursive exact()/binaryoperandfallback; kernelheader2647B
+SHA98a9963c9460978f735edcb055fa1a511023d3125663721bbc1542bca72638ff.
+This is NOT a proven cause or invalidgeometry verdict. Diagnose phase/stack from
+originalnativecore/kernel metadata first; generic fixedlarge arithmetic controls
+before anychangedbinaryqualification or productionreplay. No blindretry.
+
+Prepare's explicit solid opt-in now released:704tinytestsPASS26.19s/47new.
+Legacy numerical AST/reportliteral unchanged; sealedfullpose/independentproposal
+preflight, allzero-paddingonly/processFalse, exactorientedGLBF32/node-scene
+checks/allEuler-signcounts and same inherited1e-5 camera-space roundtrip bound.
+Nativeupstreamsource13145B SHAb465516cc96a8c5472aec995cff12e32a9d033c7c5157a6a601b96e332e45f4f
+usesprocessFalse andscene transform, not assumedPOSITIONbaking; actualsource
+metadata containsstatdict, ouroriginalbyteSHA retainedseparately. APIagreement
+withmodernv2pins; nativepose/prepareproduction/quality stillnotprovenbytests.
+No sourceclosuretrimming/newtransport; Githubmode alreadyexemptsnontransmitted
+XZ bytesfrominlinecap whileverifyingexactfullsourcebytes/ledger.
+
+Root complete prepare/inert-loader/modern-consumer correctness suite729PASS28.74s;
+13063 exclusive tiny-fixture entries removed. Actual EP21 late shared-consumer and
+officialpack both FAIL before trajectory interpretation: current generator/helper
+closure no longer byte-identical to independently pinned6a9c722 actual export.
+Preserve fail-closed behavior; audit explicit producer-versus-consumer provenance
+separation, never accept mismatched source or rerun numerical export for convenience.
+EP25 original kernel records SIGSEGV near stack pointer; coredumpctl unavailable.
+Cause still unproved, generic arithmetic ASan control precedes any revised query.
