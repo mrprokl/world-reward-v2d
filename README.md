@@ -44,7 +44,7 @@ No final Parquet, submission or verified CARI4D improvement yet.
   native forward passes all9windows (147.76 s), with independently frozen
   full816frame output. Unchanged native refinement passes all301updates (566.10 s),
   with independently sealed original output; directexport now passes all816frames
-  (43.75 s). Original official packing is dispatched, not yet independently sealed. The634-frame
+  (43.75 s). Original official packing now passes (17.43 s), scratch Parquet deleted. The634-frame
   episode has complete initializers. Its first private Azure full-pose run
   stopped before poses on the unchanged topology gate. A separately qualified
   volume proposal and its full634-frame input archive now pass provenance and
@@ -115,7 +115,9 @@ RGB filenames start at1, while the protocol incorrectly required0. No labels or
 predictions were consulted, no native IDs renumbered, under that original closed protocol. Explicit October4 authorization permits
 one corrected same-cohort engineering replay, preserving nativeIDs1..96,
 original failures, cohort, GPU budgets and quality gates. Its full-archive
-acquisition is active on Azure; private labels remain outside prediction inputs.
+acquisition passes (1,507.65 s), all288 RGB/nativeIDs retained and temporary
+archives deleted. Three native MoGe calls pass (9.50 s GPU); automatic masks
+are next. Private labels remain outside prediction inputs.
 See [protocol](docs/point_pose_protocol.md).
 None of these engineering gates is a reconstruction-quality result.
 Earlier extraction-fixture failures were corrected using authenticated historical

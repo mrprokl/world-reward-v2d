@@ -6939,3 +6939,37 @@ originalvolumeQEM/embedding/birth/protectedcavity/officialpack math. Root68PASS
 ReadOnlyCPU4/16GB/3600s+exactownerCIDcleanup, nativeQEM≤900s, nochallenge/GT
 inputs. Originalofficialmesh_budget.py directlyaudited2031B SHA42ab8ab35f37b806fb1465eadd96abe43eaac04575da47a4855d08eefe6167b0;
 singlefilekitclosure complete (onlynumpy/trimesh/fast_simplification).
+
+CorrectedYCBv2actualacquisitionPASS1507.653501s28102B receipt
+SHAc27b09e4aeda8388db4c4b790770b49da9e9787b02eee035903e883a9e4e3323.
+Root original100sourceclosure/modes/markers verify; fullarchive238652members
+SHA/layout/CRC confirmed byproducer,289public/2992private retainedfiles
+independently rehashed; root interprets only publicmanifest/retentionidentities,
+no privatecamera/depth/posesvalues. Originalunit/PID250532/CIDabsent anddisposable
+archivesgone. Public100862BmanifestSHA19d7528e296237dd09ea629608c19e86388123f96201550f124b4fc751f6b2f7
+frozen79b9c64 beforeblindGPU.
+ThreeactualnativeMoGe2 initialcallsPASS9.502261GPU/9.736128s elapsed;90672B
+receiptSHA31eb0ed6465be312d54f800baf0ef96dbf41cb8eb3fa5aefd11d8ab247c64d00,
+original79b9c64producer, all3outputs/fullnativepointmapreprojection. No metric
+accuracy or3Dtrajectorycomparison yet.
+
+InitialYCBautomaticMasks failed0.056583s beforemodels: publicRGBdirectory
+UID1000mode0700 inaccessible toUID0 afterALLcapabilities dropped. No thresholds
+changed; detector/SAM2 attempts/callsall0. Original119sources/report/CID/log
+independently pinned, PID253776/container/cgroupinactive. Exactroot-only
+NOREPLACE archive preserves originalFAIL;1701Btransitionreceipt
+SHAc2769dd656f184fd5ef3e347f4734ffc61db7ef8ae5cf026b8fffcd135540268.
+Separate manufacturedCPUcontrol provescapnoneDACdenial, singleDAC_OVERRIDE
+readonlyreadPASS+writeEROFS, fixturebytes/modesunchanged. AddonlyDACcap on
+readonlyinputs, models/nativeoperator/budgets/cohort unchanged. Root38PASS2.33s;
+one67cea1a technicalmaskaccessreplay follows, no scientificbudget renewal.
+
+EP6actualoriginalCPUofficialpackPASS816full/636scoredframes17.425520s,
+12007BreceiptSHA1b65abfda6975ded4536a1bbc2ddbf4dc2bdfae7fe8cc233a9d94d09cb31a725.
+Rootfull129sourceclosure+all15publicinputs+all4nativeproducers/5exports+original
+kithelpers independently rehashed; originalvendor/inputmodes unchanged,
+scratchParquetremoved, actualunitinactive. Readonly rootseal aborted initially
+onread-inducedatime then oninputoriginalmodes, thenunprintedPASSlogassumption;
+correctedspecificstatfields/byteproof/actualreport only, no inference rerun.
+EP8nativeforwardelapsed132.777282s/all7windows; refinement238240c nowcollected
+inactive, actualfullreceiptinventory stillneeded (notinferredPASSfrommissingunit).
