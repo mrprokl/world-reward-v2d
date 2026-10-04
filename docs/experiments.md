@@ -8295,3 +8295,11 @@ and218-source closure independently preserved. Metadata-only canonical empty
 EP25 parent createduid/gid1000 mode0755;489B receipt
 SHAc52ba44a054c64d4790ab77c79ea8ad6f28d3f8eea48cd1960343e3955d9e01d.
 No input/algorithm/model/source bytes changed and no native replay yet.
+
+Separate chartv2/cohort prepared and independently audited: frozen four new
+harmonic radial sources2358V4704F /2724V5432F, each zero/Sterbenz variant;
+all whole-source Python inverse checks PASS. Source-only exact Sterbenz choice,
+no origin retry; generated cached backend exposes new chart/build hashes and
+preserves cached collapse/mapping/main body bytes. Root90mixedtestsPASS1.03s
+and52chart/cohorttestsPASS0.16s, exact ownedfixtures520+520+14removed.
+No C++ compilation/QEM/CGAL/qualification or geometry/HOI gain claimed.

@@ -39,3 +39,23 @@ otherwise origin zero, followed by dyadic `ldexp`. Chart selection must precede
 QEM and cannot retry origins according to observed performance. Complete-source
 range and inverse-exactness remain mandatory. This is a conditioning hypothesis,
 not a guarantee of QEM quality, metric identifiability or HOI accuracy.
+
+## Separate v2 hypothesis: prepared only
+
+`mesh_conditioning_v2.py` and the source-bound native header implement the
+predeclared per-axis sufficient Sterbenz predicate, otherwise exactly zero.
+After the single source-only choice, all rows must pass inverse and range checks;
+a failed verification never triggers another origin. The generator derives the
+cached backend from its authenticated unchanged backbone, replacing only the
+chart and exposing all new build identities. No v1 executable is relabeled v2.
+
+Four new harmonic radial surfaces (not the rejected v1 sources) are frozen in
+`oriented_solid_controls_v2.py` and `configs/solid_chart_v2_manifest.json` before
+compilation/QEM: two cavities and a cavity/island/independent oblique root, each
+with origin-zero and Sterbenz-favorable variants. Counts are 2358V/4704F and
+2724V/5432F. All four pure source roundtrips pass; original fingerprints and
+procedural expectations are fixed, with no native certificate or adoption.
+
+Build-only, native chart parity, complete F64/F32 embedding, simplification,
+serialization, full forest fidelity and metric grounding remain distinct gates.
+A mocked test or source-derived build-info string does not pass any native gate.
