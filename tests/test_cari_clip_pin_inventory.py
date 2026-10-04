@@ -289,12 +289,12 @@ def test_stdlib_report_only_imports_host_compatibility_and_wrapper():
 def test_actual_immutable_runtime_archive_includes_explicit_entrypoint_and_helper_closure(gate):
     import azure_job
     files={str(path.relative_to(ROOT)):path.read_bytes() for name in ("infra","src","configs")
-        for path in (ROOT/name).rglob("*") if path.is_file() and "__pycache__" not in path.parts
-        and path.suffix in (".py",".sh",".json",".toml")}
+        for path in (ROOT/name).rglob("*") if path.is_file() and "__pycache__" not in path.parts}
     files["pyproject.toml"]=(ROOT/"pyproject.toml").read_bytes()
     selected=azure_job.runtime_bundle_paths(files,"infra/run_cari_clip_pin_inventory.sh")
     assert {"infra/cari_clip_pin_inventory.py","infra/run_cari_clip_pin_inventory.sh",
-        "infra/cari_clip_inputs.py","infra/cari96_inputs.py","infra/cari_prepare.py"}<=set(selected)
+        "infra/cari_clip_inputs.py","infra/cari96_inputs.py","infra/cari_prepare.py",
+        "infra/mesh_conditioned_chart_v2.hpp","infra/Dockerfile.volume_qem"}<=set(selected)
 
 
 def separate_producer_fixture(gate,tmp_path):

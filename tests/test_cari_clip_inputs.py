@@ -220,7 +220,7 @@ def test_public_path_enumerator_rejects_nonfixed_sources(gate, value):
     with pytest.raises(ValueError): gate.source_paths(gate.PublicClipSpec(9, 96, "front", 2, 4), object_source=value)
 
 
-@pytest.mark.parametrize("wrapper", ["run_cari_shared_prepare.sh", "run_cari_full_forward.sh", "run_cari_full_refine.sh", "run_cari_full_export.sh"])
+@pytest.mark.parametrize("wrapper", ["run_cari_shared_prepare.sh", "run_cari_full_forward.sh", "run_cari_full_refine.sh", "run_cari_full_export.sh", "run_cari_shared_episode_gate.sh", "run_official_track1_pack_gate.sh"])
 @pytest.mark.parametrize("profile", ["default", "solid"])
 def test_actual_wrapper_enumerator_remains_stdlib_only_and_selects_exact_fifteen(gate, tmp_path, wrapper, profile):
     spec = gate.PublicClipSpec(9, 96, "front", 2, 4)

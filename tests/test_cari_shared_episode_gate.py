@@ -128,7 +128,7 @@ def test_actual_wrapper_no_gpu_model_exec_or_broad_data_mount():
     wrapper=ROOT/"infra/run_cari_shared_episode_gate.sh";subprocess.run(["bash","-n",str(wrapper)],check=True)
     text=wrapper.read_text()
     assert "--gpus" not in text and "--network none --memory 4g --cpus 2" in text and "303s docker run" in text
-    assert "source_paths(spec)" in text and "prepare forward refined export" in text
+    assert "source_paths(spec,object_source=source_profile(pins))" in text and "prepare forward refined export" in text
     assert "src=$ROOT/data" not in text and "src=$ROOT/outputs,dst=$ROOT/outputs" not in text
     assert "--mount \"type=bind,src=$OUT,dst=$OUT\"" in text
     assert "sam3d_body/checkpoints/sam-3d-body-dinov3" in text and "weights/mhr/mhr_model.pt" in text

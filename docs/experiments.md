@@ -8577,3 +8577,12 @@ and oldindependentf6a4fd1/196file readonlyreader rehashedbeforeafter. All5sealed
 exportfiles and original full-N replay/reference/scalar checks validated twice;
 actualtinypins992B SHA1badd19e6d816b9ca0cce459ef91a9c7000820f06574a82773b53169818ac3c3
 frozen locally. No officialpack/quality fromnativeexport alone.
+
+Two actual lateconsumer mount enumerators (shared-episode and officialpack) also
+require the same bounded sourceprofile; only their source15 enumeration changes,
+no officialalgorithm/schema/geometrychange. Consumer319PASS3.61s; actualsixwrapper
+PYPATHS stdlib default/solid controlsPASS. Rootmodern suite1041PASS2skips1FAIL63.11s
+was an incomplete manufacturedarchivefixture missing.hpp afterprepareextension,
+not actualGit transport. Completeallsourcefixture correction and originalinline
+256KB cap preservation/GitHubbounded120KBdescriptor control2PASS. Owned17994root
+fixtureentries removed; no source/provenancetrimming toforce inline size.

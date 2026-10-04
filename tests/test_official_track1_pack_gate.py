@@ -5,6 +5,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import lzma
 from pathlib import Path
 import subprocess
 import sys
@@ -349,6 +350,7 @@ def test_bash_syntax_exact_selected_mounts_no_GPU_originalsample_official_reader
     assert "data/track_1_sample_submission.parquet" in text and "v2dlb/mhr_metrics.py" in text
     assert "src=$ROOT/data" not in text and "src=$ROOT/vendor/v2d_submission_kit,dst=" not in text
     assert "prepare forward refined export" in text and "src=$OUT,dst=$OUT" in text
+    assert "source_paths(spec,object_source=source_profile(pins))" in text
 
 
 def test_host_source_paths_bootstrap_stdlib_only():
@@ -381,8 +383,23 @@ def test_actual_runtime_archive_closure_control_cap():
         for name in selected:
             entry = tarfile.TarInfo(name); entry.size = len(files[name]); entry.mode = 0o444
             archive.addfile(entry, io.BytesIO(files[name]))
-    encoded, _ = launcher.encoded_runtime_archive(stream.getvalue())
-    assert len(encoded) <= launcher.MAX_CODE_CONTROL_BYTES
+    raw = stream.getvalue()
+    compressed = lzma.compress(raw, preset=6)
+    digest = hashlib.sha256(compressed).hexdigest()
+    # Real large source closures use the existing bounded GitHub transport,
+    # not a provenance-trimming waiver of the independent inline payload cap.
+    descriptor = launcher.github_archive_descriptor(raw, "a" * 40, digest)
+    assert {row["path"] for row in descriptor["files"]} == set(selected)
+    assert len(json.dumps(descriptor, separators=(",", ":")).encode()) <= launcher.STAGED_SCRIPT_BYTES
+    commands = launcher.transport_commands("", digest, raw, "a" * 40,
+        "infra/run_official_track1_pack_gate.sh", "official-packer-source-test", ["--episode", "15"], github_source=True)
+    assert len(commands) == 1 and len(commands[0][2].encode()) <= launcher.STAGED_SCRIPT_BYTES
+    if (len(compressed) + 2) // 3 * 4 > launcher.MAX_CODE_CONTROL_BYTES:
+        with pytest.raises(RuntimeError, match="256KB"):
+            launcher.encoded_runtime_archive(raw)
+    else:
+        encoded, observed = launcher.encoded_runtime_archive(raw)
+        assert len(encoded) <= launcher.MAX_CODE_CONTROL_BYTES and observed == digest
 
 
 def test_exact_readonly_bind_mounts_not_filemode_assumption(gate, tmp_path):
