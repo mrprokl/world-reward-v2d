@@ -7607,3 +7607,13 @@ and separately exact155-file6fb9441 auditor closure. All bytes authenticated
 before JSON and posthashed after; no HDF5/GLB/pickle values interpreted or
 prediction replay. Full442 original timeline pinned before shared preparation.
 Fresh-hand source/scan/eval focused regression root156PASS3.38s.
+
+Actual data-free CUDA SAM2 batch ABI PASS12.168175s before fresh RGB: one
+encode/four native calls Abox/Bbox+17points forN1,N2, original BF16/TF32off/
+postprocessingTrue, full640x480 procedural image. Exact126-file dd3d9e8 source
+pre/native/post, actual image fd26863 and selectedmodelleaves rehashed; no
+RGB/private/dataset mounts, noDINO load, owncontainer/CIDremoved/GPUidle PASS.
+Receipt6111B SHA1ab16cbb98400c107046a752c3f12bef9d92f0a83d2255513b7cf21471c5011c,
+results/sam2-hand-batch-gate-87acd00c7a774fd3bc81847bfb09423a/report.json.
+Mask shapesN1[1,480,640],N2[2,1,480,640] confirm untouchednative ABI; noaccuracy.
+Fresh Dex04 CPUscan source2538242 dispatchedACK only; no quality result yet.
