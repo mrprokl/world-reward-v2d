@@ -8404,3 +8404,28 @@ plusgeneratorGC preserveRGB andprovepointmaprelease. Root223combinedtests
 PASS0.94s/40newtests, own1-entryfixture removed. Preliminary216testsPASS0.81s
 cleanup name-shadowing exception corrected read-only/no native rerun. No actual
 learnedexecution, heldoutquality, challengeprediction or HOIgain from extraction.
+
+Chartv2 packaging-only mode replayc8b57be actualPASS18.102984947shost;
+full249436B receipt SHA4bea2a47d6b69324f72103000e0e467c6dd29858727ba3b85a2ecacf292dcd94.
+All4frozenfreshcontrols have actualoneQEMcall andfullsixstages; rootcomplete
+native/query-census/artifact proof stillpending, no production/adoption presumed.
+OriginalpreDockerFAIL untouched. Actualnew210sourcearchive6a2155e4b3bc7a9fc398ace049cd56e29d7243107c4ae469f0870c9d34600893
+andreadonlyledger ed557eed82b75fc2dd41d2ddb195ec7c13a401a8e12969eec5dcbc3c4445ca54
+independentlymatch allactualfiles. Rootone scalar audit accidentally emitted
+episodepose elapsed_seconds aslist; truncatedoutput discarded, corrected
+metadata-onlyscalar output; no prediction/value change/native rerun.
+
+EP21 sharednativeprepare72743a7 actualPASS20.261003685s/all563;
+25664B SHAae3119025595c6e816e3aa6aa4ef517acfeab94b8415408ec1ba81e59966f6e8.
+Separate f6a4fd1 readonly4payloadinventory source196/markers/ledgerPASS;
+891B SHA8f6a25c7a102a406b7055daa6d2525c4ef352d7805c6af822d77a97f0f40f80d
+tinyactualpins byteexactfrozen, no learnedrerun/accuracyclaim. Sourceclosurearchive
+30964a10a35e3d7b4caa37db5635218ac1144ce527cbd80d891a39d07e54825a,
+ledger e85392ae3c57f4f13e1436a97fdbe8c28d6b733b55b5659616d0542de920db9f.
+
+EP22 lock-only frontend replay reachesnativegeometry thenCLOSEDFAIL18:57:32UTC:
+all4globalbudgets boundary/nonmanifold, all4componentwise orientation/Eulerchange.
+66953B log SHA95457187f5256f7b476cb108eeaaea88a7654eb59401dc23e145c31a3430d75a
+and full222sourcepreserved; no fulltrajectory, repair or gate retune. FreshEP29
+allinitializertargets absentchecked19:08UTC; originalfixedall16initializers
+queued underf6a4fd1, ACK/completion stillseparate.
