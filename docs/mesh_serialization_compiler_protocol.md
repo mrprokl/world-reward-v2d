@@ -81,3 +81,18 @@ original shell/net volume, fixed metric bake `.375` exactly once.
 These gates cannot be skipped because scalar predicates or compilation pass.
 Phase2 success would still not establish reconstruction accuracy, licences,
 leaderboard superiority or production adoption without separate evidence.
+
+## Frozen phase2 integration
+
+`mesh_serialization_geometry_protocol_v1.json` defines two fresh procedural
+paired controls: thin ellipsoid cavity and corrugated capsule, both under one
+fixed `2**-16` source scale. Same original source for original/new backends;
+at most4 nativecalls,900s each, compile600s/inclusive5400s on the sameCPU image.
+An explicit10s final tinyreceipt publication grace permits no computation or
+geometry cleanup. Real new-backend collapses required; veto0 is INCONCLUSIVE,
+not grounds for a new fixture. Aggregated vetoes prove a serialization predicate
+was exercised, not specifically a weld collision or causal superiority.
+Only measured comparator failures are retained; technical unavailability stops.
+Phase1's measured temporary binary was removed; source/header/build parity is
+requalified after recompilation, never an invented persistent binary identity.
+No challenge/production geometry, realHOI accuracy or adoption follows.

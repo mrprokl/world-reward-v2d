@@ -17,6 +17,8 @@ ROOT = Path('/srv/scenesmith/world-reward')
 ENTRY = 'run_volume_qem_build'
 PROTOCOL = 'configs/mesh_serialization_compiler_protocol_v1.json'
 REPLAY = 'configs/mesh_serialization_compiler_replay_v1.json'
+PHASE1_PINS = 'configs/mesh_serialization_compiler_phase1_pins.json'
+GEOMETRY_PROTOCOL = 'configs/mesh_serialization_geometry_protocol_v1.json'
 CPP = 'infra/mesh_serialization_qem.cpp'
 HELPERS = (CPP, 'infra/mesh_serialization_compile.py', 'infra/run_volume_qem_build.sh',
            'infra/mesh_volume_qem.cpp', 'infra/mesh_guarded_qem.cpp',
@@ -74,9 +76,10 @@ def protocol(code):
     return value
 
 
-def source(code, revision):
+def source(code, revision, *, historical=False):
     require(re.fullmatch('[0-9a-f]{40}', revision) and code == ROOT / 'jobs' / revision / ENTRY / 'code'
-            and code.resolve() == code and Path(__file__) == code / HELPERS[1], 'Exact dispatched source required')
+            and code.resolve() == code and (historical or Path(__file__) == code / HELPERS[1]),
+            'Exact dispatched source required')
     rows = {}
     for path in (code, *sorted(code.rglob('*'))):
         require(path.resolve() == path and not path.is_symlink() and not path.lstat().st_mode & 0o222,
@@ -133,6 +136,54 @@ def technical_replay(code):
     return dict(pins_identity=identity(code / REPLAY), original_revision=rev,
                 original_host=value['original_host_report'], original_native=value['original_native_report'],
                 original_source_files_sha256=value['original_source_files_sha256'], original_failure_preserved=True)
+
+
+def phase1_qualification(code):
+    """Bind the complete actual earlier PASS, not today's consumer source."""
+    pins = strict((code / PHASE1_PINS).read_bytes()); revision = pins['producer_revision']
+    require(pins['schema'] == 'world_reward.mesh_serialization_compiler_phase1_pins.v1'
+            and re.fullmatch('[0-9a-f]{40}', revision)
+            and identity(code / CPP) == pins['source_cpp']
+            and identity(code / PROTOCOL) == pins['protocol']
+            and pins['simplification_validated'] is False and pins['binary_retained'] is False,
+            'Actual phase1 pins and unchanged source/policy required')
+    old = ROOT / 'jobs' / revision / ENTRY / 'code'
+    require((old.parent/'source-sha256').read_bytes() == (pins['source_archive_sha256']+'\n').encode(),
+            'Exact earlier source archive required')
+    # Hash old source as inert bytes; never execute an unauthenticated old module.
+    bound = source(old, revision, historical=True)
+    require(bound['source_files'] == pins['source_files']
+            and bound['source_files_sha256'] == pins['source_files_sha256'], 'Complete earlier source closure differs')
+    out = ROOT / 'results' / ('mesh-serialization-compiler-'+revision)
+    for name, pin in [('report.json', 'host_report'), ('native.json', 'native_report')]:
+        require(identity(out/name) == pins[pin], 'Independent earlier actual PASS receipt differs')
+    host = strict((out/'report.json').read_bytes()); native = strict((out/'native.json').read_bytes())
+    require(host['status'] == native['status'] == 'pass' and host['source_binding'] == native['source_binding'] == bound
+            and host['native_identity'] == pins['native_report']
+            and host['owned_container_removed'] is True and host['source_rehashed_after'] is True
+            and native['originals_rehashed_after'] is True and native['owned_scratch_removed'] is True
+            and native['original_runtime'] == pins['original_runtime']
+            and native['build']['binary'] == pins['measured_temporary_binary']
+            and native['parity']['cases'] == native['orientation_parity']['cases'] == 128
+            and native['parity']['mismatches'] == native['orientation_parity']['mismatches'] == 0
+            and native['controls']['committed_collapses'] == 0
+            and native['controls']['key_rounding_cases'] == 7
+            and host['authorized_technical_replay'] == technical_replay(old), 'Complete earlier scope required')
+    return dict(pins_identity=identity(code / PHASE1_PINS), source_binding=bound,
+                host_report=pins['host_report'], native_report=pins['native_report'],
+                binary_continuity_claim=False, simplification_previously_validated=False)
+
+
+def geometry_protocol(code):
+    config = strict((code / GEOMETRY_PROTOCOL).read_bytes())
+    require(config['schema'] == 'world_reward.mesh_serialization_geometry_protocol.v1'
+            and config['native_calls_maximum'] == 4 and config['native_seconds_per_call'] == 900
+            and config['compile_seconds'] == 600 and config['inclusive_total_seconds'] == 5400
+            and config['cpu_count'] == 4 and config['memory_gib'] == 16
+            and config['receipt_publication_grace_seconds'] == 10
+            and config['fixed_source_scale'] == '2**-16' and config['metric_bake_scale'] == .375
+            and config['claims']['adoption'] is False, 'Exact separately frozen geometry controls required')
+    return config
 
 
 def original(code, config):
@@ -355,10 +406,10 @@ def controls(binary, scratch, remaining):
                 identity_native_calls=1, committed_collapses=0, geometry_quality_validated=False)
 
 
-def native(code, revision, out):
+def native(code, revision, out, *, geometry_phase=False):
     require(sys.platform == 'linux' and os.geteuid() == 0
             and {p.name for p in Path('/sys/class/net').iterdir()} == {'lo'}, 'Offline restricted LinuxCPU required')
-    sys.path[:0] = [str(code / 'src')]
+    sys.path[:0] = [str(code / 'infra'), str(code / 'src')]
     before = source(code, revision); config = protocol(code); started = time.monotonic()
     deadline = float(os.environ['WR_PHASE1_DEADLINE'])
     def remaining():
@@ -373,6 +424,11 @@ def native(code, revision, out):
     failure = None
     try:
         remaining(); prior = original(code, config); report['original_runtime'] = prior
+        if geometry_phase:
+            geometry_protocol(code)
+            phase1 = strict((code / PHASE1_PINS).read_bytes())
+            require(prior == phase1['original_runtime'] and identity(code / CPP) == phase1['source_cpp']
+                    and identity(code / PROTOCOL) == phase1['protocol'], 'Qualified source/runtime changed before phase2')
         with tempfile.TemporaryDirectory(prefix='serialization-phase1-', dir='/tmp') as tmp:
             scratch = Path(tmp); report['phase'] = 'compile'
             binary, build = compile_binary(code, scratch, config, remaining); report['build'] = build
@@ -382,6 +438,16 @@ def native(code, revision, out):
             require(identity(binary, readonly=False) == build['binary'], 'New compiler binary changed')
             require(report['parity']['policy_sha256'] == config['source_authentication']['position_weld_policy_sha256'],
                     'Audited serialization policy changed')
+            if geometry_phase:
+                from mesh_serialization_geometry import GeometryControlError, geometry_controls
+                report['phase'] = 'geometry_controls'
+                helper = ROOT / 'vendor/v2d_submission_kit/v2dlb/mesh_budget.py'
+                try:
+                    report['geometry'] = geometry_controls(binary, scratch, remaining, official_helper=helper)
+                except GeometryControlError as exc:
+                    report['geometry'] = exc.report
+                    raise
+                require(identity(binary, readonly=False) == build['binary'], 'New binary changed during geometry')
         report.update(status='pass', phase='complete', owned_scratch_removed=True)
     except Exception as exc:
         failure = exc; report.update(error_type=type(exc).__name__, error=str(exc)[-1500:])
@@ -392,20 +458,21 @@ def native(code, revision, out):
             remaining(); report['originals_rehashed_after'] = True
         except Exception as exc:
             failure = failure or exc; report.update(post_error_type=type(exc).__name__)
-        remaining()
         report.update(status='fail' if failure else report['status'], elapsed_seconds=time.monotonic()-started)
         write(out / 'native.json', (json.dumps(report, sort_keys=True, allow_nan=False)+'\n').encode())
-        remaining()
+        # Publication is an explicit separately bounded evidence grace. A
+        # computation timeout must retain FAIL/partial geometry, not drop it.
     if failure:
         raise RuntimeError('Phase1 gate failed; see tiny native receipt')
 
 
-def host(code, revision):
-    started = time.monotonic(); deadline = started + 900
+def host(code, revision, *, geometry_phase=False):
+    started = time.monotonic(); budget = 5400 if geometry_phase else 900; deadline = started + budget
+    publication_deadline = deadline + (10 if geometry_phase else 0)
     require(sys.platform == 'linux' and os.geteuid() == 0 and os.uname().nodename == 'scenesmith-ncc-h100-01',
             'Actual VM01 CPU build driver required')
     before = source(code, revision); config = protocol(code); pins = config['source_authentication']
-    out = ROOT / 'results' / ('mesh-serialization-compiler-' + revision)
+    out = ROOT / 'results' / (('mesh-serialization-geometry-' if geometry_phase else 'mesh-serialization-compiler-') + revision)
     require(out.parent.is_dir() and not out.exists() and not out.is_symlink(), 'Fresh result namespace required')
     out.mkdir(mode=0o700); out.chmod(0o700)
     image = pins['original_image_id']; name = 'world-reward-serialization-' + revision[:12]
@@ -417,7 +484,8 @@ def host(code, revision):
                   protocol_identity=identity(code / PROTOCOL), original_image_id=image,
                   predicate_parity_only=True, simplification_validated=False, geometry_quality_validated=False,
                   production_mesh_used=False, challenge_performance_verified=False, adoption=False,
-                  gpu_used=False, total_budget_seconds=900, compile_budget_seconds=600)
+                  gpu_used=False, total_budget_seconds=budget, compile_budget_seconds=600,
+                  receipt_publication_grace_seconds=10 if geometry_phase else 0)
     failure = None; launched = False
     host_build = ROOT / 'results/image-volume-qem.json'; prior_build = identity(host_build, readonly=False)
     cidfile = out / '.container.cid'
@@ -425,11 +493,17 @@ def host(code, revision):
         raise TimeoutError('Compiler phase1 interrupted; owned cleanup only')
     handlers = {s: signal.signal(s, interrupted) for s in (signal.SIGTERM, signal.SIGINT)}
     try:
-        report['authorized_technical_replay'] = technical_replay(code)
+        if geometry_phase:
+            report['phase1_qualification'] = phase1_qualification(code)
+            geometry_protocol(code); report['geometry_protocol_identity'] = identity(code / GEOMETRY_PROTOCOL)
+        else:
+            report['authorized_technical_replay'] = technical_replay(code)
         require(prior_build == pins['original_build_receipt'], 'Original host build receipt differs')
         require(control(['image', 'inspect', image, '--format', '{{.Id}}']).decode().strip() == image,
                 'Exact existing image required')
         require(not control(['ps', '-aq', '--filter', 'name=^/'+name+'$']).strip(), 'Compiler namespace occupied')
+        helper = ROOT / 'vendor/v2d_submission_kit/v2dlb/mesh_budget.py'
+        extra_mounts = ['--mount', f'type=bind,src={helper},dst={helper},readonly'] if geometry_phase else []
         command = ['docker', 'run', '--rm', '--name', name, '--cidfile', str(cidfile),
                    '--label', 'world_reward.serialization.owner='+revision, '--network', 'none', '--read-only',
                    '--user', '0:0', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges',
@@ -439,11 +513,11 @@ def host(code, revision):
                    '--mount', f'type=bind,src={code},dst={code},readonly',
                    '--mount', f'type=bind,src={code.parent}/revision,dst={code.parent}/revision,readonly',
                    '--mount', f'type=bind,src={code.parent}/source-sha256,dst={code.parent}/source-sha256,readonly',
-                   '--mount', f'type=bind,src={out},dst={out}', '--entrypoint', '/usr/bin/env', image, '-i',
+                   '--mount', f'type=bind,src={out},dst={out}', *extra_mounts, '--entrypoint', '/usr/bin/env', image, '-i',
                    'PATH=/opt/conda/bin:/usr/local/bin:/usr/bin:/bin', 'HOME=/tmp', 'PYTHONDONTWRITEBYTECODE=1',
                    'OMP_NUM_THREADS=1', 'OPENBLAS_NUM_THREADS=1', 'MKL_NUM_THREADS=1', 'CUDA_VISIBLE_DEVICES=-1',
                    'WR_PHASE1_DEADLINE='+str(deadline), '/opt/conda/bin/python', '-I', '-B', str(code / HELPERS[1]),
-                   '--native', str(code), revision, str(out)]
+                   '--native-geometry' if geometry_phase else '--native', str(code), revision, str(out)]
         launched = True
         with (out / '.native.log').open('xb') as stream:
             os.fchmod(stream.fileno(), 0o400)
@@ -464,6 +538,14 @@ def host(code, revision):
                 and all(native_report[k] is False for k in ('simplification_validated', 'geometry_quality_validated',
                     'production_mesh_used', 'challenge_performance_verified', 'gpu_used', 'adoption')),
                 'Complete native phase1 receipt required')
+        if geometry_phase:
+            result = native_report['geometry']
+            require(result['status'] in ('pass', 'inconclusive') and result['sources_rehashed_after'] is True
+                    and result['owned_scratch_removed'] is True and result['adoption'] is False
+                    and len(result['paired_fixtures']) == 2
+                    and all(len(f['comparisons']) == 2 and f['comparisons'][1]['status'] == 'pass'
+                            for f in result['paired_fixtures']), 'Complete paired geometry evidence required')
+            report['geometry_qualification_status'] = result['status']
         report['native_identity'] = identity(out / 'native.json'); report['status'] = 'pass'
     except Exception as exc:
         failure = exc; report.update(error_type=type(exc).__name__, error=str(exc)[-500:])
@@ -485,7 +567,10 @@ def host(code, revision):
             require(source(code, revision) == before and identity(host_build, readonly=False) == prior_build
                     and control(['image', 'inspect', image, '--format', '{{.Id}}']).decode().strip() == image,
                     'Original source/build/image changed')
-            require(technical_replay(code) == report['authorized_technical_replay'], 'Original failure replay proof changed')
+            if geometry_phase:
+                require(phase1_qualification(code) == report['phase1_qualification'], 'Original phase1 proof changed')
+            else:
+                require(technical_replay(code) == report['authorized_technical_replay'], 'Original failure replay proof changed')
             report.update(source_rehashed_after=True, original_build_rehashed_after=True, owned_container_removed=True)
             require(time.monotonic() < deadline, 'Inclusive phase1 cleanup budget exhausted')
         except Exception as exc:
@@ -495,7 +580,7 @@ def host(code, revision):
             (out / '.native.log').unlink()
         report.update(status='fail' if failure else report['status'], elapsed_seconds=time.monotonic()-started)
         write(out / 'report.json', (json.dumps(report, sort_keys=True, allow_nan=False)+'\n').encode())
-        require(time.monotonic() < deadline, 'Inclusive final receipt publication deadline exceeded')
+        require(time.monotonic() < publication_deadline, 'Bounded final receipt publication deadline exceeded')
         for s, handler in handlers.items():
             signal.signal(s, handler)
     require(failure is None, 'Compiler phase1 failed; inspect original tiny receipts')
@@ -505,9 +590,11 @@ def host(code, revision):
 
 def main(argv=None):
     args = sys.argv[1:] if argv is None else argv
-    if args and args[0] == '--native':
+    if args and args[0] in ('--native', '--native-geometry'):
         require(len(args) == 4, 'Exact internal native arguments required')
-        return native(Path(args[1]), args[2], Path(args[3]))
+        return native(Path(args[1]), args[2], Path(args[3]), geometry_phase=args[0] == '--native-geometry')
+    if args == ['--geometry']:
+        return host(Path(os.environ['WR_CODE']), os.environ['WR_CODE_REVISION'], geometry_phase=True)
     require(not args, 'No arbitrary compiler arguments')
     return host(Path(os.environ['WR_CODE']), os.environ['WR_CODE_REVISION'])
 

@@ -7861,3 +7861,21 @@ One user-authorized technical replay preregistered: explicitexec only on owned
 scratchtmpfs, sameCPP/protocol/control/budgets; originalfailure remainsFAIL.
 No predicate/QEM/quality PASS implied. EP19 closes originaltopologybudgetFAIL
 15:04:03UTC, all8whole/component candidates rejected, no tuning or repair.
+
+Compilerphase1 one unchanged technicalreplay actualPASS22.654526s inclusive,
+native21.804653s/compile15.489584s underf22a075:128source scalarcases
+(124F32active/4reject)+128exactnormaldotcases+7ties-even keys, no disagreement,
+4invalidrejects and1unchangedlevel1sphereidentity. ZeroQEMcollapses; not a
+simplification or fidelity qualification. Independent full155files/archive,
+earlieractualFAIL/unchangedCPP/protocol/14322Boost+1418headers/binaries/source/
+cleanup revalidationPASS. Host2752B SHA075c853c8c940b5e9c1de690c54da7b045a9ac9f7dafa7903c85f7ffda4babeb;
+native5336B SHA2e0ced0a7810a08d1f388eb211330a0d5da348cf3727ca4872c30661292d0bb8.
+Temporary668688B binarySHA42bac47cfc6309b7c49e20251c38c8b7fd665070276fb5e3e886ea9720c8d4b4
+removed perprotocol, no future binaryidentity assumed. Phase1pins frozen before
+fresh pairedprocedural geometryphase2; no production/challenge input/adoption.
+EP20 unchanged ea26eda frontend dispatchedACK, automaticmasks underway.
+
+Integrated localtinyfullsuite frozen404855a:13382PASS8optionalSKIP496.69s.
+Entireownedtemporarytestroot removed (readonlyfixture dirs/internal-onlyhardlinks
+audited first); no media/model/dataset acquisition. Postreplay/geometry adapter
+neighbors72PASS1optionalSKIP0.81s, not nativeQEM or scientificquality evidence.

@@ -2,9 +2,10 @@
 set -euo pipefail
 # Explicit separate source-bound predicate compiler; historical build unchanged.
 if [[ "${1:-}" == --serialization ]]; then
-  (( $# == 1 )) || exit 2
+  [[ $# == 1 || $# == 2 && "$2" == --geometry ]] || exit 2
   export DOCKER_HOST="unix://${WR_ROOT:?}/docker.sock"
-  exec python3 -I -B "${WR_CODE:?}/infra/mesh_serialization_compile.py"
+  shift
+  exec python3 -I -B "${WR_CODE:?}/infra/mesh_serialization_compile.py" "$@"
 fi
 ROOT="${WR_ROOT:-/srv/scenesmith/world-reward}"
 CODE="${WR_CODE:?Require immutable committed source}"

@@ -1,0 +1,24 @@
+{
+  "schema": "world_reward.mesh_serialization_compiler_phase1_pins.v1",
+  "producer_revision": "f22a075fdee9671fef3d8b4fe08ed8979e94341c",
+  "source_files": 155,
+  "source_files_sha256": "773d0c731517c0444b7b1bd1f9c2245c886b6c5dcb6e8399bf2789f6d61ed5fd",
+  "source_archive_sha256": "7799bdef34c2b7763b264c78868f41303a4a71fe774acdaf2f65367d4cf19a7c",
+  "host_report": {"bytes": 2752, "sha256": "075c853c8c940b5e9c1de690c54da7b045a9ac9f7dafa7903c85f7ffda4babeb"},
+  "native_report": {"bytes": 5336, "sha256": "2e0ced0a7810a08d1f388eb211330a0d5da348cf3727ca4872c30661292d0bb8"},
+  "source_cpp": {"bytes": 19537, "sha256": "103781b0d952a9dee94f6ae00be4b20fb08fc03039cab9d3256ba86d05156c5e"},
+  "protocol": {"bytes": 5255, "sha256": "a23e422d1efc6e1b5e49dbf553284802315bf2b69424a4bc4a2a43ae5e0f95ac"},
+  "measured_temporary_binary": {"bytes": 668688, "sha256": "42bac47cfc6309b7c49e20251c38c8b7fd665070276fb5e3e886ea9720c8d4b4"},
+  "original_runtime": {
+    "base_build": {"bytes": 3083, "sha256": "29d219e6d43ce8d60833ec95d3b1dfb572d6d6ba4d7aef3de8a4e7ecdd18cc9e"},
+    "boost_files": 14322,
+    "boost_inventory_sha256": "046b6c5f2e204591ad563ea14163ddc240aeaa5aebebc2f092c55637b4a63961",
+    "inherited_inventory_sha256": "902a24a7e68592c9d56a679c71912853ce9874794073ea7d65b5d459fdde0a8b",
+    "original_binary": {"bytes": 574656, "sha256": "eb606febe824f8f0a308e1d78c7677b2ecddc6ffdd0cdfc8f9a3a04fcd8055e7"},
+    "original_build": {"bytes": 2421, "sha256": "c87c5c0e61be5863b764b80ca636a57bf3c59fe58f1acd84f16a1a406ebb7913"}
+  },
+  "predicate_parity_only": true,
+  "simplification_validated": false,
+  "adoption": false,
+  "binary_retained": false
+}

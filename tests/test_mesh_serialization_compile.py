@@ -22,7 +22,7 @@ def test_literal_remote_socket_precedes_optin_exec():
     text = (INFRA / 'run_volume_qem_build.sh').read_text()
     branch = text.split('if [[ "${1:-}" == --serialization ]]; then')[1].split('\nfi')[0]
     assert branch.index('export DOCKER_HOST="unix://${WR_ROOT:?}/docker.sock"') < branch.index('exec python3')
-    assert '(( $# == 1 )) || exit 2' in branch
+    assert '[[ $# == 1 || $# == 2 && "$2" == --geometry ]] || exit 2' in branch
     assert 'image-volume-qem.json' in text and '660s docker build' in text
 
 
@@ -121,3 +121,24 @@ def test_invalid_metadata_fails(raw):
 def test_no_arbitrary_local_execution():
     with pytest.raises(ValueError, match='No arbitrary'):
         gate.main(['--anything'])
+
+
+def test_geometric_phase_requires_separate_frozen_protocol_and_prior_scope():
+    config = gate.geometry_protocol(INFRA.parent)
+    assert config['native_calls_maximum'] == 4 and config['fixed_source_scale'] == '2**-16'
+    pins = json.loads((INFRA.parent / gate.PHASE1_PINS).read_text())
+    assert pins['source_files'] == 155 and pins['binary_retained'] is False
+    assert pins['predicate_parity_only'] is True and pins['simplification_validated'] is False
+    text = (INFRA / 'mesh_serialization_compile.py').read_text()
+    assert 'source(old, revision, historical=True)' in text
+    assert 'spec.loader.exec_module(previous)' not in text
+    assert "if geometry_phase:" in text and 'phase1_qualification(code)' in text
+    assert "'--native-geometry' if geometry_phase else '--native'" in text
+    assert "'original_runtime']" in text and "binary_continuity_claim=False" in text
+
+
+def test_only_single_official_helper_added_to_geometry_container_not_assets():
+    text = (INFRA / 'mesh_serialization_compile.py').read_text()
+    assert "helper = ROOT / 'vendor/v2d_submission_kit/v2dlb/mesh_budget.py'" in text
+    assert "extra_mounts = ['--mount', f'type=bind,src={helper},dst={helper},readonly'] if geometry_phase else []" in text
+    assert 'src={ROOT},dst={ROOT}' not in text
