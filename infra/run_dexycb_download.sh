@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Azure host CPU only: two original public archives, never labels or GPU models.
+# Source closure: /infra/dexycb_download.py /infra/dexycb_acquire.py
 set -euo pipefail
 [[ $# == 0 ]] || exit 2
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
