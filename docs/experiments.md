@@ -8456,3 +8456,23 @@ macOS; corrected to the actual canonical tempfile ancestor and removed only
 the uniquely owned run directory. No tests/native jobs were rerun for cleanup.
 First fresh actual EP09 proposal is predeclared, one QEM/eight queries/sixstages;
 no production geometry, downstream pose or HOI success inferred from tinytests.
+
+EP29 originalfull419initializers actualPASS19:18:00UTC: masks78.030448s,
+body141.856717s, depth235.014763s, nativeadapter8.189784s; original222closure
+and source independent audit retained. EP21 full563 originalnativeforward
+actualPASS122.410949s/19:20:07UTC, report68917B
+SHA79f131d8c3eda817043bd8b16c466ad61ab74a0ed184b8c3e8ba607b4d9d46b6,
+bundle430745916B SHA8d254951ee6dc258af1369a155c743219387dfa2e141d318847c91530c0651b6.
+Readonly inventory under previously independently audited f6a4fd1 validates
+actual complete source-bound sixwindow forward and both sealedpayloads twice;
+tinyforwardpins frozen onlyafteractual completion, not quality/adoption.
+
+First EP09 production56ed6fa is preserved FAIL63.105365s: host256547B
+SHAea0f8499f445d2487fb58122c4a08b5d4cdcb9ee140f7655a2d9fa47a88348f7.
+Actual compiler reports complete sixstagePASS/oneQEM, but the nativewrapper
+raisesValueError aftercompilation; no accepted/published mesh, no pins/adoption.
+Ownedcontainer/scratch removed and214fullsource/archive/readonlyledger match.
+Readonlyreceipt diagnosis pending; do not equate innercompilerPASS to production.
+Root223 loader/geometry/producer testsPASS1.40s; first test command named a
+nonexistent file and ranzero, corrected invocation separate. Test-created
+containedaliases/hardlinks independently proved and2986ownedentries removed.
