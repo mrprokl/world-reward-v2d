@@ -47,6 +47,11 @@
   "late_birth_recovery": false,
   "state_fusion": false,
   "frame_conversion": "exact_original_JPEG_byte_copy_to_numeric_position_names_no_recompression",
+  "video_storage": {
+    "offload_video_to_cpu": true,
+    "offload_state_to_cpu": false,
+    "async_loading_frames": false
+  },
   "budgets_seconds": {
     "data_free_native_API_gate": 90,
     "cpu_scan": 600,

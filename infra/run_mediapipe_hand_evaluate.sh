@@ -3,9 +3,10 @@
 # Source closure: /src/world_reward/hand_evaluation.py /src/world_reward/hand_observations.py
 # Source closure: /infra/hand_mask_infer.py /src/world_reward/hand_mask_evaluation.py /src/world_reward/hand_mask_proposals.py
 # Source closure: /src/world_reward/automatic_candidate_bank.py
+# Source closure: /src/world_reward/hand_temporal_masks.py
 set +x
 set -euo pipefail
-[[ $# == 0 ]] || { [[ $# == 2 && "$1" == --mask-cohort && "$2" == v2 ]] || exit 2; }
+[[ $# == 0 ]] || { [[ $# == 2 && "$1" == --mask-cohort && "$2" == v2 ]] || [[ $# == 2 && "$1" == --mask-cohort && "$2" == v3 ]] || exit 2; }
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_mediapipe_hand_evaluate/code" \

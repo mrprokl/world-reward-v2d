@@ -7745,3 +7745,20 @@ SHA67d8e14d752290084e9c2290aa90281fb451ce4b4e55329a58f868d2895d3802.
 Reference residual mean-max0.000816255mm and producer native-schema receipt
 verified, not independent trajectory decoding or accuracy. Pins frozen before
 original official packing; no final Parquet or CARI4D comparison.
+
+Dex05 fresh acquisition actualPASS382.418888s (download218.586475s, full gzip/
+selection163.832412s), subject05 lexical4/39/74 full74/74/72=220frames retained
+26,872,806B only onAzure. Full gzipCRC/175149members/13724334080decompressed
+bytes checked; disposable13GB archive removed. Exact146-file producing source
+9073159/protocol/fullRGB and opaque private byte inventory independently frozen
+before scan, no annotation values decoded. Report67888B
+SHAd65a8c8addcdadec9c750a4f3adbaed0f63791142140f62d536f17bf267b9cb4,
+manifest65522B SHA79425dced9df61da98c5360cc1deabf7680f886a7f21919b20b75f675d5999a2.
+
+Temporal availability v3 reuses the existing scan/inference/private-evaluation
+operators, with a lossless true temporal record (not fake point interventions).
+Native video storage explicitly matches the data-free qualified API; stateT/grid
+validated before seeding. Entire2T masks and anchor provenance prevalidated before
+any segmentation values. Root321integratedPASS5.37s; originalv1/v2 contracts/math
+retained. EP14export/consumer neighbors373PASS2.97s. No private quality result or
+challenge adoption; future scan/mask pins remain absent until actual freeze.

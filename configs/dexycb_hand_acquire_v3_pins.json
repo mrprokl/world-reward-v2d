@@ -1,0 +1,20 @@
+{
+  "schema": "world_reward.dexycb_hand_acquire_pins.v1",
+  "producer_revision": "90731590ce2e7e0cbd06d739be54570a143c845e",
+  "report": {
+    "bytes": 67888,
+    "sha256": "d65a8c8addcdadec9c750a4f3adbaed0f63791142140f62d536f17bf267b9cb4"
+  },
+  "manifest": {
+    "bytes": 65522,
+    "sha256": "79425dced9df61da98c5360cc1deabf7680f886a7f21919b20b75f675d5999a2"
+  },
+  "helper": {
+    "bytes": 16522,
+    "sha256": "ed3a1298305a1c154e71aaeca0d262bfe8507f4588648a1ccca5a093e7a90a55"
+  },
+  "protocol": {
+    "bytes": 1940,
+    "sha256": "158f570b91d7571e820b44b7ff1fae8332a5af4d00861e86fc098d8992feed76"
+  }
+}

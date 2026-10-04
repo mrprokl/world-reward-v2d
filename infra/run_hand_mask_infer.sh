@@ -2,9 +2,10 @@
 # Source closure: /infra/hand_mask_infer.py /infra/mediapipe_hand_scan.py /infra/mediapipe_hand_evaluate.py
 # Source closure: /infra/mediapipe_cpu_runtime_verify.py /infra/dexycb_identity_infer.py /infra/bridge_frontend_bindings.py
 # Source closure: /src/world_reward/hand_mask_proposals.py /src/world_reward/hand_observations.py
+# Source closure: /src/world_reward/hand_temporal_masks.py
 set +x
 set -euo pipefail
-[[ $# == 0 ]] || exit 2
+[[ $# == 0 || ( $# == 2 && "$1" == --temporal-cohort && "$2" == v3 ) ]] || exit 2
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_hand_mask_infer/code" \
@@ -12,4 +13,4 @@ ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
  && "$(hostname)" == world-reward-ncc-h100-02 && "$(id -u)" == 0 ]] || exit 2
 exec /usr/bin/env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME=/nonexistent \
  DOCKER_HOST="unix://$ROOT/docker.sock" WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" \
- /usr/bin/timeout --signal=TERM --kill-after=15s 960s /usr/bin/python3 -I -B "$CODE/infra/hand_mask_infer.py"
+ /usr/bin/timeout --signal=TERM --kill-after=15s 960s /usr/bin/python3 -I -B "$CODE/infra/hand_mask_infer.py" "$@"

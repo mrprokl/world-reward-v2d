@@ -1,6 +1,6 @@
 # Automatic hand availability: IMAGE versus native video memory
 
-**Preregistered; not executed, validated or adopted.** Dex03 and Dex04 remain
+**Preregistered; native API and acquisition qualified, masks not yet evaluated or adopted.** Dex03 and Dex04 remain
 closed. The rejected 17-point ablation is not extended or retuned.
 
 Hypothesis: temporal memory can maintain an automatically seeded hand hypothesis
@@ -27,6 +27,9 @@ later frames. Native logits>0 only; no prompts/points/reseeding/fusion/GT select
 No anchor means explicit full-T abstention. Keep empty masks and all seeded slots.
 Use the qualified installed upstream SAM2, not a new package or unverified
 low-memory wrapper. Numeric JPEG staging copies original bytes, without reencoding.
+Use explicit CPU video storage, GPU state and synchronous loading, matching the
+qualified native API smoke. Check the native state retains the full original
+frame count and 480×640 grid before seeding; no resampling or shortened clip.
 
 ## Gates and scope
 

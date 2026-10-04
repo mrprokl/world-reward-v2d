@@ -402,11 +402,14 @@ def test_mask_pool_weights_every_positive_frame_and_never_drops_inconclusive_or_
 def test_mask_profile_fixed_cli_and_host_remains_scientific_import_free():
     assert gate.source_helpers()==gate.HELPERS and 'src/world_reward/hand_mask_evaluation.py'in gate.source_helpers('v2')
     assert 'configs/dexycb_hand_acquire_pins.json'not in gate.source_helpers('v2')
-    with pytest.raises(ValueError):gate.source_helpers('v3')
+    assert gate.TEMPORAL_MASK_PINS in gate.source_helpers('v3')and 'configs/dexycb_hand_acquire_v3_pins.json'in gate.source_helpers('v3')
+    assert 'configs/mediapipe_hand_scan_v2_pins.json'not in gate.source_helpers('v3')
+    with pytest.raises(ValueError):gate.source_helpers('v4')
     script='import sys;sys.path[:0]=['+repr(str(REPO/'infra'))+','+repr(str(REPO/'src'))+'];import mediapipe_hand_evaluate as e;import hand_mask_infer;e.source_helpers("v2");assert not({"numpy","torch","mediapipe"}&sys.modules.keys())'
     subprocess.run([sys.executable,'-I','-B','-S','-c',script],check=True,capture_output=True)
     shell=(REPO/'infra/run_mediapipe_hand_evaluate.sh').read_text()
     assert '"$1" == --mask-cohort && "$2" == v2'in shell and '"$@"'in shell
+    assert '"$1" == --mask-cohort && "$2" == v3'in shell
 
 
 @pytest.mark.parametrize('fault',['','host_fail','core_omitted','original_source','missing_frame','native_private','call_counts','output_changed','row_count'])

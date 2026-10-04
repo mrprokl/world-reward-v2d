@@ -4,7 +4,8 @@ from dataclasses import FrozenInstanceError, replace
 import numpy as np
 import pytest
 
-from world_reward.hand_mask_evaluation import evaluate_hand_masks
+from world_reward.hand_mask_evaluation import evaluate_hand_masks,evaluate_temporal_hand_masks,validate_temporal_hand_frames
+from world_reward.hand_temporal_masks import TemporalMaskFrame
 from world_reward.hand_mask_proposals import propose_hand_masks
 from world_reward.hand_observations import HandInstances, LandmarkEvidence
 
@@ -139,3 +140,90 @@ def test_contract_failures_cannot_filter_or_reindex_to_improve_metrics(fault):
     elif fault == "reuse_changed":proposals = [replace(p, b_reuses_a=readonly([True]), masks_b=readonly(np.zeros_like(p.masks_b)))]
     else:indices = np.array([], np.int64)
     with pytest.raises(ValueError):evaluate_hand_masks(indices, proposals, segs)
+
+
+def temporal_frame(t,branch,masks,*,usable=None,evidence=None):
+    masks=np.asarray(masks,bool).reshape(-1,4,5);n=len(masks)
+    usable=np.ones(n,bool)if usable is None else np.asarray(usable,bool)
+    boxes=np.tile([1.,1.,3.,3.],(n,1));scores=np.where(usable,.7,np.nan)if branch=='A'else None
+    return TemporalMaskFrame(branch,t,t,tuple(range(n)),readonly(boxes),readonly(boxes.astype(np.float32)),
+        readonly(usable),readonly(masks),readonly(usable),None if scores is None else readonly(scores),
+        evidence or('image_prompt'if branch=='A'else'anchor_prompt'if t==1 else'video_inferred'))
+
+
+def temporal_pairs():
+    return [(temporal_frame(t,'A',[]if t!=1 else[mask((1,1)),mask()],usable=[]if t!=1 else[True,False]),
+        temporal_frame(t,'B',[gt()==255,mask()],usable=[True,False]))for t in range(3)]
+
+
+def test_temporal_different_N_retains_original_anchor_bank_and_all_positive_missing_frames():
+    pairs=temporal_pairs();r=evaluate_temporal_hand_masks(np.arange(3,dtype=np.int64),pairs,[gt()]*3)
+    assert r.proposal_count_a.tolist()==[0,2,0]and r.proposal_count_b.tolist()==[2,2,2]
+    assert r.anchor_position==1 and r.seeded_proposal_ids==(0,)
+    assert r.a.dice==(0.,.4,0.)and r.b.dice==(1.,1.,1.)and r.a.positive_empty_union_frames==2
+    assert r.a.mean_positive_dice==pytest.approx(.4/3)and r.mean_positive_paired_dice_delta==pytest.approx(1-.4/3)
+    assert r.b.unsupported_slot_count.tolist()==[1,1,1]and not hasattr(r,'b_intervention_frames')
+    assert validate_temporal_hand_frames(np.arange(3,dtype=np.int64),pairs)==dict(anchor_position=1,seeded_proposal_ids=(0,))
+    for array in(r.frame_index,r.proposal_count_a,r.proposal_count_b,r.b.predicted_pixels):assert array.flags.owndata and not array.flags.writeable
+
+
+def test_temporal_no_anchor_positive_zero_unlabelled_null_not_negatives_or_fake_ID():
+    pairs=[(temporal_frame(t,'A',[]),temporal_frame(t,'B',[],evidence='no_anchor_abstention'))for t in range(2)]
+    r=evaluate_temporal_hand_masks(np.arange(2,dtype=np.int64),pairs,[gt(),np.zeros((4,5),np.uint8)])
+    assert r.anchor_position is None and r.seeded_proposal_ids==()and r.a.dice==r.b.dice==(0.,None)
+    assert r.a.positive_empty_union_frames==r.b.positive_empty_union_frames==1 and r.unlabelled.tolist()==[False,True]
+    assert not hasattr(r,'accepted_identity')
+
+
+def test_temporal_uses_identical_branch_union_math_to_v2_without_GT_slot_selection():
+    a=[mask((1,1)),mask((1,2), (0,0))];b=[mask((2,1)),mask((2,2), (0,1))];seg=gt();seg[0,1]=21
+    old=run([proposal(0,a,b)],[seg]);pair=(temporal_frame(0,'A',a),temporal_frame(0,'B',b,evidence='anchor_prompt'))
+    new=evaluate_temporal_hand_masks(np.array([0],np.int64),[pair],[seg])
+    for branch in('a','b'):
+        for key,value in vars(getattr(old,branch)).items():
+            actual=getattr(getattr(new,branch),key)
+            assert np.array_equal(actual,value)if isinstance(value,np.ndarray)else actual==value
+    assert old.paired_dice_delta==new.paired_dice_delta
+
+
+@pytest.mark.parametrize('fault',['order','original_id','branch','mutable','slots','dtype','support','raw_nan','native_box',
+    'scores','video_scores','anchor_bank','fixed_bank','evidence','short','extra','extra_seg','bad_seg'])
+def test_temporal_provenance_malformed_records_fail_not_filter_or_reseed(fault):
+    pairs=temporal_pairs();indices=np.arange(3,dtype=np.int64);segments=[gt()]*3;a,b=pairs[0]
+    if fault=='order':a=replace(a,position=1)
+    elif fault=='original_id':a=replace(a,original_frame_id=7)
+    elif fault=='branch':a=replace(a,branch='B')
+    elif fault=='mutable':b=replace(b,masks=b.masks.copy())
+    elif fault=='slots':b=replace(b,proposal_ids=(1,0))
+    elif fault=='dtype':b=replace(b,masks=readonly(b.masks.astype(np.uint8)))
+    elif fault=='support':b=replace(b,supported=readonly([False,False]))
+    elif fault=='raw_nan':boxes=b.raw_boxes.copy();boxes[0,0]=np.nan;b=replace(b,raw_boxes=readonly(boxes))
+    elif fault=='native_box':b=replace(b,native_boxes=readonly(b.native_boxes+1))
+    elif fault=='scores':a=replace(a,raw_scores=None)
+    elif fault=='video_scores':b=replace(b,raw_scores=readonly([.7,np.nan]))
+    elif fault=='anchor_bank':pairs[1]=(temporal_frame(1,'A',[mask()]),pairs[1][1])
+    elif fault=='fixed_bank':pairs[2]=(pairs[2][0],temporal_frame(2,'B',[mask()]))
+    elif fault=='evidence':b=replace(b,evidence='anchor_prompt')
+    elif fault=='short':pairs=pairs[:-1]
+    elif fault=='extra':pairs=pairs+[pairs[-1]]
+    elif fault=='extra_seg':segments=segments+[gt()]
+    elif fault=='bad_seg':segments=[gt().astype(np.int64)]*3
+    pairs[0]=(a,b)
+    with pytest.raises(ValueError):evaluate_temporal_hand_masks(indices,pairs,segments)
+
+
+def test_source_only_temporal_prepass_rejects_crossframe_anchor_change_without_GT_argument():
+    pairs=temporal_pairs();pairs[-1]=(pairs[-1][0],replace(pairs[-1][1],raw_boxes=readonly([[0,0,1,1]]*2),native_boxes=readonly(np.array([[0,0,1,1]]*2,np.float32))))
+    with pytest.raises(ValueError):validate_temporal_hand_frames(np.arange(3,dtype=np.int64),pairs)
+
+
+def test_true_stream_temporal_shapes_reordered_by_original_position_not_physical_matching():
+    from test_hand_temporal_masks import run as stream,H,W
+    _,records,_,_,_,indices=stream(frame_ids=np.arange(4,dtype=np.int64))
+    pairs=[tuple(next(r for r in records if r.position==t and r.branch==arm)for arm in('A','B'))for t in indices]
+    segments=[np.full((H,W),255,np.uint8)for _ in indices]
+    r=evaluate_temporal_hand_masks(indices,pairs,segments)
+    assert r.proposal_count_a.tolist()==[0,3,0,2]and r.proposal_count_b.tolist()==[3]*4
+    assert r.seeded_proposal_ids==(0,2)and r.anchor_position==1
+    assert r.a.dice==(0.,)*4 and all(value>0 for value in r.b.dice)
+    assert r.b.unsupported_slot_count.tolist()==[1]*4 and r.a.positive_empty_union_frames==4
