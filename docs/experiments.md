@@ -7591,3 +7591,13 @@ PASS before export; bundle325309472B SHA142c5e73b39557b6c8db67ac96f64d68ffa4d2e6
 report13937B SHA85a5933dcd0955678526f15a3c44f637cb4f527858c33b10cbc6fd60eb9b28cd.
 Original6fb9441 source/input/prepare/forward/refinement assets rehashed, no learned
 replay or private values. EP16 original frontend actualrunning, not outputPASS.
+
+Fresh Dex04 acquisition actualPASS342.423929s (download180.673375s/fullgzip
+CRC/inventory/extraction161.750554s), source68ba043. Original3lex4/39/74 clips
+72/72/74frames total218, retained27,119,510B; owned12.79GB archive removed.
+Whole174765-member inventory13,668,474,880expandedB, no annotation values parsed.
+Independent source/protocol/publisher/allretainedRGB+opaque private bytes/modes/
+exclusiveinventory/posthash PASS; pins precede unchanged CPU scan. Report67297B
+SHA183d2ce0e68844c2b085e0533eac75e826146140611a2b7b8a0321648521da4b;
+manifest64934B SHA8b8eee48cc78da3be619a64bfdbf5a66a92414f2b5ab90a7b4244a08711f44c0.
+CC-BY-NC4/unknown overlap remain diagnostic-only; no performance claim.
