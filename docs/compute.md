@@ -44,9 +44,8 @@ producer remain unchanged. EP12 original CPU inputs PASS3035.001663s at10:17:31U
 its collected unit is not the proof of success. EP13 queue under `fc10a6e`
 failed at10:17:34UTC after that predecessor was collected, with no child inference.
 Root independently checked all EP13 targets absent before direct replay under
-the unchanged `814179a` source. Actual v2 MainPID1330097 is active; only full Body
-completion and the synchronous GPUfrontend return are established at this snapshot,
-not full CPU inputs/native reconstruction PASS.
+the unchanged `814179a` source. Actual full CPU inputs now PASS/pinned, followed
+by shared preparation; later stage status is in the table, not a live unit claim.
 
 VM02 external identity research : DexYCB original two-subject downloadv2
 PASS224.717368s,24,416,459,511B entirely on the owned Azure data disk. SHA values
@@ -58,6 +57,13 @@ Candidate-bank, full-clip tracker and CPU calibration stages are implemented;
 initial-identity micro-gate is frozen before private labels, not a3D victory.
 D107 independent TUM depth validation is REJECT4.904632756% < frozen5%; the
 four-anchor hand-support pilot is also closed REJECT. Neither is adopted.
+
+Fresh Dex03 hand-only pilot is complete:216 original RGB frames/three72-frame
+clips,9.314269s CPU native scan and3.698009s separate private2D diagnostic.
+All outputs freeze first;171/177 positives uniquely associated,6 misses,
+conditional17-joint EPE9.648746px (2907/3009 valid joints scored). No GPU,
+identity/contact/3D gain, threshold tuning or adoption. Detailed limitations and
+pins stay in experiments; source/task eligibility and overlap remain unresolved.
 
 ## Azure identities and storage
 

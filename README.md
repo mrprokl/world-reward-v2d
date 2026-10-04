@@ -16,14 +16,13 @@ inferred automatically; no hand-labeling of challenge records.
   complete engineering checks, not held-out accuracy; scratch Parquets deleted.
   EP0's legacy conversion failure stays separate. EP4 missing masks, EP7 empty
   anchor, EP9 invalid geometry and EP10/EP11 actor identity failures remain closed.
-  EP11 stops before SAM2/later frontends. EP12 full405 frontend and CPU inputs
-  pass; original fifteen inputs are pinned before native reconstruction. EP0's
+  EP11 stops before SAM2/later frontends. EP0/full790 and EP12/full405 now pass
+  native301-update refinement and direct export; official packing is next. EP0's
   exact historical metadata omission is authenticated, not a relaxed legacy
-  gate or a reversal of its old conversion failure. EP13 queue failed before
-  inference because its terminal predecessor was collected; a separately checked
-  technical replay is active, with full425 Body PASS at10:43:36UTC.
-  EP0/full790 and EP12/full405 shared preparation now pass with original native
-  controls/reference replay; their independently measured receipts are frozen.
+  gate or a reversal of its old conversion failure. EP13 full425 inputs and
+  shared preparation pass; collected-predecessor scheduling failures remain
+  separate. Original controls/reference replay and whole source-chain pins are
+  frozen before each next stage; no prediction is inferred from dispatch ACKs.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
   development scenes/objects and33–38cm absolute errors prevent a generalization
   claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.
@@ -55,6 +54,12 @@ inferred automatically; no hand-labeling of challenge records.
   Specialist [hand methods](docs/hand_specialists_audit.md) and
   [MediaPipe](docs/mediapipe_hands_audit.md) have independent feasibility audits;
   neither is adopted or presumed robust to object occlusion.
+- **Fresh hand diagnostic:** three distinct Dex03 full72-frame clips are sealed
+  before evaluation. CPU scan216 calls/9.31s, private2D diagnostic3.70s:
+  171/177 annotated-positive frames uniquely associated, six misses, conditional
+  17-joint EPE9.65px (2907/3009 valid joints scored). Weak bbox association,
+  39 unlabelled frames and unknown pretraining overlap prevent broader claims.
+  No prompt/threshold tuning, contact/identity/3D proof or challenge adoption.
 
 Detailed receipts, producing revisions and decisions live in
 [experiments](docs/experiments.md). [Compute](docs/compute.md) is the compact
