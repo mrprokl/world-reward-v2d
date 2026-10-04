@@ -23,7 +23,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 0 | 790 | Full native refinement and direct export PASS42.687162s, whole source chain/four outputs pinned. Official packing PASS16.896468s/all790 frames, scratch removed; old conversion failure separate. |
 | 4 | 747 | Tracking stops at18 empty automatic object masks; full trajectory unavailable. |
 | 7 | — | Empty automatic fixed anchor; closed without reroll. |
-| 9 | 415 | Historical topology/conditioned failures preserved. New whole-solid compiler passes all six fidelity stages; independently frozen geometry enters unchanged full-T ICP/Viterbi under31ff94d. Actual GPU run in progress, not a pose/HOI PASS. |
+| 9 | 415 | Historical topology/conditioned failures preserved. New whole-solid compiler passes all six fidelity stages; independently frozen geometry enters unchanged full-T ICP/Viterbi under31ff94d. Actual full415posePASS1426.256s; geometry/source sealed. Native input preparation/HOI quality unverified. |
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
 | 12 | 405 | Full native refinement and direct export PASS31.726037s, whole source chain/four outputs pinned. Official packing PASS13.521699s/all405, scratch removed. |
@@ -34,7 +34,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 18 | 535 | Original source boundary/nonmanifold rejection before object pose; closed, no repair. |
 | 19 | 443 | Original topology-budget FAIL before object pose; all eight fixed whole/component candidates rejected, no repair. |
 | 20 | 549 | Original topology-budget FAIL before object pose at15:24:39UTC; all eight fixed whole/component candidates rejected after full body/depth/initializers. Closed without repair. |
-| 21 | 563 | Original full frontend/input and shared prepare PASS20.261004s, native forward PASS122.410949s,301-update refinement PASS271.100399s, direct export PASS35.803141s. All source-chain/output pins independently frozen. Current late loader/officialpack FAIL closed on historical producer/current helper mismatch; original export is preserved, no packing/accuracy inferred. |
+| 21 | 563 | Original full frontend/input and shared prepare PASS20.261004s, native forward PASS122.410949s,301-update refinement PASS271.100399s, direct export PASS35.803141s. All source-chain/output pins independently frozen. Original late loader/pack source-mismatch FAILs preserved; separately authenticated actualexport/currentconsumer passes loader12.215511s and officialpacking14.944041s, scratch deleted. Engineering only, no accuracy. |
 | 22 | — | Original predecessor-wait failure preserved. New full initializers complete, then native geometry rejects boundary/nonmanifold or orientation/Euler changes18:57:32UTC; no trajectory. |
 | 23 | 552 | Full original initializers actual PASS17:56:49UTC, no object trajectory yet. Future pose-only may run on VM02 after actual initializer input pins/transfer. |
 | 24 | — | Automatic actor ambiguity rejected before frontends; no manual selection. |
@@ -44,7 +44,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 28 | 366 | Full original initializers pass18:04:45UTC, no object trajectory yet. |
 | 29 | 419 | Actual fixed-all16 initializers PASS: masks78.030s, body141.857s, depth235.015s, adapter8.190s/full419. Inputs/source rehashed; no object trajectory yet. |
 
-Eleven complete packed episodes are engineering/fidelity evidence only. Scratch
+Twelve complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
 verified CARI4D superiority exists. Other episodes are not presumed ready.
 

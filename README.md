@@ -11,8 +11,8 @@ inferred automatically; no hand-labeling of challenge records.
 **No final Parquet, submission or verified CARI4D improvement yet.**
 
 - **Engineering:** all30 original videos pass byte/metadata readiness. Episodes
-  **0,1,2,3,5,6,8,12,13,14,15** pass full native shared preparation, forward,301-update
-  refinement, direct export and original official packing. These are eleven
+  **0,1,2,3,5,6,8,12,13,14,15,21** pass full native shared preparation, forward,301-update
+  refinement, direct export and original official packing. These are twelve
   complete engineering checks, not held-out accuracy; scratch Parquets deleted.
   EP0's legacy conversion failure stays separate. EP4 missing masks, EP7 empty
   anchor, EP9's original topology-budget failure and EP10/EP11 actor identity failures remain closed.
@@ -41,8 +41,9 @@ inferred automatically; no hand-labeling of challenge records.
   controls and the first real predicted EP9 source: nine complete components,
   one QEM/eight exact queries/six fidelity stages, 65.14 s host. Its original
   tuple/list packaging FAIL is preserved; the new producer changes no numerical
-  operator or acceptance gate. Geometry feasibility only: no downstream pose,
-  HOI gain, licence clearance or adoption is inferred.
+  operator or acceptance gate. The same fixed geometry now passes full415-frame
+  pose execution; automatic mask medianIoU0.244 is not accuracy evidence.
+  No HOI gain, licence clearance or adoption is inferred.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
   development scenes/objects and33–38cm absolute errors prevent a generalization
   claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.

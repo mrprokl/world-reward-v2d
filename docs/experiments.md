@@ -8666,3 +8666,19 @@ fullsource/native receipts. Prepare3588b8d223file source-only publication
 verifiedonAzure, no nativeprepare dispatched untilfullsolidposecompletion.
 Rootcombinednumeric/source/preparetransport tests128PASS2.73s,1223exclusive
 fixtureentries removed; qualification/productionbinary/source unchanged.
+
+Actual EP09 complete415solidpose31ff94d PASS1426.256080s; frozen3files444
+under555 directory. Report10233930B SHA2041df12af75d9c66a919b6d77c07e5a78eb04ddf64db790125a7baf40980b22.
+Root actual237file/archive/readonlyledger and allpreflightoriginalinput hashes
+verifiedbeforeafter; canonicalGLB byteexact145116a7... andsolidproposalpin4a170dc5...;
+allfullTrecords/Viterbiselection preserved. MedianautomaticmaskIoU0.24405
+is only self-supervised diagnostic, noquality/adoption/HOIvictory.
+
+Actual EP21 source-bound loaderPASS12.215511s/full563 report7540B
+SHA55b6f7206c1c428a2b3deb89958ac26e85748573874be7b505f8d84859d8b80d;
+actualofficialpackPASS14.944041s report14278B
+SHAb70c49ccf57ae6b8881fb1b6d168414c86d09fcab19923f8613452cc2bec3dd9.
+Root205/208fullsource bytes+archive+readonlyledger rehashedbeforeafter,
+sole444report/noParquetleft. Original200fileproducer separatelyauthenticated;
+originalb9f4bcb failedoutputs untouched. Full563trajectory preserved; official
+sample rowIDonly selects347scoredframes, scratchParquetdeleted. Noqualityclaim.

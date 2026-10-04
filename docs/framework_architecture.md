@@ -154,6 +154,13 @@ sur splits distincts scène/objet/personne, puis calibration/validation séparé
 La sélection sur frames tenues à l'écart de la même vidéo est un diagnostic
 self-supervisé, pas une précision held-out démontrée. Rien ne retourne du privé.
 
+L’export immuable et son consommateur ont des provenances distinctes : une
+évolution des wrappers ne justifie ni de régénérer les prédictions ni de
+réécrire l’historique. Le consommateur authentifie la closure Git réelle du
+producteur, puis vérifie séparément la compatibilité de ses opérateurs
+numériques actuels. Les receipts d’échec restent à leur emplacement ; tout
+replay technique explicitement motivé utilise une sortie fraîche par révision.
+
 ## 5. Gates et expérimentation parallèle
 
 Un `ExperimentSpec` proposé déclare cohorte, entrées autorisées, baseline,
