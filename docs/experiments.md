@@ -8948,3 +8948,21 @@ SHA6eaa1ffa1a38c2e68a7e284dda288fa9adeb4d7d6166cbe44f8ddc5bc55ee3c9 retained;
 terminal unit status1, output absent and GPU idle independently observed.
 No constructor/update or native qualification PASS. A scheduling-only correction
 must preserve numerical driver/native source and use a fresh namespace.
+
+Scheduling-only native point replay reuses the exact published9d4badf220-file
+closure without chmod/upload/source changes. FD9 path now `/proc/self/fd/9`;
+original61B failure, absent namespace/CID and idleGPU rechecked before dispatch.
+Fresh unit joint-points-real-native-zero-fd9 ACK only, no actual native PASS.
+General cleanup fix b759499 distinguishes exact CID absence from daemon errors
+and verifies absence after owned removal; root122PASS11optionalSKIP1.22s.
+It does not patch the frozen replay. Independent post-run cleanup proof required.
+
+Independent method audit selects a cheap **raw TripoSR proposal experiment** over
+another wide new TRELLIS stack after observed seed-invalidity. This is not a
+SOTA2026 claim or adoption. MIT source107cefdc/weights5b521936 permit France/
+commercial use with notices; torchmcubesMPL2 adds redistribution obligations.
+Training Objaverse subset/challenge overlap and actual runtime ABI unverified.
+Only native iso25/grid256/radius0.87/chunk8192 extraction before implicit
+Trimesh processing is proposed, no cleanup/iso sweep or failed-clip reroll.
+Separate bounded runtime qualification and new private procedural cohort are
+required. Prior RGB-only MV fusion/old procedural controls stay closed.

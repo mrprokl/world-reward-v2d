@@ -83,3 +83,27 @@ in **both** arms, all full trajectories and unchanged shape/gauge. Require actua
 3D object/relative-HOI benefit without human, penetration, acceleration,
 wrong-identity or coverage regressions. RGB residual improvement alone is not
 independent 3D validation. Full-HOI reference rights remain unresolved.
+
+## Actual native qualification protocol
+
+The real-model pair binds the full563-frame EP21 input/forward receipts, original
+MHR decoder/contact assets and optimizer source. A is the original class; B is
+the explicit zero-weight subclass. Both reset Python/NumPy/Torch/CUDA seed0,
+construct the real native optimizer/scheduler, probe original losses/gradients at
+steps0 and181, then inherit all301 updates. Initial states/probes and complete
+results/history must be byte-exact; only B's declared point metadata is excluded.
+No tolerance or replacement renderer is allowed.
+
+First-frame attachments use the original **full-resolution automatic PNG** bound
+through the frozen object-pose receipt, inferred aligned depth/K, actual native
+F32 mesh and A's constructed object pose. Future support is entirely false:
+this is a numerical dead-branch control, **not tracker predictions**. Scale1 and
+weight0 are runtime-only values, not positive-weight calibration.
+
+The first launch failed before any container/model/update because systemd
+expanded a controller FD9 path containing `$$`. Its original failure is retained.
+A scheduling-only replay uses `/proc/self/fd/9`, the **same frozen9d4badf driver**
+and a fresh unit/log; ACK is not native PASS. The later strict container cleanup
+fix does not mutate that frozen job. Independently prove its exact CID absent
+before sealing any result. Real native parity remains pending; accuracy and
+positive-weight validation remain separate prerequisites.
