@@ -6988,3 +6988,26 @@ models/ranking/oracle fallback. ExistingTrack1Episode/SE3contracts reused;
 ownedreadonlyarrays/provenance, originalT/K/gauge conventions explicit,
 MHRlayout preserved andexactroundtripwithoutobjectrebake. Root129PASS1optional
 KITskip0.51s. Architecturalfoundation only; no scientificgain/adoption.
+
+EP8actualoriginal301update refinementPASS115.339089s/full634,14978Breceipt
+SHA5c973cd1b5bb53bf3d343b4e0f0b0b4d78e6c49159262e4e8d42503ceeb6294a;
+485056736BbundleSHA51a658fc2060e4835fd9d9cc42c4555d5b9fc74a1b8bec64381cf09ce775e071.
+Rootoriginaldriver/queuechildcomplete +repeated2outputs authenticated; noquality
+claim. Nativeexport890b946PASS38.784312s/all634/40chunks,26861Breceipt
+SHAf56b25e734e4886a62e3afc613ca4b05d40ea4226abb253252b2fe43edbd3cfb;
+5outputs rehashedtwice, exactallnative/sharedidentity/gauge/framecoveragechecks.
+Frozenexportpins precedeofficialCPUpacking.
+
+Datafreeprecision/backend controls14b1b81 FAIL0.385471s firstgradedtetra
+atunchangedofficialpacking: meaningfulorientedtrianglesalteredbyexport/weld.
+Runtime/source/build/binary prepost unchanged; no nativeQEM invoked orEP9adoption.
+Exactnoncollinearityalone doesnotguaranteeoriginalpacker preserves extremely
+closevertices. Keepcontrolclosedno scale/fixture/tolerancechange. Needseparate
+generalserialization/meshconditioning hypothesisandvalidation, notthreshold
+relaxation orfacedeletion.
+
+ReadonlyTrack1coverage inventory:fullnativeexports1,2,3,5,6,8,15 ready;0 has
+completeoriginalCPUinputs butlegacyroute only;4trackingmissingmasks,7emptyanchor,
+9geometryfailure remainclosed. Fresh10..14/16..29 noexistingfrontends. Proceed
+next10 withuniformfixed_all16automaticpolicy, notepisode-tailoredprompt,
+originalmasks/initializers/tracker/timebudgets, GPU lock; noqualityclaim.

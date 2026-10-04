@@ -59,6 +59,8 @@ No final Parquet, submission or verified CARI4D improvement yet.
   (4,982.71 s), within its fixed7200s outer deadline; the owned timer is stopped.
   Full native shared preparation passes (21.70 s), and native forward passes
   all7windows with a twice-rehashed frozen full634frame bundle.
+  Original301update refinement passes (115.34 s), native export passes
+  all634frames (38.78 s); original CPU packing is next.
   The next415-frame episode has complete automatic Body/depth initializers;
   its default topology gate failed before poses. The unchanged CPU
   volume proposal also rejects zero-area source faces; both failures stay
@@ -120,7 +122,8 @@ one corrected same-cohort engineering replay, preserving nativeIDs1..96,
 original failures, cohort, GPU budgets and quality gates. Its full-archive
 acquisition passes (1,507.65 s), all288 RGB/nativeIDs retained and temporary
 archives deleted. Three native MoGe calls pass (9.50 s GPU); automatic masks
-are next. Private labels remain outside prediction inputs.
+then abstain on ambiguous object identity (two detections, zero SAM2);
+the pilot is closed without retuning. Private labels remain outside prediction inputs.
 See [protocol](docs/point_pose_protocol.md).
 None of these engineering gates is a reconstruction-quality result.
 Earlier extraction-fixture failures were corrected using authenticated historical
