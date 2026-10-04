@@ -7371,3 +7371,24 @@ Report5325B SHA163f7795c179bb52dca1b4077d3e024f9db5340b0746dd71858b540cf19e60d9.
 Independent public HEAD confirms exactURL/HTTP200/identity/2311B and that MIME;
 owned evidence directory empty. Preserve originalFAIL; futurefreshv2 adds this
 actual MIME to byte-SHA-pinned transport only, not arbitrary HTML or new assets.
+
+Dependencyv2 actual4.042046s: all51 original files downloaded and publisher
+SHA/source/prior/posthash verified, then technical notice-parser FAIL on contourpy.
+Report28016B SHA9a241fb656cdd2a6a19d52bb462c576842b0d6a80c5330b66009a554c0ef1e36;
+originalhelper17135B SHA870a5baf210057b274e88fb871c912dd18d7b1c925dd208a2d279757d740fab4.
+Independent readonly audit verifies actualLicense1795B matches frozen byte/SHA,
+all other metadata fields match; the manifest intentionally omits long text,
+and the old parser incorrectly demanded this preview be present. OriginalFAIL
+is retained. Complete downloaded-byte pins515051b precede a distinct planned
+CPU-only notice verification, with **no second download, namespace mutation,
+model execution or altered dependency/license bytes**. Verification is not build,
+inference, source-OSI clearance, or a reclassification of the old FAIL.
+
+Dex03 fresh acquisition implementation: root82 tiny tests PASS1optionalSKIP1.65s;
+full original subject03 lex4/39/74/RGB640480 only, private original labelNPZ opaque,
+no meta/depth/calibration/othercamera/model. Reuses original archive/CRC/JPEG
+helpers, scoped leaf bootstrap, source/publisher pins and measuredarchiveSHA.
+Download7200s then scan/extract1800s, cleanup120s; removes only owned verified
+archive after retention/posthash. Actual acquisition remains deferred until
+the small CPU graph-load prerequisite is verified. No private values or model
+outputs are consulted in the source-only implementation/tests.

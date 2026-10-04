@@ -1,0 +1,61 @@
+{
+  "all_original_frames": true,
+  "archive": {
+    "bytes": 12197037343,
+    "file": "20200820-subject-03.tar.gz",
+    "url": "https://drive.google.com/file/d/1FkUxas8sv8UcVGgAzmSZlJw1eI5W5CXq"
+  },
+  "archive_hash_basis": "caller_measured_not_publisher_checksum",
+  "archive_root": "direct_subject_directory_only",
+  "base": "validation/dexycb_hand_v1",
+  "camera": "836212060125",
+  "challenge_overlap_verified": false,
+  "cleanup_grace_seconds": 120,
+  "download_budget_seconds": 7200,
+  "expanded_cap_bytes": 128849018880,
+  "helper_pins": {
+    "dexycb_acquire.py": {
+      "bytes": 21916,
+      "sha256": "6078c54a862f98ee4aa9790a39387e2e89922789fce5ca4ee63edbc075834554"
+    },
+    "dexycb_download.py": {
+      "bytes": 10680,
+      "sha256": "8ead4771dd49d6a0f0332c840bd0fa68aef00d6588fc0d41a3c12e433fe47591"
+    },
+    "mediapipe_hands_acquire.py": {
+      "bytes": 21381,
+      "sha256": "8293510c02777cd5b844865285736ff1a653631a8803849a9047ee9030196570"
+    }
+  },
+  "license": "CC-BY-NC-4.0",
+  "member_cap_bytes": 67108864,
+  "original_rgb_size": [
+    640,
+    480
+  ],
+  "primary_sources": {
+    "dex_ycb.py": {
+      "bytes": 8713,
+      "sha256": "f73074505bb822b01178dc7aae9778f5107efea479d43423f4fe2dc37224d8ad",
+      "url": "https://raw.githubusercontent.com/NVlabs/dex-ycb-toolkit/64551b001d360ad83bc383157a559ec248fb9100/dex_ycb_toolkit/dex_ycb.py"
+    },
+    "publisher.html": {
+      "bytes": 14026,
+      "sha256": "09b12e4a37ccd0142e849101456a7389727b13a4d798434d0c35b686ccc9d008",
+      "url": "https://dex-ycb.github.io/"
+    }
+  },
+  "private_retention": "matching_opaque_labels_npz_only",
+  "retained_cap_bytes": 8589934592,
+  "scan_extract_budget_seconds": 1800,
+  "schema": "world-reward-dexycb-hand-acquisition-v1",
+  "sequence_count": 100,
+  "sequence_lex_indices": [
+    4,
+    39,
+    74
+  ],
+  "subject": "20200820-subject-03",
+  "timestamps_available": false,
+  "training_overlap_verified": false
+}
