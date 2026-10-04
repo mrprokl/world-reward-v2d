@@ -471,6 +471,9 @@ def launch(root,code,revision):
             cleanup(out,revision,name,time.monotonic()+45)
             require(source(code,revision)==source_before and(host is None or host_proof(root,code,revision)[1]==host)and
                 (image is None or actual_image(time.monotonic()+15)==image)and(held is None or lock_identity(root,9)==held),'Original inputs/assets/source/image/lock changed after inference')
+            if report.get('status')=='pass':
+                output_inventory(out,report)  # Final12rawoutputs rehashed after assets/source/image/lock checks.
+                report['outputs_rehashed_after_host_post']=True
             report['source_rehashed_after']=True
         except BaseException as error:failure=error;report.update(status='fail',source_rehashed_after=False,error='Original post-verification or owned cleanup failed',error_type=type(error).__name__)
         report['GPU_budget_elapsed_seconds']=time.monotonic()-started

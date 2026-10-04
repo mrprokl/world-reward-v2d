@@ -369,12 +369,25 @@ def test_mocked_host_end_to_end_seals_after_final_post_not_self_success(tmp_path
     report=gate.strict((tmp_path/gate.BASE/gate.OUTPUT/'report.json').read_bytes())
     assert report['status']==('fail'if tamper else'pass')
     assert report['source_rehashed_after']is(not tamper)
+    if not tamper:assert report['outputs_rehashed_after_host_post']is True
     assert 0<report['GPU_budget_elapsed_seconds']<=900
     assert report['human_scalar_used']is False and report['hand_observations_used']is False
     assert report['acquisition_receipt_checked_host_only']is True and report['raw_image_receipt_mounted']is False
     assert (tmp_path/gate.BASE/gate.OUTPUT/'report.json').stat().st_mode&0o777==0o400
     with pytest.raises(ValueError):gate.launch(tmp_path,code,rev)
 
+
+
+def test_raw_output_tamper_during_cleanup_rejected_at_final_host_post(tmp_path,monkeypatch):
+    def cleanup(out,revision,name,deadline):
+        path=out/'scene_000048/object.glb';path.chmod(0o644);path.write_bytes(b'changed after native inventory');path.chmod(0o444)
+    monkeypatch.setattr(gate,'cleanup',cleanup)
+    # Reuse original tiny native mock; only late cleanup output mutation differs.
+    with pytest.raises(SystemExit):
+        test_mocked_host_end_to_end_seals_after_final_post_not_self_success(tmp_path,monkeypatch,False)
+    report=gate.strict((tmp_path/gate.BASE/gate.OUTPUT/'report.json').read_bytes())
+    assert report['status']=='fail'and report['source_rehashed_after']is False
+    assert report.get('outputs_rehashed_after_host_post')is not True
 
 def test_three_native_invocations_cached_api_and_exact_original_XYZ_K(tmp_path,monkeypatch,fake_trimesh):
     pins=pin_fixture();out=tmp_path/'out';out.mkdir();points=np.zeros((3,4,3),dtype=np.float32);points[...,2]=2
