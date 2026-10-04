@@ -7226,3 +7226,16 @@ lock. EP13 unchanged v2 still active, object tracking300/425 at1065.138512s.
 DexYCB byte acquisition3b178742 loadedactive, no passing receipt yet; archives
 and selected namespaces stay onAzure. No private values, trained identity model
 or measured initial-identity improvement has been read/claimed.
+
+DexYCB actual byte acquisition3b178742 PASS329.644207s: both entire original
+gzip streams/header inventories verified, selected12clips/872originalRGB and
+884opaque private NPZ/meta files retained; no annotation values interpreted.
+Sealed acquisition report323623B SHA2d0741cc89d6ff3998dca173a8aefe87273b543706510355b3316dbb8cf7f10f;
+public manifest276049B SHA95d33cc13f21912558a740dd7cd24c53f2e3b8cc329bf667dd8b7bdbee1bbb0d.
+Native full frame counts subject01 [72,74,74,72,74,74], subject02
+[72,72,74,70,72,72] for the predeclared lexicalindices0/16/32/48/64/80.
+Original archives retained onAzure; measuredSHA remains nonpublisher proof and
+data/model overlap remains unknown. Native masks stage dispatched from frozen
+dd3d9e8997b6cd8ccbb105b97a9d7e4e8f209551; no actual inference PASS yet.
+EP12 sharedprepare queued using exactly the published4d4a049 source, one
+explicit GPU-lock wait, no duplicate frontend/geometry fit or numerical retuning.
