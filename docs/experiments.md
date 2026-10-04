@@ -6916,3 +6916,10 @@ Read-only firstaudit aborted because historicalheaderproducer could not contain
 its own futurepin; correctedcontrol supplies independent committedheaderpin,
 no source/data/run changed. Correctedoneengineeringacquisition dispatch frozen
 1a0f494 ACK; actualexecution/completearchivehash/layout/CRC/cleanup stillnext.
+
+EP8 actualfull634 unchangednative sharedprepare PASS21.697175s, original32666e0
+producer, queuecompleted07:22:20UTC/collectedinactive. ActualdriverSHA verified
+before repeatedfouroutputreadonlyinventory. Frozen27,505B report
+SHA657602f65a13d8f7be4c82dd5e0f5e37cc92420e960cc041d36f0f66eb339f72;
+fullnative sharedidentity/allindices/geometry unchanged. Preparepins frozenbefore
+nativeforward, no quality/score/adoption claim.
