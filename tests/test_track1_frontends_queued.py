@@ -42,6 +42,8 @@ elif fault=='lock':
 sys.exit(int(os.environ.get('FAKE_STATUS','0')))
 PYCHILD
 ''')
+    initializers=code/'infra/run_track1_initializers_only.sh'
+    initializers.write_text(child.read_text().replace("['child',", "['initializers-child',"))
     for path in(code,*code.rglob('*')):path.chmod(0o555 if path.is_dir()else 0o444)
     bindir=tmp_path/'bin';bindir.mkdir();log=tmp_path/'calls.jsonl'
     scripts={
@@ -203,7 +205,9 @@ def test_complete_static_closure_no_native_or_network_work(monkeypatch):
     files['pyproject.toml']=(ROOT/'pyproject.toml').read_bytes()
     selected=set(azure_job.runtime_bundle_paths(files,'infra/run_track1_frontends_queued.sh'))
     child=set(azure_job.runtime_bundle_paths(files,'infra/run_track1_frontends.sh'))
+    initializers=set(azure_job.runtime_bundle_paths(files,'infra/run_track1_initializers_only.sh'))
     assert child<=selected
+    assert initializers<=selected
     assert {'infra/run_track1_frontends_queued.sh','infra/object_pose_smoke.py','src/world_reward/rigid_alignment.py'}<=selected
 
 
@@ -346,3 +350,57 @@ def test_gpu_lock_only_uses_same_bounded_wait_and_never_marks_unknown_unit_pass(
     wrapper=runtime['wrapper'];wrapper.chmod(0o644)
     wrapper.write_text(wrapper.read_text().replace('43200','0'));wrapper.chmod(0o444)
     assert runtime['run'](*lock_args(runtime)).returncode!=0 and not runtime['calls']()
+
+
+@pytest.mark.parametrize('mode',['success','terminal','lock'])
+@pytest.mark.parametrize('status',[0,7,124])
+def test_explicit_initializers_only_uses_unchanged_child_after_same_lock_handoff(runtime,mode,status):
+    args=runtime['args'] if mode=='success'else terminal_args(runtime) if mode=='terminal'else lock_args(runtime)
+    if mode=='terminal':runtime['env'].update(FAKE_ACTIVE='failed',FAKE_RESULT='exit-code',FAKE_MAIN='1')
+    if mode=='lock':runtime['env']['FAKE_LOAD']='not-found'
+    runtime['env']['FAKE_STATUS']=str(status);before=runtime['lock'].read_bytes()
+    result=runtime['run'](*args,'--initializers-only');assert result.returncode==status,result.stderr
+    calls=runtime['calls']()
+    assert calls[-1]==['initializers-child','--episode','5',True]
+    assert not any(row[0]=='child'for row in calls)
+    assert calls[-2][0:3]==['flock','--unlock','9']
+    phases=[json.loads(line)['phase']for line in result.stdout.splitlines()]
+    assert phases[-2]=='running_original_initializers'and phases[-1]==('child_complete'if status==0 else'fail')
+    assert runtime['lock'].read_bytes()==before and not runtime['base'].exists()
+
+
+@pytest.mark.parametrize('tail',[
+    ['--initializers-only','--initializers-only'],['--initializers-only','true'],
+    ['--initializers-only=false'],['--initializers-only','--actor-policy','fixed_all16'],
+    ['--initializers-only','--seed-frames','3'],
+])
+def test_initializers_only_is_unique_boolean_not_algorithm_override(runtime,tail):
+    assert runtime['run'](*lock_args(runtime),*tail).returncode==2 and not runtime['calls']()
+
+
+@pytest.mark.parametrize('fault',['missing','writable','symlink','hardlink'])
+def test_initializers_child_is_original_immutable_source_before_queue(runtime,fault,tmp_path):
+    path=runtime['code']/'infra/run_track1_initializers_only.sh'
+    if fault=='writable':path.chmod(0o644)
+    elif fault=='hardlink':os.link(path,tmp_path/'alias')
+    else:
+        path.parent.chmod(0o755);path.unlink()
+        if fault=='symlink':path.symlink_to('run_track1_frontends.sh')
+        path.parent.chmod(0o555)
+    assert runtime['run'](*lock_args(runtime),'--initializers-only').returncode!=0 and not runtime['calls']()
+
+
+@pytest.mark.parametrize('mutation',['source','marker','lock'])
+def test_initializers_only_does_not_bypass_post_child_source_and_lock_checks(runtime,mutation):
+    runtime['env']['FAKE_MUTATION']=mutation
+    result=runtime['run'](*lock_args(runtime),'--initializers-only')
+    assert result.returncode!=0 and sum(row[0]=='initializers-child'for row in runtime['calls']())==1
+
+
+def test_default_and_opt_in_child_commands_remain_literal_and_separate():
+    source=WRAPPER.read_text()
+    assert '''else
+ phase running_original_frontends
+ bash "$CODE/infra/run_track1_frontends.sh" --episode "$EPISODE" --actor-policy fixed_all16
+fi'''in source
+    assert 'bash "$CODE/infra/run_track1_initializers_only.sh" --episode "$EPISODE"'in source

@@ -217,7 +217,12 @@ numeric roundtrip is not a byte proof. Initialize cache by the same inverse,
 keep native queue/AABB/volume/serialization callback order unchanged, recompute
 full final physical geometry, and require frozen source/prediction/counter/birth
 parity. This is a technical scaling hypothesis, not another mesh-quality gain.
-No such cache or persistent native install exists at this revision.
+That implementation regression has now passed eight real-collapse arms on the
+four previously successful procedural sources; the immutable qualified cached
+binary is retained on Azure. See mesh_conditioned_cache_protocol.md. This
+establishes measured byte parity for those controls, not production mesh or HOI
+accuracy. The first production attempt stopped before geometry because its
+container lacked publication-marker mounts; one packaging-only replay is frozen.
 
 The next substantive reconstruction hypothesis is **joint persistent actor/object
 association plus explicit visible ownership** over one shared automatic evidence
@@ -240,3 +245,31 @@ available. InterCap requires account access and explicit clarification of its
 noncommercial/research terms for this context. No registration or request has
 been sent. No model, rendering stack or per-episode threshold is added merely
 because validation access is missing.
+
+### Statistical boundary for the association experiment
+
+The existing temporal_identity primitive ranks paths by MAP costs. It is not a
+marginal likelihood or a calibrated posterior. A proposed learned relation model
+must use the same complete observation bank, background nuisance, K and geometry
+for every candidate pair. Its binary temporal latent represents statistical
+dependence, not contact. Fit conditional Student-t movement emissions and an
+independence null on an external training split; marginalize regimes with forward
+log-sum-exp, including an explicit no-identifiable-relation hypothesis. Missing
+dimensions contribute their marginal emission, not an invented zero displacement;
+absence/clutter laws and normalization must be common across candidate pairs.
+Duplicate nuisance representations cannot increase probability mass.
+
+Calibration/abstention and final evaluation need distinct external splits with
+persisting instance IDs and automatic proposal-to-instance associations. Current
+hand slots do not identify full-body actors: without an automatic measured
+body-wrist association, the proposed experiment is conditional hand-object only.
+Keep stationary/common-motion/symmetric ambiguity explicit, with no nearest
+fallback. Neither a likelihood implementation nor licensed training data is
+available from this audit alone.
+
+Two attributable comparisons: same-bank independence versus learned dependence;
+then identical relation model without/with rigid reprojection on reserved queries
+not used for pose fitting. First require lower wrong-ID without reduced full-T
+coverage, then paired object and object-to-wrist 3D gains under the same downstream
+CARI fit, without human regression or per-frame alignment. A 2D residual alone
+cannot establish a reconstruction-quality gain.

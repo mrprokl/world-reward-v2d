@@ -228,3 +228,40 @@ def test_original_scope_bash_and_actual_static_closure():
     selected = set(module.runtime_bundle_paths(files, "infra/"+WRAPPER.name))
     assert selected >= {"infra/"+n for n in (*CHILDREN,*PRODUCERS,"run_episode_initializers.sh","cari_wrapper_common.sh")}
     assert not {"infra/object_pose_smoke.py","infra/run_object_pose_smoke.sh","infra/cari_prepare.py","infra/cari_forward.py"}&selected
+
+
+@pytest.fixture
+def queued_runtime(runtime):
+    env,_,log,wrapper=runtime;original=Path(env['WR_CODE'])
+    queued_parent=original.parent.with_name('run_track1_frontends_queued');original.parent.rename(queued_parent)
+    code=queued_parent/'code';env['WR_CODE']=str(code)
+    wrapper=code/'infra'/WRAPPER.name
+    wrapper.parent.chmod(0o755)
+    scheduling=wrapper.with_name('run_track1_frontends_queued.sh')
+    scheduling.write_text('# Procedural source marker, never executed.\n');scheduling.chmod(0o444)
+    wrapper.parent.chmod(0o555)
+    def run(*args):return subprocess.run(['bash',str(wrapper),*args],env=env,capture_output=True,text=True,timeout=10)
+    return env,run,log,scheduling
+
+
+def test_exact_readonly_queued_namespace_runs_same_initializers_and_full_lock(queued_runtime):
+    env,run,log,_=queued_runtime;result=run('--episode','23')
+    assert result.returncode==0,result.stderr
+    children=[row for row in log.read_text().splitlines()if row.startswith('child|')]
+    assert len(children)==8 and all('--episode 23'in row and row.endswith('|fd9-held')for row in children)
+    assert children[0]=='child|automatic_masks|--episode 23 --seed-frames 16 --actor-seed-observations 16|fd9-held'
+    base=Path(env['WR_ROOT'])/'outputs/episode_000023'
+    assert all((base/name/'report.json').is_file()for name in TARGETS)
+    assert not(base/'object_pose_full').exists()and not(base/'cari_inputs').exists()
+
+
+@pytest.mark.parametrize('fault',['missing','writable','symlink','hardlink'])
+def test_queued_namespace_needs_actual_regular_readonly_scheduling_source(queued_runtime,fault,tmp_path):
+    _,run,log,path=queued_runtime
+    if fault=='writable':path.chmod(0o644)
+    elif fault=='hardlink':os.link(path,tmp_path/'alias')
+    else:
+        path.parent.chmod(0o755);path.unlink()
+        if fault=='symlink':path.symlink_to(WRAPPER.name)
+        path.parent.chmod(0o555)
+    assert run('--episode','23').returncode!=0 and not log.exists()

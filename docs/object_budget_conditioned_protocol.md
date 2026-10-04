@@ -30,3 +30,13 @@ First source is episode09, selected because its recorded old failure isolates
 the global face-area guard. This is a new algorithm on an existing predicted
 input, not a rerun of closed failed procedural cohorts. Stop on any failed gate;
 no successful reconstruction or HOI gain is presumed from compiler qualification.
+
+Actual first attempt stopped before authentication completed because two host
+publication markers were absent from container mounts. Its lone failure receipt
+is retained at an exclusive archive; one preregistered packaging-only replay
+mounted those markers without changing pipeline, geometry, protocol or budgets.
+That replay authenticated the complete source/cache/runtime and rejected the
+source at `Unqualified nested-component arrangement` in7.545176s, before any
+native call. It is a source-qualification FAIL, not evidence that conditioning
+improved the production mesh. No loosened component policy, face deletion,
+sign flip or further same-method replay is authorized by this result.

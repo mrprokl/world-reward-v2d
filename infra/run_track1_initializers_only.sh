@@ -4,7 +4,8 @@ set -euo pipefail
 [[ $# == 2 && "$1" == --episode && "$2" =~ ^(0|[1-9]|[12][0-9])$ ]] || exit 2
 EPISODE="$2";ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
- && "$CODE" == "$ROOT/jobs/$REV/run_track1_initializers_only/code" ]] || exit 2
+ && ( "$CODE" == "$ROOT/jobs/$REV/run_track1_initializers_only/code" \
+      || "$CODE" == "$ROOT/jobs/$REV/run_track1_frontends_queued/code" ) ]] || exit 2
 printf -v PADDED '%06d' "$EPISODE"
 BASE="$ROOT/outputs/episode_$PADDED";LOCK="$ROOT/jobs/.world-reward-h100.lock"
 STAGE=preflight;BEFORE='';LOCK_BEFORE='';LOCK_OPEN=0
@@ -24,6 +25,9 @@ def read(path):
  return raw
 for path in(root,code,entry):canonical(path)
 if not root.is_dir() or not code.is_dir() or entry!=code/'infra/run_track1_initializers_only.sh':raise ValueError('Actual immutable initializer entrypoint required')
+if code==root/'jobs'/rev/'run_track1_frontends_queued/code':
+ queued=code/'infra'/'run_track1_frontends_queued.sh';raw=read(queued)
+ if not raw or queued.stat().st_mode&0o222:raise ValueError('Actual readonly queued scheduling wrapper required')
 digest=hashlib.sha256()
 for name in('revision','source-sha256'):
  raw=read(code.parent/name)

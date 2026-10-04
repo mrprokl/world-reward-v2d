@@ -8012,3 +8012,51 @@ with atomic no-replace rename and retain original bytes/owner/mode. Pipeline,
 CPP, protocol, inputs and budgets remain unchanged. Wrapper validates two regular
 nonsymlink markers before reserving output, mounts each readonly; legacy volume
 does not require them. No scientific result or geometry adoption from this fix.
+
+Marker-only fix99765accd6da84f0753d1404ba8dc1c5cc996326 publicpushed after170
+focusedPASS3.94s and exact original pipeline/CPP/protocol bytechecks. First archive
+preflight referenced native_report.json instead of actual native.json and stopped
+before any reservation/rename/inference; corrected metadata path only. Actual
+atomic no-replace archive PASS, receipt4922B
+SHA023e225d9d75bd0b98d166ccba8994722f9b9b0aa6dd4e4dd3dec320642a1a24:
+original175sourcefiles and11input/cache files unchanged, directory inode/owner/
+mode and exact report stat/bytes preserved. Original FAIL remains at its exclusive
+archive. One new conditioned-mesh-ep09-v1-markers dispatch ACK received; actual
+geometry execution/result not yet presumed. Own unique tiny pytest root removed,
+including readonly fixture directories; foreign temps untouched.
+
+Independent scheduler audit: VM02 has qualified Body/MoGe2/Grounding and EP8
+pose-only execution, not a complete Objects/full-frontends replica. Selected
+19.91GBassets remain nonpromoted; original required tags/Git/acquisition receipts
+are not equivalent. No blind EP23 fullfrontend dispatch or tag/source alias.
+Next efficient partition: original initializers on VM01, independently pinned
+pose-only inputs to VM02, exact returned result for CPU assembly on VM01. Generic
+queued initializer-only option is scheduling, not a changed scientific method.
+
+Independent association audit specifies a conditional learned dependency/null
+model with marginalized temporal regime, common nuisance/missing laws and
+no-relation hypothesis. Existing MAP graph is not that likelihood. External
+training/calibration/evaluation splits and measured body-wrist→hand association
+are still required; handslot bank alone supports only conditional hand-object
+claims. Same-bank relation ablation, then reserved-query reprojection ablation,
+must improve wrong-ID without dropping frames and actual paired HOI3D under the
+unchanged downstream fit. No model/data acquisition, training or gain yet.
+
+Actual one marker technical replay under99765ac completes authentication and
+source loading, then source_geometry FAIL7.545176s on
+`Unqualified nested-component arrangement`, native_attempts0. Six-stage/native
+execution not reached. Receipt34661B
+SHAfee4648ef6b05bcd433658f0c9a2f66327532e45b06955a30f50d8bab74607ec,
+only report retained, scratch removed; recorded source/cache/runtime/helper/input
+posthashes allPASS. Independent full176source/archive/input/cache/originalFAIL
+preservation and removed-owned-container audit PASS. No conditioned per-episode pins,
+GPU consumer, source modification, component/sign repair or same-method replay.
+EP21 original fullpose actual350/563frames at1824.079178s, active; no complete
+input/export/accuracy claimed. EP22 remains immutable queued original job.
+
+Generic queued initializer-only partition local316scheduling/frontend testsPASS
+139.89s, bashsyntax/diffPASS. It calls the unchanged initializer children with
+fixedall16, preserves readonly closure/namespace/lock/fulltarget prepost gates;
+default fullfrontend command remains unchanged. No native algorithm, candidate,
+source mesh, weights, original running/queued snapshot or dataset modified.
+Own unique scheduling testroot removed after owner/link checks, foreign preserved.

@@ -3,8 +3,9 @@
 # cooperative GPU lock; the original frontend child reacquires its own lock.
 # Source closure: /infra/run_track1_frontends.sh /infra/run_episode_initializers.sh
 # /infra/run_automatic_masks.sh /infra/run_object_pose_smoke.sh /infra/run_cari_prepare.sh
+# /infra/run_track1_initializers_only.sh
 set -euo pipefail
-EPISODE='' WAIT_FOR='' WAIT_MODE=success episode_seen=0 wait_seen=0
+EPISODE='' WAIT_FOR='' WAIT_MODE=success episode_seen=0 wait_seen=0 INITIALIZERS_ONLY=0
 while (( $# ));do
  case "$1" in
   --episode)
@@ -17,6 +18,9 @@ while (( $# ));do
   --after-gpu-lock)
    (( ! wait_seen )) || exit 2
    WAIT_MODE=lock;wait_seen=1;shift ;;
+  --initializers-only)
+   (( ! INITIALIZERS_ONLY )) || exit 2
+   INITIALIZERS_ONLY=1;shift ;;
   *) exit 2 ;;
  esac
 done
@@ -48,7 +52,7 @@ for path in(root,code,base,entry):canonical(path)
 if not root.is_dir()or not code.is_dir()or not(root/'outputs').is_dir()or entry!=code/'infra/run_track1_frontends_queued.sh':raise ValueError('Actual queued wrapper and existing outputs root required')
 if base.exists()and not base.is_dir():raise ValueError('Selected episode ancestor must be a directory')
 required=('run_track1_frontends_queued.sh','run_track1_frontends.sh','run_episode_initializers.sh',
- 'run_automatic_masks.sh','run_object_pose_smoke.sh','run_cari_prepare.sh')
+ 'run_automatic_masks.sh','run_object_pose_smoke.sh','run_cari_prepare.sh','run_track1_initializers_only.sh')
 if any(not(code/'infra'/name).is_file()for name in required):raise ValueError('Complete original frontend children required')
 digest=hashlib.sha256()
 for name in('revision','source-sha256'):
@@ -174,6 +178,11 @@ APPS="$(nvidia-smi --query-compute-apps=pid --format=csv,noheader,nounits)"
 # The original child has its own nonblocking lock+GPU-idle preflight. A handoff
 # race fails there, never runs unlocked. No fabricated child path or lock mode.
 flock --unlock 9;exec 9>&-;LOCK_OPEN=0
-phase running_original_frontends
-bash "$CODE/infra/run_track1_frontends.sh" --episode "$EPISODE" --actor-policy fixed_all16
+if (( INITIALIZERS_ONLY ));then
+ phase running_original_initializers
+ bash "$CODE/infra/run_track1_initializers_only.sh" --episode "$EPISODE"
+else
+ phase running_original_frontends
+ bash "$CODE/infra/run_track1_frontends.sh" --episode "$EPISODE" --actor-policy fixed_all16
+fi
 phase child_complete
