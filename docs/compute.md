@@ -124,6 +124,10 @@ source and selected assets against the producing stage's independent pins.
   clip only after a loaded, coherent terminal predecessor (success or retained
   failure). Source/targets/lock/GPU are rechecked; missing/unknown units fail.
   Bounded12h wait, unchanged fixed_all16 child, no retry or failure reclassification.
+- `--after-gpu-lock` is an explicit scheduling-only alternative for fresh clips:
+  no unit query or claim of predecessor success, same existing readonly lock,
+  bounded12h wait, full source/target/GPU checks and unchanged child reacquisition.
+  Collected units do not block this mode; they still never prove prior success.
 - Fresh outputs only; reuse successful artifacts solely after their full lineage
   checks. Authenticate historical producer helpers, not current consumer hashes.
 - Budgets are predeclared per stage. CPU assembly retains7200s; no longer timeout

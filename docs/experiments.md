@@ -7251,3 +7251,26 @@ No tracking, CPU feature/calibration, GT segmentation/target values or quality
 evaluation. Do not alter query/threshold/selection or reopen this cohort to make
 the gate pass. Generic text grounding is insufficient automatic hand evidence;
 next audit specializes observations, then needs a new independent protocol.
+
+EP0 native sharedprepare PASS23.308068s/full790, EP12 PASS18.401943s/full405.
+All controls/native/reference replay and original input/assets/helper bytes
+verified; max reference point residual0.002672/0.002766mm is conversion fidelity,
+not reconstruction accuracy. Independent all-four-artifact pins committed in
+`configs/cari_clip_000000_shared_prepare_pins.json` and000012. Original actual
+4d4a049 queued producer source helpers also rehashed remotely; no namespace spoof.
+Root408 focused tests PASS1optionalSKIP54.08s for nativeprepare/forward/input/queue.
+EP0 nativeforward publication started under6912d79, not yet a verified execution.
+
+Independent specialist audits: MediaPipe Hands modelcard explicitly excludes
+object-holding occlusions; native handednessscore is not detectionconfidence or
+jointvisibility. Separate cheap CPU diagnostic only after a fresh protocol.
+WiLoR direct hand detector has unresolved checkpoint/source rights; HaMeR source
+MIT but defaultdemo person→ViTPose; Dyn-HaMR sourceMIT/README conflict and shared
+WiLoR/MANO dependencies. HaMeR/WiLoR configs includeDEX-TRAIN: no leakage-free
+Dexvalidation claim. No additional hand model/data/job acquired from these audits.
+
+Scheduling-only `--after-gpu-lock` adds no predecessor-success assumption,
+numerical/model/threshold changes or retry. Root139 existing+additive real-shell
+tests PASS69.60s; originalsuccess/terminal modes remain fail-closed. Fresh clips
+can now queue without losing work to collected predecessor units; owned existing
+lock, full immutable source/target/idle checks and childlock reacquisition remain.
