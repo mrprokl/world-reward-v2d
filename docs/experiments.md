@@ -6827,3 +6827,13 @@ fullrefinement dispatched with4exactstagedcodeACKs; actualparent1214837/GPU
 inferred. EP8 CPU originalassembly active300/634; original7200s budgetguard
 remainsfrozen for07:12:53UTC. YCBv2 replay remainsnonexecutable pending explicit
 userauthorization, no thirdacquisition/GT/modelrun. No finalParquet/submission.
+
+EP6 actual full816 native refinement completed05:57:49UTC,566.098277s,
+300requested/301effective originaloptimizerupdates, unchangedinput/objectgeometry.
+Actual parent1214837 terminated; original queue log ends child_complete, GCunit
+inactive/MainPID0. Root independently bound originalc06ca34driverSHA and repeated
+readonlycomplete twooutputinventory PASS. Frozen624,166,816B refinedbundle
+SHAef7dfce4fbaf083984e1b26d288e39a1fad63dc938166b2493baa0d07a8183cc;
+15,888B finalreceiptSHA26f6a8eecbac3b923ee1b74f14141c79e238903080a1c67f39ee70ec2678841b.
+Tinyrefinedpins precede originalexport; this is fullpipeline engineering, not
+externalquality/CARI4D-victory evidence. No YCB replay authorized.
