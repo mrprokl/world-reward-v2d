@@ -7299,3 +7299,8 @@ explicit numerical support, coordinateunits, separate nativehandedness and
 handcentredworld variables passes152 focused tests0.11s. No model inference,
 visibility/identity/contact/sharedmetric truth inferred by constructing it.
 Proposed freshDex03 fullTCPU protocol is not implemented/adopted/data-acquired.
+
+Full tiny suite collected atc9b2910 (before later forward pin configs/source-only
+acquisition work) completed **12739PASS8optionalSKIP496.02s**. Exact owned isolated
+`/tmp/world-reward-root-full-20261004-hand-v1` fixture removed only after completion.
+This validates numerical/plumbing contracts, not actual learned accuracy/rights.
