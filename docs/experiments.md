@@ -7443,3 +7443,13 @@ seg:uint8[480,640] and joint_2d:float32[1,21,2], no3D/pose/MANO/calibration memb
 Pure evaluation uses17 verified joints, association/missing/ambiguity denominators
 and nullable errors; no best-GT match, prediction edits or adoption threshold.
 Native paths/markers/report/posthash are checked; fixtures are not actual GT.
+
+EP0/12 actual shared native refinement PASS428.883269s/223.082131s under7392634,
+301 updates on all790/405 original frames. Native mesh/raw inputs unchanged;
+independent CPU-only full-chain/source/native-assets/posthash audit PASS before
+refined pins. Reports15761B SHA9a7aacc7cda4011bff8119d861a440881c8fd4a26b9f3203a51fccc7cc549943
+and13835B SHAd6604b251a4114004b449ee11f9823a224b8d86bead863b75f04ec482b9bc4bc.
+No private truth or learned inference in refinement; fidelity not quality.
+EP13 shared prepare v1 scheduling FAIL12:26:14UTC: predecessor was collected,
+zero child execution. Original failure preserved; exact published95fdd40 snapshot
+reused explicitly in fresh v2 idle dispatch after target absence check, ACK only.

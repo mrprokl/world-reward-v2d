@@ -20,15 +20,15 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 6 | 816 | Same complete chain PASS on qualified fixed volume geometry. |
 | 8 | 634 | Same complete chain PASS; VM02 full pose/result return byte-sealed before VM01 assembly. |
 | 15 | 501 | Same complete chain PASS. |
-| 0 | 790 | Shared preparation PASS23.308068s and full native forward PASS145.404580s/9 windows; frozen receipts. Refinement actually waiting for EP14 GPU release. Old conversion failure separate. |
+| 0 | 790 | Full shared native refinement PASS428.883269s/301 updates; complete inputs/prepare/forward/refined chain independently audited/pinned. Direct export not yet run; old conversion failure separate. |
 | 4 | 747 | Tracking stops at18 empty automatic object masks; full trajectory unavailable. |
 | 7 | — | Empty automatic fixed anchor; closed without reroll. |
 | 9 | 415 | Geometry/topology failures before pose; no face deletion or threshold rescue. |
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
-| 12 | 405 | Shared preparation PASS18.401943s and full native forward PASS108.541485s/5 windows; frozen receipts. Refinement reuse-dispatch ACK received; actual execution not yet inspected. Export not run. |
-| 13 | 425 | Original full input preparation PASS3253.951699s at12:07:17UTC; all15 source artifacts and dependency reports audited/pinned. Shared preparation/forward/refinement/export not yet run. Technical queue failure retained. |
-| 14 | — | Fresh unchanged fixed_all16 frontend active; object tracking100 frames at417.908247s. No full input or reconstruction PASS. |
+| 12 | 405 | Full shared native refinement PASS223.082131s/301 updates; complete chain independently audited/pinned. Direct export not yet run. |
+| 13 | 425 | Original full inputs PASS3253.951699s/pinned. Shared prepare v1 scheduling FAIL before child because predecessor was collected; explicit idle metadata-only replay ACK, actual result not yet inspected. |
+| 14 | — | Fresh unchanged fixed_all16 frontend active; object GPU return established, CPU depth packaging100 frames at12:31 audit. No full input or reconstruction PASS. |
 
 Seven complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
