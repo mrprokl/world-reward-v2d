@@ -6604,3 +6604,11 @@ rows and byte/SHA attachment prevent queryposition0/source1 or privateID
 misassociation.97LOC no models/NumPy/I/O, no existing adapter/math changes.
 This is preparation for a future explicittechnical protocol, not authorization
 or an executed external validation result.
+
+EP5 unchanged full native refinement actual **PASS668/668,392.972054s**,
+producer3acfe4bc8bd64a849f37648b126078e02f6f2610;300requested/301effective
+updates, rawinputs/clipconstantgeometry/sharedidentity/fullnativeframes intact.
+Originalunitexit0 and independentwhole2output+producerstage audit PASS. Report
+15151B SHAeec7fabeb0912ca983c954837c3723052d9444f00943ef3690c1f72cc5cda697;
+refined511044384B SHA430caca2c286d77d3b8643143c44188c7f4170c2628c21972b258fbc6d4439d2.
+Nextdirectexport onlyafterfrozenpins; no acceleration/CD/CARI4D improvement claim.
