@@ -193,3 +193,67 @@ def test_host_fail_keeps_original_status_and_actual_failed_scope(q,monkeypatch,t
     assert status==7 and report['status']=='fail' and report['native_report'] is None
     assert report['owned_container_removed'] is True and out.stat().st_mode & 0o777==0o555
     assert (out/'report.json').stat().st_mode & 0o777==0o444
+
+
+def test_third_native_preflight_failure_stops_after_two_valid_preflights(q,monkeypatch,tmp_path):
+    rows=q.fixtures(np); before=[(v.tobytes(),f.tobytes()) for _,(v,f) in rows]
+    first=q.modules()[0]; manifest=first._array_manifest([(name,*pair) for name,pair in rows])
+    progress={}; calls=[]; real_topology=q.topology
+    monkeypatch.setattr(q,'fixtures',lambda _: rows)
+    def checked_topology(v,f):
+        assert progress['all_sources_frozen_before_measurement'] is True
+        assert progress['fixture_manifest']==manifest
+        assert not v.flags.writeable and not f.flags.writeable
+        assert all(not np.shares_memory(v,pair[0]) and not np.shares_memory(f,pair[1]) for _,pair in rows)
+        return real_topology(v,f)
+    monkeypatch.setattr(q,'topology',checked_topology)
+    binary=tmp_path/'manufactured-ELF-call-only'
+    def native(argv,**kwargs):
+        assert argv[:2]==[str(binary),'--preflight'] and len(argv)==3
+        assert 0<kwargs['timeout']<=100 and kwargs['capture_output'] is True
+        index=len(calls); calls.append(argv)
+        assert Path(argv[2]).name==q.NAMES[index]+'.obj'
+        if index==2:
+            return SimpleNamespace(returncode=2,stdout=b'',stderr=b'FAIL: manufactured unexpected negative preflight')
+        nv,nf,nc,nb=((4000,7680,1,320),(4704,8960,2,448))[index]
+        report=dict(source_vertices=nv,source_faces=nf,components=nc,boundary_vertices=nb,
+            unused_vertices=0,float32_triangles_exactly_active=True,oriented_vertex_manifold=True,
+            volume_or_closure_required=False,qem_calls=0,adoption=False)
+        return SimpleNamespace(returncode=0,stdout=json.dumps(report).encode(),stderr=b'')
+    monkeypatch.setattr(q.subprocess,'run',native)
+    with pytest.raises(ValueError,match='Native preflight exit 2'):
+        q.controls(np,None,None,None,None,binary,tmp_path,lambda:100,progress)
+    assert len(calls)==3 and progress['counts']==dict(preflight_attempts=3,preflight_returns=3,
+        qem_attempts=0,qem_returns=0,native_loader_attempts=0,native_loader_returns=0,
+        authority_attempts=0,authority_returns=0,budget_attempts=0,budget_returns=0)
+    assert progress['current_case']==q.NAMES[2] and progress['current_phase']=='source_preflight'
+    assert progress['records']==[] and progress['all_sources_rehashed_after'] is True
+    assert progress['created_artifacts_rehashed_after'] is True
+    assert set(progress['created_artifacts'])=={name+'.obj' for name in q.NAMES}
+    assert {p.name for p in tmp_path.iterdir()}=={name+'.obj' for name in q.NAMES}
+    assert before==[(v.tobytes(),f.tobytes()) for _,(v,f) in rows]
+
+
+@pytest.mark.parametrize('corruption',['boundary_position','boundary_orientation'])
+def test_valid_open_interior_contraction_rejects_boundary_corruption(q,corruption):
+    # Remove a nonincident top face from the tiny bipyramid: vertices2/3/4
+    # form one fixed boundary, while the actual contracted edge0--1 is interior.
+    v,f,u,g,m=tiny_valid_collapse(q)
+    f=np.delete(f,2,axis=0); j=np.array([1,2,4,5,6],np.int64)
+    quotient=np.asarray(m['original_vertex_to_output'],np.int64); g=quotient[f[j]]
+    m.update(source_faces=len(f),output_faces=len(g),J=j.tolist())
+    m['ledger'][0]['removed_faces']=[0,3]
+    arrays=[np.frombuffer(a.tobytes(),dtype=a.dtype).reshape(a.shape) for a in (v,f,u,g)]
+    source,candidate=q.verify_mapping(*arrays,m)
+    assert len(source.boundary_loops)==len(candidate.boundary_loops)==1
+    assert set(source.boundary_loops[0])=={2,3,4}
+    before=[a.tobytes() for a in arrays]
+    bad_u,bad_g=arrays[2].copy(),arrays[3].copy()
+    if corruption=='boundary_position':
+        boundary_output=m['I'].index(2); bad_u[boundary_output,2]+=.125
+    else:
+        # Reverse every surviving face: manifoldness remains, but oriented
+        # boundary/face lineage cannot be relabeled as the original surface.
+        bad_g=bad_g[:,::-1].copy()
+    with pytest.raises(ValueError):q.verify_mapping(arrays[0],arrays[1],bad_u,bad_g,m)
+    assert before==[a.tobytes() for a in arrays]
