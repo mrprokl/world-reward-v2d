@@ -28,7 +28,9 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
 | 12 | 405 | Full native refinement and direct export PASS31.726037s, whole source chain/four outputs pinned. Official packing PASS13.521699s/all405, scratch removed. |
 | 13 | 425 | Original full inputs and shared preparation PASS18.417917s/all425 frames; full source/geometry lineage pinned. Original collected-predecessor scheduling FAIL remains separate. Native forward PASS109.129234s/all425 and301-update refinement PASS220.562431s, both independently frozen. Direct export PASS31.882319s and official packing PASS13.458823s; scratch removed. |
-| 14 | 442 | Original full frontend/input PASS3319.999303s; independent15-input pins sealed. Shared preparation PASS18.842805s and native forward PASS111.789331s; both independently pinned. No accuracy PASS. |
+| 14 | 442 | Original full frontend/input PASS3319.999303s; independent15-input pins sealed. Shared preparation PASS18.842805s, native forward PASS111.789331s and301-update refinement PASS224.287833s; independently pinned. Export dispatched, not presumed complete. No accuracy PASS. |
+| 16 | — | Original topology budget FAIL before object pose; all eight fixed automatic candidates rejected, no reroll or face/component deletion. |
+| 17 | — | Unchanged original frontend dispatched after cooperative GPU lock; completion not yet independently qualified. |
 
 Ten complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
@@ -64,6 +66,12 @@ All outputs freeze first;171/177 positives uniquely associated,6 misses,
 conditional17-joint EPE9.648746px (2907/3009 valid joints scored). No GPU,
 identity/contact/3D gain, threshold tuning or adoption. Detailed limitations and
 pins stay in experiments; source/task eligibility and overlap remain unresolved.
+
+Dex04 paired mask ablation is CLOSED qualityFAIL: meanDice0.367→0.376 but
+one clip regresses and object-label contamination rises; no tracking extension.
+Separate Dex05 IMAGE-versus-native-video-memory protocol is preregistered.
+Data-free two-state SAM2 CUDA API gate PASS11.442363s; fresh acquisition dispatched
+on VM02, not yet independently qualified. No new private metrics or adoption.
 
 ## Azure identities and storage
 

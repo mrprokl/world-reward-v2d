@@ -19,7 +19,7 @@ inferred automatically; no hand-labeling of challenge records.
   EP11 stops before SAM2/later frontends. EP0's exact historical metadata
   omission is authenticated, not a relaxed legacy gate or a reversal of its old
   conversion failure. EP13 full425 complete chain passes. EP14 full442 inputs, shared preparation
-  and native forward pass with independent source-chain pins; refinement next.
+  and native forward plus301-update refinement pass with independent source-chain pins; export next.
   EP16 closes on topology-budget failure before object pose, without mesh repair. Collected-predecessor scheduling failures
   remain separate. Original controls/reference replay and whole source-chain pins are
   frozen before each next stage; no prediction is inferred from dispatch ACKs.
@@ -64,6 +64,9 @@ inferred automatically; no hand-labeling of challenge records.
   frozen before private segmentation. Dice0.367→0.376, but one clip regresses
   and object-pixel contamination rises: preregistered gate **REJECTS**. Missing
   proposals affect82/175 annotated positives; no tuning or tracking extension.
+- **Next hand ablation:** separate Dex05 protocol freezes IMAGE versus native
+  video memory before acquisition. Data-free CUDA API gate passes11.44s; this
+  is neither fresh-mask accuracy nor a new tracker. Diagnostic-only, no adoption.
 
 Detailed receipts, producing revisions and decisions live in
 [experiments](docs/experiments.md). [Compute](docs/compute.md) is the compact
