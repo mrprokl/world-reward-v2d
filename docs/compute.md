@@ -21,18 +21,24 @@ EP5's original CPU input assembly passes all668frames; shared preparation is
 queued under the original GPU lock. EP6's default topology reduction failed
 before any pose; an independently qualified volume proposal and authenticated
 empty-directory archive preserve that failure. The unchanged full816-frame
-volume tracker is active, most recently200frames complete. EP7's empty fixed
+volume tracker is active, most recently350frames complete. EP7's empty fixed
 anchor is closed without reroll; EP8's complete634-frame initializers and minimal
 private archive pass. Its first private transfer stopped on the existing NSG
-deny before any bytes; a temporary exact private-pair TCP2222 rule fixes that
-transport barrier, not the prediction algorithm. A new transfer is pending.
+deny before any bytes; a temporary exact private-pair TCP2222 rule fixed that
+transport barrier, not the prediction algorithm. The complete private transfer
+passes, but the unchanged VM02 tracker fails topology before any pose. Its
+isolated empty failed output is preserved; no canonical pose is promoted. The
+temporary ingress/listener and both newly generated private keys are removed.
 All masks/frames/shape/scale contracts remain unchanged.
 
 VM02 Boots native CPU verification, full three-video inference and preregistered
 CPU evaluation pass: meanAJ0.6679 versus static0.1778. The earlier API/format/
 receipt-access FAILs remain preserved; oracle initial queries, a static negative
 control and unknown training overlap preclude a3D/generalization/CARI4D claim.
-New full-contiguous YCBV acquisition is CPU-active under a900s fixed budget;
+Full-contiguous YCBV CPU acquisition fails its900s download deadline, with
+complete disposable cleanup and no ZIP/private-label interpretation. A single
+technical3600s continuation is being prepared, preserving the authenticated
+first FAIL and exactly the same dataset/cohort/scientific gates;
 automatic3D point-pose validation has not run. Its three-anchor depth and
 automatic-mask preflights and identical-pool comparison are separately gated.
 

@@ -6342,3 +6342,35 @@ After independent receive verification, the exact owned temporary TCP2222 NSG
 rule was deleted; original deny-all remains. Private listener/keys cleanup is
 next, not kept as a broad research ingress. EP8 unchanged VM02 full-pose job
 f63554f accepted under the original lock; actual native result still pending.
+
+
+2026-10-04 ~02:40UTC EP8 native VM02 **FAIL7.144679s**, before any pose:
+all default global/componentwise budget proposals violate original boundary or
+orientation/Euler gates. Native log1486B SHA
+`59ff59cefdf79b694b3eb2412741c5c43d275c39797d8a78fdb1da59a064009d`;
+sealed report2479B SHA
+`12477d73a4d41f06d5153a3290fe21795a09ce1b07d351500355b69a331f892d`.
+Source/image/input/lock postchecks pass; canonical pose target absent, owned
+failed pose directory empty. Preserve failure, do not relax topology, shrink,
+fill cavities or repeat the same default backend. The separately qualified
+per-shell-volume CPU proposal is the next general geometry hypothesis, retaining
+all original geometry/scale constraints; a proposal PASS would not prove motion.
+
+Independent actual senderd729ec4 **PASS34.929616s**: report850B SHA
+`16cba7c7b4625aefde7ede8c7ceb03878b97bfd5144638c5600428729bbc89ba`,
+source/archive/key metadata unchanged and original receiver pins match. Exact
+owned VM01 client private600/public400 key pair was deleted after metadata/public
+identity checks, without opening/hashing private bytes. VM02 server private key,
+listener and temporary exact NSG rule were already removed; useful receipts and
+original failures remain. EP6 volume tracking350/816 is active; EP5 shared
+preparation remains queued, no duplicate GPU job.
+
+YCBV original40ee2cb CPU acquisition **FAIL901.158598s** at the frozen900s
+full-test download deadline. Actual unit failed/exit1/MainPID0; sealed report
+2038B SHA`36377969586fd66d0c01176a3a73484268e45286086c4a859f7c107484afd8e9`.
+Source rehash and disposable cleanup pass; only report/CID remain, no RGB/ZIP
+or private annotations interpreted. Independent audit permits one technical
+3600s continuation with explicit bounded cleanup grace, atomic NOREPLACE archive
+of the complete original FAIL, unchanged full-archive SHA, licenses, 3x96 cohort
+and GPU/scientific gates. Actual transition/pins must precede that single run;
+this transport-time correction is not validation-based hyperparameter tuning.
