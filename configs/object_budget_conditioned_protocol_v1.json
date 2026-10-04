@@ -1,0 +1,36 @@
+{
+  "schema": "world_reward.object_budget_conditioned_protocol.v1",
+  "inputs": "immutable automatically generated Track1 monocular object geometry and human-grounded scale only",
+  "backend": "qualified_cached_fixed_chart_qem",
+  "total_seconds": 1800,
+  "native_seconds": 1200,
+  "target_faces": 4096,
+  "target_vertices": 4096,
+  "chamfer_diagonal_limit": 0.01,
+  "each_shell_and_net_volume_limit": 0.05,
+  "source_geometry": "exact numeric welding only; every original oriented triangle preserved; no near merge, repair, deletion or normal inversion",
+  "source_f32_triangles_required": true,
+  "source_weld_collisions": "diagnosed; allow native real collapse to resolve, no welding/snap repair",
+  "source_roundtrip_required": "numerically exact fixed chart F64",
+  "source_components": "any all-positive independent shells; otherwise exactly one outward/one inward shell with independent containment; other nesting stops unqualified",
+  "fixed_object_scale": "original human-grounded scalar applied once after original official pack, no additional fitted scale",
+  "full_stages": [
+    "physical_source",
+    "native_candidate",
+    "float32_glb",
+    "default8_exact_weld",
+    "unmodified_official_pack",
+    "original_grounding_metric_bake"
+  ],
+  "failure_policy": "stop_keep_tiny_receipt_and_remove_own_candidate_outputs_no_historicaloverwrite_no_parameterretune",
+  "claims": {
+    "adoption": false,
+    "reconstruction_accuracy_verified": false,
+    "challenge_performance_verified": false,
+    "metric_scale_accuracy_verified": false,
+    "source_calibration_used": false,
+    "ground_truth_used": false,
+    "hand_labeled_test": false,
+    "oracle_modes": []
+  }
+}

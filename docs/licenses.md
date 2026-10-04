@@ -311,3 +311,22 @@ shell, not a new authenticated rules audit. Contact remains
 [v2d_challenge@nvidia.com](mailto:v2d_challenge@nvidia.com), verified on the
 [official contact page](https://nvidia-isaac.github.io/video_to_data/v2d_challenge/#contact).
 The organizer clarification below remains unsent; eligibility is unresolved.
+
+### October4 independent full-body validation alternatives
+
+No commercial/competition-compatible real full-T HOI reference is newly cleared.
+[HOI-M3 toolbox](https://github.com/Juzezhang/HOIM3_Toolbox/tree/0665e177c3f8285593e688c265fa56c44ae314ff)
+and [publisher metadata](https://huggingface.co/datasets/JuzeZhang/HOI-M3/tree/1359843ef96929bbc96f6129ffbb8d60cfc89c2d)
+make single-camera acquisition technically feasible, but code/site licenses do
+not establish rights to captures, multiview reference fits or MHR assets. Mono
+MHR estimates are not independent truth; frame pairing and the two documented
+camera gauges must be clarified. Contacts `wangjingya@shanghaitech.edu.cn` and
+`xulan1@shanghaitech.edu.cn`; no message or acquisition made.
+
+[CORE4D license issue14](https://github.com/leolyliu/CORE4D-Instructions/issues/14)
+remains unresolved: README CC-BY4, publisher MIT and dataset-site NC disagree.
+[Object poses issue13](https://github.com/leolyliu/CORE4D-Instructions/issues/13)
+and [synchronization issue9](https://github.com/leolyliu/CORE4D-Instructions/issues/9)
+also prevent assuming a clean shared SE3 reference. HIMO is explicitly NC;
+HUMOTO public animations are not verified synchronized real RGB. No model
+overlap or derived-label rights are inferred from downloadable files.

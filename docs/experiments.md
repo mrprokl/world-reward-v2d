@@ -7977,3 +7977,25 @@ retainedAzure0555, receipts0444/dir0555; no media fetched locally. Exactqualifie
 implementationpins frozen afterPASS, notdummy. No productionmesh or HOIgain.
 Localfocused113PASS1.10s and207PASS4.24s, syntax/diffPASS. EP21originalfullpose
 100/563frames processed at lastmetadataquery, stillactive/no reconstructionPASS.
+
+Independent association-ROI audit: reuse actual GroundingDINO/SAM2 bank producer,
+shared nativeSAM2 memory and Boots automaticqueries rather than introduce a new
+unqualified ReID checkpoint. Tracked points uniquely contained in a candidate
+can produce persistence evidence; outside/overlap/missing stay explicit. This
+does not identify the manipulated object. A joint actor/object likelihood needs
+pair-specific relation calibration on a fresh external split, shared nuisance/
+absence model, and same-observation persistence-only ablation. No ad hoc sum of
+pixels/cosines/co-motion, nearest-hand ownership or mask subtraction. Existing
+primitives are not an operational trained joint estimator or a HOI-quality gain.
+
+Independent fullbody-HOI dataset rights audit: no immediately qualified public
+commercial/competition-compatible alternative established. HOI-M3 toolbox
+0665e177c3f8285593e688c265fa56c44ae314ff distinguishes mono-MHR estimates from
+multiview fits; Apache toolbox/site CC-BY-SA are not a grant for captures or fits.
+HF1359843ef96929bbc96f6129ffbb8d60cfc89c2d permits metadata-only singleview
+inventory, but no acquisition approved. CORE4D96b9084b9516af3ec4382a65d79e892d3e5c22b9
+README CC-BY4 conflicts with publisherHF MIT/siteDatasetNC; authorissue14
+unresolved, objectSE3/synchronization issues13/9/15 also unresolved. HIMO is
+explicitNC; HUMOTO publicanimations not established realRGB/HOI reference.
+Permission requests remain UNSENT, no accounts/datasets/labels fetched. Prefer
+one targeted rights/provenance clarification to another unrelated proxy pipeline.

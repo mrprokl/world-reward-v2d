@@ -26,17 +26,20 @@ def _argument_parser():
     class Once(argparse.Action):
         def __call__(self,parser,namespace,value,option_string=None):
             if getattr(namespace,self.dest,None) is not None:
-                parser.error('Episode must occur exactly once')
+                parser.error('Episode must occur exactly once' if self.dest=='episode' else 'Backend must occur exactly once')
             setattr(namespace,self.dest,value)
     parser=argparse.ArgumentParser(description=__doc__,allow_abbrev=False)
     parser.add_argument('--episode',type=_episode,choices=range(30),required=True,action=Once)
+    parser.add_argument('--backend',choices=('volume','conditioned'),action=Once)
     return parser
 
 
-def output_relative(episode):
+def output_relative(episode,backend='volume'):
     if type(episode) is not int or not 0<=episode<30:
         raise ValueError('Explicit Track1 episode integer0..29 required')
-    return f'outputs/episode_{episode:06d}/object_budget_volume'
+    if type(backend) is not str or backend not in ('volume','conditioned'):
+        raise ValueError('Explicit volume or conditioned backend required')
+    return f'outputs/episode_{episode:06d}/object_budget_{backend}'
 
 
 def prerequisites(root,episode):
@@ -57,6 +60,9 @@ def prerequisites(root,episode):
 
 def main(argv=None):
     args=_argument_parser().parse_args(argv)
+    if args.backend=='conditioned':
+        import object_budget_conditioned
+        return object_budget_conditioned.main(args.episode)
     if platform.system()!='Linux' or {p.name for p in Path('/sys/class/net').iterdir()}!={'lo'}:
         raise RuntimeError('Require remote CPU network-none')
     root=Path(os.environ['WR_ROOT']);out=root/output_relative(args.episode);path=out/'report.json'
