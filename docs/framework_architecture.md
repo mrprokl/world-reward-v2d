@@ -20,6 +20,7 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 | Identité temporelle | `temporal_identity.IdentityGraph`, `rank_identity_paths` | Ranking global et min-marginales de coûts fournis ; aucun générateur de candidats/costs appris, identité acceptée ou probabilité. |
 | Evidence relationnelle | `relational_motion.relational_motion_features` | Résidus 2D après nuisance affine du fond, comptages/support ; tracks fournis, pas génération/identité/contact/confiance ni caméra physique. |
 | Banque automatique | `automatic_candidate_bank.build_automatic_candidate_bank` | Callbacks DINO/SAM2 : toutes les propositions retenues, un encodeur et batch de masques, queries + fond ; pas encore une exécution de modèles ou une identité acceptée. |
+| Mains spécialisées | `hand_observations.HandObservations`, `HandInstances`, `LandmarkEvidence` | Contrat readonly full-T/ragged/21 points, coordonnées et handedness séparés ; pas de modèle exécuté, identité ou visibilité certifiée. |
 | Lacunes | `occlusion_bridge.initialize_occluded_gaps` | Initialiseur conditionnel ; pas contact observé ni validation RGB complète. |
 | Baseline complète | `cari_shared_prepare`, `cari_full_forward`, `cari_full_refine`, `cari_full_export` | Adaptateurs natifs séparés, preuve et exécution souvent imbriquées. |
 | Évaluation externe | `point_motion_evaluation`, `point_bop_evaluation`, `ycbv_point_evaluate` | Portée rigide relative ; pas validation HOI globale. |
@@ -81,6 +82,14 @@ sans refill ; les masques vides restent Q=0. Coordonnées originales continues
 `[0,row+.5,col+.5]`, copies readonly ; scores bruts non calibrés. Root215 tests
 combinés PASS0.20s. Ce sont des tests à callbacks factices, pas une exécution GPU,
 une licence/absence d'overlap certifiée ou un gain d'identité/3D.
+
+`hand_observations` sépare les 21 coordonnées image de leurs unités/support
+numérique, du Z relatif au poignet et du XYZ centré-main. Toute frame originale
+possède un record, même vide ; tous les slots sont conservés sans les nommer
+identités persistantes. Handedness n'est jamais confiance de détection/visibilité.
+L'adapter natif normalisé applique seulement xW/yH, aucun mirror/offset/crop,
+conserve les valeurs hors grille/non supportées et ne crée pas de jauge globale.
+Root152 tests de contrats PASS0.11s ; aucun run MediaPipe ni gain appris.
 
 | Champ | Invariant |
 |---|---|
