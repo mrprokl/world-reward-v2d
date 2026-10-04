@@ -1,6 +1,7 @@
 # Framework World Reward : recherche, scène partagée, preuves
 
-**Statut : proposition d'architecture, non implémentée comme framework unifié.**
+**Statut : architecture proposée ; première primitive SharedScene implémentée,
+framework unifié non encore opérationnel.**
 Objectif : améliorer la reconstruction Track 1, pas multiplier les wrappers ou
 confondre un pipeline exécutable avec une victoire sur CARI4D. Code et décisions
 restent locaux ; médias, modèles, caches et expérimentations restent sur Azure.
@@ -24,6 +25,17 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 Les contrats historiques et leurs preuves restent consultables à leur révision.
 La route proposée ne présente ni le planner historique ni les opérateurs purement
 numériques comme un framework complet déjà opérationnel.
+
+### Première migration réalisée
+
+`world_reward.shared_scene` ajoute des adaptateurs explicites
+`from_track1_episode`, `from_reconstruction`, `to_track1_episode`. K fourni,
+convention pixel et gauge déclarées ; arrays copiés readonly sans alias,
+scale/mesh non rebakés, provenance tiny deep-freeze, support d'observation
+manquant conservé. Layout MHR officiel, toute la timeline et SE3 restent
+validés par les contrats existants. Root129PASS1optionalKITskip0.51s.
+Cela n'est ni un estimateur de caméra, ni un fit, ni un système intelligent
+complet ; roundtrip logique/byte-exact seulement, sans nouveau gain3D revendiqué.
 
 ## 2. Un flux scientifique, trois frontières
 

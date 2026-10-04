@@ -6973,3 +6973,18 @@ onread-inducedatime then oninputoriginalmodes, thenunprintedPASSlogassumption;
 correctedspecificstatfields/byteproof/actualreport only, no inference rerun.
 EP8nativeforwardelapsed132.777282s/all7windows; refinement238240c nowcollected
 inactive, actualfullreceiptinventory stillneeded (notinferredPASSfrommissingunit).
+
+YCBcorrectedmaskaccessreplay actualscientificfeasibilityFAIL11.701847s:
+automaticdetector abstains onscene49 withambiguousdistinctdetectionsinside
+frozenconfidence margin. Twoattempts/twocalls, zeroSAM2/frames/trajectories,
+noObjects/Boots/private3Devaluation. Originalinputs/source/assets rehashedafter
+true;58487B reportSHA53569f0248b2456e56528418668245d52e0e18e5dd3b21079055e45a123f05b3.
+Keeporiginal67cea1a failure/cohort closed; no prompt/seuil/per-sceneobject
+selection/retune. Pointunary accuracy itself untested; newmulti-instance
+association wouldrequiredistinctfreshprotocol/cohort/negativeidentitycontrols.
+
+Firstunified-scene migration implemented tinyshared_scene adapters, noI/O/fit/
+models/ranking/oracle fallback. ExistingTrack1Episode/SE3contracts reused;
+ownedreadonlyarrays/provenance, originalT/K/gauge conventions explicit,
+MHRlayout preserved andexactroundtripwithoutobjectrebake. Root129PASS1optional
+KITskip0.51s. Architecturalfoundation only; no scientificgain/adoption.

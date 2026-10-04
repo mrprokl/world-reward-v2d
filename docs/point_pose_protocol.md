@@ -231,3 +231,18 @@ The new untouched v2 namespace and50.88GB remote free space are verified before
 dispatch. A code-transport ACK is not acquisition/model/quality PASS. Full ZIP
 SHA/CRC remain mandatory; partial-header evidence is never substituted. This
 same-cohort engineering replay is not independent replication or CARI4D victory.
+
+## Corrected engineering replay outcome — October 4
+
+Complete corrected acquisition and three original native MoGe calls pass.
+A zero-model-call DAC access failure is independently archived without changing
+input bytes/modes; a manufactured readonly CPU control precedes its access-only
+replay. The real automatic object initializer then **abstains** on scene49:
+ambiguous distinct detections within the frozen confidence margin. Exactly two
+detector calls, zero SAM2 calls, zero trajectories/private3D evaluation. This
+cohort and operator are closed: no threshold/prompt/box selection, scene mining
+or hand-picked object rescues. This is an automatic-observation feasibility
+failure, not a measured rejection or success of the point-pose unary itself.
+A future scene-level multi-instance association system is a separate hypothesis,
+requiring a fresh preregistered cohort and identity-negative controls; do not
+call a generic detector's ambiguity a correspondence-model verdict.
