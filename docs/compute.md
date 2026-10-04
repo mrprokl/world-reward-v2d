@@ -27,7 +27,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
 | 12 | 405 | Shared preparation PASS18.401943s and full native forward PASS108.541485s/5 windows; frozen receipts. Refinement reuse-dispatch ACK received; actual execution not yet inspected. Export not run. |
-| 13 | 425 | Technical queue failure retained; direct replay completes object tracking, releases GPU11:13UTC, and remains in CPU input assembly. Full inputs not yet PASS. |
+| 13 | 425 | Original full input preparation PASS3253.951699s at12:07:17UTC; all15 source artifacts and dependency reports audited/pinned. Shared preparation/forward/refinement/export not yet run. Technical queue failure retained. |
 | 14 | — | Fresh unchanged fixed_all16 frontend active; object tracking100 frames at417.908247s. No full input or reconstruction PASS. |
 
 Seven complete packed episodes are engineering/fidelity evidence only. Scratch

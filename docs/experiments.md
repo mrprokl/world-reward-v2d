@@ -7392,3 +7392,14 @@ Download7200s then scan/extract1800s, cleanup120s; removes only owned verified
 archive after retention/posthash. Actual acquisition remains deferred until
 the small CPU graph-load prerequisite is verified. No private values or model
 outputs are consulted in the source-only implementation/tests.
+
+EP13 original full inputs actual PASS3253.951699s/all425 frames at12:07:17UTC;
+nativeproducer814179a/helperc529b2409a600cd4599f38276a5275ac0c85e645c7cb5712482b4c928e67a283.
+Report3360B SHAdbdac470d7e139890c2ec686b61396076bfa3ae63e40b6ee93bb162cb6372d5e.
+All15 files independently hashed and native generic report gate verifies full
+Body/depth/object/adapter/sharedscale/source-video identities, no oracle.
+First readonly audit used a frontend closure lacking cari_clip_inputs; corrected
+consumer imports the independently hashed existing7392634 shared-stage closure,
+without rerunning the actual inputs or spoofing their producer. Original helper
+matches the actualea26eda queued source; full frozen input config precedes any
+shared native execution. Collected unit is not this PASS evidence.
