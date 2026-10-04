@@ -28,12 +28,12 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
 | 12 | 405 | Full native refinement and direct export PASS31.726037s, whole source chain/four outputs pinned. Official packing PASS13.521699s/all405, scratch removed. |
 | 13 | 425 | Original full inputs and shared preparation PASS18.417917s/all425 frames; full source/geometry lineage pinned. Original collected-predecessor scheduling FAIL remains separate. Native forward PASS109.129234s/all425 and301-update refinement PASS220.562431s, both independently frozen. Direct export PASS31.882319s and official packing PASS13.458823s; scratch removed. |
-| 14 | 442 | Original full frontend/input PASS3319.999303s; independent15-input pins sealed. Shared preparation PASS18.842805s, native forward PASS111.789331s and301-update refinement PASS224.287833s; independently pinned. Direct export PASS32.767795s, all five outputs/source-chain frozen before original packing. No accuracy PASS. |
+| 14 | 442 | Original full frontend/input PASS3319.999303s; independent15-input pins sealed. Shared preparation PASS18.842805s, native forward PASS111.789331s and301-update refinement PASS224.287833s; independently pinned. Direct export PASS32.767795s and original official packing PASS13.783991s, all442 source/83 scored frames and geometry preserved, scratch removed. No accuracy PASS. |
 | 16 | — | Original topology budget FAIL before object pose; all eight fixed automatic candidates rejected, no reroll or face/component deletion. |
 | 17 | — | Original topology-budget FAIL before object pose; all eight fixed automatic candidates rejected. Closed without reroll. |
 | 18 | — | Untouched original frontend dispatched after cooperative GPU lock; ACK only, not presumed ready. |
 
-Ten complete packed episodes are engineering/fidelity evidence only. Scratch
+Eleven complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
 verified CARI4D superiority exists. Other episodes are not presumed ready.
 

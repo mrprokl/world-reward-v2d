@@ -7773,3 +7773,13 @@ returned/deleted/normalized. Unsupported/nonfinite/int64 key ranges fail closed.
 Root81tiny combinedPASS0.40s, no Trimesh runtime qualification, accuracy or
 production adoption. The closed precision-control failure remains unchanged; a
 future compiler must satisfy external whole-shell/fidelity/export gates.
+
+EP14 unchanged original official CPU packing actualPASS13.783991s under188089b:
+all442 source frames/83 scored indices, six original controls/sharedidentity and
+4096 active oriented triangles preserved exactly; scratchParquet/payloads removed.
+Report9242B SHA7f85db4bd5df0020183a31214977f3292a814f4a8778a088013a01400395502b.
+Independent complete174-file source/archive, official helpers/runtime/full five
+exports, receipt/schema/firewall/roundtrip/scratch posthashPASS. Eleven complete
+packed engineering episodes, no final all30 artifact or quality superiority.
+EP18 full535 Body actualPASS182.141548s; original full CPUdepth started14:33:59UTC,
+no fullinput completion presumed.
