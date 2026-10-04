@@ -5,11 +5,15 @@ Public model/source bytes and offline dependency notices have been acquired and
 qualified. The full-T native adapter and pure private-array evaluator are
 implemented; the offline CPU graph qualification is independently verified.
 Fresh subject-03 RGB/opaque labels are independently byte-qualified: three
-original72-frame clips (216 full original frames). Actual hand predictions and
-private-array diagnostics have not run yet; no annotation values were read.
+original72-frame clips (216 full original frames). Predictions were sealed before
+private diagnostics, which read only external segmentation and2D joint values.
 The complete native scan is now independently sealed:216 original calls,
 9.314269s inclusive CPU,70/58/48 nonempty frames across the three72-frame clips,
 no capacity saturation. Availability is not accuracy or actor identity.
+Private diagnostic PASS3.698009s:171/177 annotated-positive frames uniquely
+associated,6 missed,0 ambiguous;2907/3009 valid17-subset joints scored, pooled
+conditional EPE9.648746 pixels.39 unlabelled frames are not certified negatives;
+five other predictions are not certified false positives. No adoption/HOI gain.
 It tests automatic 2D observation availability, not identity, tracking, contact,
 shared metric geometry, full HOI, or superiority over CARI4D.
 

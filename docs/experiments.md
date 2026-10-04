@@ -7474,3 +7474,26 @@ remotely, not silenced with changed graph or hidden settings. Independent source
 runtime/task/dependencies/allRGB and seven original outputs/posthash PASS.
 Hostreport6270B SHA900a37e75ae0b6e1bbef2d4b11e47a81016dc305ea5be5fad1b9b9b59c5c97f7
 freeze precedes private evaluation. Nonempty rate is availability, not accuracy.
+
+Fresh external hand diagnostic actual PASS3.698009s undere09a9bf after seven
+prediction artifacts were frozen; independent original source/input/scan/private
+byte permissions/diagnostic posthash PASS. Report7717B
+SHAc0430057a26924ba4a6c8f3c5e98a4d7b73234f850bceb3ce9b58e6c1d5aacb4.
+Onlyseg/joint_2d decoded, no3D/pose/K/model/GPU; all216 frames retained.
+
+| Lex index | Unique/positive | Conditional17-joint EPE px | Median frame EPE px | p95 frame EPE px |
+|---|---:|---:|---:|---:|
+|4|70/71|7.655521|6.901647|11.623261|
+|39|56/57|9.307389|8.945935|12.163009|
+|74|45/49|13.174116|11.638999|23.081442|
+
+Pooled171/177 positives(96.61%),6misses/0ambiguities,2907/3009 valid joints scored,
+conditional EPE9.648746px.39unlabelled frames not negatives;5 other predictions
+not false positives,0outgrid/unavailable boxes. Minimal falsification gate PASS
+only: weak bboxoverlap can still match a wrong hand; errors exclude misses and
+pretraining overlap is unknown. No detector comparison/full-body/HOI gain claimed.
+Decision: retain automatic hand observations as a candidate research interface,
+not an adopted challenge estimator. Any landmark→SAM2/fullT tracking test needs
+a distinct fresh preregistered cohort, unchanged parameters and identity/mask
+gates. Do not tune on these three clips, reopen closed cohorts, attract hands to
+objects, suppress missing objects or infer contact/visibility from availability.
