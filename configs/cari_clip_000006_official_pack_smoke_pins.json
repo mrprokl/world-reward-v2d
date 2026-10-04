@@ -1,0 +1,19 @@
+{
+  "schema": "world_reward.ep6_official_packer_smoke.v1",
+  "producer_revision": "32666e039a23cc27b4c8df7f8cdfd10de4fb2da1",
+  "script_sha256": "031969fcb966178ac94a3c70926d744d3a82b80f7aee3a16c83393412afb2232",
+  "report": {
+    "path": "outputs/episode_000006/official_track1_pack_smoke_v2/report.json",
+    "bytes": 12007,
+    "sha256": "1b65abfda6975ded4536a1bbc2ddbf4dc2bdfae7fe8cc233a9d94d09cb31a725"
+  },
+  "status": "pass",
+  "frames": 816,
+  "scored_frames": 636,
+  "elapsed_seconds": 17.425519504991826,
+  "temporary_Parquet_removed": true,
+  "final_Parquet_produced": false,
+  "quality_verified": false,
+  "source_independently_rehashed": true,
+  "all_four_stage_inputs_independently_rehashed": true
+}

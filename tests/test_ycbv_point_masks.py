@@ -6,6 +6,7 @@ import importlib.util
 import io
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 
@@ -192,6 +193,25 @@ def test_wrapper_firewall_lock_cleanup_and_real_dependency_closure():
     selected=azure_job.runtime_bundle_paths(files,'infra/run_ycbv_point_masks.sh')
     assert set(gate.HELPERS)<=set(selected)
     assert 'infra/ycbv_point_depth.py' in selected and 'infra/frontend_sam2_kernel_gate.py' in selected
+
+
+def test_dac_access_fix_is_only_capability_addition_all_original_mounts_readonly():
+    """Engineering directory traversal, not chmod or broader prediction inputs."""
+    source=(REPO/'infra/run_ycbv_point_masks.sh').read_text()
+    assert re.findall(r'--cap-add\s+([^\s\\]+)',source)==['DAC_OVERRIDE']
+    assert '--cap-drop ALL --cap-add DAC_OVERRIDE' in source
+    assert '--user 0:0' in source and '--read-only' in source and '--network none' in source
+    assert '--security-opt no-new-privileges' in source
+    mounts=re.findall(r'--mount\s+"([^"]+)"',source)
+    assert mounts and [m for m in mounts if not m.endswith(',readonly')]==['type=bind,src=$OUT,dst=$OUT']
+    assert not any(token in source for token in ('--privileged','--cap-add ALL','--cap-add SYS_ADMIN',
+                                                '--cap-add FOWNER','--cap-add CHOWN','chmod -R','chown','eval_private'))
+    assert '--mount "type=bind,src=$BASE/inputs,dst=$BASE/inputs,readonly"' in source
+    # The failed canonical namespace remains non-overwritable. Preservation of
+    # a sealed zero-call historical run is an explicit external owner operation.
+    assert '[[ ! -e "$OUT" && ! -L "$OUT"' in source
+    assert not any(token in source for token in ('mv "$OUT"','renameat2','rm -rf "$OUT"'))
+    assert '630s docker run' in source and gate.BUDGET==600
 
 
 def write_readonly(path,raw):

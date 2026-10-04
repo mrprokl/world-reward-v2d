@@ -106,7 +106,7 @@ done
 MOUNTS+=(--mount "type=bind,src=$BASE/inputs,dst=$BASE/inputs,readonly")
 timeout --signal=TERM --kill-after=10s 630s docker run --rm --name "$NAME" --cidfile "$CIDFILE" \
  --label world-reward.job=run_ycbv_point_masks --label "world-reward.revision=$REV" \
- --gpus all --network none --user 0:0 --memory 32g --cpus 4 --read-only --cap-drop ALL --security-opt no-new-privileges \
+ --gpus all --network none --user 0:0 --memory 32g --cpus 4 --read-only --cap-drop ALL --cap-add DAC_OVERRIDE --security-opt no-new-privileges \
  --tmpfs /tmp:rw,noexec,nosuid,size=512m --entrypoint /usr/bin/env \
  "${MOUNTS[@]}" --mount "type=bind,src=$OUT,dst=$OUT" "$IMAGE" \
  -i PATH=/opt/conda/bin:/usr/bin:/bin HOME=/tmp XDG_CACHE_HOME=/tmp PYTHONPATH="$CODE/infra:$CODE/src" \
