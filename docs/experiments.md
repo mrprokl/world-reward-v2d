@@ -6540,3 +6540,18 @@ all2output hashes/reports PASS; GPU idle. Report71614B SHA
 bundle510994684B SHA9a0f440883f5269e5de16b7596e26fcf6cd5709b737cf6ce0a2c2c1cd6d9c068.
 Tiny committed pins authorize unchanged full native300requested/301effective
 refinement next, never a missing frame or score claim.
+
+EP5 unchanged full native refinement dispatched producer
+3acfe4bc8bd64a849f37648b126078e02f6f2610, driver
+fb5ff78a3168693fde1d72523adca1ec99f7c468e7232b277a03613148fd91a2;
+requested300steps/native301updates unchanged,7200s, existingGPUlock. Acceptance
+is not refinementPASS. EP6 CPU depth assembly and EP8 full volume tracking
+remain disjoint, no duplicate GPU job.
+
+Distinct YCBV header-only identity-chain protocol frozen62a8d005eff20257a4b3351e7a4f7a5d7400877b,
+driver525f5712a155ee7862f58478b98ac9f208f7412cf748ca3507ba3f871fd1eae3;
+root126PASS1LinuxSKIP2.11s. Exactprimaryresolver revision/LFS/size/Xet→finalCAS
+ETag and perarchive identity are required before206body; ContentLength/range/
+32MiB/300s preserved. Original parsing/audit mathematics are ASTidentical.
+Old headerFAIL fullsource/report/unit and original acquisitionFAIL source/
+markers/CID remain sealedbefore/after; no third full acquisition authorized.
