@@ -76,9 +76,9 @@ image compiles offline and its thin Python import gate passes. The independent
 SAM2 CUDA connectivity/hole-filling operator gate also passes, without models
 or historical image-parity/eligibility claims. The new four-frame frontend pilot
 passes; complete replica and reconstruction accuracy remain unverified.
-The full `b7b24a8` lightweight source/test suite passed **11,802 tests,
-5 optional skips** in 419.62 s. Later runtime-reference changes pass176 focused tests;
-current full-suite recheck is running. The synchronous GPU-lock queue retains
+The full `abe793f` lightweight source/test suite passed **11,837 tests,
+5 optional skips** in 425.23 s. Later EP5 inventory/scheduling checks pass281 tests
+with one platform skip; no scientific result follows from these fixtures. The synchronous GPU-lock queue retains
 unchanged
 native stages. Opaque RoboTAP/BootsTAPIR acquisition, independent native CPU
 verification and full2D prediction/evaluation now pass on Azure: three videos

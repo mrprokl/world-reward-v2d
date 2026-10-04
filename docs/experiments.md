@@ -6490,3 +6490,10 @@ report28616B SHA cccb16852e9d56ad5e2d52303120f11309aaad82e7d5d251fe0926c84cab972
 Exact all668frame shared-initializer/reference replay/nooptimizer receipt and
 native payloads are frozen in committed next-stage pins. Unchanged full native
 forward is next under the scoped GPU lock, before any refinement/packing.
+
+Fullsuite collectedabe793f (actual full producerabe793fb6e4b44e19553d008f03aa54aa61d1810)
+**11837PASS5optionalSKIP425.23s**. LaterEP5 inventory/scheduler281PASS,
+1platformSKIP48.19s. EP5 full-native forward dispatched producer
+e080f7e6b6d3a6653e2fab9f8c38006a58f3e7ed, source
+13aaf4d0ee3c287fca54e2c2e9d5fcde8f6680a701a97d05d38847b9cfcb8e65,
+under the existing cooperative GPU lock; acceptance is not a final forward PASS.

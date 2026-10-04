@@ -53,8 +53,8 @@ automatic-mask preflights and identical-pool comparison are separately gated.
 D107 real-depth independent validation is closedREJECT: median4.904632756%
 gain is below frozen5%; no retuning or rounded success. Native offline temporal
 depth is a new hypothesis, not acquired/adopted; OpenLORIS registration is not
-yet proved exact color-camera Z. Fullsuiteb7b24a8 **11802PASS5optionalSKIP419.62s**; later final
-Objects-output rehash correction150focusedPASS1.31s.
+yet proved exact color-camera Z. Fullsuiteabe793f **11837PASS5optionalSKIP425.23s**; later EP5
+inventory/scheduling checks281PASS1platformSKIP48.19s.
 No final Parquet or verified CARI4D
 improvement. Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
