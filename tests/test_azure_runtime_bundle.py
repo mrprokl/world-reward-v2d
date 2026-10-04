@@ -693,3 +693,108 @@ def test_existing_inline_snapshot_not_silently_fixed_or_accepted_by_markers(tmp_
     result=run_local_phase(second[0][2],root,environment)
     assert result.returncode!=0 and len((tmp_path/'launched').read_text().splitlines())==1
     assert {p:p.stat().st_mode for p in modes}==modes
+
+
+def published_reuse_fixture(tmp_path, *, large=False):
+    if large: archive,encoded,sha,_=staged_fixture()
+    else:
+        archive=launcher.runtime_archive(full_archive(files()),'infra/run_smoke.sh')[0]
+        encoded,sha=launcher.encoded_runtime_archive(archive)
+    root,env=local_transport_runtime(tmp_path);job=root/'jobs'/('b'*40)/'run_smoke';job.mkdir(parents=True)
+    with tarfile.open(fileobj=io.BytesIO(archive))as tar:
+        for member in tar:
+            p=job/'code'/member.name;p.parent.mkdir(parents=True,exist_ok=True)
+            p.write_bytes(tar.extractfile(member).read());p.chmod(member.mode&0o555)
+    for p in(job/'code',*(job/'code').rglob('*')):
+        if p.is_dir():p.chmod(0o555)
+    for name,value in(('revision','b'*40),('source-sha256',sha)):
+        p=job/name;p.write_text(value+'\n');p.chmod(0o444)
+    commands=launcher.transport_commands(encoded,sha,archive,'b'*40,'infra/run_smoke.sh','reused-episode',
+        ['--episode','11'],reuse_published=True)
+    return root,env,job,encoded,commands
+
+
+def snapshot_metadata(job):
+    return {str(p.relative_to(job)):(p.lstat().st_ino,p.lstat().st_mode,p.lstat().st_mtime_ns,
+        p.lstat().st_ctime_ns,p.lstat().st_nlink,p.read_bytes()if p.is_file()and not p.is_symlink()else None)
+        for p in(job,*job.rglob('*'))}
+
+
+@pytest.mark.parametrize('large',[False,True])
+def test_explicit_reuse_metadata_only_dispatch_same_frozen_code_without_mutation(tmp_path,large):
+    root,env,job,encoded,commands=published_reuse_fixture(tmp_path,large=large)
+    assert len(commands)==1
+    phase,ack,script=commands[0]
+    assert phase=='published-reused-dispatched'and len(script.encode())<launcher.STAGED_SCRIPT_BYTES
+    assert encoded not in script
+    assert all(token not in script for token in('mkdir ','chmod ','base64 -d','PY_PUBLISH','renameat2'))
+    before=snapshot_metadata(job);result=run_local_phase(script,root,env)
+    assert result.returncode==0 and ack.encode()in result.stdout
+    assert snapshot_metadata(job)==before and not list((root/'jobs').glob('.runtime-stage-*'))
+    argv=(tmp_path/'launched').read_text()
+    assert f'WR_CODE={job}/code'in argv and 'WR_CODE_REVISION='+'b'*40 in argv
+    assert '--episode 11'in argv and 'world-reward-reused-episode'in argv
+
+
+@pytest.mark.parametrize('fault',['revision','marker_sha','marker_mode','marker_symlink','marker_hardlink',
+    'file_bytes','file_mode','file_missing','extra_file','extra_directory','source_alias',
+    'job_symlink','private_parent','unknown_job_entry','existing_unit','existing_log'])
+def test_explicit_reuse_tampered_or_occupied_state_fails_without_repair_or_launch(tmp_path,fault):
+    root,env,job,_,commands=published_reuse_fixture(tmp_path)
+    source=job/'code/infra/smoke.py';marker=job/'source-sha256'
+    if fault in('revision','marker_sha'):
+        p=job/'revision'if fault=='revision'else marker
+        p.chmod(0o644);p.write_text('c'*40+'\n');p.chmod(0o444)
+    elif fault=='marker_mode':marker.chmod(0o644)
+    elif fault=='marker_symlink':
+        saved=tmp_path/'saved-marker';saved.write_bytes(marker.read_bytes());marker.unlink();marker.symlink_to(saved)
+    elif fault=='marker_hardlink':
+        import os
+        os.link(marker,tmp_path/'marker-link')
+    elif fault=='file_bytes':source.chmod(0o644);source.write_bytes(b'changed');source.chmod(0o444)
+    elif fault=='file_mode':source.chmod(0o555)
+    elif fault=='file_missing':source.parent.chmod(0o755);source.unlink();source.parent.chmod(0o555)
+    elif fault in('extra_file','extra_directory'):
+        parent=job/'code';parent.chmod(0o755)
+        if fault=='extra_file':(parent/'unexpected.py').write_bytes(b'unowned');(parent/'unexpected.py').chmod(0o444)
+        else:(parent/'unexpected-empty').mkdir(mode=0o555)
+        parent.chmod(0o555)
+    elif fault=='source_alias':
+        saved=tmp_path/'saved-source';saved.write_bytes(source.read_bytes());source.parent.chmod(0o755)
+        source.unlink();source.symlink_to(saved);source.parent.chmod(0o555)
+    elif fault=='job_symlink':
+        saved=job.with_name('saved');job.rename(saved);job.symlink_to(saved,target_is_directory=True)
+    elif fault=='private_parent':job.parent.chmod(0o700)
+    elif fault=='unknown_job_entry':(job/'source.tar.xz').write_bytes(b'partial-publication')
+    elif fault=='existing_unit':
+        systemctl=Path(env['PATH'].split(':')[0])/'systemctl';systemctl.write_text('#!/bin/bash\necho occupied\n')
+    else:(root/'results/reused-episode.log').write_bytes(b'original log')
+    before=snapshot_metadata(job);result=run_local_phase(commands[0][2],root,env)
+    assert result.returncode!=0 and commands[0][1].encode()not in result.stdout
+    assert not(tmp_path/'launched').exists()and snapshot_metadata(job)==before
+    assert not list((root/'jobs').glob('.runtime-stage-*'))
+
+
+def test_explicit_reuse_missing_snapshot_does_not_publish(tmp_path):
+    archive=launcher.runtime_archive(full_archive(files()),'infra/run_smoke.sh')[0]
+    encoded,sha=launcher.encoded_runtime_archive(archive)
+    commands=launcher.transport_commands(encoded,sha,archive,'b'*40,'infra/run_smoke.sh','missing',[],reuse_published=True)
+    root,env=local_transport_runtime(tmp_path);before=list((root/'jobs').iterdir())
+    result=run_local_phase(commands[0][2],root,env)
+    assert result.returncode!=0 and not(tmp_path/'launched').exists()and list((root/'jobs').iterdir())==before
+
+
+def test_explicit_reuse_cli_no_payload_and_unknown_ack_no_retry(monkeypatch,capsys):
+    args,revision,calls,archives,_=exact_revision_stub(monkeypatch)
+    launcher.main([*args,'--reuse-published'])
+    assert len(calls)==len(archives)==1
+    script=calls[0][calls[0].index('--scripts')+1]
+    assert 'published-reused-dispatched'in script and 'base64 -d'not in script
+    assert f"WR_CODE_REVISION='{revision}'"in script
+    calls.clear()
+    def unacknowledged(command,**kwargs):
+        calls.append(command);return types.SimpleNamespace(returncode=0,stdout=b'',stderr=b'unprinted')
+    monkeypatch.setattr(launcher.subprocess,'run',unacknowledged)
+    with pytest.raises(RuntimeError,match='inspect target before any retry'):
+        launcher.main([*args,'--reuse-published'])
+    assert len(calls)==1 and 'unprinted'not in capsys.readouterr().out

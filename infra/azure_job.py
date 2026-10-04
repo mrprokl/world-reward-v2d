@@ -231,7 +231,7 @@ def runtime_archive(full_archive: bytes, script: str) -> tuple[bytes, list[str]]
 
 
 
-def transport_commands(encoded, archive_hash, source_archive, revision, script, name, arguments):
+def transport_commands(encoded, archive_hash, source_archive, revision, script, name, arguments, *, reuse_published=False):
     """Ordered code-only phases; no calls, retries or caller-selected remote paths."""
     bundle = script.removeprefix("infra/").removesuffix(".sh")
     unit = "world-reward-" + name
@@ -291,6 +291,31 @@ systemd-run --unit "$UNIT" --property=Type=exec \\
     def phase(label, command):
         ack = ACK_PREFIX + identity + ":" + label
         return label, ack, command + f"printf '%s\\n' '{ack}'\n"
+    if reuse_published:
+        # Explicit metadata-only dispatch. The local archive independently binds
+        # the existing remote bytes; no encoded payload or publication occurs.
+        directories = {"."}
+        with tarfile.open(fileobj=io.BytesIO(source_archive), mode="r:") as archive:
+            for member in archive:
+                if member.isfile():
+                    directories.update(str(parent) for parent in Path(member.name).parents)
+        directories_sha = hashlib.sha256(json.dumps(sorted(directories), separators=(",", ":")).encode()).hexdigest()
+        reuse_guard = f"""/usr/bin/python3 -I -B - "$JOB" <<'PY_REUSE'
+import hashlib,json,stat,sys
+from pathlib import Path
+job=Path(sys.argv[1]);code=job/'code'
+if not(job.is_dir() and code.is_dir() and {{p.name for p in job.iterdir()}}=={{'code','revision','source-sha256'}}):raise RuntimeError('Published snapshot missing or contains unknown entries; no publication in reuse mode')
+for name,expected in(('revision',{(revision+chr(10)).encode()!r}),('source-sha256',{(archive_hash+chr(10)).encode()!r})):
+ p=job/name;s=p.lstat()
+ if p.resolve()!=p or not stat.S_ISREG(s.st_mode)or s.st_nlink!=1 or s.st_mode&0o777!=0o444 or p.read_bytes()!=expected:raise RuntimeError('Original readonly publication marker mismatch')
+dirs=sorted(['.',*(str(p.relative_to(code))for p in code.rglob('*')if p.is_dir())])
+if hashlib.sha256(json.dumps(dirs,separators=(',',':')).encode()).hexdigest()!={directories_sha!r}:raise RuntimeError('Published source directory inventory differs from the exact archive')
+PY_REUSE
+"""
+        reused = phase("published-reused-dispatched", prefix + preflight + reuse_guard + launch)
+        if len(reused[2].encode()) > STAGED_SCRIPT_BYTES:
+            raise RuntimeError("Published-reuse verification exceeds bounded120KB script budget")
+        return [reused]
     inline = prefix + preflight + f"""if test ! -d "$JOB"; then
   test ! -e "$JOB" && test ! -L "$JOB" || exit 1
   if test ! -d "${{JOB%/*}}"; then mkdir -m 755 "${{JOB%/*}}"; chmod 755 "${{JOB%/*}}"; fi
@@ -430,6 +455,8 @@ def main(argv=None) -> None:
     parser.add_argument("--resource-group", type=azure_resource_group, default=DEFAULT_RESOURCE_GROUP)
     parser.add_argument("--vm-name", type=azure_vm_name, default=DEFAULT_VM_NAME,
                         help="Azure target VM; --name remains only the immutable job name")
+    parser.add_argument("--reuse-published", action="store_true",
+                        help="Verify and dispatch the exact existing snapshot only; no upload, repair, retry or publication")
     parser.add_argument("arguments", nargs="*")
     args = parser.parse_args(argv)
     if not re.fullmatch(r"[a-z][a-z0-9-]{0,50}", args.name):
@@ -453,7 +480,8 @@ def main(argv=None) -> None:
     source_archive, paths = runtime_archive(git("archive", "--format=tar", revision,
                                                "infra", "src", "configs", "pyproject.toml"), args.script)
     encoded, archive_hash = encoded_runtime_archive(source_archive)
-    commands = transport_commands(encoded, archive_hash, source_archive, revision, args.script, args.name, args.arguments)
+    commands = transport_commands(encoded, archive_hash, source_archive, revision, args.script, args.name, args.arguments,
+                                  reuse_published=args.reuse_published)
     print(f"immutable_runtime_bundle_files={len(paths)} encoded_bytes={len(encoded)} revision={revision} transport_phases={len(commands)}", flush=True)
     for phase, ack, command in commands:
         invoke_transport(command, ack, args.resource_group, args.vm_name)
