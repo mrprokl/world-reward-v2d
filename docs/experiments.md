@@ -6862,3 +6862,32 @@ plus122publication PASS; localrealtrimesh absence explicit, actualAzurecontrols
 required. Distinguish exact arithmetic zeros, norm-underflow and positive areas
 below globalextent guard; historicalpre-export arrays absent, no attribution to
 historical serialization invented. Measurement/adoption/CARI4Dquality separate.
+
+EP6 authenticated final codepublish-only resume ACK, originaled11fa5 export
+PASS816/81643.753073s, final32,205B receipt
+SHA06062e23957ceffb54d3a8dd79119d2e4b3a0583a00b23c351b00ae2eb5bd6c6.
+Actual queuechildcompleted07:07:32UTC/inactive; originaldriverbytes bound and
+fiveexactfrozenoutputs rehashed twice. All51original16framechunks/exportreference
+gates preserved, no newalignment/missingocclusion. Frozenexportpins precede
+unmodified officialCPU packsmoke; no finalsubmission/verifiedquality yet.
+EP8 full15input pins independentlysealed with all100originalinventorysource
+bytes/modes/markers before and after two repeated inventories. Newfull634 native
+stage inputs ready, unchangedrawposevolume/clipconstantframe preserved.
+
+EP9 actualreadOnlyprecision diagnostic40d5809 measurement_complete1.335674s,
+19,467B receiptSHAc95066ef98c736d66708e8507b229e37d7f0b731716326742e2721c5054fbacd.
+Three realdatafreeGLBloader/serialization/precisioncontrols PASS. All213,876faces
+and106,956vertices retained; rawscene→loader→exactweld orientedtrianglesidentical
+SHA73add83c3196e90b118724bce43bfee55bb0df5395616101976691c72d4b79e5.
+Zero float64cross/normzero or angularroundofffaces; two positiveareas below
+legacyglobalextentthreshold1.0575486237707516e-14. This attributes an overly
+conservative area guard, not proven historical exportloss or exactrealnonzero.
+No faces/components deleted, no threshold changed, historicalFAIL unchanged.
+Nextmethod must be general exactpredicate validity on procedural adversarial
+controls, preserving all other topology/embedding/volume/fidelity gates.
+
+User explicitly authorizes necessary honest technical replays October4, while
+prioritizing leaderboard gains. One corrected YCBv2 engineeringreplay authorized;
+same288RGB/three scenes, immutablebudgets/qualitythresholds andoriginalfailures.
+No retuning after scores or newclaimofindependentreplication. Acquisition only
+after actualhistory/cleanup/source/runtime audit, not merely flippingauthorization.

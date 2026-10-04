@@ -42,7 +42,8 @@ No final Parquet, submission or verified CARI4D improvement yet.
   also passes (4,794.56 s); its CPU CARI input assembly now passes all816frames (6,148.76 s).
   Independently pinned full native shared preparation also passes (23.50 s);
   native forward passes all9windows (147.76 s), with independently frozen
-  full816frame output. Unchanged native refinement is running. The634-frame
+  full816frame output. Unchanged native refinement passes all301updates (566.10 s),
+  with independently sealed original output; directexport has been dispatched. The634-frame
   episode has complete initializers. Its first private Azure full-pose run
   stopped before poses on the unchanged topology gate. A separately qualified
   volume proposal and its full634-frame input archive now pass provenance and
@@ -50,8 +51,8 @@ No final Parquet, submission or verified CARI4D improvement yet.
   original frames on VM02 (4,743.69 s), with independent source/full-input/output
   byte seals. Its private Azure result return passes with unchanged bytes;
   independent129/133source+output seals, listener/clientkey cleanup and
-  temporary NSG rule removal also pass. Original CPU assembly is running
-  under its fixed7200s outer deadline.
+  temporary NSG rule removal also pass. Original CPU assembly passes all634frames
+  (4,982.71 s), within its fixed7200s outer deadline; the owned timer is stopped.
   The next415-frame episode has complete automatic Body/depth initializers;
   its default topology gate failed before poses. The unchanged CPU
   volume proposal also rejects zero-area source faces; both failures stay
