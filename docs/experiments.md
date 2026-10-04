@@ -6406,3 +6406,12 @@ facbf00 remains CPU-active; no third acquisition or duplicate GPU launched.
 Local full-suite verification collected at5668eace: **11677PASS5SKIP415.26s**.
 Later runtime-inventory/safe-image changes:194focused PASS1.35s, shell syntax
 PASS. These tiny CPU fixtures establish code contracts only, not model accuracy.
+
+EP8 volume private transport actual **PASS35.337917s** producerce1d1d67:
+sender850B SHA `ed984e132e6ed97aedbae7e25ce3c3ccc8bd1a893f3bbec19a43b25476605693`;
+receiver1164B SHA `51e7c55861a58e815077ae396d38edde05aa9510c8e3b06ea35e251f80cfbf01`.
+Independent Azure receiver audit rehashed wholearchive, manifest and all1920
+original leaves (2,787,387,893B), full634frames, unchanged volume provenance.
+New receipt is frozen separately from the closed default-backend history.
+Canonical native pose output remains absent; no accuracy claim. Private listener,
+keys and exact temporary NSG rule will be removed after this verified seal.
