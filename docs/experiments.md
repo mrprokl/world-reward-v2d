@@ -6415,3 +6415,17 @@ original leaves (2,787,387,893B), full634frames, unchanged volume provenance.
 New receipt is frozen separately from the closed default-backend history.
 Canonical native pose output remains absent; no accuracy claim. Private listener,
 keys and exact temporary NSG rule will be removed after this verified seal.
+
+Independent source audit prioritizes automatic bidirectional mask reacquisition
+if the fixed YCB point pilot fails: EP4 empty segmentation is not established
+physical occlusion. Do not rerun the rejected hand bridge, lower support gates
+or use episode prompts. Any new segmentation policy needs a separately frozen
+external cohort, identity preservation and occlusion false-positive validation.
+A continuous Boots-guided SE3 proposal experiment is conditional on reliable
+query evidence and a deficient25-slot pool; mere reranking cannot create missing
+observations. No new hypothesis is adopted or measured by this audit.
+
+Private YCB evaluator now requires an exclusive host-post seal after exact owned
+cleanup and source/public/producer/full-image postchecks; original container
+report remains unchanged. Root227focused tests PASS7.20s and Bash syntax PASS.
+Neither the adapter nor its mock tests constitute an actual3D quality result.
