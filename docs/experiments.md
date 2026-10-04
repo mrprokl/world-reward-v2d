@@ -6374,3 +6374,22 @@ or private annotations interpreted. Independent audit permits one technical
 of the complete original FAIL, unchanged full-archive SHA, licenses, 3x96 cohort
 and GPU/scientific gates. Actual transition/pins must precede that single run;
 this transport-time correction is not validation-based hyperparameter tuning.
+
+
+Actual original YCBV download-only FAIL archive **PASS** producerd1eff474:
+sealed transition2548B SHA
+`05c91f11ba6e41fcf4308529931384cf65a514e931bdd4df58d33bdfc96bf4dc`,
+sourcecb084317599106b98ded91b33e9aceead54dc0cc330b16f787631e77a83c65ad.
+Linux NOREPLACE preserved complete original report/CID under
+validation/ycbv_point_pose_v1_acquisition_failed_v1; original log0644 is pinned
+without changing permissions. Original PID/container absent, fresh v1 base
+absent and no private values read. These independently frozen receipt/source
+pins authorize exactly one3600s CPU acquisition plus180s absolute cleanup grace;
+no dataset, scientific threshold or cohort change. Actual new acquisition next.
+
+EP8 independently qualified per-shell-volume CPU mesh proposal **PASS6.823469s**
+producer8785bf4; report17477B SHA
+`ff43bbda680c28ac4aa143d77dbb6026a77366536f573c541195f729baf1ae81`.
+All source arrays unchanged and shared scale1.6271884441375732 baked once.
+This is geometry/fidelity eligibility only, not full-pose or accuracy PASS.
+Readonly seven-artifact inventory/pins must precede a volume tracking run.

@@ -1,0 +1,13 @@
+{
+  "schema": "world-reward-ycbv-continuation-pins-v1",
+  "failed_pins": {
+    "bytes": 642,
+    "sha256": "01d60029d22ec5eac4536b169b81c58ca49656b36f2a20555173b29a8b966b36"
+  },
+  "transition": {
+    "bytes": 2548,
+    "sha256": "05c91f11ba6e41fcf4308529931384cf65a514e931bdd4df58d33bdfc96bf4dc",
+    "producer_revision": "d1eff4744d72b0ae02fda919e75b9cbb78bb9759",
+    "script_sha256": "cb084317599106b98ded91b33e9aceead54dc0cc330b16f787631e77a83c65ad"
+  }
+}
