@@ -47,9 +47,9 @@ finish() {
  if [[ -f "$CID" && ! -L "$CID" ]];then
   cid="$(cat "$CID")"
   if [[ "$cid" =~ ^[0-9a-f]{64}$ ]];then
-   ids="$(docker ps -aq --no-trunc --filter "id=$cid")";[[ $? == 0 ]] || status=1
+   ids="$(timeout --signal=TERM --kill-after=2s 5s docker ps -aq --no-trunc --filter "id=$cid")";[[ $? == 0 ]] || status=1
    if [[ -n "$ids" ]];then
-    owned="$(docker inspect "$cid" --format '{{.Image}}|{{.Name}}|{{index .Config.Labels "world-reward.job"}}|{{index .Config.Labels "world-reward.revision"}}')"
+    owned="$(timeout --signal=TERM --kill-after=2s 5s docker inspect "$cid" --format '{{.Image}}|{{.Name}}|{{index .Config.Labels "world-reward.job"}}|{{index .Config.Labels "world-reward.revision"}}')"
     if [[ "$owned" == "$IMAGE|/$NAME|run_tracker_noise_experiment|$REV" ]];then
      timeout 15s docker rm -f "$cid" >/dev/null || status=1
      ids="$(timeout 5s docker ps -aq --no-trunc --filter "id=$cid")";[[ $? == 0 && -z "$ids" ]] || status=1
@@ -67,7 +67,8 @@ finish() {
 trap finish EXIT;trap 'exit 130' INT;trap 'exit 143' TERM
 BEFORE="$(control preflight)";IMAGE_BEFORE="$(image_identity)";[[ "$IMAGE_BEFORE" == "$IMAGE|amd64|linux|"* ]]
 [[ ! -e "$OUT" && ! -L "$OUT" && ! -e "$CONTROL" && ! -L "$CONTROL" ]]
-[[ -z "$(docker ps -aq --filter "name=^/$NAME$")" ]]
+EXISTING="$(timeout --signal=TERM --kill-after=2s 5s docker ps -aq --filter "name=^/$NAME$")"
+[[ -z "$EXISTING" ]]
 if [[ "$STAGE" == infer ]];then
  control mirror >/dev/null
  LOCK_BEFORE="$(lock_identity)";exec 9<"$LOCK";LOCK_OPEN=1
