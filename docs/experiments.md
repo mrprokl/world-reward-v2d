@@ -6119,3 +6119,48 @@ for the existing900s native FP32 diagnostic. This PASS is safe data plumbing,
 not a benchmark gain, full-HOI validation or training-overlap clearance.
 EP7 initializer-only job from the same immutable caf2e75 source was accepted
 active on VM01 after EP6 ended and GPU idle was independently observed.
+
+All three public NPZ/manifest files independently rehashed after the actual PASS;
+selection359B SHA`070afdeb98578c3b63baa4194e190fc92f40df5d6184b38f3fbcb10251460cb3`.
+VM02 original cooperative lock exists and GPU was empty before dispatch.
+Native Boots inference `9dfccb7` accepted active/PID208973; actual execution/
+quality gate remains pending. Full tested caf2e75 source suite **11,054 PASS,
+3 SKIP408.48s**; later9dfccb7 adds actual pins/docs only, no numerical changes
+during this test. Removed38 owned untracked disposable pyc files after the suite,
+no code/data/model/user-environment cleanup. No verified reconstruction gain.
+
+EP6 original a06b703 frontend **FAIL at topology budget before any pose**
+(2026-10-04T01:17:27Z): canonical reducer cannot preserve manifold/oriented
+component topology at4096 vertices/faces. Original log95,538B SHA
+`7df1c869eb49eb7b00c7c81229cb3f75a75592bb9d93e4bf6b48408fcf3564d2`;
+original pose output is empty, not deleted/retried. All prior initializers are
+retained. EP7 initializer-only caf2e75 later **FAIL at scale_smoke**; root must
+inspect its exact failure before deciding any general continuation. No EP6/EP7
+full-chain/accuracy success or arbitrary scale/mesh rescue. EP5 original CPU
+assembly remains active at500/668 exported depth frames; no interruption.
+
+Boots original inference `9dfccb7` **FAIL0.175504s at preflight** with zero
+model/native calls: report1022B SHA
+`054bedb32ae379910f18dacd09a749a095a33d3768d2b41ce61cbedbea47c4f1`.
+Independent permission audit confirms the original CPU verification receipt
+is root-owned0400, unlike UID1000 public data; the UID1000 predictor cannot
+read it. No GPU/checkpoint/model run, prediction or benchmark score. Preserve
+original receipt/modes and failed infer_v1. A fresh v2 wrapper may exclusively
+copy the already-pinned3051B CPU metadata receipt to a tiny read-only mirror,
+verify bytes before/after, and mount it at the same expected container path.
+No root capability widening, original chmod, private-label access or numerical
+configuration change; all full-T/first32/900s research gates remain fixed.
+
+EP7 exact failure is an empty/nonbinary automatic mask at one fixed scale-anchor
+frame, before scale output creation; original log70,921B SHA
+`795ef54b845c7a06d395a2c8eafe7a442c4a00882b1c2a3e91ce60fa8d0dd0f2`.
+Unit failedExec1/noPID; no scale_smoke exists. Close this globalfixed_all16 route,
+do not hand-label, replace an anchor, fill a mask or choose an arbitrary scale.
+Next scheduling may initialize EP8 unchanged; EP6's topology-only failure can
+separately test the previously external-gated volume-preserving algorithm.
+
+CPU proof permission correction's root regression **170 PASS1.44s**, syntax/
+diff PASS. Source-AST comparison verifies the six model/resize/query/coordinate/
+validation numerical functions are identical to9dfccb7; only permission plumbing,
+fresh namespace and actual failed-preflight lineage change. No inference or
+metric success is inferred from these tiny tests.

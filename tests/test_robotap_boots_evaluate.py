@@ -90,7 +90,7 @@ def save_npz(gate, path, arrays):
 
 
 def fixture_files(gate, base):
-    public, inference = base / "public_v2", base / "infer_v1"
+    public, inference = base / "public_v2", base / gate.INFER_NAMESPACE
     for directory in (public / "inputs", inference / "predictions"): directory.mkdir(parents=True)
     rows, selection, pubfiles, predfiles = [], [], {}, {}
     for i, name in enumerate(gate.NAMES):
@@ -140,7 +140,7 @@ def test_frozen_prediction_firewall_before_private_gt(gate, tmp_path, monkeypatc
     elif fault == "report": pins["inference_report"]["sha256"] = "0" * 64
     elif fault == "hash": pins["prediction_files"][gate.NAMES[-1]]["sha256"] = "0" * 64
     else:
-        path = base / "infer_v1/predictions" / gate.NAMES[-1]; arrays = gate.load_arrays(path)
+        path = base / gate.INFER_NAMESPACE / "predictions" / gate.NAMES[-1]; arrays = gate.load_arrays(path)
         if fault == "shape": arrays["tracks"] = arrays["tracks"][:, :-1]
         elif fault == "nan": arrays["tracks"][0, 0, 0] = np.nan
         elif fault == "query": arrays["query_points"][0, 0] = 1
@@ -150,7 +150,7 @@ def test_frozen_prediction_firewall_before_private_gt(gate, tmp_path, monkeypatc
         elif fault == "static": arrays["static_tracks"] += 1
         else: arrays["visible"][:] = False
         path.unlink(); pins["prediction_files"][gate.NAMES[-1]] = save_npz(gate, path, arrays)
-        report_path = base / "infer_v1/report.json"; report = json.loads(report_path.read_bytes())
+        report_path = base / gate.INFER_NAMESPACE / "report.json"; report = json.loads(report_path.read_bytes())
         report["videos"][-1]["output"] = pins["prediction_files"][gate.NAMES[-1]]
         report_path.unlink(); gate.source.save_bytes(report_path, json.dumps(report).encode(), 0o444)
         pins["inference_report"].update(gate.source.identity(report_path))

@@ -60,6 +60,8 @@ def bound(tmp_path,monkeypatch):
     for name,row in protocol['source']['files'].items():row.update(save(root/gate.BASE/'assets/tapnet_source'/name,('procedural pinned native '+name).encode()))
     protocol['checkpoint'].update(save(root/gate.BASE/'assets'/protocol['checkpoint']['file'],b'procedural checkpoint never loaded'))
     save(code/gate.PROTOCOL,(REPO/gate.PROTOCOL).read_bytes())
+    old=dict(stage=gate.STAGE,status='fail',phase='preflight',producer_revision=gate.PREVIOUS_REVISION,error_type='PermissionError',native_calls_attempted=0,native_calls_returned=0,native_calls_completed=0,videos=[],private_pickles_read=False,future_tracks_or_visibility_read=False,evaluation_performed=False,challenge_inputs_used=False)
+    old_identity=save(root/gate.BASE/'infer_v1/report.json',encode(old));monkeypatch.setattr(gate,'PREVIOUS_FAILURE',old_identity)
     manifest=public(root/gate.PUBLIC/'inputs');p=pins();p['public']['files']={name:gate.source.identity(root/gate.PUBLIC/'inputs'/name)for name in p['public']['files']}
     before=dict(files={'infra/robotap_boots_public.py':dict(bytes=9,sha256=p['public']['script_sha256'])},markers={})
     report=dict(stage='external_robotap_oracle_initial_query_public_adapter',status='pass',producer_revision=p['public']['producer_revision'],source_before=before,source_after=before,
@@ -230,6 +232,8 @@ def test_wrapper_firewall_lock_and_real_static_closure():
     assert '[[ $# == 0 ]]'in text and 'flock --nonblock 9' in text and text.index('flock --nonblock 9')<text.index('docker run')
     assert '--network none' in text and '--gpus all' in text and '--memory 32g' in text and '915s docker run' in text
     assert 'eval_private'not in text and 'pickles'not in text and 'src=$ROOT,dst=$ROOT'not in text and 'src=$BASE,dst=$BASE'not in text
+    assert '/infer_v2' in text and 'WR_RUNTIME_PROOF_MIRROR=1' in text and '--publish-runtime-proof' in text
+    assert 'src=$src,dst=$dst,readonly' in text
     assert 'exec 9>&-'in text and 'lock_identity fd'in text and 'docker rm -f "$cid"'in text
     import azure_job
     files={str(p.relative_to(REPO)):p.read_bytes()for parent in ('infra','configs','src')for p in (REPO/parent).rglob('*')if p.is_file()and p.suffix not in ('.pyc',)}
@@ -250,7 +254,7 @@ def test_no_torch_or_numpy_import_on_host_preflight():
 def test_main_seals_all_three_or_exact_partial_failure(bound,monkeypatch,failed):
     out=bound['root']/gate.OUT;out.mkdir();save(out/'.container.cid',('1'*64+'\n').encode())
     monkeypatch.setenv('WR_ROOT',str(bound['root']));monkeypatch.setenv('WR_CODE',str(bound['code']));monkeypatch.setenv('WR_CODE_REVISION',bound['revision'])
-    monkeypatch.setenv('WR_AZURE_VM02_VERIFIED','1');monkeypatch.setenv('WR_IMAGE_ID',gate.IMAGE)
+    monkeypatch.setenv('WR_AZURE_VM02_VERIFIED','1');monkeypatch.setenv('WR_IMAGE_ID',gate.IMAGE);monkeypatch.setenv('WR_RUNTIME_PROOF_MIRROR','1')
     monkeypatch.setattr(gate.os,'uname',lambda:types.SimpleNamespace(sysname='Linux'));monkeypatch.setattr(gate.os,'geteuid',lambda:1000)
     original=Path.iterdir
     monkeypatch.setattr(Path,'iterdir',lambda path:iter([Path('lo')])if str(path)=='/sys/class/net'else original(path))
@@ -287,3 +291,68 @@ def test_public_v1_not_accepted_as_v2(tmp_path):
     directory=tmp_path/'inputs';manifest=public(directory);manifest['public_namespace']='public_v1'
     (directory/'manifest.json').chmod(0o644);save(directory/'manifest.json',encode(manifest))
     with pytest.raises(ValueError):gate.public_records(directory)
+
+
+@pytest.fixture
+def proof_owners(bound,monkeypatch):
+    original=Path.lstat;target=gate.runtime_proof_path(bound['root'],bound['revision'])
+    def metadata(path):
+        result=original(path)
+        if path in (target,target.parent):
+            fields={name:getattr(result,name)for name in dir(result)if name.startswith('st_')};fields['st_uid']=0;return types.SimpleNamespace(**fields)
+        return result
+    monkeypatch.setattr(Path,'lstat',metadata);monkeypatch.setattr(gate.os,'geteuid',lambda:0)
+    return target
+
+
+def test_authorized_single_receipt_mirror_original_unchanged(bound,proof_owners):
+    original=bound['root']/bound['pins']['runtime']['report_path'];original.chmod(0o400);before=gate.source.identity(original)
+    binding=gate.bindings(bound['root'],bound['code'],bound['revision'],bound['pins'])
+    target=gate.publish_runtime_proof(bound['root'],bound['code'],bound['revision'],bound['pins'],binding)
+    assert target==proof_owners and target.read_bytes()==original.read_bytes()
+    assert target.stat().st_mode&0o777==0o444 and original.stat().st_mode&0o777==0o400
+    assert gate.source.identity(original)==before and gate.verify_runtime_proof(bound['root'],bound['revision'],bound['pins'])==target
+    assert {p.name for p in target.parent.iterdir()}=={'report.json'}
+    with pytest.raises(FileExistsError):gate.publish_runtime_proof(bound['root'],bound['code'],bound['revision'],bound['pins'],binding)
+
+
+def test_mirror_rejects_changed_or_extra_metadata(bound,proof_owners):
+    binding=gate.bindings(bound['root'],bound['code'],bound['revision'],bound['pins'])
+    target=gate.publish_runtime_proof(bound['root'],bound['code'],bound['revision'],bound['pins'],binding)
+    save(target.parent/'other.json',b'{}')
+    with pytest.raises(ValueError):gate.verify_runtime_proof(bound['root'],bound['revision'],bound['pins'])
+    (target.parent/'other.json').unlink();target.chmod(0o644);target.write_bytes(b'changed');target.chmod(0o444)
+    with pytest.raises(ValueError):gate.verify_runtime_proof(bound['root'],bound['revision'],bound['pins'])
+
+
+def test_host_mounts_only_mirror_at_original_destination(bound,proof_owners,monkeypatch,capsys):
+    before=gate.bindings(bound['root'],bound['code'],bound['revision'],bound['pins']);target=gate.publish_runtime_proof(bound['root'],bound['code'],bound['revision'],bound['pins'],before)
+    monkeypatch.setenv('WR_ROOT',str(bound['root']));monkeypatch.setenv('WR_CODE',str(bound['code']));monkeypatch.setenv('WR_CODE_REVISION',bound['revision'])
+    gate.host_mode('--mounts');rows=[line.split('\t')for line in capsys.readouterr().out.splitlines()]
+    original=str(bound['root']/bound['pins']['runtime']['report_path'])
+    assert [str(target),original]in rows and [original,original]not in rows
+    assert [str(bound['root']/gate.BASE/'infer_v1/report.json')]*2 in rows
+    assert all('/eval_private/' not in p and not p.endswith('.pkl')for row in rows for p in row)
+
+
+def test_original_inference_permission_failure_remains_failed(bound):
+    path=bound['root']/gate.BASE/'infer_v1/report.json';before=gate.source.identity(path)
+    assert gate.previous_failure(bound['root'])==before
+    report=json.loads(path.read_bytes());report['native_calls_completed']=1
+    path.chmod(0o644);new=save(path,encode(report))
+    with pytest.raises(ValueError):gate.previous_failure(bound['root'])
+    gate.PREVIOUS_FAILURE=new
+    try:
+        with pytest.raises(ValueError):gate.previous_failure(bound['root'])
+    finally:gate.PREVIOUS_FAILURE=before
+
+
+def test_original_failed_inference_numerical_functions_unchanged():
+    import ast
+    path='infra/robotap_boots_infer.py'
+    old=ast.parse(subprocess.check_output(['git','show',gate.PREVIOUS_REVISION+':'+path],cwd=REPO))
+    current=ast.parse((REPO/path).read_text())
+    for name in ('load_model','native_prediction','validate_prediction','validate_video','public_records','native_modules'):
+        before=next(f for f in old.body if isinstance(f,ast.FunctionDef)and f.name==name)
+        after=next(f for f in current.body if isinstance(f,ast.FunctionDef)and f.name==name)
+        assert ast.dump(before,include_attributes=False)==ast.dump(after,include_attributes=False)

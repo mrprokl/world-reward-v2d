@@ -15,6 +15,7 @@ source = public.source
 ROOT = source.ROOT
 BASE = public.INPUT
 OUT = BASE + "/eval_v1"
+INFER_NAMESPACE = "infer_v2"
 JOB = "run_robotap_boots_evaluate"
 PINS = "configs/robotap_boots_evaluation_pins.json"
 FILES = ("infra/robotap_boots_evaluate.py", "infra/run_robotap_boots_evaluate.sh", "infra/robotap_boots_public.py", "infra/robotap_boots_acquire.py", "configs/robotap_boots_protocol.json", public.PINS, PINS)
@@ -84,7 +85,7 @@ def validate_prediction(data, queries, indices, row):
 
 def public_predictions(base, pins):
     """Complete frozen public/prediction firewall before any private GT access."""
-    validate_pins(pins); pub, infer = base / public.PUBLIC_NAMESPACE, base / "infer_v1"
+    validate_pins(pins); pub, infer = base / public.PUBLIC_NAMESPACE, base / INFER_NAMESPACE
     for path, pin in ((pub / "report.json", pins["public_report"]), (pub / "inputs/manifest.json", pins["public_manifest"]),
             (pub / "selection.json", pins["public_selection"]), (infer / "report.json", pins["inference_report"])):
         public.check_pinned(path, pin)

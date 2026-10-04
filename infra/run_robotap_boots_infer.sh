@@ -9,10 +9,10 @@ ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
  && "$CODE" == "$ROOT/jobs/$REV/run_robotap_boots_infer/code" \
  && "${BASH_SOURCE[0]}" == "$CODE/infra/run_robotap_boots_infer.sh" ]] || exit 2
 IMAGE=sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4
-OUT="$ROOT/validation/robotap_boots_v1/infer_v1";LOCK="$ROOT/jobs/.world-reward-h100.lock"
+OUT="$ROOT/validation/robotap_boots_v1/infer_v2";LOCK="$ROOT/jobs/.world-reward-h100.lock"
 NAME="world-reward-robotap-boots-infer-${REV:0:12}";CIDFILE="$OUT/.container.cid"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-BEFORE='';IMAGE_BEFORE='';LOCK_BEFORE='';LOCK_OPEN=0
+BEFORE='';IMAGE_BEFORE='';LOCK_BEFORE='';LOCK_OPEN=0;PROOF_READY=0
 control() {
  /usr/bin/env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME=/nonexistent LANG=C.UTF-8 WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" PYTHONDONTWRITEBYTECODE=1 \
  /usr/bin/python3 -I -B - "$CODE" "$1" <<'PYCONTROL'
@@ -55,7 +55,10 @@ finish() {
    chmod 400 "$CIDFILE"
   else status=1;fi
  fi
- if [[ -n "$BEFORE" ]];then after="$(control --verify)";[[ $? == 0 && "$after" == "$BEFORE" ]] || status=1;fi
+ if [[ -n "$BEFORE" ]];then
+  MODE=--preflight;[[ "$PROOF_READY" == 1 ]] && MODE=--verify
+  after="$(control "$MODE")";[[ $? == 0 && "$after" == "$BEFORE" ]] || status=1
+ fi
  if [[ -n "$IMAGE_BEFORE" ]];then after="$(image_identity)";[[ $? == 0 && "$after" == "$IMAGE_BEFORE" ]] || status=1;fi
  if [[ "$LOCK_OPEN" == 1 ]];then
   after="$(lock_identity fd)";[[ $? == 0 && "$after" == "$LOCK_BEFORE" ]] || status=1
@@ -68,13 +71,15 @@ BEFORE="$(control --preflight)"
 [[ ! -e "$OUT" && ! -L "$OUT" ]]
 IMAGE_BEFORE="$(image_identity)";[[ "$IMAGE_BEFORE" == "$IMAGE|amd64|linux|"* ]]
 [[ -z "$(docker ps -aq --filter "name=^/$NAME$")" ]]
+PROOF="$(control --publish-runtime-proof)";PROOF_READY=1
+[[ "$PROOF" == "$ROOT/results/robotap-boots-runtime-proof-$REV/report.json" ]]
 LOCK_BEFORE="$(lock_identity)";exec 9<"$LOCK";LOCK_OPEN=1
 [[ "$(lock_identity fd)" == "$LOCK_BEFORE" ]];flock --nonblock 9;gpu_idle
 MOUNT_PATHS="$(control --mounts)"
 MOUNTS=()
-while IFS= read -r path;do
- [[ "$path" == "$ROOT/"* && "$path" != *','* ]]
- MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
+while IFS=$'\t' read -r src dst;do
+ [[ "$src" == "$ROOT/"* && "$dst" == "$ROOT/"* && "$src" != *','* && "$dst" != *','* ]]
+ MOUNTS+=(--mount "type=bind,src=$src,dst=$dst,readonly")
 done <<< "$MOUNT_PATHS"
 [[ ${#MOUNTS[@]} -ge 20 ]]
 mkdir -m 700 "$OUT";chown 1000:1000 "$OUT"
@@ -83,7 +88,7 @@ set +e
 timeout --signal=TERM --kill-after=10s 915s docker run --rm --interactive --name "$NAME" --cidfile "$CIDFILE" --label world-reward.job=run_robotap_boots_infer --label "world-reward.revision=$REV" \
  --gpus all --network none --memory 32g --cpus 4 --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges --tmpfs /tmp:rw,noexec,nosuid,size=64m \
  "${MOUNTS[@]}" --entrypoint /usr/bin/env "$IMAGE" -i PATH=/opt/conda/bin:/usr/local/bin:/usr/bin:/bin HOME=/tmp XDG_CACHE_HOME=/tmp \
- WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" WR_IMAGE_ID="$IMAGE" WR_AZURE_VM02_VERIFIED=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 \
+ WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" WR_IMAGE_ID="$IMAGE" WR_AZURE_VM02_VERIFIED=1 WR_RUNTIME_PROOF_MIRROR=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 \
  /opt/conda/bin/python -I -B - "$CODE" <<'PYINFER'
 import runpy,sys
 from pathlib import Path

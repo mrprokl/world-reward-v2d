@@ -17,13 +17,15 @@ import robotap_boots_acquire as source
 ROOT = source.ROOT
 BASE = "validation/robotap_boots_v1"
 PUBLIC = BASE + "/public_v2"
-OUT = BASE + "/infer_v1"
+OUT = BASE + "/infer_v2"
 JOB = "run_robotap_boots_infer"
 STAGE = "public_robotap_native_bootstapir_predictions"
 PINS = "configs/robotap_boots_inference_pins.json"
 PROTOCOL = "configs/robotap_boots_protocol.json"
 IMAGE = "sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4"
 BUDGET = 900
+PREVIOUS_FAILURE = dict(bytes=1022,sha256='054bedb32ae379910f18dacd09a749a095a33d3768d2b41ce61cbedbea47c4f1')
+PREVIOUS_REVISION = '9dfccb7999c56fe5ff7d262af7299079c467d29b'
 RESOLUTION = (256, 256)
 QUERY_CHUNK = 32
 DEMO = dict(url="https://raw.githubusercontent.com/google-deepmind/tapnet/730cda1c730877cfedbe01bf87fb1cadb78a565d/colabs/torch_tapir_demo.ipynb", bytes=17144,
@@ -86,6 +88,7 @@ def bindings(root, code, revision, pins):
     markers = {name: source.identity(code.parent / name, readonly=False) for name in ("revision", "source-sha256")}
     require((code.parent / "revision").read_bytes() == (revision + "\n").encode()
             and re.fullmatch(b"[0-9a-f]{64}\n", (code.parent / "source-sha256").read_bytes()), "Original dispatch markers required")
+    previous=previous_failure(root)
     protocol = source.read_protocol(code / PROTOCOL)
     native = {name: checked(root / BASE / "assets/tapnet_source" / name, row) for name, row in protocol["source"]["files"].items()}
     checkpoint = checked(root / BASE / "assets" / protocol["checkpoint"]["file"], protocol["checkpoint"])
@@ -113,7 +116,7 @@ def bindings(root, code, revision, pins):
     manifests = public_records(root / PUBLIC / 'inputs')
     require(report.get('actual_full_frame_matrix') == [r['frames'] for r in manifests], "Adapter's original timelines differ")
     return dict(source_files=files, markers=markers, native_sources=native, checkpoint=checkpoint,
-                runtime=checked(runtime_path, pins["runtime"]), public_report=checked(report_path, pins["public"]), public_files=public_files)
+                runtime=checked(runtime_path, pins["runtime"]), previous_inference_failure=previous, public_report=checked(report_path, pins["public"]), public_files=public_files)
 
 
 def public_records(directory):
@@ -232,32 +235,69 @@ def preflight(root, code, revision):
     return pins,bound
 
 
+def previous_failure(root):
+    path=root/BASE/'infer_v1/report.json';checked(path,PREVIOUS_FAILURE);report=strict_json(path.read_bytes())
+    require(report.get('stage')==STAGE and report.get('status')=='fail' and report.get('phase')=='preflight'
+            and report.get('producer_revision')==PREVIOUS_REVISION and report.get('error_type')=='PermissionError'
+            and all(type(report.get(k)) is int and report[k]==0 for k in ('native_calls_attempted','native_calls_returned','native_calls_completed'))
+            and report.get('videos')==[] and all(report.get(k) is False for k in ('private_pickles_read','future_tracks_or_visibility_read','evaluation_performed','challenge_inputs_used')), 'Original zero-model preflight failure must remain FAIL')
+    return checked(path,PREVIOUS_FAILURE)
+
+
+def runtime_proof_path(root,revision):
+    return root/'results'/('robotap-boots-runtime-proof-'+revision)/'report.json'
+
+
+def verify_runtime_proof(root,revision,pins):
+    path=source.canonical(runtime_proof_path(root,revision));meta=path.lstat();parent=path.parent.lstat()
+    require(stat.S_ISDIR(parent.st_mode) and parent.st_uid==0 and parent.st_mode&0o777==0o700
+            and stat.S_ISREG(meta.st_mode) and meta.st_uid==0 and meta.st_mode&0o777==0o444 and meta.st_nlink==1
+            and {p.name for p in path.parent.iterdir()}=={'report.json'}, 'Exclusive root-owned readonly CPU receipt mirror required')
+    checked(root/pins['runtime']['report_path'],pins['runtime']);checked(path,pins['runtime'])
+    return path
+
+
+def publish_runtime_proof(root,code,revision,pins,before):
+    require(os.geteuid()==0,'Only host root may publish authorized metadata mirror')
+    original=root/pins['runtime']['report_path'];checked(original,pins['runtime']);raw=original.read_bytes();checked(original,pins['runtime'])
+    path=source.canonical(runtime_proof_path(root,revision));path.parent.mkdir(mode=0o700)
+    source.save_bytes(path,raw,0o444);verify_runtime_proof(root,revision,pins)
+    require(bindings(root,code,revision,pins)==before,'Originals changed while publishing byte-identical proof')
+    return path
+
+
 def host_mode(mode):
     root,code,revision=Path(os.environ['WR_ROOT']),Path(os.environ['WR_CODE']),os.environ['WR_CODE_REVISION']
     pins,bound=preflight(root,code,revision)
-    if mode=='--mounts':
-        paths=[code,code.parent/'revision',code.parent/'source-sha256',root/PUBLIC/'report.json',root/pins['runtime']['report_path']]
+    if mode=='--publish-runtime-proof':
+        source.azure_vm02_identity(source.read_protocol(code/PROTOCOL))
+        print(publish_runtime_proof(root,code,revision,pins,bound))
+    elif mode=='--mounts':
+        mirror=verify_runtime_proof(root,revision,pins)
+        paths=[code,code.parent/'revision',code.parent/'source-sha256',root/PUBLIC/'report.json',root/BASE/'infer_v1/report.json']
         paths += [root/PUBLIC/'inputs'/name for name in sorted(pins['public']['files'])]
         protocol=source.read_protocol(code/PROTOCOL)
         paths += [root/BASE/'assets/tapnet_source'/name for name in protocol['source']['files']]
         paths += [root/BASE/'assets'/protocol['checkpoint']['file']]
-        for path in paths:print(source.canonical(path))
+        for path in paths:print(str(source.canonical(path))+'\t'+str(source.canonical(path)))
+        print(str(mirror)+'\t'+str(source.canonical(root/pins['runtime']['report_path'])))
     else:
         protocol=source.read_protocol(code/PROTOCOL);source.azure_vm02_identity(protocol)
+        if mode=='--verify':verify_runtime_proof(root,revision,pins)
         print(hashlib.sha256(json.dumps(bound,sort_keys=True).encode()).hexdigest())
 
 
 def main(argv=None):
     argparse.ArgumentParser(description=__doc__, allow_abbrev=False).parse_args(argv)
     root, code, revision = Path(os.environ["WR_ROOT"]), Path(os.environ["WR_CODE"]), os.environ["WR_CODE_REVISION"]
-    require(os.uname().sysname == "Linux" and os.environ.get("WR_AZURE_VM02_VERIFIED") == "1" and os.environ.get("WR_IMAGE_ID") == IMAGE
+    require(os.uname().sysname == "Linux" and os.environ.get("WR_AZURE_VM02_VERIFIED") == "1" and os.environ.get("WR_IMAGE_ID") == IMAGE and os.environ.get("WR_RUNTIME_PROOF_MIRROR")=="1"
             and {p.name for p in Path('/sys/class/net').iterdir()} == {"lo"}, "Offline host-verified Azure VM02 CUDA required")
     output = source.canonical(root / OUT)
     require(output.is_dir() and {p.name for p in output.iterdir()} == {".container.cid"}, "Fresh reserved inference namespace required")
     cid=output/'.container.cid'
     require(stat.S_ISREG(cid.lstat().st_mode) and re.fullmatch(b'[0-9a-f]{64}\n?',cid.read_bytes()) and os.geteuid()==1000,'Owned container CID and UID1000 required')
     start = time.monotonic(); report = dict(stage=STAGE, status="fail", phase="preflight", producer_revision=revision,
-        image_id=IMAGE, budget_seconds=BUDGET, native_calls_attempted=0, native_calls_returned=0, native_calls_completed=0, videos=[], network="none",
+        image_id=IMAGE, runtime_proof_byte_identical_authorized_mirror=True, previous_inference_failure_preserved=False, budget_seconds=BUDGET, native_calls_attempted=0, native_calls_returned=0, native_calls_completed=0, videos=[], network="none",
         future_tracks_or_visibility_read=False, private_pickles_read=False, challenge_inputs_used=False, evaluation_performed=False,
         oracle_initial_queries=True, private_truth_read=False, benchmark_verified=False, quality_verified=False, static_control_is_valid_motion_prediction=False, training_overlap_verified=False, full_hoi_verified=False, adoption_performed=False)
     error = None; before = None
@@ -266,6 +306,7 @@ def main(argv=None):
     try:
         pins,before = preflight(root,code,revision)
         rows = public_records(root / PUBLIC / "inputs"); report.update(phase="model_load", input_bindings=before, inference_pins=source.identity(code/PINS),
+            previous_inference_failure=before["previous_inference_failure"], previous_inference_failure_preserved=True,
             script_sha256=before["source_files"]["infra/robotap_boots_infer.py"]["sha256"], native_source_revision="730cda1c730877cfedbe01bf87fb1cadb78a565d", demo_evidence=DEMO,
             inference_config=dict(pyramid_level=1, resolution=[256,256], query_chunk_size=32, is_training=False, compute_dtype="float32", AMP=False,
                                   resize="native utils.bilinear align_corners=False", normalize="RGB float32 /255*2-1", frame_offload=False, visibility="(1-sigmoid(occlusion))*(1-sigmoid(expected_dist))>0.5"))
@@ -316,5 +357,5 @@ def main(argv=None):
 
 if __name__ == "__main__":
     import sys
-    if sys.argv[1:] in (['--preflight'],['--verify'],['--mounts']):host_mode(sys.argv[1])
+    if sys.argv[1:] in (['--preflight'],['--verify'],['--mounts'],['--publish-runtime-proof']):host_mode(sys.argv[1])
     else:main()
