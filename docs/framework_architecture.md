@@ -25,6 +25,8 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 | Pilote natif de mains | `infra/mediapipe_hand_scan.py`, `hand_evaluation.evaluate_hand_clip` | Exécution CPU full-T et diagnostic séparé vérifiés sur3 clips externes/216 frames ;171/177 positives associées, EPE conditionnelle17 joints9.65px. Ni identité/contact/3D ni adoption challenge. |
 | Propositions de masques mains | `hand_mask_proposals.propose_hand_masks` | Callback apparié A=box/B=mêmebox+17points, slotsfullT explicites ; pas de tracking ou d'identités physiques. |
 | Ablation native de masques mains | `infra/hand_mask_infer.py`, `infra/mediapipe_hand_evaluate.py` | SAM2 apparié full218 frames Dex04 exécuté et gelé avant labels ; Dice0.367→0.376 mais régression d'un clip et contamination objet accrue : gate rejeté, aucune adoption. |
+| Mémoire temporelle des mains | `hand_temporal_masks.stream_temporal_hand_masks`, opt-in v3 des mêmes exécuteurs | Deux états SAM2 natifs, ancre automatique et full-T lossless ; API/acquisition qualifiées sur Dex05, qualité et transfert3D non établis. |
+| Géométrie sérialisée | `mesh_serialization.serialization_preflight` | Diagnostic readonly F32/weld8 digits/ties-even et triangles exacts ; pas de compilateur, réparation, fidélité ou qualification runtime. |
 | Lacunes | `occlusion_bridge.initialize_occluded_gaps` | Initialiseur conditionnel ; pas contact observé ni validation RGB complète. |
 | Baseline complète | `cari_shared_prepare`, `cari_full_forward`, `cari_full_refine`, `cari_full_export` | Adaptateurs natifs séparés, preuve et exécution souvent imbriquées. |
 | Évaluation externe | `point_motion_evaluation`, `point_bop_evaluation`, `ycbv_point_evaluate` | Portée rigide relative ; pas validation HOI globale. |

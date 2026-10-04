@@ -7762,3 +7762,14 @@ validated before seeding. Entire2T masks and anchor provenance prevalidated befo
 any segmentation values. Root321integratedPASS5.37s; originalv1/v2 contracts/math
 retained. EP14export/consumer neighbors373PASS2.97s. No private quality result or
 challenge adoption; future scan/mask pins remain absent until actual freeze.
+
+Serialization-aware geometry preflight added as a pure reusable diagnostic, not
+a new simplifier or challenge repair. Plain official helper42ab8ab's constructor
+and Trimesh5.1.0 weld policy audited: referenced-only positions, F32→F64, decimal
+8digits/ties-even keys, first representative without snapping. Distinguishes
+exact seams/signedzero, F32 position collapse and nonexact weld merges; exact
+source/stored/welded triangle predicates and scalar/SHA evidence only. No arrays
+returned/deleted/normalized. Unsupported/nonfinite/int64 key ranges fail closed.
+Root81tiny combinedPASS0.40s, no Trimesh runtime qualification, accuracy or
+production adoption. The closed precision-control failure remains unchanged; a
+future compiler must satisfy external whole-shell/fidelity/export gates.
