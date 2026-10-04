@@ -6176,3 +6176,11 @@ once against the preregistered AJ/OA gates; metrics remain pending. Original
 infer_v1 FAIL and root-owned0400 CPU proof stay untouched; the3051B narrow
 read-only receipt mirror is byte-identical. This is execution PASS, not a
 verified tracking improvement, Track1 provenance clearance or CARI4D victory.
+
+The b9ef3ba source regression completes **11,059 PASS/3 optional SKIP405.41s**;
+later855caff changes only frozen actual evaluation pins and decisions. CPU
+RoboTAP evaluator accepted on VM02, actual verdict pending. EP8 unchanged
+initializers have actual PASS masks/body/depth sparse/scale/object reports;
+full body/depth still running. EP5 CPU assembly reaches600/668 frames.
+EP6's unchanged previously external-gated volume proposal is separately
+dispatched CPU-only; no geometry adoption, pose retry or accuracy claim yet.
