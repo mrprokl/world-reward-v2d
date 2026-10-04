@@ -9140,3 +9140,19 @@ Fresh build required; originalFAIL not relabeled, no backend/accuracy adoption.
 EP09 unchanged original official pack scheduled from b2eef8a/full415exportpins,
 216-source archivef08e7e1aa98882225587723f5f7a3c37c02a40bb172977f6461773625fed1b3b.
 Actual completion/independent packing audit still required; no final submission.
+
+Surface QSlim corrected standalonebuilde5f82ea actualPASS22.814019s,
+nativePASS21.853523s; same24827BCPP486c85b27eb4fa4bf060a603fb470dfed75eaa90e09a6b9a5223a20f5a60d765.
+Retained ELF636200B17aac0e5d463d785cd0df4bb5b3abf6399906a2737c3ea74f1720edf58f2da98,
+host2626Bc984468a09f48092fdbc66fd21942326a044a8ef61b13e85cb9722d2c3b77a8e,
+native3680B299b65f8354e4357cb8515424629c85fc804025b83501c3b7094c4ecc68435bb.
+Independent full200source/archive/ledger/image/compiler1418headers14322Boost
+files beforeafter rehashPASS5.338060s; no compile/retainedELF/mesh/QEM replay,
+terminalsuccessfulunit and actualCIDabsence. Independent receipt988B
+0a1559eac13611ca8dc66ffd0cfc6da5d83079537bcddc927d8f5295ea173bb5.
+First independentcontroller hashed Boost JSON with wrong separators; rejected
+beforebinary/geometry, ownedCID-only scratch removed; corrected same inventory
+uses the original declared JSON encoding. Buildpins now frozen, not QEM/accuracy
+qualification. Original4ccefd3headersFAIL and e571132hostFAIL remain unchanged.
+Root77tinytestsPASS0.58s including thirdpreflight-failure/fullfreeze and open
+boundaryposition/winding-corruption rejection; actual freshcohort next.

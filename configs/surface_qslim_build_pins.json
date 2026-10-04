@@ -1,0 +1,20 @@
+{
+  "schema": "world_reward.surface_qslim_build_pins.v1",
+  "producer_revision": "e5f82ea6f4dddf07f96ad6094e5ad40f6651a833",
+  "report": {
+    "bytes": 2626,
+    "sha256": "c984468a09f48092fdbc66fd21942326a044a8ef61b13e85cb9722d2c3b77a8e"
+  },
+  "native": {
+    "bytes": 3680,
+    "sha256": "299b65f8354e4357cb8515424629c85fc804025b83501c3b7094c4ecc68435bb"
+  },
+  "binary": {
+    "bytes": 636200,
+    "sha256": "17aac0e5d463d785cd0df4bb5b3abf6399906a2737c3ea74f1720edf58f2da98"
+  },
+  "source_cpp": {
+    "bytes": 24827,
+    "sha256": "486c85b27eb4fa4bf060a603fb470dfed75eaa90e09a6b9a5223a20f5a60d765"
+  }
+}

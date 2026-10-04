@@ -16,6 +16,13 @@ single-link files, complete hashes, publisher pins and the libigl/Eigen cap.
 The original sealed FAIL is retained; a fresh build is required before the
 already-frozen two-positive/one-negative QEM cohort. No geometry gate changes.
 
+That corrected build (`e5f82ea`) now passes independently: same CPP, existing
+compiler/image, all 1,418 libigl/Eigen and 14,322 Boost files verified twice;
+the retained ELF and host/native receipts are frozen in
+`configs/surface_qslim_build_pins.json`. Build-only wall time22.814s, zero mesh/QEM
+calls. The numerical cohort, physical fidelity and real HOI accuracy remain
+unqualified; a successful compiler is not a successful reconstruction method.
+
 ## 1. Audited primary sources
 
 Official revision: `7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80`.
