@@ -60,6 +60,10 @@ inferred automatically; no hand-labeling of challenge records.
   17-joint EPE9.65px (2907/3009 valid joints scored). Weak bbox association,
   39 unlabelled frames and unknown pretraining overlap prevent broader claims.
   No prompt/threshold tuning, contact/identity/3D proof or challenge adoption.
+- **Fresh paired hand-mask ablation:** distinct Dex04/full218 frames, all masks
+  frozen before private segmentation. Dice0.367→0.376, but one clip regresses
+  and object-pixel contamination rises: preregistered gate **REJECTS**. Missing
+  proposals affect82/175 annotated positives; no tuning or tracking extension.
 
 Detailed receipts, producing revisions and decisions live in
 [experiments](docs/experiments.md). [Compute](docs/compute.md) is the compact

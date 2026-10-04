@@ -7677,3 +7677,20 @@ PASS111.789331s, wholeinput/prepare/nativebindings independently sealed before
 refinement. Report66132B SHA19dbda48a92073c2cd81c7dbf172d1d38b6654f02acc2afecd573db31d3cd30b,
 bundle338268732B SHA3da674b61f7f22e06f762c5aa6c4fd592218127aa9d81fee9146eb957a263cec.
 Mask-onlyCPU evaluation7fa3931 dispatchedACK, no private metric presumed.
+
+Fresh paired-hand-mask ablation CLOSED qualityFAIL despite executionPASS5.668159s:
+175annotatedpositive/218originalframes,43unlabelled notnegative,82positive
+no-proposalframes includedaszero. MeanunionDiceA0.366958254/B0.375756965,
+pooleddelta+0.008798711; perclipdeltas[-0.014661180,+0.008097917,+0.035404268].
+Firstclipregresses, failing frozenno-regressiongate; positive objectlabelpixels
+17684→38835 (notFPsemantictruth), backgrounds26196→17930. No17point/box
+retuning, clipdrop, maskthreshold or trackingextension. SeparateCPUdecodedseg
+only after fullmaskfreeze/prepass, no joint/meta/pose reads; noID/contact/3D
+claims/adoption. Missing detector support dominates, not repaired by prompts.
+
+Independentmaskprivate evaluator source/allmask/rawscan/acq/runtime/private
+opaque bytes/diagnosticoutputs posthash PASS; executionreceipt12754B
+SHAe7db7336b45e48cf3603b300bc88cf90be2ed2e8d9674bb0dac9ea4d54ab8b3d,
+producer7fa3931. Native diagnostic7594B
+SHAf1755f4583f62ec4dce33e6d947737c1fc557d6c28822380c926ab263d7e313c.
+ExecutionPASS distinct from qualityFAIL; no conditionaltracking run.
