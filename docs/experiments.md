@@ -6260,3 +6260,12 @@ execution yet. EP5 unchanged shared preparation4d8f607 accepted/PID1094567,
 waiting for EP6 volume tracking's cooperative GPU lock, not duplicating a GPU
 worker. EP8 CPU-only archive inventory4d8f607 accepted/PID1095456; actual result
 pending, no transferred images/depth/weights or local dense manifest.
+
+Independent ray-witness and contiguous YCBV acquisition helpers are now frozen.
+Root203 focused tests PASS/1Linux-only SKIP3.91s; exact typed protocol and Bash
+syntax PASS. Ray queries are original-face barycentrics with fixed raster
+selection and explicit ambiguity failure, not ground-truth correspondences.
+YCBV source revisions, full-test archive, publisher/embedded MIT evidence,
+first3×96 contiguous RGB filenames and private all-instance retention are fixed
+before any acquisition or inference. No real-data3D/native comparison, GPU job
+or held-out performance claim follows from these control/operator tests.
