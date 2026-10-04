@@ -6393,3 +6393,12 @@ producer8785bf4; report17477B SHA
 All source arrays unchanged and shared scale1.6271884441375732 baked once.
 This is geometry/fidelity eligibility only, not full-pose or accuracy PASS.
 Readonly seven-artifact inventory/pins must precede a volume tracking run.
+
+2026-10-04 ~03:00UTC EP8 volume archive inventory actual **PASS**, producer5668eace:
+sealed report3049B SHA `e3e9e0f6e84fb7aeaf6d278e521827e23aac3a0b3fc1934b5a61fcb86bdb6f77`;
+archive2,789,109,760B SHA `716a58cdb83e02b37367913e0902d51f0529879dfdfd0d031a804a078ef11719`.
+Independent host audit rehashed archive, complete manifest and every original
+allowlisted file. Full634-frame coverage and volume provenance unchanged.
+New isolated private transport is next; old default receive/native FAIL remains
+unmodified. No pose/accuracy PASS inferred. Single YCBV technical acquisition
+facbf00 remains CPU-active; no third acquisition or duplicate GPU launched.
