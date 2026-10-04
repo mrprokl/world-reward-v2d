@@ -8616,3 +8616,39 @@ Preserve fail-closed behavior; audit explicit producer-versus-consumer provenanc
 separation, never accept mismatched source or rerun numerical export for convenience.
 EP25 original kernel records SIGSEGV near stack pointer; coredumpctl unavailable.
 Cause still unproved, generic arithmetic ASan control precedes any revised query.
+
+EP21 first lateconsumer exact203-source read-only audit PASS on its preserved
+FAIL receipt1571B SHAc91b2481319ce40603e4ef75cc06a0e439c68ee4768776a8e2e3386213655ab6,
+no trajectory deserialization/Parquet. Git comparison isolates three changed
+wrapper/input-enum helpers, not export numerical generator. Entire original
+prepare/forward/refinement helper chain is byte-compatible in actual6a9c722
+export snapshot; authenticate that complete immutable producer separately from
+current consumer. New explicit source-bound/fresh namespace proposed, not a
+weakened current-source gate or a numerical export replay.
+
+Corrected root-only readonly controller (missing tuple namespace field, no
+production edit) independently audits both preserved EP21 lateconsumer failures:
+shared-loader203file source complete; officialpack206file archive
+0a7c347313090c670029d61c6c601167abf2bdf5736c5a9ab57bc20896bed71a,
+ledgerf633831f973b80c038d6e8a65706f24565135d326f88f29a10a7b6ebc0277463.
+Officialreceipt3833B SHA291c23d096d747b41731c2539b8644d87f11ecc111d941f98473872fc49f4a8a
+FAILbeforetrajectory, sole readonlyreport/no scratchParquet. Originalpose source
+preflight fixes full415 EP09 frames; native GPU job still running at audit, not
+completed based on active ExecMainStatus0. All receipts remain on Azure.
+
+Original-export binding released405focusedPASS4.79s/root456PASS7.75s. Fixed
+EP21 pin independently regenerates actualqueued200file Git6a9c722 archive
+86d96c8e8421d41cad4693f3394dae5d503c5b53a383c92f1eeb992dedea171c;
+29710B SHA6906cee8ae5447fda90dc8e1e3a9ca1ed2c920ff1160fee2c5cc5cf774bc7674.
+Hash-only wholeoriginalsnapshot +current17numericmodules/seveninputnumericAST
+definitions before/after; oldcode neverexecutes. BothCPUconsumers opt-in
+--original-export-source with freshrevision-scoped outputs, oldFAIL paths intact.
+Actualremote source-binding/consumer/officialpacking remainsunexecuted.
+
+Independent end-to-end research priority: persistent automatic point reprojection
+within the shared human/object joint objective versus actualNVlabsCARI4D71fa7cbe,
+samefixedgeometry/gauge/fullT. DEFER held-outHOI claim until lawful nonchallenge
+reference rights (InterCap registration/research-use; competition evaluation
+unresolved). ExistingBOP/TUM/Dex research cannot establish fullbodyHOI gain.
+TripoSR volumetric prior notprioritized: marchingcubes doesnot guarantee
+wholeembeddedsolid/cavities or address EP25nativecrash; noacquisition/adoption.

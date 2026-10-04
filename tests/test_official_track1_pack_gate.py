@@ -353,6 +353,13 @@ def test_bash_syntax_exact_selected_mounts_no_GPU_originalsample_official_reader
     assert "source_paths(spec,object_source=source_profile(pins))" in text
 
 
+def test_original_export_source_flag_fresh_namespace_and_no_arbitrary_paths(gate):
+    assert gate.parser().parse_args(['--episode','21','--original-export-source']).original_export_source is True
+    assert gate.output_relative(21,revision='a'*40)=='outputs/episode_000021/official_track1_pack_smoke_source_'+'a'*40
+    with pytest.raises(SystemExit):gate.parser().parse_args(['--episode','21','--original-export-source','--original-export-source'])
+    with pytest.raises(ValueError):gate.output_relative(21,revision='../old')
+
+
 def test_host_source_paths_bootstrap_stdlib_only():
     text = (ROOT / "infra/run_official_track1_pack_gate.sh").read_text()
     source = text.split("<<'PYPATHS'\n", 1)[1].split("\nPYPATHS", 1)[0]

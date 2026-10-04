@@ -65,15 +65,19 @@ def parser():
         def __call__(self, parser, namespace, value, option_string=None):
             if getattr(namespace, self.dest, None) is not None:
                 parser.error("Exactly one explicit episode required")
-            setattr(namespace, self.dest, value)
+            setattr(namespace, self.dest, True if self.nargs == 0 else value)
     result = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     result.add_argument("--episode", type=int, choices=range(30), required=True, action=Once)
+    result.add_argument("--original-export-source", action=Once, nargs=0, default=None)
     return result
 
 
-def output_relative(episode):
+def output_relative(episode, *, revision=None):
     if type(episode) is not int or not 0 <= episode < 30:
         raise ValueError("Explicit Track1 integer episode0..29 required")
+    if revision is not None:
+        if type(revision) is not str or not re.fullmatch('[0-9a-f]{40}', revision):raise ValueError('Exact consumer revision required')
+        return f"outputs/episode_{episode:06d}/official_track1_pack_smoke_source_{revision}"
     return f"outputs/episode_{episode:06d}/official_track1_pack_smoke_v2"
 
 
@@ -571,7 +575,7 @@ def run(root, out, code, episode, report, persist, *, consumer=None, packer=None
                   complete_challenge_submission_created=False, final_Parquet_produced=False)
 
 
-def execute(root, out, code, episode, revision, **callbacks):
+def execute(root, out, code, episode, revision, *, original_export_source=False, **callbacks):
     if not out.is_dir() or any(out.iterdir()):
         raise ValueError("Fresh exclusive one-receipt smoke output required")
     runtime = load_runtime(root, code)
@@ -585,6 +589,9 @@ def execute(root, out, code, episode, revision, **callbacks):
                   numerical_geometry_independently_reverified=False, quality_verified=False,
                   code_accessibility_verified_offline=False, submission_eligibility_verified=False, submission_eligible=False,
                   complete_challenge_submission_created=False, final_Parquet_produced=False)
+    if original_export_source:
+        if out != root / output_relative(episode, revision=revision):raise ValueError('Fresh revision-scoped original source pack output required')
+        report['original_export_source_requested'] = True
     path = out / "report.json"
     started = time.perf_counter()
     with path.open("x") as stream:
@@ -625,7 +632,7 @@ def require_readonly_mounts(paths, *, mountinfo="/proc/self/mountinfo"):
 def main(argv=None):
     args = parser().parse_args(argv)
     root = Path(os.environ["WR_ROOT"]); code = Path(os.environ["WR_CODE"]); revision = os.environ["WR_CODE_REVISION"]
-    out = root / output_relative(args.episode)
+    out = root / output_relative(args.episode, revision=revision if args.original_export_source else None)
     historical_root = os.environ.get("WR_HISTORICAL_READONLY_ROOT", "0")
     if (platform.system() != "Linux" or root != ROOT
             or historical_root not in ("0", "1") or os.geteuid() != (0 if historical_root == "1" else 1000)
@@ -644,7 +651,15 @@ def main(argv=None):
         raise ValueError("Actual immutable CPU image ID differs from runtime pins")
     kit = root / "vendor/v2d_submission_kit"
     require_readonly_mounts((code, *(kit / name for name in OFFICIAL_SOURCES), root / SAMPLE_RELATIVE, root / BUILD_RECEIPT))
-    execute(root, out, code, args.episode, revision)
+    source_pin = code / f"configs/cari_clip_{args.episode:06d}_export_source_pins.json"
+    if bool(args.original_export_source) != (source_pin.exists() or source_pin.is_symlink()):raise ValueError('Explicit original export source flag/pin agreement required')
+    if args.original_export_source:
+        from cari_export_source import verify_export_source
+        import cari_clip_inputs as public
+        pins = strict_json(code / f"configs/cari_clip_{args.episode:06d}_shared_export_pins.json")
+        original, _ = verify_export_source(root, code, public.PublicClipSpec(**pins['clip_spec']), pins)
+        require_readonly_mounts((original, original.parent / 'revision', original.parent / 'source-sha256'))
+    execute(root, out, code, args.episode, revision, original_export_source=bool(args.original_export_source))
 
 
 if __name__ == "__main__":

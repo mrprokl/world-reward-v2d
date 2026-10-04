@@ -127,8 +127,9 @@ def load_shared_track1_episode(root,code,spec,export_pins):
     """Consume one externally pinned actual export, never old LM predictions.
 
     Only trajectory.npz is decompressed; all other exports and predecessor
-    sources/assets are hash-only. Current immutable producer source and bundled
-    actual refined/input pins are mandatory. Returned arrays never alias a
+    sources/assets are hash-only. Independently pinned original export source,
+    when explicitly present, is never executed. Bundled actual refined/input
+    pins remain mandatory. Returned arrays never alias a
     source archive. No model-forward fidelity/held-out quality is re-established.
     """
     root,code=_directory(root),_directory(code)
@@ -139,9 +140,14 @@ def load_shared_track1_episode(root,code,spec,export_pins):
     if (any(report.get(key)!=export_pins["export"][key] for key in ("producer_revision","script_sha256"))
             or report["output_files"]!={name:row for name,row in observed.items() if name!="report.json"}):
         raise ValueError("Actual export producer/output manifest differs from explicit pins")
-    helpers=export.source_helpers(code)
+    source_code=code;original_source_proof=None
+    export_source_path=code/f"configs/cari_clip_{spec.episode_index:06d}_export_source_pins.json"
+    if export_source_path.exists() or export_source_path.is_symlink():
+        from cari_export_source import verify_export_source
+        source_code,original_source_proof=verify_export_source(root,code,spec,export_pins)
+    helpers=export.source_helpers(source_code)
     if report.get("source_helpers")!=helpers or report.get("script_sha256")!=helpers["infra/cari_full_export.py"]["sha256"]:
-        raise ValueError("Current immutable actual export generator/helper closure differs")
+        raise ValueError("Original immutable actual export generator/helper closure differs")
     refined_path=code/f"configs/cari_clip_{spec.episode_index:06d}_shared_refined_pins.json"
     input_path=code/f"configs/cari_clip_{spec.episode_index:06d}_input_pins.json"
     refined_id=export.lineage.identity(refined_path);input_id=export.lineage.identity(input_path)
@@ -151,13 +157,15 @@ def load_shared_track1_episode(root,code,spec,export_pins):
     historical_path=code/f"configs/cari_clip_{spec.episode_index:06d}_historical_source_pins.json"
     historical=None
     if historical_path.exists():
+        if original_source_proof is not None:raise ValueError("Distinct historical producer bindings cannot be mixed")
         from cari_historical_source import verify_historical_source
         historical,historical_proof=verify_historical_source(root,historical_path)
         if report.get("historical_source_binding")!=historical_proof:
             raise ValueError("Export historical source binding differs from independent pins")
         chain=export.lineage.verify_refined_artifacts(root,code,spec,refined_pins,source_code=historical)
     else:
-        chain=export.lineage.verify_refined_artifacts(root,code,spec,refined_pins)
+        chain=(export.lineage.verify_refined_artifacts(root,code,spec,refined_pins) if original_source_proof is None else
+            export.lineage.verify_refined_artifacts(root,code,spec,refined_pins,source_code=source_code))
     if historical is not None and verify_historical_source(root,historical_path)!=(historical,historical_proof):
         raise ValueError("Historical source changed during export consumption")
     refined,prepared=chain["report"],chain["prepare"]["report"]
@@ -172,7 +180,7 @@ def load_shared_track1_episode(root,code,spec,export_pins):
         raise ValueError("Actual export/refined/public video/model source lineage differs")
     bindings={Path(path):row for path,row in chain["bindings"].items()}
     bindings.update({root/name:row for name,row in sources.items()})
-    bindings.update({code/name:row for name,row in helpers.items()})
+    bindings.update({source_code/name:row for name,row in helpers.items()})
     bindings.update({refined_path:refined_id,input_path:input_id})
     if any(public.identity(path)!=row for path,row in bindings.items()):
         raise ValueError("Complete original predecessor/source asset bindings changed")
@@ -185,9 +193,11 @@ def load_shared_track1_episode(root,code,spec,export_pins):
         raise ValueError("Export must retain byte-exact original aligned GLB geometry")
     episode,values,roundtrip=_trajectory(directory/"trajectory.npz",spec,report,prepared["input_sha256"])
     if (_inventory(directory,observed)!=observed or export_pins!=original_pins
-            or export.source_helpers(code)!=helpers
+            or export.source_helpers(source_code)!=helpers
             or any(public.identity(path)!=row for path,row in bindings.items())):
         raise ValueError("Frozen export/source/helper/pin bytes changed during consumption")
+    if original_source_proof is not None and verify_export_source(root,code,spec,export_pins)!=(source_code,original_source_proof):
+        raise ValueError("Original export source/current numerical consumer compatibility changed")
     manifest=dict(stage="world_reward_shared_native_episode_consumer",episode_index=spec.episode_index,
         frames=spec.total_frames,clip_spec=asdict(spec),input_video_sha256=prepared["input_sha256"],
         input_dataset_revision=public.DATASET_REVISION,input_track="track_1",ground_truth_used=False,
@@ -199,4 +209,5 @@ def load_shared_track1_episode(root,code,spec,export_pins):
         original_source_binding_count=len(bindings),native_direct_export_consumed=True,old_LM_conversion_used=False,
         numerical_geometry_independently_reverified=False,quality_verified=False,challenge_performance_verified=False,
         submission_eligibility_verified=False,submission_eligible=False,final_Parquet_produced=False)
+    if original_source_proof is not None:manifest['original_export_source_binding']=original_source_proof
     return LoadedTrack1Episode(episode,manifest)

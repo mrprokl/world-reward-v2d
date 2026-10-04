@@ -226,6 +226,43 @@ print('actual peer API PASS')
     result=subprocess.run([sys.executable,"-c",source],check=True,capture_output=True,text=True)
     assert result.stdout.strip()=="actual peer API PASS"
 
+
+def test_independent_original_source_passed_to_entire_hash_only_chain(gate,tmp_path,monkeypatch):
+    from types import SimpleNamespace
+    root,code,spec,_,report,_,chain,save=fixture(gate,tmp_path,monkeypatch)
+    pin=code/f'configs/cari_clip_{spec.episode_index:06d}_export_source_pins.json'
+    pin.write_text('{"independently_frozen":"tiny source fixture"}');pin.chmod(0o444)
+    old=tmp_path/'original';old.mkdir()
+    names=tuple(report['source_helpers'])
+    for name in names:
+        p=old/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes((code/name).read_bytes());p.chmod(0o444)
+    for name in ('infra/run_cari_full_export.sh','infra/cari_clip_inputs.py'):
+        p=code/name;p.chmod(0o644);p.write_bytes(b'changed current non-numeric/profile source');p.chmod(0o444)
+    pins=save();proof={'producer_revision':'f'*40,'historical_code_executed':False};calls=[]
+    def verify(*args):
+        assert args==(root,code,spec,pins);calls.append('proof');return old,proof
+    def lineage(*args,**kwargs):
+        assert args[:3]==(root,code,spec) and kwargs=={'source_code':old};calls.append('lineage');return chain
+    monkeypatch.setitem(sys.modules,'cari_export_source',SimpleNamespace(verify_export_source=verify))
+    monkeypatch.setattr(gate.export.lineage,'verify_refined_artifacts',lineage)
+    value=gate.load_shared_track1_episode(root,code,spec,pins)
+    assert calls==['proof','lineage','proof'] and value.manifest['original_export_source_binding']==proof
+
+
+def test_original_source_rehashed_after_trajectory(gate,tmp_path,monkeypatch):
+    from types import SimpleNamespace
+    root,code,spec,pins,_,_,_,_=fixture(gate,tmp_path,monkeypatch)
+    pin=code/f'configs/cari_clip_{spec.episode_index:06d}_export_source_pins.json';pin.write_text('{}');pin.chmod(0o444)
+    calls=[]
+    def verify(*args):
+        calls.append(1)
+        if len(calls)>1:raise ValueError('Original ledger changed')
+        return code,{'immutable':True}
+    monkeypatch.setitem(sys.modules,'cari_export_source',SimpleNamespace(verify_export_source=verify))
+    chain=gate.export.lineage.verify_refined_artifacts(root,code,spec,{})
+    monkeypatch.setattr(gate.export.lineage,'verify_refined_artifacts',lambda *_a,**_k:chain)
+    with pytest.raises(ValueError,match='Original ledger changed'):gate.load_shared_track1_episode(root,code,spec,pins)
+
 @pytest.mark.parametrize('fault',[None,'binding','old_source'])
 def test_historical_source_explicit_binding_before_trajectory(gate,tmp_path,monkeypatch,fault):
     from types import SimpleNamespace

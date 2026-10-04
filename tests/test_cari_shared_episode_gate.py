@@ -108,6 +108,14 @@ def test_episode_parser_no_implicit_selection(gate,ep):
     assert gate.output_relative(ep)==f"outputs/episode_{ep:06d}/cari_shared_episode_v1"
 
 
+def test_original_export_source_flag_fresh_namespace_and_no_arbitrary_paths(gate):
+    args=gate.parser().parse_args(['--episode','21','--original-export-source'])
+    assert args.original_export_source is True
+    assert gate.output_relative(21,revision='a'*40)=='outputs/episode_000021/cari_shared_episode_source_'+'a'*40
+    with pytest.raises(SystemExit):gate.parser().parse_args(['--episode','21','--original-export-source','--original-export-source'])
+    with pytest.raises(ValueError):gate.output_relative(21,revision='../old')
+
+
 def test_fresh_actual_loader_api_and_gate_import_do_not_load_torch_joblib():
     source=f"""
 import inspect,sys

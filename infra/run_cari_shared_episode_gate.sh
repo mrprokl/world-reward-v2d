@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 # CPU-only real frozen full-native loader; sole new output is its JSON receipt.
 set -euo pipefail
-[[ $# == 2 && "$1" == --episode && "$2" =~ ^(0|[1-9]|[12][0-9])$ ]] || exit 2
+[[ ( $# == 2 || ( $# == 3 && "$3" == --original-export-source ) ) && "$1" == --episode && "$2" =~ ^(0|[1-9]|[12][0-9])$ ]] || exit 2
 EPISODE="$2"
+ORIGINAL_SOURCE=0; SOURCE_ARGS=()
+if [[ $# == 3 ]];then ORIGINAL_SOURCE=1;SOURCE_ARGS=(--original-export-source);fi
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_cari_shared_episode_gate/code" ]]
 printf -v PADDED '%06d' "$EPISODE"
 BASE="$ROOT/outputs/episode_$PADDED";OUT="$BASE/cari_shared_episode_v1"
+if [[ "$ORIGINAL_SOURCE" == 1 ]];then OUT="$BASE/cari_shared_episode_source_$REV";fi
 PIN="$CODE/configs/cari_clip_${PADDED}_input_pins.json"
 EXPORT_PIN="$CODE/configs/cari_clip_${PADDED}_shared_export_pins.json"
 python3 -I -B - "$ROOT" "$CODE" "$OUT" "$PIN" "$EXPORT_PIN" <<'PYSAFE'
@@ -42,6 +45,21 @@ while IFS= read -r relative;do
  path="$ROOT/$relative";[[ -f "$path" && ! -L "$path" ]]
  MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
 done <<< "$SOURCES"
+SOURCE_PIN="$CODE/configs/cari_clip_${PADDED}_export_source_pins.json"
+if [[ "$ORIGINAL_SOURCE" == 1 ]];then
+ [[ -f "$SOURCE_PIN" && ! -L "$SOURCE_PIN" ]]
+ ORIGINAL_MOUNTS="$(python3 -I -B - "$ROOT" "$CODE" "$EXPORT_PIN" <<'PYORIGINAL'
+from pathlib import Path
+import json,sys
+root,code,pin=map(Path,sys.argv[1:]);sys.path.insert(0,str(code/'infra'))
+from cari_clip_inputs import PublicClipSpec
+from cari_export_source import verify_export_source
+pins=json.loads(pin.read_text());original,_=verify_export_source(root,code,PublicClipSpec(**pins['clip_spec']),pins)
+print('\n'.join(map(str,(original,original.parent/'revision',original.parent/'source-sha256'))))
+PYORIGINAL
+)"
+ while IFS= read -r path;do MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly");done <<< "$ORIGINAL_MOUNTS"
+else [[ ! -e "$SOURCE_PIN" && ! -L "$SOURCE_PIN" ]];fi
 HISTORICAL_PIN="$CODE/configs/cari_clip_${PADDED}_historical_source_pins.json"
 CONTAINER_USER="$(id -u scenesmith):$(id -g scenesmith)"; HISTORICAL_ROOT=0
 if [[ -e "$HISTORICAL_PIN" || -L "$HISTORICAL_PIN" ]];then
@@ -73,4 +91,4 @@ timeout --signal=TERM --kill-after=10s 303s docker run --rm --network none --mem
  --env "PYTHONPATH=$CODE/src:$CODE/infra" --env PYTHONDONTWRITEBYTECODE=1 \
  --env HOME=/tmp --env HF_HUB_OFFLINE=1 --env TRANSFORMERS_OFFLINE=1 --env MOMENTUM_ENABLED=0 \
  --env OMP_NUM_THREADS=2 --env OPENBLAS_NUM_THREADS=2 --env MKL_NUM_THREADS=2 \
- "${MOUNTS[@]}" --mount "type=bind,src=$OUT,dst=$OUT" "$IMAGE" "$CODE/infra/cari_shared_episode_gate.py" --episode "$EPISODE"
+ "${MOUNTS[@]}" --mount "type=bind,src=$OUT,dst=$OUT" "$IMAGE" "$CODE/infra/cari_shared_episode_gate.py" --episode "$EPISODE" "${SOURCE_ARGS[@]}"
