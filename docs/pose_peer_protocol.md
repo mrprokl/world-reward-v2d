@@ -59,3 +59,22 @@ PID/address to its expiring2400s owned unit and exact data-disk UUID; refuse any
 occupied port, output or source namespace. Server setup PASS is not transport
 PASS. Setup failure can stop only its exact transient ExecStart/config binding;
 private host/client keys are never read, hashed or exported by Python controls.
+
+## Exact private pose-result return
+
+After an independent original full native source/input/output seal, a CPU-only
+return inventory on VM02 hashes all3 readonly native outputs plus the actual
+parent receipt. It archives those exact bytes behind one independently pinned
+bounded first manifest. Freeze full archive/manifest/inventory SHA before opening
+a single expiring private forced-export listener. The source is the genuine
+readonly server snapshot; no spoofed producer or numeric re-encoding.
+
+VM01 pulls using an independently supplied Ed25519 host public key, no user SSH
+config/agent/TOFU, no arbitrary commands. Exact SHA/byte count/EOF and SSHexit0
+precede original receipt/native-full-frame JSON validation and Linux atomic
+NOREPLACE. Only3 byte-identical files become UID1000/0444 under0755 native target;
+parent receipt remains private results evidence. No model, array/mesh decoding,
+GPU or local heavy transit. Budgets inventory300s, pull/export600s, listener1200s.
+Root owns narrow temporary NSG source4→9TCP2222 and key/listener cleanup; unknown
+state stops without automatic retry or replacing original target/evidence.
+Transport/interface fixtures are not actual transfer or reconstruction accuracy.

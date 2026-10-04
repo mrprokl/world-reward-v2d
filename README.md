@@ -46,8 +46,11 @@ No final Parquet, submission or verified CARI4D improvement yet.
   fidelity checks. The unchanged isolated volume tracker now passes all634
   original frames on VM02 (4,743.69 s), with independent source/full-input/output
   byte seals. Its output return and CPU assembly remain separate unrun gates.
+  The next415-frame episode has complete automatic Body/depth initializers;
+  its default topology gate failed before poses. One unchanged CPU
+  volume-constrained proposal is running, not yet accepted.
   The original
-  default-backend failure remains closed.
+  default-backend failures remain closed.
   No frames, components or
   trajectories were dropped to rescue either episode.
 - **Depth research:** D106 anchors DA3 to MoGe with one scene-constant median

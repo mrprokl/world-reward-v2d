@@ -6692,3 +6692,18 @@ parent3408B SHA7578f33a24d9c810baa88ada2c0d9be2b7c69cb7e5f56ed842ae55e413980765.
 GPUempty/containerremoved; tiny pose-return sourcepins frozen. No arrays or
 media transferred locally. Private return to VM01 and originalCPUassembly are
 separate unrun gates; no quality, eligibility or CARI4D-improvement claim.
+
+EP9 original5355582 globalfixed_all16 route FAIL04:41:41UTC after complete
+415 automatic masks and native Body/depth/adapter initializers. Native object
+tracking aborted before poses at unchanged topology-preserving budget gate;
+original pose directory is empty, failed unitexit1/MainPID0/GPUempty independently
+observed. No mesh components deleted, shape shrunk, masks relabeled or thresholds
+retuned. One unchanged900s CPU volume-constrained proposal dispatched02d65e4;
+its geometry/fidelity provenance, then atomic archivedemptyFAIL and complete
+tracking are separate required gates. Failure remainsclosed, no timing/qualityPASS.
+
+Private EP8 exactpose-return control prepared: root210focused source/return/
+privateSSHexit/EOF/NOREPLACE/transport fixtures PASS9.91s; wrapper syntaxPASS.
+No existing numeric algorithms changed, no actual source archive or return
+claimed. Original3files/parentreceipt remain independentlysealed; exactfuture
+archive/manifest pins must be measured on Azure before private listener/transfer.
