@@ -5996,3 +5996,49 @@ world-reward-ncc-h100-02/WORLD-REWARD-RESEARCH. Root29tinytests PASS0.21s;
 build/install/nativeCPU operator gates remain unexecuted. It reads no
 checkpoint/private dataset and cannot establish TAPIR accuracy or full licence
 eligibility. Existing Torch2.5.1cu124/NumPy1.26.3 must stay unchanged.
+
+Throughput correction: cancel ONLY the untouched EP6 scheduling queue after
+source7b0df06/ExecStart/fragment/PID/cgroup waiting-child checks, every EP6
+target absent, GPU empty and original lock acquired. Cancellation receipt
+status is **cancelled_before_producer**, never PASS; original log370B SHA
+`ddb61e3ba27a6e48f038fcf58538a58380afc0e8ef8c887563dbccc77f1ae75e`
+retained. EP5's original CPU assembly PID1021201 remains active and untouched.
+The unnecessary wait for whole frontend completion left the GPU idle despite
+releasedFD9. A fresh direct EP6 route with unchanged globalfixed_all16 children
+was dispatched froma06b703, acceptedactive/PID1062403. No EP6 producer was
+retried, output replaced, threshold altered or second GPU job duplicated.
+
+Full committed `a06b703` regression: **10,944 PASS, 3 SKIP** in399.72s.
+Independent later public-adapter files are outside that tested snapshot;
+unchanged historical frontend/native numerical helpers stay frozen.
+
+Opaque RoboTAP acquisition from `f4d2bee` **PASS848.791314s**. Original
+generation1693927735577112 archive13,558,087,507B SHA
+`ac09f54e85e596b2ad2f04040baa7e47c6d4982e8180494c2f1b13cf4c09b9fd`
+matched published MD5. Five retained private split pickles total38,207,132,392B
+(embedded text accounts for the remaining612B expanded payload); all five were
+independently streamed and frozen in acquisition pins before decoding. Actual
+report9751B SHA`f8be0b22fce58f4ceea8c58550760eddc1b770d49a87c12009cd4667bb64b792`;
+receipt3808B SHA`de5871336d1a897acd40ff58d0bff5ba261d853cca5c16f245cdb1833661d137`.
+Checkpoint218,886,140B matches published SHA. Everything remains on Azure;
+ZIP removed only after successful immutable retention/source/inode/hash gates.
+No unpickle, RGB/GT decode, GPU, prediction or evaluation in this acquisition.
+
+Boots dependency build **FAIL36.226695s at cpu_import**, original a06b703
+receipt4390B SHA`5ceff1a96cc8a705f2e8dfa43f17eb8486c57a821aecc32a3c8147ac74cab9a3`.
+Five pinned offline wheels passed licence/install gates and created image
+`sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4`
+(47layers; original44-layer prefix unchanged). Probe incorrectly imports the
+nonexistent `einshape.torch`; pinned upstream uses its own torch backend through
+`tapnet.torch.utils.einshape`. Preserve original FAIL, image and log; do not
+rebuild, retag or reclassify it. A separate source-native CPU verification of
+the existing installed image is required before inference.
+
+Public-adapter preregistration: first lexicographic key in each original first
+three split files, first32 original point indices without replacements, full
+original uint8RGB and standard first-visible `(t,y,x)` queries. Initial queries
+are explicitly external annotation oracles, not Track1 automatic queries;
+future annotations stay private. Selection freezes before label-derived query
+access; sealed pre/post all-five hashes, restricted unpickle, no resizing or
+frame removal. CPU-only16GB/4CPU180s gate, fresh namespace and exact owned-CID
+cleanup. Actual compatibility/cardinalities and benchmark results remain pending.

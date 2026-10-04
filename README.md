@@ -68,10 +68,13 @@ image compiles offline and its thin Python import gate passes. The independent
 SAM2 CUDA connectivity/hole-filling operator gate also passes, without models
 or historical image-parity/eligibility claims. The new four-frame frontend pilot
 passes; complete replica and reconstruction accuracy remain unverified.
-The full `bf6f740` lightweight source/test suite passed **10,746 tests,
-2 optional skips** in 332.26 s. A synchronous GPU-lock queue for the unchanged
-native stages and a separately frozen RoboTAP/BootsTAPIR acquisition are being
-validated; neither is a reconstruction-quality result.
+The full `a06b703` lightweight source/test suite passed **10,944 tests,
+3 optional skips** in 399.72 s. The synchronous GPU-lock queue retains unchanged
+native stages. Opaque RoboTAP/BootsTAPIR acquisition passes on Azure; its known-
+benchmark initial-query diagnostic remains pending and training overlap is
+unverified. A separate native CPU check is required after the dependency build's
+incorrect `einshape.torch` probe failed; that original failure is preserved.
+None of these engineering gates is a reconstruction-quality result.
 Earlier extraction-fixture failures were corrected using authenticated historical
 Git bytes; the historical producer and production pins remain unchanged.
 

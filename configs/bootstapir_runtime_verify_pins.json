@@ -1,0 +1,24 @@
+{
+  "schema": "world_reward.bootstapir_runtime_verify.pins.v1",
+  "azure_vm_name": "world-reward-ncc-h100-02",
+  "azure_resource_group": "WORLD-REWARD-RESEARCH",
+  "budget_seconds": 120,
+  "build_output": "results/bootstapir-runtime-build-a06b703d017d40f9fedf2b1e9e19f11cfe40aa0f",
+  "original_build_report": {"bytes": 4390, "sha256": "5ceff1a96cc8a705f2e8dfa43f17eb8486c57a821aecc32a3c8147ac74cab9a3", "producer_revision": "a06b703d017d40f9fedf2b1e9e19f11cfe40aa0f"},
+  "original_cpu_import_log": {"bytes": 128, "sha256": "0e0a9df673a6a854b6b6e37fe62a447f3084ac7f294883638d1b500d27773511"},
+  "original_build_log": {"bytes": 2843, "sha256": "89eee7cc680ffbd01e913aeca837cde53670047b969fac9fc14e279035ceb2cb"},
+  "original_build_helpers": {
+    "infra/run_bootstapir_runtime_build.sh": {"bytes": 15946, "sha256": "880784ad77c410523b5f62a338ae90cc831d5c2ec9326205c18fe8185ad2b671"},
+    "configs/bootstapir_runtime_pins.json": {"bytes": 4852, "sha256": "ea01a5593d63572d0890e48b49e31a757c5d4acc2442cd0bc32e420722e6c489"}
+  },
+  "base_image_id": "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3",
+  "child_image_id": "sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4",
+  "target_image": "world-reward/bootstapir:0.1",
+  "base_layers": 44,
+  "child_layers": 47,
+  "ordered_rootfs_sha256": "0f1bf78024834b90e5841b8de8893fba8eec4176bf36c071516d0c1205d84fdc",
+  "source_protocol": {"path": "configs/robotap_boots_protocol.json", "bytes": 6339, "sha256": "830cbf41b88ab7a2c856884172f226eb4cd7773b169d647af33b729d0d7ac1cf"},
+  "acquisition_pins": {"path": "configs/robotap_boots_acquisition_pins.json", "bytes": 1482, "sha256": "99288ba8b357f57e1e1c92f0f3e7ed7b40007ef78e5b52ea5ebd173efeb2b216"},
+  "cpu_operator": "Unmodified tapnet.torch.utils.einshape PyTorch backend plus native bilinear; import TAPIR/nets only, never instantiate model or load checkpoint",
+  "scope": "Independent source-native CPU runtime verification. Original build FAIL remains FAIL. No GPU/network/install, benchmark accuracy, model readiness or full license eligibility claim."
+}

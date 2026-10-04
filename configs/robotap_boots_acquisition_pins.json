@@ -1,0 +1,39 @@
+{
+  "schema": "world-reward-robotap-boots-acquisition-pins-v1",
+  "report": {
+    "bytes": 9751,
+    "sha256": "f8be0b22fce58f4ceea8c58550760eddc1b770d49a87c12009cd4667bb64b792",
+    "producer_revision": "f4d2bee6eadf9acd9da7a03eda1553f02f1b4a3a",
+    "script_sha256": "d4071356e04b086266cf3b9f1ca9f3359e0b2dff75ef0101d76d092f1eae0171"
+  },
+  "retention_receipt": {
+    "bytes": 3808,
+    "sha256": "de5871336d1a897acd40ff58d0bff5ba261d853cca5c16f245cdb1833661d137"
+  },
+  "pickles": {
+    "eval_private/pickles/robotap/robotap_split0.pkl": {
+      "bytes": 6204610710,
+      "sha256": "5fcf3953baca9202e0d1afd8a7d8d70a03e5480921f7ec2ab1240501fc5e1e91"
+    },
+    "eval_private/pickles/robotap/robotap_split1.pkl": {
+      "bytes": 6835282828,
+      "sha256": "93a305347003ef25f12f906a8354e78f7a8a6001e238a7f4ca06c2ebb3c14424"
+    },
+    "eval_private/pickles/robotap/robotap_split2.pkl": {
+      "bytes": 7971820026,
+      "sha256": "24096d8524211bfb0b84a3abe72e98afbd780df860695e2682a9a0f7a7476539"
+    },
+    "eval_private/pickles/robotap/robotap_split3.pkl": {
+      "bytes": 8625803948,
+      "sha256": "9ebd36c8582d5f357b51c4a970ce1b805e480cb01e674edaebed89dc14262149"
+    },
+    "eval_private/pickles/robotap/robotap_split4.pkl": {
+      "bytes": 8569614880,
+      "sha256": "2d158ccdad2bce1c88194e39b6f1f257882b9ca143de5c119bfc8d9cb10a8b46"
+    }
+  },
+  "protocol": {
+    "sha256": "830cbf41b88ab7a2c856884172f226eb4cd7773b169d647af33b729d0d7ac1cf",
+    "bytes": 6339
+  }
+}
