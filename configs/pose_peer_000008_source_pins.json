@@ -1,0 +1,98 @@
+{
+  "schema": "world_reward.pose_peer.source_pins.v1",
+  "episode_index": 8,
+  "producer_revision": "b9ef3ba6504262f3e7e9706a37eddeeb453941c9",
+  "producer_entrypoint": "run_track1_initializers_only",
+  "producer_helpers": {
+    "infra/run_track1_initializers_only.sh": {
+      "bytes": 5600,
+      "sha256": "7bb5bf4bf38c9b81922d5e717ad9a02e7ed62e88f090ead0a601ad76ad10cde6"
+    },
+    "infra/automatic_masks.py": {
+      "bytes": 11604,
+      "sha256": "b6d5b543ace41c1cca6b327182ff23528328a1052ead0f4f1d7423dc7404e234"
+    },
+    "infra/body_smoke.py": {
+      "bytes": 33592,
+      "sha256": "3f662f88cd212ad1a04b59b66ccdb5e32a00829b52f5e224daadfbe519e1bc93"
+    },
+    "infra/depth_smoke.py": {
+      "bytes": 5972,
+      "sha256": "a76bb2cfa4b01a15d7604a304b9cdc13b6548721cae3d55edd0de8556dbb55b9"
+    },
+    "infra/object_smoke.py": {
+      "bytes": 10994,
+      "sha256": "1e249274153859150130be415203ae7cf4cb77862cba92d056493dbd51337407"
+    },
+    "infra/scale_smoke.py": {
+      "bytes": 10742,
+      "sha256": "a260e5c4e21548c66c20a7621f7dfe2a1d0c1661e3bf9f6d7adbfae02a564bdc"
+    }
+  },
+  "tracker_helpers": {
+    "infra/object_pose_smoke.py": {
+      "bytes": 21856,
+      "sha256": "1ece387e2c8010183e4a38757728cd00adf07af069cca54803e28e2a05deb694"
+    },
+    "infra/body_smoke.py": {
+      "bytes": 33592,
+      "sha256": "3f662f88cd212ad1a04b59b66ccdb5e32a00829b52f5e224daadfbe519e1bc93"
+    },
+    "infra/camera_render.py": {
+      "bytes": 24558,
+      "sha256": "325fa1c42b6e620f93fe59d6e4f63852557a08343b13e2bea60eee8c88f4743c"
+    },
+    "src/world_reward/__init__.py": {
+      "bytes": 81,
+      "sha256": "1ac8c64041277f0c3cf4d8838b3153210d7076dd86a5121d1e6ef494b64b36a1"
+    },
+    "src/world_reward/data.py": {
+      "bytes": 5181,
+      "sha256": "c8200e28900a88394f2821c558cd3693225ae8547331f12f2aff7d225c008a30"
+    },
+    "src/world_reward/rigid_alignment.py": {
+      "bytes": 8376,
+      "sha256": "d165a6a353e5d5557fc6f3256bdb694d72979c64c9779e29627954907b2b3f51"
+    },
+    "src/world_reward/mesh_geometry.py": {
+      "bytes": 5746,
+      "sha256": "7e1fbeec221665cef1f419459ebe2aa68da4acc39bc5e7475d615c20a980399b"
+    },
+    "src/world_reward/mesh_budget.py": {
+      "bytes": 10062,
+      "sha256": "194bae8a9a62d214c4d5cd95b90e8ff1001beae36797902a4de9402a9d3f5579"
+    },
+    "src/world_reward/pose_selection.py": {
+      "bytes": 13059,
+      "sha256": "663636ad7bb84ecf2093169313de0301bd2eef0f3a568dd90f84f05a1958549a"
+    }
+  },
+  "reports": {
+    "results/input-manifest.json": {
+      "bytes": 13081,
+      "sha256": "3df960ce0f594b8f51675b21bb070925de7aa87a583332674eb89b0e90fc6263"
+    },
+    "outputs/episode_000008/automatic_masks/report.json": {
+      "bytes": 10846,
+      "sha256": "f7b36b4b25f240d26cf8dea95cb227d38d3986cc42381a16b5b3a8c3ce9056d5"
+    },
+    "outputs/episode_000008/body_full/report.json": {
+      "bytes": 406765,
+      "sha256": "d45e83bd40f9b620fc7032f7833c366896fb37188b8e425bfa7016f8aa35fec2"
+    },
+    "outputs/episode_000008/depth_full/report.json": {
+      "bytes": 960170,
+      "sha256": "2c402ce280a489804e8652713aa996b8a29d8f5f59d9459886c5ef3c5f63f7dd"
+    },
+    "outputs/episode_000008/object_grounded/report.json": {
+      "bytes": 15642,
+      "sha256": "61590917fcb059527a87181af1d3b6b4be9385c0692f83b8c59186a8f6e382c6"
+    },
+    "outputs/episode_000008/scale_smoke/report.json": {
+      "bytes": 9431,
+      "sha256": "3b181a9561c959306123bdc1a2b1c65cad5bf4f519a0841c2dcf7a519c8b063b"
+    }
+  },
+  "mesh_source": "default",
+  "volume_pins": null
+}

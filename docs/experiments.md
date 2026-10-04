@@ -6244,3 +6244,11 @@ real parent permissions, immutable image/operator availability and actual
 transfer/native execution still need gates. Full dense manifests/archives stay
 Azure, only≤4KB measured pins locally. No image clone, Body prediction transfer,
 Objects weights, GT, new predictor numerics or quality claim.
+
+EP5 original3bee CPU assembly **actualPASS all668frames**; receipt3357B SHA
+`3c4b565a4e775afa0154300f33953639e001d071eb6b38c2a6668c5c8ac7ea62`.
+Previously published6ba2359 inventory's five helper sources are independently
+byte-identical to current source; its read-only SHA/JSON inventory verifies
+all fifteen originals before new episode5 native pins. No arrays/media fetched
+locally and no shared-forward/refinement/export success inferred. EP8's six
+actual source/report pins are separately frozen before Azure-only archive.
