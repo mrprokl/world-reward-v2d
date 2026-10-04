@@ -6780,3 +6780,11 @@ withoutprivatebyte reads; original NSG4096Denyonly restored. Server462B cleanup
 SHAd2cd27b40f500559bcae11ee4af9bd64c8a902008f6ce19726f281de5b06098c;
 pull798B cleanupSHA76b03dd12cd474ca1a272c0eeab587125957bf704181011e1f1c242ef00577cd.
 OriginalCPUassembly separatelydispatchedecd6e7a, noGPU/numericchanges/qualityclaim.
+
+EP6 full816 original15inputpins independentlysealed by root: exact100current
+committedinventorysourcebytes/modes/dispatchmarkers, actualoriginale655eed
+preparebytes, all15original artifacts beforeJSON and repeatedpostinventory
+matchtiny2850B actualreadonlyinventory output
+SHA5c23cb212a2ba87c9459a37737851b479d8ba8536d5689884edcc1438830c50d.
+No arrays/videos/models decoded on barehost, noheavy localtransit. Frozen3335B
+clipinputpins precede next603s unchanged native sharedprepare, notqualityPASS.
