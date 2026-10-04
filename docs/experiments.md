@@ -8725,3 +8725,29 @@ Agent422PASS5.03s/root693PASS25.26s;13768owned rootfixture entries removed.
 Predeclare bounded native procedural controls before realprepare replay;
 failedpartial tree must be archived atomically with complete before/after
 inventory/source/failure proof, never overwritten or resumed as valid input.
+
+Actual native proceduralcontrols under f5e6030 PASS: dyadic rotation/noSVD
+camera7.450581e-09m; F32 .6/.8rotation/nativeSVD1.794337e-08m; reversed and
+missing meaningfulface correctly rejected. Complete224source/archive
+3a98088939cffd1e51d730c7a6db83cacdb310b73697518d6b1eba91c7937803,
+ledger3e2ae063324359fa02572a7751ad45a7efd33b4198a36fbe929e7528203bb27c
+rehashbeforeafter PASS. Readonly oldpartialEP09/full415 recomputedF32 poses
+roundtrip6.260959e-07m; not actual newly saved-pose preparation success.
+Originalfailed17-entry tree atomically NOREPLACE archived with exactpre/post
+bytes/inodes/modes, stoppedunitPID0/Exec1 and fullsource/log authentication;
+receipt4541B SHAbab80df67707137eb462835fa1633daa9bd5ac65f5e480666ad8d9214fc5a06a.
+No partial reuse, prediction edit or historical PASS mutation. Fresh canonical
+technicalprepare replay authorized only after these controls.
+
+Actual generic numericaldiagnostic fbdb66a PASS16.329313s; host39202B
+SHA7ac0fecba88e1ceac37f1a4f8a2425cb6f490fb64d7d4cc7f62df89212de4f30,
+native34314B SHA7b74568f3c422fe979460e39ca859d5d000b0f3cd88dc5221617273ea1ae9ca4.
+Independent192files archive0aa77115a13e3145c6211e48e22664221b2f6ada37570a8428113f4fbf79b0fc,
+ledger0120570d3b0cf85e2b122cc25bc2c36b22b48850dbc482fc2277bf07dfe59a28
+and allnative/host/source/runtime postproof PASS. Sequentialexactforce SIGABRT
+with ASan stack-overflow/70Lazy frames0.181334s; balancedexactzero+teardown
+PASS0.445347s. Supports mechanism only: production_failure_explained=false,
+adoption=false. Nextproposal logarithmic-depth EPECK streaming sums requires
+new15controls+four geometric qualifications; no production operator/replay yet.
+Disposed native build inputs removed; original container ID witness retained
+and independently proven absent (not an extra prediction or runnable container).
