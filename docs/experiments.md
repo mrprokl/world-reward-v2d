@@ -7626,3 +7626,7 @@ allseven rawoutputs and posthash PASS before SAM2 inference/private values.
 Host6732B SHA11818ed0c67cbec760257021f13a14bcfa0ce1c19307bf0412f4f0e7cc51ecd9.
 No private values, identity, contact/3D or adoption. EP13export66a48ff and
 EP14prepare2538242 ACKqueued behind originalEP16 lock, not inferredPASS.
+
+Focused baseline/paired-mask release root353tiny tests PASS3.48s. Turn-owned
+temporary test roots removed without following symlinks; remote heavydata remain
+onAzure. No private mask metric used for tuning or adoption.

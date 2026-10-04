@@ -20,7 +20,7 @@ inferred automatically; no hand-labeling of challenge records.
   omission is authenticated, not a relaxed legacy gate or a reversal of its old
   conversion failure. EP13 full425 inputs, shared preparation and native forward
   and301-update refinement pass; direct export is not yet run. EP14 full442 frontend/input receipt passes
-  and independent15-input sealing pass. Collected-predecessor scheduling failures
+  and independent15-input sealing pass; subsequent export/preparation are queued. Collected-predecessor scheduling failures
   remain separate. Original controls/reference replay and whole source-chain pins are
   frozen before each next stage; no prediction is inferred from dispatch ACKs.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
