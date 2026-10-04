@@ -43,7 +43,8 @@ No final Parquet, submission or verified CARI4D improvement yet.
   Independently pinned full native shared preparation also passes (23.50 s);
   native forward passes all9windows (147.76 s), with independently frozen
   full816frame output. Unchanged native refinement passes all301updates (566.10 s),
-  with independently sealed original output; directexport has been dispatched. The634-frame
+  with independently sealed original output; directexport now passes all816frames
+  (43.75 s). Original official packing is dispatched, not yet independently sealed. The634-frame
   episode has complete initializers. Its first private Azure full-pose run
   stopped before poses on the unchanged topology gate. A separately qualified
   volume proposal and its full634-frame input archive now pass provenance and
@@ -53,6 +54,8 @@ No final Parquet, submission or verified CARI4D improvement yet.
   independent129/133source+output seals, listener/clientkey cleanup and
   temporary NSG rule removal also pass. Original CPU assembly passes all634frames
   (4,982.71 s), within its fixed7200s outer deadline; the owned timer is stopped.
+  Full native shared preparation passes (21.70 s), and native forward passes
+  all7windows with a twice-rehashed frozen full634frame bundle.
   The next415-frame episode has complete automatic Body/depth initializers;
   its default topology gate failed before poses. The unchanged CPU
   volume proposal also rejects zero-area source faces; both failures stay
@@ -92,9 +95,9 @@ image compiles offline and its thin Python import gate passes. The independent
 SAM2 CUDA connectivity/hole-filling operator gate also passes, without models
 or historical image-parity/eligibility claims. The new four-frame frontend pilot
 passes; complete replica and reconstruction accuracy remain unverified.
-The full `abe793f` lightweight source/test suite passed **11,837 tests,
-5 optional skips** in 425.23 s. Later EP5 inventory/scheduling checks pass281 tests
-with one platform skip; no scientific result follows from these fixtures. The synchronous GPU-lock queue retains
+An isolated full source/test suite now passes **12,098 tests, 6 optional skips**
+in444.46 s; the new exact precision/backend contracts pass68 tests with one
+optional local Trimesh skip. These are correctness checks, not scientific results. The synchronous GPU-lock queue retains
 unchanged
 native stages. Opaque RoboTAP/BootsTAPIR acquisition, independent native CPU
 verification and full2D prediction/evaluation now pass on Azure: three videos
@@ -109,8 +112,10 @@ continuation failed archive inventory after1,701.10 s, before image selection or
 private-label reading. All disposable archives were removed; zero public/private
 inputs remain. Metadata-only diagnosis now proves the technical cause: original
 RGB filenames start at1, while the protocol incorrectly required0. No labels or
-predictions were consulted, no native IDs renumbered, and no third acquisition
-is authorized under that closed protocol.
+predictions were consulted, no native IDs renumbered, under that original closed protocol. Explicit October4 authorization permits
+one corrected same-cohort engineering replay, preserving nativeIDs1..96,
+original failures, cohort, GPU budgets and quality gates. Its full-archive
+acquisition is active on Azure; private labels remain outside prediction inputs.
 See [protocol](docs/point_pose_protocol.md).
 None of these engineering gates is a reconstruction-quality result.
 Earlier extraction-fixture failures were corrected using authenticated historical

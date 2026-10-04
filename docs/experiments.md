@@ -6923,3 +6923,19 @@ before repeatedfouroutputreadonlyinventory. Frozen27,505B report
 SHA657602f65a13d8f7be4c82dd5e0f5e37cc92420e960cc041d36f0f66eb339f72;
 fullnative sharedidentity/allindices/geometry unchanged. Preparepins frozenbefore
 nativeforward, no quality/score/adoption claim.
+
+EP8 actual unchangedfullnative forward completes all634 originalframes/all7
+windows. Root binds originala684108 full125sourceclosure/filemodes independently
+and rehashes both immutableoutputs twice. Final71,432B report
+SHA93d17f18120d0b49f177429683ba7945e6ecdb734debf3b7c758cce7dd3b4e97;
+485,009,404B bundleSHA450b665fd07af54259df04adeb94346bedcc3a6f308cb65df59c84969327c095.
+Original queuechildcomplete/inactive and parent1257877 absent; no restart.
+Tinyforwardpins committed238240c before original301update refinement.
+
+Frozen datafree precision/backend controls14b1b81: newexplicitstatichelpers
+replace only globalarea validity with exactstoredtriangle predicates, keeping
+originalvolumeQEM/embedding/birth/protectedcavity/officialpack math. Root68PASS
+1optionalTrimeshSKIP0.50s; actuallarge nativecontrols notyetexecuted/adopted.
+ReadOnlyCPU4/16GB/3600s+exactownerCIDcleanup, nativeQEM≤900s, nochallenge/GT
+inputs. Originalofficialmesh_budget.py directlyaudited2031B SHA42ab8ab35f37b806fb1465eadd96abe43eaac04575da47a4855d08eefe6167b0;
+singlefilekitclosure complete (onlynumpy/trimesh/fast_simplification).
