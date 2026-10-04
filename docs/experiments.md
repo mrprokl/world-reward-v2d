@@ -8751,3 +8751,43 @@ adoption=false. Nextproposal logarithmic-depth EPECK streaming sums requires
 new15controls+four geometric qualifications; no production operator/replay yet.
 Disposed native build inputs removed; original container ID witness retained
 and independently proven absent (not an extra prediction or runnable container).
+
+
+EP29 default fullpose independently closed: unchanged237file31ff94d source,
+archive23856387871410365776a715207c069146921cca498ba225c226b3d45b80dd88,
+ledger0e6337ce53b039d63e2590b22d20893cbe6a5c266a89f20ff2e497b62e388920.
+Actual terminalExec1/PID0, log2021B
+SHAf543f53f3fcfddf2aa58b5e2935126ae9ea1fd8663c6a43782cf990db5062e30;
+all eight frozen whole/component budget candidates rejected. Reserved empty
+object_pose_full directory exists; no prediction/pose/report/cari_inputs.
+Initial readonly controller incorrectly expected directoryabsence; corrected
+empty-directory census PASS without production/source changes. No repair/rescue.
+EP09 f5e6030 nativeprepare remains active at21:08UTC with100/415depth frames;
+no report yet, no completion/quality inferred from ExecMainStatus0.
+
+Balanced EPECK source proposal7e42314c471c54ea1604e2e9e24d14785a6b9c29786db6ff4717e5b714facf38
+changes only accumulation/helper/finalization: restoration exactly reproduces
+old13914B source72098be329146be0c48f32bf1473731c195120fb53b65511955d69e222c59ee4.
+22 exactrational/source tests PASS; signs/terms/predicates unchanged, to_double
+not presumed byte-identical, DAGmemory remainsO(F). Old qualification pins remain
+historical, not authorization for the new source. Fresh15controls thenfour
+six-stage geometric controls precede any technicalEP25 replay. Explicit runtime
+reuse authenticates originalCPUimage/qualification and recompiles newquery;
+no dependencyinstall/imagebuild or reuse-as-new-qualification.
+
+Coherent pointobjective extension implemented as explicit source-bound native
+subclass: inherited loss/run unchanged plus fixedtriangle persistent robust
+reprojection, trackequal support, forcedtime0excluded, fullT/fixedR/fixedgeometry.
+External calibration scale/weight/reference REQUIRED, not chosen on challenge.
+No clipping, reselection, geometryfit or replacement of missing evidence.
+Datafree source/contracts150PASS/10realTorchSKIP0.62s combined with exactquery
+checks; localTorch unavailable. Native/Torch/model execution and fullHOI quality
+remain unqualified. Historical baseline paths/results untouched.
+
+Runtime-reuse independent13hostbranchtestsPASS,107combined0.45s; rejected
+wrongoldpins/oldcontrols/missingcontrols/wrongimage/posthash/source/nativefailure.
+Owned scratchcleanup moved to independent owner-inode guarded try so integrity
+FAIL cannot retain disposable inputs. Replaced/aliased namespace stays untouched,
+never falselypasses. Root540pipeline/regressionPASS6.34s; historicalCGALpins
+retained explicitly as historical values, not newsourcequalification. Rootowned
+15357fixtureentries removed afternofollow/owner/hardlinkcensus; no artifactsadopted.

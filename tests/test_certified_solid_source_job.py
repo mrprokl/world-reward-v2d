@@ -79,7 +79,10 @@ def test_actual_frozen_pins_primary_values_and_no_placeholder():
     assert pins['qualified_controls'] == 15
     assert pins['report'] == {'bytes': 102696, 'sha256': 'c047ba89d5982fdede115fb38b147bfddd0b11435478f3fd08185733d27154eb'}
     assert pins['binary']['bytes'] == 896712
-    assert pins['native_source']['sha256'] == hashlib.sha256((ROOT / 'infra/certified_solid_query.cpp').read_bytes()).hexdigest()
+    # Historical pins do not qualify the new balanced accumulator. Real
+    # consumers reject a mismatching current source before a geometry call.
+    assert pins['native_source'] == {'bytes': 13914, 'sha256':
+        '72098be329146be0c48f32bf1473731c195120fb53b65511955d69e222c59ee4'}
     assert 'eligibility' in pins['qualification_scope']
 
 

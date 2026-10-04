@@ -326,13 +326,14 @@ def cleanup_container(name, image, revision, cid):
             'Owned container cleanup failed')
 
 
-def host(code, revision):
+def host(code, revision, *, reuse_qualified_runtime=False):
     start = time.monotonic()
     require(sys.platform == 'linux' and os.getuid() == 0 and os.environ.get('DOCKER_HOST') == 'unix://' + str(ROOT / 'docker.sock'), 'Linux owned Docker host required')
     before = source_binding(code, revision)
     out = ROOT / 'results' / ('certified-solid-build-' + revision)
     require(not out.exists() and not out.is_symlink(), 'Fresh qualification namespace required')
     out.mkdir(mode=0o700); scratch = out / 'disposable'; scratch.mkdir(mode=0o755)
+    scratch_owner = scratch.lstat()
     context, work = scratch / 'context', scratch / 'work'
     context.mkdir(mode=0o755); work.mkdir(mode=0o700); os.chown(work, 1000, 1000)
     name = 'wr-certified-solid-' + revision
@@ -353,11 +354,25 @@ def host(code, revision):
         parent_id = run(['docker', 'image', 'inspect', PARENT, '--format', '{{.Id}}'], min(30, remaining(start))).decode().strip()
         require(parent_id == PARENT, 'Actual parent image differs')
         parent_before = probe(PARENT, min(60, remaining(start)))
-        require(subprocess.run(['docker', 'image', 'inspect', tag], capture_output=True, timeout=20, check=False).returncode == 1,
-                'Child image tag already exists')
-        depdir = context / 'deps'; depdir.mkdir(mode=0o755)
-        deadline = min(start + BUDGET, time.monotonic() + 180)
-        report['dependency_archives'] = {p['package']: download(p, depdir / p['filename'], deadline) for p in DEBS}
+        if reuse_qualified_runtime:
+            # Authenticate the original completed numerical runtime, not the
+            # current (unqualified) query. Only the freshly compiled query may
+            # become qualified by the unchanged fifteen controls below.
+            sys.path.insert(0, str(code / 'infra'))
+            import certified_solid_source_job as certificate
+            prior_pins, _, prior_measured = certificate.qualification(code, sys.modules[__name__])
+            image = prior_pins['child_image_id']
+            require(run(['docker', 'image', 'inspect', image, '--format', '{{.Id}}'],
+                        min(30, remaining(start))).decode().strip() == image,
+                    'Original qualified runtime image differs')
+            report['reused_qualified_runtime'] = dict(pins=prior_pins, artifacts=prior_measured,
+                current_query_qualified_by_reuse=False, image_rebuilt=False, dependencies_installed=False)
+        else:
+            require(subprocess.run(['docker', 'image', 'inspect', tag], capture_output=True, timeout=20, check=False).returncode == 1,
+                    'Child image tag already exists')
+            depdir = context / 'deps'; depdir.mkdir(mode=0o755)
+            deadline = min(start + BUDGET, time.monotonic() + 180)
+            report['dependency_archives'] = {p['package']: download(p, depdir / p['filename'], deadline) for p in DEBS}
         deadline = min(start + BUDGET, time.monotonic() + 120)
         archive, sums = context / 'cgal.tar.xz', context / 'sha256sum.txt'
         report['cgal_archive'] = download(CGAL, archive, deadline)
@@ -369,16 +384,17 @@ def host(code, revision):
         report['cgal_headers'] = extract_headers(archive, context / 'include', EXPECTED['capacities'])
         context_before = {p.relative_to(context).as_posix(): identity(p) for p in sorted(context.rglob('*')) if p.is_file()}
         report['downloaded_context_sha256'] = hashlib.sha256(json.dumps(context_before, sort_keys=True).encode()).hexdigest()
-        # Only verified DEBs enter the child. No model, data, source or CGAL header image layers.
-        dockerfile = context / 'Dockerfile'
-        dockerfile.write_text('FROM ' + PARENT + '\nCOPY deps /tmp/wr-deps\nRUN dpkg -i /tmp/wr-deps/*.deb && rm -rf /tmp/wr-deps\n')
-        report['derived_dockerfile'] = identity(dockerfile)
-        context_before['Dockerfile'] = report['derived_dockerfile']
-        report['phase'] = 'offline_child_build'
-        run(['/usr/bin/env', 'DOCKER_BUILDKIT=0', 'docker', 'build', '--pull=false', '--network', 'none', '--force-rm', '--rm', '--cpu-period', '100000', '--cpu-quota', '400000', '--memory', '16g',
-             '--label', 'world_reward.certified_solid.owner=' + revision, '--tag', tag, '--file', str(dockerfile), str(context)],
-            min(180, remaining(start)), scratch / 'docker-build.log')
-        image = run(['docker', 'image', 'inspect', tag, '--format', '{{.Id}}'], min(30, remaining(start))).decode().strip()
+        if not reuse_qualified_runtime:
+            # Only verified DEBs enter the child, never data/model/CGAL layers.
+            dockerfile = context / 'Dockerfile'
+            dockerfile.write_text('FROM ' + PARENT + '\nCOPY deps /tmp/wr-deps\nRUN dpkg -i /tmp/wr-deps/*.deb && rm -rf /tmp/wr-deps\n')
+            report['derived_dockerfile'] = identity(dockerfile)
+            context_before['Dockerfile'] = report['derived_dockerfile']
+            report['phase'] = 'offline_child_build'
+            run(['/usr/bin/env', 'DOCKER_BUILDKIT=0', 'docker', 'build', '--pull=false', '--network', 'none', '--force-rm', '--rm', '--cpu-period', '100000', '--cpu-quota', '400000', '--memory', '16g',
+                 '--label', 'world_reward.certified_solid.owner=' + revision, '--tag', tag, '--file', str(dockerfile), str(context)],
+                min(180, remaining(start)), scratch / 'docker-build.log')
+            image = run(['docker', 'image', 'inspect', tag, '--format', '{{.Id}}'], min(30, remaining(start))).decode().strip()
         require(re.fullmatch(r'sha256:[0-9a-f]{64}', image) and image != PARENT, 'Actual child image differs')
         report['child_image_id'] = image
         report['environment'] = compare_environment(parent_before, probe(image, min(60, remaining(start))))
@@ -432,9 +448,12 @@ def host(code, revision):
                 context_after = {p.relative_to(context).as_posix(): identity(p) for p in sorted(context.rglob('*')) if p.is_file()}
                 require(context_after == context_before, 'Acquired headers/DEBs/build context changed')
                 report['build_inputs_rehashed_after'] = True
-            if scratch.exists():
-                shutil.rmtree(scratch)
-            report['disposable_build_inputs_removed'] = True
+            if reuse_qualified_runtime and 'prior_measured' in locals():
+                require(certificate.qualification(code, sys.modules[__name__])[2] == prior_measured and
+                        run(['docker', 'image', 'inspect', image, '--format', '{{.Id}}'],
+                            min(30, remaining(start))).decode().strip() == image,
+                        'Original qualified runtime changed during fresh compilation')
+                report['reused_runtime_rehashed_after'] = True
             if 'parent_before' in locals() and time.monotonic() - start < BUDGET:
                 require(probe(PARENT, min(60, remaining(start))) == parent_before, 'Parent changed after run')
                 report['parent_rehashed_after'] = True
@@ -445,12 +464,25 @@ def host(code, revision):
             require(report['elapsed_seconds'] <= BUDGET, 'Inclusive build deadline after cleanup')
         except Exception as error:
             report.update(status='fail', failure_type=type(error).__name__)
+        # An integrity rejection must not bypass removal of this invocation's
+        # disposable inputs. Never clean an aliased/replaced/foreign namespace.
+        try:
+            if scratch.exists():
+                current = scratch.lstat()
+                require(scratch.resolve() == scratch and not scratch.is_symlink() and
+                        (current.st_dev, current.st_ino, current.st_uid) ==
+                        (scratch_owner.st_dev, scratch_owner.st_ino, scratch_owner.st_uid),
+                        'Refuse cleanup of replaced disposable namespace')
+                shutil.rmtree(scratch)
+            report['disposable_build_inputs_removed'] = True
+        except Exception as error:
+            report.update(status='fail', cleanup_failure_type=type(error).__name__)
         report['elapsed_seconds'] = time.monotonic() - start
         if report['elapsed_seconds'] > BUDGET:
             report.update(status='fail', failure_type='InclusiveDeadline')
         if report['status'] != 'pass':
             signal.alarm(60)  # Failed-run cleanup only; never changes qualification deadline.
-            if image:
+            if image and not reuse_qualified_runtime:
                 try:
                     records = strict_json(run(['docker', 'image', 'inspect', tag], 20))
                     require(len(records) == 1 and records[0]['Id'] == image and
@@ -477,12 +509,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--native', action='store_true')
     parser.add_argument('--work', type=Path)
+    parser.add_argument('--reuse-qualified-runtime', action='store_true',
+        help='Authenticate existing qualified CPU image; fresh compile and all15 controls still required')
     args = parser.parse_args()
     code = Path(os.environ.get('WR_CODE', ''))
     revision = os.environ.get('WR_CODE_REVISION', '')
     require(not args.native or args.work == ROOT / 'results' / ('certified-solid-build-' + revision) / 'disposable/work', 'Native work namespace differs')
     require(args.native or args.work is None, 'Host accepts no work override')
-    return native(code, revision, args.work, Path('/opt/wr-cgal/include')) if args.native else host(code, revision)
+    require(not args.native or not args.reuse_qualified_runtime, 'Runtime reuse is a host-only operation')
+    return native(code, revision, args.work, Path('/opt/wr-cgal/include')) if args.native else host(
+        code, revision, reuse_qualified_runtime=args.reuse_qualified_runtime)
 
 
 if __name__ == '__main__':

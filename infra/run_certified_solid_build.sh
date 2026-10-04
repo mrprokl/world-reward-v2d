@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-(( $# == 0 )) || exit 2
+if (( $# != 0 ));then
+ [[ $# == 1 && "$1" == --reuse-qualified-runtime ]] || exit 2
+fi
 ROOT="${WR_ROOT:?}"
 CODE="${WR_CODE:?}"
 REV="${WR_CODE_REVISION:?}"
@@ -10,4 +12,4 @@ REV="${WR_CODE_REVISION:?}"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
 # Source closure: /infra/certified_solid_build.py /infra/certified_solid_query.cpp
 # /infra/certified_solid_controls.py /src/world_reward/oriented_solid_forest.py
-exec python3 -I -B "$CODE/infra/certified_solid_build.py"
+exec python3 -I -B "$CODE/infra/certified_solid_build.py" "$@"

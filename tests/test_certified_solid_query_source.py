@@ -61,7 +61,8 @@ def test_volume_sign_is_exact_and_diagnostic_conversion_does_not_choose_orientat
     validation = section("std::vector<Kernel::FT> volume6", "std::string query(")
     assert "component.original_vertices.front()" in validation
     assert "input.points[f[0]]-origin" in validation
-    assert "volume6[face.component]+=" in validation
+    assert "volume_sums[face.component].add(" in validation
+    assert "volume6[i]=volume_sums[i].sum();" in validation
     assert "CGAL::sign(volume6[i])" in validation
     assert "sign!=CGAL::ZERO" in validation
     assert "component.sign=(sign==CGAL::POSITIVE ? 1 : -1)" in validation

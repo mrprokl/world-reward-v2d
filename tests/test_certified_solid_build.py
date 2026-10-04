@@ -223,7 +223,8 @@ def test_shell_exact_entrypoint_markers_and_complete_real_closure():
                      'src/world_reward/oriented_solid_forest.py', build.CONFIG):
         assert expected in paths
     shell = (ROOT / 'infra/run_certified_solid_build.sh').read_text()
-    assert 'docker.sock' in shell and '(( $# == 0 ))' in shell
+    assert 'docker.sock' in shell and '(( $# != 0 ))' in shell
+    assert '[[ $# == 1 && "$1" == --reuse-qualified-runtime ]]' in shell
     source = (ROOT / 'infra/certified_solid_build.py').read_text()
     assert 'code.parent / "revision"' in source and 'code.parent / "source-sha256"' in source
     assert 'FROM ' in source and 'docker image tag' not in source

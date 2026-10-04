@@ -149,6 +149,34 @@ struct Component {
   double diagnostic_volume=0;
 };
 
+// Exact binary carries bound lazy addition depth, not total DAG memory.
+// Slots hold disjoint consecutive blocks of 2^level original face terms.
+struct BalancedVolumeSum {
+  std::vector<Kernel::FT> levels;
+  std::vector<bool> occupied;
+
+  void add(Kernel::FT carry) {
+    std::size_t level=0;
+    while(level<levels.size() && occupied[level]) {
+      carry=levels[level]+carry;
+      levels[level]=Kernel::FT(0); occupied[level]=false; ++level;
+    }
+    if(level==levels.size()) {
+      levels.push_back(carry); occupied.push_back(true);
+    } else {
+      levels[level]=carry; occupied[level]=true;
+    }
+  }
+
+  Kernel::FT sum() const {
+    Kernel::FT result(0); bool any=false;
+    for(std::size_t level=0;level<levels.size();++level) if(occupied[level]) {
+      result=any ? levels[level]+result : levels[level]; any=true;
+    }
+    return result;
+  }
+};
+
 std::vector<Component> validate(const Input& input) {
   const auto nv=input.points.size();
   std::vector<std::size_t> owner(nv,input.components), counts(input.components,0);
@@ -212,16 +240,18 @@ std::vector<Component> validate(const Input& input) {
     require(visited.size()==component.original_vertices.size(), "One label contains disconnected surfaces");
   }
   std::vector<Kernel::FT> volume6(input.components,Kernel::FT(0));
+  std::vector<BalancedVolumeSum> volume_sums(input.components);
   for(const auto& face:input.faces) {
     auto& component=result[face.component]; const auto& f=face.vertices;
     require(component.mesh.add_face(local[f[0]],local[f[1]],local[f[2]])!=Mesh::null_face(),
             "Surface_mesh rejected an original face");
     const auto& origin=input.points[component.original_vertices.front()];
     const auto a=input.points[f[0]]-origin, b=input.points[f[1]]-origin, c=input.points[f[2]]-origin;
-    volume6[face.component]+=a.x()*(b.y()*c.z()-b.z()*c.y())
+    volume_sums[face.component].add(a.x()*(b.y()*c.z()-b.z()*c.y())
                            -a.y()*(b.x()*c.z()-b.z()*c.x())
-                           +a.z()*(b.x()*c.y()-b.y()*c.x());
+                           +a.z()*(b.x()*c.y()-b.y()*c.x()));
   }
+  for(std::size_t i=0;i<input.components;++i) volume6[i]=volume_sums[i].sum();
   for(std::size_t i=0;i<input.components;++i) {
     auto& component=result[i];
     require(CGAL::is_valid_polygon_mesh(component.mesh) && CGAL::is_closed(component.mesh)
