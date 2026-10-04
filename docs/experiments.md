@@ -6108,3 +6108,14 @@ PASS1.32s**, including the real runtime resolver and tampered decoder manifests;
 syntax/diff checks pass. Exact mediapy tag removal conserves original ndarray
 dtype/shape/strides/storage and streams byte checks in1MiB buffers. No package
 installation/FFmpeg/model run, new data/cohort choice or inference-math change.
+
+Fresh `caf2e75` public-v2 adapter **PASS75.212722s**, actual report5141B SHA
+`e1e5b1db6ec782277520702d11f70f9974636b7b824111424de3fe7f5213fdeb`.
+Original RGB timelines are **74/1179/1337** frames,480×640; original first32
+indices yield32/32/29 standard oracle initial queries, without replacement.
+All frames retained, no resize/crop, future annotations never published. Public
+manifest4265B and three fullRGB+query NPZ identities are independently frozen
+for the existing900s native FP32 diagnostic. This PASS is safe data plumbing,
+not a benchmark gain, full-HOI validation or training-overlap clearance.
+EP7 initializer-only job from the same immutable caf2e75 source was accepted
+active on VM01 after EP6 ended and GPU idle was independently observed.

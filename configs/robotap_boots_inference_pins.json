@@ -1,0 +1,24 @@
+{
+  "schema": "world-reward-robotap-boots-inference-pins-v1",
+  "public": {
+    "bytes": 5141,
+    "sha256": "e1e5b1db6ec782277520702d11f70f9974636b7b824111424de3fe7f5213fdeb",
+    "producer_revision": "caf2e751846685713ae1f6ecb19ebcb69e73242c",
+    "script_sha256": "9aab5f85db1246bd276e49404e5f75ae202e7d1e5081829489848c511cc17ae9",
+    "files": {
+      "manifest.json": {"bytes": 4265, "sha256": "f257ce362c18d69f9d6c215104583cb21ac2e54f6c94fdd71ad4729326694dfe"},
+      "video_000.npz": {"bytes": 68200202, "sha256": "e66ebdc865a9c054383616bded8f7dde7ee72d6da8eaa243ac44cd4c88c077a8"},
+      "video_001.npz": {"bytes": 1086568202, "sha256": "8ccefad2805cd2dcabe1f8189a086c457845e8c4e4a036d5ae714d31554ea9cc"},
+      "video_002.npz": {"bytes": 1232180906, "sha256": "913cd66c762b755d1e6f20194c8a0d5db09e18ebeebdab7051975e863be12c4c"}
+    }
+  },
+  "runtime": {
+    "bytes": 3051,
+    "sha256": "794b6e5313e992c2c86610f855f4a86dc8c9a994ede37c22e33093e6ad9fc5e7",
+    "producer_revision": "f3cfde1992c6cfc9a6504b393d8a1f24735dc94d",
+    "script_sha256": "5b2974b3e36ced5b8cbf67f6be02d6e9ee6e773403cd9575397f4a940206de9c",
+    "report_path": "results/bootstapir-runtime-verify-f3cfde1992c6cfc9a6504b393d8a1f24735dc94d/report.json"
+  },
+  "image_id": "sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4",
+  "protocol": {"bytes": 6339, "sha256": "830cbf41b88ab7a2c856884172f226eb4cd7773b169d647af33b729d0d7ac1cf"}
+}
