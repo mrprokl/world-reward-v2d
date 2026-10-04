@@ -34,7 +34,10 @@ No final Parquet, submission or verified CARI4D improvement yet.
   automatic masks and Body/depth initializers; its default topology reduction failed before object tracking. A separately
   gated volume-constrained proposal retains its three shells, including two
   cavities; full tracking now passes on all 668 frames (3,605.69 s). Its CPU
-  CARI input assembly is running; the native reconstruction/export remains pending.
+  CARI input assembly passes on all668 original frames; native shared preparation
+  is queued behind the next episode's volume-based full tracker. The634-frame
+  episode has complete initializers and a sealed minimal pose-input archive;
+  private Azure transfer/native pose execution remain pending.
   No frames, components or
   trajectories were dropped to rescue either episode.
 - **Depth research:** D106 anchors DA3 to MoGe with one scene-constant median
@@ -70,10 +73,15 @@ or historical image-parity/eligibility claims. The new four-frame frontend pilot
 passes; complete replica and reconstruction accuracy remain unverified.
 The full `a06b703` lightweight source/test suite passed **10,944 tests,
 3 optional skips** in 399.72 s. The synchronous GPU-lock queue retains unchanged
-native stages. Opaque RoboTAP/BootsTAPIR acquisition passes on Azure; its known-
-benchmark initial-query diagnostic remains pending and training overlap is
-unverified. A separate native CPU check is required after the dependency build's
-incorrect `einshape.torch` probe failed; that original failure is preserved.
+native stages. Opaque RoboTAP/BootsTAPIR acquisition, independent native CPU
+verification and full2D prediction/evaluation now pass on Azure: three videos
+have meanAJ0.6679 versus0.1778 for a static negative control. Initial queries are
+annotated oracles, the control is not a valid motion method, and training overlap
+is unverified; this is not an automatic3D or CARI4D comparison. The dependency
+build's incorrect `einshape.torch` probe failure remains preserved. A separate
+contiguous YCBV relative-motion pilot is preregistered, with automatic canonical
+queries, one shared native candidate pool and private CPU-only evaluation
+operators; no real-data3D comparison has run. See [protocol](docs/point_pose_protocol.md).
 None of these engineering gates is a reconstruction-quality result.
 Earlier extraction-fixture failures were corrected using authenticated historical
 Git bytes; the historical producer and production pins remain unchanged.
