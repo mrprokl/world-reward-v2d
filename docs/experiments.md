@@ -6252,3 +6252,11 @@ byte-identical to current source; its read-only SHA/JSON inventory verifies
 all fifteen originals before new episode5 native pins. No arrays/media fetched
 locally and no shared-forward/refinement/export success inferred. EP8's six
 actual source/report pins are separately frozen before Azure-only archive.
+
+Private pose server control root183 combined PASS/1Linux-only SKIP2.65s.
+Source-bound new receiver snapshot, key/global forced command, unique expiring
+listener and strict owned-failure-stop gates; no actual server/key/transfer
+execution yet. EP5 unchanged shared preparation4d8f607 accepted/PID1094567,
+waiting for EP6 volume tracking's cooperative GPU lock, not duplicating a GPU
+worker. EP8 CPU-only archive inventory4d8f607 accepted/PID1095456; actual result
+pending, no transferred images/depth/weights or local dense manifest.

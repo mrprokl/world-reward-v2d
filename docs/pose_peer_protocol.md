@@ -42,3 +42,11 @@ Tiny control tests and read-only independent audit pass. No real archive,
 private SSH transfer or VM02 full-pose execution is claimed until each actual
 sealed Azure receipt independently verifies. Image entrypoint/parent traversal
 are runtime concerns; mocked tests are not successful native execution.
+
+The server installer uses the frozen source closure to create a separate genuine
+read-only receiver namespace with the same original dispatch markers/bytes.
+Global and key-restricted forced commands must match. Bind the sole listener
+PID/address to its expiring2400s owned unit and exact data-disk UUID; refuse any
+occupied port, output or source namespace. Server setup PASS is not transport
+PASS. Setup failure can stop only its exact transient ExecStart/config binding;
+private host/client keys are never read, hashed or exported by Python controls.
