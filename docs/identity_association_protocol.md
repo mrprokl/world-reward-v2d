@@ -110,6 +110,21 @@ recall>1/2 est un gate séparé. Cible=`ycb_ids[ycb_grasp_ind]` constante, pas v
 de contact/main active. Fragment propre peut avoir identité sans couverture ;
 mixed/unknown et absent restent échecs, jamais clips retirés du dénominateur.
 
+### Primitive conditionnelle distincte, sans adoption
+
+`relational_likelihood.conditional_relational_likelihood` fournit désormais un
+HMM Gaussian à deux régimes avec forward log-sum-exp, null explicite, marginales
+par entité communes sur la banque entière et paramètres/prior tous fournis.
+Les dimensions absentes sont intégrées ; une seule entité observée donne log-ratio0
+sans réinitialiser la mémoire latente. Les poids relatifs sont construits directement
+depuis logBF+prior, sans perte par addition d'un facteur commun gigantesque.
+Ce n'est pas un posterior calibré, une identité acceptée ni du contact.
+Le null indépendant est une hypothèse NON qualifiée sur les résidus OLS/Boots :
+erreur de caméra partagée et autocorrélation peuvent donner un faux BF positif.
+Tests procéduraux et énumération vérifient les mathématiques, pas cette hypothèse
+sur vidéo. Les anciens sujets01/02, score logistique et seuils clos ne sont pas
+réutilisés comme protocole ou calibration de ce nouveau modèle.
+
 Ne pas appeler le minimum de chemins `temporal_identity` une vraisemblance HMM
 marginalisée : MAP/profilage et log-sum-exp des chemins diffèrent, et des banques
 de nuisance de tailles différentes peuvent biaiser le minimum. Comparabilité,

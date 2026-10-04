@@ -19,6 +19,7 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 | Association pose/image | `point_pose_comparison.compare`, `rgb_pose_tracking.track_rgb_pose` | Coût ou suivi image, pas preuve de précision3D. |
 | Identité temporelle | `temporal_identity.IdentityGraph`, `rank_identity_paths` | Ranking global et min-marginales de coûts fournis ; aucun générateur de candidats/costs appris, identité acceptée ou probabilité. |
 | Evidence relationnelle | `relational_motion.relational_motion_features` | Résidus 2D après nuisance affine du fond, comptages/support ; tracks fournis, pas génération/identité/contact/confiance ni caméra physique. |
+| Vraisemblance conditionnelle | `relational_likelihood.conditional_relational_likelihood` | Gaussian HMM forward sur innovations fournies, marginales communes, null et poids relatifs ; hypothèses d'indépendance non validées, pas modèle appris/calibration/identité/contact. |
 | Banque automatique | `automatic_candidate_bank.build_automatic_candidate_bank` | Callbacks DINO/SAM2 : toutes les propositions retenues, un encodeur et batch de masques, queries + fond ; pas encore une exécution de modèles ou une identité acceptée. |
 | Mains spécialisées | `hand_observations.HandObservations`, `HandInstances`, `LandmarkEvidence` | Contrat readonly full-T/ragged/21 points, coordonnées et handedness séparés ; pas de modèle exécuté, identité ou visibilité certifiée. |
 | Scan de mains | `hand_scan.scan_hands`, `NativeHandResult`, `HandScanResult` | Callback streaming une fois par frame originale, sorties natives et saturation conservées ; aucun modèle importé, paramètre natif ou précision vérifié par la primitive. |
@@ -256,9 +257,11 @@ The existing temporal_identity primitive ranks paths by MAP costs. It is not a
 marginal likelihood or a calibrated posterior. A proposed learned relation model
 must use the same complete observation bank, background nuisance, K and geometry
 for every candidate pair. Its binary temporal latent represents statistical
-dependence, not contact. Fit conditional Student-t movement emissions and an
-independence null on an external training split; marginalize regimes with forward
-log-sum-exp, including an explicit no-identifiable-relation hypothesis. Missing
+dependence, not contact. The new conditional Gaussian primitive marginalizes
+regimes with forward log-sum-exp and an explicit null. Every hypothesis shares
+the whole bank and the same per-entity means/covariances; only the paired joint
+cross-covariance differs. Block-diagonal finite-df Student-t is not an independence
+null because its radial scale is shared, so that proposed shortcut is not used. Missing
 dimensions contribute their marginal emission, not an invented zero displacement;
 absence/clutter laws and normalization must be common across candidate pairs.
 Duplicate nuisance representations cannot increase probability mass.
@@ -268,8 +271,13 @@ persisting instance IDs and automatic proposal-to-instance associations. Current
 hand slots do not identify full-body actors: without an automatic measured
 body-wrist association, the proposed experiment is conditional hand-object only.
 Keep stationary/common-motion/symmetric ambiguity explicit, with no nearest
-fallback. Neither a likelihood implementation nor licensed training data is
-available from this audit alone.
+fallback. The implementation is mathematically tested, not empirically qualified:
+OLS camera error creates shared residual covariance and Boots/adjacent differences
+remain autocorrelated. Conditioning on the same camera estimate does not prove
+independence. A causal innovation/noise model, external negatives, lawful training
+data and separate calibration/evaluation are still required. Direct relative
+log weights cancel common bank factors algebraically, not by subtracting enormous
+absolute likelihoods; they are neither normalized nor calibrated probabilities.
 
 ### Two source-level routes, not a generator shopping list
 

@@ -8133,3 +8133,37 @@ Root92focusedPASS0.21s, owned fixture tree removed. This is packaging validation
 not native CGAL compilation or a geometry/quality result. EP25 original0444f56
 initializer-only lock scheduling dispatch ACK received; no inference presumed
 from transport acknowledgment alone.
+
+Actual isolated CGAL6.0.1 build253fc9d PASS83.791370s; compile plus all15 fresh
+native procedural controls PASS14.829143s, not mocked. Host102696B
+SHAc047ba89d5982fdede115fb38b147bfddd0b11435478f3fd08185733d27154eb;
+native54915B SHAfbe3923ee0d2cf3ba2bb913902829f37e022eadb68bb186fb9ded57095ca172f.
+Retained896712B binary SHA1d61b8b7e721023a00ec29e17db6a2761482e1ae91d1a8a6ead68a09db2a3b9a,
+child8693f4d575f94936b1e607958256fccf94650346be7381974af6f02d2f3f5bd6.
+Independent actual full160source, two receipts/binary, all ordered native outcomes,
+source/input/parent rehash, scope and owned-container absence audit PASS. Original
+parent unchanged, scratch removed, only useful sealed binary/receipts/CID retained.
+These establish exact represented-geometry predicates on procedural controls,
+not validity of a production source, packing safety, HOI gain or licence eligibility.
+EP25 original365-frame automatic masks and object initializer actualPASS; full
+body/depth stage active at last query. EP21 CPU input assembly200/563 depthframes,
+no complete input receipt. No original pipeline modified or restarted.
+
+Conditional association core added separately from the closed logistic pilot:
+full-bank Gaussian marginal densities, normalized HMM forward (not MAP), explicit
+null, exact missing marginalization and algebraically relative logweights. All
+means/covariances/priors externally supplied, no fitted default or acceptance.
+Independent review confirms mathematics only; common-camera error and stationary
+counterexamples expose non-identifiability/null misspecification. Root236 combined
+tinytestsPASS0.44s (likelihood, existing association and exact solid source/build
+contracts); own212-entry fixture tree removed. No learned model/real identity or
+HOI gain, contact, calibrated posterior or challenge adoption.
+
+EP25 actual original365-frame initializer chain PASS17:04:00UTC, body155.559199s,
+depth197.224514s, adapter8.099910s; five report hashes and original209source closure
+verified independently. Pose remains pending. Fresh untouchedEP26/399 frames
+scheduled with unchanged0444f56 initializers-only after canonical GPUlock; ACK
+not inference proof. Original EP21 CPUassembly300/563 depthframes at last query.
+Transport producer contract strengthens queued source pins to require the genuine
+queue shell and both children in that same snapshot; no fabricated child dispatch
+or numerical/mesh/coverage change. Independent audit and104testsPASS1SKIP2.62s.
