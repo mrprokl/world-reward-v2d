@@ -6497,3 +6497,14 @@ Fullsuite collectedabe793f (actual full producerabe793fb6e4b44e19553d008f03aa54a
 e080f7e6b6d3a6653e2fab9f8c38006a58f3e7ed, source
 13aaf4d0ee3c287fca54e2c2e9d5fcde8f6680a701a97d05d38847b9cfcb8e65,
 under the existing cooperative GPU lock; acceptance is not a final forward PASS.
+
+Bounded YCBV metadata-only archive diagnostic now frozen and dispatched
+cd505d2393f9f83bb070b4ece73dc1c487f6d248, driver
+cae27c5f58672150349f70aa9b240fd58eea1180f9293832d08154f9c4505fce.
+Root111focusedPASS1LinuxSKIP2.07s; own51headerfixtures PASS, Bash syntaxPASS.
+≤300s/32MiB CPU-only Range206 EOCD/ZIP64/central-directory reads reproduce
+original safety/layout/budget guards with exact shared base budget. No member
+payload/CRC/fullSHA/acquisition/inference claim; complete original FAIL/unit/
+CID/source/markers must remain unchanged before/after. Pending diagnostic does
+not authorize third acquisition or model execution. Source closure87files,
+91144encodedB is code-only; heavy artifacts remainAzure.
