@@ -8340,3 +8340,12 @@ realbuild by explicit own WR_ROOT and mounting two original narrow0555 build
 directories RO. Original image-volume receipt is actually0644/3429B: rehash its
 original bytes and mountRO, never change historicalmode/producer. Newtests
 cover these runtime contracts; previousdraft neverexecuted/relabelledPASS.
+
+EP21 original frontends actualfull563-frame PASS, pose2872.496811s and complete
+CARIinputassembly4248.320709s. Original ea26eda153-file source retained;
+new dccfe61 report-only inventory validates/rechecks all15publicinputbytes and
+fullno-oracle reports. Tiny2850B pinfile frozen; inventorySHA491275860b3ddf15ceb7ea1a785ed3eedfe1c9383c3824fcee3b8430025a2774,
+input3358B SHAe254d266376f309ed9a30a9f25507594c9ffcc06ae695f3954667ce3897c497e.
+OriginalEP22waiter exits on vanishedcollected predecessor beforecreatinginputs;
+EP23initializers actualPASSfull552frames17:56:49UTC; EP28body366PASS,depthrunning.
+Do not mistake pipelineavailability/proxyIoU for precision/leaderboard gain.
