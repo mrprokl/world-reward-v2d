@@ -25,8 +25,14 @@ FLAGS = ['-O1', '-g', '-std=c++17', '-fsanitize=address', '-fno-omit-frame-point
          '-fno-optimize-sibling-calls', '-ffp-contract=off', '-frounding-math', '-fno-fast-math']
 TERMS, TOTAL, COMPILE, ARM = 131072, 600, 180, 60
 PHASES = ('before_build', 'before_exact_force', 'exact_force_complete', 'before_teardown', 'teardown_complete')
-HEADER_PINS = {'CGAL/Lazy_exact_nt.h':dict(bytes=46566,sha256='a02d707ddf05cdd14126dca87f74181ebad8398c7c7f6a25a18ede49c9739576'),
-    'CGAL/Exact_predicates_exact_constructions_kernel.h':dict(bytes=2647,sha256='98a9963c9460978f735edcb055fa1a511023d3125663721bbc1542bca72638ff')}
+# Release bytes include expanded $URL/$Id comments. Compile those exact pinned
+# bytes; never normalize an executable header to manufacture correspondence.
+HEADER_PINS = {'CGAL/Lazy_exact_nt.h':dict(bytes=46694,sha256='68b93eb5a312f38114d1375ad34add04cf2c57fd1d54d8dc092ba446ba02f6e3'),
+    'CGAL/Exact_predicates_exact_constructions_kernel.h':dict(bytes=2832,sha256='e6d493404634d8aea55a51ac82a635001833493f67e58cfb8bf316ed0a63a6be')}
+PRIMARY_TEXT_PINS = {'CGAL/Lazy_exact_nt.h':dict(bytes=46566,sha256='a02d707ddf05cdd14126dca87f74181ebad8398c7c7f6a25a18ede49c9739576',
+    url='https://raw.githubusercontent.com/CGAL/cgal/v6.0.1/Number_types/include/CGAL/Lazy_exact_nt.h'),
+    'CGAL/Exact_predicates_exact_constructions_kernel.h':dict(bytes=2647,sha256='98a9963c9460978f735edcb055fa1a511023d3125663721bbc1542bca72638ff',
+    url='https://raw.githubusercontent.com/CGAL/cgal/v6.0.1/Kernel_23/include/CGAL/Exact_predicates_exact_constructions_kernel.h')}
 RIGHTS = dict(glue_spdx='Apache-2.0',linked_cgal_scope='GPL-3.0-or-later OR commercial license',
               binary_is_apache_only=False,competition_eligibility_verified=False)
 
@@ -144,7 +150,7 @@ def native(code, revision, work, headers, build):
     pins = build.strict_json((code/PINS).read_bytes()); require(os.environ.get('WR_CPU_IMAGE_ID') == pins['child_image_id'], 'Qualified CPU image required')
     h = header_ledger(headers,build); report = dict(stage='cgal_sum_control_native_v1',status='fail',phase='compile',source_binding=before,
         image_id=pins['child_image_id'],terms=TERMS,compiler_flags=FLAGS,budget_seconds=TOTAL,compile_seconds=COMPILE,arm_seconds=ARM,
-        primary_headers=HEADER_PINS,rights=RIGHTS,gpu_used=False,challenge_inputs_used=False,gt_used=False,adoption=False,production_failure_explained=False)
+        release_headers=HEADER_PINS,primary_text_headers=PRIMARY_TEXT_PINS,rights=RIGHTS,gpu_used=False,challenge_inputs_used=False,gt_used=False,adoption=False,production_failure_explained=False)
     try:
         binary = work/'sum-control'; args = ['c++',*FLAGS,'-I'+str(headers),str(code/'infra/cgal_sum_control.cpp'),'-o',str(binary),'-lgmpxx','-lgmp','-lmpfr']
         compile_result = command(args,min(COMPILE,left(start))); report['compile'] = {k:v for k,v in compile_result.items() if k != 'stdout'}
@@ -189,7 +195,7 @@ def host(code, revision, build, certificate):
     owner = (scratch.stat().st_dev,scratch.stat().st_ino); work = scratch/'work'; work.mkdir(mode=0o700); os.chown(work,1000,1000)
     cid = out/'.container.cid'; report = dict(stage='cgal_sum_control_host_v1',status='fail',phase='header_acquisition',producer_revision=revision,
         source_binding=before,qualified_runtime=qualified,image_id=image,budget_seconds=TOTAL,gpu_used=False,gt_used=False,
-        primary_headers=HEADER_PINS,rights=RIGHTS,challenge_inputs_used=False,adoption=False,production_failure_explained=False)
+        release_headers=HEADER_PINS,primary_text_headers=PRIMARY_TEXT_PINS,rights=RIGHTS,challenge_inputs_used=False,adoption=False,production_failure_explained=False)
     old = {s:signal.signal(s,lambda *_: (_ for _ in ()).throw(TimeoutError('Inclusive CPU deadline'))) for s in (signal.SIGALRM,signal.SIGTERM)}
     signal.alarm(max(1,int(left(start))))
     try:

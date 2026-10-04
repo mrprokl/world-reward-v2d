@@ -8682,3 +8682,35 @@ Root205/208fullsource bytes+archive+readonlyledger rehashedbeforeafter,
 sole444report/noParquetleft. Original200fileproducer separatelyauthenticated;
 originalb9f4bcb failedoutputs untouched. Full563trajectory preserved; official
 sample rowIDonly selects347scoredframes, scratchParquetdeleted. Noqualityclaim.
+
+Generic CPUdiagnostic c9c2010 dispatched192sourcefiles, archive
+565af12c67408ab2fabd4d3f0e1d65a2708adec268e7a06d2b73c36d5a1e0f32,
+ledgercc267d006c268e59a549f5f038b4f6eea4b4caf7fabe78994c69200ed6d64a86.
+NoASan result yet. Actual EP09 sealedfull415pose prerequisite independently
+validated before explicitnativeprepare3588b8d publishedsource reuse; canonical
+cari_inputs freshonly, --mesh-source solid, unchanged1e-5F32/frame roundtrip.
+Ownedcompletedlocal tinyfixtures67roots/131453entries cleanedaftercomplete
+checks;15ambiguous/largerrootsandolderunrelatedworkleftuntouched.
+
+Actual standaloneCGAL c9c2010 FAIL4.579850s before native compilation/arms,
+header_acquisition; report4320B SHAfc29c837e6e4afacfdbe464ef6d70b43113d85083cddd28ed7db35925ad4607c.
+Source/runtime rehash and owned scratch/container cleanup PASS. Independent
+Azure exact5MBarchive+publisherchecksum audit isolates only release-expanded
+$URL/$Id comments: Lazy46694B SHA68b93eb5a312f38114d1375ad34add04cf2c57fd1d54d8dc092ba446ba02f6e3,
+EPECK2832B SHAe6d493404634d8aea55a51ac82a635001833493f67e58cfb8bf316ed0a63a6be.
+Rawtag primarytext remains separately pinned; no executable header normalization.
+Packaging-only correction leaves C++/arithmetic/terms/flags/budgets unchanged.
+One freshrevision diagnostic repeat predeclared; no production cause/adoption.
+Agent44PASS0.36s/root220PASS19.88s,1409owned rootfixture entries removed.
+
+Actual EP09 solid nativeprepare3588b8d FAIL before own poses/depth/report;
+partial cari_inputs retained. Readonly actualTrimesh5.1.0 source audit separates
+localPOSITION/index and rawworld/A hashes (exactPASS) from defaultflattening
+(different, max2.563362166974059e-08m). Actual graphB==nativefix_rigid(A)
+and loader==B(local) exactPASS; default SceneGraph rigid SVD projection is the
+cause, not geometry deletion or another guessed F32 cast. Source-bound tiny
+native tetra reproduces default divergence and no-repair exactraw identity.
+Keep native loader/metadata/poses unchanged; forthcoming correction checks
+both exactstages and real nativeF32 vertices/savedF32 poses against original
+camera geometry with inherited1e-5m bound. Zero-pose diagnostic9.573812e-08m
+is not fullT validation or quality. No gate relaxation or episode fitting.

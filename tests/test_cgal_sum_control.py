@@ -200,8 +200,11 @@ assert m.TERMS==131072
 
 
 def test_primary_header_correspondence_and_linked_rights(tmp_path,monkeypatch):
-    assert gate.HEADER_PINS['CGAL/Lazy_exact_nt.h']==dict(bytes=46566,sha256='a02d707ddf05cdd14126dca87f74181ebad8398c7c7f6a25a18ede49c9739576')
-    assert gate.HEADER_PINS['CGAL/Exact_predicates_exact_constructions_kernel.h']==dict(bytes=2647,sha256='98a9963c9460978f735edcb055fa1a511023d3125663721bbc1542bca72638ff')
+    assert gate.HEADER_PINS['CGAL/Lazy_exact_nt.h']==dict(bytes=46694,sha256='68b93eb5a312f38114d1375ad34add04cf2c57fd1d54d8dc092ba446ba02f6e3')
+    assert gate.HEADER_PINS['CGAL/Exact_predicates_exact_constructions_kernel.h']==dict(bytes=2832,sha256='e6d493404634d8aea55a51ac82a635001833493f67e58cfb8bf316ed0a63a6be')
+    assert gate.PRIMARY_TEXT_PINS['CGAL/Lazy_exact_nt.h']['sha256']=='a02d707ddf05cdd14126dca87f74181ebad8398c7c7f6a25a18ede49c9739576'
+    assert gate.PRIMARY_TEXT_PINS['CGAL/Exact_predicates_exact_constructions_kernel.h']['sha256']=='98a9963c9460978f735edcb055fa1a511023d3125663721bbc1542bca72638ff'
+    assert all('/v6.0.1/'in p['url']for p in gate.PRIMARY_TEXT_PINS.values())
     assert gate.RIGHTS['binary_is_apache_only'] is gate.RIGHTS['competition_eligibility_verified'] is False
     assert 'GPL-3.0-or-later' in gate.RIGHTS['linked_cgal_scope']
     headers=tmp_path/'headers';pins={n:write(headers/n,n.encode())for n in gate.HEADER_PINS}
@@ -209,6 +212,17 @@ def test_primary_header_correspondence_and_linked_rights(tmp_path,monkeypatch):
     first=gate.header_ledger(headers,build);write(headers/next(iter(pins)),b'changed')
     with pytest.raises(ValueError):gate.header_ledger(headers,build)
     assert len(first)==64
+
+
+def test_release_headers_are_hashed_without_comment_normalization(tmp_path,monkeypatch):
+    headers=tmp_path/'headers';name='CGAL/Lazy_exact_nt.h'
+    raw=b'// $URL: release $\n// $Id: release $\nint exact_operator;\n'
+    pin=write(headers/name,raw);monkeypatch.setattr(gate,'HEADER_PINS',{name:pin})
+    expected=gate.header_ledger(headers,build)
+    assert (headers/name).read_bytes()==raw
+    write(headers/name,b'// $URL$\n// $Id$\nint exact_operator;\n')
+    with pytest.raises(ValueError):gate.header_ledger(headers,build)
+    assert len(expected)==64
 
 
 def test_readonly_mode_ledger_and_private_directory_rejection(tmp_path,monkeypatch):
@@ -258,6 +272,7 @@ def test_native_compile_and_each_arm_separate_once(tmp_path,monkeypatch,compile_
     assert result==int(compile_fails) and receipt['source_rehashed_after'] is receipt['headers_rehashed_after'] is True
     assert calls[0][0][1:1+len(gate.FLAGS)]==gate.FLAGS and calls[0][1]<=180
     assert len(calls)==(1 if compile_fails else 3)
+    assert receipt['release_headers']==gate.HEADER_PINS and receipt['primary_text_headers']==gate.PRIMARY_TEXT_PINS
     if compile_fails:assert receipt['compile']['failure_tail']=='compiler failure' and 'arms'not in receipt
     else:
         assert [a[-1]for a,_ in calls[1:]]==['sequential','balanced'] and all(t<=60 for _,t in calls[1:])
