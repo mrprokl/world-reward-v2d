@@ -9156,3 +9156,23 @@ uses the original declared JSON encoding. Buildpins now frozen, not QEM/accuracy
 qualification. Original4ccefd3headersFAIL and e571132hostFAIL remain unchanged.
 Root77tinytestsPASS0.58s including thirdpreflight-failure/fullfreeze and open
 boundaryposition/winding-corruption rejection; actual freshcohort next.
+
+EP09 b2eef8a originalofficialpackPASS13.537493s/full415/325scored/24481rows.
+10450Breportd4c39274a6bde83db1aed2d5b22ec4d150c0bffc5b7bbf761534271b9b91f01c.
+Independent216source/archive/ledgerruntime/fiveexport/priorchains/fulltrajectory
+and mask/identitycontrols PASS, actualoriginalsinglepacker receipt1/1/1; deleted
+657908BtemporaryParquet8a516e2fc2588f4ad3a409a473aff9351812962f42e8f75799f3a7b98353533c.
+Separate oneactualoriginalmeshbudget audit verifies4096meaningfulfaces, nine
+components in one GLBsceneinstance, zeroPADfaces/2030exactpaddingvertices, raw
+GLB/nativeF32/packed orientedsurfaces exact. Originalpacker not reexecuted,
+no model/optimizer/GPU; terminalsuccessfulunit/sourceprepost/image/exactown
+auditcontainerabsence verified. Initialaudit-only consumer imported missing
+surface_identity module outside producerclosure; replacementstdlibcomponentDSU
+first shadowedroot path, then corrected find-name. Neither failure repacked or
+changed predictions. Thirteen episodes complete engineering, not accuracy.
+
+Fresh Surface QSlim numericalcohortfc4fb4e nowDISPATCHED after actualbuildpins;
+248source/archive638f1ab2f0a1c7e5d9d418b730337af5a837f8f8c7a0a67c46fe7cdb0fe17e94,
+ledger7113b6b2640ebe43eced98559a975fb0d558d83b67c32c9386684542051e50ac.
+Threefixedsources/preflights before twoQEM; native300s inclusive, originaltwo
+budgets/fourloaders fixed. ACKonly atthispoint; noadaptedthreshold/retry/adoption.

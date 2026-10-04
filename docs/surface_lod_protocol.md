@@ -215,7 +215,8 @@ embedding and reconstruction accuracy are separate, still unproved here.
 
 ## 7. Phase2 preimplementation contract: fixed-boundary native surface QSlim
 
-**Design only; no new binary, QEM execution or qualification asserted.** Section6
+**Preimplementation contract retained below; current build-only evidence above.**
+The standalone compiler is now authenticated; QEM execution/qualification are not. Section6
 and the frozen Phase1 sources keep their original meaning. This section specifies
 the first prospective Phase2 variant, not a relaxation of any closed experiment.
 Implementation review and Phase1's actual terminal/runtime proof precede a new
@@ -380,3 +381,5 @@ exact sameCID message and empty or empty-array stdout, never daemon errors.
 Root194 manufactured tests PASS0.63s. This is source/API/fixture-contract review,
 not a real C++ compile, collapse qualification, geometry accuracy or adoption.
 Fresh Phase2 control cohort from Section7 remains frozen before native values.
+The implementation status at freeze above is historical; the October5 build-only
+PASS and pins at the beginning of this document supersede only compilation status.

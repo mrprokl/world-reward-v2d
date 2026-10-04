@@ -20,10 +20,10 @@ inferred automatically; no hand-labeling of challenge records.
   EP21 real native point qualification stops before optimization (<8 queries);
   no replay, positive-weight fit or accuracy gain. EP09 full415 preparation,
   forward,301-update refinement and directexport pass independent source/full-
-  bundle audits; original official packing remains pending.
+  bundle audits; original official packing also passes its independent audit.
 - **Engineering:** all30 original videos pass byte/metadata readiness. Episodes
-  **0,1,2,3,5,6,8,12,13,14,15,21** pass full native shared preparation, forward,301-update
-  refinement, direct export and original official packing. These are twelve
+  **0,1,2,3,5,6,8,9,12,13,14,15,21** pass full native shared preparation, forward,301-update
+  refinement, direct export and original official packing. These are thirteen
   complete engineering checks, not held-out accuracy; scratch Parquets deleted.
   EP0's legacy conversion failure stays separate. EP4 missing masks, EP7 empty
   anchor, EP9's original topology-budget failure and EP10/EP11 actor identity failures remain closed.
