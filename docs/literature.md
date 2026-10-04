@@ -126,6 +126,12 @@ configurations are global and externally selected, never per-episode repairs.
 - https://arxiv.org/abs/2606.19333 (2026-06-17), https://github.com/malik-group/do-as-i-do ; HEAD 824591b808c342b20079c3b4198a8c2bdf88c74e (2026-08-02), MIT first-party code, upstream licenses remain.
 - Complete reconstruction pipeline public: SAM3 segmentation -> SAM3D shape -> MoGe pointmap -> HaWoR hand -> BootsTAPIR -> shape-fixed guided SAM3D pose diffusion -> translation/scale optimization.
 - Adaptive pose prior guided by 20 point tracks; sample candidate poses, clustering selection comparable to likelihood 30x faster. Reported DexYCB CD .66 vs FP .89, HOI4D .49 tied FP .49; controlled shared remaining pipeline. 150-video human preference 67% vs FP18%,15% ties. These are hand/object metrics, not full-body/world challenge.
+- Important primary-protocol correction,2026-10-04: paper §4.1 explicitly
+  **supplies ground-truth hands** on160DexYCB and12HOI4D videos to isolate
+  object tracking/reconstruction. Those table numbers are not blind RGB-only
+  coupled HOI results and cannot justify a hand/contact/gauge replacement here.
+  Whole v1 HTML222284B SHA256
+  `1d5a51cc2a7ccd55d015b23b564a3c18b621ac93029ffeda43157dcf83ccd1d9`.
 - Requires >=32GB GPU, SAM3/SAM3D licensed gated access and MANO; current segmentation code click GUI can be replaced with automatic prompts. HaWoR fork CC-BY-NC-ND requires careful license review before modifying/redistributing.
 - Assumes rigid object and semi-accurate monocular metric depth; only hand+object, not full-body/environment.
 

@@ -7065,3 +7065,20 @@ dataset declaration is not silently supplied/resealed as a currentproducer.
 Repository cleanup: redundant stale current-state prose incompute/README replaced
 by concise timedoperational summary and links to original experimentrecords;
 no historical producer, outputs or failures erased. No local heavydata acquired.
+
+
+Primary literature correction04Oct: Do-as-I-Do §4.1 suppliesGT hands for
+160DexYCB/12HOI4D clips to isolateobject; originaltable isnotblindRGB-only
+coupledHOI evidence. Whole222284BhtmlSHA1d5a51cc2a7ccd55d015b23b564a3c18b621ac93029ffeda43157dcf83ccd1d9
+verifiedbeforetextread. DexYCBjoint_3d directlymetres mayavoidMANOforjointmetrics,
+notforhandmesh. Proposedobjectidentitypilotneedsfixedhandnotpersonquery,
+noGTcalibration/initialscale. Publisheronlysubjectarchives12.41/12.00GB; no
+verifiedarchivechecksum/per-sequenceendpoint, assetsoverlapunknown. Do notspend
+24GB orclaimfreshbenchmark until algorithm/cohort/provenance/metricgatesfreeze.
+
+4DAnyone complete342894Bv1HTML independentlyverified onAzure/controltext
+SHA22f99ee14c55a3f09d7d81140713a2effb7543889ea955f75da376c8ff9dc130;
+method/ablations/limitations read withoutfigure/model/mediafetch.40keypoints
+exclude30finefingerjoints; generatedfinehandsnotobservedcontact. Random/strided
+routing do notmatch Sliding ablation; consistentviews inherit wrongHMRpose.
+These areprior/coherenceideas only, notmetrictruth orfullTrack1replacement.

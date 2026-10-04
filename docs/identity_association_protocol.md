@@ -1,7 +1,7 @@
 # Association temporelle multi-instance — proposition scientifique
 
 **4 octobre 2026 : primitive mathématique implémentée ; protocole externe
-PROPOSÉ, ni préenregistré, ni autorisé, ni exécuté.** Les seuils, modèles,
+PROPOSÉ, pas encore gelé ni exécuté.** Les seuils, modèles,
 coûts, budgets, licences complètes et pins d'acquisition restent à geler.
 YCB48–50 et les pilotes clos ne sont pas recyclés pour ajuster cette méthode.
 
@@ -57,7 +57,12 @@ poses rigides et main ; **pas corps entier**, ni objets nouveaux face à YCBV.
 Données CC-BY-NC4.0, toolkit GPL3 au
 [pin64551b001d360ad83bc383157a559ec248fb9100](https://github.com/NVlabs/dex-ycb-toolkit/tree/64551b001d360ad83bc383157a559ec248fb9100).
 MANO/meshes ont leurs droits distincts à vérifier ; modèle/challenge overlap
-inconnu. Environ12GB/sujet selon le publisher, aucun asset acquis ici.
+inconnu. Aucun asset acquis ici. Archives sujet01/02 seulement, tailles Drive
+publiques12,412,314,463/12,004,145,048B ; aucun checksum publisher vérifié.
+Un SHA acquis sur Azure sera une identité mesurée, pas un hash publisher indépendant.
+Pas d'endpoint par séquence identifié ; ne pas télécharger24GB sans nécessité.
+`joint_3d[21,3]` natif est en mètres et directement disponible (sentinel−1) :
+évaluer les joints ne nécessite pas MANO, contrairement à une surface main.
 
 Design proposé à geler avant acquisition : sujet `20200709-subject-01`, caméra
 `836212060125`, six premières séquences lexicographiques, toutes les frames
@@ -72,6 +77,15 @@ correspondante. `grasp_eval.py` confirme cette association. Le selector privé
 s'exécute après gel complet des deux prédictions, **avant calcul des erreurs**,
 sans recherche du meilleur matching. Ces champs, MANO/labels, K/depth capteurs,
 objets scannés et autres caméras ne sont jamais fournis au predictor RGB-only.
+
+Avant un pilote couplé, qualifier un pilote **identité/pose objet seulement** :
+RGB original et requête automatique `hand.` fixe, pas `person.` ni corps entier
+absent du cadrage. Identité cible, abstentions, translation/rotation absolues sans
+meshes scannés sont suffisants pour un premier rejet discriminant. Main3D relative
+seulement après mapping de prédicteur qualifié. Sujet02 n'est nécessaire que si
+calibration de coûts/acceptation doit être apprise ; pas une dépense automatique.
+Do-as-I-Do fournit des **mains GT** dans son benchmarkDexYCB/HOI4D pour isoler
+l'objet (§4.1), donc ses résultats n'établissent pas le gain RGB-only couplé.
 
 ## 4. Deux bras et décision à préenregistrer
 
