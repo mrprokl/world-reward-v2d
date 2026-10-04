@@ -6222,3 +6222,11 @@ This does not classify a garbage-collected predecessor as success; unchanged
 children still verify committed actual input receipts. Existing `--wait-for`
 mode stays strict and mutually exclusive. Root168 focused PASS/1 Linux-only
 SKIP38.85s, syntax/diff PASS; all numerical native child sources unchanged.
+
+Automatic point-association operator is frozen separately: fixed raster queries,
+clip-constant canonical witnesses, proper SE(3), full original indices and
+native-visible-only0.1×clipped8px reprojection unary. Root90 pure NumPy/operator
+tests PASS0.22s. No challenge integration, raycasting/model run, external3D
+validation or native pose improvement is inferred. New independent YCBV
+relative-motion pilot is preregistered in `docs/point_pose_protocol.md`; exact
+acquisition pins and a full native/candidate comparison remain prerequisites.
