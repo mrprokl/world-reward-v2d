@@ -7167,3 +7167,29 @@ fixed subjects/bytes, no auth/cookies or private labels; measured hashes are not
 publisher checksums. Root64PASS1LinuxSKIP1.14s; actual dispatch initiated, ACK
 and availability still to verify. Full tiny suite12346PASS7SKIP400.83s preceded
 these focused changes; no claim that this exact new HEAD has that full result.
+
+Actual original-input report gate under f432e33 completed for EP0 and EP12:
+remote hash/JSON-only outputs exactly match both committed15-file pin objects.
+EP0 audit2850B SHAa259f3e0593c120c8c2c82064a72c02aad487d242777f860be8feeef7cf0ca15;
+EP12 audit2848B SHA4d7c335edd90f0d915d0ed4d4d02209f2f2a8b35d4bce7baacecdf0e63526c94.
+No source/artifact rewriting, decoding/model or legacy conversion rescue.
+
+DexYCB downloadv1 actual technical FAIL before network: runpy driver omitted
+from immutable closure because its path was composed, not a recognised literal.
+Incoming/resultsdata namespaces absent, zero sourcearchives consumed. Root fixed
+source closure with tiny regression test; distinctv2 a1b55f5 dispatch ACK and
+actual loaded MainPID269062 streaming two originals in parallel (4,024,434,688/
+2,877,292,544B partial at readonlycheck). No PASS/CRC/inference/quality implied.
+CPU acquire source closure receives the same regression guard before dispatch.
+
+Automatic identity evidence 4d4a049 composes masks/tracks in two independently
+pinned native images, narrow readonly public/model/proof mounts, one SAM2 encoder
+and batched candidates/frame0, one Boots call/full clip for all queries. Native
+SAM2 dynamic postprocessing explicitly retained; DINO postprocess records are
+not detector-head logits. Movement explicitly per original frame, no guessedFPS;
+no private labels/camera/meshes or static predictions exported. Root192 combined
+tiny tests PASS1.54s including calibration primitives/CPU wrapper, no real model
+performance yet. Calibration rule fixed before acquired private labels :
+all-supported score>0/gap>0, decision3 all initial identities correctly covered,
+evaluation6 ≥one additional initial identity success with no wrong-ID increase.
+Only a mechanism micro-test, not full-T masks, 3D/contact gain or CARI4D victory.

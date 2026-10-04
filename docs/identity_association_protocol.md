@@ -94,6 +94,16 @@ wrong-ID ; cela qualifie seulement le mécanisme de sélection, pas la pose3D ou
 la persistance full-T. Toutes les frames/gaps restent au bilan de couverture.
 Sans masques ultérieurs réels, ne pas inventer un score de segmentation full-T.
 
+Résumé public fixe par proposition objet : moyenne des trois features
+`relational_motion` sur **tous** les intervalles/main supportés, pas le meilleur
+couple ni un max-score appris. Nombre de slots conservé séparément ; aucun slot
+⇒ NaN/unsupported/ABSTAIN, un slot ne constitue pas une confiance. Temps DexYCB
+en indices de frames natifs, non secondes/FPS fabriqué. Deux stages CPU bornés
+120s chacun, génération/gel des features puis calibration privée. Le bras A
+emploie `_select_detection` original sur mêmes records objet après NMS(.3/.7),
+ambiguity .05 et exact matching de box ; pas main la plus proche/mieux couverte.
+Les seuils qualité ci-dessus ne sont pas ajustés après accès aux labels.
+
 Convention DexYCB privée : segmentation0=fond,255=mains fusionnées,1..21=classes
 YCB (pas lignes de pose). Matching strict majorité>1/2 des pixels du masque ;
 recall>1/2 est un gate séparé. Cible=`ycb_ids[ycb_grasp_ind]` constante, pas vérité
