@@ -5928,3 +5928,17 @@ runtime235PASS54.86s. Failedpilot remains closed; no model/helper numeric
 changes. Plan next cleanEP6 originalglobal fixed_all16 queued only after
 explicitEP5 success+releasedlock, never alongside existingGPU worker.
 FreshEP6namespace/unit/log preflight pending beforedispatch.
+
+EP6 queued7b0df06 actualactive/MainPID1032468: fresh output/unit/log
+verified before dispatch,105files171624encodedB. Original globalfixed_all16
+frontends wait for explicit EP5success andGPUlock; no duplication. Actual
+00:15:56UTC EP5stillactive/MainPID1021201,400/668frames at2125.462816335s,
+one1021287worker1886MiB; EP6phasewaiting_for_successful_predecessor.
+No complete EP5/EP6 frontend, reconstructionquality or submission PASS.
+
+Final bf6f740source/testsuite10746PASS/2optionalSKIP332.26s, no failures
+and no concurrent source/test changes; latercommit closespilot/docs only.
+Removed44owneduntrackedpyc files underinfra/src/tests aftertestcompletion,
+no trackedfiles/userenv/data/model deletions. Repo finalcode/results pushed;
+EP5tracking/EP6waiting continueAzure. No verifiedfull-HOI/CARIvictory/final
+Parquet/upload/license/registrationPASSclaimed.

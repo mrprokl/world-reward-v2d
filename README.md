@@ -66,8 +66,8 @@ image compiles offline and its thin Python import gate passes. The independent
 SAM2 CUDA connectivity/hole-filling operator gate also passes, without models
 or historical image-parity/eligibility claims. The new four-frame frontend pilot
 passes; complete replica and reconstruction accuracy remain unverified.
-The full `001aa0f` lightweight source/test suite passed **10,685 tests,
-2 optional skips** in 334.94 s; later changes only freeze actual result pins
+The full `bf6f740` lightweight source/test suite passed **10,746 tests,
+2 optional skips** in 332.26 s; later changes only record queue/results
 and update this status.
 Earlier extraction-fixture failures were corrected using authenticated historical
 Git bytes; the historical producer and production pins remain unchanged.
