@@ -19,8 +19,8 @@ inferred automatically; no hand-labeling of challenge records.
   Parquet and real-object pose quality remain separate.
   EP21 real native point qualification stops before optimization (<8 queries);
   no replay, positive-weight fit or accuracy gain. EP09 full415 preparation,
-  forward and301-update refinement pass independent source/full-bundle audits;
-  export/packing remain pending.
+  forward,301-update refinement and directexport pass independent source/full-
+  bundle audits; original official packing remains pending.
 - **Engineering:** all30 original videos pass byte/metadata readiness. Episodes
   **0,1,2,3,5,6,8,12,13,14,15,21** pass full native shared preparation, forward,301-update
   refinement, direct export and original official packing. These are twelve

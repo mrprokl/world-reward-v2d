@@ -9108,3 +9108,16 @@ Dispatch ACK only; actual compile/runtime receipt must precede any QEM control.
 Fresh two-positive/one-negative geometry cohort wrapper/source now prepared;
 root202tinytestsPASS0.82s. Pins absent until actual build independently verified.
 No QEM replay of earlier failures, packages, newmodels, performance or adoption.
+
+
+EP09 directexportb6e3000 now independently PASS:31.802225s/full415, original
+report20599B SHA64a4421b71cf9397bac3f492ce6b99467a27313228aecbe60baf7f4c686b5eaa.
+Complete208-source/archive/ledger and5exportfiles, all prior pins,16helpers,
+15publicinputs/170inference sources-assets, actual body/native runtime and
+full native arrays/target rechecked before/after.26native-direct/26native-replay/
+26official-reference original calls; maxdirect0.004774700mm/maxreplay0.000990227mm/
+worstframe meanreference0.001281787mm. CPUaudit verifies every415frame and
+frozen refined controls/poses byteexact, no native decode/optimizer replay.
+Originalexport schema passes, downstream consumer not reexecuted in this audit.
+Source/image/terminaljournal/own audit-containerabsence verified; newexportpins
+freeze this actualevidence. These are representation checks, not3D accuracy gains.
