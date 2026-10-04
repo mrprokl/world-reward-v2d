@@ -7833,3 +7833,21 @@ SHA173ebaf758941d40f69fdf5cc51bc7b5762455c0dfb9a49da180bdd7f9ccbcd0;
 native7886B SHAbcdc10871c10365d1760ff1911bd1492c24174d54528ddfc0b9f6290d32f7fb7.
 Temporal memory solves2Davailability here but leaks foreground; this is not
 qualified evidence for3Dcoupling. Retain generic adapters, stop handrecipe.
+
+EP18 original fixed_all16 frontend CLOSED before object pose: source inspection
+rejects boundary/nonmanifold edges at14:38:52UTC; full535 body/depth/initializers
+precede the failure. No geometric repair or episode replay. FreshEP19 dispatched
+under unchanged published ea26eda, automatic original443-frame bodyPASS149.927s;
+depth ongoing, no complete reconstruction presumed.
+
+Serialization compiler phase1 preregistered as a separate opt-in of the original
+volume build operator, not another image/model/runtime stack. Exact untouched
+volume prefix/base/libigl/Eigen preserved; nativeQSlim cost, intersection and
+signedshell±5% band unchanged. New transactional F32 exact-dyadic normal/weld
+veto and combinedF/V/safety stopping prepared, not yet natively qualified.
+128procedural scalarcases+128normaldotcases(seed8401),7ties-even keys and one
+underbudgetlevel1sphereidentity only; no edge-collapse efficacy/quality/adoption
+claim. Compile600s, inclusive900s, offlineCPU4/16GiB; historicalfailures unchanged.
+Actual datafree existingimage preflight confirms originalPython/NumPy1.26.3/
+Trimesh5.1.0, compiler/Boost14322regular nonempty singlelinkfiles and inherited
+1418sources; host3429B originalbuild remains0644, authenticated without chmod.

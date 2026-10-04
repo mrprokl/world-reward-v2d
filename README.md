@@ -20,7 +20,8 @@ inferred automatically; no hand-labeling of challenge records.
   omission is authenticated, not a relaxed legacy gate or a reversal of its old
   conversion failure. EP13 full425 complete chain passes. EP14 full442 inputs, shared preparation
   and native forward plus301-update refinement, export and official packing pass with independent source-chain pins.
-  EP16/EP17 close on topology-budget failure before object pose, without mesh repair. Collected-predecessor scheduling failures
+  EP16/EP17 close on topology-budget failure; EP18 rejects a boundary/nonmanifold
+  source before object pose. EP19 runs unchanged; no mesh repair. Collected-predecessor scheduling failures
   remain separate. Original controls/reference replay and whole source-chain pins are
   frozen before each next stage; no prediction is inferred from dispatch ACKs.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
