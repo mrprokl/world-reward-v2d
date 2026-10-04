@@ -6625,3 +6625,20 @@ identical to original input. Unit/source/full5artifact inventory independently
 PASS. Report28034B SHAcd61aed6cc6691a99a217eb560eb55dbe42e8aa7fad2372f9deb72206762b729.
 Tinyexportpins frozenbeforeoriginalofficialCPUpacker smoke; no geometry/data
 transferredlocally. No finalParquet/leaderboardquality claim.
+
+Local test hygiene: reclaimed~12GiB from21 independently identified inactive
+V2D-only pytest fixture directories, never user assets/models/media/credentials.
+New tests use explicitly bounded temporary directories and immediate owned
+cleanup. Azure SDK transport acknowledgement for the EP5 officialpack dispatch
+was not a launch: actual source/job/log/output all absent, extension script0B.
+No CPU/GPU/packer call or experiment failure occurred; investigate transport
+before retry, never count provisioning success as actual unit execution.
+
+Native-ID v2 preparation independent audit:160 acquisition/evaluator/map fixtures
+PASS8.22s; agent695combinedPASS1LinuxSKIP. Original seven pure numeric sources
+are byte-identical; native compose_scene/Boots/native_pose/export_geometry ASTs
+unchanged. All historical YCB configs remain byte-identical. Exact positional
+queries plus native-ID attachment/mask export/private metadata copy are tested.
+New v2 is intentionally closed before IO; no acquisition/inference/GT evaluation
+was authorized. ActualAzure old2280B inventoryFAIL and2038B downloadFAIL remain
+unchanged; v2 output absent. Correctness preparation is not held-out quality.

@@ -1,4 +1,4 @@
-"""Azure RGB-only MoGe2 initialization: exactly three frozen YCBV frame zeroes.
+"""Azure RGB-only MoGe2 initialization: exactly three frozen YCBV initial array positions.
 
 This is an execution/camera-consistency preflight, not a 96-frame prediction,
 held-out quality result or metric-scale verification. Only the host reads the
@@ -17,14 +17,15 @@ import stat
 import time
 
 import tudl_holdout_inputs as files
+from world_reward.native_frame_map import NativeFrameMap
 
 ROOT = Path("/srv/scenesmith/world-reward")
-BASE = "validation/ycbv_point_pose_v1"
+BASE = "validation/ycbv_point_pose_v2"
 JOB, OUTPUT = "run_ycbv_point_depth", "depth_init_v1"
-PIN_FILE = "configs/ycbv_point_input_pins.json"
+PIN_FILE = "configs/ycbv_point_input_pins_v2.json"
 IMAGE = "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3"
 REVISION = "5c2c4aa229800355648cd268040aa814f8dc94f0"
-SCHEMA, PINS_SCHEMA = "world-reward-ycbv-point-rgb-v1", "public_ycbv_point_inputs_pins_v1"
+SCHEMA, PINS_SCHEMA = "world-reward-ycbv-point-rgb-v2", "public_ycbv_point_inputs_pins_v2"
 SELECTION = "first_three_sorted_scene_directories_first_96_contiguous_RGB_names_before_private_annotations"
 ATTRIBUTION = "YCB-Video: Yu Xiang et al.; BOP conversion: Hodan et al."
 STAGE, BUDGET = "public_ycbv_three_frame_zero_native_MoGe2_preflight", 300
@@ -32,13 +33,14 @@ WIDTH, HEIGHT, SCENES = 640, 480, (48, 49, 50)
 GEOMETRY_SHA = "2f8d5de7d671af16d25fe13c555fd73855d8447bc086bb23aa42e859b303fb05"
 SOURCE_FILES = ("infra/ycbv_point_depth.py", "infra/run_ycbv_point_depth.sh",
     "infra/tudl_holdout_inputs.py", "infra/object_synthetic_observations.py",
-    "src/world_reward/__init__.py", "src/world_reward/data.py", "src/world_reward/pointmap.py")
+    "src/world_reward/__init__.py", "src/world_reward/native_frame_map.py", "src/world_reward/data.py", "src/world_reward/pointmap.py")
 FROZEN = {"infra/tudl_holdout_inputs.py": "40ea32a5a85bb53682f1ec8d3aaf4459d8b314498aca67e03b32adf685e0268e",
     "infra/object_synthetic_observations.py": "b3fe54859f478f35ca754cd407d09ea961a46c662246f96e0a7a6b1d59b89940",
     "src/world_reward/pointmap.py": "6c526d76bc97406f9581482f42174b73236237a26029851c5127c08af2917d65",
+    "src/world_reward/native_frame_map.py": "8e6615b4354e2a3a16952f6edc527bccd845ee5a19894364e10f18e63045ba50",
     "src/world_reward/data.py": "c8200e28900a88394f2821c558cd3693225ae8547331f12f2aff7d225c008a30"}
 ACQUISITION_FILES = ("infra/ycbv_point_acquire.py", "infra/run_ycbv_point_acquire.sh",
-    "infra/tudl_acquire.py", "configs/ycbv_point_protocol.json")  # Host only.
+    "infra/tudl_acquire.py", "src/world_reward/native_frame_map.py", "configs/ycbv_point_protocol_v2.json")  # Host only.
 
 
 def validate_pins(pins):
@@ -54,42 +56,74 @@ def validate_pins(pins):
             raise ValueError("Full immutable acquisition source identity required")
 
 
+def frame_map(scene):
+    if type(scene) is not int or scene not in SCENES:
+        raise ValueError("Selected scene required")
+    return NativeFrameMap(f"ycbv_scene_{scene:06d}", tuple(range(1, 97)))
+
+
+def frame_maps():
+    return [frame_map(scene).to_dict() for scene in SCENES]
+
+
+def validate_scene_rows(records):
+    if type(records) is not list or len(records) != 96:
+        raise ValueError("Complete scene map required")
+    mapping = frame_map(records[0]["scene_id"])
+    if any(type(r.get("scene_id")) is not int or r["scene_id"] != records[0]["scene_id"] for r in records):
+        raise ValueError("One original scene required")
+    mapping.validate_rows([{k: r[k] for k in ("frame_position", "source_frame_id")} for r in records])
+    return mapping
+
+
 def filenames():
-    return tuple(f"scene_{scene:06d}_frame_{frame:06d}.png" for scene in SCENES for frame in range(96))
+    return tuple(f"scene_{scene:06d}_frame_{source:06d}.png"
+        for scene in SCENES for source in frame_map(scene).source_frame_ids)
+
+
+def validate_manifest(manifest):
+    """Strict v2 metadata, usable when only the three initial RGBs are transported."""
+    expected = {"schema": SCHEMA, "revision": REVISION, "license": "MIT",
+        "selection": SELECTION, "attribution": ATTRIBUTION}
+    if (type(manifest) is not dict or set(manifest) != {*expected, "frame_maps", "images"}
+            or any(type(manifest.get(k)) is not str or manifest[k] != v for k, v in expected.items())
+            or type(manifest["frame_maps"]) is not list or len(manifest["frame_maps"]) != 3
+            or type(manifest["images"]) is not list or len(manifest["images"]) != 288):
+        raise ValueError("Explicit v2 RGB-only cohort and native frame maps required")
+    maps = [NativeFrameMap.from_dict(value) for value in manifest["frame_maps"]]
+    if maps != [frame_map(scene) for scene in SCENES]:
+        raise ValueError("Frozen native source IDs 1..96 required")
+    for index, row in enumerate(manifest["images"]):
+        scene, position = SCENES[index // 96], index % 96
+        source = maps[index // 96].source_id(position)
+        if (type(row) is not dict or set(row) != {"scene_id", "frame_position", "source_frame_id", "file", "sha256", "width", "height"}
+                or any(type(row.get(k)) is not int for k in ("scene_id", "frame_position", "source_frame_id", "width", "height"))
+                or (row["scene_id"], row["frame_position"], row["source_frame_id"], row["width"], row["height"]) != (scene, position, source, WIDTH, HEIGHT)
+                or type(row["file"]) is not str or row["file"] != filenames()[index]
+                or type(row["sha256"]) is not str or re.fullmatch(r"[0-9a-f]{64}", row["sha256"]) is None):
+            raise ValueError("Unchanged native filename / explicit position association required")
+    return manifest["images"]
 
 
 def public_inputs(directory, pins):
-    """Hash all 288 original RGBs without decoding or opening any sibling file."""
+    """Hash all 288 native-ID RGBs without decoding or opening any sibling file."""
     validate_pins(pins); directory = files._canonical(directory)
     names = {"manifest.json", *filenames()}
-    if not directory.is_dir() or directory.parts[-3:] != ("validation", "ycbv_point_pose_v1", "inputs") or {p.name for p in directory.iterdir()} != names:
-        raise ValueError("Exactly 289 original public files required")
+    if not directory.is_dir() or directory.parts[-3:] != ("validation", "ycbv_point_pose_v2", "inputs") or {p.name for p in directory.iterdir()} != names:
+        raise ValueError("Exactly 289 original public v2 files required")
     manifest_id = files.identity(directory / "manifest.json")
     if manifest_id != pins["manifest"]: raise ValueError("Manifest bytes differ before JSON")
     raw = (directory / "manifest.json").read_bytes()
     if {"bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()} != manifest_id:
         raise ValueError("Manifest changed before JSON interpretation")
-    manifest = files.strict_json(raw)
-    expected = {"schema": SCHEMA, "revision": REVISION, "license": "MIT", "selection": SELECTION, "attribution": ATTRIBUTION}
-    if (type(manifest) is not dict or set(manifest) != {*expected, "images"}
-            or any(type(manifest.get(k)) is not str or manifest[k] != v for k, v in expected.items())
-            or type(manifest["images"]) is not list or len(manifest["images"]) != 288):
-        raise ValueError("Frozen MIT RGB-only cohort required")
-    records = []; identities = {}
-    for index, row in enumerate(manifest["images"]):
-        scene, frame = SCENES[index // 96], index % 96; name = filenames()[index]
-        if (type(row) is not dict or set(row) != {"scene_id", "frame_id", "file", "sha256", "width", "height"}
-                or any(type(row.get(k)) is not int for k in ("scene_id", "frame_id", "width", "height"))
-                or (row["scene_id"], row["frame_id"], row["width"], row["height"]) != (scene, frame, WIDTH, HEIGHT)
-                or type(row["file"]) is not str or row["file"] != name
-                or type(row["sha256"]) is not str or re.fullmatch(r"[0-9a-f]{64}", row["sha256"]) is None):
-            raise ValueError("Original scene/frame/order/grid fields required; private fields forbidden")
-        identities[name] = files.identity(directory / name)
+    rows = validate_manifest(files.strict_json(raw)); records = []; identities = {}
+    for row in rows:
+        name = row["file"]; identities[name] = files.identity(directory / name)
         if identities[name]["sha256"] != row["sha256"]: raise ValueError("Original RGB SHA differs")
         records.append({**row, "path": directory / name})
     if files.identity(directory / "manifest.json") != manifest_id or {p.name for p in directory.iterdir()} != names:
         raise ValueError("Frozen public cohort changed during validation")
-    return records, {"manifest": manifest_id, "RGB_identities": identities}
+    return records, {"manifest": manifest_id, "RGB_identities": identities, "frame_maps": frame_maps()}
 
 
 def marker_identity(path):
@@ -138,7 +172,7 @@ def host_proof(root, code, revision):
         "models_downloaded": False, "train_downloaded": False, "sparse_test_downloaded": False,
         "private_annotations_exported_as_inference_inputs": False, "selection_before_private_annotation_values": True,
         "selected_frames": 288, "all_instances_retained": True, "disposable_archives_removed": True, "source_rehashed_after": True}
-    if type(report) is not dict or any(type(report.get(k)) is not type(v) or report[k] != v for k, v in expected.items()) or report.get("public_manifest") != pins["manifest"]:
+    if type(report) is not dict or any(type(report.get(k)) is not type(v) or report[k] != v for k, v in expected.items()) or (report.get("public_manifest") != pins["manifest"] or report.get("frame_maps") != frame_maps()):
         raise ValueError("Successful original CPU acquisition provenance required")
     original = root / "jobs" / pin["producer_revision"] / "run_ycbv_point_acquire" / "code"
     actual = {"files": {n: files.identity(original / n) for n in ACQUISITION_FILES},
@@ -174,13 +208,13 @@ def moge_bindings(root, code):
 def validate_prediction_arrays(arrays):
     import numpy as np
     from world_reward.pointmap import validate_camera_pointmap
-    if type(arrays) is not dict or set(arrays) != {"depth", "points", "mask", "intrinsics", "frame_index"}: raise ValueError("Exact untouched native output arrays required")
-    shapes = {"depth": (HEIGHT, WIDTH), "points": (HEIGHT, WIDTH, 3), "mask": (HEIGHT, WIDTH), "intrinsics": (3, 3), "frame_index": ()}
+    if type(arrays) is not dict or set(arrays) != {"depth", "points", "mask", "intrinsics", "frame_index", "source_frame_id"}: raise ValueError("Exact untouched native output arrays required")
+    shapes = {"depth": (HEIGHT, WIDTH), "points": (HEIGHT, WIDTH, 3), "mask": (HEIGHT, WIDTH), "intrinsics": (3, 3), "frame_index": (), "source_frame_id": ()}
     for key, value in arrays.items():
-        dtype = np.bool_ if key == "mask" else np.int64 if key == "frame_index" else np.float32
+        dtype = np.bool_ if key == "mask" else np.int64 if key in ("frame_index", "source_frame_id") else np.float32
         if type(value) is not np.ndarray or value.shape != shapes[key] or value.dtype != dtype:
             raise ValueError("Original native full-grid dtype/shape required")
-    if arrays["frame_index"].item() != 0: raise ValueError("Only original frame zero is preregistered")
+    if arrays["frame_index"].item() != 0 or arrays["source_frame_id"].item() != 1: raise ValueError("Position zero must remain native source frame one")
     focal = float(np.hypot(WIDTH, HEIGHT)); K = np.array([[focal, 0., WIDTH / 2], [0., focal, HEIGHT / 2], [0., 0., 1.]])
     return validate_camera_pointmap(arrays["depth"], arrays["points"], arrays["mask"], arrays["intrinsics"], K)
 
@@ -199,7 +233,7 @@ def exclusive(path, mode):
 def run(root, code, revision, out, report, persist):
     import numpy as np
     pins = files.strict_json((code / PIN_FILE).read_bytes()); records, public = public_inputs(root / BASE / "inputs", pins)
-    report.update(input_pins=pins, input_pin_identity=files.identity(code / PIN_FILE), input_manifest=public["manifest"], public_RGB_identities=public["RGB_identities"]); persist()
+    report.update(input_pins=pins, input_pin_identity=files.identity(code / PIN_FILE), input_manifest=public["manifest"], public_RGB_identities=public["RGB_identities"], frame_maps=public["frame_maps"]); persist()
     started = time.perf_counter(); report["model_read_started"] = True; signal.alarm(BUDGET); binding = None
     try:
         model_path, binding = moge_bindings(root, code); report.update(MoGe_bindings=binding, phase="model_load"); persist()
@@ -224,14 +258,14 @@ def run(root, code, revision, out, report, persist):
             with torch.inference_mode(): predicted = network.infer(tensor[None], fov_x=fov)
             report["native_calls_returned"] += 1
             arrays = {key: predicted[key][0].cpu().numpy() for key in ("depth", "points", "mask", "intrinsics")}
-            arrays["frame_index"] = np.array(0, dtype=np.int64); checks = validate_prediction_arrays(arrays)
+            arrays["frame_index"] = np.array(record["frame_position"], dtype=np.int64); arrays["source_frame_id"] = np.array(record["source_frame_id"], dtype=np.int64); checks = validate_prediction_arrays(arrays)
             torch.cuda.synchronize(); report["native_calls_completed"] += 1
             original = array_identities(arrays); path = out / (Path(record["file"]).stem + ".npz")
             with exclusive(path, 0o444) as stream: np.savez_compressed(stream, **arrays)
             with np.load(path, allow_pickle=False) as archive: saved = {k: archive[k] for k in archive.files}
             validate_prediction_arrays(saved)
             if array_identities(saved) != original: raise ValueError("Saved native bytes changed")
-            report["outputs"].append({"file": path.name, "scene_id": record["scene_id"], "frame_id": 0,
+            report["outputs"].append({"file": path.name, "scene_id": record["scene_id"], "frame_position": record["frame_position"], "source_frame_id": record["source_frame_id"],
                 **files.identity(path), "rgb_sha256": record["sha256"], "decoded_RGB_sha256": hashlib.sha256(rgb.tobytes()).hexdigest(), "arrays": original, "pointmap_checks": checks}); persist()
             del arrays, saved, predicted, tensor, rgb
         if module.recover_focal_shift is not geometry_torch.recover_focal_shift: raise ValueError("Original native focal solver changed")

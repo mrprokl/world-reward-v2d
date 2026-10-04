@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # CPU private evaluator only; no model/GPU or acquisition recipe invocation.
+# Source closure: /src/world_reward/native_frame_map.py
 # Source closure: /infra/ycbv_point_evaluate.py /infra/tudl_holdout_inputs.py
 # /src/world_reward/point_bop_evaluation.py /src/world_reward/point_motion_evaluation.py
 set +x
@@ -9,7 +10,7 @@ ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_ycbv_point_evaluate/code" && "${BASH_SOURCE[0]}" == "$CODE/infra/run_ycbv_point_evaluate.sh" \
  && "$(hostname -s)" == world-reward-ncc-h100-02 && "$(id -u)" == 0 ]] || exit 2
-BASE="$ROOT/validation/ycbv_point_pose_v1";OUT="$BASE/evaluation_v1";JOB="${CODE%/code}"
+BASE="$ROOT/validation/ycbv_point_pose_v2";OUT="$BASE/evaluation_v1";JOB="${CODE%/code}"
 IMAGE=sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3
 NAME="world-reward-ycbv-point-evaluate-${REV:0:12}";CIDFILE=''
 export DOCKER_HOST="unix://$ROOT/docker.sock"
@@ -18,7 +19,7 @@ host_identity() {
  /usr/bin/python3 -I -B - "$CODE" "$REV" <<'PY'
 from pathlib import Path
 import json,runpy,sys
-code=Path(sys.argv[1]);sys.path.insert(0,str(code/'infra'))
+code=Path(sys.argv[1]);sys.path[:0]=[str(code/'infra'),str(code/'src')]
 driver=runpy.run_path(str(code/'infra/ycbv_point_evaluate.py'),run_name='host_control')
 print(json.dumps(driver['host_snapshot'](driver['ROOT'],code,sys.argv[2]),sort_keys=True,separators=(',',':')))
 PY
@@ -35,7 +36,7 @@ finish() {
   REPORT_BEFORE="$(/usr/bin/env -i PATH=/usr/bin:/bin /usr/bin/python3 -I -B - "$CODE" "$OUT" <<'PYREPORT'
 from pathlib import Path
 import json,sys
-code=Path(sys.argv[1]);sys.path.insert(0,str(code/'infra'));import tudl_holdout_inputs as files
+code=Path(sys.argv[1]);sys.path[:0]=[str(code/'infra'),str(code/'src')];import tudl_holdout_inputs as files
 identity=files.identity(Path(sys.argv[2])/'report.json')
 if identity['bytes']>262144:raise ValueError('Bounded aggregate-only report required')
 print(json.dumps(identity,sort_keys=True,separators=(',',':')))
@@ -62,7 +63,7 @@ PYREPORT
   /usr/bin/python3 -I -B - "$CODE" "$REV" "$BEFORE" "$REPORT_BEFORE" "$STATUS" "$CLEANUP_OK" <<'PYSEAL'
 from pathlib import Path
 import json,runpy,sys
-code=Path(sys.argv[1]);sys.path.insert(0,str(code/'infra'));driver=runpy.run_path(str(code/'infra/ycbv_point_evaluate.py'),run_name='host_post')
+code=Path(sys.argv[1]);sys.path[:0]=[str(code/'infra'),str(code/'src')];driver=runpy.run_path(str(code/'infra/ycbv_point_evaluate.py'),run_name='host_post')
 if not driver['write_host_seal'](driver['ROOT'],code,sys.argv[2],json.loads(sys.argv[3]),json.loads(sys.argv[4]),int(sys.argv[5]),sys.argv[6]=='1'):raise SystemExit(1)
 PYSEAL
   [[ $? == 0 || "$STATUS" != 0 ]] || STATUS=1
@@ -71,14 +72,14 @@ PYSEAL
 }
 trap finish EXIT;trap 'exit 130' INT;trap 'exit 143' TERM
 MOUNTS=()
-for name in infra/ycbv_point_evaluate.py infra/run_ycbv_point_evaluate.sh infra/tudl_holdout_inputs.py src/world_reward/__init__.py src/world_reward/point_bop_evaluation.py src/world_reward/point_motion_evaluation.py configs/ycbv_point_evaluation_pins.json;do
+for name in infra/ycbv_point_evaluate.py infra/run_ycbv_point_evaluate.sh infra/tudl_holdout_inputs.py src/world_reward/__init__.py src/world_reward/native_frame_map.py src/world_reward/point_bop_evaluation.py src/world_reward/point_motion_evaluation.py configs/ycbv_point_evaluation_pins_v2.json;do
  MOUNTS+=(--mount "type=bind,src=$CODE/$name,dst=$CODE/$name,readonly")
 done
 for path in "$JOB/revision" "$JOB/source-sha256" "$BASE/report.json" "$BASE/comparison_v1" "$BASE/automatic_masks_v1/report.json" "$BASE/eval_private";do
  [[ -e "$path" && ! -L "$path" ]];MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
 done
 for scene in 000048 000049 000050;do
- path="$BASE/automatic_masks_v1/scene_$scene/masks/1/000000.png";MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
+ path="$BASE/automatic_masks_v1/scene_$scene/masks/1/000001.png";MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
 done
 mkdir -m 700 "$OUT";CIDFILE="$OUT/.container.cid"
 set +e

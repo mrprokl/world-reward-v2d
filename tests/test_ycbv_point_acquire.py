@@ -41,7 +41,7 @@ def zipped(files):
     return out.getvalue()
 
 
-def member(name="test/000048/rgb/000000.png",size=20,kind=stat.S_IFREG):
+def member(name="test/000048/rgb/000001.png",size=20,kind=stat.S_IFREG):
     return SimpleNamespace(filename=name,file_size=size,external_attr=kind<<16,flag_bits=0,compress_type=zipfile.ZIP_DEFLATED,is_dir=lambda:name.endswith("/"))
 
 
@@ -71,19 +71,19 @@ def filenames():
     files={}
     for scene in range(48,60):
         for kind in ("camera","gt","gt_info"): files[f"test/{scene:06d}/scene_{kind}.json"]=object()
-        for frame in range(100): files[f"test/{scene:06d}/rgb/{frame:06d}.png"]=object()
+        for frame in range(1,101): files[f"test/{scene:06d}/rgb/{frame:06d}.png"]=object()
     return files
 
 
 def test_first_three96_filenames_only_never_labels(gate):
     members=filenames();gate.inspect_layout("ycbv_test_all.zip",members)
     selected=gate.select_rgb_names(dict(reversed(list(members.items()))))
-    assert [(s,f) for s,f,_ in selected]==[(s,f) for s in (48,49,50) for f in range(96)]
+    assert [(s,f) for s,f,_ in selected]==[(s,f) for s in (48,49,50) for f in range(1,97)]
     assert len(selected)==288
     for fault in ("missing","shift","root","sparse","model"):
         values=members.copy()
         if fault=="missing": values.pop("test/000048/rgb/000040.png")
-        elif fault=="shift":values.pop("test/000048/rgb/000000.png")
+        elif fault=="shift":values.pop("test/000048/rgb/000001.png")
         elif fault=="root":values={"ycbv/"+k:v for k,v in values.items()}
         elif fault=="sparse":values={k:v for k,v in values.items() if "/rgb/"not in k or int(Path(k).stem)%2==0}
         else: values["models/obj_000001.ply"]=b"NEVER"
@@ -97,7 +97,7 @@ def test_base_and_protocol_exact_no_numeric_or_source_changes(gate):
     assert expected["limits"]["seconds"]==3600 and sum(x["bytes"] for x in expected["archives"].values())<30*1024**3
     for fault in ("bool","extra","sparse","scene","license"):
         value=copy.deepcopy(expected)
-        if fault=="bool":value["selection"]["first_frame"]=False
+        if fault=="bool":value["selection"]["first_frame_position"]=False
         elif fault=="extra":value["oracle"]=False
         elif fault=="sparse":value["archives"]["ycbv_test_all.zip"]["url"]+="?alternate=bop19"
         elif fault=="scene":value["selection"]["scene_ids"]=[49,50,51]
@@ -158,11 +158,11 @@ def full_fixture():
     files={}
     for scene in range(48,60):
         for kind in ("camera","gt","gt_info"):
-            values={str(f):({"private_K":[1,2,3]} if kind=="camera" else [{"obj_id":1},{"obj_id":2}]) for f in range(100)}
+            values={str(f):({"private_K":[1,2,3],"source_frame_id":f} if kind=="camera" else [{"obj_id":1},{"obj_id":2}]) for f in range(1,101)}
             files[f"test/{scene:06d}/scene_{kind}.json"]=json.dumps(values).encode()
-        for frame in range(100):
+        for frame in range(1,101):
             prefix=f"test/{scene:06d}/";files[prefix+f"rgb/{frame:06d}.png"]=png()
-            if scene<51 and frame<96:
+            if scene<51 and frame<=96:
                 files[prefix+f"depth/{frame:06d}.png"]=png(16,0)
                 for folder in ("mask","mask_visib"):
                     for instance in range(2):files[prefix+f"{folder}/{frame:06d}_{instance:06d}.png"]=png(8,0)
@@ -175,10 +175,10 @@ def test_retains288_rgb_and_all_instances_private(gate,tmp_path):
     with zipfile.ZipFile(io.BytesIO(zipped(files))) as archive:
         members=gate.zip_inventory(archive,[0,0]);selected=gate.select_rgb_names(members)
         gate.crc_all(archive);manifest=gate.retain_subset(archive,members,private,inputs,selected,owned)
-    assert set(manifest)=={"schema","revision","license","selection","attribution","images"}
+    assert set(manifest)=={"schema","revision","license","selection","attribution","frame_maps","images"}
     assert len(manifest["images"])==288 and len(list(inputs.iterdir()))==288
     for row in manifest["images"]:
-        assert set(row)=={"scene_id","frame_id","file","sha256","width","height"}
+        assert set(row)=={"scene_id","frame_position","source_frame_id","file","sha256","width","height"}
         assert (inputs/row["file"]).read_bytes()==png() and row["sha256"]==sha(png())
         assert (inputs/row["file"]).stat().st_mode&0o777==0o444
     for scene in (48,49,50):
@@ -187,17 +187,18 @@ def test_retains288_rgb_and_all_instances_private(gate,tmp_path):
         assert len(list((folder/"mask").iterdir()))==192 and len(list((folder/"mask_visib").iterdir()))==192
         for kind in ("camera","gt","gt_info"):
             path=folder/f"scene_{kind}.json";value=json.loads(path.read_text())
-            assert set(value)=={str(f) for f in range(96)} and path.stat().st_mode&0o777==0o400
+            assert set(value)=={str(f) for f in range(1,97)} and path.stat().st_mode&0o777==0o400
+            if kind=="camera": assert value["1"]["source_frame_id"]==1 and value["96"]["source_frame_id"]==96
     with pytest.raises(FileExistsError):gate.save(inputs/manifest["images"][0]["file"],png(),owned)
 
 
 @pytest.mark.parametrize("fault",["selection","mask","instance","depth","rgb_type"])
 def test_bad_coverage_fails_no_alternative_or_instance_choice(gate,tmp_path,fault):
     files=full_fixture()
-    if fault=="mask":files.pop("test/000048/mask/000000_000001.png")
+    if fault=="mask":files.pop("test/000048/mask/000001_000001.png")
     elif fault=="instance":files["test/000048/scene_gt_info.json"]=b'{"0":[]}'
-    elif fault=="depth":files.pop("test/000048/depth/000000.png")
-    elif fault=="rgb_type":files["test/000048/rgb/000000.png"]=png(8,6)
+    elif fault=="depth":files.pop("test/000048/depth/000001.png")
+    elif fault=="rgb_type":files["test/000048/rgb/000001.png"]=png(8,6)
     with zipfile.ZipFile(io.BytesIO(zipped(files))) as archive:
         members=gate.zip_inventory(archive,[0,0]);selected=gate.select_rgb_names(members)
         if fault=="selection":selected=selected[1:]
@@ -241,10 +242,10 @@ def test_full_acquire_transaction_tiny_sources_and_failure_pruning(gate,tmp_path
 def test_sources_dispatch_protocol_bound_and_rehashed(gate,tmp_path,monkeypatch):
     root=tmp_path/"world-reward";root.mkdir();revision="a"*40;code=root/"jobs"/revision/gate.JOB/"code";code.mkdir(parents=True)
     for name in gate.HELPERS:
-        path=code/name;path.parent.mkdir(exist_ok=True);path.write_bytes(json.dumps(gate.EXPECTED_PROTOCOL).encode() if name==gate.PROTOCOL else b"source");path.chmod(0o444)
+        path=code/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(json.dumps(gate.EXPECTED_PROTOCOL).encode() if name==gate.PROTOCOL else b"source");path.chmod(0o444)
     (code.parent/"revision").write_text(revision+"\n");(code.parent/"source-sha256").write_text("b"*64+"\n")
     monkeypatch.setattr(gate,"ROOT",root);monkeypatch.setattr(gate.shared,"__file__",str(code/gate.HELPERS[2]))
-    before=gate.bound_source(root,code,revision,code/gate.HELPERS[0]);assert len(before["files"])==4
+    before=gate.bound_source(root,code,revision,code/gate.HELPERS[0]);assert len(before["files"])==5
     path=code/gate.HELPERS[0];path.chmod(0o600);path.write_bytes(b"changed")
     with pytest.raises(ValueError):gate.bound_source(root,code,revision,path)
     path.chmod(0o444);assert gate.bound_source(root,code,revision,path)!=before
@@ -263,8 +264,7 @@ def test_wrapper_zeroargs_offline_gpu_firewall_and_real_closure(gate):
     files["pyproject.toml"]=(REPO/"pyproject.toml").read_bytes();paths=module.runtime_bundle_paths(files,"infra/run_ycbv_point_acquire.sh")
     assert set(gate.HELPERS)|{"infra/run_ycbv_point_acquire.sh"}<=set(paths)
     assert not any("robotap"in x or "sam3d"in x for x in paths if x.startswith("infra/"))
-    assert {x for x in paths if x.startswith('infra/')}==set(gate.HELPERS[:-1])|{
-        'infra/atomic_metadata.py','infra/ycbv_acquire_transition.py','infra/run_ycbv_acquire_transition.sh'}
+    assert {x for x in paths if x.startswith('infra/')}=={x for x in gate.HELPERS if x.startswith('infra/')}
 
 
 def test_only_acquisition_time_contract_changes_from_original(gate):
@@ -272,9 +272,9 @@ def test_only_acquisition_time_contract_changes_from_original(gate):
     original=subprocess.run(['git','show','40ee2cb4710ec15f0b2bda32bbf0e1f727804b18:infra/ycbv_point_acquire.py'],cwd=REPO,capture_output=True,check=True,text=True).stdout
     namespace={'__name__':'original_ycbv_prereg'};exec(compile(original,'original','exec'),namespace)
     expected=copy.deepcopy(namespace['EXPECTED_PROTOCOL']);expected['limits']['seconds']=3600;expected['limits']['cleanup_seconds']=180
-    assert gate.EXPECTED_PROTOCOL==expected
+    assert {k:gate.EXPECTED_PROTOCOL[k] for k in ('archives','evidence','embedded_dataset_info','limits')}=={k:expected[k] for k in ('archives','evidence','embedded_dataset_info','limits')}
     old=ast.parse(original);new=ast.parse(Path(gate.__file__).read_text())
-    for name in ('transfer','zip_inventory','inspect_layout','select_rgb_names','crc_all','png_header','retain_subset','cleanup'):
+    for name in ('transfer','zip_inventory','inspect_layout','crc_all','png_header','cleanup'):
         a=next(n for n in old.body if isinstance(n,ast.FunctionDef)and n.name==name)
         b=next(n for n in new.body if isinstance(n,ast.FunctionDef)and n.name==name)
         assert ast.dump(a,include_attributes=False)==ast.dump(b,include_attributes=False)
@@ -295,7 +295,7 @@ def test_absolute_cleanup_grace_does_not_renew_and_never_masks_timeout(gate,monk
 def test_timeout_main_seals_failure_and_cleanup_grace_without_retry(gate,tmp_path,monkeypatch):
     root=tmp_path/'root';out=root/gate.BASE;out.mkdir(parents=True);(out/'.container.cid').write_text('c'*64)
     monkeypatch.setenv('WR_ROOT',str(root));monkeypatch.setenv('WR_CODE',str(tmp_path/'code'));monkeypatch.setenv('WR_CODE_REVISION','a'*40)
-    monkeypatch.setenv('WR_IMAGE_ID',gate.IMAGE);monkeypatch.setenv('WR_AZURE_VM02_VERIFIED','1');monkeypatch.setenv('WR_YCBV_TECHNICAL_CONTINUATION_SHA256','b'*64)
+    monkeypatch.setenv('WR_IMAGE_ID',gate.IMAGE);monkeypatch.setenv('WR_AZURE_VM02_VERIFIED','1');monkeypatch.setenv('WR_YCBV_V2_AUTHORIZED','1');monkeypatch.setattr(gate,'require_execution',lambda:None)
     monkeypatch.setattr(gate.platform,'system',lambda:'Linux');monkeypatch.setattr(gate.os,'getuid',lambda:1000)
     before={'files':{gate.HELPERS[0]:{'sha256':'d'*64,'bytes':1}}};monkeypatch.setattr(gate,'bound_source',lambda *a:before)
     alarms=[];handlers={}
@@ -308,7 +308,7 @@ def test_timeout_main_seals_failure_and_cleanup_grace_without_retry(gate,tmp_pat
     with pytest.raises(SystemExit):gate.main([])
     result=json.loads((out/'report.json').read_text())
     assert result['status']=='fail'and result['error_type']=='TimeoutError'and result['budget_seconds']==3600
-    assert result['technical_continuation_attempt']==2 and result['cleanup_grace_seconds']==180
+    assert result['engineering_replay']is True and result['cleanup_grace_seconds']==180
     assert (out/'report.json').stat().st_mode&0o777==0o400
     assert alarms.count(3600)==alarms.count(180)==1 and alarms[-1]==0
 
@@ -316,7 +316,7 @@ def test_timeout_main_seals_failure_and_cleanup_grace_without_retry(gate,tmp_pat
 def test_expired_cleanup_not_restarted_or_reported_success(gate,tmp_path,monkeypatch):
     root=tmp_path/'root';out=root/gate.BASE;out.mkdir(parents=True);(out/'.container.cid').write_text('c'*64)
     monkeypatch.setenv('WR_ROOT',str(root));monkeypatch.setenv('WR_CODE',str(tmp_path/'code'));monkeypatch.setenv('WR_CODE_REVISION','a'*40)
-    monkeypatch.setenv('WR_IMAGE_ID',gate.IMAGE);monkeypatch.setenv('WR_AZURE_VM02_VERIFIED','1');monkeypatch.setenv('WR_YCBV_TECHNICAL_CONTINUATION_SHA256','b'*64)
+    monkeypatch.setenv('WR_IMAGE_ID',gate.IMAGE);monkeypatch.setenv('WR_AZURE_VM02_VERIFIED','1');monkeypatch.setenv('WR_YCBV_V2_AUTHORIZED','1');monkeypatch.setattr(gate,'require_execution',lambda:None)
     monkeypatch.setattr(gate.platform,'system',lambda:'Linux');monkeypatch.setattr(gate.os,'getuid',lambda:1000)
     monkeypatch.setattr(gate,'bound_source',lambda *a:{'files':{gate.HELPERS[0]:{'sha256':'d'*64,'bytes':1}}})
     alarms=[];handlers={}
@@ -330,3 +330,24 @@ def test_expired_cleanup_not_restarted_or_reported_success(gate,tmp_path,monkeyp
     assert result['cleanup_grace_exhausted']is True and result['status']=='fail'
     assert result['error_type']=='TimeoutError'and (out/'report.json').stat().st_mode&0o777==0o400
     assert alarms.count(180)==1
+
+
+def test_v2_is_prepared_only_and_fails_before_any_io(gate,monkeypatch):
+    def forbidden(*args,**kwargs):pytest.fail("Unapproved third acquisition reached I/O")
+    monkeypatch.setattr(Path,"open",forbidden)
+    monkeypatch.setattr(gate.shutil,"disk_usage",forbidden)
+    monkeypatch.setattr(gate.urllib.request,"build_opener",forbidden)
+    for call in (lambda:gate.main([]),lambda:gate.preflight(Path("/not/read"),Path("/not/read"),"a"*40)):
+        with pytest.raises(ValueError,match="no third acquisition authorized"):call()
+    assert gate.BASE=="validation/ycbv_point_pose_v2"
+    assert gate.PROTOCOL=="configs/ycbv_point_protocol_v2.json"
+    assert gate.EXPECTED_PROTOCOL["execution"]==dict(authorized=False,status="prepared_non_executable",engineering_replay=True)
+
+
+def test_original_v1_protocol_and_failure_pins_not_modified(gate):
+    import subprocess
+    names=["configs/ycbv_point_protocol.json","configs/ycbv_point_failed_acquisition_pins.json","configs/ycbv_point_inventory_failed_pins.json"]
+    for name in names:
+        old=subprocess.run(["git","show","HEAD:"+name],cwd=REPO,capture_output=True,check=True).stdout
+        assert (REPO/name).read_bytes()==old
+    assert json.loads((REPO/gate.PROTOCOL).read_bytes())==gate.EXPECTED_PROTOCOL

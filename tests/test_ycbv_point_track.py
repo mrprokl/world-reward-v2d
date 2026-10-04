@@ -18,7 +18,7 @@ gate = importlib.util.module_from_spec(spec); spec.loader.exec_module(gate)
 def independent_pins():
     identity = {'bytes': 12, 'sha256': 'a' * 64}
     producer = {**identity, 'producer_revision': 'b' * 40, 'script_sha256': 'c' * 64}
-    return {'schema': 'world-reward-ycbv-point-track-pins-v1', 'input_pins': identity.copy(),
+    return {'schema': 'world-reward-ycbv-point-track-pins-v2', 'input_pins': identity.copy(),
         **{kind: {'report': producer.copy(), 'files': {n: identity.copy() for n in gate.stage_names(kind)}} for kind in gate.STAGES}}
 
 
@@ -38,7 +38,7 @@ def test_bad_prerequisite_pins_fail_before_any_io(monkeypatch, fault):
     elif fault == 'sha': pins['masks']['report']['sha256'] = 'A' * 64
     elif fault == 'bytes': pins['depth_init']['report']['bytes'] = 0
     elif fault == 'missing_frame': pins['masks']['files'].pop(next(iter(pins['masks']['files'])))
-    elif fault == 'extra_frame': pins['masks']['files']['scene_000048/masks/1/000096.png'] = pins['input_pins'].copy()
+    elif fault == 'extra_frame': pins['masks']['files']['scene_000048/masks/1/000097.png'] = pins['input_pins'].copy()
     else: pins['objects']['files']['scene_000048/private.json'] = pins['input_pins'].copy()
     monkeypatch.setattr(Path, 'open', lambda *a, **k: pytest.fail('Bad pins opened a file'))
     with pytest.raises(ValueError): gate.validate_track_pins(pins)
@@ -182,7 +182,7 @@ def test_original_native_camera_uses_normalized_axes_not_rounded_f800(monkeypatc
     y, x = np.mgrid[:3, :4]; z = np.full((3, 4), 2., dtype=np.float32)
     points = np.stack(((x + .5 - K[0, 2]) / K[0, 0] * z,
         (y + .5 - K[1, 2]) / K[1, 1] * z, z), -1).astype(np.float32)
-    initial = dict(depth=z, points=points, mask=np.ones((3, 4), bool), intrinsics=normalized, frame_index=np.array(0, np.int64))
+    initial = dict(depth=z, points=points, mask=np.ones((3, 4), bool), intrinsics=normalized, frame_index=np.array(0, np.int64), source_frame_id=np.array(1, np.int64))
     before = gate.depth.array_identities(initial); actual = gate.native_initial_camera(initial)
     np.testing.assert_array_equal(actual, K); assert not actual.flags.writeable
     assert actual[1, 1] != 5. and gate.depth.array_identities(initial) == before
@@ -250,3 +250,17 @@ def test_actual_runtime_bundle_keeps_numeric_helpers_but_container_mounts_no_rec
     assert set(gate.SOURCE_FILES) <= set(selected)
     assert 'infra/object_pose_smoke.py' not in gate.SOURCE_FILES
     assert 'configs/ycbv_point_protocol.json' not in gate.SOURCE_FILES
+
+
+def test_numerical_candidate_and_tracking_functions_unchanged():
+    import ast,subprocess
+    old=subprocess.run(['git','show','HEAD:infra/ycbv_point_track.py'],cwd=ROOT,capture_output=True,text=True,check=True).stdout
+    before=ast.parse(old);after=ast.parse((ROOT/'infra/ycbv_point_track.py').read_text())
+    for name in ('compose_scene','native_boots','native_initial_camera','load_geometry'):
+        a=next(n for n in before.body if isinstance(n,ast.FunctionDef)and n.name==name)
+        b=next(n for n in after.body if isinstance(n,ast.FunctionDef)and n.name==name)
+        assert ast.dump(a,include_attributes=False)==ast.dump(b,include_attributes=False)
+
+
+def test_updated_transitive_source_hashes_are_exact():
+    for name,sha in gate.FROZEN.items():assert hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==sha

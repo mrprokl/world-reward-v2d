@@ -28,10 +28,10 @@ def cohort(tmp_path):
     directory=tmp_path/gate.BASE/'inputs';directory.mkdir(parents=True);raw=png();rows=[]
     for scene in gate.public.SCENES:
         for frame in range(96):
-            name=f'scene_{scene:06d}_frame_{frame:06d}.png';path=directory/name;path.write_bytes(raw);path.chmod(0o444)
-            rows.append(dict(scene_id=scene,frame_id=frame,file=name,sha256=hashlib.sha256(raw).hexdigest(),width=640,height=480))
+            name=f'scene_{scene:06d}_frame_{frame+1:06d}.png';path=directory/name;path.write_bytes(raw);path.chmod(0o444)
+            rows.append(dict(scene_id=scene,frame_position=frame,source_frame_id=frame+1,file=name,sha256=hashlib.sha256(raw).hexdigest(),width=640,height=480))
     manifest=dict(schema=gate.public.SCHEMA,revision=gate.public.REVISION,license='MIT',selection=gate.public.SELECTION,
-        attribution=gate.public.ATTRIBUTION,images=rows)
+        attribution=gate.public.ATTRIBUTION,frame_maps=gate.public.frame_maps(),images=rows)
     path=directory/'manifest.json';path.write_text(json.dumps(manifest));path.chmod(0o444)
     pins=dict(schema=gate.public.PINS_SCHEMA,manifest=gate.binding.identity(path),
         acquisition_report=dict(bytes=10,sha256='a'*64,producer_revision='b'*40,script_sha256='c'*64))
@@ -76,7 +76,7 @@ def test_exact_full_reader_no_private(tmp_path,monkeypatch):
     actual,proof=gate.public.public_inputs(directory,pins)
     assert len(actual)==len(proof['RGB_identities'])==288
     assert [r['scene_id'] for r in actual[::96]]==[48,49,50]
-    assert [r['frame_id'] for r in actual[:96]]==list(range(96))
+    assert [r['frame_position'] for r in actual[:96]]==list(range(96))
 
 
 def test_three_detections_before_sam_all_native_masks_and_bytecopies(tmp_path):
@@ -304,7 +304,7 @@ def test_run_failure_rehashes_source_public_models_and_installed_code_before_rec
     monkeypatch.setattr(gate,'frontend_proof',lambda *a,**k:events.append('proof')or {'original':'proof'})
     monkeypatch.setattr(gate.binding,'strict_json',lambda raw:{'manifest':{'sha256':'a'*64,'bytes':1},'acquisition_report':{}})
     pinpath=tmp_path/gate.PIN_FILE;pinpath.parent.mkdir();pinpath.write_text('{}')
-    monkeypatch.setattr(gate.public,'public_inputs',lambda *a:events.append('public')or ([],{'RGB_identities':{}}))
+    monkeypatch.setattr(gate.public,'public_inputs',lambda *a:events.append('public')or ([],{'RGB_identities':{},'frame_maps':gate.public.frame_maps()}))
     monkeypatch.setattr(gate,'selected_model_assets',lambda *a:events.append('models')or {})
     monkeypatch.setattr(gate,'installed_sources',lambda *a:events.append('installed')or {})
     def fail(*a,**k):events.append('observe');raise RuntimeError('native failure')
@@ -322,3 +322,22 @@ def test_run_failure_rehashes_source_public_models_and_installed_code_before_rec
     assert r['original_inputs_sources_assets_rehashed_after'] is True
     assert events[-5:]==['source','proof','public','models','installed']
     assert r.get('status')!='pass'
+
+
+def test_native_positional_mask_export_preserves_first_and_last_bytes(tmp_path):
+    records,_=cohort(tmp_path);rows=records[:96];folder=tmp_path/"native_masks";target=folder/"1";target.mkdir(parents=True)
+    original={}
+    for position in range(96):
+        value=np.zeros((480,640),np.uint8);value[0,position]=255
+        path=target/f"{position:06d}.png";Image.fromarray(value).save(path)
+        original[position]=path.read_bytes()
+    gate.export_native_mask_ids(folder,rows)
+    saved=gate.mask_inventory(folder,rows)
+    assert (target/"000001.png").read_bytes()==original[0]
+    assert (target/"000096.png").read_bytes()==original[95]
+    assert not (target/"000000.png").exists()
+    assert [(r["frame_position"],r["source_frame_id"]) for r in saved]==list(zip(range(96),range(1,97)))
+    stage=tmp_path/"positional_rgb";owner,frozen=gate.stage_frames(rows,stage)
+    assert (stage/"000000.png").read_bytes()==rows[0]["path"].read_bytes()
+    assert rows[0]["file"].endswith("000001.png")
+    gate.remove_stage(stage,owner,frozen)

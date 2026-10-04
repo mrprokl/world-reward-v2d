@@ -24,19 +24,24 @@ def digest(raw):
 
 def fixture(tmp_path, direction='init'):
     root = tmp_path / 'origin'; root.mkdir(mode=0o700)
-    pins = dict(schema='world-reward-ycbv-init-peer-pins-v1', direction=direction, files={},
+    pins = dict(schema='world-reward-ycbv-init-peer-pins-v2', direction=direction, files={},
         producer_reports={}, source_replica=None, archive=None, inventory_report=None)
     contents = {name: ('own tiny ' + name).encode() for name in peer.payload_names(direction)}
     if direction == 'init':
-        contents[peer.BASE + '/inputs/manifest.json'] = peer.encoded(dict(schema='world-reward-ycbv-point-rgb-v1',
-            revision='e' * 40, license='MIT', selection='own fixed fixture', attribution='own tiny metadata', images=[{}] * 288))
+        reader=peer.public_reader
+        images=[dict(scene_id=scene,frame_position=position,source_frame_id=position+1,
+            file=f'scene_{scene:06d}_frame_{position+1:06d}.png',sha256=digest(contents[peer.BASE+f'/inputs/scene_{scene:06d}_frame_{position+1:06d}.png'])['sha256'] if position==0 else 'a'*64,width=640,height=480)
+            for scene in reader.SCENES for position in range(96)]
+        contents[peer.BASE + '/inputs/manifest.json'] = peer.encoded(dict(schema=reader.SCHEMA,
+            revision=reader.REVISION,license='MIT',selection=reader.SELECTION,attribution=reader.ATTRIBUTION,
+            frame_maps=reader.frame_maps(),images=images))
     roles = ('acquisition', 'masks', 'depth') if direction == 'init' else ('objects',)
     for role in roles:
         value = dict(stage=peer.STAGES[role], status='pass', phase='complete', producer_revision=REV,
             script_sha256=SCRIPT, challenge_inputs_used=False, source_rehashed_after=True,
             all_inputs_sources_assets_outputs_rehashed=True, sources_after_reverified=True,
             private_annotations_exported_as_inference_inputs=False, ground_truth_used=False,
-            private_truth_read=False, private_annotations_read=False)
+            private_truth_read=False, private_annotations_read=False,frame_maps=peer.public_reader.frame_maps())
         if role == 'objects':
             files = {name: digest(b'' if name.endswith('/__init__.py') else ('tiny original code ' + name).encode()) for name in peer.OBJECT_HELPERS}
             value['script_sha256'] = files['infra/ycbv_point_objects.py']['sha256']
@@ -67,7 +72,7 @@ def test_exact_thirteen_payloads_and_explicit_source_only_on_return(tmp_path, di
     root, pins = fixture(tmp_path, direction)
     assert len(pins['files']) == 13
     peer.validate_pins(pins, direction)
-    assert len(peer.verify_files(root, pins)) == (13 if direction == 'init' else 21)
+    assert len(peer.verify_files(root, pins)) == (13 if direction == 'init' else 24)
     assert b'acquisition_receipt_host_only' in peer.manifest(pins)
 
 

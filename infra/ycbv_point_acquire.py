@@ -17,23 +17,24 @@ import zipfile
 import zlib
 
 import tudl_acquire as shared
+from world_reward.native_frame_map import NativeFrameMap
 
 ACQUISITION_SECONDS = 3600
 CLEANUP_SECONDS = 180
 
 ROOT = Path("/srv/scenesmith/world-reward")
 JOB = "run_ycbv_point_acquire"
-BASE = "validation/ycbv_point_pose_v1"
+BASE = "validation/ycbv_point_pose_v2"
 STAGE = "external_ycbv_contiguous_rgb_only_acquisition"
 IMAGE = "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3"
 REVISION = "5c2c4aa229800355648cd268040aa814f8dc94f0"
 URL = f"https://huggingface.co/datasets/bop-benchmark/ycbv/resolve/{REVISION}/"
 PUBLISHER = "https://raw.githubusercontent.com/yuxng/YCB_Video_toolbox/98630204fc73c1dbc2ff66ddea22cf517f269f5f/"
-PROTOCOL = "configs/ycbv_point_protocol.json"
-HELPERS = ("infra/ycbv_point_acquire.py", "infra/run_ycbv_point_acquire.sh", "infra/tudl_acquire.py", PROTOCOL)
+PROTOCOL = "configs/ycbv_point_protocol_v2.json"
+HELPERS = ("infra/ycbv_point_acquire.py", "infra/run_ycbv_point_acquire.sh", "infra/tudl_acquire.py", "src/world_reward/native_frame_map.py", PROTOCOL)
 SELECTION = "first_three_sorted_scene_directories_first_96_contiguous_RGB_names_before_private_annotations"
 EXPECTED_PROTOCOL = {
- "schema":"world-reward-ycbv-point-protocol-v1", "dataset_revision":REVISION, "license":"MIT",
+ "schema":"world-reward-ycbv-point-protocol-v2", "dataset_revision":REVISION, "license":"MIT",
  "archives":{
   "ycbv_base.zip":{"url":URL+"ycbv_base.zip","bytes":15805,"sha256":"98440f8bd403100b21cf11a6729fabe8b3d5ce714472edc57a18b7f1fcd4bb18"},
   "ycbv_test_all.zip":{"url":URL+"ycbv_test_all.zip","bytes":14969383039,"sha256":"fea2ab5f18aba1857acd320827cec10d9dbf258e4940ea4b52f5dd51cb2356a7"}},
@@ -44,9 +45,10 @@ EXPECTED_PROTOCOL = {
   "bop_format":{"url":"https://raw.githubusercontent.com/thodan/bop_toolkit/af97c1938083dfd512eb6f32a85921ea38198ee4/docs/bop_datasets_format.md","bytes":9821,"sha256":"6994afd65c29c2a198ea6e08e138f586ace316aaacda21ae3c498b37d1535222"},
   "bop_params":{"url":"https://raw.githubusercontent.com/thodan/bop_toolkit/b72b3015c87a96fa6398c2ef4c196e85f798d3e6/bop_toolkit_lib/dataset_params.py","bytes":32303,"sha256":"a935fc4f6fd42f367a0bbf816036f783fb4c5d87200a8615ce1e08e6d51af05e"}},
  "embedded_dataset_info":{"file":"ycbv/dataset_info.md","bytes":4035,"sha256":"4766684f25f165c1c312745e3583fe248161c56c35a862bfa04134141151882e"},
- "selection":{"split_prefix":"test","scene_ids":[48,49,50],"frames_per_scene":96,"first_frame":0,"width":640,"height":480,"rule":SELECTION},
+ "selection":{"split_prefix":"test","scene_ids":[48,49,50],"frames_per_scene":96,"first_source_frame_id":1,"first_frame_position":0,"width":640,"height":480,"rule":SELECTION},
  "limits":{"seconds":3600,"cleanup_seconds":180,"download_bytes":32212254720,"expanded_bytes":60000000000,"member_bytes":2000000000,"members":1000000,"min_free_bytes":45000000000},
- "output":{"base":BASE,"public_schema":"world-reward-ycbv-point-rgb-v1"}}
+ "execution":{"authorized":False,"status":"prepared_non_executable","engineering_replay":True},
+ "output":{"base":BASE,"public_schema":"world-reward-ycbv-point-rgb-v2"}}
 FIELDS = lambda s:(s.st_dev,s.st_ino,s.st_mode,s.st_size,s.st_mtime_ns,s.st_ctime_ns)
 CHUNK = 1024*1024
 
@@ -100,7 +102,13 @@ def bound_source(root,code,revision,executing):
     return {"files":files,"markers":markers}
 
 
+def require_execution():
+    if EXPECTED_PROTOCOL["execution"]["authorized"] is not True:
+        raise ValueError("Prepared v2 interface: no third acquisition authorized")
+
+
 def preflight(root,code,revision):
+    require_execution()
     sources=bound_source(root,code,revision,code/HELPERS[0]); canonical(root/BASE)
     if not (root/BASE).parent.is_dir() or (root/BASE).exists(): raise ValueError("Fresh absent cohort required")
     if shutil.disk_usage(root).free<EXPECTED_PROTOCOL["limits"]["min_free_bytes"]: raise ValueError("45GB free space required")
@@ -191,8 +199,9 @@ def select_rgb_names(members):
     selected=[]
     for scene in scenes[:3]:
         names=sorted(n for n in members if re.fullmatch(fr"test/{scene:06d}/rgb/[0-9]{{6}}\.png",n))[:96]
-        if [int(PurePosixPath(n).stem) for n in names]!=list(range(96)): raise ValueError("First96 contiguous original RGB frames missing")
-        selected.extend((scene,f,n) for f,n in enumerate(names))
+        mapping=NativeFrameMap(f"ycbv_scene_{scene:06d}", tuple(int(PurePosixPath(n).stem) for n in names))
+        if mapping.source_frame_ids!=tuple(range(1,97)): raise ValueError("First96 native source IDs 1..96 missing")
+        selected.extend((scene,source,n) for source,n in zip(mapping.source_frame_ids,names))
     return selected
 
 
@@ -217,9 +226,9 @@ def retain_subset(archive,members,private,inputs,selected,owned):
         prefix=f"test/{scene:06d}/";values={}
         for kind in ("camera","gt","gt_info"):
             full=strict_json(archive.read(prefix+f"scene_{kind}.json"))
-            if type(full) is not dict or any(str(f) not in full for f in range(96)): raise ValueError("Private coverage missing")
-            values[kind]={str(f):full[str(f)] for f in range(96)}
-        for frame in range(96):
+            if type(full) is not dict or any(str(f) not in full for f in range(1,97)): raise ValueError("Private coverage missing")
+            values[kind]={str(f):full[str(f)] for f in range(1,97)}
+        for frame in range(1,97):
             gt,info=values["gt"][str(frame)],values["gt_info"][str(frame)]
             if type(gt) is not list or not gt or type(info) is not list or len(gt)!=len(info): raise ValueError("All object instances required")
             names=[prefix+f"depth/{frame:06d}.png"]
@@ -233,9 +242,10 @@ def retain_subset(archive,members,private,inputs,selected,owned):
         for kind,value in values.items(): save(private/"source"/prefix/f"scene_{kind}.json",(json.dumps(value,sort_keys=True,allow_nan=False)+"\n").encode(),owned)
     for scene,frame,name in selected:
         data=archive.read(name);png_header(data,8,2);filename=f"scene_{scene:06d}_frame_{frame:06d}.png";save(inputs/filename,data,owned,0o444)
-        images.append({"scene_id":scene,"frame_id":frame,"file":filename,"sha256":hashlib.sha256(data).hexdigest(),"width":640,"height":480})
+        images.append({"scene_id":scene,"frame_position":NativeFrameMap(f"ycbv_scene_{scene:06d}",tuple(range(1,97))).position(frame),"source_frame_id":frame,"file":filename,"sha256":hashlib.sha256(data).hexdigest(),"width":640,"height":480})
     return {"schema":EXPECTED_PROTOCOL["output"]["public_schema"],"revision":REVISION,"license":"MIT","selection":SELECTION,
-            "attribution":"YCB-Video: Yu Xiang et al.; BOP conversion: Hodan et al.","images":images}
+            "attribution":"YCB-Video: Yu Xiang et al.; BOP conversion: Hodan et al.",
+            "frame_maps":[NativeFrameMap(f"ycbv_scene_{scene:06d}",tuple(range(1,97))).to_dict() for scene in (48,49,50)],"images":images}
 
 
 def prune_empty(folder):
@@ -289,7 +299,7 @@ def acquire(out,report,persist):
         retention={"files":[{"file":str(p.relative_to(private)),**identity(p)} for p,_,_,_ in owned if p.is_relative_to(private)],"all_instances_retained":True}
         save(private/"retention-receipt.json",(json.dumps(retention,sort_keys=True)+"\n").encode(),owned)
         save(inputs/"manifest.json",(json.dumps(manifest,indent=2)+"\n").encode(),owned,0o444)
-        report.update(public_manifest=identity(inputs/"manifest.json"),retention_receipt=identity(private/"retention-receipt.json"),archives=EXPECTED_PROTOCOL["archives"],expanded_bytes_inspected=budget[0],archive_members=budget[1],all_instances_retained=True,phase="retained")
+        report.update(frame_maps=manifest["frame_maps"],public_manifest=identity(inputs/"manifest.json"),retention_receipt=identity(private/"retention-receipt.json"),archives=EXPECTED_PROTOCOL["archives"],expanded_bytes_inspected=budget[0],archive_members=budget[1],all_instances_retained=True,phase="retained")
         for path,_,_,sha in owned:
             if identity(path)["sha256"]!=sha: raise ValueError("Retained source changed")
         complete=True
@@ -309,17 +319,18 @@ def acquire(out,report,persist):
 
 
 def main(argv=None):
+    require_execution()
     parser=argparse.ArgumentParser(allow_abbrev=False);parser.add_argument("--preflight",action="store_true");args=parser.parse_args(argv)
     root=Path(os.environ["WR_ROOT"]);code=Path(os.environ["WR_CODE"]);revision=os.environ["WR_CODE_REVISION"]
     if platform.system()!="Linux": raise RuntimeError("Heavy acquisition is Azure-only")
     if args.preflight:
         print(hashlib.sha256(json.dumps(preflight(root,code,revision),sort_keys=True).encode()).hexdigest());return
-    if os.getuid()!=1000 or os.environ.get("WR_IMAGE_ID")!=IMAGE or os.environ.get("WR_AZURE_VM02_VERIFIED")!="1" or re.fullmatch("[0-9a-f]{64}",os.environ.get("WR_YCBV_TECHNICAL_CONTINUATION_SHA256","")) is None: raise ValueError("Exact CPU image/UID1000/VM02 required")
+    if os.getuid()!=1000 or os.environ.get("WR_IMAGE_ID")!=IMAGE or os.environ.get("WR_AZURE_VM02_VERIFIED")!="1" or os.environ.get("WR_YCBV_V2_AUTHORIZED")!="1": raise ValueError("Exact CPU image/UID1000/VM02 required")
     out=canonical(root/BASE)
     if not out.is_dir() or set(p.name for p in out.iterdir())!={".container.cid"}: raise ValueError("Exclusively reserved new output required")
     before=bound_source(root,code,revision,Path(__file__));oldmask=os.umask(0o077)
     (out/"eval_private").mkdir(mode=0o700);(out/"inputs").mkdir(mode=0o755)
-    report={"stage":STAGE,"status":"fail","phase":"start","producer_revision":revision,"script_sha256":before["files"][HELPERS[0]]["sha256"],"source_helpers":before,"dataset_revision":REVISION,"license":"MIT","image_id":IMAGE,"budget_seconds":ACQUISITION_SECONDS,"cleanup_grace_seconds":CLEANUP_SECONDS,"technical_continuation_attempt":2,"technical_continuation_host_sha256":os.environ["WR_YCBV_TECHNICAL_CONTINUATION_SHA256"],"device":"cpu","gpu_used":False,"inference_performed":False,"challenge_inputs_used":False,"challenge_overlap_verified":False,"accuracy_verified":False,"models_downloaded":False,"train_downloaded":False,"sparse_test_downloaded":False,"private_annotations_exported_as_inference_inputs":False}
+    report={"stage":STAGE,"status":"fail","phase":"start","producer_revision":revision,"script_sha256":before["files"][HELPERS[0]]["sha256"],"source_helpers":before,"dataset_revision":REVISION,"license":"MIT","image_id":IMAGE,"budget_seconds":ACQUISITION_SECONDS,"cleanup_grace_seconds":CLEANUP_SECONDS,"engineering_replay":True,"native_frame_ids_preserved":True,"device":"cpu","gpu_used":False,"inference_performed":False,"challenge_inputs_used":False,"challenge_overlap_verified":False,"accuracy_verified":False,"models_downloaded":False,"train_downloaded":False,"sparse_test_downloaded":False,"private_annotations_exported_as_inference_inputs":False}
     started=time.perf_counter();path=out/"report.json";retained=[]
     with path.open("x") as stream:
         def persist():

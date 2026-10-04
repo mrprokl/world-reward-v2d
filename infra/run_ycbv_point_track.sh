@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Source closure: /src/world_reward/native_frame_map.py
 # Source closure: /infra/ycbv_point_track.py /infra/ycbv_point_depth.py
 # /infra/camera_render.py /infra/robotap_boots_infer.py
 # Same frozen full96 native pool: baseline and automatic Boots unary; no GT.
@@ -7,7 +8,7 @@ set -euo pipefail
 [[ $# == 0 ]] || exit 2
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ && "$CODE" == "$ROOT/jobs/$REV/run_ycbv_point_track/code" && "${BASH_SOURCE[0]}" == "$CODE/infra/run_ycbv_point_track.sh" && "$(uname -s)" == Linux ]] || exit 2
-BASE="$ROOT/validation/ycbv_point_pose_v1";OUT="$BASE/comparison_v1";JOB="${CODE%/code}"
+BASE="$ROOT/validation/ycbv_point_pose_v2";OUT="$BASE/comparison_v1";JOB="${CODE%/code}"
 IMAGE=sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4
 PARENT=sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3
 NAME="world-reward-ycbv-point-track-${REV:0:12}";CIDFILE='';LOCK_BEFORE='';IMAGE_BEFORE=''
@@ -19,7 +20,7 @@ control() {
  /usr/bin/env -i PATH=/usr/bin:/bin WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -I -B - "$1" <<'PYCONTROL'
 from pathlib import Path
 import hashlib,json,os,runpy,stat,sys
-code=Path(os.environ['WR_CODE']);sys.path.insert(0,str(code/'infra'));d=runpy.run_path(str(code/'infra/ycbv_point_track.py'),run_name='host_control');root=d['ROOT']
+code=Path(os.environ['WR_CODE']);sys.path[:0]=[str(code/'infra'),str(code/'src')];d=runpy.run_path(str(code/'infra/ycbv_point_track.py'),run_name='host_control');root=d['ROOT']
 if sys.argv[1]=='proof':
  proof=d['host_proof'](root,code,os.environ['WR_CODE_REVISION']);digest=hashlib.sha256(proof.encode())
  for name in ('weights/cari4d/hf_home/hub/models--Ruicheng--moge-2-vitl-normal','weights/cari4d/hf_home/hub/blobs/9f/9f4c4857a8203605fd29a80f0e81e9ed52fc1654c1e657d437ab29b73d8db37c','results/weights-acquisition.json'):

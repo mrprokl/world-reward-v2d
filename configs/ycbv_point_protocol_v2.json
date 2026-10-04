@@ -1,0 +1,81 @@
+{
+  "schema": "world-reward-ycbv-point-protocol-v2",
+  "dataset_revision": "5c2c4aa229800355648cd268040aa814f8dc94f0",
+  "license": "MIT",
+  "archives": {
+    "ycbv_base.zip": {
+      "url": "https://huggingface.co/datasets/bop-benchmark/ycbv/resolve/5c2c4aa229800355648cd268040aa814f8dc94f0/ycbv_base.zip",
+      "bytes": 15805,
+      "sha256": "98440f8bd403100b21cf11a6729fabe8b3d5ce714472edc57a18b7f1fcd4bb18"
+    },
+    "ycbv_test_all.zip": {
+      "url": "https://huggingface.co/datasets/bop-benchmark/ycbv/resolve/5c2c4aa229800355648cd268040aa814f8dc94f0/ycbv_test_all.zip",
+      "bytes": 14969383039,
+      "sha256": "fea2ab5f18aba1857acd320827cec10d9dbf258e4940ea4b52f5dd51cb2356a7"
+    }
+  },
+  "evidence": {
+    "hf_readme": {
+      "url": "https://huggingface.co/datasets/bop-benchmark/ycbv/raw/5c2c4aa229800355648cd268040aa814f8dc94f0/README.md",
+      "bytes": 24,
+      "sha256": "d8d7a46d41a1a37fe4f0a5f637bf55c649310185329127d8a2204632e480be17"
+    },
+    "publisher_readme": {
+      "url": "https://raw.githubusercontent.com/yuxng/YCB_Video_toolbox/98630204fc73c1dbc2ff66ddea22cf517f269f5f/README.md",
+      "bytes": 2787,
+      "sha256": "12d222b033b2c74d7b1d7fca93175d5a8eae5e40f83b050631d949e9c6ee8ee0"
+    },
+    "publisher_license": {
+      "url": "https://raw.githubusercontent.com/yuxng/YCB_Video_toolbox/98630204fc73c1dbc2ff66ddea22cf517f269f5f/LICENSE",
+      "bytes": 1065,
+      "sha256": "8a236ca04573bec835d33fb30b98b5bd3c551718a6ef7b33854d9202a8e2d167"
+    },
+    "bop_format": {
+      "url": "https://raw.githubusercontent.com/thodan/bop_toolkit/af97c1938083dfd512eb6f32a85921ea38198ee4/docs/bop_datasets_format.md",
+      "bytes": 9821,
+      "sha256": "6994afd65c29c2a198ea6e08e138f586ace316aaacda21ae3c498b37d1535222"
+    },
+    "bop_params": {
+      "url": "https://raw.githubusercontent.com/thodan/bop_toolkit/b72b3015c87a96fa6398c2ef4c196e85f798d3e6/bop_toolkit_lib/dataset_params.py",
+      "bytes": 32303,
+      "sha256": "a935fc4f6fd42f367a0bbf816036f783fb4c5d87200a8615ce1e08e6d51af05e"
+    }
+  },
+  "embedded_dataset_info": {
+    "file": "ycbv/dataset_info.md",
+    "bytes": 4035,
+    "sha256": "4766684f25f165c1c312745e3583fe248161c56c35a862bfa04134141151882e"
+  },
+  "selection": {
+    "split_prefix": "test",
+    "scene_ids": [
+      48,
+      49,
+      50
+    ],
+    "frames_per_scene": 96,
+    "first_source_frame_id": 1,
+    "first_frame_position": 0,
+    "width": 640,
+    "height": 480,
+    "rule": "first_three_sorted_scene_directories_first_96_contiguous_RGB_names_before_private_annotations"
+  },
+  "limits": {
+    "seconds": 3600,
+    "cleanup_seconds": 180,
+    "download_bytes": 32212254720,
+    "expanded_bytes": 60000000000,
+    "member_bytes": 2000000000,
+    "members": 1000000,
+    "min_free_bytes": 45000000000
+  },
+  "execution": {
+    "authorized": false,
+    "status": "prepared_non_executable",
+    "engineering_replay": true
+  },
+  "output": {
+    "base": "validation/ycbv_point_pose_v2",
+    "public_schema": "world-reward-ycbv-point-rgb-v2"
+  }
+}

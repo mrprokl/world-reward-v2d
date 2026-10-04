@@ -63,13 +63,13 @@ def pin_fixture():
     bundles=[]
     for scene in gate.SCENES:
         bundles.append(dict(scene_id=scene,
-            rgb=dict(path=f'{gate.BASE}/inputs/scene_{scene:06d}_frame_000000.png',**pin),
-            mask=dict(path=f'{gate.BASE}/automatic_masks_v1/scene_{scene:06d}/masks/1/000000.png',**pin),
-            depth=dict(path=f'{gate.BASE}/depth_init_v1/scene_{scene:06d}_frame_000000.npz',**pin)))
+            rgb=dict(path=f'{gate.BASE}/inputs/scene_{scene:06d}_frame_000001.png',**pin),
+            mask=dict(path=f'{gate.BASE}/automatic_masks_v1/scene_{scene:06d}/masks/1/000001.png',**pin),
+            depth=dict(path=f'{gate.BASE}/depth_init_v1/scene_{scene:06d}_frame_000001.npz',**pin)))
     models={gate.OBJECT+'/checkpoints/'+n+'.ckpt':dict(bytes=z,sha256=h)for n,(z,h)in zip(gate.CKPTS,gate.CHECKPOINT_PINS)}
     models.update({gate.OBJECT+'/checkpoints/'+n+'.yaml':dict(bytes=z,sha256=h)for n,(z,h)in zip(gate.YAMLS,gate.YAML_PINS)})
     models.update({gate.OBJECT+'/LICENSE':gate.SOURCE_LICENSE_PIN,**{gate.WEIGHTS+'/torch_home/hub/checkpoints/'+n:pin for n in gate.REG4},gate.MOGE+'/blobs/'+'d'*64:dict(bytes=1256823446,sha256='da96b09a0485a3c45a5aa455e67743c8b4efc4dd8437c1f2aa93c2b4303d957f'),gate.MOGE+'/blobs/'+'e'*40:pin})
-    return dict(schema='world_reward.ycbv_point_objects.pins.v1',inputs=dict(manifest=pin,acquisition_report=producers,mask_report=producers,depth_report=producers,bundles=bundles),
+    return dict(schema='world_reward.ycbv_point_objects.pins.v2',inputs=dict(manifest=pin,acquisition_report=producers,mask_report=producers,depth_report=producers,bundles=bundles),
         runtime=dict(image_receipt=dict(path='results/ycbv-objects-runtime-'+('b'*40)+'/image.json',**pin),model_files=models,
             source_files={gate.DINO+'/'+n:pin for n in ('hubconf.py','LICENSE','MODEL_CARD.md','dinov2/__init__.py')},
             installed_sources={n:{'__init__.py':pin}for n in gate.MODULES},
@@ -128,10 +128,10 @@ def input_fixture(tmp_path):
     pins=copy.deepcopy(pin_fixture());rows=[]
     for scene in gate.SCENES:
         for frame in range(96):
-            filename=f'scene_{scene:06d}_frame_{frame:06d}.png'
-            rows.append(dict(scene_id=scene,frame_id=frame,file=filename,sha256='f'*64,width=640,height=480))
-    manifest=dict(schema='world-reward-ycbv-point-rgb-v1',revision='5c2c4aa229800355648cd268040aa814f8dc94f0',license='MIT',
-        selection='first_three_sorted_scene_directories_first_96_contiguous_RGB_names_before_private_annotations',attribution='YCB-Video: Yu Xiang et al.; BOP conversion: Hodan et al.',images=rows)
+            filename=f'scene_{scene:06d}_frame_{frame+1:06d}.png'
+            rows.append(dict(scene_id=scene,frame_position=frame,source_frame_id=frame+1,file=filename,sha256='f'*64,width=640,height=480))
+    manifest=dict(schema='world-reward-ycbv-point-rgb-v2',revision='5c2c4aa229800355648cd268040aa814f8dc94f0',license='MIT',
+        selection='first_three_sorted_scene_directories_first_96_contiguous_RGB_names_before_private_annotations',attribution='YCB-Video: Yu Xiang et al.; BOP conversion: Hodan et al.',frame_maps=gate.public.frame_maps(),images=rows)
     mask_rows=[];depth_rows=[]
     for bundle in pins['inputs']['bundles']:
         for kind in ('rgb','mask','depth'):
@@ -139,13 +139,13 @@ def input_fixture(tmp_path):
         scene=bundle['scene_id'];manifest['images'][(scene-48)*96]['sha256']=bundle['rgb']['sha256']
         for frame in range(96):
             actual={k:bundle['mask'][k]for k in ('bytes','sha256')}if frame==0 else dict(bytes=8,sha256='a'*64)
-            mask_rows.append(dict(scene_id=scene,frame_id=frame,file=f'scene_{scene:06d}/masks/1/{frame:06d}.png',rgb_sha256=bundle['rgb']['sha256'],**actual))
-        depth_rows.append(dict(scene_id=scene,frame_id=0,file=Path(bundle['depth']['path']).name,rgb_sha256=bundle['rgb']['sha256'],**{k:bundle['depth'][k]for k in ('bytes','sha256')}))
+            mask_rows.append(dict(scene_id=scene,frame_position=frame,source_frame_id=frame+1,file=f'scene_{scene:06d}/masks/1/{frame+1:06d}.png',rgb_sha256=bundle['rgb']['sha256'],**actual))
+        depth_rows.append(dict(scene_id=scene,frame_position=0,source_frame_id=1,file=Path(bundle['depth']['path']).name,rgb_sha256=bundle['rgb']['sha256'],**{k:bundle['depth'][k]for k in ('bytes','sha256')}))
     pins['inputs']['manifest']=json_file(tmp_path/gate.BASE/'inputs/manifest.json',manifest)
     receipts={}
     for role,stage,path in (('acquisition_report','external_ycbv_contiguous_rgb_only_acquisition','report.json'),('mask_report','public_ycbv_point_native_object_masks','automatic_masks_v1/report.json'),('depth_report','public_ycbv_three_frame_zero_native_MoGe2_preflight','depth_init_v1/report.json')):
-        receipt=dict(stage=stage,status='pass',phase='complete',producer_revision='b'*40,script_sha256='c'*64,challenge_inputs_used=False)
-        if role=='acquisition_report':receipt.update(source_rehashed_after=True,private_annotations_exported_as_inference_inputs=False,selected_frames=288,all_instances_retained=True,selection_before_private_annotation_values=True,license='MIT',public_manifest=pins['inputs']['manifest'])
+        receipt=dict(frame_maps=gate.public.frame_maps(),stage=stage,status='pass',phase='complete',producer_revision='b'*40,script_sha256='c'*64,challenge_inputs_used=False)
+        if role=='acquisition_report':receipt.update(source_rehashed_after=True,private_annotations_exported_as_inference_inputs=False,selected_frames=288,all_instances_retained=True,selection_before_private_annotation_values=True,license='MIT',public_manifest=pins['inputs']['manifest'],frame_maps=gate.public.frame_maps())
         if role=='mask_report':receipt.update(all_inputs_sources_assets_outputs_rehashed=True,ground_truth_used=False,frames_completed=288,masks=mask_rows,budget_seconds=600,elapsed_seconds=2.)
         if role=='depth_report':receipt.update(sources_after_reverified=True,private_truth_read=False,outputs_completed=3,outputs=depth_rows,budget_seconds=300,GPU_budget_elapsed_seconds=3.,elapsed_seconds=3.01)
         pins['inputs'][role]=dict(**json_file(tmp_path/gate.BASE/path,receipt),producer_revision='b'*40,script_sha256='c'*64);receipts[role]=receipt
@@ -327,7 +327,7 @@ def test_wrapper_arguments_guard_existing_lock_and_sourceclosure(tmp_path):
     files['pyproject.toml']=(REPO/'pyproject.toml').read_bytes()
     closure=job.runtime_bundle_paths(files,'infra/run_ycbv_point_objects.sh')
     assert set(gate.HELPERS)<=set(closure)
-    assert not any(n in closure for n in ('infra/ycbv_point_acquire.py','infra/bridge_rgb_anchor_render.py','infra/object_smoke.py','infra/frontend_replica_inventory.py'))
+    assert not any(n in closure for n in ('infra/bridge_rgb_anchor_render.py','infra/object_smoke.py','infra/frontend_replica_inventory.py'))
 
 
 @pytest.mark.parametrize('tamper',[False,True])
@@ -358,7 +358,7 @@ def test_mocked_host_end_to_end_seals_after_final_post_not_self_success(tmp_path
             rows=[]
             for scene in gate.SCENES:
                 files={n:write(out/f'scene_{scene:06d}'/n,n.encode())for n in ('object.glb','transform.json','intrinsics.json','canonical.npz')}
-                rows.append(dict(scene_id=scene,frame_id=0,files=files))
+                rows.append(dict(scene_id=scene,frame_position=0,source_frame_id=1,files=files))
             native=dict(stage=gate.STAGE,status='pass',phase='complete',source_helpers=before['helpers'],producer_revision=rev,
                 native_calls_attempted=3,native_calls_returned=3,native_calls_completed=3,outputs_completed=3,outputs=rows)
             json_file(out/'.native-report.json',native)
@@ -394,7 +394,7 @@ def test_three_native_invocations_cached_api_and_exact_original_XYZ_K(tmp_path,m
     pins=pin_fixture();out=tmp_path/'out';out.mkdir();points=np.zeros((3,4,3),dtype=np.float32);points[...,2]=2
     rgb=np.zeros((3,4,3),dtype=np.uint8)
     monkeypatch.setattr(gate,'bundle_arrays',lambda *a:(rgb,np.full((3,4),255,dtype=np.uint8),{'points':points},camera()))
-    monkeypatch.setattr(gate,'bound_json',lambda *a:{'outputs':[{'scene_id':s,'frame_id':0,'decoded_RGB_sha256':hashlib.sha256(rgb.tobytes()).hexdigest()}for s in gate.SCENES]})
+    monkeypatch.setattr(gate,'bound_json',lambda *a:{'outputs':[{'scene_id':s,'frame_position':0,'source_frame_id':1,'decoded_RGB_sha256':hashlib.sha256(rgb.tobytes()).hexdigest()}for s in gate.SCENES]})
     monkeypatch.setattr(sys.modules['trimesh'],'load',lambda *a,**k:box(),raising=False)
     calls=[]
     def native(*args,**kwargs):
@@ -421,7 +421,7 @@ def test_full_native_grid_K_is_unrounded_normalized_FP32_no_geometry_fill(monkey
     K=np.diag([640.,480.,1.])@intrinsics.astype(np.float64)
     points=np.stack(((x+.5-320)/K[0,0]*2,(y+.5-240)/K[1,1]*2,np.full_like(x,2)),axis=-1).astype(np.float32)
     valid=np.ones((480,640),dtype=bool);valid[0,0]=False;depth[0,0]=np.nan;points[0,0]=np.inf
-    arrays=dict(depth=depth,points=points,mask=valid,intrinsics=intrinsics,frame_index=np.array(0,dtype=np.int64))
+    arrays=dict(depth=depth,points=points,mask=valid,intrinsics=intrinsics,frame_index=np.array(0,dtype=np.int64),source_frame_id=np.array(1,dtype=np.int64))
     class Npz:
         files=list(arrays)
         def __enter__(self):return self
@@ -455,7 +455,7 @@ def reference_fixture(tmp_path):
     """Tiny Azure metadata stand-ins; original producer is never executed."""
     full=pin_fixture();revision='b'*40;prefix='results/ycbv-objects-runtime-'+revision
     code=tmp_path/'current-code';old=tmp_path/'jobs'/revision/'run_ycbv_objects_runtime_inventory'/'code'
-    helpers=('infra/ycbv_objects_runtime_inventory.py','infra/run_ycbv_objects_runtime_inventory.sh',*gate.HELPERS)
+    helpers=('infra/ycbv_objects_runtime_inventory.py','infra/run_ycbv_objects_runtime_inventory.sh',*gate.RUNTIME_INVENTORY_HELPERS)
     for name in(*helpers,'configs/original_other_pin.json'):write(old/name,('# original '+name+'\n').encode())
     for path in(old,*old.rglob('*')):
         if path.is_dir():path.chmod(0o555)

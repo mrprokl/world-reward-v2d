@@ -22,12 +22,12 @@ from world_reward.prompt_selection import BoxDetection
 ROOT, BASE, IMAGE = binding.ROOT, public.BASE, binding.IMAGE
 ENTRY, OUTPUT = "run_ycbv_point_masks", "automatic_masks_v1"
 STAGE, BUDGET = "public_ycbv_point_native_object_masks", 600
-PIN_FILE = "configs/ycbv_point_input_pins.json"
+PIN_FILE = "configs/ycbv_point_input_pins_v2.json"
 HELPERS = ("infra/ycbv_point_masks.py", "infra/run_ycbv_point_masks.sh", "infra/ycbv_point_depth.py",
     "infra/bridge_frontend_bindings.py", "infra/frontend_selected_assets.py", "infra/frontend_sam2_kernel_gate.py",
     "infra/hand_synthetic_masks.py", "infra/tudl_holdout_inputs.py", binding.CONFIG,
     "configs/frontend_asset_archive_pins.json", PIN_FILE,
-    "src/world_reward/__init__.py", "src/world_reward/prompt_selection.py")
+    "src/world_reward/__init__.py", "src/world_reward/native_frame_map.py", "src/world_reward/prompt_selection.py")
 NATIVE_MASK_SHA = "5193404292cfc7e66053e261049e58b76d3484f92ac1124c481f9951cc4907ec"
 require = binding.require
 
@@ -170,15 +170,15 @@ def read_rgb(record):
 
 
 def stage_frames(records, directory):
-    """Exclusive byte copies only: retain source hashes and original 0..95 order."""
-    require(len(records) == 96 and [r["frame_id"] for r in records] == list(range(96)), "Full contiguous scene required")
+    """Exclusive native-ID RGB byte copies staged at array positions 0..95."""
+    public.validate_scene_rows(records)
     directory.mkdir(mode=0o700); owner = directory.lstat(); frozen = {}
     try:
         for record in records:
             before = binding.identity(record["path"]);raw = record["path"].read_bytes()
             require(before["sha256"] == record["sha256"] and hashlib.sha256(raw).hexdigest() == record["sha256"]
                 and binding.identity(record["path"]) == before, "Public RGB changed before staging")
-            path = directory/f'{record["frame_id"]:06d}.png'
+            path = directory/f'{record["frame_position"]:06d}.png'
             with os.fdopen(os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444),"wb") as stream:
                 stream.write(raw);stream.flush();os.fsync(stream.fileno())
             path.chmod(0o444); state = path.lstat()
@@ -200,13 +200,35 @@ def remove_stage(directory, owner, frozen):
     directory.rmdir()
 
 
+def export_native_mask_ids(folder, records):
+    """Native SAM2 remains positional. Rename byte-identical masks to native source IDs."""
+    mapping = public.validate_scene_rows(records)
+    target = binding.canonical(folder/"1")
+    require({p.name for p in folder.iterdir()} == {"1"} and
+        {p.name for p in target.iterdir()} == {f"{i:06d}.png" for i in mapping.frame_positions},
+        "Complete positional native SAM2 output required before export")
+    original = {}
+    for position in mapping.frame_positions:
+        path = target/f"{position:06d}.png"; state = path.lstat()
+        require(stat.S_ISREG(state.st_mode) and state.st_nlink == 1 and state.st_uid == os.geteuid(), "Unaliased native mask required")
+        path.chmod(0o444); original[position] = binding.identity(path, 2_000_000)
+    # Reverse order avoids every overlapping destination; no pixels are rewritten.
+    for position in reversed(mapping.frame_positions):
+        source = target/f"{position:06d}.png"; dest = target/f"{mapping.source_id(position):06d}.png"
+        require(not dest.exists() and binding.identity(source, 2_000_000) == original[position], "Native mask export collision/change")
+        source.rename(dest)
+    require({p.name for p in target.iterdir()} == {f"{i:06d}.png" for i in mapping.source_frame_ids}, "Native-ID export coverage differs")
+    for position in mapping.frame_positions:
+        require(binding.identity(target/f"{mapping.source_id(position):06d}.png", 2_000_000) == original[position], "Native mask bytes changed on export")
+
+
 def mask_inventory(folder, records):
     import numpy as np
     from PIL import Image
-    require({p.name for p in folder.iterdir()} == {"1"} and {p.name for p in (folder/"1").iterdir()} == {f"{i:06d}.png" for i in range(96)}, "Exactly object1/full96 native masks required")
+    require({p.name for p in folder.iterdir()} == {"1"} and {p.name for p in (folder/"1").iterdir()} == {f"{i:06d}.png" for i in public.validate_scene_rows(records).source_frame_ids}, "Exactly object1/full96 native masks required")
     rows = []
     for record in records:
-        path = binding.canonical(folder/"1"/f'{record["frame_id"]:06d}.png'); s = path.lstat()
+        path = binding.canonical(folder/"1"/f'{record["source_frame_id"]:06d}.png'); s = path.lstat()
         require(stat.S_ISREG(s.st_mode) and s.st_nlink == 1 and s.st_uid == os.geteuid(), "Native mask file must be unaliased regular")
         with Image.open(path) as image:
             require(image.format == "PNG" and image.mode == "L" and image.size == (640,480), "Native mask PNG/grid differs")
@@ -214,7 +236,7 @@ def mask_inventory(folder, records):
         require(value.dtype == np.uint8 and np.all((value == 0)|(value == 255)) and np.count_nonzero(value) > 0,
             "All original frames require nonempty native binary masks")
         path.chmod(0o444); pin = binding.identity(path, 2_000_000)
-        rows.append(dict(scene_id=record["scene_id"],frame_id=record["frame_id"],rgb_file=record["file"],rgb_sha256=record["sha256"],
+        rows.append(dict(scene_id=record["scene_id"],frame_position=record["frame_position"],source_frame_id=record["source_frame_id"],rgb_file=record["file"],rgb_sha256=record["sha256"],
             file=f'scene_{record["scene_id"]:06d}/masks/1/{path.name}',mask_pixels=int(np.count_nonzero(value)),**pin))
     return rows
 
@@ -227,7 +249,7 @@ def observe(records, out, report, persist, *, detect, propagate):
         report.update(phase="automatic_detection", current_scene=scene);report["detector_attempts"] += 1;persist()
         boxes = detect(rgb,"object.");report["detector_calls"] += 1
         chosen = detector_policy.select_person(boxes,640,480)
-        seeds.append(dict(scene_id=scene,frame_id=0,rgb_file=record["file"],rgb_sha256=record["sha256"],query="object.",
+        seeds.append(dict(scene_id=scene,frame_position=record["frame_position"],source_frame_id=record["source_frame_id"],rgb_file=record["file"],rgb_sha256=record["sha256"],query="object.",
             box=list(chosen.box),detector_score=chosen.score,candidate_count=len(boxes),decoded_rgb_sha256=hashlib.sha256(rgb.tobytes()).hexdigest()))
         report["seeds"] = seeds;persist()
     report["all_three_detections_passed_before_SAM2"] = True
@@ -243,6 +265,7 @@ def observe(records, out, report, persist, *, detect, propagate):
         try:
             report.update(phase="native_SAM2_propagation", current_scene=seed["scene_id"]);report["sam2_attempts"] += 1;persist()
             propagate(str(stage),str(path),str(scene_dir/"masks"),str(binding.DEST/"weights/sam2"));report["sam2_calls"] += 1
+            export_native_mask_ids(scene_dir/"masks",rows)
             masks = mask_inventory(scene_dir/"masks",rows)
             report["masks"].extend(masks);report["frames_completed"] += len(masks)
             seed.update(propagation_elapsed_seconds=time.monotonic()-started,prompt_identity=binding.identity(path));persist()
@@ -258,7 +281,7 @@ def run(root, code, revision, out, report, persist):
     installed = None
     try:
         report.update(source_binding=source,public_manifest=pins["manifest"],acquisition_report_identity=pins["acquisition_report"],
-            public_RGB_identities=rgb_proof["RGB_identities"],model_assets=assets,build_report_identity=binding.BUILD_PIN,
+            public_RGB_identities=rgb_proof["RGB_identities"],frame_maps=rgb_proof["frame_maps"],model_assets=assets,build_report_identity=binding.BUILD_PIN,
             kernel_report_identity=binding.KERNEL_PIN,phase="native_model_load");persist()
         import numpy as np
         import torch

@@ -18,8 +18,11 @@ import subprocess
 import sys
 import time
 
-ROOT=Path('/srv/scenesmith/world-reward');BASE='validation/ycbv_point_pose_v1';OUTPUT='objects_init_v1'
-ENTRY='run_ycbv_point_objects';PIN_FILE='configs/ycbv_point_objects_pins.json'
+sys.path[:0] = [str(Path(__file__).resolve().parent), str(Path(__file__).resolve().parents[1]/'src')]
+import ycbv_point_depth as public
+
+ROOT=Path('/srv/scenesmith/world-reward');BASE='validation/ycbv_point_pose_v2';OUTPUT='objects_init_v1'
+ENTRY='run_ycbv_point_objects';PIN_FILE='configs/ycbv_point_objects_pins_v2.json'
 IMAGE='sha256:eb389b26358c49778a14303b5875c66d887824011388ce9f8666ed7cc1841ce5'
 STAGE='external_ycbv_three_anchor_native_Objects_initializer';BUDGET=900;SCENES=(48,49,50)
 OBJECT_REV='2e73555018d2741ccd486e56c24fac41155a1dc6';DINO_REV='7764ea0f912e53c92e82eb78a2a1631e92725fc8'
@@ -30,6 +33,10 @@ CKPTS=('ss_generator','slat_generator','ss_decoder','slat_decoder_gs','slat_deco
 YAMLS=('pipeline',*CKPTS);REG4=('dinov2_vitl14_reg4_pretrain.pth','dinov2_vitb14_reg4_pretrain.pth')
 HELPERS=('infra/ycbv_point_objects.py','infra/run_ycbv_point_objects.sh','src/world_reward/__init__.py',
     'src/world_reward/pointmap.py','src/world_reward/mesh_geometry.py')
+RUNTIME_INVENTORY_HELPERS = HELPERS  # Original inventory source closure remains historically identifiable.
+HELPERS = ('infra/ycbv_point_objects.py','infra/run_ycbv_point_objects.sh','src/world_reward/__init__.py',
+    'src/world_reward/pointmap.py','src/world_reward/mesh_geometry.py','infra/ycbv_point_depth.py',
+    'infra/tudl_holdout_inputs.py','src/world_reward/native_frame_map.py')
 MODULES=('sam3d_objects','v2d.common','v2d.sam3d.lib','moge')
 # Independently published model identities, not hashes observed during inference.
 CHECKPOINT_PINS=(
@@ -110,7 +117,7 @@ def source(code,revision,container=False):
 
 
 def validate_pins(value):
-    require(type(value)is dict and set(value)=={'schema','inputs','runtime'}and value['schema']=='world_reward.ycbv_point_objects.pins.v1','Independent committed Objects input/runtime pins required')
+    require(type(value)is dict and set(value)=={'schema','inputs','runtime'}and value['schema']=='world_reward.ycbv_point_objects.pins.v2','Independent committed Objects input/runtime pins required')
     incoming=value['inputs'];require(set(incoming)=={'manifest','acquisition_report','mask_report','depth_report','bundles'},'Exact frozen public producer bundle pins required');pin(incoming['manifest'])
     for name in('acquisition_report','mask_report','depth_report'):
         row=incoming[name];require(set(row)=={'bytes','sha256','producer_revision','script_sha256'},'Actual historical producer receipt identity required')
@@ -118,7 +125,7 @@ def validate_pins(value):
     require(type(incoming['bundles'])is list and len(incoming['bundles'])==3,'Exactly three original frame-zero bundles required')
     for scene,row in zip(SCENES,incoming['bundles']):
         require(set(row)=={'scene_id','rgb','mask','depth'}and type(row['scene_id'])is int and row['scene_id']==scene,'Fixed external scene order required')
-        expected=dict(rgb=f'{BASE}/inputs/scene_{scene:06d}_frame_000000.png',mask=f'{BASE}/automatic_masks_v1/scene_{scene:06d}/masks/1/000000.png',depth=f'{BASE}/depth_init_v1/scene_{scene:06d}_frame_000000.npz')
+        expected=dict(rgb=f'{BASE}/inputs/scene_{scene:06d}_frame_000001.png',mask=f'{BASE}/automatic_masks_v1/scene_{scene:06d}/masks/1/000001.png',depth=f'{BASE}/depth_init_v1/scene_{scene:06d}_frame_000001.npz')
         for kind,name in expected.items():require(set(row[kind])=={'path','bytes','sha256'}and row[kind]['path']==name,'Only original public RGB/automaticmask/nativeMoGe2 NPZ allowed');pin({k:row[kind][k]for k in('bytes','sha256')})
     runtime=value['runtime'];require(set(runtime)=={'image_receipt','model_files','source_files','moge_links','installed_sources','acquisition_receipts'},'Exact frozen existing runtime evidence required')
     image=runtime['image_receipt'];require(set(image)=={'path','bytes','sha256'}and type(image['path'])is str and re.fullmatch(r'results/ycbv-objects-runtime-[0-9a-f]{40}/image\.json',image['path']),'Exact independently hashed safe Objects image projection required');pin({k:image[k]for k in('bytes','sha256')})
@@ -147,7 +154,7 @@ def validate_pins(value):
 
 def runtime_reference(value):
     """Tiny independently frozen Azure metadata refs, never an arbitrary path."""
-    require(type(value)is dict and set(value)=={'schema','inputs','runtime_ref'}and value['schema']=='world_reward.ycbv_point_objects.pins.v1','Exact tiny Objects input/runtime reference config required')
+    require(type(value)is dict and set(value)=={'schema','inputs','runtime_ref'}and value['schema']=='world_reward.ycbv_point_objects.pins.v2','Exact tiny Objects input/runtime reference config required')
     refs=value['runtime_ref'];require(type(refs)is dict and set(refs)=={'manifest','inventory_report'},'Exactly manifest and original CPU inventory refs required')
     report=refs['inventory_report'];require(type(report)is dict and set(report)=={'path','bytes','sha256','producer_revision','script_sha256'},'Independent original CPU inventory producer pin required')
     revision=report['producer_revision'];require(type(revision)is str and re.fullmatch('[0-9a-f]{40}',revision)and type(report['script_sha256'])is str and re.fullmatch('[0-9a-f]{64}',report['script_sha256']),'Actual full original inventory producer required')
@@ -171,7 +178,7 @@ def original_inventory_proof(root,refs,runtime):
     require(type(report.get('CPU_inventory_elapsed_seconds'))in(int,float)and 0<report['CPU_inventory_elapsed_seconds']<=300 and
         type(report.get('elapsed_seconds'))in(int,float)and report['CPU_inventory_elapsed_seconds']<=report['elapsed_seconds']<=330,'Original frozen CPU inventory budget required')
     revision=spec['producer_revision'];code=canonical(root/'jobs'/revision/'run_ycbv_objects_runtime_inventory'/'code')
-    binding=report.get('source_helpers');helpers=('infra/ycbv_objects_runtime_inventory.py','infra/run_ycbv_objects_runtime_inventory.sh',*HELPERS)
+    binding=report.get('source_helpers');helpers=('infra/ycbv_objects_runtime_inventory.py','infra/run_ycbv_objects_runtime_inventory.sh',*RUNTIME_INVENTORY_HELPERS)
     require(type(binding)is dict and set(binding)=={'closure_sha256','helpers','markers'}and type(binding['helpers'])is dict and set(binding['helpers'])==set(helpers)
         and binding['helpers'][helpers[0]].get('sha256')==spec['script_sha256'],'Exact original inventory helper closure required')
     digest=hashlib.sha256();markers={};rows={}
@@ -246,16 +253,7 @@ def runtime_proof(root,pins,host=True):
 
 def inputs_proof(root,pins,host=True):
     incoming=pins['inputs'];manifest=bound_json(root/BASE/'inputs/manifest.json',incoming['manifest'])
-    require(manifest.get('schema')=='world-reward-ycbv-point-rgb-v1'and manifest.get('revision')=='5c2c4aa229800355648cd268040aa814f8dc94f0'and
-        manifest.get('license')=='MIT'and len(manifest.get('images',[]))==288 and set(manifest)=={'schema','revision','license','selection','attribution','images'},'Original independently acquired contiguous MITRGB cohort required')
-    require(manifest['selection']=='first_three_sorted_scene_directories_first_96_contiguous_RGB_names_before_private_annotations' and
-        manifest['attribution']=='YCB-Video: Yu Xiang et al.; BOP conversion: Hodan et al.','Frozen RGB-only cohort selection required')
-    for index,row in enumerate(manifest['images']):
-        scene,frame=SCENES[index//96],index%96
-        require(set(row)=={'scene_id','frame_id','file','sha256','width','height'} and
-            all(type(row[k])is int for k in ('scene_id','frame_id','width','height'))and
-            (row['scene_id'],row['frame_id'],row['width'],row['height'])==(scene,frame,640,480) and
-            row['file']==f'scene_{scene:06d}_frame_{frame:06d}.png'and re.fullmatch('[0-9a-f]{64}',row['sha256']),'Every original full-clip index/grid must stay unchanged')
+    public.validate_manifest(manifest)
     stages=dict(acquisition_report=('external_ycbv_contiguous_rgb_only_acquisition','report.json'),mask_report=('public_ycbv_point_native_object_masks','automatic_masks_v1/report.json'),depth_report=('public_ycbv_three_frame_zero_native_MoGe2_preflight','depth_init_v1/report.json'))
     receipts={}
     for role,(stage,path)in stages.items():
@@ -266,22 +264,23 @@ def inputs_proof(root,pins,host=True):
         require(receipt.get(post)is True,'Actual original producer post-verification field required')
         require(receipt.get('challenge_inputs_used')is False and(receipt.get('private_truth_read')is False if role=='depth_report'else receipt.get('ground_truth_used')is False if role=='mask_report'else receipt.get('private_annotations_exported_as_inference_inputs')is False),'Original noGT/challenge provenance required');receipts[role]=receipt
     if host:
-        acquire=receipts['acquisition_report'];require(acquire.get('public_manifest')==incoming['manifest'] and acquire.get('selected_frames')==288 and acquire.get('all_instances_retained')is True and
+        acquire=receipts['acquisition_report'];require(acquire.get('frame_maps')==public.frame_maps() and acquire.get('public_manifest')==incoming['manifest'] and acquire.get('selected_frames')==288 and acquire.get('all_instances_retained')is True and
             acquire.get('selection_before_private_annotation_values')is True and acquire.get('license')=='MIT','Original pinned acquisition cohort/no-label export required')
+    require(receipts['mask_report'].get('frame_maps')==receipts['depth_report'].get('frame_maps')==manifest['frame_maps'],'Public producers must bind the same native ID map')
     require(receipts['mask_report'].get('frames_completed')==288 and receipts['depth_report'].get('outputs_completed')==3,'All three full masks and native framezero depth required')
     for role,budget in (('mask_report',600),('depth_report',300)):
         row=receipts[role];elapsed=row.get('GPU_budget_elapsed_seconds',row.get('elapsed_seconds'))
         require(row.get('budget_seconds')==budget and type(elapsed)in(int,float)and 0<elapsed<=budget,'Original frozen frontend budget must have passed')
-    require([(r.get('scene_id'),r.get('frame_id'))for r in receipts['mask_report']['masks']]==[(s,f)for s in SCENES for f in range(96)] and
-        [(r.get('scene_id'),r.get('frame_id'))for r in receipts['depth_report']['outputs']]==[(s,0)for s in SCENES],'Full original automatic-mask/native-depth order required')
+    require([(r.get('scene_id'),r.get('frame_position'),r.get('source_frame_id'))for r in receipts['mask_report']['masks']]==[(s,p,public.frame_map(s).source_id(p))for s in SCENES for p in range(96)] and
+        [(r.get('scene_id'),r.get('frame_position'),r.get('source_frame_id'))for r in receipts['depth_report']['outputs']]==[(s,0,1)for s in SCENES],'Full original automatic-mask/native-depth order required')
     for bundle in incoming['bundles']:
-        scene=bundle['scene_id'];rgb=bundle['rgb'];rows=[r for r in manifest['images']if r.get('scene_id')==scene and r.get('frame_id')==0]
+        scene=bundle['scene_id'];rgb=bundle['rgb'];rows=[r for r in manifest['images']if r.get('scene_id')==scene and r.get('frame_position')==0 and r.get('source_frame_id')==1]
         require(len(rows)==1 and rows[0].get('sha256')==rgb['sha256']and rows[0].get('file')==Path(rgb['path']).name,'Same original RGB manifest required')
         for kind in('rgb','mask','depth'):require(identity(root/bundle[kind]['path'])=={k:bundle[kind][k]for k in('bytes','sha256')},'Original public bundle bytes required')
-        mask=[r for r in receipts['mask_report']['masks']if r['scene_id']==scene and r['frame_id']==0];depth=[r for r in receipts['depth_report']['outputs']if r['scene_id']==scene and r['frame_id']==0]
+        mask=[r for r in receipts['mask_report']['masks']if r['scene_id']==scene and r['frame_position']==0 and r['source_frame_id']==1];depth=[r for r in receipts['depth_report']['outputs']if r['scene_id']==scene and r['frame_position']==0 and r['source_frame_id']==1]
         require(len(mask)==len(depth)==1 and {k:mask[0][k]for k in('bytes','sha256')}=={k:bundle['mask'][k]for k in('bytes','sha256')}and
             {k:depth[0][k]for k in('bytes','sha256')}=={k:bundle['depth'][k]for k in('bytes','sha256')}and
-            mask[0]['rgb_sha256']==depth[0]['rgb_sha256']==rgb['sha256'] and mask[0]['file']==f'scene_{scene:06d}/masks/1/000000.png' and
+            mask[0]['rgb_sha256']==depth[0]['rgb_sha256']==rgb['sha256'] and mask[0]['file']==f'scene_{scene:06d}/masks/1/000001.png' and
             depth[0]['file']==Path(bundle['depth']['path']).name,'Original mask/depth sameRGB lineage required')
     return receipts
 
@@ -305,10 +304,8 @@ def bundle_arrays(root,bundle):
     with Image.open(root/bundle['mask']['path'])as image:require(image.format=='PNG'and image.mode=='L'and image.size==(640,480),'OriginalautomaticmaskPNG640480 required');mask=np.asarray(image).copy()
     require(mask.dtype==np.uint8 and np.isin(mask,[0,255]).all()and np.count_nonzero(mask)>0,'Nonempty automaticbinaryobjectmask required')
     with np.load(root/bundle['depth']['path'],allow_pickle=False)as file:arrays={k:file[k]for k in file.files}
-    require(set(arrays)=={'depth','points','mask','intrinsics','frame_index'},'Exact untouched nativeMoGe2 arrays required')
-    for key,shape,dtype in(('depth',(480,640),np.float32),('points',(480,640,3),np.float32),('mask',(480,640),np.bool_),('intrinsics',(3,3),np.float32),('frame_index',(),np.int64)):
-        require(arrays[key].shape==shape and arrays[key].dtype==dtype,'Nativefullgrid dtype/shape required')
-    require(arrays['frame_index'].item()==0 and np.count_nonzero((mask>0)&arrays['mask']&np.isfinite(arrays['points']).all(-1)&(arrays['points'][...,2]>0))>=8,'Originalframezero/visibleinferredobjectsupport required')
+    public.validate_prediction_arrays(arrays)
+    require(np.count_nonzero((mask>0)&arrays['mask']&np.isfinite(arrays['points']).all(-1)&(arrays['points'][...,2]>0))>=8,'Initial native source1/visible inferred object support required')
     focal=float(np.hypot(640,480));K=np.array([[focal,0.,320.],[0.,focal,240.],[0.,0.,1.]])
     checked=validate_camera_pointmap(arrays['depth'],arrays['points'],arrays['mask'],arrays['intrinsics'],K)
     K=np.asarray(checked['pixel_K'],dtype=np.float64)  # Exact inferred normalized-FP32 K; no rounding/snap.
@@ -360,7 +357,7 @@ def observe(root,pins,out,report,persist,native):
         rgb,_,arrays,K=bundle_arrays(root,bundle);pointmap=folder/'pointmap.npy';camera=folder/'pointmap_intrinsics.json'
         with pointmap.open('xb')as stream:os.fchmod(stream.fileno(),0o444);np.save(stream,arrays['points'],allow_pickle=False)
         depth_receipt=bound_json(root/BASE/'depth_init_v1/report.json',{k:pins['inputs']['depth_report'][k]for k in ('bytes','sha256')})
-        matching=[r for r in depth_receipt['outputs']if r['scene_id']==scene and r['frame_id']==0]
+        matching=[r for r in depth_receipt['outputs']if r['scene_id']==scene and r['frame_position']==0 and r['source_frame_id']==1]
         require(len(matching)==1 and matching[0]['decoded_RGB_sha256']==hashlib.sha256(rgb.tobytes()).hexdigest(),'Original native depth decodedRGB lineage differs')
         camera_dict=dict(fx=float(K[0,0]),fy=float(K[1,1]),cx=float(K[0,2]),cy=float(K[1,2]),width=640,height=480)
         with camera.open('x')as stream:os.fchmod(stream.fileno(),0o444);json.dump(camera_dict,stream)
@@ -376,7 +373,7 @@ def observe(root,pins,out,report,persist,native):
         require({n:identity(folder/n)for n in rawpins}==rawpins,'Native outputs changed during canonical export')
         for name in('object.glb','transform.json','intrinsics.json'):identity(folder/name);(folder/name).chmod(0o444)
         pointmap.unlink();camera.unlink();report['native_calls_completed']+=1
-        report['outputs'].append(dict(scene_id=scene,frame_id=0,geometry=geometry,files={name:identity(folder/name)for name in('object.glb','transform.json','intrinsics.json','canonical.npz')},
+        report['outputs'].append(dict(scene_id=scene,frame_position=0,source_frame_id=1,geometry=geometry,files={name:identity(folder/name)for name in('object.glb','transform.json','intrinsics.json','canonical.npz')},
             input_bundle=bundle,camera_unchanged=True,generated_metric_scale_accuracy_verified=False));persist()
 
 
@@ -439,7 +436,7 @@ def command(args,deadline,allowed=(0,)):
 
 
 def output_inventory(out,report):
-    require([(r['scene_id'],r['frame_id'])for r in report['outputs']]==[(s,0)for s in SCENES],'All three original scene outputs required')
+    require([(r['scene_id'],r['frame_position'],r['source_frame_id'])for r in report['outputs']]==[(s,0,1)for s in SCENES],'All three original scene outputs required')
     for row in report['outputs']:
         folder=canonical(out/f"scene_{row['scene_id']:06d}")
         require(set(row['files'])=={'object.glb','transform.json','intrinsics.json','canonical.npz'}and {p.name for p in folder.iterdir()}==set(row['files']),'No extra/missing native outputs or retained staging files')

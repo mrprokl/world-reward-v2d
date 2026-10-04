@@ -202,3 +202,16 @@ external cohort would be an engineering replay, not new independent replication.
 The existing one-continuation protocol remains closed; no third acquisition or
 model/label interpretation is authorized by this diagnosis. A tiny mapping helper
 may be implemented/tested without changing old producers or scientific gates.
+
+## Native-ID interface preparation v2 — not executed
+
+Seven adapters/bridge now explicitly separate array/query positions0..95 from
+source IDs1..96 with a strict RGB-only manifest and shared immutable frame maps.
+Automatic mask export is byte-preserving, Boots/native math stays position-based,
+and the private BOP bridge copies metadata to positional keys only after exact
+all96 source-ID attachment checks. Old v1 manifests are rejected, not silently
+renumbered. The distinct validation/ycbv_point_pose_v2 namespace preserves both
+original FAIL directories and every historical pin. Its protocol is intentionally
+non-executable before filesystem/network/model calls. No future input/report pins
+are fabricated. Independent audit/tests precede any proposed technical amendment;
+this same-cohort engineering replay is not an independent replication.

@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 # Source closure: /infra/ycbv_point_acquire.py /infra/tudl_acquire.py
-# /configs/ycbv_point_protocol.json.
-# Source closure: /infra/ycbv_acquire_transition.py /infra/atomic_metadata.py
-# /configs/ycbv_point_continuation_pins.json /configs/ycbv_point_failed_acquisition_pins.json
+# /configs/ycbv_point_protocol_v2.json.
+# Source closure: /src/world_reward/native_frame_map.py /src/world_reward/__init__.py
 # Azure VM02 CPU/public HTTPS only; no GPU.
 set +x
 set -euo pipefail
 [[ $# == 0 ]] || exit 2
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ && "$CODE" == "$ROOT/jobs/$REV/run_ycbv_point_acquire/code" && "${BASH_SOURCE[0]}" == "$CODE/infra/run_ycbv_point_acquire.sh" ]] || exit 2
-OUT="$ROOT/validation/ycbv_point_pose_v1";JOB="${CODE%/code}"
+OUT="$ROOT/validation/ycbv_point_pose_v2";JOB="${CODE%/code}"
 IMAGE=sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3
 NAME="world-reward-ycbv-point-acquire-${REV:0:12}"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
@@ -30,16 +29,14 @@ for name in ('revision','source-sha256'):
 print(digest.hexdigest())
 PYSOURCE
 }
-continuation_identity() {
- /usr/bin/env -i PATH=/usr/bin:/bin HOME=/nonexistent WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" PYTHONDONTWRITEBYTECODE=1 \
- /usr/bin/python3 -I -B - "$CODE" <<'PYCONTINUATION'
-import runpy,sys
+# Intentionally closed: a distinct amendment and independent audit are required.
+/usr/bin/env -i PATH=/usr/bin:/bin /usr/bin/python3 -I -B - "$CODE" <<'PYAUTH'
 from pathlib import Path
-code=Path(sys.argv[1]);sys.path.insert(0,str(code/'infra'));sys.argv=[str(code/'infra/ycbv_acquire_transition.py'),'--verify-continuation']
-runpy.run_path(sys.argv[0],run_name='__main__')
-PYCONTINUATION
-}
-CONTINUATION="$(continuation_identity)";[[ "$CONTINUATION" =~ ^[0-9a-f]{64}$ ]]
+import sys
+code=Path(sys.argv[1]);sys.path[:0]=[str(code/'infra'),str(code/'src')]
+from ycbv_point_acquire import require_execution
+require_execution()
+PYAUTH
 BEFORE="$(source_identity)";IMAGE_BEFORE='';CIDFILE=''
 finish() {
  STATUS=$?;trap - EXIT INT TERM;set +e
@@ -57,7 +54,6 @@ finish() {
    chmod 400 "$CIDFILE"
   else STATUS=1;fi
  fi
- AFTER="$(continuation_identity)";[[ $? == 0 && "$AFTER" == "$CONTINUATION" ]] || STATUS=1
  AFTER="$(source_identity)";[[ $? == 0 && "$AFTER" == "$BEFORE" ]] || STATUS=1
  if [[ -n "$IMAGE_BEFORE" ]];then AFTER="$(docker image inspect "$IMAGE" --format '{{.Id}}')";[[ $? == 0 && "$AFTER" == "$IMAGE_BEFORE" ]] || STATUS=1;fi
  exit "$STATUS"
@@ -66,7 +62,7 @@ trap finish EXIT;trap 'exit 130' INT;trap 'exit 143' TERM
 /usr/bin/env -i PATH=/usr/bin:/bin WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -I -B - "$CODE" <<'PYPREFLIGHT'
 from pathlib import Path
 import runpy,sys
-code=Path(sys.argv[1]);sys.path.insert(0,str(code/'infra'));driver=code/'infra/ycbv_point_acquire.py';sys.argv=[str(driver),'--preflight']
+code=Path(sys.argv[1]);sys.path[:0]=[str(code/'infra'),str(code/'src')];driver=code/'infra/ycbv_point_acquire.py';sys.argv=[str(driver),'--preflight']
 runpy.run_path(str(driver),run_name='__main__')
 PYPREFLIGHT
 IMAGE_BEFORE="$(docker image inspect "$IMAGE" --format '{{.Id}}')";[[ "$IMAGE_BEFORE" == "$IMAGE" ]]
@@ -77,11 +73,11 @@ timeout --signal=TERM --kill-after=10s 3810s docker run --rm --interactive --nam
  --network host --memory 16g --cpus 4 --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges --tmpfs /tmp:rw,noexec,nosuid,size=64m \
  --mount "type=bind,src=$CODE,dst=$CODE,readonly" --mount "type=bind,src=$JOB/revision,dst=$JOB/revision,readonly" --mount "type=bind,src=$JOB/source-sha256,dst=$JOB/source-sha256,readonly" --mount "type=bind,src=$OUT,dst=$OUT" \
  --entrypoint /usr/bin/env "$IMAGE" -i PATH=/opt/conda/bin:/usr/local/bin:/usr/bin:/bin HOME=/tmp XDG_CACHE_HOME=/tmp \
- WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" WR_IMAGE_ID="$IMAGE" WR_AZURE_VM02_VERIFIED=1 WR_YCBV_TECHNICAL_CONTINUATION_SHA256="$CONTINUATION" CUDA_VISIBLE_DEVICES= PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 \
+ WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" WR_IMAGE_ID="$IMAGE" WR_AZURE_VM02_VERIFIED=1 WR_YCBV_V2_AUTHORIZED=1 CUDA_VISIBLE_DEVICES= PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 \
  /opt/conda/bin/python -I -B - "$CODE" <<'PYACQUIRE'
 from pathlib import Path
 import runpy,sys
-code=Path(sys.argv[1]);sys.path.insert(0,str(code/'infra'));driver=code/'infra/ycbv_point_acquire.py';sys.argv=[str(driver)]
+code=Path(sys.argv[1]);sys.path[:0]=[str(code/'infra'),str(code/'src')];driver=code/'infra/ycbv_point_acquire.py';sys.argv=[str(driver)]
 runpy.run_path(str(driver),run_name='__main__')
 PYACQUIRE
 STATUS=$?;set -e

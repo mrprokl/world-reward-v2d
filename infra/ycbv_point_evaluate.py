@@ -4,6 +4,7 @@ No model/GPU, no geometry import, no optimized alignment or frame deletion.
 The public/firewall proof completes for all3scenes before private annotation
 values are decoded. Only scalar/errors decisions are serialized, not GT arrays.
 """
+import copy
 import argparse
 import hashlib
 import json
@@ -16,13 +17,29 @@ import subprocess
 import time
 import tudl_holdout_inputs as files
 
-ROOT=Path('/srv/scenesmith/world-reward');BASE='validation/ycbv_point_pose_v1'
+from world_reward.native_frame_map import NativeFrameMap
+
+ROOT=Path('/srv/scenesmith/world-reward');BASE='validation/ycbv_point_pose_v2'
 JOB='run_ycbv_point_evaluate';OUTPUT='evaluation_v1'
-PINS='configs/ycbv_point_evaluation_pins.json'
+PINS='configs/ycbv_point_evaluation_pins_v2.json'
 IMAGE='sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3'
 STAGE='private_ycbv_contiguous_relative_material_motion';BUDGET=240;SCENES=(48,49,50)
 SOURCE=('infra/ycbv_point_evaluate.py','infra/run_ycbv_point_evaluate.sh','infra/tudl_holdout_inputs.py',
- 'src/world_reward/__init__.py','src/world_reward/point_bop_evaluation.py','src/world_reward/point_motion_evaluation.py',PINS)
+ 'src/world_reward/__init__.py','src/world_reward/native_frame_map.py','src/world_reward/point_bop_evaluation.py','src/world_reward/point_motion_evaluation.py',PINS)
+
+
+def frame_map(scene):
+    require(type(scene) is int and scene in SCENES, 'Frozen scene required')
+    return NativeFrameMap(f'ycbv_scene_{scene:06d}', tuple(range(1,97)))
+
+
+def positional_private_metadata(mapping, cameras, gt, info):
+    """Validate all native keys before copying metadata for unchanged positional BOP math."""
+    expected = {str(i) for i in mapping.source_frame_ids}
+    if any(type(value) is not dict or set(value) != expected for value in (cameras,gt,info)):
+        raise ValueError('Exact retained native source IDs required before positional evaluation')
+    return tuple({str(position): copy.deepcopy(value[str(source)]) for position,source in enumerate(mapping.source_frame_ids)}
+                 for value in (cameras,gt,info))
 
 
 def require(value,message):
@@ -42,7 +59,7 @@ def names():return {f'scene_{scene:06d}.npz'for scene in SCENES}
 
 def validate_pins(value):
     require(type(value)is dict and set(value)=={'schema','acquisition_report','retention','track_report','masks_report','predictions','initial_masks'}
-      and value['schema']=='world-reward-ycbv-point-evaluation-pins-v1','Actual completed independently measured evaluator pins required')
+      and value['schema']=='world-reward-ycbv-point-evaluation-pins-v2','Actual completed independently measured evaluator pins required')
     for name in('acquisition_report','track_report','masks_report'):pin(value[name],True)
     pin(value['retention'])
     require(type(value['predictions'])is dict and set(value['predictions'])==names(),'Exactly3 full original predictions required')
@@ -90,7 +107,7 @@ def public_predictions(root,pins,*,decode=True):
       challenge_inputs_used=False,inference_performed=False,source_rehashed_after=True,disposable_archives_removed=True,
       selection_before_private_annotation_values=True,selected_frames=288,all_instances_retained=True,
       private_annotations_exported_as_inference_inputs=False))
-    require(acquisition.get('retention_receipt')==pins['retention'],'Original all-instance retention receipt differs')
+    require(acquisition.get('frame_maps')==[frame_map(s).to_dict() for s in SCENES] and acquisition.get('retention_receipt')==pins['retention'],'Original all-instance retention receipt differs')
     track=_report(base/'comparison_v1/report.json',pins['track_report'],dict(stage='public_ycbv_same_native25_pool_boots_point_comparison',status='pass',phase='complete',
       full_original_frame_coverage=True,same_native_valid_pool=True,native_pool_frozen_before_tracking_and_rankings=True,
       all_inputs_models_sources_after_reverified=True,ground_truth_used=False,private_annotations_read=False,sensor_depth_used=False,
@@ -100,30 +117,38 @@ def public_predictions(root,pins,*,decode=True):
     durations=track.get('whole_pilot_GPU_elapsed_seconds');require(type(durations)in(int,float)and 0<durations<=3600,'Complete frozen GPU budget required')
     require(type(track.get('outputs'))is list and len(track['outputs'])==3,'All3 output receipts required')
     require(type(masks.get('masks'))is list and len(masks['masks'])==288,'All original automatic mask receipts required')
+    require(masks.get('frame_maps')==acquisition['frame_maps'], 'Exact mask/native frame maps required')
+    for index,row in enumerate(masks['masks']):
+        scene,position=SCENES[index//96],index%96;source=frame_map(scene).source_id(position)
+        require(type(row)is dict and all(type(row.get(k))is int for k in ('scene_id','frame_position','source_frame_id'))
+            and (row['scene_id'],row['frame_position'],row['source_frame_id'])==(scene,position,source)
+            and row.get('file')==f'scene_{scene:06d}/masks/1/{source:06d}.png','Full automatic mask position/native ID linkage required')
     rows=[]
     for scene,row in zip(SCENES,track['outputs']):
         name=f'scene_{scene:06d}.npz';path=base/'comparison_v1'/name;wanted=pins['predictions'][name]
         require(type(row)is dict and row.get('file')==name and type(row.get('scene_id'))is int and row['scene_id']==scene and type(row.get('frames'))is int and row['frames']==96
-          and {k:row.get(k)for k in ('bytes','sha256')}==wanted and files.identity(path)==wanted,'Original full prediction bytes/scene/order required')
-        mask=base/f'automatic_masks_v1/scene_{scene:06d}/masks/1/000000.png';mp=pins['initial_masks'][str(scene)]
+          and row.get('frame_map')==frame_map(scene).to_dict() and {k:row.get(k)for k in ('bytes','sha256')}==wanted and files.identity(path)==wanted,'Original full prediction bytes/scene/order required')
+        mask=base/f'automatic_masks_v1/scene_{scene:06d}/masks/1/000001.png';mp=pins['initial_masks'][str(scene)]
         require(files.identity(mask)==mp,'Original automatic initial mask bytes differ')
         mr=masks['masks'][(scene-48)*96]
-        require(mr.get('scene_id')==scene and mr.get('frame_id')==0 and mr.get('file')==f'scene_{scene:06d}/masks/1/000000.png'
+        require(mr.get('scene_id')==scene and mr.get('frame_position')==0 and mr.get('source_frame_id')==1 and mr.get('file')==f'scene_{scene:06d}/masks/1/000001.png'
           and {k:mr.get(k)for k in ('bytes','sha256')}==mp,'Initial mask must be original automatic framezero')
-        rows.append(dict(scene_id=scene,path=path,mask_path=mask,pin=wanted,mask_pin=mp,arrays=row.get('arrays')))
+        rows.append(dict(scene_id=scene,frame_map=frame_map(scene),path=path,mask_path=mask,pin=wanted,mask_pin=mp,arrays=row.get('arrays')))
     require({p.name for p in(base/'comparison_v1').iterdir()}=={'.container.cid','report.json',*names()},'No missing/extra prediction files allowed')
     if decode:
         import numpy as np
         from PIL import Image
         for row in rows:
             with np.load(row['path'],allow_pickle=False)as data:
-                require(len(data.files)==len(set(data.files))and {'frame_index','baseline_poses','candidate_poses'}<=set(data.files),'Explicit full homogeneous trajectory aliases required')
+                require(len(data.files)==len(set(data.files))and {'frame_index','source_frame_id','baseline_poses','candidate_poses'}<=set(data.files),'Explicit full homogeneous trajectory aliases required')
                 arrays={k:data[k]for k in data.files}
             require(type(row['arrays'])is dict and set(row['arrays'])==set(arrays),'Original array identity inventory required')
             for key,array in arrays.items():
                 identity=dict(dtype=array.dtype.str,shape=list(array.shape),sha256=hashlib.sha256(np.ascontiguousarray(array).tobytes()).hexdigest())
                 require(identity==row['arrays'][key],'Original saved native array bytes differ')
-            idx=arrays['frame_index'];require(idx.dtype==np.int64 and np.array_equal(idx,np.arange(96,dtype=np.int64)),'Every original frame0..95 required')
+            idx=arrays['frame_index'];require(idx.dtype==np.int64 and np.array_equal(idx,np.arange(96,dtype=np.int64)),'Every positional frame0..95 required')
+            source_ids=arrays['source_frame_id'];require(source_ids.dtype==np.int64 and source_ids.shape==(96,), 'Native source ID int64 attachment required')
+            row['frame_map'].validate_attachment(tuple(idx.tolist()),tuple(source_ids.tolist()))
             for key in('baseline_poses','candidate_poses'):
                 a=arrays[key];require(a.dtype==np.float64 and a.shape==(96,4,4)and np.isfinite(a).all()and np.all(a[:,3]==[0,0,0,1])
                   and np.allclose(a[:,:3,:3].transpose(0,2,1)@a[:,:3,:3],np.eye(3),atol=1e-6,rtol=0)
@@ -236,15 +261,15 @@ def private_identities(root,pins):
           and '\\'not in name and all(x not in('', '.', '..')for x in name.split('/'))and name not in seen,'Original relative unaliased private source required')
         allowed=re.fullmatch(r'source/(?:licenses/(?:hf_readme|publisher_readme|publisher_license|bop_format|bop_params)\.txt|licenses/dataset_info\.md|test/0000(?:48|49|50)/(?:scene_(?:camera|gt|gt_info)\.json|depth/[0-9]{6}\.png|(?:mask|mask_visib)/[0-9]{6}_[0-9]{6}\.png))',name)
         require(allowed is not None,'Only the frozen three-scene original private source/license layout allowed')
-        if '/depth/'in name or '/mask/'in name or '/mask_visib/'in name:require(0<=int(Path(name).stem.split('_')[0])<96,'Only full original0..95 private frames allowed')
+        if '/depth/'in name or '/mask/'in name or '/mask_visib/'in name:require(int(Path(name).stem.split('_')[0]) in range(1,97),'Only retained native source IDs 1..96 allowed')
         seen.add(name);wanted={k:row[k]for k in ('bytes','sha256')};pin(wanted)
         require(files.identity(private/name)==wanted,'Original retained private bytes differ');expected[name]=wanted
     minimum={f'source/licenses/{name}.txt'for name in('hf_readme','publisher_readme','publisher_license','bop_format','bop_params')}|{'source/licenses/dataset_info.md'}
     for scene in SCENES:
         prefix=f'source/test/{scene:06d}/'
         minimum.update(prefix+f'scene_{kind}.json'for kind in('camera','gt','gt_info'))
-        minimum.update(prefix+f'depth/{i:06d}.png'for i in range(96))
-        for i in range(96):
+        minimum.update(prefix+f'depth/{i:06d}.png'for i in range(1,97))
+        for i in range(1,97):
             for folder in('mask','mask_visib'):require(any(re.fullmatch(re.escape(prefix+folder+'/')+fr'{i:06d}_[0-9]{{6}}\.png',n)for n in seen),'All96 original mask/visible-mask inventories required')
     require(minimum<=seen,'Complete full96 three-scene metadata/depth/licenses required before private interpretation')
     for path in private.rglob('*'):
@@ -265,16 +290,16 @@ def evaluate_private(root,rows,pins):
         scene=item['scene_id'];prefix=f'source/test/{scene:06d}/'
         def original(name):return checked_json(private/(prefix+name),identities[prefix+name])
         cameras,gt,info=[original(f'scene_{name}.json')for name in('camera','gt','gt_info')]
-        require(type(gt)is dict and type(gt.get('0'))is list and gt['0'],'All original initial instances required')
-        for frame in range(96):
+        require(type(gt)is dict and type(gt.get('1'))is list and gt['1'],'All original initial instances required')
+        for frame in frame_map(scene).source_frame_ids:
             require(type(gt.get(str(frame)))is list and gt[str(frame)],'All96 original instance lists required')
             for folder in('mask','mask_visib'):
                 expected={prefix+f'{folder}/{frame:06d}_{i:06d}.png'for i in range(len(gt[str(frame)]))}
                 actual={n for n in identities if n.startswith(prefix+f'{folder}/{frame:06d}_')}
                 require(actual==expected,'All original native instance masks, no deletion/replacement allowed')
-        mask_paths=[private/(prefix+f'mask_visib/000000_{i:06d}.png')for i in range(len(gt['0']))]
+        mask_paths=[private/(prefix+f'mask_visib/000001_{i:06d}.png')for i in range(len(gt['1']))]
         require(all(str(p.relative_to(private))in identities for p in mask_paths),'All initial instance masks retained')
-        with Image.open(private/(prefix+'depth/000000.png'))as image:
+        with Image.open(private/(prefix+'depth/000001.png'))as image:
             require(image.mode in('I;16','I;16L','I')and image.size==(640,480),'Original uint16 depth PNG required')
             raw=np.array(image)
             require(raw.dtype.kind in 'iu'and np.all((raw>=0)&(raw<=65535)),'Native unsigned16 sensor values required')
@@ -282,6 +307,7 @@ def evaluate_private(root,rows,pins):
         masks=[]
         for path in mask_paths:
             with Image.open(path)as image:require(image.mode=='L'and image.size==(640,480),'Original instance mask grid required');masks.append(np.array(image))
+        cameras,gt,info=positional_private_metadata(frame_map(scene),cameras,gt,info)
         results.append(evaluate_bop_scene(item['baseline'],item['candidate'],item['automatic_mask'],cameras,gt,info,depth,np.stack(masks),sequence_id=f'ycbv_scene_{scene:06d}'))
     require(private_identities(root,pins)==identities,'Private source changed after evaluation')
     return results,cohort_gate(results)

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Source closure: /src/world_reward/native_frame_map.py
 # Source closure: /infra/ycbv_point_masks.py /infra/ycbv_point_depth.py /infra/tudl_holdout_inputs.py
 # Source closure: /infra/bridge_frontend_bindings.py /infra/frontend_selected_assets.py
 # Source closure: /infra/frontend_sam2_kernel_gate.py /infra/hand_synthetic_masks.py
@@ -12,7 +13,7 @@ ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
  && "${BASH_SOURCE[0]}" == "$CODE/infra/run_ycbv_point_masks.sh" \
  && "$(hostname)" == world-reward-ncc-h100-02 && "$(id -u)" == 0 ]] || exit 2
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-BASE="$ROOT/validation/ycbv_point_pose_v1";OUT="$BASE/automatic_masks_v1"
+BASE="$ROOT/validation/ycbv_point_pose_v2";OUT="$BASE/automatic_masks_v1"
 IMAGE=sha256:fd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252
 NAME="world-reward-ycbv-point-masks-${REV:0:12}";LOCK="$ROOT/jobs/.world-reward-h100.lock"
 CIDFILE='';LOCK_OPEN=0;LOCK_BEFORE=''
@@ -81,8 +82,8 @@ MOUNTS=()
 # Blind import closure only; full own/archive source is authenticated on host.
 for relative in infra/ycbv_point_masks.py infra/run_ycbv_point_masks.sh infra/ycbv_point_depth.py \
  infra/bridge_frontend_bindings.py infra/frontend_selected_assets.py infra/frontend_sam2_kernel_gate.py \
- infra/hand_synthetic_masks.py infra/tudl_holdout_inputs.py src/world_reward/__init__.py src/world_reward/prompt_selection.py \
- configs/frontend_grounding_source_pins.json configs/frontend_asset_archive_pins.json configs/ycbv_point_input_pins.json;do
+ infra/hand_synthetic_masks.py infra/tudl_holdout_inputs.py src/world_reward/__init__.py src/world_reward/native_frame_map.py src/world_reward/prompt_selection.py \
+ configs/frontend_grounding_source_pins.json configs/frontend_asset_archive_pins.json configs/ycbv_point_input_pins_v2.json;do
  path="$CODE/$relative";[[ -f "$path" && ! -L "$path" ]] || exit 1
  MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
 done

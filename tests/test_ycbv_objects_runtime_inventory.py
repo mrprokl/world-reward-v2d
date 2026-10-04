@@ -215,7 +215,12 @@ def test_shell_arguments_exact_namespace_and_statically_complete_closure(tmp_pat
     data={str(p.relative_to(REPO)):p.read_bytes()for folder in('infra','src','configs')for p in(REPO/folder).rglob('*')if p.is_file()and p.suffix in('.py','.sh','.json')}
     data['pyproject.toml']=(REPO/'pyproject.toml').read_bytes();closure=job.runtime_bundle_paths(data,'infra/run_ycbv_objects_runtime_inventory.sh')
     assert set(gate.HELPERS)<=set(closure)
-    assert not any(n in closure for n in('infra/object_smoke.py','infra/frontend_replica_inventory.py','infra/ycbv_point_acquire.py','infra/bridge_rgb_anchor_render.py'))
+    # Historical acquisition text may enter the host provenance bundle transitively,
+    # but the Objects GPU import/mount inventory excludes it and every private recipe.
+    assert 'infra/ycbv_point_acquire.py' not in gate.objects.HELPERS
+    assert not any('protocol' in n or 'eval_private' in n for n in gate.objects.HELPERS)
+    assert {'infra/ycbv_point_depth.py','src/world_reward/native_frame_map.py'}<=set(gate.objects.HELPERS)
+    assert not any(n in closure for n in('infra/object_smoke.py','infra/frontend_replica_inventory.py','infra/bridge_rgb_anchor_render.py'))
 
 
 def test_original_MoGe1_link_graph_preserved_and_hash_not_fabricated(tmp_path,monkeypatch):

@@ -30,26 +30,26 @@ def fixture(tmp_path):
       dataset_revision='5c2c4aa229800355648cd268040aa814f8dc94f0',license='MIT',device='cpu',gpu_used=False,
       challenge_inputs_used=False,inference_performed=False,source_rehashed_after=True,disposable_archives_removed=True,
       selection_before_private_annotation_values=True,selected_frames=288,all_instances_retained=True,
-      private_annotations_exported_as_inference_inputs=False,retention_receipt=retention))
+      private_annotations_exported_as_inference_inputs=False,retention_receipt=retention,frame_maps=[gate.frame_map(s).to_dict() for s in gate.SCENES]))
     rows=[];predictions={};initial_masks={};maskrows=[]
     comp=base/'comparison_v1';comp.mkdir();write(comp/'.container.cid',b'e'*64)
     for scene in gate.SCENES:
-        arrays=dict(frame_index=np.arange(96,dtype=np.int64),baseline_poses=np.tile(np.eye(4),(96,1,1)),candidate_poses=np.tile(np.eye(4),(96,1,1)))
+        arrays=dict(source_frame_id=np.arange(1,97,dtype=np.int64),frame_index=np.arange(96,dtype=np.int64),baseline_poses=np.tile(np.eye(4),(96,1,1)),candidate_poses=np.tile(np.eye(4),(96,1,1)))
         p=comp/f'scene_{scene:06d}.npz';np.savez_compressed(p,**arrays);p.chmod(0o400);identity=gate.files.identity(p);predictions[p.name]=identity
         ids={k:dict(dtype=v.dtype.str,shape=list(v.shape),sha256=hashlib.sha256(v.tobytes()).hexdigest())for k,v in arrays.items()}
-        rows.append(dict(file=p.name,scene_id=scene,frames=96,arrays=ids,**identity))
+        rows.append(dict(file=p.name,scene_id=scene,frame_map=gate.frame_map(scene).to_dict(),frames=96,arrays=ids,**identity))
         m=np.zeros((480,640),np.uint8);m[:3,:4]=255
-        p=base/f'automatic_masks_v1/scene_{scene:06d}/masks/1/000000.png';p.parent.mkdir(parents=True);Image.fromarray(m).save(p);p.chmod(0o400)
+        p=base/f'automatic_masks_v1/scene_{scene:06d}/masks/1/000001.png';p.parent.mkdir(parents=True);Image.fromarray(m).save(p);p.chmod(0o400)
         mp=gate.files.identity(p);initial_masks[str(scene)]=mp
-        for frame in range(96):maskrows.append(dict(scene_id=scene,frame_id=frame,file=f'scene_{scene:06d}/masks/1/{frame:06d}.png',**mp))
+        for frame in range(96):maskrows.append(dict(scene_id=scene,frame_position=frame,source_frame_id=frame+1,file=f'scene_{scene:06d}/masks/1/{frame+1:06d}.png',**mp))
     track=record(comp/'report.json',dict(stage='public_ycbv_same_native25_pool_boots_point_comparison',status='pass',phase='complete',
       full_original_frame_coverage=True,same_native_valid_pool=True,native_pool_frozen_before_tracking_and_rankings=True,
       all_inputs_models_sources_after_reverified=True,ground_truth_used=False,private_annotations_read=False,sensor_depth_used=False,
       source_camera_calibration_used=False,human_scale_used=False,hand_labeled_test=False,oracle_initial_queries=False,oracle_modes=[],challenge_inputs_used=False,
       whole_pilot_GPU_elapsed_seconds=800.,outputs=rows))
     masks=record(base/'automatic_masks_v1/report.json',dict(stage='public_ycbv_point_native_object_masks',status='pass',phase='complete',
-      private_annotations_read=False,query='object.',frames_completed=288,all_inputs_sources_assets_outputs_rehashed=True,masks=maskrows))
-    pins=dict(schema='world-reward-ycbv-point-evaluation-pins-v1',acquisition_report=acq,retention=retention,track_report=track,
+      private_annotations_read=False,query='object.',frames_completed=288,all_inputs_sources_assets_outputs_rehashed=True,frame_maps=[gate.frame_map(s).to_dict() for s in gate.SCENES],masks=maskrows))
+    pins=dict(schema='world-reward-ycbv-point-evaluation-pins-v2',acquisition_report=acq,retention=retention,track_report=track,
       masks_report=masks,predictions=predictions,initial_masks=initial_masks)
     return tmp_path,pins
 
@@ -95,7 +95,7 @@ def test_private_retention_exact_all_files_and_no_label_interpretation(tmp_path)
         prefix=f'source/test/{scene:06d}/'
         for kind in('camera','gt','gt_info'):
             path=prefix+f'scene_{kind}.json';files.append(dict(file=path,**write(base/path,b'not JSON but hash only')))
-        for frame in range(96):
+        for frame in range(1,97):
             for folder,suffix in(('depth',''),('mask','_000000'),('mask_visib','_000000')):
                 path=prefix+f'{folder}/{frame:06d}{suffix}.png';files.append(dict(file=path,**write(base/path,b'not PNG but hash only')))
     data=dict(files=files,all_instances_retained=True)
@@ -352,3 +352,35 @@ def test_wrapper_host_post_seal_after_exact_cleanup():
     assert '[[ "$IDS" == "$CID" ]]'in finish and '--filter "id=$CID"'in finish
     assert 'run_ycbv_point_evaluate|$REV'in finish and '"$IMAGE|/$NAME|'in finish
     assert 'STATUS=$?'in finish and '"$STATUS" "$CLEANUP_OK"'in finish
+
+
+def test_private_native_ids_are_copied_to_position_not_renumbered_on_disk():
+    mapping=gate.frame_map(48)
+    originals=[{str(source):[{"source_id":source,"role":role}] for source in range(1,97)}for role in range(3)]
+    before=json.dumps(originals,sort_keys=True)
+    positional=gate.positional_private_metadata(mapping,*originals)
+    assert positional[0]["0"][0]["source_id"]==1 and positional[2]["95"][0]["source_id"]==96
+    assert set(positional[0])=={str(i)for i in range(96)}
+    positional[0]["0"][0]["source_id"]=999
+    assert json.dumps(originals,sort_keys=True)==before
+    wrong={str(i):[]for i in range(96)}
+    with pytest.raises(ValueError):gate.positional_private_metadata(mapping,wrong,originals[1],originals[2])
+
+
+@pytest.mark.parametrize("fault",["wrong_source","source_float","missing_source","position_shift"])
+def test_full_public_index_attachment_rejected_before_private(tmp_path,monkeypatch,fault):
+    root,pins=fixture(tmp_path);path=root/gate.BASE/"comparison_v1/scene_000048.npz"
+    with np.load(path,allow_pickle=False)as loaded:arrays={k:loaded[k]for k in loaded.files}
+    if fault=="wrong_source":arrays["source_frame_id"]=np.arange(96,dtype=np.int64)
+    elif fault=="source_float":arrays["source_frame_id"]=arrays["source_frame_id"].astype(np.float64)
+    elif fault=="missing_source":arrays.pop("source_frame_id")
+    else:arrays["frame_index"]=np.arange(1,97,dtype=np.int64)
+    path.chmod(0o600);np.savez_compressed(path,**arrays);path.chmod(0o400);identity=gate.files.identity(path)
+    reportpath=root/gate.BASE/"comparison_v1/report.json";report=json.loads(reportpath.read_bytes());row=report["outputs"][0]
+    row.update(identity);row["arrays"]={k:dict(dtype=v.dtype.str,shape=list(v.shape),sha256=hashlib.sha256(v.tobytes()).hexdigest())for k,v in arrays.items()}
+    reportpath.chmod(0o600);pins["track_report"]=record(reportpath,report);pins["predictions"][path.name]=identity
+    original=Path.open
+    def no_private(path,*args,**kwargs):
+        assert "eval_private"not in path.parts;return original(path,*args,**kwargs)
+    monkeypatch.setattr(Path,"open",no_private)
+    with pytest.raises(ValueError):gate.public_predictions(root,pins)

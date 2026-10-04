@@ -22,10 +22,10 @@ def cohort(tmp_path):
     rows = []
     for scene in gate.SCENES:
         for frame in range(96):
-            name = f"scene_{scene:06d}_frame_{frame:06d}.png"; data = f"undecoded own bytes {scene}:{frame}".encode()
+            name = f"scene_{scene:06d}_frame_{frame+1:06d}.png"; data = f"undecoded own bytes {scene}:{frame}".encode()
             path = directory / name; path.write_bytes(data); path.chmod(0o444)
-            rows.append({"scene_id": scene, "frame_id": frame, "file": name, "sha256": hashlib.sha256(data).hexdigest(), "width": 640, "height": 480})
-    manifest = {"schema": gate.SCHEMA, "revision": gate.REVISION, "license": "MIT", "selection": gate.SELECTION, "attribution": gate.ATTRIBUTION, "images": rows}
+            rows.append({"scene_id": scene, "frame_position": frame, "source_frame_id": frame+1, "file": name, "sha256": hashlib.sha256(data).hexdigest(), "width": 640, "height": 480})
+    manifest = {"schema": gate.SCHEMA, "revision": gate.REVISION, "license": "MIT", "selection": gate.SELECTION, "attribution": gate.ATTRIBUTION, "frame_maps": gate.frame_maps(), "images": rows}
     path = directory / "manifest.json"; path.write_text(json.dumps(manifest)); path.chmod(0o444)
     pins = {"schema": gate.PINS_SCHEMA, "manifest": gate.files.identity(path),
         "acquisition_report": {"bytes": 123, "sha256": "a" * 64, "producer_revision": "b" * 40, "script_sha256": "c" * 64}}
@@ -79,7 +79,7 @@ def test_manifest_exact_cohort_not_adaptive(tmp_path, fault):
     elif fault == "private": manifest["K"] = [800]
     elif fault == "row_private": manifest["images"][0]["depth"] = "private"
     elif fault == "scene_bool": manifest["images"][0]["scene_id"] = True
-    elif fault == "frame_float": manifest["images"][0]["frame_id"] = 0.
+    elif fault == "frame_float": manifest["images"][0]["frame_position"] = 0.
     elif fault == "grid": manifest["images"][0]["width"] = 480
     elif fault == "name": manifest["images"][0]["file"] = "../private.png"
     else: manifest["images"][-1]["sha256"] = "0" * 64
@@ -106,7 +106,7 @@ def analytic_arrays(monkeypatch):
     points = np.stack(((x + .5 - 2) / focal * 2, (y + .5 - 1.5) / focal * 2, np.full_like(x, 2.)), axis=-1).astype(np.float32)
     K = np.array([[focal / 4, 0, .5], [0, focal / 3, .5], [0, 0, 1]], dtype=np.float32)
     return {"depth": np.full((3, 4), 2., dtype=np.float32), "points": points,
-        "mask": np.ones((3, 4), dtype=bool), "intrinsics": K, "frame_index": np.array(0, dtype=np.int64)}
+        "mask": np.ones((3, 4), dtype=bool), "intrinsics": K, "frame_index": np.array(0, dtype=np.int64), "source_frame_id": np.array(1, dtype=np.int64)}
 
 
 def test_camera_native_dtype_full_grid_and_invalid_pixels_unmodified(monkeypatch):
@@ -169,7 +169,7 @@ def host_fixture(tmp_path, monkeypatch):
         "gpu_used": False, "inference_performed": False, "challenge_inputs_used": False, "models_downloaded": False,
         "train_downloaded": False, "sparse_test_downloaded": False, "private_annotations_exported_as_inference_inputs": False,
         "selection_before_private_annotation_values": True, "selected_frames": 288, "all_instances_retained": True,
-        "disposable_archives_removed": True, "source_rehashed_after": True, "public_manifest": pins["manifest"], "source_helpers": sources}
+        "disposable_archives_removed": True, "source_rehashed_after": True, "public_manifest": pins["manifest"], "source_helpers": sources, "frame_maps": gate.frame_maps()}
     path = directory.parent / "report.json"; path.write_text(json.dumps(report)); path.chmod(0o400)
     pins["acquisition_report"].update(gate.files.identity(path))
     pin_path = code / gate.PIN_FILE; pin_path.chmod(0o644); pin_path.write_text(json.dumps(pins)); pin_path.chmod(0o444)
@@ -218,3 +218,52 @@ def test_wrapper_native_scope_and_syntax_and_runtime_closure():
 def test_top_level_stdlib_host_import_does_not_load_numerical_runtime():
     script = "import sys,runpy;sys.path.insert(0,sys.argv[1]);runpy.run_path(sys.argv[2]);assert not {'numpy','torch','moge','object_synthetic_observations'}&sys.modules.keys()"
     subprocess.run([sys.executable, "-I", "-B", "-c", script, str(ROOT / "infra"), str(ROOT / "infra/ycbv_point_depth.py")], check=True)
+
+
+@pytest.mark.parametrize("fault",["legacy_schema","legacy_rows","map_shift","map_bool","row_position","row_source","map_missing"])
+def test_explicit_position_source_map_has_no_v1_fallback(tmp_path,fault):
+    directory,pins,manifest=cohort(tmp_path)
+    if fault=="legacy_schema":manifest["schema"]="world-reward-ycbv-point-rgb-v1"
+    elif fault=="legacy_rows":
+        for row in manifest["images"]:row["frame_id"]=row.pop("frame_position");row.pop("source_frame_id")
+        manifest.pop("frame_maps")
+    elif fault=="map_shift":manifest["frame_maps"][0]["frames"][0]["source_frame_id"]=0
+    elif fault=="map_bool":manifest["frame_maps"][0]["frames"][0]["frame_position"]=False
+    elif fault=="row_position":manifest["images"][0]["frame_position"]=1
+    elif fault=="row_source":manifest["images"][0]["source_frame_id"]=0
+    else:manifest.pop("frame_maps")
+    rewrite_manifest(directory,pins,manifest)
+    with pytest.raises(ValueError):gate.public_inputs(directory,pins)
+
+
+@pytest.mark.parametrize("fault",["missing","wrong","dtype","bool"])
+def test_initial_depth_position_zero_is_source_one(monkeypatch,fault):
+    arrays=analytic_arrays(monkeypatch)
+    if fault=="missing":arrays.pop("source_frame_id")
+    elif fault=="wrong":arrays["source_frame_id"]=np.array(0,np.int64)
+    elif fault=="dtype":arrays["source_frame_id"]=np.array(1,np.int32)
+    else:arrays["source_frame_id"]=np.array(True)
+    with pytest.raises(ValueError):gate.validate_prediction_arrays(arrays)
+
+
+def test_all_adapter_wrappers_have_native_map_and_narrow_execution_mounts():
+    import ast
+    from infra import azure_job
+    data={str(p.relative_to(ROOT)):p.read_bytes()for folder in ('infra','src','configs')
+        for p in (ROOT/folder).rglob('*')if p.is_file()and p.suffix in ('.py','.sh','.json')}
+    data['pyproject.toml']=(ROOT/'pyproject.toml').read_bytes()
+    # Future independently measured v2 pins do not exist and are not fabricated on disk.
+    for name in ('input','objects','track','evaluation'):
+        data[f'configs/ycbv_point_{name}_pins_v2.json']=b'{}\n'
+    scripts=[f'infra/run_ycbv_point_{name}.sh'for name in ('acquire','depth','masks','objects','track','evaluate')]+['infra/run_ycbv_init_peer.sh']
+    for script in scripts:
+        subprocess.run(['bash','-n',str(ROOT/script)],check=True)
+        closure=azure_job.runtime_bundle_paths(data,script)
+        assert 'src/world_reward/native_frame_map.py' in closure
+        assert 'infra/'+Path(script).stem[4:]+'.py' in closure
+    import ycbv_point_masks as masks,ycbv_point_objects as objects,ycbv_point_track as track,ycbv_point_evaluate as evaluate
+    for source in (gate.SOURCE_FILES,masks.HELPERS,objects.HELPERS,track.SOURCE_FILES,evaluate.SOURCE):
+        assert 'src/world_reward/native_frame_map.py'in source
+        assert 'infra/ycbv_point_acquire.py'not in source
+        assert not any('protocol_v2' in n or 'eval_private'in n for n in source)
+    assert 'configs/ycbv_point_input_pins_v2.json'in (ROOT/'infra/run_ycbv_point_depth.sh').read_text()

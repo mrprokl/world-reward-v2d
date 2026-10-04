@@ -22,7 +22,7 @@ import ycbv_point_depth as depth
 
 ROOT, BASE, SCENES = depth.ROOT, depth.BASE, depth.SCENES
 JOB, OUTPUT = 'run_ycbv_point_track', 'comparison_v1'
-PIN_FILE = 'configs/ycbv_point_track_pins.json'
+PIN_FILE = 'configs/ycbv_point_track_pins_v2.json'
 IMAGE = 'sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4'
 STAGE, TOTAL_BUDGET, FRAMES = 'public_ycbv_same_native25_pool_boots_point_comparison', 3600, 96
 BOOTS_BASE = 'validation/robotap_boots_v1/assets'
@@ -41,12 +41,12 @@ BOOTS_SOURCE = {
     'tapnet/torch/utils.py': {'bytes': 10477, 'sha256': 'a4267b3a6bd8ecf2dfe5effacab9f7a43664dc5d08966c98f6a0cc68f5ccedd3'}}
 SOURCE_FILES = ('infra/ycbv_point_track.py', 'infra/run_ycbv_point_track.sh', 'infra/ycbv_point_depth.py',
     'infra/tudl_holdout_inputs.py', 'infra/object_synthetic_observations.py', 'infra/camera_render.py',
-    'infra/robotap_boots_infer.py', 'infra/robotap_boots_acquire.py', 'src/world_reward/__init__.py',
+    'infra/robotap_boots_infer.py', 'infra/robotap_boots_acquire.py', 'src/world_reward/__init__.py', 'src/world_reward/native_frame_map.py',
     'src/world_reward/data.py', 'src/world_reward/pointmap.py', 'src/world_reward/point_surface_queries.py',
     'src/world_reward/point_pose_cost.py', 'src/world_reward/point_candidate_pool.py',
     'src/world_reward/rigid_alignment.py', 'src/world_reward/point_pose_comparison.py', 'src/world_reward/pose_selection.py')
 FROZEN = {**depth.FROZEN,
-    'infra/ycbv_point_depth.py': '5a255115b2989dac6050b0e335a02d3f64722ecec2b491ecee8f0b83e69a55e2',
+    'infra/ycbv_point_depth.py': 'f4708ae507247947bc337d1d46ea1c154d95feda5691872c684a934c9425f65e',
     'infra/robotap_boots_infer.py': '2339d6660ec2b751400b7ffe07a75b6abe9c4d48c3cd75a1725b92be65a6f826',
     'infra/robotap_boots_acquire.py': 'd4071356e04b086266cf3b9f1ca9f3359e0b2dff75ef0101d76d092f1eae0171',
     'infra/camera_render.py': '325fa1c42b6e620f93fe59d6e4f63852557a08343b13e2bea60eee8c88f4743c',
@@ -76,14 +76,14 @@ def pin(value, producer=False):
 
 
 def stage_names(kind):
-    if kind == 'depth_init': return {f'scene_{s:06d}_frame_000000.npz' for s in SCENES}
-    if kind == 'masks': return {f'scene_{s:06d}/masks/1/{f:06d}.png' for s in SCENES for f in range(FRAMES)}
+    if kind == 'depth_init': return {f'scene_{s:06d}_frame_000001.npz' for s in SCENES}
+    if kind == 'masks': return {f'scene_{s:06d}/masks/1/{f:06d}.png' for s in SCENES for f in depth.frame_map(s).source_frame_ids}
     return {f'scene_{s:06d}/{name}' for s in SCENES for name in ('object.glb', 'transform.json', 'intrinsics.json', 'canonical.npz')}
 
 
 def validate_track_pins(value):
     require(type(value) is dict and set(value) == {'schema', 'input_pins', *STAGES}
-        and value['schema'] == 'world-reward-ycbv-point-track-pins-v1', 'Actual independently frozen prerequisite pins required')
+        and value['schema'] == 'world-reward-ycbv-point-track-pins-v2', 'Actual independently frozen prerequisite pins required')
     pin(value['input_pins'])
     for kind in STAGES:
         row = value[kind]; require(type(row) is dict and set(row) == {'report', 'files'}, 'Exact prerequisite report/artifacts required'); pin(row['report'], True)
@@ -128,6 +128,7 @@ def prerequisites(root, code):
         require(report.get('challenge_inputs_used') is False and report.get('hand_labeled_test') is False and report.get('oracle_modes') == [], 'Automatic no-challenge/no-oracle prerequisite required')
         reports[kind] = report
     init, masks, objects = (reports[k] for k in ('depth_init', 'masks', 'objects'))
+    require(init.get('frame_maps') == masks.get('frame_maps') == public['frame_maps'], 'Exact producer native frame maps required')
     require(init.get('input_pins') == public_pins and init.get('input_manifest') == public['manifest']
         and init.get('public_RGB_identities') == public['RGB_identities'] and init.get('private_truth_read') is False
         and all(init.get(k) is True for k in ('sources_after_reverified', 'all_public_RGB_after_reverified', 'model_assets_after_reverified', 'saved_native_arrays_byte_exact'))
@@ -144,18 +145,19 @@ def prerequisites(root, code):
     for kind, rows, field in (('depth_init', init.get('outputs'), 'file'), ('masks', masks.get('masks'), 'file')):
         require(type(rows) is list and len(rows) == len(stage_names(kind)), 'Prerequisite output inventory cardinality differs')
         for row, expected_record in zip(rows, records[::96] if kind == 'depth_init' else records):
-            name = (Path(expected_record['file']).stem + '.npz') if kind == 'depth_init' else f"scene_{expected_record['scene_id']:06d}/masks/1/{expected_record['frame_id']:06d}.png"
+            name = (Path(expected_record['file']).stem + '.npz') if kind == 'depth_init' else f"scene_{expected_record['scene_id']:06d}/masks/1/{expected_record['source_frame_id']:06d}.png"
             require(row.get(field) == name and type(row.get('scene_id')) is int and row['scene_id'] == expected_record['scene_id']
-                and type(row.get('frame_id')) is int and row['frame_id'] == expected_record['frame_id']
+                and type(row.get('frame_position')) is int and row['frame_position'] == expected_record['frame_position']
+                and type(row.get('source_frame_id')) is int and row['source_frame_id'] == expected_record['source_frame_id']
                 and row.get('rgb_sha256') == expected_record['sha256'] and {k: row.get(k) for k in ('bytes', 'sha256')} == artifacts[kind][name], 'Original RGB/artifact output linkage differs')
     require(type(objects.get('outputs')) is list and len(objects['outputs']) == 3, 'All original Objects outputs required')
     for scene, row in zip(SCENES, objects['outputs']):
         bundle = row.get('input_bundle'); require(type(bundle) is dict and bundle.get('scene_id') == scene, 'Original Objects triplet required')
-        expected_paths = dict(rgb=f'{BASE}/inputs/scene_{scene:06d}_frame_000000.png', mask=f'{BASE}/automatic_masks_v1/scene_{scene:06d}/masks/1/000000.png', depth=f'{BASE}/depth_init_v1/scene_{scene:06d}_frame_000000.npz')
+        expected_paths = dict(rgb=f'{BASE}/inputs/scene_{scene:06d}_frame_000001.png', mask=f'{BASE}/automatic_masks_v1/scene_{scene:06d}/masks/1/000001.png', depth=f'{BASE}/depth_init_v1/scene_{scene:06d}_frame_000001.npz')
         for kind, relative in expected_paths.items():
             require(type(bundle.get(kind)) is dict and bundle[kind].get('path') == relative
                 and {k: bundle[kind].get(k) for k in ('bytes', 'sha256')} == depth.files.identity(root / relative), 'Objects input was not exact native public RGB/mask/depth')
-        require(row.get('scene_id') == scene and row.get('frame_id') == 0 and row.get('camera_unchanged') is True
+        require(row.get('scene_id') == scene and row.get('frame_position') == 0 and row.get('source_frame_id') == 1 and row.get('camera_unchanged') is True
             and row.get('files') == {name: artifacts['objects'][f'scene_{scene:06d}/{name}'] for name in ('object.glb', 'transform.json', 'intrinsics.json', 'canonical.npz')}
             and row.get('geometry', {}).get('scale_baked_once') is True and row.get('geometry', {}).get('source_triangles_retained') is True
             and row.get('geometry', {}).get('pose_applied_to_mesh') is False, 'Fixed original native geometry/camera proof required')
@@ -347,7 +349,7 @@ def run(root, code, revision, out, report, persist):
                 closedness_required=False, mesh_repaired=False, original_triangles_retained=True)
             sampled, _ = trimesh.sample.sample_surface(mesh, 8192, seed=0); masks = []
             for frame in range(FRAMES):
-                with Image.open(root / BASE / 'automatic_masks_v1' / f'scene_{scene:06d}/masks/1/{frame:06d}.png') as image:
+                with Image.open(root / BASE / 'automatic_masks_v1' / f'scene_{scene:06d}/masks/1/{depth.frame_map(scene).source_id(frame):06d}.png') as image:
                     require(image.format == 'PNG' and image.mode == 'L' and image.size == (depth.WIDTH, depth.HEIGHT), 'Original automatic mask PNG required'); value = np.asarray(image).copy()
                 require(value.dtype == np.uint8 and np.all((value == 0) | (value == 255)) and value.any(), 'Original native nonempty binary mask required'); masks.append(value > 0)
             def frames():
@@ -382,6 +384,7 @@ def run(root, code, revision, out, report, persist):
                 poses[:, :3, :3] = path.rotations; poses[:, :3, 3] = path.translations
                 arrays[f'{branch}_poses'] = poses
             arrays['frame_index'] = comparison.pool.frame_index
+            arrays['source_frame_id'] = np.asarray(depth.frame_map(scene).source_frame_ids, dtype=np.int64)
             arrays.update(point_costs=comparison.point_costs, candidate_costs=comparison.candidate_costs, visible_count=comparison.visible_count,
                 no_visible_evidence=comparison.no_visible_evidence, canonical_points=canonical.canonical_points, query_points=canonical.query_points,
                 query_grid_indices=canonical.grid_indices, query_face_indices=canonical.face_indices, **tracks)
@@ -390,7 +393,7 @@ def run(root, code, revision, out, report, persist):
             identities = depth.array_identities(arrays)
             with np.load(target, allow_pickle=False) as archive: require(depth.array_identities({k: archive[k] for k in archive.files}) == identities, 'Saved full original native pool/tracks/paths changed')
             report['outputs'].append(dict(file=target.name, scene_id=scene, frames=FRAMES, queries=len(canonical.query_points),
-                native_pixel_K=K.tolist(), raw_surface_audit=mesh_audit, **depth.files.identity(target), arrays=identities)); persist()
+                frame_map=depth.frame_map(scene).to_dict(), native_pixel_K=K.tolist(), raw_surface_audit=mesh_audit, **depth.files.identity(target), arrays=identities)); persist()
             del mesh, sampled, masks, initial, geometry, comparison, canonical, tracks, arrays; gc.collect(); torch.cuda.empty_cache()
         torch.cuda.synchronize()
         require(report['MoGe_calls_attempted'] == report['MoGe_calls_returned'] == report['MoGe_calls_completed'] == 285

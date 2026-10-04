@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Source closure: /src/world_reward/native_frame_map.py
 # Source closure: /infra/ycbv_point_depth.py /infra/tudl_holdout_inputs.py
 # /infra/object_synthetic_observations.py /src/world_reward/pointmap.py
 # Three frame-zero native RGB preflights only; no YCB acquisition/GT mount.
@@ -7,7 +8,7 @@ set -euo pipefail
 [[ $# == 0 ]] || exit 2
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ && "$CODE" == "$ROOT/jobs/$REV/run_ycbv_point_depth/code" && "${BASH_SOURCE[0]}" == "$CODE/infra/run_ycbv_point_depth.sh" && "$(uname -s)" == Linux ]] || exit 2
-BASE="$ROOT/validation/ycbv_point_pose_v1";OUT="$BASE/depth_init_v1";JOB="${CODE%/code}"
+BASE="$ROOT/validation/ycbv_point_pose_v2";OUT="$BASE/depth_init_v1";JOB="${CODE%/code}"
 IMAGE=sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3
 NAME="world-reward-ycbv-point-depth-${REV:0:12}";CIDFILE='';IMAGE_BEFORE='';LOCK_BEFORE=''
 MOGE="$ROOT/weights/cari4d/hf_home/hub/models--Ruicheng--moge-2-vitl-normal"
@@ -18,7 +19,7 @@ integrity() {
  /usr/bin/env -i PATH=/usr/bin:/bin WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -I -B - "$CODE" "$OUT" "$MOGE" "$BLOB" "$MODEL_RECEIPT" <<'PYINTEGRITY'
 from pathlib import Path
 import hashlib,runpy,stat,sys
-code,out,moge,blob,receipt=map(Path,sys.argv[1:]);sys.path.insert(0,str(code/'infra'))
+code,out,moge,blob,receipt=map(Path,sys.argv[1:]);sys.path[:0]=[str(code/'infra'),str(code/'src')]
 driver=runpy.run_path(str(code/'infra/ycbv_point_depth.py'),run_name='host_preflight')
 proof=driver['host_proof'](driver['ROOT'],code,__import__('os').environ['WR_CODE_REVISION'])
 digest=hashlib.sha256(proof.encode())
@@ -92,7 +93,7 @@ APPS="$(nvidia-smi --query-compute-apps=pid --format=csv,noheader,nounits)"
 [[ -z "${APPS//[[:space:]]/}" ]] || { echo 'GPU busy; RGB preflight not started' >&2;exit 1; }
 [[ -z "$(docker ps -aq --filter "name=^/$NAME$")" ]]
 MOUNTS=()
-for name in infra/ycbv_point_depth.py infra/run_ycbv_point_depth.sh infra/tudl_holdout_inputs.py infra/object_synthetic_observations.py src/world_reward/__init__.py src/world_reward/data.py src/world_reward/pointmap.py configs/ycbv_point_input_pins.json;do
+for name in infra/ycbv_point_depth.py infra/run_ycbv_point_depth.sh infra/tudl_holdout_inputs.py infra/object_synthetic_observations.py src/world_reward/__init__.py src/world_reward/native_frame_map.py src/world_reward/data.py src/world_reward/pointmap.py configs/ycbv_point_input_pins_v2.json;do
  MOUNTS+=(--mount "type=bind,src=$CODE/$name,dst=$CODE/$name,readonly")
 done
 for path in "$BASE/inputs" "$JOB/revision" "$JOB/source-sha256" "$MOGE" "$BLOB" "$MODEL_RECEIPT";do

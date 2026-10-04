@@ -26,13 +26,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import frontend_peer_receive as receiver
 
 ROOT = Path('/srv/scenesmith/world-reward')
-BASE = 'validation/ycbv_point_pose_v1'
+sys.path[:0] = [str(Path(__file__).resolve().parent), str(Path(__file__).resolve().parents[1]/'src')]
+import ycbv_point_depth as public_reader
+validate_public_manifest = public_reader.validate_manifest
+
+BASE = 'validation/ycbv_point_pose_v2'
 JOB = 'run_ycbv_init_peer'
-HELPERS = ('infra/ycbv_init_peer.py', 'infra/run_ycbv_init_peer.sh', 'infra/frontend_peer_receive.py')
+HELPERS = ('infra/ycbv_init_peer.py', 'infra/run_ycbv_init_peer.sh', 'infra/frontend_peer_receive.py', 'infra/ycbv_point_depth.py', 'infra/tudl_holdout_inputs.py',
+    'src/world_reward/__init__.py', 'src/world_reward/native_frame_map.py')
 OBJECT_HELPERS = ('infra/ycbv_point_objects.py', 'infra/run_ycbv_point_objects.sh',
-    'src/world_reward/__init__.py', 'src/world_reward/pointmap.py', 'src/world_reward/mesh_geometry.py',
-    'configs/ycbv_point_objects_pins.json')
-COMMANDS = {'init': 'world-reward-ycbv-init-public-v1', 'return': 'world-reward-ycbv-objects-return-v1'}
+    'src/world_reward/__init__.py', 'src/world_reward/pointmap.py', 'src/world_reward/mesh_geometry.py', 'infra/ycbv_point_depth.py', 'infra/tudl_holdout_inputs.py',
+    'src/world_reward/native_frame_map.py', 'configs/ycbv_point_objects_pins_v2.json')
+COMMANDS = {'init': 'world-reward-ycbv-init-public-v2', 'return': 'world-reward-ycbv-objects-return-v2'}
 STAGES = {'acquisition': 'external_ycbv_contiguous_rgb_only_acquisition',
     'masks': 'public_ycbv_point_native_object_masks', 'depth': 'public_ycbv_three_frame_zero_native_MoGe2_preflight',
     'objects': 'external_ycbv_three_anchor_native_Objects_initializer'}
@@ -126,16 +131,16 @@ def report_pin(value):
 def payload_names(direction):
     if direction == 'init':
         return {BASE + '/inputs/manifest.json', *(REPORT_PATHS[k] for k in ('acquisition', 'masks', 'depth')),
-            *(f'{BASE}/inputs/scene_{s:06d}_frame_000000.png' for s in SCENES),
-            *(f'{BASE}/automatic_masks_v1/scene_{s:06d}/masks/1/000000.png' for s in SCENES),
-            *(f'{BASE}/depth_init_v1/scene_{s:06d}_frame_000000.npz' for s in SCENES)}
+            *(f'{BASE}/inputs/scene_{s:06d}_frame_000001.png' for s in SCENES),
+            *(f'{BASE}/automatic_masks_v1/scene_{s:06d}/masks/1/000001.png' for s in SCENES),
+            *(f'{BASE}/depth_init_v1/scene_{s:06d}_frame_000001.npz' for s in SCENES)}
     return {REPORT_PATHS['objects'], *(f'{BASE}/objects_init_v1/scene_{s:06d}/{name}'
         for s in SCENES for name in ('object.glb', 'transform.json', 'intrinsics.json', 'canonical.npz'))}
 
 
 def validate_pins(value, direction, network=False):
     require(type(value) is dict and set(value) == {'schema', 'direction', 'files', 'producer_reports',
-        'source_replica', 'archive', 'inventory_report'} and value['schema'] == 'world-reward-ycbv-init-peer-pins-v1'
+        'source_replica', 'archive', 'inventory_report'} and value['schema'] == 'world-reward-ycbv-init-peer-pins-v2'
         and direction in COMMANDS and value['direction'] == direction, 'Closed immutable transport pins required')
     require(type(value['files']) is dict and set(value['files']) == payload_names(direction), 'Exactly 13 original payload leaves required')
     for name, row in value['files'].items(): safe(name); pin(row)
@@ -177,7 +182,7 @@ def all_files(pins):
 
 
 def manifest(pins):
-    raw = encoded({'schema': 'world-reward-ycbv-init-peer-archive-v1', 'direction': pins['direction'],
+    raw = encoded({'schema': 'world-reward-ycbv-init-peer-archive-v2', 'direction': pins['direction'],
         'files': pins['files'], 'producer_reports': pins['producer_reports'], 'source_replica': pins['source_replica'],
         'producer_source_replica_not_execution': pins['source_replica'] is not None,
         'acquisition_receipt_host_only': pins['direction'] == 'init'})
@@ -225,9 +230,11 @@ def verify_files(root, pins):
             and receipts['masks'].get('ground_truth_used') is False and receipts['depth'].get('private_truth_read') is False,
             'No private prediction inputs allowed')
         public = bound_json(root / BASE / 'inputs/manifest.json', pins['files'][BASE + '/inputs/manifest.json'])
-        require(type(public) is dict and set(public) == {'schema', 'revision', 'license', 'selection', 'attribution', 'images'}
-            and public['schema'] == 'world-reward-ycbv-point-rgb-v1' and public['license'] == 'MIT'
-            and type(public['images']) is list and len(public['images']) == 288, 'Original RGB-only public manifest required')
+        rows = validate_public_manifest(public)
+        for row in rows[::96]:
+            rgb_pin = pins["files"][BASE+"/inputs/"+row["file"]]
+            require(rgb_pin["sha256"] == row["sha256"], "Initial native source1 RGB association differs")
+        require(receipts["acquisition"].get("frame_maps") == receipts["masks"].get("frame_maps") == receipts["depth"].get("frame_maps") == public["frame_maps"], "Public producer native maps differ")
         metadata_only(public)
     else:
         replica = pins['source_replica']; original = root / 'jobs' / replica['producer_revision'] / 'run_ycbv_point_objects'

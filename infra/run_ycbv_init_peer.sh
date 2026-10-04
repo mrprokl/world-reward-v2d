@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Source closure: /src/world_reward/native_frame_map.py
 # Source closure: /infra/ycbv_init_peer.py /infra/frontend_peer_receive.py
 set +x
 set -euo pipefail

@@ -281,3 +281,14 @@ in runtimeimage or documented possibleTAO route donotprove theirusebythisown
 tracker. Keep the existing clean tracker. ActualCARIforwardnvdiffrast inputrender
 remainsa separateunresolved NCdependency; SAMBody/Objects sourceexception and
 legacyCARIgrant also stillunresolved. No blanketeligible/runtimeclearedclaim.
+
+## October4 primary-source recheck
+
+Official repository remains7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80; FAQ is
+byte-identical84452B SHAa1e569e1c83eeac2584de34e9503f1226e20ab369d53d2c67c2e243deb1a4d7a.
+No explicit non-OSI inference-source exception was found. PR164 is closed,
+draft and unmerged, not adopted permission. Kaggle HTTP-only page is a JavaScript
+shell, not a new authenticated rules audit. Contact remains
+[v2d_challenge@nvidia.com](mailto:v2d_challenge@nvidia.com), verified on the
+[official contact page](https://nvidia-isaac.github.io/video_to_data/v2d_challenge/#contact).
+The organizer clarification below remains unsent; eligibility is unresolved.
