@@ -9008,3 +9008,21 @@ Completed exact files retained and only owned partials removed on failure.
 Checkpoint training/challenge overlap and full runtime eligibility unverified.
 Defer this transfer while testing the cheaper representation bottleneck; do not
 call TripoSR SOTA2026 or qualified by these manufactured acquisition tests.
+
+
+Surface identity and mask query operators now implemented, not deployed:
+source surface_identity28fd1dcbce4b4e63c35339947b4a48ecdabd990922c66b52861bdcf2ecb4517e,
+query84307432eb16945f6a4173b302bf8ce9c67735dc19f2b15ee0ed2371b6a86910.
+Root289tinytestsPASS0.48s plus independent legacy Git-source ABI/byte parity on
+all8 fixed cases. Surface preserves all native bytes/births/orphans and verifies
+exact positive faces+vertex-links+boundaries, no volume/QEM/repair/I/O.
+F32 cast risk is diagnostic only; actual loader/official packing still missing.
+
+New quantile cohort SHA13c6a154bd278946128b7c255f1313a2d5b1c65f079bfb88fe8cc61776d3ebac
+frozen before measurement:4positive/4negative scalar-plane fixtures, no models.
+Agent first inclusive gate0.014361s PASS: A-grid scarce cases2/0 mask hits FAIL,
+B32distinct PASS; A54/108 mask hits controls not regressed. Empty/depthmissing/
+shiftedanchor abstain,32 tied rays reject. Two calls perarm/case byte-identical,
+independent plane/bary reference1e-12, no mutation or refill. Root verification
+reuses only these operator fixtures, not a held-out-performance cohort or EP21.
+No actual native mask/track/6D/HOI benefit or adoption follows from this PASS.

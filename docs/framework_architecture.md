@@ -68,6 +68,17 @@ unités natives comme des mètres. La certification, le grounding métrique, le
 tracking et l'ajustement joint restent des étapes explicites ; ce contrat ne les
 remplace pas. Aucun backend alternatif réel n'est encore exécuté par cette API.
 
+Deux primitives génériques supplémentaires existent maintenant :
+`surface_identity.prepare_surface_identity` valide uniquement le domaine
+vertex-manifold ouvert/fermé sous-budget, avec births identité et tableaux
+natifs byte-immuables, sans volume/weld/repair. La readiness F32 est un diagnostic
+séparé ; aucun loader/packer réel ni embedding n'est qualifié par ce contrat.
+`point_surface_queries.canonical_mask_quantile_queries` partage le noyau de raycast
+historique, alloue32 quantiles du masque frame0 avant profondeur et conserve
+les diagnostics de tous les slots. Moins de8 témoins ou ambiguïté ⇒ FAIL, sans
+refill. La route legacy et les jobs historiques ne sont pas changés/adoptés.
+Root289tests PASS ; la mesure est de disponibilité/représentation, pas de qualité3D.
+
 ### Première migration réalisée
 
 `world_reward.shared_scene` ajoute des adaptateurs explicites
