@@ -1,0 +1,12 @@
+{
+  "schema": "world_reward.mediapipe_cpu_dependencies_acquire_pins.v1",
+  "producer_revision": "5fe36a39060cad87b9948bb177765d45bce8988b",
+  "report": {
+    "bytes": 87144,
+    "sha256": "4706608a4f10aac5b352f58b1f36676b816b6eb21b6481a540367687027b34ad"
+  },
+  "helper": {
+    "bytes": 22983,
+    "sha256": "7827b66397bb56da930d6a9b39b5cb43cd619b95652d70b67fad0da56d6afb0d"
+  }
+}

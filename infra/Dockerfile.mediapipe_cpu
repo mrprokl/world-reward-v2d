@@ -1,0 +1,14 @@
+FROM sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3
+ARG WR_REVISION
+ARG WR_SOURCE_SHA256
+ARG WR_MANIFEST_SHA256
+LABEL world_reward.mediapipe_cpu.revision=$WR_REVISION \
+      world_reward.mediapipe_cpu.source=$WR_SOURCE_SHA256 \
+      world_reward.mediapipe_cpu.manifest=$WR_MANIFEST_SHA256
+COPY wheels /opt/world-reward-mediapipe-inputs/wheels
+COPY manifest.json wheel-notices.json /opt/world-reward-mediapipe-inputs/
+RUN /usr/bin/env -i PATH=/opt/conda/bin:/usr/bin:/bin HOME=/tmp \
+    /opt/conda/bin/python -m venv /opt/world-reward-mediapipe && \
+    /usr/bin/env -i PATH=/opt/world-reward-mediapipe/bin:/usr/bin:/bin HOME=/tmp \
+    /opt/world-reward-mediapipe/bin/python -I -B -c \
+    'import json,subprocess,sys; from pathlib import Path; p=Path("/opt/world-reward-mediapipe-inputs"); m=json.loads((p/"manifest.json").read_text()); wheels=[str(p/"wheels"/r["filename"]) for r in m["packages"]]; subprocess.run([sys.executable,"-m","pip","--isolated","install","--no-index","--no-deps","--no-cache-dir","--disable-pip-version-check",*wheels],check=True); subprocess.run([sys.executable,"-m","pip","--isolated","check"],check=True)'

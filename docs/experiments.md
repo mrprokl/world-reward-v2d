@@ -7403,3 +7403,13 @@ consumer imports the independently hashed existing7392634 shared-stage closure,
 without rerunning the actual inputs or spoofing their producer. Original helper
 matches the actualea26eda queued source; full frozen input config precedes any
 shared native execution. Collected unit is not this PASS evidence.
+
+Dependency notice verificationv3 actual PASS4.589115s under5fe36a3, **zero HTTP,
+zero new download**, all51 bytes and26 wheels' embedded metadata/CRC/notices
+qualified after independently authenticating originalv2 unchangedFAIL.
+Report87144B SHA4706608a4f10aac5b352f58b1f36676b816b6eb21b6481a540367687027b34ad;
+actualhelper22983B SHA7827b66397bb56da930d6a9b39b5cb43cd619b95652d70b67fad0da56d6afb0d.
+Independent remote source, prior7assets, downloadlineage andall51 posthashes PASS;
+directories unchangedreadonly/noGPU/private/model/installation. Actual pins now
+precede a distinct offline CPU child construction/native graph-load-only gate.
+Root134 integrated tests PASS1.88s, not learned quality/licence/overlap evidence.
