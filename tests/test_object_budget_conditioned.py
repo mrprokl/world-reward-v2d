@@ -67,7 +67,7 @@ def test_conditioned_dispatches_once_integer_and_propagates_failure_without_volu
 
 
 def test_legacy_numerical_functions_and_main_after_dispatch_are_ast_unchanged():
-    historical = subprocess.check_output(['rtk', 'git', 'show', 'HEAD:infra/object_budget_volume.py'],
+    historical = subprocess.check_output(['rtk', 'git', 'show', '23c5731e792482cc9a229422d32aacf370b084fc:infra/object_budget_volume.py'],
                                          cwd=REPO, text=True)
     old, new = ast.parse(historical), ast.parse((REPO/'infra/object_budget_volume.py').read_text())
     functions = lambda module: {n.name: n for n in module.body if isinstance(n, ast.FunctionDef)}

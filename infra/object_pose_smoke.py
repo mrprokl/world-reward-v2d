@@ -27,7 +27,7 @@ def _argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
     parser.add_argument("--full-video", action="store_true")
-    parser.add_argument("--mesh-source", choices=('default','volume'), default='default')
+    parser.add_argument("--mesh-source", choices=('default','volume','conditioned'), default='default')
     return parser
 
 
@@ -43,6 +43,8 @@ def main() -> None:
     import trimesh
     base = root / f"outputs/episode_{args.episode:06d}"
     output = base / ("object_pose_full" if args.full_video else "object_pose_smoke")
+    if args.mesh_source=='conditioned':
+        output = output.with_name(output.name+'_conditioned')
     if output.exists():
         raise RuntimeError("Frozen object pose smoke already exists")
     object_dir = base / "object_grounded"
@@ -111,6 +113,22 @@ def main() -> None:
             topology_budget['committed_pins_sha256'] = pin_identity['sha256']
         output.mkdir(exist_ok=False)
         shutil.copyfile(qualified_glb,fixed_mesh_path)  # remote only, canonical scale not applied here
+    elif args.mesh_source=='conditioned':
+        from conditioned_geometry_loader import load, identity, strict_json
+        import shutil
+        pin_path = Path(__file__).resolve().parent.parent / 'configs' / f'conditioned_mesh_{args.episode:06d}_pins.json'
+        pin_identity = identity(pin_path)  # Missing independent CPU pins FAIL; never use default geometry.
+        pins = strict_json(pin_path.read_text())
+        vertices,faces,active_indices,geometry_cleanup,qualified_glb,topology_budget=load(
+            root,args.episode,inputs['video_sha256'],sha256(object_report_path),sha256(alignment_path),float(scale[0]),pins=pins)
+        if identity(pin_path) != pin_identity:
+            raise ValueError('Committed conditioned mesh pins changed during loading')
+        topology_budget['committed_pins_sha256'] = pin_identity['sha256']
+        source_identity = identity(qualified_glb)
+        output.mkdir(exist_ok=False)
+        shutil.copyfile(qualified_glb,fixed_mesh_path)  # canonical only; metric vertices already scaled by CPU
+        if sha256(fixed_mesh_path) != source_identity['sha256'] or identity(qualified_glb) != source_identity:
+            raise ValueError('Conditioned canonical GLB changed during remote-only copying')
     else:
         output.mkdir(exist_ok=False)
         source_raw = trimesh.load(object_dir / "object.glb", force="mesh", process=False)
@@ -126,9 +144,11 @@ def main() -> None:
     # Preserve exact 4096 row budget and never drop a real component/cavity.
     inactive = np.ones(len(faces), dtype=bool)
     inactive[active_indices] = False
+    if args.mesh_source=='conditioned' and np.any(faces[inactive] != 0):
+        raise ValueError('Conditioned route only permits original all-zero official padding')
     faces = faces.copy()
     faces[inactive] = 0
-    if args.mesh_source=='volume':
+    if args.mesh_source in ('volume','conditioned'):
         ids,inverse=np.unique(faces[active_indices],return_inverse=True)
         mesh=trimesh.Trimesh(vertices[ids],inverse.reshape(-1,3),process=False)
     else:
