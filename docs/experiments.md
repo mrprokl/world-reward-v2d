@@ -7281,3 +7281,21 @@ and the primary toolkit does not guarantee an annotated hand atframe0. The
 closed contract assumes frame0hand evidence and cannot support this input.
 Future distinct validation should model automatic first appearance/absence over
 full original time, not fabricate a frame0hand or relabel this FAIL as success.
+
+EP0 nativefullforward actualPASS145.404580s/790frames/9windows and EP12
+PASS108.541485s/405frames/5windows under6912d79. Original source helpers and
+all output SHA/modes rehashed remotely; full native raw/composed window assembly
+is verified, not a quality score. Reports76538B/59d88fecd3ebdd1e9403dfd5ace6e85d73a2c05660ad775e879f8f2df4d38e7c
+and65931B/20fa2d483fc6465b4dc6ce87230c8869028ee84cefc215d6cb8bf4b2a8c52ffd;
+payloads604236156B/a2b302ef9d30d3b3fd8e9221137617b1e73f1165fed5e5126af8e40f6efe5958
+and309990588B/d70ce10b24abcf8051e8e85aef61b307d2c0cde01a94ee80d24b88e539eb4231.
+Both independently frozen forward configs committed7392634 before refinement.
+EP14 fresh unchanged fixed_all16 frontend actually active11:39UTC; EP13 CPU
+assembly200/425 remainsactive. No all-stage PASS inferred. EP0 refinement
+publication begun behindEP14 GPUrelease; no parallel competing GPU child.
+
+Reusable `hand_observations` numerical contract24fbed7 fullT/ragged/21xy,
+explicit numerical support, coordinateunits, separate nativehandedness and
+handcentredworld variables passes152 focused tests0.11s. No model inference,
+visibility/identity/contact/sharedmetric truth inferred by constructing it.
+Proposed freshDex03 fullTCPU protocol is not implemented/adopted/data-acquired.
