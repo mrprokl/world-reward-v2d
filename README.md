@@ -18,7 +18,8 @@ inferred automatically; no hand-labeling of challenge records.
   anchor, EP9 invalid geometry and EP10/EP11 actor identity failures remain closed.
   EP11 stops before SAM2/later frontends. EP12 is active: full405 masks, Body
   and depth pass; object tracking remains incomplete. EP13 has a dispatch ACK
-  for a bounded queue after EP12 terminates; ACK is not execution/completion.
+  for a bounded queue after EP12 terminates; actual wait is active, not child
+  inference/completion.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
   development scenes/objects and33–38cm absolute errors prevent a generalization
   claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.

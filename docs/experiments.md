@@ -7109,3 +7109,35 @@ transport phases,148sourcefiles/193676encodedB; no retry or EP12failure rescue.
 EP12 original producer814179a remains active: full405Body138.256485s/depth
 224.729919s PASS, tracker progress50/405227.459412s. Whole trajectory, CPU inputs,
 native chain and quality not yet complete.
+
+
+Root independent relational math check200random affine scenes/800adjacent
+comparisons PASS, maxfeaturedifference2.498e-15 against supplied-knownaffine
+reference; math only, no video/GT quality. Empty automatic mask/query candidates
+now remain explicit Q=0 instances, NaN features/supportfalse, no fabricated query.
+Root190 integrated tests PASS0.47s; full tiny suite collected before latest
+compat/acquisition work **12346PASS7optionalSKIP400.83s**.
+
+EP0 readonly provenance preflight: original15public inputs twice SHA-hashed,
+original3283B receipt9a9a9348 unchanged; actual producer namespace
+`baba81be965dff878d7c16c9f132f85dcf712bd7/run_episode0_volume_chain` complete
+30file/mode closure matches original Git source and dispatchXZ
+d8150b914287cbaca74a7b59a5774e503e86192effb720f5908617974964eb0a.
+OfficialTrack1manifest5f68335f verified with RGB21716125B
+1eb6293e4552397668a5013adbcee95e0bf230dd8c79a594aa7d7f8ea4991ab1 and
+publicmetadata hashes; historicalsource `_validate_inputs` identical current.
+PreparationAST differs onlymissingdatasetreceiptfield. Source proves allowed
+reads/nooracle route, not retroactive narrowOSmounts: legacywrappers had broad
+readonlydata/vendor/results (objectwrapperalsoexternalvalidation). Consumer must
+use only15leafmounts; oldconversionFAIL never reclassified. Strict metadata
+compatibility still being implemented; fullinputchain/native route notyetpassed.
+
+ActualEP13 unit1309029 loadedactivewaiting_for_terminal_predecessor at09:13:01,
+notchildinference. EP12 actualtracking250/405 at1022.690278s remainsactive.
+Laterreadonlypoll lost localmanagement.azure.com DNS before delivery; it neither
+stops remote jobs nor proves job failure. DNSprobe recovers; no GPU retry.
+FreshDexYCB acquisition plan will use spacedlexindices0/16/32/48/64/80 instead
+of firstfew : primarytoolkit groupsobjects by i//5, repeats i%5. Subject02
+fit0/32/64 versusdecision16/48/80, subject01all6blind, fixedcamera/fullframes.
+No archive/model/newprivatevalue acquired yet. VM02GPUidle, owneddata disk
+975.12GBfree, root50.66GBfree; planarchives on data disk, selected<=8GBonroot.

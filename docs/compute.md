@@ -26,7 +26,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 9 | 415 | Geometry/topology failures before pose; no face deletion or threshold rescue. |
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
-| 12 | 405 | Active original frontend: full405 masks/Body/depth PASS; object tracking has50/405 progress, not full PASS. |
+| 12 | 405 | Active original frontend: full405 masks/Body/depth PASS; object tracking has250/405 progress, not full PASS. |
 
 Seven complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
@@ -39,8 +39,8 @@ Private annotation values/projections were not consulted. This pilot is closed,
 not a reason to change its prompts/margin. **No active VM02 GPU job is reported
 at this snapshot.** EP11 is closed FAIL at08:46:36UTC; its original log and
 producer remain unchanged. EP12 is active, MainPID1295652, with one1886MiB GPU worker at the next readonly check;
-this observation does not predict completion. EP13 queued dispatch under `fc10a6e`
-is acknowledged, but its wait/child state has not yet been independently checked.
+this observation does not predict completion. EP13 actual MainPID1309029 is waiting for the explicit terminal predecessor
+at09:13:01UTC under `fc10a6e`; no child inference is implied.
 D107 independent TUM depth validation is REJECT4.904632756% < frozen5%; the
 four-anchor hand-support pilot is also closed REJECT. Neither is adopted.
 

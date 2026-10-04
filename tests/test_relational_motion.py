@@ -159,6 +159,41 @@ def test_single_frame_produces_empty_adjacent_arrays_without_dropping_timeline()
     assert result.camera_affine.shape == (0, 2, 3)
 
 
+def test_zero_query_instances_remain_present_without_fabricated_support():
+    data = scene()
+    data["hand_tracks"] = (np.empty((0, 3, 2), dtype=np.float32),)
+    data["hand_observed"] = (np.empty((0, 3), dtype=bool),)
+    data["object_tracks"] = (np.empty((0, 3, 2), dtype=np.float64),)
+    data["object_observed"] = (np.empty((0, 3), dtype=bool),)
+    result = relational_motion_features(**data)
+    assert result.features.shape == (2, 1, 1, 3)
+    assert result.camera_supported.all()
+    assert result.hand_correspondence_count.tolist() == result.object_correspondence_count.tolist() == [[0], [0]]
+    assert not result.hand_supported.any() and not result.object_supported.any()
+    assert not result.pair_supported.any() and np.isnan(result.features).all()
+    assert np.isnan(result.hand_velocity).all() and np.isnan(result.object_velocity).all()
+
+
+def test_zero_query_instance_keeps_other_instances_and_np_metadata_roundtrip(tmp_path):
+    data = scene()
+    zero = np.empty((0, 3, 2), dtype=np.float64)
+    zero_support = np.empty((0, 3), dtype=bool)
+    path = tmp_path/"empty-automatic-query-bank.npz"
+    np.savez(path, tracks=zero, observed=zero_support, frame_index=data["frame_index"])
+    with np.load(path, allow_pickle=False) as archive:
+        assert set(archive.files) == {"tracks", "observed", "frame_index"}
+        assert archive["tracks"].shape == (0, 3, 2) and archive["tracks"].dtype == np.float64
+        assert archive["observed"].shape == (0, 3) and archive["observed"].dtype == np.bool_
+        data["object_tracks"] += (archive["tracks"].copy(),)
+        data["object_observed"] += (archive["observed"].copy(),)
+    result = relational_motion_features(**data)
+    assert result.features.shape == (2, 1, 2, 3)
+    assert result.pair_supported[:, :, 0].all() and not result.pair_supported[:, :, 1].any()
+    assert result.object_correspondence_count.tolist() == [[3, 0], [3, 0]]
+    np.testing.assert_allclose(result.features[:, :, 0], 0., atol=1e-16)
+    assert np.isnan(result.features[:, :, 1]).all()
+
+
 def test_arrays_are_owned_readonly_inputs_unchanged_and_not_aliased():
     data = scene()
     before = data["hand_tracks"][0].copy()
@@ -186,7 +221,7 @@ def test_arrays_are_owned_readonly_inputs_unchanged_and_not_aliased():
     {"timestamps": np.ma.array(np.arange(3.))},
     {"image_width": 0}, {"image_width": True}, {"image_height": 4.5},
     {"hand_tracks": ()}, {"hand_tracks": [np.zeros((3, 3, 2))]},
-    {"hand_tracks": (np.zeros((0, 3, 2)),)}, {"hand_tracks": (np.zeros((3, 3, 2), dtype=int),)},
+    {"hand_tracks": (np.zeros((3, 3, 2), dtype=int),)},
     {"hand_observed": (np.ones((3, 3)),)}, {"hand_observed": (np.zeros((2, 3), dtype=bool),)},
     {"hand_tracks": (np.full((3, 3, 2), np.nan),)},
     {"hand_tracks": (np.ma.array(np.zeros((3, 3, 2))),)},

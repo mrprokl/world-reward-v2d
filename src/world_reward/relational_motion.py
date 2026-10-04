@@ -18,11 +18,11 @@ def _readonly(value):
     return owned
 
 
-def _tracks(value, supported, frames, name, *, minimum=1):
+def _tracks(value, supported, frames, name):
     original, support = np.asarray(value), np.asarray(supported)
     if (np.ma.isMaskedArray(value) or np.ma.isMaskedArray(supported)
             or original.dtype.kind != "f" or original.ndim != 3
-            or original.shape[1:] != (frames, 2) or len(original) < minimum
+            or original.shape[1:] != (frames, 2)
             or support.dtype != np.bool_ or support.shape != original.shape[:2]):
         raise ValueError(f"{name}: floating [Q,T,2] and boolean [Q,T] required")
     points = np.array(original, dtype=np.float64, copy=True)
@@ -60,7 +60,8 @@ class RelationalMotionEvidence:
     from that median. A median is robust for instance translation, not general
     rotation/deformation; symmetric rotation may have zero coherent velocity
     despite substantial dispersion. Componentwise medians are not rotation
-    equivariant. All instances remain present even if entirely unsupported.
+    equivariant. All instances remain present even if entirely unsupported or
+    represented by zero queries; no placeholder track is manufactured.
     """
     frame_index: np.ndarray
     time_intervals: np.ndarray
@@ -88,8 +89,10 @@ def relational_motion_features(frame_index, timestamps, hand_tracks, hand_observ
                                background_observed, *, image_width, image_height):
     """Extract raw 2D movement evidence from supplied automatic point tracks.
 
-    Each hand/object entry is [Q,T,2], Q>=1, with a separate [Q,T] boolean
-    observation mask. Background is one [Qb,T,2] bank, Qb may be zero. These masks
+    Each hand/object entry is [Q,T,2], Q>=0, with a separate [Q,T] boolean
+    observation mask. Instance tuples remain nonempty, but Q=0 preserves an
+    instance without tracked evidence, rather than inserting a fake query.
+    Background is one [Qb,T,2] bank, Qb may be zero. These masks
     declare automatic observed support, not calibrated visibility. Unsupported
     coordinates may be NaN and are never used or interpolated. Full original
     frame_index must be int64 arange(T), T>=1; finite timestamps[T] strictly
@@ -119,7 +122,7 @@ def relational_motion_features(frame_index, timestamps, hand_tracks, hand_observ
         raise ValueError("Finite image diagonal required")
     hands = _instances(hand_tracks, hand_observed, frames, "hand")
     objects = _instances(object_tracks, object_observed, frames, "object")
-    background, bg_support = _tracks(background_tracks, background_observed, frames, "background", minimum=0)
+    background, bg_support = _tracks(background_tracks, background_observed, frames, "background")
     steps, nh, no = frames - 1, len(hands), len(objects)
     affine = np.full((steps, 2, 3), np.nan)
     camera_ok = np.zeros(steps, dtype=bool)

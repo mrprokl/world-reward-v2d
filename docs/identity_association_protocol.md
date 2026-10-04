@@ -100,11 +100,16 @@ Pas d'endpoint par séquence identifié ; ne pas télécharger24GB sans nécessi
 `joint_3d[21,3]` natif est en mètres et directement disponible (sentinel−1) :
 évaluer les joints ne nécessite pas MANO, contrairement à une surface main.
 
-Design proposé à geler avant acquisition : sujet `20200709-subject-01`, caméra
-`836212060125`, six premières séquences lexicographiques, toutes les frames
-natives. Calibration séparée proposée : trois premières séquences du sujet
-`20200813-subject-02`, même caméra. Pas de remplacement selon visibilité/labels.
-Ce sont des choix de design, **pas des pins mesurés ou un split déjà disponible**.
+Plan d'acquisition fixé avant toute annotation : sujets `20200709-subject-01`
+(évaluation) et `20200813-subject-02` (calibration), caméra `836212060125`,
+indices lexicographiques `[0,16,32,48,64,80]` sur les100 séquences, toutes les
+frames natives. Sujet02 : fit `[0,32,64]`, décision `[16,48,80]` ; sujet01 : les
+six pour évaluation. Le toolkit impose100 séquences/sujet et groupe objets par
+`i//5`, répétitions par `i%5` : premières3–6 séquences étaient un mauvais choix
+avant acquisition car quasi un même groupe. Cette règle espacée est décidée
+**avant données/labels**, pas après un résultat. Aucun remplacement selon
+visibilité, cible ou qualité. Les noms/hashes restent à mesurer ; ce n'est pas
+un split officiel unseen ni une preuve statistique avec seulement six clips.
 
 Le toolkit `dex_ycb.py` lit `meta.yml` : les vrais champs sont `ycb_ids` et
 `ycb_grasp_ind` (pas `object_ids`/`grasp_ind`). La règle privée figée est : vérifier
@@ -141,8 +146,11 @@ Main/contact non annotés ne deviennent pas une vérité inventée.
 
 Seuils d'erreur, pénalités/acceptation, gain minimal, non-régressions par séquence,
 budget et traitement des labels absents doivent être fixés **avant évaluation**,
-sur le split externe de calibration distinct. Pas de nombres empruntés après
-résultats ni tuning sur ces six séquences. Gel/preuves avant privé ; PASS technique,
+sur le split externe de calibration distinct. Si fit manque positifs/négatifs
+ou si décision ne discrimine pas, ABSTAIN sans nouveau clip/prompt/feature.
+GTseg→candidat en calibration exige une règle préfixée de dominance/pureté ;
+cible absente ou masque mélangé reste non-étiquetable et dans le bilan.
+Pas de nombres empruntés après résultats ni tuning sur ces six séquences. Gel/preuves avant privé ; PASS technique,
 soutien scientifique et adoption restent séparés. Même succès ne certifierait
 ni full-HOI Track1 ni supériorité SOTA/CARI4D. Aucun nouveau transport requis ici.
 
