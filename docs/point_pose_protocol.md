@@ -164,3 +164,16 @@ All member hashes precede publication; originals are never merged/overwritten.
 No dataset/model/private annotation payload moves locally or in this bridge.
 Future actual input/report/archive pins must precede transport; no transfer or
 3D inference is inferred from the172tiny contract tests (1.26s).
+
+Source-audit correction for the deferred segmentation experiment: the original
+V2D wrapper already iterates reverse then forward, but no explicit start index
+means a seed at0 cannot propagate backward to later observations. A genuinely
+new bilateral-anchor method requires independent fresh SAM2 states and explicit
+start_frame_idx at automatically verified left/right anchors; it is not simply
+enabling an existing reverse flag. Do not change the frozen current48–50 masks
+experiment. Proposed preregistration: fixed8-frame detector grid, ≥8same visible
+Boots identities with≥80% support at both anchors, competing identity→abstain;
+fill only originally empty intervals when bilateral masks agreeIoU≥.70, use the
+nearer native mask with no union/erosion. New external microgate/negative controls
+and cohort/source/license/budget must be frozen before any run. This proposal
+remains unvalidated; unresolved gaps stay failures, not fabricated trajectories.
