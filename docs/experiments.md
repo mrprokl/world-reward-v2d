@@ -5899,3 +5899,13 @@ VM01 EP5 tracking remains active: latest preserved progress250/668 at
 query returned nonexistentunit defaults; NOT actual completion evidence.
 Actualunit listing and original results/track1-episode5-volume-frontends-v1.log
 confirm continued fulltimeline tracking. No duplicate/restart/trajectorydrop.
+
+Predicted-geometry CPU QA57d109c dispatched78files126192encodedB after
+210focusedPASS1.09s/Bashsyntax/isolatedstdlibhelp. Codeclosure retains original
+inference helpers as provenance (not importedexecuted byQA); no authored
+renderer/private recipe. Narrowmounts contain only small originalsource/proofs
+and frozenpublic/automaticmask/prediction bytes, no modelweights/GT.
+Frozen all4 IoU>=.7 and namedleftframe+within5pxpersonmask gates unchanged;
+operator/supportproxy only, not anatomicalkeypoint/contact/metricaccuracy.
+Perrecord100s renderer bound insideoverall180s, no thresholdrelaxation.
+Actual CPUresult pending; no bridge/full192adoption yet.
