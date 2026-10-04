@@ -20,14 +20,14 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 6 | 816 | Same complete chain PASS on qualified fixed volume geometry. |
 | 8 | 634 | Same complete chain PASS; VM02 full pose/result return byte-sealed before VM01 assembly. |
 | 15 | 501 | Same complete chain PASS. |
-| 0 | 790 | Original full inputs pinned; exact metadata omission compatibility implemented. Old conversion failure remains separate; new native route not yet executed. |
+| 0 | 790 | Full shared preparation PASS23.308068s with native/reference replay; original source/four output pins frozen. Forward publication pending. Old conversion failure separate. |
 | 4 | 747 | Tracking stops at18 empty automatic object masks; full trajectory unavailable. |
 | 7 | — | Empty automatic fixed anchor; closed without reroll. |
 | 9 | 415 | Geometry/topology failures before pose; no face deletion or threshold rescue. |
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
-| 12 | 405 | Full original frontend and CPU inputs PASS; all15 source hashes pinned. Shared native chain not yet executed. |
-| 13 | 425 | Technical queue failure before inference retained; direct replay active with full425 Body PASS144.844406s at10:43:36UTC, depth starting. |
+| 12 | 405 | Full original frontend/CPU inputs plus shared preparation PASS18.401943s; all15 inputs/four preparation artifacts pinned. Forward/refinement/export pending. |
+| 13 | 425 | Technical queue failure retained; direct replay completes object tracking, releases GPU11:13UTC, and remains in CPU input assembly. Full inputs not yet PASS. |
 
 Seven complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
@@ -44,12 +44,15 @@ its collected unit is not the proof of success. EP13 queue under `fc10a6e`
 failed at10:17:34UTC after that predecessor was collected, with no child inference.
 Root independently checked all EP13 targets absent before direct replay under
 the unchanged `814179a` source. Actual v2 MainPID1330097 is active; only full Body
-completion is established at this snapshot, not depth/object/full inputs PASS.
+completion and the synchronous GPUfrontend return are established at this snapshot,
+not full CPU inputs/native reconstruction PASS.
 
 VM02 external identity research : DexYCB original two-subject downloadv2
 PASS224.717368s,24,416,459,511B entirely on the owned Azure data disk. SHA values
-are caller-measured, not publisher checksums; extraction/full gzip CRC and
-predictor validation remain separate. No labels were interpreted or model run.
+are caller-measured, not publisher checksums. Full gzip/header/extraction
+PASS329.644207s,12clips/872originalRGB with private opaque bytes kept separate.
+Actual generic hand-bank inference REJECT13.134305s atclip0 (zero hands), sources
+rehashed and own container removed. No tracking or private values interpreted.
 Candidate-bank, full-clip tracker and CPU calibration stages are implemented;
 initial-identity micro-gate is frozen before private labels, not a3D victory.
 D107 independent TUM depth validation is REJECT4.904632756% < frozen5%; the

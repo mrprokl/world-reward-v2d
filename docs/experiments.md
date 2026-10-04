@@ -7274,3 +7274,10 @@ numerical/model/threshold changes or retry. Root139 existing+additive real-shell
 tests PASS69.60s; originalsuccess/terminal modes remain fail-closed. Fresh clips
 can now queue without losing work to collected predecessor units; owned existing
 lock, full immutable source/target/idle checks and childlock reacquisition remain.
+
+Interpretation limit: missing hand proposal atDexclip0 does **not** establish
+a false negative on a visible hand: no pixels/privatevisibility were inspected,
+and the primary toolkit does not guarantee an annotated hand atframe0. The
+closed contract assumes frame0hand evidence and cannot support this input.
+Future distinct validation should model automatic first appearance/absence over
+full original time, not fabricate a frame0hand or relabel this FAIL as success.
