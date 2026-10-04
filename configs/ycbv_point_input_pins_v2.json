@@ -1,0 +1,13 @@
+{
+  "schema": "public_ycbv_point_inputs_pins_v2",
+  "manifest": {
+    "bytes": 100862,
+    "sha256": "19d7528e296237dd09ea629608c19e86388123f96201550f124b4fc751f6b2f7"
+  },
+  "acquisition_report": {
+    "bytes": 28102,
+    "sha256": "c27b09e4aeda8388db4c4b790770b49da9e9787b02eee035903e883a9e4e3323",
+    "producer_revision": "1a0f494421912f74df6881495750987366a4bc54",
+    "script_sha256": "75ecfdf336369915225ca3ea4e9f9c54f68f1b3284edb2f4d5b03f969c67dbfb"
+  }
+}
