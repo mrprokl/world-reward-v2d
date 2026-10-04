@@ -1,0 +1,1361 @@
+{
+  "schema": "world_reward.mediapipe_cpu_dependencies.v1",
+  "status": "preregistered_metadata_only_not_built_or_installed",
+  "metadata_audit_date": "2026-10-04",
+  "publication_cutoff": "2026-09-30T23:59:59.999999Z",
+  "platform": {
+    "os": "linux",
+    "architecture": "amd64",
+    "python_implementation": "CPython",
+    "python_version": "3.11",
+    "minimum_glibc": "2.28"
+  },
+  "base_image_id": "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3",
+  "environment": {
+    "isolated_venv": true,
+    "system_site_packages": false,
+    "resolver_at_build": false,
+    "GPU_extras": [],
+    "opencv_substitution_allowed": false,
+    "sdists_allowed": false,
+    "install": "all_exact_wheels_no_index_no_deps_then_pip_check"
+  },
+  "marker_environment": {
+    "implementation_name": "cpython",
+    "implementation_version": "3.11.0",
+    "os_name": "posix",
+    "platform_machine": "x86_64",
+    "platform_release": "",
+    "platform_system": "Linux",
+    "platform_version": "",
+    "python_full_version": "3.11.0",
+    "platform_python_implementation": "CPython",
+    "python_version": "3.11",
+    "sys_platform": "linux",
+    "extra": ""
+  },
+  "mandatory_dependency_graph": {
+    "absl-py": [],
+    "attrs": [],
+    "cffi": [
+      "pycparser"
+    ],
+    "contourpy": [
+      "numpy"
+    ],
+    "cycler": [],
+    "flatbuffers": [],
+    "fonttools": [],
+    "jax": [
+      "jaxlib",
+      "ml-dtypes",
+      "numpy",
+      "opt-einsum",
+      "scipy"
+    ],
+    "jaxlib": [
+      "ml-dtypes",
+      "numpy",
+      "scipy"
+    ],
+    "kiwisolver": [],
+    "matplotlib": [
+      "contourpy",
+      "cycler",
+      "fonttools",
+      "kiwisolver",
+      "numpy",
+      "packaging",
+      "pillow",
+      "pyparsing",
+      "python-dateutil"
+    ],
+    "mediapipe": [
+      "absl-py",
+      "attrs",
+      "flatbuffers",
+      "jax",
+      "jaxlib",
+      "matplotlib",
+      "numpy",
+      "opencv-contrib-python",
+      "protobuf",
+      "sentencepiece",
+      "sounddevice"
+    ],
+    "ml-dtypes": [
+      "numpy"
+    ],
+    "numpy": [],
+    "opencv-contrib-python": [
+      "numpy"
+    ],
+    "opt-einsum": [],
+    "packaging": [],
+    "pillow": [],
+    "protobuf": [],
+    "pycparser": [],
+    "pyparsing": [],
+    "python-dateutil": [
+      "six"
+    ],
+    "scipy": [
+      "numpy"
+    ],
+    "sentencepiece": [],
+    "six": [],
+    "sounddevice": [
+      "cffi"
+    ]
+  },
+  "package_count": 26,
+  "total_wheel_bytes": 282981523,
+  "new_wheel_bytes": 247358885,
+  "maximum_total_wheel_bytes": 1000000000,
+  "packages": [
+    {
+      "name": "absl-py",
+      "version": "2.1.0",
+      "filename": "absl_py-2.1.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/a2/ad/e0d3c824784ff121c03cc031f944bc7e139a8f1870ffd2845cc2dd76f6c4/absl_py-2.1.0-py3-none-any.whl",
+      "bytes": 133706,
+      "sha256": "526a04eadab8b4ee719ce68f204172ead1027549089702d99b9059f129ff1308",
+      "upload_time": "2024-01-16T22:14:24.055289Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/absl-py/2.1.0/json",
+        "bytes": 4518,
+        "sha256": "f2ede8eb0569cfe782001037636f93d9a7e9ae5ad2d223c6c13e4feb644af36b",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/a2/ad/e0d3c824784ff121c03cc031f944bc7e139a8f1870ffd2845cc2dd76f6c4/absl_py-2.1.0-py3-none-any.whl.metadata",
+        "bytes": 2311,
+        "sha256": "093a793882e012362fe18edda421f35b9426339ee197eda2f808b3c059674580",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.7",
+        "requires_dist": [],
+        "license": {
+          "expression": null,
+          "declared": "Apache 2.0",
+          "declared_text_bytes": 10,
+          "declared_text_sha256": "cf989ea142f203f532233fa944ee1d8d5acfe6f6875e4d611f515ee108ba26df",
+          "license_files": [
+            "LICENSE",
+            "AUTHORS"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: Apache Software License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "attrs",
+      "version": "25.3.0",
+      "filename": "attrs-25.3.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/77/06/bb80f5f86020c4551da315d78b3ab75e8228f89f0162f2c3a819e407941a/attrs-25.3.0-py3-none-any.whl",
+      "bytes": 63815,
+      "sha256": "427318ce031701fea540783410126f03899a97ffc6f61596ad581ac2e40e3bc3",
+      "upload_time": "2025-03-13T11:10:21.140999Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/attrs/25.3.0/json",
+        "bytes": 12774,
+        "sha256": "ad151c5dee1509ad54cb49911a801ef06629556beaf3a18c49c8077b2af5c5bb",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/77/06/bb80f5f86020c4551da315d78b3ab75e8228f89f0162f2c3a819e407941a/attrs-25.3.0-py3-none-any.whl.metadata",
+        "bytes": 10993,
+        "sha256": "5b7f1c4448fbb35c2a35fd5f838855c1998bd7187401d4a9e0886d4cc44e8a7c",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.8",
+        "requires_dist": [
+          "cloudpickle; (platform_python_implementation == 'CPython') and extra == 'benchmark'",
+          "hypothesis; extra == 'benchmark'",
+          "mypy>=1.11.1; (platform_python_implementation == 'CPython' and python_version >= '3.10') and extra == 'benchmark'",
+          "pympler; extra == 'benchmark'",
+          "pytest-codspeed; extra == 'benchmark'",
+          "pytest-mypy-plugins; (platform_python_implementation == 'CPython' and python_version >= '3.10') and extra == 'benchmark'",
+          "pytest-xdist[psutil]; extra == 'benchmark'",
+          "pytest>=4.3.0; extra == 'benchmark'",
+          "cloudpickle; (platform_python_implementation == 'CPython') and extra == 'cov'",
+          "coverage[toml]>=5.3; extra == 'cov'",
+          "hypothesis; extra == 'cov'",
+          "mypy>=1.11.1; (platform_python_implementation == 'CPython' and python_version >= '3.10') and extra == 'cov'",
+          "pympler; extra == 'cov'",
+          "pytest-mypy-plugins; (platform_python_implementation == 'CPython' and python_version >= '3.10') and extra == 'cov'",
+          "pytest-xdist[psutil]; extra == 'cov'",
+          "pytest>=4.3.0; extra == 'cov'",
+          "cloudpickle; (platform_python_implementation == 'CPython') and extra == 'dev'",
+          "hypothesis; extra == 'dev'",
+          "mypy>=1.11.1; (platform_python_implementation == 'CPython' and python_version >= '3.10') and extra == 'dev'",
+          "pre-commit-uv; extra == 'dev'",
+          "pympler; extra == 'dev'",
+          "pytest-mypy-plugins; (platform_python_implementation == 'CPython' and python_version >= '3.10') and extra == 'dev'",
+          "pytest-xdist[psutil]; extra == 'dev'",
+          "pytest>=4.3.0; extra == 'dev'",
+          "cogapp; extra == 'docs'",
+          "furo; extra == 'docs'",
+          "myst-parser; extra == 'docs'",
+          "sphinx; extra == 'docs'",
+          "sphinx-notfound-page; extra == 'docs'",
+          "sphinxcontrib-towncrier; extra == 'docs'",
+          "towncrier; extra == 'docs'",
+          "cloudpickle; (platform_python_implementation == 'CPython') and extra == 'tests'",
+          "hypothesis; extra == 'tests'",
+          "mypy>=1.11.1; (platform_python_implementation == 'CPython' and python_version >= '3.10') and extra == 'tests'",
+          "pympler; extra == 'tests'",
+          "pytest-mypy-plugins; (platform_python_implementation == 'CPython' and python_version >= '3.10') and extra == 'tests'",
+          "pytest-xdist[psutil]; extra == 'tests'",
+          "pytest>=4.3.0; extra == 'tests'",
+          "mypy>=1.11.1; (platform_python_implementation == 'CPython' and python_version >= '3.10') and extra == 'tests-mypy'",
+          "pytest-mypy-plugins; (platform_python_implementation == 'CPython' and python_version >= '3.10') and extra == 'tests-mypy'"
+        ],
+        "license": {
+          "expression": "MIT",
+          "declared": null,
+          "declared_text_bytes": 0,
+          "declared_text_sha256": null,
+          "license_files": [
+            "LICENSE"
+          ],
+          "classifiers": [],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "cffi",
+      "version": "1.17.1",
+      "filename": "cffi-1.17.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/ff/6b/d45873c5e0242196f042d555526f92aa9e0c32355a1be1ff8c27f077fd37/cffi-1.17.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 467242,
+      "sha256": "610faea79c43e44c71e1ec53a554553fa22321b65fae24889706c0a84d4ad86d",
+      "upload_time": "2024-09-04T20:44:03.467594Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/cffi/1.17.1/json",
+        "bytes": 60254,
+        "sha256": "d38a945b39800f2c9ab0c6adad1be3b03c257d74bd2c3ac698223a912bde15f7",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/ff/6b/d45873c5e0242196f042d555526f92aa9e0c32355a1be1ff8c27f077fd37/cffi-1.17.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata",
+        "bytes": 1531,
+        "sha256": "bba9eebcffea3c92aedb3bc86e2db3906cd5bbb2a39e744861417222b398de3e",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.8",
+        "requires_dist": [
+          "pycparser"
+        ],
+        "license": {
+          "expression": null,
+          "declared": "MIT",
+          "declared_text_bytes": 3,
+          "declared_text_sha256": "e5dcffe836b6ec8a58e492419b550e65fb8cbdc308503979e5dacb33ac7ea3b7",
+          "license_files": [
+            "LICENSE"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "contourpy",
+      "version": "1.3.1",
+      "filename": "contourpy-1.3.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/85/fc/7fa5d17daf77306840a4e84668a48ddff09e6bc09ba4e37e85ffc8e4faa3/contourpy-1.3.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 326184,
+      "sha256": "3a04ecd68acbd77fa2d39723ceca4c3197cb2969633836ced1bea14e219d077c",
+      "upload_time": "2024-11-12T10:53:40.261085Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/contourpy/1.3.1/json",
+        "bytes": 52238,
+        "sha256": "093e86f165485e44b7f1a97f6a78228c2cd5d6fc57362fc34c3bdf010ebe6d08",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/85/fc/7fa5d17daf77306840a4e84668a48ddff09e6bc09ba4e37e85ffc8e4faa3/contourpy-1.3.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata",
+        "bytes": 5423,
+        "sha256": "2d035a7b8abd315370a5f6f41659d30937b6b64c36d8688a1098e992cf67ee39",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.10",
+        "requires_dist": [
+          "numpy>=1.23",
+          "furo; extra == \"docs\"",
+          "sphinx>=7.2; extra == \"docs\"",
+          "sphinx-copybutton; extra == \"docs\"",
+          "bokeh; extra == \"bokeh\"",
+          "selenium; extra == \"bokeh\"",
+          "contourpy[bokeh,docs]; extra == \"mypy\"",
+          "docutils-stubs; extra == \"mypy\"",
+          "mypy==1.11.1; extra == \"mypy\"",
+          "types-Pillow; extra == \"mypy\"",
+          "contourpy[test-no-images]; extra == \"test\"",
+          "matplotlib; extra == \"test\"",
+          "Pillow; extra == \"test\"",
+          "pytest; extra == \"test-no-images\"",
+          "pytest-cov; extra == \"test-no-images\"",
+          "pytest-rerunfailures; extra == \"test-no-images\"",
+          "pytest-xdist; extra == \"test-no-images\"",
+          "wurlitzer; extra == \"test-no-images\""
+        ],
+        "license": {
+          "expression": null,
+          "declared": null,
+          "declared_text_bytes": 1795,
+          "declared_text_sha256": "e087dbe43e6d4600fe7b120c1c813aa390f266ec6e9610ee4222548287f29ba0",
+          "license_files": [],
+          "classifiers": [
+            "License :: OSI Approved :: BSD License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "cycler",
+      "version": "0.12.1",
+      "filename": "cycler-0.12.1-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/e7/05/c19819d5e3d95294a6f5947fb9b9629efb316b96de511b418c53d245aae6/cycler-0.12.1-py3-none-any.whl",
+      "bytes": 8321,
+      "sha256": "85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30",
+      "upload_time": "2023-10-07T05:32:16.783035Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/cycler/0.12.1/json",
+        "bytes": 5598,
+        "sha256": "c4dc853a4b3611f48cfef3e363faeb85c70af63e3d49fe2c64dbe56ab5d688f0",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/e7/05/c19819d5e3d95294a6f5947fb9b9629efb316b96de511b418c53d245aae6/cycler-0.12.1-py3-none-any.whl.metadata",
+        "bytes": 3779,
+        "sha256": "23289e19b76f1e01394227696e6af2b6cd1ce79e89731209bf9195148b18ed36",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.8",
+        "requires_dist": [
+          "ipython ; extra == 'docs'",
+          "matplotlib ; extra == 'docs'",
+          "numpydoc ; extra == 'docs'",
+          "sphinx ; extra == 'docs'",
+          "pytest ; extra == 'tests'",
+          "pytest-cov ; extra == 'tests'",
+          "pytest-xdist ; extra == 'tests'"
+        ],
+        "license": {
+          "expression": null,
+          "declared": null,
+          "declared_text_bytes": 1705,
+          "declared_text_sha256": "b49b4850bd5fb39f7db349bcdf425760ac326c3d5cd8304f3295bd353196471b",
+          "license_files": [
+            "LICENSE"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: BSD License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "flatbuffers",
+      "version": "25.2.10",
+      "filename": "flatbuffers-25.2.10-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/b8/25/155f9f080d5e4bc0082edfda032ea2bc2b8fab3f4d25d46c1e9dd22a1a89/flatbuffers-25.2.10-py2.py3-none-any.whl",
+      "bytes": 30953,
+      "sha256": "ebba5f4d5ea615af3f7fd70fc310636fbb2bbd1f566ac0a23d98dd412de50051",
+      "upload_time": "2025-02-11T04:26:44.484431Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/flatbuffers/25.2.10/json",
+        "bytes": 3188,
+        "sha256": "ed6865c029040487533fa6ac735ab2713266404578151957f1eacef00063e46f",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/b8/25/155f9f080d5e4bc0082edfda032ea2bc2b8fab3f4d25d46c1e9dd22a1a89/flatbuffers-25.2.10-py2.py3-none-any.whl.metadata",
+        "bytes": 875,
+        "sha256": "304b2ef58070ef87861162bc834c1147791f8689524007875b43e2f566c5ce92",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": null,
+        "requires_dist": [],
+        "license": {
+          "expression": null,
+          "declared": "Apache 2.0",
+          "declared_text_bytes": 10,
+          "declared_text_sha256": "cf989ea142f203f532233fa944ee1d8d5acfe6f6875e4d611f515ee108ba26df",
+          "license_files": [
+            "../LICENSE"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: Apache Software License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "fonttools",
+      "version": "4.59.0",
+      "filename": "fonttools-4.59.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/eb/0c/707c5a19598eafcafd489b73c4cb1c142102d6197e872f531512d084aa76/fonttools-4.59.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "bytes": 4974422,
+      "sha256": "fa39475eaccb98f9199eccfda4298abaf35ae0caec676ffc25b3a5e224044464",
+      "upload_time": "2025-07-16T12:03:57.406760Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/fonttools/4.59.0/json",
+        "bytes": 153634,
+        "sha256": "67ecff8f930380af026de4de9584219a385637706658b32fe44bc607cb33409a",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/eb/0c/707c5a19598eafcafd489b73c4cb1c142102d6197e872f531512d084aa76/fonttools-4.59.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata",
+        "bytes": 107891,
+        "sha256": "2e77846ed1d8b004073de72f293e2034cbfeab34bf0304132419ac96b4a77efb",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.9",
+        "requires_dist": [
+          "lxml>=4.0; extra == \"lxml\"",
+          "brotli>=1.0.1; platform_python_implementation == \"CPython\" and extra == \"woff\"",
+          "brotlicffi>=0.8.0; platform_python_implementation != \"CPython\" and extra == \"woff\"",
+          "zopfli>=0.1.4; extra == \"woff\"",
+          "unicodedata2>=15.1.0; python_version <= \"3.12\" and extra == \"unicode\"",
+          "lz4>=1.7.4.2; extra == \"graphite\"",
+          "scipy; platform_python_implementation != \"PyPy\" and extra == \"interpolatable\"",
+          "munkres; platform_python_implementation == \"PyPy\" and extra == \"interpolatable\"",
+          "pycairo; extra == \"interpolatable\"",
+          "matplotlib; extra == \"plot\"",
+          "sympy; extra == \"symfont\"",
+          "xattr; sys_platform == \"darwin\" and extra == \"type1\"",
+          "skia-pathops>=0.5.0; extra == \"pathops\"",
+          "uharfbuzz>=0.23.0; extra == \"repacker\"",
+          "lxml>=4.0; extra == \"all\"",
+          "brotli>=1.0.1; platform_python_implementation == \"CPython\" and extra == \"all\"",
+          "brotlicffi>=0.8.0; platform_python_implementation != \"CPython\" and extra == \"all\"",
+          "zopfli>=0.1.4; extra == \"all\"",
+          "unicodedata2>=15.1.0; python_version <= \"3.12\" and extra == \"all\"",
+          "lz4>=1.7.4.2; extra == \"all\"",
+          "scipy; platform_python_implementation != \"PyPy\" and extra == \"all\"",
+          "munkres; platform_python_implementation == \"PyPy\" and extra == \"all\"",
+          "pycairo; extra == \"all\"",
+          "matplotlib; extra == \"all\"",
+          "sympy; extra == \"all\"",
+          "xattr; sys_platform == \"darwin\" and extra == \"all\"",
+          "skia-pathops>=0.5.0; extra == \"all\"",
+          "uharfbuzz>=0.23.0; extra == \"all\""
+        ],
+        "license": {
+          "expression": null,
+          "declared": "MIT",
+          "declared_text_bytes": 3,
+          "declared_text_sha256": "e5dcffe836b6ec8a58e492419b550e65fb8cbdc308503979e5dacb33ac7ea3b7",
+          "license_files": [
+            "LICENSE",
+            "LICENSE.external"
+          ],
+          "classifiers": [],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "jax",
+      "version": "0.4.35",
+      "filename": "jax-0.4.35-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/62/20/6c57c50c0ccc645fea1895950f1e5cd02f961ee44b3ffe83617fa46b0c1d/jax-0.4.35-py3-none-any.whl",
+      "bytes": 2158621,
+      "sha256": "fa99e909a31424abfec750019a6dd36f6acc18a6e7d40e2c0086b932cc351325",
+      "upload_time": "2024-10-22T20:56:34.071264Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/jax/0.4.35/json",
+        "bytes": 25148,
+        "sha256": "3d4871c8e8c9fe3fceb8a5c0aeda700a9e992871cd635f5292a6784b6aefe16f",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/62/20/6c57c50c0ccc645fea1895950f1e5cd02f961ee44b3ffe83617fa46b0c1d/jax-0.4.35-py3-none-any.whl.metadata",
+        "bytes": 22670,
+        "sha256": "10b297bfc0a1f0d876d65cb6e815b9b72440c785e66cc99c494f7f123d358b35",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.10",
+        "requires_dist": [
+          "jaxlib<=0.4.35,>=0.4.34",
+          "ml-dtypes>=0.4.0",
+          "numpy>=1.24",
+          "opt-einsum",
+          "scipy>=1.10",
+          "numpy>=1.26.0; python_version >= \"3.12\"",
+          "scipy>=1.11.1; python_version >= \"3.12\"",
+          "jaxlib==0.4.34; extra == \"ci\"",
+          "jaxlib==0.4.34; extra == \"cuda\"",
+          "jax-cuda12-plugin[with_cuda]<=0.4.35,>=0.4.34; extra == \"cuda\"",
+          "jaxlib==0.4.34; extra == \"cuda12\"",
+          "jax-cuda12-plugin[with_cuda]<=0.4.35,>=0.4.34; extra == \"cuda12\"",
+          "jaxlib==0.4.34; extra == \"cuda12-local\"",
+          "jax-cuda12-plugin==0.4.34; extra == \"cuda12-local\"",
+          "jaxlib==0.4.34; extra == \"cuda12-pip\"",
+          "jax-cuda12-plugin[with_cuda]<=0.4.35,>=0.4.34; extra == \"cuda12-pip\"",
+          "kubernetes; extra == \"k8s\"",
+          "jaxlib==0.4.34; extra == \"minimum-jaxlib\"",
+          "jaxlib<=0.4.35,>=0.4.34; extra == \"tpu\"",
+          "libtpu-nightly==0.1.dev20241010+nightly.cleanup; extra == \"tpu\"",
+          "libtpu==0.0.2; extra == \"tpu\"",
+          "requests; extra == \"tpu\""
+        ],
+        "license": {
+          "expression": null,
+          "declared": "Apache-2.0",
+          "declared_text_bytes": 10,
+          "declared_text_sha256": "2af71558e438db0b73a20beab92dc278a94e1bbe974c00c1a33e3ab62d53a608",
+          "license_files": [
+            "LICENSE",
+            "AUTHORS"
+          ],
+          "classifiers": [],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "jaxlib",
+      "version": "0.4.35",
+      "filename": "jaxlib-0.4.35-cp311-cp311-manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/c8/a6/1abe8d682d46cf2989f9c4928866ae80c30a54d607221a262cff8a5d9366/jaxlib-0.4.35-cp311-cp311-manylinux2014_x86_64.whl",
+      "bytes": 87309681,
+      "sha256": "bc9eafba001ff8569cfa252fe7f04ba553622702b4b473b656dd0866edf6b8d4",
+      "upload_time": "2024-10-22T20:57:35.089746Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/jaxlib/0.4.35/json",
+        "bytes": 18802,
+        "sha256": "6b2fc53fc037194d13c1eab2f0ab2e2aa2c61c768eaa7ae7edc8581bf299694b",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/c8/a6/1abe8d682d46cf2989f9c4928866ae80c30a54d607221a262cff8a5d9366/jaxlib-0.4.35-cp311-cp311-manylinux2014_x86_64.whl.metadata",
+        "bytes": 983,
+        "sha256": "b2aaefe35f8df2f6942e2b59e880e346bfdd25d76923aafe0b3d2a4a19d24c80",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.10",
+        "requires_dist": [
+          "scipy >=1.10",
+          "numpy >=1.24",
+          "ml-dtypes >=0.2.0",
+          "scipy >=1.11.1 ; python_version >= \"3.12\""
+        ],
+        "license": {
+          "expression": null,
+          "declared": "Apache-2.0",
+          "declared_text_bytes": 10,
+          "declared_text_sha256": "2af71558e438db0b73a20beab92dc278a94e1bbe974c00c1a33e3ab62d53a608",
+          "license_files": [
+            "LICENSE.txt"
+          ],
+          "classifiers": [],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "kiwisolver",
+      "version": "1.4.7",
+      "filename": "kiwisolver-1.4.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/a7/4b/2db7af3ed3af7c35f388d5f53c28e155cd402a55432d800c543dc6deb731/kiwisolver-1.4.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 1426376,
+      "sha256": "18077b53dc3bb490e330669a99920c5e6a496889ae8c63b58fbc57c3d7f33a18",
+      "upload_time": "2024-09-04T09:04:22.419261Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/kiwisolver/1.4.7/json",
+        "bytes": 105413,
+        "sha256": "646cc83f90ebffeef9d013bf099d4b13ea3f5b6481ff6379411abd9c84c76f80",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/a7/4b/2db7af3ed3af7c35f388d5f53c28e155cd402a55432d800c543dc6deb731/kiwisolver-1.4.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata",
+        "bytes": 6286,
+        "sha256": "21c9140831e45cd51baa53d19bc9674ba662edce1f90d0316138776331c8d9bf",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.8",
+        "requires_dist": [],
+        "license": {
+          "expression": null,
+          "declared": null,
+          "declared_text_bytes": 3857,
+          "declared_text_sha256": "69047421c34d2b976983183ad391d0a2b6e419c622daa445cec555efac61a7d9",
+          "license_files": [
+            "LICENSE"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: BSD License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "matplotlib",
+      "version": "3.9.4",
+      "filename": "matplotlib-3.9.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/ab/33/1648da77b74741c89f5ea95cbf42a291b4b364f2660b316318811404ed97/matplotlib-3.9.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 8322873,
+      "sha256": "aca90ed222ac3565d2752b83dbb27627480d27662671e4d39da72e97f657a423",
+      "upload_time": "2024-12-13T05:54:53.066041Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/matplotlib/3.9.4/json",
+        "bytes": 46458,
+        "sha256": "d1bb36553f072548cd7ff6eda28f12c1971d31f9d37daac1a9f57abe71461e1c",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/ab/33/1648da77b74741c89f5ea95cbf42a291b4b364f2660b316318811404ed97/matplotlib-3.9.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata",
+        "bytes": 11423,
+        "sha256": "7a2eec23b5442d1cac788f0c25f7f5d90a10c9b7f7c861fe4faf396472baa002",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.9",
+        "requires_dist": [
+          "contourpy>=1.0.1",
+          "cycler>=0.10",
+          "fonttools>=4.22.0",
+          "kiwisolver>=1.3.1",
+          "numpy>=1.23",
+          "packaging>=20.0",
+          "pillow>=8",
+          "pyparsing>=2.3.1",
+          "python-dateutil>=2.7",
+          "importlib-resources>=3.2.0; python_version < \"3.10\"",
+          "meson-python<0.17.0,>=0.13.1; extra == \"dev\"",
+          "numpy>=1.25; extra == \"dev\"",
+          "pybind11!=2.13.3,>=2.6; extra == \"dev\"",
+          "setuptools_scm>=7; extra == \"dev\"",
+          "setuptools>=64; extra == \"dev\""
+        ],
+        "license": {
+          "expression": null,
+          "declared": null,
+          "declared_text_bytes": 5712,
+          "declared_text_sha256": "cb0e15ca06a7420bc4ef0464bd5c83ffb0452f86b18a8e227a92b5f12cb50940",
+          "license_files": [],
+          "classifiers": [
+            "License :: OSI Approved :: Python Software Foundation License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "mediapipe",
+      "version": "0.10.21",
+      "filename": "mediapipe-0.10.21-cp311-cp311-manylinux_2_28_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/ad/83/56f760fecdc60de84c529d6c05c9dfc7d972617c6632bd254d5e021e5b16/mediapipe-0.10.21-cp311-cp311-manylinux_2_28_x86_64.whl",
+      "bytes": 35622638,
+      "sha256": "05dc4a9e593655a79558d05d6227d31018c2537a4bd3362b51e230cf22aecfe3",
+      "upload_time": "2025-02-06T19:06:45.952545Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/mediapipe/0.10.21/json",
+        "bytes": 24127,
+        "sha256": "854b19f71fe5730332c9166527a66bda9cfa6e0f44ce39dea227b8f4b10d0680",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/ad/83/56f760fecdc60de84c529d6c05c9dfc7d972617c6632bd254d5e021e5b16/mediapipe-0.10.21-cp311-cp311-manylinux_2_28_x86_64.whl.metadata",
+        "bytes": 9703,
+        "sha256": "b72de4a6e099e64941a22f0a89e935c101880950f4cdb729d61b289ba6a767d1",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": null,
+        "requires_dist": [
+          "absl-py",
+          "attrs>=19.1.0",
+          "flatbuffers>=2.0",
+          "jax",
+          "jaxlib",
+          "matplotlib",
+          "numpy<2",
+          "opencv-contrib-python",
+          "protobuf<5,>=4.25.3",
+          "sounddevice>=0.4.4",
+          "sentencepiece"
+        ],
+        "license": {
+          "expression": null,
+          "declared": "Apache 2.0",
+          "declared_text_bytes": 10,
+          "declared_text_sha256": "cf989ea142f203f532233fa944ee1d8d5acfe6f6875e4d611f515ee108ba26df",
+          "license_files": [
+            "LICENSE"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: Apache Software License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "reference_existing_mediapipe_hands_acquire_v1"
+    },
+    {
+      "name": "ml-dtypes",
+      "version": "0.5.1",
+      "filename": "ml_dtypes-0.5.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/cc/2a/5421fd3dbe6eef9b844cc9d05f568b9fb568503a2e51cb1eb4443d9fc56b/ml_dtypes-0.5.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 4743893,
+      "sha256": "c09526488c3a9e8b7a23a388d4974b670a9a3dd40c5c8a61db5593ce9b725bab",
+      "upload_time": "2025-01-07T03:34:08.333030Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/ml-dtypes/0.5.1/json",
+        "bytes": 40733,
+        "sha256": "8919a78f691809a89dff90d5341f9cbcb8e12734efc5daad123e6c373a03870a",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/cc/2a/5421fd3dbe6eef9b844cc9d05f568b9fb568503a2e51cb1eb4443d9fc56b/ml_dtypes-0.5.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata",
+        "bytes": 21813,
+        "sha256": "1b593e31d4b6ed262a951f2d8ed331a587f72d4108149b0dd89de1661ab0479c",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.9",
+        "requires_dist": [
+          "numpy>=1.21",
+          "numpy>=1.21.2; python_version >= \"3.10\"",
+          "numpy>=1.23.3; python_version >= \"3.11\"",
+          "numpy>=1.26.0; python_version >= \"3.12\"",
+          "numpy>=2.1.0; python_version >= \"3.13\"",
+          "absl-py; extra == \"dev\"",
+          "pytest; extra == \"dev\"",
+          "pytest-xdist; extra == \"dev\"",
+          "pylint>=2.6.0; extra == \"dev\"",
+          "pyink; extra == \"dev\""
+        ],
+        "license": {
+          "expression": null,
+          "declared": null,
+          "declared_text_bytes": 12974,
+          "declared_text_sha256": "b19b1f4be8385a85e329e1b5d78f92b90a35465abb96b24d35004c376eb3ea1b",
+          "license_files": [
+            "LICENSE",
+            "LICENSE.eigen",
+            "AUTHORS"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: Apache Software License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "numpy",
+      "version": "1.26.4",
+      "filename": "numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/3a/d0/edc009c27b406c4f9cbc79274d6e46d634d139075492ad055e3d68445925/numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 18252005,
+      "sha256": "666dbfb6ec68962c033a450943ded891bed2d54e6755e35e5835d63f4f6931d5",
+      "upload_time": "2024-02-05T23:53:15.637779Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/numpy/1.26.4/json",
+        "bytes": 83489,
+        "sha256": "3d9ccdd5a7a1036b03f41414dcbf3bfa29b2e022a656fe2b61871086f9a0660f",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/3a/d0/edc009c27b406c4f9cbc79274d6e46d634d139075492ad055e3d68445925/numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata",
+        "bytes": 61041,
+        "sha256": "b09734a7fed44e84b4c8161934ce532dff1e779ec6822d415644d117f6381070",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.9",
+        "requires_dist": [],
+        "license": {
+          "expression": null,
+          "declared": null,
+          "declared_text_bytes": 55480,
+          "declared_text_sha256": "513c4bdec4cc743711a02dbd33890454e4db4f5f89ff52a54c44646daa8addab",
+          "license_files": [],
+          "classifiers": [
+            "License :: OSI Approved :: BSD License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "opencv-contrib-python",
+      "version": "4.11.0.86",
+      "filename": "opencv_contrib_python-4.11.0.86-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/f7/13/756b13b8d5d417a0b4c3bf6ceafb59df0ed05cec7fedc2490bbbf5e60ebc/opencv_contrib_python-4.11.0.86-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 69098423,
+      "sha256": "c47c0ef1098461cdc6fa1cdce4c942b8ec974c87423f4b5951443d26bb9ae407",
+      "upload_time": "2025-01-16T13:52:46.840938Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/opencv-contrib-python/4.11.0.86/json",
+        "bytes": 27125,
+        "sha256": "86682d7a499f81cc12091718ee4e5b23fdb9629ef8db5af9c3b9d1a6fadafc2e",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/f7/13/756b13b8d5d417a0b4c3bf6ceafb59df0ed05cec7fedc2490bbbf5e60ebc/opencv_contrib_python-4.11.0.86-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata",
+        "bytes": 20299,
+        "sha256": "98dcad1c561b33b502df98c8f80b807e787bd5cfeaac7f4006c2842d7b5bb5de",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.6",
+        "requires_dist": [
+          "numpy>=1.13.3; python_version < \"3.7\"",
+          "numpy>=1.21.0; python_version <= \"3.9\" and platform_system == \"Darwin\" and platform_machine == \"arm64\"",
+          "numpy>=1.21.2; python_version >= \"3.10\"",
+          "numpy>=1.21.4; python_version >= \"3.10\" and platform_system == \"Darwin\"",
+          "numpy>=1.23.5; python_version >= \"3.11\"",
+          "numpy>=1.26.0; python_version >= \"3.12\"",
+          "numpy>=1.19.3; python_version >= \"3.6\" and platform_system == \"Linux\" and platform_machine == \"aarch64\"",
+          "numpy>=1.17.0; python_version >= \"3.7\"",
+          "numpy>=1.17.3; python_version >= \"3.8\"",
+          "numpy>=1.19.3; python_version >= \"3.9\""
+        ],
+        "license": {
+          "expression": null,
+          "declared": "Apache 2.0",
+          "declared_text_bytes": 10,
+          "declared_text_sha256": "cf989ea142f203f532233fa944ee1d8d5acfe6f6875e4d611f515ee108ba26df",
+          "license_files": [
+            "LICENSE-3RD-PARTY.txt",
+            "LICENSE.txt"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: Apache Software License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "opt-einsum",
+      "version": "3.4.0",
+      "filename": "opt_einsum-3.4.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/23/cd/066e86230ae37ed0be70aae89aabf03ca8d9f39c8aea0dec8029455b5540/opt_einsum-3.4.0-py3-none-any.whl",
+      "bytes": 71932,
+      "sha256": "69bb92469f86a1565195ece4ac0323943e83477171b91d24c35afe028a90d7cd",
+      "upload_time": "2024-09-26T14:33:23.039572Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/opt-einsum/3.4.0/json",
+        "bytes": 8582,
+        "sha256": "2add37620afa4479121a81d07899b50f8ee03c6b40a07b11a6b7ca93897d6813",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/23/cd/066e86230ae37ed0be70aae89aabf03ca8d9f39c8aea0dec8029455b5540/opt_einsum-3.4.0-py3-none-any.whl.metadata",
+        "bytes": 6345,
+        "sha256": "9f6791140c5e1be4f1b189365e6312d711a1eaaeb399b5dd6741f7a4bd99d03b",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.8",
+        "requires_dist": [],
+        "license": {
+          "expression": "MIT",
+          "declared": null,
+          "declared_text_bytes": 0,
+          "declared_text_sha256": null,
+          "license_files": [
+            "LICENSE"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "packaging",
+      "version": "25.0",
+      "filename": "packaging-25.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/20/12/38679034af332785aac8774540895e234f4d07f7545804097de4b666afd8/packaging-25.0-py3-none-any.whl",
+      "bytes": 66469,
+      "sha256": "29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484",
+      "upload_time": "2025-04-19T11:48:57.875608Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/packaging/25.0/json",
+        "bytes": 5501,
+        "sha256": "6ab300d7b0735a50109912decebb1731ed292f1ed88a3ce5e4bb7876b182cac0",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/20/12/38679034af332785aac8774540895e234f4d07f7545804097de4b666afd8/packaging-25.0-py3-none-any.whl.metadata",
+        "bytes": 3281,
+        "sha256": "5b611a609c38fefc3d616bf45d20aec98fb7d53f245daca9e2c30fc85c7ac282",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.8",
+        "requires_dist": [],
+        "license": {
+          "expression": null,
+          "declared": null,
+          "declared_text_bytes": 0,
+          "declared_text_sha256": null,
+          "license_files": [
+            "LICENSE",
+            "LICENSE.APACHE",
+            "LICENSE.BSD"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: Apache Software License",
+            "License :: OSI Approved :: BSD License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "pillow",
+      "version": "11.3.0",
+      "filename": "pillow-11.3.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/f2/2f/d7675ecae6c43e9f12aa8d58b6012683b20b6edfbdac7abcb4e6af7a3784/pillow-11.3.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "bytes": 6640273,
+      "sha256": "106064daa23a745510dabce1d84f29137a37224831d88eb4ce94bb187b1d7e5f",
+      "upload_time": "2025-07-01T09:14:06.235911Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/pillow/11.3.0/json",
+        "bytes": 198004,
+        "sha256": "217a86cee1e6e85a4e6ebff889b46211041eb159e0e0d2adeb3f6c257c1643c9",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/f2/2f/d7675ecae6c43e9f12aa8d58b6012683b20b6edfbdac7abcb4e6af7a3784/pillow-11.3.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata",
+        "bytes": 9023,
+        "sha256": "d53d4d78f8a8efe182396711ef76840386d2ba4ccdad421f58cc00c3b3401f73",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.9",
+        "requires_dist": [
+          "furo; extra == \"docs\"",
+          "olefile; extra == \"docs\"",
+          "sphinx>=8.2; extra == \"docs\"",
+          "sphinx-autobuild; extra == \"docs\"",
+          "sphinx-copybutton; extra == \"docs\"",
+          "sphinx-inline-tabs; extra == \"docs\"",
+          "sphinxext-opengraph; extra == \"docs\"",
+          "olefile; extra == \"fpx\"",
+          "olefile; extra == \"mic\"",
+          "pyarrow; extra == \"test-arrow\"",
+          "check-manifest; extra == \"tests\"",
+          "coverage>=7.4.2; extra == \"tests\"",
+          "defusedxml; extra == \"tests\"",
+          "markdown2; extra == \"tests\"",
+          "olefile; extra == \"tests\"",
+          "packaging; extra == \"tests\"",
+          "pyroma; extra == \"tests\"",
+          "pytest; extra == \"tests\"",
+          "pytest-cov; extra == \"tests\"",
+          "pytest-timeout; extra == \"tests\"",
+          "pytest-xdist; extra == \"tests\"",
+          "trove-classifiers>=2024.10.12; extra == \"tests\"",
+          "typing-extensions; python_version < \"3.10\" and extra == \"typing\"",
+          "defusedxml; extra == \"xmp\""
+        ],
+        "license": {
+          "expression": "MIT-CMU",
+          "declared": null,
+          "declared_text_bytes": 0,
+          "declared_text_sha256": null,
+          "license_files": [
+            "LICENSE"
+          ],
+          "classifiers": [],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "protobuf",
+      "version": "4.25.8",
+      "filename": "protobuf-4.25.8-cp37-abi3-manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/d6/c6/c9deaa6e789b6fc41b88ccbdfe7a42d2b82663248b715f55aa77fbc00724/protobuf-4.25.8-cp37-abi3-manylinux2014_x86_64.whl",
+      "bytes": 294924,
+      "sha256": "83e6e54e93d2b696a92cad6e6efc924f3850f82b52e1563778dfab8b355101b0",
+      "upload_time": "2025-05-28T14:22:17.105712Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/protobuf/4.25.8/json",
+        "bytes": 11695,
+        "sha256": "f544643cd42aabac6638d5a60619b43e13f0b0ea7f106bdadbba2b52af19136a",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/d6/c6/c9deaa6e789b6fc41b88ccbdfe7a42d2b82663248b715f55aa77fbc00724/protobuf-4.25.8-cp37-abi3-manylinux2014_x86_64.whl.metadata",
+        "bytes": 541,
+        "sha256": "acdb08c097068a12bc205357771e74a497400d291da19242e51269dce810fc1b",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.8",
+        "requires_dist": [],
+        "license": {
+          "expression": null,
+          "declared": "3-Clause BSD License",
+          "declared_text_bytes": 20,
+          "declared_text_sha256": "15934bcfcb57d72b1b73d913180ce7f86d2773c32725efa41ddb6b14e143cb84",
+          "license_files": [],
+          "classifiers": [],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "pycparser",
+      "version": "2.22",
+      "filename": "pycparser-2.22-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/13/a3/a812df4e2dd5696d1f351d58b8fe16a405b234ad2886a0dab9183fb78109/pycparser-2.22-py3-none-any.whl",
+      "bytes": 117552,
+      "sha256": "c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc",
+      "upload_time": "2024-03-30T13:22:20.476234Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/pycparser/2.22/json",
+        "bytes": 3111,
+        "sha256": "f7595f3ca9fb886e6eb2360d5e844d14af7e0bde1ba9f166936dd5eddceb771a",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/13/a3/a812df4e2dd5696d1f351d58b8fe16a405b234ad2886a0dab9183fb78109/pycparser-2.22-py3-none-any.whl.metadata",
+        "bytes": 943,
+        "sha256": "dd7381f278201f88a3975ec30a352193b83aaa2a0c24ba6b525124c18819bd6f",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.8",
+        "requires_dist": [],
+        "license": {
+          "expression": null,
+          "declared": "BSD-3-Clause",
+          "declared_text_bytes": 12,
+          "declared_text_sha256": "118dbcd2d5c9f9b296a9ede9fcc469c5840f7b98ad2c88461055bf2ceda38037",
+          "license_files": [
+            "LICENSE"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: BSD License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "pyparsing",
+      "version": "3.2.3",
+      "filename": "pyparsing-3.2.3-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/05/e7/df2285f3d08fee213f2d041540fa4fc9ca6c2d44cf36d3a035bf2a8d2bcc/pyparsing-3.2.3-py3-none-any.whl",
+      "bytes": 111120,
+      "sha256": "a749938e02d6fd0b59b356ca504a24982314bb090c383e3cf201c95ef7e2bfcf",
+      "upload_time": "2025-03-25T05:01:24.908117Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/pyparsing/3.2.3/json",
+        "bytes": 7196,
+        "sha256": "097f9ed340310a0cb60ae512a3ab45c9bd2555c72a374906ee3da1180c891948",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/05/e7/df2285f3d08fee213f2d041540fa4fc9ca6c2d44cf36d3a035bf2a8d2bcc/pyparsing-3.2.3-py3-none-any.whl.metadata",
+        "bytes": 5042,
+        "sha256": "0e4470308c0c9b62d14bf0e2745860d4eb23f6457ee102d00a47bdf320393ca0",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.9",
+        "requires_dist": [
+          "railroad-diagrams ; extra == \"diagrams\"",
+          "jinja2 ; extra == \"diagrams\""
+        ],
+        "license": {
+          "expression": null,
+          "declared": null,
+          "declared_text_bytes": 0,
+          "declared_text_sha256": null,
+          "license_files": [],
+          "classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "filename": "python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+      "bytes": 229892,
+      "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427",
+      "upload_time": "2024-03-01T18:36:18.570437Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/python-dateutil/2.9.0.post0/json",
+        "bytes": 10760,
+        "sha256": "65747bc111eb972ae6f477f211253f21e25738cb7d894ddb80ddd65f620b58a7",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata",
+        "bytes": 8354,
+        "sha256": "a9d436da322be808332f98d88325998e87cb693a678a9969feb4cfad729a6e93",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7",
+        "requires_dist": [
+          "six >=1.5"
+        ],
+        "license": {
+          "expression": null,
+          "declared": "Dual License",
+          "declared_text_bytes": 12,
+          "declared_text_sha256": "199628ddb098f90709bb2dc43f816a5a40fe31690de0e25d0f4d6455fe6bc609",
+          "license_files": [
+            "LICENSE"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: BSD License",
+            "License :: OSI Approved :: Apache Software License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "scipy",
+      "version": "1.14.1",
+      "filename": "scipy-1.14.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/93/6b/701776d4bd6bdd9b629c387b5140f006185bd8ddea16788a44434376b98f/scipy-1.14.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 41165244,
+      "sha256": "fef8c87f8abfb884dac04e97824b61299880c43f4ce675dd2cbeadd3c9b466d2",
+      "upload_time": "2024-08-21T00:05:00.489728Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/scipy/1.14.1/json",
+        "bytes": 80843,
+        "sha256": "dd5bb23ba900857f55c3d2251d7843c9e54bb59889f7b0107693bb7ce1d6a30b",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/93/6b/701776d4bd6bdd9b629c387b5140f006185bd8ddea16788a44434376b98f/scipy-1.14.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata",
+        "bytes": 60767,
+        "sha256": "031edf0fce95ede724b72a1edcf8c26f4b8bf6030516581d13dc11baa54b7a92",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.10",
+        "requires_dist": [
+          "numpy<2.3,>=1.23.5",
+          "pytest; extra == \"test\"",
+          "pytest-cov; extra == \"test\"",
+          "pytest-timeout; extra == \"test\"",
+          "pytest-xdist; extra == \"test\"",
+          "asv; extra == \"test\"",
+          "mpmath; extra == \"test\"",
+          "gmpy2; extra == \"test\"",
+          "threadpoolctl; extra == \"test\"",
+          "scikit-umfpack; extra == \"test\"",
+          "pooch; extra == \"test\"",
+          "hypothesis>=6.30; extra == \"test\"",
+          "array-api-strict>=2.0; extra == \"test\"",
+          "Cython; extra == \"test\"",
+          "meson; extra == \"test\"",
+          "ninja; sys_platform != \"emscripten\" and extra == \"test\"",
+          "sphinx<=7.3.7,>=5.0.0; extra == \"doc\"",
+          "pydata-sphinx-theme>=0.15.2; extra == \"doc\"",
+          "sphinx-design>=0.4.0; extra == \"doc\"",
+          "matplotlib>=3.5; extra == \"doc\"",
+          "numpydoc; extra == \"doc\"",
+          "jupytext; extra == \"doc\"",
+          "myst-nb; extra == \"doc\"",
+          "pooch; extra == \"doc\"",
+          "jupyterlite-sphinx>=0.13.1; extra == \"doc\"",
+          "jupyterlite-pyodide-kernel; extra == \"doc\"",
+          "mypy==1.10.0; extra == \"dev\"",
+          "typing_extensions; extra == \"dev\"",
+          "types-psutil; extra == \"dev\"",
+          "pycodestyle; extra == \"dev\"",
+          "ruff>=0.0.292; extra == \"dev\"",
+          "cython-lint>=0.12.2; extra == \"dev\"",
+          "rich-click; extra == \"dev\"",
+          "doit>=0.36.0; extra == \"dev\"",
+          "pydevtool; extra == \"dev\""
+        ],
+        "license": {
+          "expression": null,
+          "declared": null,
+          "declared_text_bytes": 54260,
+          "declared_text_sha256": "f3da99b169c47076aff90a51d38ef68506700508ed9bec5dd9a648080c176452",
+          "license_files": [],
+          "classifiers": [
+            "License :: OSI Approved :: BSD License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "sentencepiece",
+      "version": "0.2.0",
+      "filename": "sentencepiece-0.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/fb/12/2f5c8d4764b00033cf1c935b702d3bb878d10be9f0b87f0253495832d85f/sentencepiece-0.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 1301464,
+      "sha256": "e58b47f933aca74c6a60a79dcb21d5b9e47416256c795c2d58d55cec27f9551d",
+      "upload_time": "2024-02-19T17:06:21.796806Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/sentencepiece/0.2.0/json",
+        "bytes": 55154,
+        "sha256": "cea250053584e271c8783081468ace68f0f0550e083fadf28a0aa2853ab1cd5f",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/fb/12/2f5c8d4764b00033cf1c935b702d3bb878d10be9f0b87f0253495832d85f/sentencepiece-0.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata",
+        "bytes": 7683,
+        "sha256": "a8a8c4f673d7d88e5c9949e4bb441059b1f620d6283a74a2036be09071a9a7b3",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": null,
+        "requires_dist": [],
+        "license": {
+          "expression": null,
+          "declared": "Apache",
+          "declared_text_bytes": 6,
+          "declared_text_sha256": "87ec4027e1c873944291bdd61ee07ed30d74d45cbb418c85ae256e0a18e9e2cc",
+          "license_files": [],
+          "classifiers": [
+            "License :: OSI Approved :: Apache Software License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "six",
+      "version": "1.17.0",
+      "filename": "six-1.17.0-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl",
+      "bytes": 11050,
+      "sha256": "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274",
+      "upload_time": "2024-12-04T17:35:26.475808Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/six/1.17.0/json",
+        "bytes": 3904,
+        "sha256": "d8de39dd52b73048d81a8fd78022ee2bc72f8b568bcf0d88e5d5069c302b1208",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl.metadata",
+        "bytes": 1658,
+        "sha256": "562042078c2752549f6d8a7c86dbc5dd708088a7be6d80672ec7b07100b72468",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*",
+        "requires_dist": [],
+        "license": {
+          "expression": null,
+          "declared": "MIT",
+          "declared_text_bytes": 3,
+          "declared_text_sha256": "e5dcffe836b6ec8a58e492419b550e65fb8cbdc308503979e5dacb33ac7ea3b7",
+          "license_files": [
+            "LICENSE"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    },
+    {
+      "name": "sounddevice",
+      "version": "0.5.2",
+      "filename": "sounddevice-0.5.2-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/75/2d/582738fc01352a5bc20acac9221e58538365cecb3bb264838f66419df219/sounddevice-0.5.2-py3-none-any.whl",
+      "bytes": 32450,
+      "sha256": "82375859fac2e73295a4ab3fc60bd4782743157adc339561c1f1142af472f505",
+      "upload_time": "2025-05-16T18:12:21.919278Z",
+      "yanked": false,
+      "pypi_release": {
+        "url": "https://pypi.org/pypi/sounddevice/0.5.2/json",
+        "bytes": 6330,
+        "sha256": "35bc90510386b908fc7248784dc6f8f2f72bd2cf101e85fb56ba137121c275db",
+        "hash_basis": "audit_observed_metadata_not_immutable_release_json"
+      },
+      "metadata": {
+        "url": "https://files.pythonhosted.org/packages/75/2d/582738fc01352a5bc20acac9221e58538365cecb3bb264838f66419df219/sounddevice-0.5.2-py3-none-any.whl.metadata",
+        "bytes": 1637,
+        "sha256": "430175d25fd6bbff6a4de6d28d6688e55abbc6d0b881991953a9b5d6e10f3048",
+        "hash_basis": "publisher_PEP658_sha256",
+        "requires_python": ">=3.7",
+        "requires_dist": [
+          "CFFI>=1.0",
+          "NumPy; extra == \"numpy\""
+        ],
+        "license": {
+          "expression": null,
+          "declared": "MIT",
+          "declared_text_bytes": 3,
+          "declared_text_sha256": "e5dcffe836b6ec8a58e492419b550e65fb8cbdc308503979e5dacb33ac7ea3b7",
+          "license_files": [
+            "LICENSE"
+          ],
+          "classifiers": [
+            "License :: OSI Approved :: MIT License"
+          ],
+          "embedded_notices_verified": false
+        }
+      },
+      "acquisition": "new_Azure_wheel_only"
+    }
+  ],
+  "prerequisites": {
+    "mediapipe_acquisition_pass_required": true,
+    "wheel_payloads_not_downloaded_by_metadata_audit": true,
+    "embedded_wheel_notice_audit_required": true,
+    "task_constituent_license_verified": false,
+    "license_eligibility_verified": false,
+    "training_overlap_verified": false,
+    "challenge_overlap_verified": false
+  },
+  "qualification": {
+    "build_budget_seconds": 600,
+    "cpu_smoke_budget_seconds": 120,
+    "network": "none",
+    "gpus": false,
+    "dataset_read": false,
+    "native_model_load_only": true,
+    "detect_calls": 0,
+    "task_acquisition_pin_required": true,
+    "hand_landmarker_mode": "IMAGE",
+    "delegate": "CPU",
+    "num_hands": 4,
+    "min_hand_detection_confidence": 0.5,
+    "min_hand_presence_confidence": 0.5,
+    "min_tracking_confidence": 0.5,
+    "success_means": "dependency_import_and_native_graph_load_not_hand_accuracy"
+  }
+}
