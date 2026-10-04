@@ -1,0 +1,24 @@
+{
+  "schema": "world_reward.certified_solid_qualification_pins.v1",
+  "producer_revision": "52d4ca4094f071702230afd094a0db3278ac4147",
+  "parent_image_id": "sha256:c8fb1632a6908a82aeeeb73c36a00f17a26b81f95f4d2d498c53f75894e21137",
+  "child_image_id": "sha256:8693f4d575f94936b1e607958256fccf94650346be7381974af6f02d2f3f5bd6",
+  "report": {
+    "bytes": 119365,
+    "sha256": "48ec2ca70193b596baff30e2b5abebb7c8ca66504f8fa4229e97a4b7cca5c519"
+  },
+  "native": {
+    "bytes": 62794,
+    "sha256": "cc791c5dec8d056c08f2dd4c7d1d5bcafbdd69ca97d5d7dbfd66b1de4aa60a55"
+  },
+  "binary": {
+    "bytes": 901320,
+    "sha256": "acc3d3b6cb41617724fdb4f812e4bcf84283602d1c48b499478e0e63e1b7013f"
+  },
+  "native_source": {
+    "bytes": 14927,
+    "sha256": "7e42314c471c54ea1604e2e9e24d14785a6b9c29786db6ff4717e5b714facf38"
+  },
+  "qualified_controls": 15,
+  "qualification_scope": "fresh procedural exact represented geometry only; no production mesh, reconstruction gain or eligibility"
+}

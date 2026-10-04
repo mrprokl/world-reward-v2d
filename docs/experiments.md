@@ -8798,3 +8798,22 @@ binds same actualnativeF32mesh/frame and fullT PointTrackEvidence exactly,
 noattachmentrefit/nearestmatching/reselection. Root253PASS11optionalruntimeSKIP
 2.76s combined; actualTorch/native qualification dispatched separately onAzure,
 notpresumedPASS. Sameoriginalsurface/trackgenerator parameters preserved.
+
+Actual balancedquery52d4ca4 passes15freshcontrols22.120194s/native14.900310s.
+Independent whole190file source/archive8fa8269b0247542d4b4077551403ce9f8831c66f74c389d58d8901994ed9ecc7,
+ledger7b7ee2024ab6a4d14ebf8f387fbe463a759604c640fe01b90e5f71537bd721a2,
+originalCPUqualified runtime/oldreceipt/newsource/controlscope/compileflags/posthash
+PASS; ownedcontainerabsent. Host119365B SHA48ec2ca70193b596baff30e2b5abebb7c8ca66504f8fa4229e97a4b7cca5c519,
+native62794B SHAcc791c5dec8d056c08f2dd4c7d1d5bcafbdd69ca97d5d7dbfd66b1de4aa60a55,
+binary901320B SHAacc3d3b6cb41617724fdb4f812e4bcf84283602d1c48b499478e0e63e1b7013f.
+New separate pins preserve historicalqualification. Fourfreshcompositioncontrols
+notyetexecuted; no EP25productioncause/replay/adoption/HOIquality inferred.
+
+Actual jointpoint nativeTorch2.5.1+cu124/numpy1.26.3 tennumericalcontrolsPASS:
+translationgradient+gradcheck, occludedtrackequal, initializerexcluded, sixinvalid
+geometry/timeline/supportrejects, similarityinvariance. Firstnativefixture
+controller FAIL TypeError(missingpytestfixtureargument), before actualnativecall;
+originalsource unchanged/report2460B SHA7de75c0dc046521464fb6a6d4fb75a8d03e50d41d2f18ca5a74ff97d506fdb7d
+preserved. Freshcontroller-only correction calls actualfixture explicitly;
+no repeated10mathcontrols/sourcefix/model/productioninference. Native301loop
+qualification pending; no3D/HOIquality claim.
