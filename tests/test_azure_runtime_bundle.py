@@ -386,3 +386,77 @@ def test_unknown_abbreviated_targets_and_root_override_fail(monkeypatch, args):
     def forbidden(*a, **k): raise AssertionError("No subprocess on invalid option")
     monkeypatch.setattr(launcher.subprocess, "check_output", forbidden)
     with pytest.raises(SystemExit): launcher.main(["--name", "test", "--script", "infra/run_smoke.sh", *args])
+
+
+@pytest.mark.parametrize("revision", ["", "HEAD", "main", "v1", "a" * 39, "a" * 41, "A" * 40, "g" * 40, "a" * 40 + "^", "--all", "a;echo x", "a" * 40 + "\n"])
+def test_explicit_revision_invalid_before_any_git_or_azure(monkeypatch, revision):
+    def forbidden(*_, **__): raise AssertionError("Invalid revision reached subprocess")
+    monkeypatch.setattr(launcher.subprocess, "check_output", forbidden)
+    monkeypatch.setattr(launcher.subprocess, "run", forbidden)
+    with pytest.raises(SystemExit):
+        launcher.main(["--name", "test", "--script", "infra/run_smoke.sh", "--revision", revision])
+
+
+def exact_revision_stub(monkeypatch, *, explicit=True, kind=b"commit\n", resolved=None, missing=False):
+    revision = "b" * 40; calls = []; archives = []; git_calls = []
+    committed = files(); committed["infra/smoke.py"] = b"COMMITTED_VALUE = 1\n"
+    def git(command):
+        assert command[:3] == ["rtk", "proxy", "git"]
+        args = command[3:]; git_calls.append(args)
+        if args[0] == "status": return b" M infra/smoke.py\n?? disjoint.py\n"
+        if args[:2] == ["cat-file", "-t"]:
+            assert args[2] == revision
+            if missing: raise launcher.subprocess.CalledProcessError(128, command)
+            return kind
+        if args[0] == "rev-parse":
+            assert args == ["rev-parse", "--verify", revision + "^{commit}"]
+            return (resolved or revision).encode() + b"\n"
+        if args[:2] == ["cat-file", "-e"]:
+            assert args[2] == revision + ":infra/run_smoke.sh"; return b""
+        if args[0] == "archive":
+            assert args == ["archive", "--format=tar", revision, "infra", "src", "configs", "pyproject.toml"]
+            archives.append(args); return full_archive(committed)
+        raise AssertionError(command)
+    monkeypatch.setattr(launcher.subprocess, "check_output", git)
+    def azure(command, **kwargs):
+        calls.append(command); return type("Result", (), {"returncode": 0})()
+    monkeypatch.setattr(launcher.subprocess, "run", azure)
+    args = ["--name", "test", "--script", "infra/run_smoke.sh"]
+    if explicit: args += ["--revision", revision]
+    return args, revision, calls, archives, git_calls
+
+
+def test_explicit_commit_dispatch_ignores_dirty_worktree_and_freezes_commit_bytes(monkeypatch, capsys):
+    args, revision, calls, archives, git_calls = exact_revision_stub(monkeypatch)
+    launcher.main(args)
+    assert len(calls) == len(archives) == 1 and not any(call[0] == "status" for call in git_calls)
+    assert "revision=" + revision in capsys.readouterr().out
+    remote = calls[0][calls[0].index("--scripts") + 1]
+    assert f"jobs/{revision}/run_smoke" in remote and f"WR_CODE_REVISION='{revision}'" in remote
+    encoded = remote.split("printf '%s' '", 1)[1].split("' | base64", 1)[0]
+    frozen = lzma.decompress(base64.b64decode(encoded))
+    with tarfile.open(fileobj=io.BytesIO(frozen), mode="r:") as archive:
+        assert archive.extractfile("infra/smoke.py").read() == b"COMMITTED_VALUE = 1\n"
+        assert not any("disjoint" in member.name for member in archive)
+
+
+def test_default_still_rejects_dirty_tree_before_archive_or_azure(monkeypatch):
+    args, _, calls, archives, _ = exact_revision_stub(monkeypatch, explicit=False)
+    with pytest.raises(RuntimeError, match="clean"): launcher.main(args)
+    assert not calls and not archives
+
+
+@pytest.mark.parametrize("kind", [b"tree\n", b"blob\n", b"tag\n", b""])
+def test_explicit_noncommit_object_rejected_before_archive_or_azure(monkeypatch, kind):
+    args, _, calls, archives, _ = exact_revision_stub(monkeypatch, kind=kind)
+    with pytest.raises(ValueError, match="Git commit"): launcher.main(args)
+    assert not calls and not archives
+
+
+def test_explicit_resolved_mismatch_or_missing_commit_never_calls_azure(monkeypatch):
+    args, _, calls, archives, _ = exact_revision_stub(monkeypatch, resolved="c" * 40)
+    with pytest.raises(ValueError, match="differs"): launcher.main(args)
+    assert not calls and not archives
+    args, _, calls, archives, _ = exact_revision_stub(monkeypatch, missing=True)
+    with pytest.raises(launcher.subprocess.CalledProcessError): launcher.main(args)
+    assert not calls and not archives

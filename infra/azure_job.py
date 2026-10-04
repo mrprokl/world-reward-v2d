@@ -51,6 +51,13 @@ def azure_vm_name(value: str) -> str:
     return value
 
 
+def exact_commit_revision(value: str) -> str:
+    """Only a complete lowercase Git commit ID, never a ref or revision expression."""
+    if re.fullmatch(r"[0-9a-f]{40}", value) is None:
+        raise argparse.ArgumentTypeError("Revision must be exactly40 lowercase hexadecimal commit characters")
+    return value
+
+
 def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
     """Select committed entrypoint/import closure, never data or unused tooling.
 
@@ -223,6 +230,8 @@ def main(argv=None) -> None:
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--name", required=True)
     parser.add_argument("--script", required=True, help="Committed infra/*.sh entrypoint")
+    parser.add_argument("--revision", type=exact_commit_revision,
+                        help="Exact immutable commit; ignores disjoint local changes and archives only this commit")
     parser.add_argument("--resource-group", type=azure_resource_group, default=DEFAULT_RESOURCE_GROUP)
     parser.add_argument("--vm-name", type=azure_vm_name, default=DEFAULT_VM_NAME,
                         help="Azure target VM; --name remains only the immutable job name")
@@ -235,9 +244,16 @@ def main(argv=None) -> None:
     # RTK also wraps child shell-facing CLIs on the local host.
     def git(*arguments: str) -> bytes:
         return subprocess.check_output(["rtk", "proxy", "git", *arguments])
-    if git("status", "--porcelain", "--untracked-files=all").strip():
-        raise RuntimeError("Commit/clean the worktree before launching a reproducible job")
-    revision = git("rev-parse", "HEAD").decode().strip()
+    if args.revision is None:
+        if git("status", "--porcelain", "--untracked-files=all").strip():
+            raise RuntimeError("Commit/clean the worktree before launching a reproducible job")
+        revision = git("rev-parse", "HEAD").decode().strip()
+    else:
+        revision = args.revision
+        if git("cat-file", "-t", revision).strip() != b"commit":
+            raise ValueError("Explicit revision must identify a Git commit, not a tree/blob/tag")
+        if git("rev-parse", "--verify", revision + "^{commit}").decode().strip() != revision:
+            raise ValueError("Resolved commit differs from the exact caller revision")
     git("cat-file", "-e", f"{revision}:{args.script}")
     source_archive, paths = runtime_archive(git("archive", "--format=tar", revision,
                                                "infra", "src", "configs", "pyproject.toml"), args.script)

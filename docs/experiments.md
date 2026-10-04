@@ -6184,3 +6184,24 @@ initializers have actual PASS masks/body/depth sparse/scale/object reports;
 full body/depth still running. EP5 CPU assembly reaches600/668 frames.
 EP6's unchanged previously external-gated volume proposal is separately
 dispatched CPU-only; no geometry adoption, pose retry or accuracy claim yet.
+
+Frozen855caff RoboTAP CPU evaluation **PASS75.985419s / ACCEPT_2D_DIAGNOSTIC**;
+report7927B SHA`6778843b042f36be59e4c01ece69636978b9c82389ccfb652755f2bc14d6222a`.
+Mean-per-video AJBoots0.667886322 vs static0.177800616, absolute gain0.490085706,
+positive on3/3; OA0.929311955 vs0.768736684. All frozen predictions/source/private
+inputs reverified, no future truth serialized. Preregistered0.05/2-of-3/OA gates
+pass; close the cohort without tuning. Static is only a diagnostic negative
+control, not a valid motion estimator. Three known-benchmark videos with oracle
+initial queries do NOT establish held-out/generalized 3D object tracking, automatic
+Track1 queries, training-overlap clearance, full-HOI gain or CARI4D victory.
+Next useful gate is an independent external3D pose comparison versus the native
+dynamic baseline, not another score on these same three videos.
+
+Research control improvements: strict optional Azure `--revision` archives only
+the exact verified40-hex Git commit while disjoint agents edit other files;
+default clean-worktree contract stays unchanged. New empty-pose topology
+transition authenticates old source/log/PID/cgroup, seven actual volume pins and
+held GPU lock before atomicNOREPLACE archiving ONLY the original empty directory;
+no geometry/trajectory deletion or historical PASS reinterpretation. Root
+combined271 focused tests PASS2.06s; these are control tests, not executed
+transition, transferred data or reconstruction results.
