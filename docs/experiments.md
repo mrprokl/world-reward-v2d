@@ -8189,3 +8189,38 @@ only report retained, no archive or model/label read. This is a root invocation
 error, not a scientific failure or permission to weaken source authentication.
 Preserve failed namespace; a corrected argument replay needs a fresh revision
 and exact same original inputs/helpers. No restart or forged producer namespace.
+
+Readonly exact-solid source query ef039ed **PASS6.299616s** (native5.584934s,
+one exact query5.301738s): original EP09 represented106956vertices/213876faces,
+all9 connected boundaries retained and embedded. Actual109381B receipt
+SHA8787706e111d823fc60586af495d9dfc3234aa345067f035cd009cabbabe8955.
+Independent174-file committed closure/modes/markers, original129-file lineage,
+qualified binary/runtime and original5 input byte pins pass before/after;
+host/native source bindings agree and owned container/disposable removed.
+Only report and container-ID retained onAzure. This certifies represented
+source geometry, NOT quantization, official budget/packing, shape/scale accuracy,
+old QEM acceptance or adoption. Historical conditioned-source FAIL stays closed.
+
+Correct-argument EP25 inventory ec7fe6b **PASS8.569772s**:1108 allowlisted files,
+1601191236 input bytes; archive1602242560B
+SHAfe93b7919b6c5afc25065b6ed83d6efaadf3dcdd04de00ac4a127ccb67cfb4cc,
+manifest168737B SHA96ce8a3da3da90242c3bd380c42e29ffbc8d818b0e176d324b55deac188c5eb4,
+receipt2433B SHA5bdef94a80692147faa2bb70b62b566adc411821aaec0c6aecb20ffd7b5362e2.
+Freeze tiny1941B transport pins; full365-frame/default geometry archive remains
+Azure. Integrity check is not pose execution or accuracy. No old result overwritten.
+
+Original EP26/399 full initializer chain finishes17:18:22UTC, body165.522316s,
+depth217.274318s, adapter8.166031s. Pose not run. Fresh untouchedEP27/440 original
+initializers scheduled through existing0444f56 readonly GPUlock; masksPASS64.300367s,
+remaining chain active. CPU EP21 assembly continues independently; no duplicate GPU.
+
+New external tracker-noise hypothesis frozen BEFORE new data values: existing
+CC-BY RoboTAP split3 first lexical clip for fit, split4 first two for test;
+old split0–2 cohort remains closed. Gaussian4 composite error-increment densities
+B(full covariance)/A(same means/marginals, cross0), parity groups nonsemantic,
+both interval endpoints strictly after query, no jitter/fallback or missing fill.
+Matched-anchor temporal-shift contrast descriptive only; main heldout gate is
+positive B-minus-A mean on EACH test clip, not a camera/identity/contact claim.
+Independent mathematical/scientific audit clear; root156 combined peer/null
+testsPASS1SKIP2.12s and matched extension54PASS0.09s. Root6331-entry fixtures
+removed; no new labels/models executed or quality conclusion from tinytests.
