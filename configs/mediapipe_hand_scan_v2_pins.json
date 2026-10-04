@@ -1,0 +1,38 @@
+{
+  "schema": "world_reward.mediapipe_hand_scan_pins.v1",
+  "producer_revision": "2538242edfdbd07b02a5bc1e684c2e29b1da3403",
+  "report": {
+    "bytes": 6732,
+    "sha256": "11818ed0c67cbec760257021f13a14bcfa0ce1c19307bf0412f4f0e7cc51ecd9"
+  },
+  "outputs": {
+    "report.json": {
+      "bytes": 2894,
+      "sha256": "ec6a68ebf9b3894e378e242644365fbff6f37e96ed7107cf89a0b35f312557e3"
+    },
+    "sequence_004.npz": {
+      "bytes": 26266,
+      "sha256": "9eac0cd5c82847e50dddd69d61989dc48f533a21aff08424b26b8a287af5b1b3"
+    },
+    "sequence_004.npz.json": {
+      "bytes": 1168,
+      "sha256": "d060c1e66982e212ab321ecbd1b8fac55e9f0d2b04377585c8f5fbbc1e38c0a6"
+    },
+    "sequence_039.npz": {
+      "bytes": 89586,
+      "sha256": "cf393b4588841d124bf11f00a17240ab6aa2f83f1a564b504d32a489d7ffa2ec"
+    },
+    "sequence_039.npz.json": {
+      "bytes": 3620,
+      "sha256": "bb64376a04e6d73eafdfc70930ba529b50dd23fc15298f9e10b7f7f0b6c95e7d"
+    },
+    "sequence_074.npz": {
+      "bytes": 59543,
+      "sha256": "5275f008c4356cff776fa878dc39a35ad3338271e58af11ad18769c44ebdcb0f"
+    },
+    "sequence_074.npz.json": {
+      "bytes": 2457,
+      "sha256": "a65f94db5ccb9f5393b5e2245ff64d908da174fdb949f96c6d8eedbd0d872785"
+    }
+  }
+}

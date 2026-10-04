@@ -7617,3 +7617,12 @@ Receipt6111B SHA1ab16cbb98400c107046a752c3f12bef9d92f0a83d2255513b7cf21471c5011c
 results/sam2-hand-batch-gate-87acd00c7a774fd3bc81847bfb09423a/report.json.
 Mask shapesN1[1,480,640],N2[2,1,480,640] confirm untouchednative ABI; noaccuracy.
 Fresh Dex04 CPUscan source2538242 dispatchedACK only; no quality result yet.
+
+Fresh Dex04 CPU scan actualPASS9.427117s/all218calls/onegraph under2538242,
+IMAGE4/.5 unchanged. Original72/72/74 timelines,14/54/35frames with proposals,
+no capacitysaturation; missingframes retained (not GTmisses certified).
+Independent147-file originalsource, acquisition/protocol/publisher/runtime/task,
+allseven rawoutputs and posthash PASS before SAM2 inference/private values.
+Host6732B SHA11818ed0c67cbec760257021f13a14bcfa0ce1c19307bf0412f4f0e7cc51ecd9.
+No private values, identity, contact/3D or adoption. EP13export66a48ff and
+EP14prepare2538242 ACKqueued behind originalEP16 lock, not inferredPASS.
