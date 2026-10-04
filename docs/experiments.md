@@ -8368,3 +8368,11 @@ at18:11:59 beforechild becauseEP28precedessorhadbeenlegitimatelycollected;
 preserveoriginalunit/log/outputabsence. EP28full366initializers actualPASS
 at18:04:45; no GPUjobactiveat18:14. A new explicitexistinglock policy avoids
 interpretingmissingunit asPASS and leaves nativealgorithm/inputpins unchanged.
+
+Root112qualification/build/cohort testsPASS1.53s, own2114-entryfixturesremoved.
+Actual full nativefour-control qualification25f7b93 dispatched onCPU, allheavy
+geometryremainsAzure. Separate unchangedEP22lock-only frontend replay queued
+after independently preserved originalpredecessorwaitFAIL/nooutputs; notnativePASS.
+Generic CARI stage queue adds explicit bounded --after-gpu-lock policy, retaining
+source/pin/GPU-idle checks and FD9 acrosschild, without interpreting unitabsence
+as success. Root90schedulingtestsPASS/2Linux-onlySKIP53.80s; no prediction change.

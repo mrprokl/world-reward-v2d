@@ -192,6 +192,39 @@ def test_explicit_idle_mode_requires_original_lock_without_invented_unit_success
     assert calls[-1][1:4] == [CHILDREN[stage][0], '--episode', '5']
 
 
+@pytest.mark.parametrize('stage', CHILDREN)
+def test_explicit_after_gpu_lock_blocks_without_reading_collected_predecessor(runtime, stage):
+    runtime['env'].update(FAKE_LOAD='not-found', FAKE_SYSTEM_STATUS='9')
+    result = runtime['run']('--stage', stage, '--episode', '5', '--after-gpu-lock')
+    assert result.returncode == 0, result.stderr
+    calls = runtime['calls']()
+    assert [row[0] for row in calls] == ['flock', 'nvidia-smi', 'child']
+    assert calls[0] == ['flock', '--timeout', '43200', '9', runtime['lock'].stat().st_ino]
+    assert calls[-1] == ['child', CHILDREN[stage][0], '--episode', '5', runtime['lock'].stat().st_ino]
+
+
+@pytest.mark.parametrize('args', [
+    ['--after-gpu-lock', '--after-gpu-lock'], ['--after-gpu-lock', '--when-idle'],
+    ['--when-idle', '--after-gpu-lock'], ['--after-gpu-lock', '--wait-for', 'world-reward-test'],
+    ['--wait-for', 'world-reward-test', '--after-gpu-lock'], ['--after-gpu-lock', 'true'],
+    ['--after-gpu-lock=true'],
+])
+def test_after_gpu_lock_is_explicit_exclusive_before_any_runtime_query(runtime, args):
+    assert runtime['run']('--stage', 'prepare', '--episode', '5', *args).returncode == 2
+    assert not runtime['calls']()
+
+
+@pytest.mark.parametrize('fault', ['timeout', 'gpu', 'gpuquery', 'targetduringwait', 'sourceduringwait'])
+def test_after_gpu_lock_keeps_all_original_postwait_guards(runtime, fault):
+    if fault == 'timeout':runtime['env']['FAKE_FLOCK_STATUS'] = '1'
+    elif fault == 'gpu':runtime['env']['FAKE_APPS'] = '12345'
+    elif fault == 'gpuquery':runtime['env']['FAKE_GPU_STATUS'] = '9'
+    elif fault == 'targetduringwait':runtime['env']['FAKE_WAIT_TARGET'] = '1'
+    else:runtime['env']['FAKE_WAIT_SOURCE'] = '1'
+    assert runtime['run']('--stage', 'prepare', '--episode', '5', '--after-gpu-lock').returncode != 0
+    assert not any(row[0] in ('systemctl', 'child') for row in runtime['calls']())
+
+
 @pytest.mark.parametrize('args', [
     ['--stage', 'prepare', '--episode', '5', '--when-idle', '--when-idle'],
     ['--stage', 'prepare', '--episode', '5', '--when-idle', '--wait-for', 'world-reward-test'],
@@ -245,11 +278,13 @@ def test_target_never_overwritten_or_deleted(runtime, kind):
     assert out.exists() or out.is_symlink()
 
 
+@pytest.mark.parametrize('mode', ['wait-for', 'after-gpu-lock'])
 @pytest.mark.skipif(sys.platform != 'linux' or not shutil.which('flock'), reason='Original Linux flock only')
-def test_real_linux_parent_retains_lock(runtime):
+def test_real_linux_parent_retains_lock(runtime, mode):
     runtime['env']['FAKE_REAL_FLOCK'] = shutil.which('flock')
     runtime['env']['FAKE_CHECK_REAL_LOCK'] = '1'
-    result = runtime['run'](*runtime['args']); assert result.returncode == 0, result.stderr
+    args = runtime['args'] if mode == 'wait-for' else ['--stage', 'prepare', '--episode', '5', '--after-gpu-lock']
+    result = runtime['run'](*args); assert result.returncode == 0, result.stderr
 
 
 def test_bash_syntax_and_complete_literal_runtime_closure(monkeypatch):
