@@ -11,16 +11,16 @@ inferred automatically; no hand-labeling of challenge records.
 **No final Parquet, submission or verified CARI4D improvement yet.**
 
 - **Engineering:** all30 original videos pass byte/metadata readiness. Episodes
-  **0,1,2,3,5,6,8,12,15** pass full native shared preparation, forward,301-update
-  refinement, direct export and original official packing. These are nine
+  **0,1,2,3,5,6,8,12,13,15** pass full native shared preparation, forward,301-update
+  refinement, direct export and original official packing. These are ten
   complete engineering checks, not held-out accuracy; scratch Parquets deleted.
   EP0's legacy conversion failure stays separate. EP4 missing masks, EP7 empty
   anchor, EP9 invalid geometry and EP10/EP11 actor identity failures remain closed.
   EP11 stops before SAM2/later frontends. EP0's exact historical metadata
   omission is authenticated, not a relaxed legacy gate or a reversal of its old
-  conversion failure. EP13 full425 inputs, shared preparation and native forward
-  and301-update refinement pass; direct export is not yet run. EP14 full442 frontend/input receipt passes
-  and independent15-input sealing pass; subsequent export/preparation are queued. Collected-predecessor scheduling failures
+  conversion failure. EP13 full425 complete chain passes. EP14 full442 inputs, shared preparation
+  and native forward pass with independent source-chain pins; refinement next.
+  EP16 closes on topology-budget failure before object pose, without mesh repair. Collected-predecessor scheduling failures
   remain separate. Original controls/reference replay and whole source-chain pins are
   frozen before each next stage; no prediction is inferred from dispatch ACKs.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same

@@ -27,10 +27,10 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
 | 12 | 405 | Full native refinement and direct export PASS31.726037s, whole source chain/four outputs pinned. Official packing PASS13.521699s/all405, scratch removed. |
-| 13 | 425 | Original full inputs and shared preparation PASS18.417917s/all425 frames; full source/geometry lineage pinned. Original collected-predecessor scheduling FAIL remains separate. Native forward PASS109.129234s/all425 and301-update refinement PASS220.562431s, both independently frozen. Export queued behind original EP16; ACK only. |
-| 14 | 442 | Original full frontend/input PASS3319.999303s; independent15-input pins sealed. Shared preparation queued; ACK only, no reconstruction/accuracy PASS. |
+| 13 | 425 | Original full inputs and shared preparation PASS18.417917s/all425 frames; full source/geometry lineage pinned. Original collected-predecessor scheduling FAIL remains separate. Native forward PASS109.129234s/all425 and301-update refinement PASS220.562431s, both independently frozen. Direct export PASS31.882319s and official packing PASS13.458823s; scratch removed. |
+| 14 | 442 | Original full frontend/input PASS3319.999303s; independent15-input pins sealed. Shared preparation PASS18.842805s and native forward PASS111.789331s; both independently pinned. No accuracy PASS. |
 
-Nine complete packed episodes are engineering/fidelity evidence only. Scratch
+Ten complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
 verified CARI4D superiority exists. Other episodes are not presumed ready.
 

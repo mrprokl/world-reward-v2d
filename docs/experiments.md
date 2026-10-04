@@ -7669,3 +7669,11 @@ assets/fullRGBindices/counters/exclusiveoutputs pre/posthash. Host123452B
 SHA9d45149afddd760c4158948cb23a9883d591bc9db9db8188571a27404fea3cb8.
 No private values, quality/physicalID/contact/3D inferred; pins precede separate
 CPUprivate mask evaluation. Originalfirstattempt technicalfail retained.
+
+EP13 originalofficialpack PASS13.458823s/full425 and source/receipt/exclusive
+report-only scratchremoved independentlyPASS under66f6138; ten fully packed
+engineeringepisodes, no finalall30 submission. EP14 originalfull442forward
+PASS111.789331s, wholeinput/prepare/nativebindings independently sealed before
+refinement. Report66132B SHA19dbda48a92073c2cd81c7dbf172d1d38b6654f02acc2afecd573db31d3cd30b,
+bundle338268732B SHA3da674b61f7f22e06f762c5aa6c4fd592218127aa9d81fee9146eb957a263cec.
+Mask-onlyCPU evaluation7fa3931 dispatchedACK, no private metric presumed.
