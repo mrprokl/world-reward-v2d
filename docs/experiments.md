@@ -7694,3 +7694,14 @@ SHAe7db7336b45e48cf3603b300bc88cf90be2ed2e8d9674bb0dac9ea4d54ab8b3d,
 producer7fa3931. Native diagnostic7594B
 SHAf1755f4583f62ec4dce33e6d947737c1fc557d6c28822380c926ab263d7e313c.
 ExecutionPASS distinct from qualityFAIL; no conditionaltracking run.
+
+Next research decision after closed maskgate: improve automatic availability
+before relations/contact. WiLoR full-image detector is a plausible distinct
+source, but NC-ND checkpoint/Ultralytics and DEX-TRAIN overlap unresolved;
+no heavydownload/adoption. Assess nativeSAM2 video-memory alternative on aNEW
+cohort before infrastructure; sharedobservations and metrics, not Dex04rescue.
+
+Full tiny regression suite13186PASS8optionalSKIP494.65s after explicit Path
+proof fix and existing transport-cap test correction; no algorithm changes.
+Turn-owned exclusive test root removed without following symlinks or touching
+foreign work. This verifies code correctness only, not held-out reconstruction.
