@@ -8279,3 +8279,19 @@ manifest SHA766ed8adfbe6a7e232a6c2e2bf6b293b2d24869afcbe54b5fe8dca41acc3f769.
 All-source gate FAIL; zero native QEM/CGAL calls, no qualification/adoption,
 no challenge arrays changed. Preserve fixtures/gates; investigate a separately
 source-bound deterministic chart method on a fresh predeclared cohort.
+
+Tracker-noise inferadcbdbb actualPASS26.604895s: all3 original native Boots calls
+complete, full1231/1253/1228frames32queries preserved. Receipt53120B
+SHA84544964faa74f4515bb869d831175a6ea1484eede31fb936ead571b92e28fc5;
+root independently verifies173sourcefiles, archive/readonly-ledger/markers,
+receipt pre/postsource, all3 outputSHA, no privatepickles/labels and wrapper
+terminalexit0/ownedcontainergone. Actualinfer pins now frozen for a separate
+CPU fit/evaluation; no learned-noise/HOI/contact/causal-camera conclusion yet.
+One root audit used nonexistent evidence key `report`, failing after hashes
+without rerunning inference; corrected actual schema key `runtime` matches.
+
+EP25 original preflight log32B SHAb4d82426bc130b6cb88fab56aa62ebb5259e58d695a729daf837d554f223d475
+and218-source closure independently preserved. Metadata-only canonical empty
+EP25 parent createduid/gid1000 mode0755;489B receipt
+SHAc52ba44a054c64d4790ab77c79ea8ad6f28d3f8eea48cd1960343e3955d9e01d.
+No input/algorithm/model/source bytes changed and no native replay yet.
