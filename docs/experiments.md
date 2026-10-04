@@ -5942,3 +5942,43 @@ Removed44owneduntrackedpyc files underinfra/src/tests aftertestcompletion,
 no trackedfiles/userenv/data/model deletions. Repo finalcode/results pushed;
 EP5tracking/EP6waiting continueAzure. No verifiedfull-HOI/CARIvictory/final
 Parquet/upload/license/registrationPASSclaimed.
+
+## 2026-10-04 — full EP5 tracking and next research direction
+
+Original volume-frontends producer `3bee2c7e830f6175bc662d02c394e0179a0e262a`
+completes object tracking on **all 668 original EP5 frames** in 3605.685147 s.
+Actual receipt: 34,085,820 B, SHA256
+`5b974fa5bb95795f9db34d52e8b8aa10eca72fce3f18f1c7dd47cc025d7c1864`;
+unchanged object-pose source SHA
+`1ece387e2c8010183e4a38757728cd00adf07af069cca54803e28e2a05deb694`.
+Tracking PASS is engineering/full-frame evidence, not held-out accuracy. CPU
+CARI input assembly remains active; EP6 waits for the complete frontend route.
+No dropped frames, cavities, static rescue, duplicate job or final submission.
+
+Decision: prioritize the existing full native EP5 prepare→forward→refine→export
+and original packer. Queue its native work behind EP6's actual cooperative GPU
+lock, not a flock around an asynchronous launcher. Keep every numerical helper
+byte-identical; freeze actual stage pins only after independently inventoried
+PASS. For VM02 throughput, assess only the dominant object-pose stage before
+replicating the much larger Objects model stack.
+
+Independent September-cutoff follow-up verifies Apache BootsTAPIR/TAPNext++
+code/checkpoints and CC-BY-4.0 RoboTAP point-tracking data. Start a single fixed
+RoboTAP/Boots diagnostic on Azure; the 13.56 GB real archive is acceptable there.
+The 187 MB RGB-Stacking alternative is synthetic. These known benchmarks have
+unverified training overlap and no metric full-HOI truth; neither warrants a
+CARI4D/generalization claim. No new weights/data have yet been acquired.
+
+Synchronous native-stage queue added without changing producer numerics: parent
+FD9 holds the original cooperative lock through the entire child. Required
+committed pins/source/lock/absent-output/GPU-idle checks run before execution
+and source/lock are checked afterward. Independent focused controls: **417 PASS,
+1 Linux-only flock SKIP** in 34.14 s; unchanged native-stage regression audit
+**425 PASS** in 21.36 s.
+
+RoboTAP acquisition's final37 tiny tests PASS0.53 s; combined acquisition
+regression119 PASS1.56 s. Files are created0400 before their first byte, and
+the original archive's inode/state/SHA must remain unchanged before disposal.
+Only two stdlib infra helpers enter its code closure; no models/GT are imported.
+Acquisition source is frozen before any remote download. Selection/inference
+and evaluation remain pending; there is no hidden-label-driven tuning.

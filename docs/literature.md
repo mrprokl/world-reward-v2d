@@ -2,6 +2,45 @@
 
 Primary papers, project pages, GitHub source/README and Hugging Face metadata were inspected on 2026-10-02. No Track2/3 assets, FORM-HOI GT, or challenge multiview data were accessed. Paper benchmark numbers are not challenge numbers. This is a targeted, not exhaustive, SOTA survey.
 
+## October 4 follow-up: occlusion-aware point association
+
+The [primary TAPNet release](https://github.com/google-deepmind/tapnet/tree/730cda1c730877cfedbe01bf87fb1cadb78a565d)
+is pinned to September 15, 2026. It explicitly licenses its code and linked
+BootsTAPIR/TAPNext++ checkpoints under Apache-2.0; RGB-Stacking and RoboTAP
+videos/annotations are CC-BY-4.0. This does **not** verify checkpoint training
+overlap with either these benchmarks or the challenge.
+
+- **BootsTAPIR first:** the official PyTorch checkpoint is 218,886,140 B,
+  SHA256 `8493c7a69e02c85b9382fbb3c7b8b539b36bc08ede744b9e99feb739a0129f4b`,
+  [publisher HF revision](https://huggingface.co/google/tapnet/tree/5d3fb48e76c5422841e38501514121e251beabb7).
+  `TAPIR(pyramid_level=1)` consumes full RGB clips and `(t,y,x)` queries;
+  its native visibility is `(1-sigmoid(occlusion)) *
+  (1-sigmoid(expected_dist)) > .5`. Keep all original frame indices.
+- **TAPNext++ deferred:** the released 256 model improves long tracking in
+  the publisher's evaluation, but its checkpoint is 2,532,282,370 B. Establish
+  Boots runtime and an actual failure mode before acquiring another model.
+- **Testable Track 1 hypothesis:** automatic masked point trajectories and
+  confidence can disambiguate rigid-pose candidates when silhouettes/depth
+  are ambiguous. This supplies association, **not** metric depth or invisible
+  3D truth. Do not fabricate masks, interpolate a static occlusion interval,
+  or adopt this on the strength of a 2D benchmark alone.
+- **Real external diagnostic selected:** official
+  [RoboTAP archive](https://storage.googleapis.com/dm-tapnet/robotap/robotap.zip?generation=1693927735577112),
+  13,558,087,507 B, publisher MD5 `08dc00f12b10a7d70e0afd53ab822762`.
+  Its 265 real robot-manipulation videos have checked manual point annotations,
+  not metric human/object ground truth. Acquire only on Azure, freeze selection
+  before reading target coordinates, and distinguish a standard benchmark's
+  annotated initial query from automatic challenge query generation.
+  RGB-Stacking's 187 MB archive is **synthetic**, not a substitute real holdout.
+- **YCB-Video alternative deferred:** the publisher explicitly releases the
+  dataset under MIT, independently of its code. BOP's complete 14.97 GB test
+  archive has contiguous RGB/depth/poses; the 660 MB BOP19 subset is sparse.
+  Object configurations are predominantly static under camera motion; no
+  hand-moving-object cohort was verified. It cannot establish full-HOI accuracy.
+
+No new model execution, benchmark gain, overlap clearance or CARI4D superiority
+is established by this source audit. The failed authored-hand pilot stays closed.
+
 ## Priority order
 
 1. Reproduce frozen CARI4D baseline. It is a full-body category-agnostic metric 4D reference, not just a per-image PA-aligned method. It explicitly lacks detailed finger articulation and cannot fix major FoundationPose flips; first-frame object visibility is assumed.

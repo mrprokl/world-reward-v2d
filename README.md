@@ -33,7 +33,9 @@ No final Parquet, submission or verified CARI4D improvement yet.
   with empty automatic object masks. The next 668-frame episode has complete
   automatic masks and Body/depth initializers; its default topology reduction failed before object tracking. A separately
   gated volume-constrained proposal retains its three shells, including two
-  cavities; full tracking is running and remains unverified. No frames, components or
+  cavities; full tracking now passes on all 668 frames (3,605.69 s). Its CPU
+  CARI input assembly is running; the native reconstruction/export remains pending.
+  No frames, components or
   trajectories were dropped to rescue either episode.
 - **Depth research:** D106 anchors DA3 to MoGe with one scene-constant median
   ratio over whole native-valid support. It gains **56.2007%** median
@@ -67,8 +69,9 @@ SAM2 CUDA connectivity/hole-filling operator gate also passes, without models
 or historical image-parity/eligibility claims. The new four-frame frontend pilot
 passes; complete replica and reconstruction accuracy remain unverified.
 The full `bf6f740` lightweight source/test suite passed **10,746 tests,
-2 optional skips** in 332.26 s; later changes only record queue/results
-and update this status.
+2 optional skips** in 332.26 s. A synchronous GPU-lock queue for the unchanged
+native stages and a separately frozen RoboTAP/BootsTAPIR acquisition are being
+validated; neither is a reconstruction-quality result.
 Earlier extraction-fixture failures were corrected using authenticated historical
 Git bytes; the historical producer and production pins remain unchanged.
 

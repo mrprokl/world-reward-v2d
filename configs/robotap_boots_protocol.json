@@ -1,0 +1,117 @@
+{
+  "schema": "world-reward-robotap-boots-acquisition-protocol-v1",
+  "namespace": "validation/robotap_boots_v1",
+  "azure_vm_name": "world-reward-ncc-h100-02",
+  "azure_resource_group": "WORLD-REWARD-RESEARCH",
+  "budget_seconds": 1200,
+  "minimum_free_disk_bytes": 68719476736,
+  "maximum_expanded_bytes": 51539607552,
+  "maximum_archive_members": 10000,
+  "maximum_embedded_text_bytes": 131072,
+  "maximum_total_embedded_text_bytes": 1048576,
+  "dataset": {
+    "name": "RoboTAP",
+    "publisher": "Google DeepMind / Vecerik et al.",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "publisher_readme_revision": "730cda1c730877cfedbe01bf87fb1cadb78a565d",
+    "archive": {
+      "name": "robotap.zip",
+      "url": "https://storage.googleapis.com/dm-tapnet/robotap/robotap.zip?generation=1693927735577112",
+      "generation": "1693927735577112",
+      "metageneration": "1",
+      "bytes": 13558087507,
+      "md5_hex": "08dc00f12b10a7d70e0afd53ab822762",
+      "md5_base64": "CNwA8SsQp9cOCv1Tq4InYg==",
+      "crc32c_base64": "dfP9XQ==",
+      "last_modified": "Tue, 05 Sep 2023 15:28:55 GMT",
+      "content_type": "application/zip",
+      "published_sha256": null
+    },
+    "real_robotics_videos_declared": 265,
+    "annotations": "Externally manually annotated 2D point tracks and occlusion flags; evaluation-only",
+    "training_overlap_verified": false,
+    "challenge_overlap_verified": false,
+    "embedded_license_policy": "Primary pinned README is authority; retain all embedded text and STOP on contradictory/incomplete explicit licence declarations; no requirement to invent absent embedded terms"
+  },
+  "source": {
+    "repository": "google-deepmind/tapnet",
+    "revision": "730cda1c730877cfedbe01bf87fb1cadb78a565d",
+    "revision_date": "2026-09-15T20:59:57Z",
+    "license": "Apache-2.0",
+    "files": {
+      "README.md": {
+        "url": "https://raw.githubusercontent.com/google-deepmind/tapnet/730cda1c730877cfedbe01bf87fb1cadb78a565d/README.md",
+        "bytes": 22951,
+        "sha256": "c0cda10a66a91513fd78e1638ff6db7789d4320dc24e5897ce6bc1bd567c15c3"
+      },
+      "LICENSE": {
+        "url": "https://raw.githubusercontent.com/google-deepmind/tapnet/730cda1c730877cfedbe01bf87fb1cadb78a565d/LICENSE",
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "tapnet/__init__.py": {
+        "url": "https://raw.githubusercontent.com/google-deepmind/tapnet/730cda1c730877cfedbe01bf87fb1cadb78a565d/tapnet/__init__.py",
+        "bytes": 1350,
+        "sha256": "35b29d7968272465e0f9cbb0d2c1035003ef96b140f4de7516eb85a047ec9ab3"
+      },
+      "tapnet/torch/__init__.py": {
+        "url": "https://raw.githubusercontent.com/google-deepmind/tapnet/730cda1c730877cfedbe01bf87fb1cadb78a565d/tapnet/torch/__init__.py",
+        "bytes": 656,
+        "sha256": "f7c8d8c66e2f93ac350ce82c03f02152ffc82524cd120ebc944c931b6ea879e1"
+      },
+      "tapnet/torch/tapir_model.py": {
+        "url": "https://raw.githubusercontent.com/google-deepmind/tapnet/730cda1c730877cfedbe01bf87fb1cadb78a565d/tapnet/torch/tapir_model.py",
+        "bytes": 27917,
+        "sha256": "87c05fb17d48d0f4353a00b67c9d40d3a264e13e43d88e3f7b5829119845e3ba"
+      },
+      "tapnet/torch/nets.py": {
+        "url": "https://raw.githubusercontent.com/google-deepmind/tapnet/730cda1c730877cfedbe01bf87fb1cadb78a565d/tapnet/torch/nets.py",
+        "bytes": 12032,
+        "sha256": "4961a8e4882e8c9ac219c4714f6f2c811cc1ab665a439d4d2e79942002a9517c"
+      },
+      "tapnet/torch/utils.py": {
+        "url": "https://raw.githubusercontent.com/google-deepmind/tapnet/730cda1c730877cfedbe01bf87fb1cadb78a565d/tapnet/torch/utils.py",
+        "bytes": 10477,
+        "sha256": "a4267b3a6bd8ecf2dfe5effacab9f7a43664dc5d08966c98f6a0cc68f5ccedd3"
+      }
+    }
+  },
+  "checkpoint": {
+    "repository": "google/tapnet",
+    "revision": "5d3fb48e76c5422841e38501514121e251beabb7",
+    "file": "bootstapir_checkpoint_v2.pt",
+    "url": "https://huggingface.co/google/tapnet/resolve/5d3fb48e76c5422841e38501514121e251beabb7/bootstapir_checkpoint_v2.pt",
+    "bytes": 218886140,
+    "sha256": "8493c7a69e02c85b9382fbb3c7b8b539b36bc08ede744b9e99feb739a0129f4b",
+    "license": "Apache-2.0"
+  },
+  "planned_diagnostic": {
+    "selection_rule": "Sort original ZIP pickle member names lexicographically before opening any member values; freeze first three files when at least three exist; otherwise video selection remains pending",
+    "file_selection_count": 3,
+    "video_identity_from_pickle_filename_verified": false,
+    "single_or_grouped_pickle_policy": "No unpickle at acquisition. Video key selection and frame cardinalities remain pending; acquisition PASS is never benchmark PASS",
+    "query_protocol": "Future standard TAP first-query (t,y,x) may expose externally annotated initial query only, never future tracks/visibility to prediction; disclose oracle initial query",
+    "oracle_initial_query_is_track1_automatic_readiness": false,
+    "future_baseline": "Static initial-point control with all original frames retained; not a motion reconstruction or smoothing success",
+    "future_model": "Unmodified BootsTAPIR PyTorch offline TAPIR(pyramid_level=1), strict state_dict, eval, native tracks/visibility; no training or private-label adaptation",
+    "frame_and_query_matrix_frozen": false,
+    "inference_configuration_frozen": false,
+    "scope": "2D tracking/occlusion diagnostic only; no metric object pose, human reconstruction, full HOI or CARI4D victory claim",
+    "heldout_training_unseen_verified": false,
+    "no_inference_or_evaluation_during_acquisition": true,
+    "all_pickle_bytes_private": true,
+    "no_rgb_or_gt_decode_during_acquisition": true,
+    "no_challenge_assets": true,
+    "no_models_or_meshes_from_dataset": true
+  },
+  "attribution": {
+    "dataset": "RoboTAP",
+    "authors": "Google DeepMind; Vecerik et al.",
+    "publication": "RoboTAP: Tracking arbitrary points for few-shot visual imitation, ICRA 2024",
+    "source_url": "https://github.com/google-deepmind/tapnet",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "changes": "Original pickle contents retained byte-for-byte; acquisition metadata added; no RGB or annotation decoding"
+  }
+}
