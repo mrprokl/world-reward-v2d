@@ -50,8 +50,10 @@ No final Parquet, submission or verified CARI4D improvement yet.
   `person.`/`bottle.` queries, no manual prompts or model access to private
   authored geometry. Four full Body/MoGe predictions pass (`14ebc28`, 30.926 s),
   including native control replay and point-map projection. This is
-  pipeline readiness, **not** mask accuracy, bridge validation or adoption;
-  the future 192-frame experiment has not run. Earlier hypotheses and failed
+  pipeline readiness, **not** reconstruction accuracy. The frozen predicted-
+  geometry QA **REJECTS** the pilot: all four silhouettes pass, but one left
+  hand lacks the required automatic-mask support. No threshold/seed change,
+  192-frame run or bridge adoption; this cohort is closed. Earlier hypotheses and failed
   authored references remain closed; the new pilot does not turn them into PASS.
 - **Eligibility:** upstream source/checkpoint licenses, training overlap and
   NVIDIA's separate registration remain unresolved before any submission.

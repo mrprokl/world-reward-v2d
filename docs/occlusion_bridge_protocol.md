@@ -100,3 +100,15 @@ Store scalar decisions and original byte identities only; all heavy arrays and
 masks remain on Azure. Even PASS still requires clip-constant identity/scale,
 RGB-inferred object geometry and independently evidenced hand observations
 before the unchanged availability-ablation can be run.
+
+### Frozen pilot decision
+
+The original four-record CPU QA completed in 6.712 s and **REJECTED** adoption
+(`57d109c`). Silhouette IoUs were 0.85497/0.87489/0.88131/0.87363, all above
+0.70; the second anchor's named left-hand projections failed the original
+5-pixel automatic-person-mask support gate. All inputs/sources rehashed after
+all four records. This is not a measured ground-truth finger error, but it is
+sufficient to stop this preregistered pilot. No threshold, hand selection, seed
+or recipe change; no 192-frame manufacture, object-model transfer or bridge
+experiment follows from this cohort. Preserve the failure and pursue independent
+real validation and complete baseline processing instead.

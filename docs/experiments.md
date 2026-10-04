@@ -5909,3 +5909,22 @@ Frozen all4 IoU>=.7 and namedleftframe+within5pxpersonmask gates unchanged;
 operator/supportproxy only, not anatomicalkeypoint/contact/metricaccuracy.
 Perrecord100s renderer bound insideoverall180s, no thresholdrelaxation.
 Actual CPUresult pending; no bridge/full192adoption yet.
+
+NEW predicted-geometry QA57d109c actualFAIL6.712265321s/exit1, all4records
+completed andsources/inputspost-rehashed. Receipt22682B/
+33b8ea67e93c69a0f56252f3c39b7a0d3b1b7366168c4d178d3aa5a343c1f5cd;
+scripted92a7bd5f6210edfc88e7d3ad468fe2cd73bd4112c0e5ed0c42bd40a482fad5.
+AllsilhouetteIoU .854970407/.874891399/.881307964/.873633524 pass>=.7.
+Clip1namedleft-frame properSO3 but requiredpersonmaskproxy unsupported;
+other3pass. Thisis anhonestfrozenaggregateREJECT, notsoftwarefailure or
+permission toincrease5pxradius/changehand/dilation/retunebottle/seed. Close
+NEW4RGBpilot; DONOTrun192/Objects-transfer/availabilitybridge/adoption.
+Allpredicted/source/inputbytes retainedAzure, noactualmedia locally.
+Actualleftmaskproxyfailure doesNOTestablish GTfingererror/contacttruth;
+independentrealfull-HOI validation/sourceeligibility remainunresolved.
+
+Independent CPU QA source/tests210PASS1.09s plus baselinequeued/frontend/
+runtime235PASS54.86s. Failedpilot remains closed; no model/helper numeric
+changes. Plan next cleanEP6 originalglobal fixed_all16 queued only after
+explicitEP5 success+releasedlock, never alongside existingGPU worker.
+FreshEP6namespace/unit/log preflight pending beforedispatch.
