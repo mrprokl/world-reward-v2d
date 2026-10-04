@@ -7783,3 +7783,13 @@ exports, receipt/schema/firewall/roundtrip/scratch posthashPASS. Eleven complete
 packed engineering episodes, no final all30 artifact or quality superiority.
 EP18 full535 Body actualPASS182.141548s; original full CPUdepth started14:33:59UTC,
 no fullinput completion presumed.
+
+Dex05 unchanged full-T CPU IMAGE scan actualPASS9.284019s/220calls/onegraph
+under5b0f032. Exact157-file source/archive plus completeacq/runtime/task/fullRGB
+and seven scan artifacts independently frozen and all native floats/support/
+indices restored on isolated offlineCPU without MediaPipe/Torch or private.
+Report6734B SHA51e5f80e560907381a986c74bfafb09d3da659d6e9caf02ada456da97130febc.
+First independent cleanup assertion wrongly expected historical CID-file deletion;
+actual documented helper retains readonly CID after verifying container removal.
+No producer rerun or code change: corrected audit verifies original CID, absence
+of that container and stable receipt. Whole freezePASS, before native masks.
