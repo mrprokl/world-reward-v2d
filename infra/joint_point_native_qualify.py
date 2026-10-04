@@ -67,6 +67,42 @@ def source_binding(root, code, revision):
     return runtime().source(root, code, revision, ENTRY, HELPERS)
 
 
+def first_mask_binding(root, code):
+    """Bind only the original frame0 PNG through its independent pose receipt."""
+    rt=runtime();pin=rt.strict((code/'configs/cari_clip_000021_input_pins.json').read_bytes())
+    relative='outputs/episode_000021/object_pose_full/report.json';path=root/relative
+    expected=pin['source_files'][relative]
+    if rt.identity(path,readonly=False)!=expected:raise ValueError('Pinned original object pose report differs')
+    record=rt.strict(path.read_bytes());frames=record.get('frames')
+    if (type(frames)is not list or len(frames)!=FRAMES or type(frames[0])is not dict
+            or type(frames[0].get('frame_index'))is not int or frames[0]['frame_index']!=0
+            or not re.fullmatch('[0-9a-f]{64}',str(frames[0].get('object_mask_sha256')))):
+        raise ValueError('Original first-frame automatic mask receipt required')
+    mask=root/'outputs/episode_000021/automatic_masks/masks/1/000000.png'
+    identity=rt.identity(mask,16<<20,readonly=False)
+    if (identity['sha256']!=frames[0]['object_mask_sha256']
+            or rt.identity(path,readonly=False)!=expected):
+        raise ValueError('Original first-frame mask/report identity differs')
+    return mask,identity
+
+
+def load_first_mask(path, identity, image_size):
+    """Decode original binary L PNG, never resize or borrow224x224 observations."""
+    import numpy as np
+    from PIL import Image
+    rt=runtime()
+    if rt.identity(path,16<<20,readonly=False)!=identity:raise ValueError('Original mask changed before decode')
+    with Image.open(path)as image:
+        if image.format!='PNG' or image.mode!='L':raise ValueError('Original binary single-channel PNG required')
+        raw=np.array(image,copy=True)
+    if (raw.dtype!=np.uint8 or raw.shape!=image_size or not np.isin(raw,[0,255]).all()
+            or not np.count_nonzero(raw)):
+        raise ValueError('Original full-grid nonempty binary uint8 mask required')
+    if rt.identity(path,16<<20,readonly=False)!=identity:raise ValueError('Original mask changed during decode')
+    mask=raw>0;mask.flags.writeable=False
+    return mask
+
+
 def host_mounts(root, code):
     """Stdlib metadata only; no broad validation/private/model-cache mounts."""
     rt = runtime(); pin = rt.strict((code/'configs/cari_clip_000021_input_pins.json').read_bytes())
@@ -84,6 +120,7 @@ def host_mounts(root, code):
         root/'results/cari-refinement-assets.json',root/'results/weights-acquisition.json']
     for snapshot, _ in historical(root,code).values():
         paths += [snapshot,snapshot.parent/'revision',snapshot.parent/'source-sha256']
+    paths += [first_mask_binding(root,code)[0]]
     for path in paths: rt.canonical(path)
     return tuple(sorted(set(paths)))
 
@@ -111,7 +148,7 @@ def paired_execution(construct, probe, run, reset, release, initial, validate, r
                   actual_native_updates_per_arm=301,actual_native_updates_total=602)
 
 
-def numerical_control(root, source, vertices, faces, spec, pose):
+def numerical_control(root, source, vertices, faces, spec, pose, mask):
     import numpy as np
     import cari_clip_inputs as inputs
     from prep.mhr_depth_h5 import read_metric_depth
@@ -119,7 +156,6 @@ def numerical_control(root, source, vertices, faces, spec, pose):
     from world_reward.fixed_shape_point_pose import PointTrackEvidence
     from world_reward.joint_point_evidence import bind_joint_point_evidence
     depth=read_metric_depth(root/inputs.relative_paths(spec)['depth_h5'],'aligned',spec.camera_name,source['frames'][0])
-    mask=np.asarray(source['observations']['object_mask'][0])
     if mask.dtype!=np.bool_ or mask.shape!=(spec.height,spec.width) or np.shape(depth)!=mask.shape:
         raise ValueError('Original automatic mask and inferred depth grid required')
     K=inputs.inferred_camera(spec)
@@ -148,6 +184,11 @@ def run_runtime(root,out,code,report,persist,frozen):
         if full.identity(old/name)!=row:raise ValueError('Forward snapshot preparation helper identity differs')
     selected=forward.verify_forward_artifacts(root,code,spec,pins,source_code=old)
     frozen.update({Path(p):row for p,row in selected['bindings'].items()})
+    mask_path,mask_identity=first_mask_binding(root,code);frozen[mask_path]=mask_identity
+    mask=load_first_mask(mask_path,mask_identity,(spec.height,spec.width))
+    report['first_frame_automatic_mask']=dict(path=str(mask_path.relative_to(root)),identity=mask_identity,
+        frame_index=0,grid=[spec.height,spec.width],source_dtype='uint8',binary_values=[0,255],
+        nonzero_pixels=int(np.count_nonzero(mask)),resized=False,cropped_native_mask_used=False)
     for name in HELPERS:frozen[code/name]=rt.identity(code/name)
     report['historical_sources']={role:proof for role,(_,proof) in histories.items()}
     fr,pr=selected['report'],selected['prepare']['report']
@@ -221,7 +262,7 @@ def run_runtime(root,out,code,report,persist,frozen):
             with torch.no_grad():
                 rotation,translation,_,_=instance._object_state(indices,include_surface=False)
                 pose=optimizer.pose_matrix(rotation,translation)[0].detach().cpu().numpy()
-            evidence=numerical_control(root,source,vertices,faces,spec,pose)
+            evidence=numerical_control(root,source,vertices,faces,spec,pose,mask)
             extension=op.native_point_optimizer_class(optimizer,evidence,config)
             report.update(evidence_sha256=evidence.evidence_sha256,query_count=len(evidence.query_ids),
                           attachment_pose_source='actual_original_constructor._object_state')

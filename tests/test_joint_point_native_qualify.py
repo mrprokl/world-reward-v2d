@@ -85,6 +85,8 @@ def test_actual_original_calls_and_control_scope():
     assert source.index('evidence=numerical_control') < source.index('return extension(source')
     assert 'torch.use_deterministic_algorithms'not in source and 'setattr('not in source
     assert q.PROBES==(0,181) and q.BUDGET==7200 and q.FRAMES==563
+    numeric=ast.unparse(next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef)and n.name=='numerical_control'))
+    assert 'observations'not in numeric
 
 
 def test_wrapper_narrow_offline_scope_and_actual_markers():
@@ -110,3 +112,64 @@ def test_complete_runtime_closure():
 def test_shell_syntax():
     import subprocess
     subprocess.run(['bash','-n',str(ROOT/'infra/run_joint_point_native_qualify.sh')],check=True)
+
+
+def first_mask_fixture(tmp_path):
+    import json
+    import numpy as np
+    from PIL import Image
+    code=tmp_path/'code';(code/'configs').mkdir(parents=True)
+    path=tmp_path/'outputs/episode_000021/automatic_masks/masks/1/000000.png';path.parent.mkdir(parents=True)
+    Image.fromarray(np.array([[0,255,0],[255,0,0]],np.uint8)).save(path)
+    identity=q.runtime().identity(path,readonly=False)
+    report=tmp_path/'outputs/episode_000021/object_pose_full/report.json';report.parent.mkdir()
+    frames=[{'frame_index':i,'object_mask_sha256':identity['sha256']}for i in range(q.FRAMES)]
+    report.write_text(json.dumps({'frames':frames}))
+    relative=str(report.relative_to(tmp_path))
+    (code/'configs/cari_clip_000021_input_pins.json').write_text(json.dumps({
+        'source_files':{relative:q.runtime().identity(report,readonly=False)}}))
+    return code,path,identity,report
+
+
+def test_original_first_png_pin_and_binary_decoder(tmp_path):
+    import numpy as np
+    code,path,identity,_=first_mask_fixture(tmp_path)
+    assert q.first_mask_binding(tmp_path,code)==(path,identity)
+    mask=q.load_first_mask(path,identity,(2,3))
+    assert mask.dtype==np.bool_ and mask.shape==(2,3) and mask.sum()==2 and not mask.flags.writeable
+    assert np.array_equal(mask,[[False,True,False],[True,False,False]])
+    assert not (path.parent/'000001.png').exists()
+
+
+def test_first_mask_report_or_png_mutation_rejected(tmp_path):
+    code,path,identity,report=first_mask_fixture(tmp_path)
+    with pytest.raises(ValueError,match='full-grid'):q.load_first_mask(path,identity,(224,224))
+    path.write_bytes(path.read_bytes()+b'changed')
+    with pytest.raises(ValueError,match='identity'):q.first_mask_binding(tmp_path,code)
+    with pytest.raises(ValueError,match='before decode'):q.load_first_mask(path,identity,(2,3))
+    report.write_text('{}')
+    with pytest.raises(ValueError,match='pose report'):q.first_mask_binding(tmp_path,code)
+
+
+@pytest.mark.parametrize('value,mode',[(1,'L'),(0,'L'),(255,'RGB')])
+def test_nonbinary_empty_or_rgb_first_mask_rejected(tmp_path,value,mode):
+    import numpy as np
+    from PIL import Image
+    _,path,_,_=first_mask_fixture(tmp_path)
+    pixels=np.full((2,3,3)if mode=='RGB'else(2,3),value,np.uint8)
+    Image.fromarray(pixels).save(path)
+    identity=q.runtime().identity(path,readonly=False)
+    with pytest.raises(ValueError):q.load_first_mask(path,identity,(2,3))
+
+
+def test_host_mounts_add_only_original_first_mask(tmp_path,monkeypatch):
+    import json
+    code,path,identity,report=first_mask_fixture(tmp_path)
+    pin_path=code/'configs/cari_clip_000021_input_pins.json'
+    pin=json.loads(pin_path.read_bytes());pin.update(schema='world-reward-cari-clip-input-pins-v1',
+        clip_spec=dict(episode_index=21,total_frames=563,camera_name='front_stereo_camera_left',height=1152,width=1536))
+    pin['source_files'].update({f'outputs/episode_000021/tiny_{i}.json':{}for i in range(14)})
+    pin_path.write_text(json.dumps(pin));monkeypatch.setattr(q,'historical',lambda *_:{})
+    mounts=q.host_mounts(tmp_path,code)
+    assert [p for p in mounts if 'automatic_masks'in p.parts]==[path]
+    assert path.parent not in mounts and all(p.name!='000001.png'for p in mounts)
