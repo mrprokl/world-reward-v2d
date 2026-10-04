@@ -7559,3 +7559,13 @@ PASS13.521699s/all405, report9853B SHAd2f7232ae9d610694fd3222c1ece38a3e9e57b38f6
 scratch_removed=true. EP14 original full442 CPUinputs PASS3319.999303s underea26eda,
 report3360B SHA85dfc8f6f213f81181d20875443cb7d13cc655b4f1494109d580cd4e101d6968;
 independent completeinput freeze next, no later pipeline/accuracy claim.
+
+Paired native SAM2 adapter: root137focused tiny tests PASS1.05s, exact full-T
+lossless output decoder and counts/shared encoder, source/readonly narrow mounts,
+existing cooperative FD9, idle check after lock and owned cleanup/posthash.
+No task/private/Body/Boots/GroundingDINO execution. Budget900s unchanged, native
+point-prompts API still needs a bounded data-free actual CUDA check before fresh
+RGB inference. Source profile v2 CPU acquisition dispatchedACK only.
+First EP14 independent source audit failed at absent run_track1_frontends marker;
+no input values or predictions interpreted, no inference replay. Inspect actual
+queued producer namespace rather than fabricate markers or relax byte binding.
