@@ -4,6 +4,9 @@ Goal: a valid monocular human-object reconstruction submission that improves on
 CARI4D, **not** an evaluation exploit. No superiority claim until held-out scores
 verify it. See [research audit](docs/audit.md), [literature](docs/literature.md),
 [baseline contracts](docs/baseline.md) and [experiment gates](docs/experiments.md).
+The [unified framework design](docs/framework_architecture.md) and new
+[4DAnyone source audit](docs/4danyone_audit.md) distinguish implemented adapters
+from proposed research, not a claimed completed new method.
 Third-party source/model terms and unresolved eligibility are documented in
 [licenses](docs/licenses.md); own code is Apache-2.0, not the external assets.
 

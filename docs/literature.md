@@ -41,6 +41,20 @@ overlap with either these benchmarks or the challenge.
 No new model execution, benchmark gain, overlap clearance or CARI4D superiority
 is established by this source audit. The failed authored-hand pilot stays closed.
 
+## October 4 follow-up: 4DAnyone and framework architecture
+
+The newly supplied [4DAnyone](https://4danyone.github.io/) was audited against
+pre-September30 primary releases; see [source audit](4danyone_audit.md).
+Its structured reference context and routed generation are useful design ideas,
+not observed extra views or a complete metric human-object solution. The public
+release is human-centric SMPL-X→MHR70; paper 4DGS is not released, and its GVHMR
+path requires static-camera mode. No checkpoint or media was acquired.
+We prioritize shared scene state, explicit uncertainty, and separately validated
+proposal/selection/fitting modules over adding an unvalidated generator.
+The [proposed framework](framework_architecture.md) distinguishes existing
+reusable contracts from the unified system still to implement; scientific
+configurations are global and externally selected, never per-episode repairs.
+
 ## Priority order
 
 1. Reproduce frozen CARI4D baseline. It is a full-body category-agnostic metric 4D reference, not just a per-image PA-aligned method. It explicitly lacks detailed finger articulation and cannot fix major FoundationPose flips; first-frame object visibility is assumed.
