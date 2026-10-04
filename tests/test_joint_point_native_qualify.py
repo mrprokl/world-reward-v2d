@@ -173,3 +173,121 @@ def test_host_mounts_add_only_original_first_mask(tmp_path,monkeypatch):
     mounts=q.host_mounts(tmp_path,code)
     assert [p for p in mounts if 'automatic_masks'in p.parts]==[path]
     assert path.parent not in mounts and all(p.name!='000001.png'for p in mounts)
+
+
+def cleanup_probe(tmp_path,scenario,*,status=0,cid_kind='regular',trap=False):
+    """Execute ONLY the real shell cleanup functions with tiny Docker stubs."""
+    import os
+    import shlex
+    import subprocess
+    source=(ROOT/'infra/run_joint_point_native_qualify.sh').read_text()
+    start=source.index('read_cleanup_cid() {');stop=source.index('\ntrap ',start)
+    functions=source[start:stop]
+    out=tmp_path/'owned-output';out.mkdir()
+    cid=Path(str(out)+'.container.cid');contents='a'*64
+    if cid_kind=='regular':cid.write_text(contents)
+    elif cid_kind=='newline':cid.write_text(contents+'\n')
+    elif cid_kind=='symlink':
+        foreign=tmp_path/'foreign';foreign.write_text(contents);cid.symlink_to(foreign)
+    elif cid_kind=='hardlink':
+        foreign=tmp_path/'foreign';foreign.write_text(contents);os.link(foreign,cid)
+    elif cid_kind=='directory':cid.mkdir()
+    elif cid_kind=='malformed':cid.write_text('g'*64)
+    elif cid_kind=='extra_newline':cid.write_text(contents+'\n\n')
+    elif cid_kind!='missing':raise AssertionError(cid_kind)
+    log=tmp_path/'docker.calls';removed=tmp_path/'removed'
+    script=f'''set -euo pipefail
+OUT={shlex.quote(str(out))};CID={shlex.quote(str(cid))}
+NAME=owned-name;IMAGE=sha256:qualified-image;REV=original-revision
+SCENARIO={shlex.quote(scenario)};LOG={shlex.quote(str(log))};REMOVED={shlex.quote(str(removed))}
+timeout() {{
+ local bound="$1";shift
+ [[ "$bound" == 10s || "$bound" == 20s ]] || return 98
+ "$@"
+}}
+docker() {{
+ printf '%s\\n' "$*" >> "$LOG"
+ if [[ "$1" == rm ]];then
+  [[ "$2" == -f && "$3" == {'a'*64} ]] || return 98
+  [[ "$SCENARIO" != rm_failure ]] || return 1
+  : > "$REMOVED";return 0
+ fi
+ [[ "$1" == inspect && "$2" == {'a'*64} && "$3" == --format ]] || return 98
+ case "$SCENARIO" in
+  daemon) echo 'Cannot connect to the Docker daemon' >&2;return 1 ;;
+  timeout) return 124 ;;
+  malformed) echo 'unexpected output';return 0 ;;
+  wrong_labels) echo "/$NAME $IMAGE foreign-revision";return 0 ;;
+  wrong_name) echo "/foreign-name $IMAGE $REV";return 0 ;;
+  wrong_image) echo "/$NAME sha256:foreign $REV";return 0 ;;
+  absent_rc2) echo "Error: No such object: $2" >&2;return 2 ;;
+  absent_extra) echo "Error: No such object: $2 additional" >&2;return 1 ;;
+  absent_container) echo "Error response from daemon: No such container: $2" >&2;return 1 ;;
+  absent_wrong_cid) echo 'Error: No such object: foreign' >&2;return 1 ;;
+ esac
+ if [[ "$SCENARIO" == absent || -f "$REMOVED" && "$SCENARIO" != still_present && "$SCENARIO" != after_daemon ]];then
+  echo "Error: No such object: $2" >&2;return 1
+ fi
+ if [[ -f "$REMOVED" && "$SCENARIO" == after_daemon ]];then
+  echo 'Cannot connect to the Docker daemon' >&2;return 1
+ fi
+ echo "/$NAME $IMAGE $REV"
+}}
+{functions}
+'''
+    if trap:
+        actual_trap=source[stop+1:source.index('\ntimeout --signal',stop)]
+        script+=actual_trap+f'\nexit {status}\n'
+    else:
+        script+=f'\nif cleanup {status};then exit 0;else exit "$?";fi\n'
+    result=subprocess.run(['bash','-c',script],capture_output=True,text=True,timeout=10)
+    calls=log.read_text().splitlines()if log.exists()else[]
+    return result.returncode,calls
+
+
+@pytest.mark.parametrize('scenario', ['absent','absent_container'])
+def test_cleanup_exact_absence_is_accepted(tmp_path,scenario):
+    status,calls=cleanup_probe(tmp_path,scenario)
+    assert status==0 and len(calls)==1 and calls[0].startswith('inspect ')
+
+
+@pytest.mark.parametrize('scenario',['daemon','timeout','malformed','absent_rc2','absent_extra','absent_wrong_cid',
+                                    'wrong_labels','wrong_name','wrong_image'])
+def test_cleanup_unproven_or_foreign_container_fails_without_rm(tmp_path,scenario):
+    status,calls=cleanup_probe(tmp_path,scenario)
+    assert status!=0 and len(calls)==1 and not any(c.startswith('rm ')for c in calls)
+
+
+def test_cleanup_matching_live_container_removed_then_independently_absent(tmp_path):
+    status,calls=cleanup_probe(tmp_path,'live')
+    assert status==0 and len(calls)==3
+    assert calls[0]==calls[2] and calls[1]=='rm -f '+'a'*64
+
+
+@pytest.mark.parametrize('scenario',['rm_failure','still_present','after_daemon'])
+def test_cleanup_remove_failure_or_missing_absence_proof_fails(tmp_path,scenario):
+    status,calls=cleanup_probe(tmp_path,scenario,trap=True)
+    assert status!=0 and calls[1]=='rm -f '+'a'*64
+    assert len(calls)==(2 if scenario=='rm_failure'else 3)
+
+
+@pytest.mark.parametrize('kind',['symlink','hardlink','directory','malformed','extra_newline','missing'])
+def test_cleanup_invalid_cid_inventory_rejected_before_docker(tmp_path,kind):
+    status,calls=cleanup_probe(tmp_path,'live',cid_kind=kind)
+    assert status!=0 and not calls
+
+
+def test_cleanup_single_trailing_newline_cid_is_valid(tmp_path):
+    status,calls=cleanup_probe(tmp_path,'absent',cid_kind='newline')
+    assert status==0 and len(calls)==1
+
+
+@pytest.mark.parametrize('scenario',['absent','live','daemon','rm_failure'])
+def test_cleanup_preserves_original_nonzero_exit(tmp_path,scenario):
+    status,_=cleanup_probe(tmp_path,scenario,status=23,trap=True)
+    assert status==23
+
+
+def test_cleanup_missing_cid_preserves_prelaunch_failure(tmp_path):
+    status,calls=cleanup_probe(tmp_path,'live',status=19,cid_kind='missing',trap=True)
+    assert status==19 and not calls

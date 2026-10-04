@@ -37,20 +37,54 @@ done <<< "$PATHS"
 [[ -z "$(timeout 10s nvidia-smi --query-compute-apps=pid --format=csv,noheader)" ]]
 mkdir "$OUT";chmod 755 "$OUT";chown scenesmith:scenesmith "$OUT"
 CID="$OUT.container.cid";[[ ! -e "$CID" ]]
+read_cleanup_cid() {
+ python3 - "$CID" <<'PY'
+from pathlib import Path
+import os,re,stat,sys
+p=Path(sys.argv[1]);before=p.lstat()
+if (not p.is_absolute() or p.resolve()!=p or any(parent.is_symlink()for parent in(p,*p.parents))
+    or not stat.S_ISREG(before.st_mode)or before.st_nlink!=1 or before.st_uid!=os.geteuid()
+    or before.st_size not in(64,65)):raise ValueError('Owned regular bounded CID required')
+raw=p.read_bytes();after=p.lstat()
+if (not re.fullmatch(b'[0-9a-f]{64}\n?',raw)or any(getattr(before,k)!=getattr(after,k)
+    for k in('st_dev','st_ino','st_mode','st_uid','st_gid','st_nlink','st_size','st_mtime_ns','st_ctime_ns'))):
+ raise ValueError('CID bytes or identity changed')
+print(raw.decode().rstrip('\n'))
+PY
+}
+inspect_owned_container() {
+ local cid="$1" inspected rc
+ if inspected="$(timeout 10s docker inspect "$cid" --format '{{.Name}} {{.Config.Image}} {{index .Config.Labels "world-reward.revision"}}' 2>&1)";then
+  [[ "$inspected" == "/$NAME $IMAGE $REV" ]] || return 2
+  return 0
+ else
+  rc=$?
+  if (( rc == 1 )) && [[ "$inspected" == "Error: No such object: $cid" \
+    || "$inspected" == "Error: No such container: $cid" \
+    || "$inspected" == "Error response from daemon: No such container: $cid" ]];then return 1;fi
+  return 2
+ fi
+}
 cleanup() {
- local status=$? cid inspected
- if [[ -f "$CID" && ! -L "$CID" ]];then
-  cid="$(cat "$CID")"
-  [[ "$cid" =~ ^[0-9a-f]{64}$ ]] || return 1
-  inspected="$(timeout 10s docker inspect "$cid" --format '{{.Name}} {{.Config.Image}} {{index .Config.Labels "world-reward.revision"}}' 2>/dev/null || true)"
-  if [[ -n "$inspected" ]];then
-   [[ "$inspected" == "/$NAME $IMAGE $REV" ]] || return 1
-   timeout 20s docker rm -f "$cid" >/dev/null
-  fi
+ local status="${1:-$?}" cid rc failed
+ failed=$((status == 0 ? 1 : status))
+ [[ "$CID" == "$OUT.container.cid" ]] || return "$failed"
+ if [[ ! -e "$CID" && ! -L "$CID" ]];then
+  (( status != 0 )) && return "$status"
+  return 1
+ fi
+ if ! cid="$(read_cleanup_cid)";then return "$failed";fi
+ if inspect_owned_container "$cid";then
+  if ! timeout 20s docker rm -f "$cid" >/dev/null;then return "$failed";fi
+  # Removal's exit status is not absence proof. Requery the same exact CID.
+  if inspect_owned_container "$cid";then rc=0;else rc=$?;fi
+  (( rc == 1 )) || return "$failed"
+ else
+  rc=$?;(( rc == 1 )) || return "$failed"
  fi
  return "$status"
 }
-trap cleanup EXIT
+trap 'status=$?; if cleanup "$status";then exit "$status";else exit "$?";fi' EXIT
 timeout --signal=TERM --kill-after=20s 7203s docker run --rm --cidfile "$CID" --name "$NAME" \
  --label "world-reward.revision=$REV" --gpus all --network none --read-only --cap-drop ALL \
  --security-opt no-new-privileges --memory 64g --cpus 4 --user "$(id -u scenesmith):$(id -g scenesmith)" \
