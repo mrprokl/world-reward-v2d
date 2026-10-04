@@ -236,6 +236,11 @@ def transport_commands(encoded, archive_hash, source_archive, revision, script, 
     bundle = script.removeprefix("infra/").removesuffix(".sh")
     unit = "world-reward-" + name
     identity = hashlib.sha256((revision + script + name + archive_hash).encode()).hexdigest()
+    source_digest = hashlib.sha256()
+    with tarfile.open(fileobj=io.BytesIO(source_archive), mode="r:") as archive:
+        for member in sorted(archive.getmembers(), key=lambda row: row.name):
+            if member.isfile():
+                source_digest.update(member.name.encode() + b"\0" + str(member.mode & 0o555).encode() + b"\0" + hashlib.sha256(archive.extractfile(member).read()).digest())
     prefix = f"""set -eu
 set +x
 umask 077
@@ -249,6 +254,9 @@ import sys
 for value in sys.argv[1:]:
  p=Path(value)
  if not(p.is_absolute() and p.resolve()==p and not any(x.is_symlink()for x in(p,*p.parents))):raise RuntimeError('Canonical immutable transport paths required')
+root,job=map(Path,sys.argv[1:3])
+for p in(root,root/'jobs',job.parent,job):
+ if p.exists() and not(p.is_dir() and p.stat().st_mode&0o005==0o005):raise RuntimeError('Existing private source ancestor requires independent audit; never repair implicitly')
 PY_PATHS
 """
     preflight = f"""test -d "$ROOT/jobs" && test -d "$ROOT/results" || exit 1
@@ -258,6 +266,22 @@ test ! -e "$ROOT/results/{name}.log" && test ! -L "$ROOT/results/{name}.log" || 
 """
     launch = f"""test "$(cat "$JOB/revision")" = '{revision}'
 test "$(cat "$JOB/source-sha256")" = '{archive_hash}'
+/usr/bin/python3 -I -B - "$JOB" <<'PY_SOURCE'
+import hashlib,stat,sys
+from pathlib import Path
+job=Path(sys.argv[1]);code=job/'code';digest=hashlib.sha256()
+for p in(job.parent,job,code):
+ if not(p.is_dir() and p.stat().st_mode&0o005==0o005):raise RuntimeError('Published source must be traversable without repairs')
+for p in(code,*sorted(code.rglob('*'))):
+ s=p.lstat()
+ if p.resolve()!=p or p.is_symlink()or not(stat.S_ISDIR(s.st_mode)or stat.S_ISREG(s.st_mode)):raise RuntimeError('Unaliased original source required')
+ if p.is_dir():
+  if s.st_mode&0o777!=0o555:raise RuntimeError('Readonly traversable source directories required')
+ else:
+  if s.st_nlink!=1 or s.st_mode&0o222 or s.st_mode&0o444!=0o444:raise RuntimeError('Readonly original source file required')
+  digest.update(str(p.relative_to(code)).encode()+b'\\0'+str(s.st_mode&0o777).encode()+b'\\0'+hashlib.sha256(p.read_bytes()).digest())
+if digest.hexdigest()!={source_digest.hexdigest()!r}:raise RuntimeError('Actual published source bytes/modes differ from the exact archive')
+PY_SOURCE
 systemd-run --unit "$UNIT" --property=Type=exec \\
   --property=StandardOutput=append:"$ROOT/results/{name}.log" \\
   --property=StandardError=append:"$ROOT/results/{name}.log" \\
@@ -269,15 +293,27 @@ systemd-run --unit "$UNIT" --property=Type=exec \\
         return label, ack, command + f"printf '%s\\n' '{ack}'\n"
     inline = prefix + preflight + f"""if test ! -d "$JOB"; then
   test ! -e "$JOB" && test ! -L "$JOB" || exit 1
-  mkdir -p "$JOB"
+  if test ! -d "${{JOB%/*}}"; then mkdir -m 755 "${{JOB%/*}}"; chmod 755 "${{JOB%/*}}"; fi
+  mkdir -m 755 "$JOB"; chmod 755 "$JOB"
   printf '%s' '{encoded}' | base64 -d > "$JOB/source.tar.xz"
   echo '{archive_hash}  '"$JOB/source.tar.xz" | sha256sum -c - >/dev/null
   mkdir "$JOB/code"
   tar -xJf "$JOB/source.tar.xz" -C "$JOB/code"
+  /usr/bin/python3 -I -B - "$JOB" <<'PY_NEW_MODES'
+from pathlib import Path
+import sys,tarfile
+job=Path(sys.argv[1]);code=job/'code'
+with tarfile.open(job/'source.tar.xz','r:xz')as archive:
+ for m in archive:
+  if not m.isfile():raise RuntimeError('Only original regular code members allowed')
+  (code/m.name).chmod(m.mode&0o555)
+for p in(code,*code.rglob('*')):
+ if p.is_dir():p.chmod(0o555)
+PY_NEW_MODES
   rm "$JOB/source.tar.xz"
   printf '%s\\n' '{revision}' > "$JOB/revision"
   printf '%s\\n' '{archive_hash}' > "$JOB/source-sha256"
-  chmod -R a-w "$JOB/code"
+  chmod 444 "$JOB/revision" "$JOB/source-sha256"
 fi
 """ + launch
     inline_phase = phase("inline-dispatched", inline)
@@ -344,7 +380,7 @@ with tarfile.open(fileobj=io.BytesIO(raw),mode='r:')as archive:
   with (pending/name).open('x')as f:os.fchmod(f.fileno(),0o444);f.write(value+'\\n');f.flush();os.fsync(f.fileno())
  require(canonical(job.parent.parent))
  if not job.parent.exists():job.parent.mkdir(mode=0o755);job.parent.chmod(0o755)
- require(canonical(job.parent) and not job.exists() and not job.is_symlink())
+ require(canonical(job.parent) and job.parent.stat().st_mode&0o005==0o005 and not job.exists() and not job.is_symlink())
  def syncdir(p):
   fd=os.open(p,os.O_RDONLY|os.O_DIRECTORY)
   try:os.fsync(fd)

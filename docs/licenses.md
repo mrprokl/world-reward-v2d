@@ -5,6 +5,17 @@ organizer baseline. This records primary terms, **not legal advice or a permissi
 from the organizers**. Commercially usable weights, public source, an OSI-approved
 source license, and challenge eligibility are four different checks.
 
+## October4 source recheck
+
+Official HEAD7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80 remains unchanged.
+The exact84,452B FAQ SHAa1e569e1c83eeac2584de34e9503f1226e20ab369d53d2c67c2e243deb1a4d7a
+is byte-identical. Closed/unmerged draftPR164 is not adopted policy; SAM
+inference code, FoundationPose/nvdiffrast research restrictions and legacy
+CARI notices still lack an explicit competition-source waiver verified here.
+Kaggle JavaScript shell is not a new rules reading. Contact remains
+v2d_challenge@nvidia.com; existing question below is unsent. Eligibility is
+separate from successful research execution; no all-clear inferred.
+
 ## 1. Governing challenge clauses
 
 Source: [official CD-H Kaggle rules](https://www.kaggle.com/competitions/v2d-challenge-track1-cd-h/rules),

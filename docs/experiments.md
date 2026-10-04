@@ -6707,3 +6707,17 @@ privateSSHexit/EOF/NOREPLACE/transport fixtures PASS9.91s; wrapper syntaxPASS.
 No existing numeric algorithms changed, no actual source archive or return
 claimed. Original3files/parentreceipt remain independentlysealed; exactfuture
 archive/manifest pins must be measured on Azure before private listener/transfer.
+
+EP9 CPU volume dispatch02d65e4 actual returnedexit2 before opening driver:
+immutable source namespace PermissionError, no proposalreport/numericcode ran.
+TransportACK was onlydispatch, not CPUproposalPASS. Retain60167B defaultfailed
+frontendlog SHAfbda21e932b84af0a64316ee54aed6ef819585be1d4ab388f79980cf6b81c589
+and separate failedCPUunit/log. Audit restrictive publication umask before any
+new invocation; never retry invisibly or weaken geometry thresholds.
+
+Immutable publication repair: independent restrictive-umask audit identified
+a runtime path-access precondition, not geometry failure. New inline snapshots
+explicitly755 newparents/555 allcodedirs and preserveGitfilemodes withoutwrite;
+common postpublication exactsourceSHA/mode gate nowcovers inline/staged/reuse.
+Existing private/changed sources failclosed, never implicitly chmod. Rootfocused
+publication+return tests and actualnewAzurelaunch remain separate gates.

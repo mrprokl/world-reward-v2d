@@ -524,6 +524,10 @@ def local_transport_runtime(tmp_path):
         path=bindir/name
         path.write_text('#!/bin/bash\n'+('printf "%s\\n" "$*" >> "$HOME/launched"\n'if name=='systemd-run'else'exit 0\n'))
         path.chmod(0o755)
+    # macOS lacks coreutils; this tiny shim checks the actual bytes, never a fake PASS.
+    checksum=bindir/'sha256sum'
+    checksum.write_text("#!/usr/bin/python3\nimport hashlib,sys\nfrom pathlib import Path\nsha,path=sys.stdin.read().strip().split(maxsplit=1)\nraise SystemExit(0 if hashlib.sha256(Path(path).read_bytes()).hexdigest()==sha else 1)\n")
+    checksum.chmod(0o755)
     return root,{'PATH':str(bindir)+':/usr/bin:/bin','HOME':str(tmp_path)}
 
 
@@ -612,13 +616,18 @@ def test_inline_existing_snapshot_reused_only_exact_markers_and_canonical_job(tm
     assert len(commands)==1 and len(commands[0][2].encode())<=180_000
     root,environment=local_transport_runtime(tmp_path);job=root/'jobs'/revision/'run_smoke';job.mkdir(parents=True)
     (job/'revision').write_text(revision+'\n');(job/'source-sha256').write_text((sha if fault!='markers'else'c'*64)+'\n')
-    (job/'code').mkdir();original=job/'code/unchanged';original.write_bytes(b'existing snapshot not rewritten')
+    with tarfile.open(fileobj=io.BytesIO(source))as archive:
+        for member in archive:
+            target=job/'code'/member.name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(archive.extractfile(member).read());target.chmod(member.mode&0o555)
+    for path in(job/'code',*(job/'code').rglob('*')):
+        if path.is_dir():path.chmod(0o555)
+    original=job/'code/infra/run_smoke.sh';original_bytes=original.read_bytes()
     if fault=='symlink':
         saved=job.with_name('saved');job.rename(saved);job.symlink_to(saved,target_is_directory=True)
     result=run_local_phase(commands[0][2],root,environment)
     assert (result.returncode==0)is(fault is None)
     assert (tmp_path/'launched').exists()is(fault is None)
-    assert original.read_bytes()==b'existing snapshot not rewritten'
+    assert original.read_bytes()==original_bytes
 
 
 def test_staged_published_source_rehash_stops_tamper_before_systemd(tmp_path):
@@ -630,3 +639,57 @@ def test_staged_published_source_rehash_stops_tamper_before_systemd(tmp_path):
     assert old in publish;result=run_local_phase(publish.replace(old,new),root,environment)
     assert result.returncode!=0 and not(tmp_path/'launched').exists()
     assert commands[-1][1].encode()not in result.stdout
+
+
+@pytest.mark.parametrize('staged',[False,True])
+def test_publication_under_umask077_all_new_ancestors_traversable_code_readonly(tmp_path,staged):
+    if staged:archive,_,_,commands=staged_fixture()
+    else:
+        archive=launcher.runtime_archive(full_archive(files()),'infra/run_smoke.sh')[0]
+        encoded,sha=launcher.encoded_runtime_archive(archive)
+        commands=launcher.transport_commands(encoded,sha,archive,'b'*40,'infra/run_smoke.sh','stage-test',[])
+    root,environment=local_transport_runtime(tmp_path)
+    shared_before={p:(p.stat().st_ino,p.stat().st_mode)for p in(root,root/'jobs',root/'results')}
+    for _,ack,script in commands:
+        result=run_local_phase('umask 077\n'+script,root,environment)
+        assert result.returncode==0 and ack.encode()in result.stdout
+    job=root/'jobs'/('b'*40)/'run_smoke'
+    assert all(p.stat().st_mode&0o777==0o755 for p in(job.parent,job))
+    assert all(p.stat().st_mode&0o777==0o555 for p in(job/'code',*(p for p in(job/'code').rglob('*')if p.is_dir())))
+    with tarfile.open(fileobj=io.BytesIO(archive))as tar:
+        for m in tar:
+            p=job/'code'/m.name;assert p.read_bytes()==tar.extractfile(m).read()and p.stat().st_mode&0o777==m.mode&0o555
+    assert {p:(p.stat().st_ino,p.stat().st_mode)for p in shared_before}==shared_before
+
+
+@pytest.mark.parametrize('staged',[False,True])
+def test_existing_private_revision_ancestor_fails_without_permission_repair(tmp_path,staged):
+    if staged:*_,commands=staged_fixture()
+    else:
+        archive=launcher.runtime_archive(full_archive(files()),'infra/run_smoke.sh')[0]
+        encoded,sha=launcher.encoded_runtime_archive(archive)
+        commands=launcher.transport_commands(encoded,sha,archive,'b'*40,'infra/run_smoke.sh','stage-test',[])
+    root,environment=local_transport_runtime(tmp_path);parent=root/'jobs'/('b'*40);parent.mkdir(mode=0o700)
+    before=parent.stat().st_mode
+    result=run_local_phase(commands[0][2],root,environment)
+    assert result.returncode!=0 and not(tmp_path/'launched').exists()
+    assert parent.stat().st_mode==before and not(parent/'run_smoke').exists()
+
+
+@pytest.mark.parametrize('fault',['private_job','private_code','source_tamper'])
+def test_existing_inline_snapshot_not_silently_fixed_or_accepted_by_markers(tmp_path,fault):
+    archive=launcher.runtime_archive(full_archive(files()),'infra/run_smoke.sh')[0]
+    encoded,sha=launcher.encoded_runtime_archive(archive);revision='b'*40
+    first=launcher.transport_commands(encoded,sha,archive,revision,'infra/run_smoke.sh','first',[])
+    root,environment=local_transport_runtime(tmp_path)
+    assert run_local_phase(first[0][2],root,environment).returncode==0
+    job=root/'jobs'/revision/'run_smoke';code=job/'code'
+    if fault=='private_job':job.chmod(0o700)
+    elif fault=='private_code':code.chmod(0o500)
+    else:
+        path=code/'infra/run_smoke.sh';path.chmod(0o755);path.write_bytes(b'changed source with exact old markers');path.chmod(0o555)
+    modes={p:p.stat().st_mode for p in(job,code,code/'infra/run_smoke.sh')}
+    second=launcher.transport_commands(encoded,sha,archive,revision,'infra/run_smoke.sh','second',[])
+    result=run_local_phase(second[0][2],root,environment)
+    assert result.returncode!=0 and len((tmp_path/'launched').read_text().splitlines())==1
+    assert {p:p.stat().st_mode for p in modes}==modes
