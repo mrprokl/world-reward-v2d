@@ -5,7 +5,7 @@
 # /infra/run_cari_full_refine.sh /infra/cari_full_refine.py
 # /infra/run_cari_full_export.sh /infra/cari_full_export.py
 set -euo pipefail
-STAGE='' EPISODE='' WAIT_FOR='' stage_seen=0 episode_seen=0 wait_seen=0
+STAGE='' EPISODE='' WAIT_FOR='' stage_seen=0 episode_seen=0 wait_seen=0 idle_seen=0
 while (( $# ));do
  case "$1" in
   --stage)
@@ -16,12 +16,15 @@ while (( $# ));do
    if (( episode_seen || $# < 2 )) || [[ ! "$2" =~ ^(0|[1-9]|[12][0-9])$ ]];then exit 2;fi
    EPISODE="$2";episode_seen=1;shift 2 ;;
   --wait-for)
-   if (( wait_seen || $# < 2 )) || [[ ! "$2" =~ ^world-reward-[a-z0-9][a-z0-9-]{0,80}(\.service)?$ ]];then exit 2;fi
+   if (( wait_seen || idle_seen || $# < 2 )) || [[ ! "$2" =~ ^world-reward-[a-z0-9][a-z0-9-]{0,80}(\.service)?$ ]];then exit 2;fi
    WAIT_FOR="${2%.service}.service";wait_seen=1;shift 2 ;;
+  --when-idle)
+   if (( idle_seen || wait_seen ));then exit 2;fi
+   idle_seen=1;shift ;;
   *) exit 2 ;;
  esac
 done
-(( stage_seen && episode_seen && wait_seen )) || exit 2
+(( stage_seen && episode_seen && (wait_seen || idle_seen) )) || exit 2
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_cari_shared_stage_queued/code" && "$(uname -s)" == Linux ]] || exit 2
@@ -122,14 +125,18 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 phase preflight
 BEFORE="$(integrity)";target_absent
-# This different episode needs the released GPU lock, not CPU assembly success.
-LOAD="$(systemctl show "$WAIT_FOR" --property=LoadState --value)"
-[[ "$LOAD" == loaded ]] || { echo 'Explicit preceding frontend unit is not loaded' >&2;exit 1; }
+# A queued episode needs the released GPU lock, not CPU assembly success.
+# Explicit idle mode handles already-collected predecessors without claiming
+# not-found means PASS: child inputs still require their actual frozen receipts.
+if (( wait_seen ));then
+ LOAD="$(systemctl show "$WAIT_FOR" --property=LoadState --value)"
+ [[ "$LOAD" == loaded ]] || { echo 'Explicit preceding frontend unit is not loaded' >&2;exit 1; }
+fi
 LOCK_BEFORE="$(lock_identity)"
 exec 9<"$LOCK";LOCK_OPEN=1
 [[ "$(lock_identity fd)" == "$LOCK_BEFORE" ]] || exit 1
 phase waiting_for_gpu_lock
-flock --timeout 43200 9
+if (( idle_seen ));then flock --nonblock 9;else flock --timeout 43200 9;fi
 [[ "$(lock_identity fd)" == "$LOCK_BEFORE" && "$(integrity)" == "$BEFORE" ]] || exit 1
 target_absent
 APPS="$(nvidia-smi --query-compute-apps=pid --format=csv,noheader,nounits)"

@@ -6215,3 +6215,10 @@ shell-volume gates unchanged. Original a06b703 FAIL, log and empty pose director
 still preserved; no pose/native/full-HOI accuracy inferred. EP8 initializers now
 actually retain all634 body/depth/adapter frames; GPU idle after completion,
 not an object pose or reconstruction quality success.
+
+Cooperative native scheduling adds explicit `--when-idle`: only after acquiring
+the original nonblocking FD9 lock and independently checking empty GPU apps.
+This does not classify a garbage-collected predecessor as success; unchanged
+children still verify committed actual input receipts. Existing `--wait-for`
+mode stays strict and mutually exclusive. Root168 focused PASS/1 Linux-only
+SKIP38.85s, syntax/diff PASS; all numerical native child sources unchanged.

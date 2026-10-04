@@ -181,6 +181,37 @@ def test_loaded_explicit_predecessor_required(runtime, load):
     assert [row[0] for row in runtime['calls']()] == ['systemctl']
 
 
+@pytest.mark.parametrize('stage', CHILDREN)
+def test_explicit_idle_mode_requires_original_lock_without_invented_unit_success(runtime, stage):
+    args = ['--stage', stage, '--episode', '5', '--when-idle']
+    result = runtime['run'](*args)
+    assert result.returncode == 0, result.stderr
+    calls = runtime['calls']()
+    assert [row[0] for row in calls] == ['flock', 'nvidia-smi', 'child']
+    assert calls[0] == ['flock', '--nonblock', '9', runtime['lock'].stat().st_ino]
+    assert calls[-1][1:4] == [CHILDREN[stage][0], '--episode', '5']
+
+
+@pytest.mark.parametrize('args', [
+    ['--stage', 'prepare', '--episode', '5', '--when-idle', '--when-idle'],
+    ['--stage', 'prepare', '--episode', '5', '--when-idle', '--wait-for', 'world-reward-test'],
+    ['--stage', 'prepare', '--episode', '5', '--wait-for', 'world-reward-test', '--when-idle'],
+    ['--stage', 'prepare', '--episode', '5', '--when-idle', 'true'],
+])
+def test_idle_mode_is_explicit_and_exclusive_before_any_runtime_query(runtime, args):
+    assert runtime['run'](*args).returncode == 2 and not runtime['calls']()
+
+
+@pytest.mark.parametrize('fault', ['busy_lock', 'gpu', 'gpuquery', 'target'])
+def test_idle_mode_aborts_before_child_on_contention_or_foreign_target(runtime, fault):
+    if fault == 'busy_lock':runtime['env']['FAKE_FLOCK_STATUS'] = '1'
+    elif fault == 'gpu':runtime['env']['FAKE_APPS'] = '12345'
+    elif fault == 'gpuquery':runtime['env']['FAKE_GPU_STATUS'] = '9'
+    else:(runtime['root'] / 'outputs/episode_000005/cari_shared_prepare_v1').mkdir()
+    result = runtime['run']('--stage', 'prepare', '--episode', '5', '--when-idle')
+    assert result.returncode != 0 and not any(row[0] == 'child' for row in runtime['calls']())
+
+
 @pytest.mark.parametrize('fault', ['missing', 'symlink', 'hardlink', 'directory', 'gpu', 'gpuquery', 'timeout', 'targetduringwait', 'sourceduringwait'])
 def test_lock_and_gpu_fail_closed(runtime, fault, tmp_path):
     lock = runtime['lock']
