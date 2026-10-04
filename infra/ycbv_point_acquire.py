@@ -47,7 +47,7 @@ EXPECTED_PROTOCOL = {
  "embedded_dataset_info":{"file":"ycbv/dataset_info.md","bytes":4035,"sha256":"4766684f25f165c1c312745e3583fe248161c56c35a862bfa04134141151882e"},
  "selection":{"split_prefix":"test","scene_ids":[48,49,50],"frames_per_scene":96,"first_source_frame_id":1,"first_frame_position":0,"width":640,"height":480,"rule":SELECTION},
  "limits":{"seconds":3600,"cleanup_seconds":180,"download_bytes":32212254720,"expanded_bytes":60000000000,"member_bytes":2000000000,"members":1000000,"min_free_bytes":45000000000},
- "execution":{"authorized":False,"status":"prepared_non_executable","engineering_replay":True},
+ "execution":{"authorized":True,"status":"authorized_one_corrected_engineering_replay","engineering_replay":True,"reason":"explicit_user_authorization_2026-10-04"},
  "output":{"base":BASE,"public_schema":"world-reward-ycbv-point-rgb-v2"}}
 FIELDS = lambda s:(s.st_dev,s.st_ino,s.st_mode,s.st_size,s.st_mtime_ns,s.st_ctime_ns)
 CHUNK = 1024*1024
@@ -103,8 +103,8 @@ def bound_source(root,code,revision,executing):
 
 
 def require_execution():
-    if EXPECTED_PROTOCOL["execution"]["authorized"] is not True:
-        raise ValueError("Prepared v2 interface: no third acquisition authorized")
+    if EXPECTED_PROTOCOL["execution"] != {"authorized":True,"status":"authorized_one_corrected_engineering_replay","engineering_replay":True,"reason":"explicit_user_authorization_2026-10-04"}:
+        raise ValueError("Exactly one explicitly authorized corrected engineering replay required")
 
 
 def preflight(root,code,revision):

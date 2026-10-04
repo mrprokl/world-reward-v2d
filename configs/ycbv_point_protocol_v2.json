@@ -70,9 +70,10 @@
     "min_free_bytes": 45000000000
   },
   "execution": {
-    "authorized": false,
-    "status": "prepared_non_executable",
-    "engineering_replay": true
+    "authorized": true,
+    "status": "authorized_one_corrected_engineering_replay",
+    "engineering_replay": true,
+    "reason": "explicit_user_authorization_2026-10-04"
   },
   "output": {
     "base": "validation/ycbv_point_pose_v2",

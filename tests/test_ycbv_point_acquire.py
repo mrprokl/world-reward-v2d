@@ -332,16 +332,18 @@ def test_expired_cleanup_not_restarted_or_reported_success(gate,tmp_path,monkeyp
     assert alarms.count(180)==1
 
 
-def test_v2_is_prepared_only_and_fails_before_any_io(gate,monkeypatch):
-    def forbidden(*args,**kwargs):pytest.fail("Unapproved third acquisition reached I/O")
+def test_v2_requires_exact_one_replay_authorization_before_any_io(gate,monkeypatch):
+    def forbidden(*args,**kwargs):pytest.fail("Unapproved acquisition reached I/O")
     monkeypatch.setattr(Path,"open",forbidden)
     monkeypatch.setattr(gate.shutil,"disk_usage",forbidden)
     monkeypatch.setattr(gate.urllib.request,"build_opener",forbidden)
+    assert gate.EXPECTED_PROTOCOL["execution"]==dict(authorized=True,status="authorized_one_corrected_engineering_replay",engineering_replay=True,reason="explicit_user_authorization_2026-10-04")
+    gate.require_execution()
+    monkeypatch.setitem(gate.EXPECTED_PROTOCOL,"execution",dict(authorized=False,status="prepared_non_executable",engineering_replay=True))
     for call in (lambda:gate.main([]),lambda:gate.preflight(Path("/not/read"),Path("/not/read"),"a"*40)):
-        with pytest.raises(ValueError,match="no third acquisition authorized"):call()
+        with pytest.raises(ValueError,match="Exactly one explicitly authorized"):call()
     assert gate.BASE=="validation/ycbv_point_pose_v2"
     assert gate.PROTOCOL=="configs/ycbv_point_protocol_v2.json"
-    assert gate.EXPECTED_PROTOCOL["execution"]==dict(authorized=False,status="prepared_non_executable",engineering_replay=True)
 
 
 def test_original_v1_protocol_and_failure_pins_not_modified(gate):
