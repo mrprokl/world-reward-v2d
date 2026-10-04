@@ -6820,3 +6820,10 @@ SHAff7948bf65467a401edeebd17c3281d3ba0aa84c96f0306fb2fdf7e19fc18500.
 All9nativewindows originalfirstoccurrence indices/clipconstantidentity preserved.
 Tinyforwardpins precede unchanged300requested/301effective fullnative refinement.
 No newalignment, partialtrajectory or qualityclaim.
+
+EP6 frozen c06ca34d2e15a055860448ab025b30f5307e058c unchanged native
+fullrefinement dispatched with4exactstagedcodeACKs; actualparent1214837/GPU
+1214933 active at05:49,100/300reportedoptimizersteps. No completedreceipt
+inferred. EP8 CPU originalassembly active300/634; original7200s budgetguard
+remainsfrozen for07:12:53UTC. YCBv2 replay remainsnonexecutable pending explicit
+userauthorization, no thirdacquisition/GT/modelrun. No finalParquet/submission.
