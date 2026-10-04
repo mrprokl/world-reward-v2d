@@ -1,0 +1,33 @@
+{
+  "schema": "world-reward-dexycb-identity-acquisition-v1",
+  "base": "validation/dexycb_identity_v1",
+  "scope": "acquisition_plan_only_not_frozen_model_or_quality_protocol",
+  "camera": "836212060125",
+  "sequence_count_per_subject": 100,
+  "sequence_lex_indices": [0, 16, 32, 48, 64, 80],
+  "subjects": {
+    "20200709-subject-01": {"role": "blind_evaluation", "fit_indices": [], "decision_indices": []},
+    "20200813-subject-02": {"role": "calibration", "fit_indices": [0, 32, 64], "decision_indices": [16, 48, 80]}
+  },
+  "archives": {
+    "20200709-subject-01": {"file": "20200709-subject-01.tar.gz", "bytes": 12412314463, "url": "https://drive.google.com/file/d/1Ehh92wDE3CWAiKG7E9E73HjN2Xk2XfEk"},
+    "20200813-subject-02": {"file": "20200813-subject-02.tar.gz", "bytes": 12004145048, "url": "https://drive.google.com/file/d/1Uo7MLqTbXEa-8s7YQZ3duugJ1nXFEo62"}
+  },
+  "primary_sources": {
+    "publisher.html": {"url": "https://dex-ycb.github.io/", "bytes": 14026, "sha256": "09b12e4a37ccd0142e849101456a7389727b13a4d798434d0c35b686ccc9d008"},
+    "dex_ycb.py": {"url": "https://raw.githubusercontent.com/NVlabs/dex-ycb-toolkit/64551b001d360ad83bc383157a559ec248fb9100/dex_ycb_toolkit/dex_ycb.py", "bytes": 8713, "sha256": "f73074505bb822b01178dc7aae9778f5107efea479d43423f4fe2dc37224d8ad"}
+  },
+  "license": "CC-BY-NC-4.0",
+  "archive_hash_basis": "caller_measured_not_publisher_checksum",
+  "archive_root": "direct_subject_directory_only",
+  "all_original_frames": true,
+  "timestamps_available": false,
+  "training_overlap_verified": false,
+  "challenge_overlap_verified": false,
+  "budget_seconds": 1800,
+  "cleanup_grace_seconds": 120,
+  "member_cap_bytes": 67108864,
+  "expanded_cap_bytes": 128849018880,
+  "retained_cap_bytes": 8589934592,
+  "download_performed": false
+}
