@@ -14,14 +14,23 @@ FAILs remain separate. Its independently audited CPU consumer and original
 official packing pass; temporary Parquet deleted. Episode4 full747 preserves
 all25 components but tracking stopped at18 empty automatic masks; no full-chain
 PASS. Episode5 full668 initializers and a separately gated three-shell/cavity
-volume proposal pass; full tracking is active, not yet validated. One GPU job
+volume proposal pass; full tracking now passes668/668 in3605.685147s. One GPU job
 per VM; scoped locks release before CPU preparation for disjoint overlap.
+
+EP5's original CPU input assembly remains active. EP6's untouched scheduling-
+only queue was cancelled before any producer ran; a fresh direct fixed-all16
+frontend route uses the released GPU. No frame/threshold changes. VM02 opaque
+RoboTAP acquisition passes. Its Boots dependency build's incorrect API probe
+remains FAIL; independent native CPU verification of the unchanged installed
+image now **PASS2.510988s**, before model/checkpoint execution. The first public-
+adapter launch failed in host source-closure preflight before private decoding
+or output creation; benchmark inference/evaluation is pending.
 
 D107 real-depth independent validation is closedREJECT: median4.904632756%
 gain is below frozen5%; no retuning or rounded success. Native offline temporal
 depth is a new hypothesis, not acquired/adopted; OpenLORIS registration is not
-yet proved exact color-camera Z. Fullsuitec84558c10051PASS/2optionalSKIP277.13s;
-later scheduling/source focused310PASS19.75s. No final Parquet or verified CARI4D
+yet proved exact color-camera Z. Fullsuitea06b70310944PASS/3optionalSKIP399.72s.
+No final Parquet or verified CARI4D
 improvement. Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
 [experiments](experiments.md). No final submission/CARI4D superiority yet.

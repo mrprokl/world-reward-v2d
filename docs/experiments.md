@@ -6042,3 +6042,43 @@ future annotations stay private. Selection freezes before label-derived query
 access; sealed pre/post all-five hashes, restricted unpickle, no resizing or
 frame removal. CPU-only16GB/4CPU180s gate, fresh namespace and exact owned-CID
 cleanup. Actual compatibility/cardinalities and benchmark results remain pending.
+
+Independent native CPU verification from `f3cfde1` **PASS2.510987945s**:
+report3051B SHA`794b6e5313e992c2c86610f855f4a86dc8c9a994ede37c22e33093e6ad9fc5e7`;
+native log380B SHA`e889b538d207629b43d4a2efefa0d20222910bf0898b48f045023212883c9d61`.
+Exact published seven source files, original failed build/log/wheel permissions,
+original44-layer base prefix,47-layer child/full rootfs and all five installed
+versions verified before/after. Native einshape/bilinear/tree CPU operators and
+TAPIR module imports pass. No model construction, checkpoint/data/GPU reads,
+rebuild, image mutation or original FAIL reclassification.
+
+First public-adapter unit **FAIL in host source-closure preflight**: the shell's
+embedded Python imports were not visible to the static runtime bundle resolver,
+so only the wrapper entered the dispatched infra closure. It stops on missing
+`robotap_boots_acquire` before private decoding/output creation. Preserve the
+original unit/log; add an explicit literal helper closure and a real resolver
+regression test. This is a packaging correction, not a new benchmark selection,
+failed-result overwrite or hidden-label-driven retry. Public180s/16GB/4CPU
+limits and first3/first32 protocol stay unchanged.
+
+Independent check confirms original failed log134B SHA
+`5b5ae8459f0c8852b495a1b740cdb85838597a384bf2be5c05325565aaa40c42`,
+failedunit Exec1/noPID, original dispatched infra contains only the wrapper,
+and `public_v1` remains absent. Complete f3cfde1 regression before packaging
+fix: **10,988 PASS, 3 SKIP394.09s**. Later new inference/evaluation files are
+outside that tested snapshot. New root regression checks the actual resolver's
+full embedded Python helper closure, not just shell-comment presence.
+
+RoboTAP diagnostic producer/evaluator frozen before any private decode or metric:
+native BootsTAPIR FP32 `pyramid_level=1`,256raster,querychunk32, all original
+frames/indices, upstream resize/normalization/visibility, strict published state
+dict and900s total gate. Predictor receives only full public RGB/initial oracle
+queries, pinned source/checkpoint and actual independent CPU receipt, never
+private pickles/future annotations. CPU240s evaluation uses the native TAP
+first-query rule (query frame excluded), strict1/2/4/8/16 thresholds, AJ/APD/OA.
+Preregistered narrow gate: mean-per-video AJ gain≥0.05 over static initial-point
+control, positive AJ gain on≥2/3 videos, mean OA no worse. Static is not a valid
+motion prediction. Execution PASS and scientific ACCEPT/REJECT remain distinct;
+known-benchmark overlap, full-HOI accuracy and CARI4D improvement unverified.
+Root83focusedpublic/infer/eval tests PASS0.67s; producer fake-tensor and formula
+controls test no actual RGB/model/GT. Actual output pins remain absent until PASS.

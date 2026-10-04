@@ -155,3 +155,15 @@ def test_no_speculative_jpeg_or_unpublished_normalization(gate):
     data = example(); data["video"] = [b"not an actual JPEG"] * 4
     with pytest.raises(ValueError, match="full RGB"): gate.initial_queries(data)
     assert gate.TAP_SOURCE["sha256"] == "90cd01e53e23f6d489d3a6cd840cfd93fed4c1a6f4a0dfd373933cc164f0e570"
+
+
+def test_actual_public_runtime_bundle_has_all_embedded_python_helpers(gate):
+    import azure_job
+    root = Path(__file__).resolve().parents[1]
+    files = {str(path.relative_to(root)): path.read_bytes()
+             for folder in ("infra", "configs", "src")
+             for path in (root / folder).rglob("*")
+             if path.is_file() and path.suffix not in (".pyc",)}
+    selected = set(azure_job.runtime_bundle_paths(files, "infra/run_robotap_boots_public.sh"))
+    assert set(gate.FILES) <= selected
+    assert not any("infer" in path or "evaluate" in path for path in selected if path.startswith("infra/"))
