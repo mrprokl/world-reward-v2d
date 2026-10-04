@@ -8249,3 +8249,24 @@ closure/modes/archive verified, unit active at last observation, no final receip
 Frozen budgets unchanged; no labels/noise result or model/inference success inferred.
 Bounded daemon metadata queries added before any real stage;46tinytestsPASS0.59s,
 own445-entry fixtures removed. Fresh data never used for a parameter rescue.
+
+Tracker-noise actual publicCPU stage042efc3 **PASS63.349597s**,53346B receipt
+SHA3211755f2ab2fb42b26d44e4962760cfaa88afdf07114441e1c62bff72c18282;
+all3 original timelines1231/1253/1228frames,32original queries each,640×480.
+First lexical fit/test selections match frozen split3/4 policy;3.42GB publicRGB
+and initial oracle queries stayAzure, no future annotations exported to GPU.
+Root independently checks171-source closure, wrapper terminal exit0/no active
+unit, native source/input selfseal and all4 public output hashes before freezing
+actual next-stage pins. Not inference, learned-noise quality, automaticTrack1
+queries, causal camera/contact or HOI accuracy.
+
+EP25 private sender actualPASS and source/archive posthash; VM02 server listener
+stopped, private host control removed without reading/hashing keys,385B cleanup
+receipt SHA09a9521a9780cc53cac4573cbb66c985cf7a09a84f22c8cb51df7a5a48c6cecc.
+Exact temporary NSG4095 allow deleted; only original4096 deny remains.
+VM01 client key removed after actual senderPASS without private-byte access.
+First pose-only invocation04a10e8 stops in preflight, no native tracker or result:
+canonical EP25 parent does not yet exist on fresh VM02. Original inputs/source
+and existing image pass; no source/array/prompt/numerical change justifies retry.
+Preserve this failed unit/log. A fresh metadata-only parent creation and new
+immutable revision may enable an explicitly recorded packaging-only replay.
