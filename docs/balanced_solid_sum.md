@@ -1,4 +1,4 @@
-# Balanced exact component-volume sums — query qualified, composition pending
+# Balanced exact component-volume sums — native composition qualified
 
 ## Change and scope
 
@@ -69,4 +69,9 @@ executing historical Python. It composes that unchanged QEM binary with the
 independently qualified balanced query in a fresh output namespace. Original
 and active query proofs remain distinct; no QEM recompilation or relabeling.
 159 local qualification/transport regression tests pass in the existing project
-venv. The four full geometric controls and any production replay remain pending.
+venv. The four full geometric controls subsequently pass at801ede8 in18.078832s
+(native16.675492s), with exactly4QEM/40query calls. Independent218-file source,
+originalQEM/cache/runtime, active15-control query, entirehost/native receipts,
+image and removedcontainer checks pass. Separate fixed composition pins bind
+this execution; original qualification pins remain untouched. A later technical
+production replay still does not prove shape quality or the earlier crash cause.

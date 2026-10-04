@@ -52,7 +52,8 @@ inferred automatically; no hand-labeling of challenge records.
   validation remain required. No challenge-tuned loss weights or measured gain.
   [Balanced exact sums](docs/balanced_solid_sum.md) pass15 fresh native controls
   on the authenticated existing CPU runtime; four fresh QEM/query composition
-  controls still precede any new production proposal.
+  controls also pass, with the original QEM unchanged and query proofs separate.
+  Technical production replay remains distinct from reconstruction accuracy.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
   development scenes/objects and33–38cm absolute errors prevent a generalization
   claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.
