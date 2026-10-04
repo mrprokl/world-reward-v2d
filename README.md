@@ -1,159 +1,82 @@
 # World Reward — V2D Track 1
 
-Goal: a valid monocular human-object reconstruction submission that improves on
-CARI4D, **not** an evaluation exploit. No superiority claim until held-out scores
-verify it. See [research audit](docs/audit.md), [literature](docs/literature.md),
-[baseline contracts](docs/baseline.md) and [experiment gates](docs/experiments.md).
-The [unified framework design](docs/framework_architecture.md) and new
-[4DAnyone source audit](docs/4danyone_audit.md) distinguish implemented adapters
-from proposed research, not a claimed completed new method.
-Third-party source/model terms and unresolved eligibility are documented in
-[licenses](docs/licenses.md); own code is Apache-2.0, not the external assets.
+Goal: a correct monocular human-object reconstruction submission that improves
+on CARI4D, **not an evaluation exploit**. Track1 RGB/public metadata only: no
+Track2/3 assets, challenge multiview, hidden meshes/trajectories, source camera
+calibration or sequence-matched FORM-HOI. All masks/identity/geometry must be
+inferred automatically; no hand-labeling of challenge records.
 
-## Research status — 2026-10-04
+## Status — 2026-10-04
 
-No final Parquet, submission or verified CARI4D improvement yet.
+**No final Parquet, submission or verified CARI4D improvement yet.**
 
-- **Engineering:** all 30 original Track 1 videos pass byte/metadata readiness.
-  The full 501-frame episode passes native preparation, forward, refinement,
-  direct export and the original official packer; its temporary one-episode
-  Parquet was deleted after QA. The next full 668-frame episode now passes
-  preparation, forward, 301-update refinement, direct export and the original
-  official packer.
-  A further 866-frame episode has verified complete inputs, but its frontend
-  continuation exceeded the original time budget: provenance PASS is not a
-  timing PASS. Its full native preparation, forward, refinement and export
-  and original official packing now pass independently. The next 592-frame
-  episode has independently verified preparation, forward and native refinement;
-  the outer queue failed its source-cache postcheck and is not reclassified.
-  After a separate source audit, two export attempts stopped before model
-  execution: first on historical-source binding, then on private-proof access.
-  The explicit authenticated readonly-source access fix now passes a full native
-  export of all 592 frames. Its independent export inventory, CPU consumer
-  validation and original official packing now pass; scratch Parquet deleted.
-  The 747-frame
-  episode keeps all 25 object components but tracking stopped at 18 frames
-  with empty automatic object masks. The next 668-frame episode has complete
-  automatic masks and Body/depth initializers; its default topology reduction failed before object tracking. A separately
-  gated volume-constrained proposal retains its three shells, including two
-  cavities; full tracking now passes on all 668 frames (3,605.69 s). Its CPU
-  CARI input assembly passes on all668 original frames; native shared preparation
-  now passes on all668frames (21.81 s), and native forward passes all7 windows
-  (134.23 s). Its unchanged full native301update refinement passes (392.97 s);
-  directexport passes all668 frames (39.57 s); original official CPU packing
-  passes (16.31 s), with scratch Parquet deleted. The next full816-frame volume tracker
-  also passes (4,794.56 s); its CPU CARI input assembly now passes all816frames (6,148.76 s).
-  Independently pinned full native shared preparation also passes (23.50 s);
-  native forward passes all9windows (147.76 s), with independently frozen
-  full816frame output. Unchanged native refinement passes all301updates (566.10 s),
-  with independently sealed original output; directexport now passes all816frames
-  (43.75 s). Original official packing now passes (17.43 s), scratch Parquet deleted. The634-frame
-  episode has complete initializers. Its first private Azure full-pose run
-  stopped before poses on the unchanged topology gate. A separately qualified
-  volume proposal and its full634-frame input archive now pass provenance and
-  fidelity checks. The unchanged isolated volume tracker now passes all634
-  original frames on VM02 (4,743.69 s), with independent source/full-input/output
-  byte seals. Its private Azure result return passes with unchanged bytes;
-  independent129/133source+output seals, listener/clientkey cleanup and
-  temporary NSG rule removal also pass. Original CPU assembly passes all634frames
-  (4,982.71 s), within its fixed7200s outer deadline; the owned timer is stopped.
-  Full native shared preparation passes (21.70 s), and native forward passes
-  all7windows with a twice-rehashed frozen full634frame bundle.
-  Original301update refinement passes (115.34 s), native export passes
-  all634frames (38.78 s); original CPU packing passes (16.04 s),
-  scratch Parquet deleted.
-  The next415-frame episode has complete automatic Body/depth initializers;
-  its default topology gate failed before poses. The unchanged CPU
-  volume proposal also rejects zero-area source faces; both failures stay
-  closed without face deletion or threshold relaxation.
-  The original
-  default-backend failures remain closed.
-  No frames, components or
-  trajectories were dropped to rescue either episode.
-- **Depth research:** D106 anchors DA3 to MoGe with one scene-constant median
-  ratio over whole native-valid support. It gains **56.2007%** median
-  visible-object camera Chamfer on 12 newly selected external TUD-L frames,
-  but these are the **same three development scenes/objects**; absolute errors
-  remain 33–38 cm. This is a narrow proxy, not independent generalization.
-  D107 tests the unchanged recipe on three independent TUM recordings:
-  **REJECT**, median relative AbsRel improvement **4.9046% < 5%**, with large
-  absolute errors. Both cohorts are closed without retuning or frame mining.
-  Neither establishes human/contact/temporal accuracy or a CARI4D victory.
-- **New authored RGB pilot:** four fresh anchors pass the independent CPU
-  triangle-ray rendering gate (`5536090`, 16.472 s). Automatic masks pass
-  (`001aa0f`, 14.529 s): eight Grounding and eight SAM2 calls with fixed
-  `person.`/`bottle.` queries, no manual prompts or model access to private
-  authored geometry. Four full Body/MoGe predictions pass (`14ebc28`, 30.926 s),
-  including native control replay and point-map projection. This is
-  pipeline readiness, **not** reconstruction accuracy. The frozen predicted-
-  geometry QA **REJECTS** the pilot: all four silhouettes pass, but one left
-  hand lacks the required automatic-mask support. No threshold/seed change,
-  192-frame run or bridge adoption; this cohort is closed. Earlier hypotheses and failed
-  authored references remain closed; the new pilot does not turn them into PASS.
-- **Eligibility:** upstream source/checkpoint licenses, training overlap and
-  NVIDIA's separate registration remain unresolved before any submission.
-  World Reward and all five Kaggle rule acceptances were verified on October 2.
+- **Engineering:** all30 original videos pass byte/metadata readiness. Episodes
+  **1,2,3,5,6,8,15** pass full native shared preparation, forward,301-update
+  refinement, direct export and original official packing. These are seven
+  complete engineering checks, not held-out accuracy; scratch Parquets deleted.
+  EP0's legacy conversion failure stays separate. EP4 missing masks, EP7 empty
+  anchor, EP9 invalid geometry and EP10/EP11 actor identity failures remain closed.
+  EP11 stops before SAM2/later frontends. EP12 is active: automatic masks cover all405 original frames and sparse
+  Body inference passes; the remaining full chain is not yet complete.
+- **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
+  development scenes/objects and33–38cm absolute errors prevent a generalization
+  claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.
+  No threshold/scene rescue or adoption.
+- **Hands/temporal research:** the four-anchor learned RGB pilot passes frontend
+  execution but **fails hand-support QA** despite passing silhouette IoUs;
+  no192-frame extension or occlusion-bridge adoption. RoboTAP2D execution passes,
+  but oracle initial queries, static negative control and unknown overlap make
+  it neither automatic3D validation nor a CARI4D comparison.
+- **YCBv2:** corrected acquisition and native initial depth pass; automatic object
+  identity abstains on ambiguous detections (two detector calls, zeroSAM2).
+  No private3D values/projections, Objects trajectory or quality evaluation;
+  cohort closed without prompt/margin retuning.
+- **Framework foundation:** `shared_scene` provides readonly byte-exact adapters
+  from existing Track1Episode/Reconstruction, with original indices, explicit
+  camera/gauge, constant geometry/identity and missing-observation support.
+  `temporal_identity` provides raw globally associated path costs over supplied
+  actor/object hypotheses. It does not infer/calibrate observations or accept an
+  identity. Both are tiny-tested primitives, **not an operational new framework,
+  integrated learned method or measured improvement**.
 
-A verified 19.91 GB asset-only transfer and extraction between Azure VMs
-completed without local checkpoint traffic. The second runtime is not yet
-ready: the selected Body/DINO source binding passes, and the minimal Grounding
-image compiles offline and its thin Python import gate passes. The independent
-SAM2 CUDA connectivity/hole-filling operator gate also passes, without models
-or historical image-parity/eligibility claims. The new four-frame frontend pilot
-passes; complete replica and reconstruction accuracy remain unverified.
-An isolated full source/test suite now passes **12,098 tests, 6 optional skips**
-in444.46 s; the new exact precision/backend contracts pass68 tests with one
-optional local Trimesh skip. These are correctness checks, not scientific results. The synchronous GPU-lock queue retains
-unchanged
-native stages. Opaque RoboTAP/BootsTAPIR acquisition, independent native CPU
-verification and full2D prediction/evaluation now pass on Azure: three videos
-have meanAJ0.6679 versus0.1778 for a static negative control. Initial queries are
-annotated oracles, the control is not a valid motion method, and training overlap
-is unverified; this is not an automatic3D or CARI4D comparison. The dependency
-build's incorrect `einshape.torch` probe failure remains preserved. A separate
-contiguous YCBV relative-motion pilot is preregistered, with automatic canonical
-queries, one shared native candidate pool and private CPU-only evaluation
-operators; no real-data3D comparison has run. Its sole technical acquisition
-continuation failed archive inventory after1,701.10 s, before image selection or
-private-label reading. All disposable archives were removed; zero public/private
-inputs remain. Metadata-only diagnosis now proves the technical cause: original
-RGB filenames start at1, while the protocol incorrectly required0. No labels or
-predictions were consulted, no native IDs renumbered, under that original closed protocol. Explicit October4 authorization permits
-one corrected same-cohort engineering replay, preserving nativeIDs1..96,
-original failures, cohort, GPU budgets and quality gates. Its full-archive
-acquisition passes (1,507.65 s), all288 RGB/nativeIDs retained and temporary
-archives deleted. Three native MoGe calls pass (9.50 s GPU); automatic masks
-then abstain on ambiguous object identity (two detections, zero SAM2);
-the pilot is closed without retuning. Private labels remain outside prediction inputs.
-See [protocol](docs/point_pose_protocol.md).
-None of these engineering gates is a reconstruction-quality result.
-Earlier extraction-fixture failures were corrected using authenticated historical
-Git bytes; the historical producer and production pins remain unchanged.
+Detailed receipts, producing revisions and decisions live in
+[experiments](docs/experiments.md). [Compute](docs/compute.md) is the compact
+operational snapshot; do not treat stale status prose as a live job monitor.
+See [architecture](docs/framework_architecture.md), [constraints/audit](docs/audit.md),
+[literature](docs/literature.md), [4DAnyone audit](docs/4danyone_audit.md),
+[baseline](docs/baseline.md), [point-pose protocol](docs/point_pose_protocol.md),
+[identity association](docs/identity_association_protocol.md) and
+[licenses](docs/licenses.md). Proxy/packing/test PASS never establishes victory.
 
-Heavy data, models and computation remain on Azure. Only reproducibility pins,
-results and decisions are kept here; see [experiments](docs/experiments.md).
+## Repository and data flow
 
-## Layout
+- `src/world_reward/`: reusable numerical contracts, scene adapters and research
+  operators; model/GT/provenance verification is not implied by array validation.
+- `infra/`: isolated Azure executors and existing native adapters; migrate
+  incrementally rather than mutate historical producer code.
+- `configs/`: frozen protocols/source/model/artifact pins, not per-episode labels
+  or quality-selected constants. `configs/sources.json` pins official inputs.
+- `tests/`: tiny procedural correctness/equivalence fixtures, no heavy media.
+- `docs/`: concise research contracts, sources, results and decisions.
 
-- `src/world_reward/`: input firewall and strict reconstruction contracts.
-- `infra/`: Azure-only acquisition, isolated image builds and GPU smoke gates.
-- `configs/sources.json`: official sources, pinned revisions and baseline scores.
-- `tests/`: lightweight, data-free correctness checks.
-- `docs/`: constraints, literature, experiment results and decisions only.
-- Runtime data, weights, upstream checkouts and outputs live **on Azure**, outside Git.
+Heavy data, checkpoints, renders and inference/training stay **on Azure**. Only
+code, small reproducibility pins and useful summaries stay here. Human and object
+share one camera frame; shape/scales/geometry are clip-constant and trajectories
+retain every original frame, including occlusion. No deletion/shrink/static
+trajectory or per-frame alignment to evade metrics.
 
 ## Development
 
 ```sh
 rtk uv sync --extra dev
-rtk uv run pytest -q
+rtk uv run pytest -q --basetemp=/tmp/world-reward-tests-unique-run
 ```
 
-Optional parity checks against the already-audited official kit use
-`WR_KIT_ROOT=/path/to/v2d_submission_kit`; only source helpers are imported and
-template I/O reads `row_id` alone, never sample prediction values.
+Choose a different exclusive basetemp for concurrent runs. Optional official-kit
+parity uses `WR_KIT_ROOT=/path/to/v2d_submission_kit`; template I/O reads row IDs
+alone, never sample prediction values. Tiny tests are not accuracy validation.
 
-Remote Linux download (never run on the tethered local host):
+Download/setup **on remote Linux only**, never the tethered laptop:
 
 ```sh
 uv sync --extra data --extra dev
@@ -161,14 +84,25 @@ uv run wr-data --config configs/sources.json --root /data/world-reward/data \
   --manifest /data/world-reward/results/input-manifest.json
 ```
 
-Final submissions use the original pinned official packer/uploader. Independent
-schema assembly/roundtrip tests guard its input/output contracts; they are not a
-replacement metric or evidence of reconstruction accuracy.
-One frozen file goes to all five metric competitions after validation, quota check,
-rule acceptance, team identity **World Reward**, and accessible producing GitHub commit.
-Kaggle credentials are configured in an ignored secret file; browser acceptance
-of all five competition rules and team name was verified on 2026-10-02;
-the own-code producer history is now public at
-[mrprokl/world-reward-v2d](https://github.com/mrprokl/world-reward-v2d).
-NVIDIA’s separate registration, source-license eligibility and the final exact
-producing commit/reproduction still require verification before the first upload.
+Model access, actual image/source/assets and protocol gates must pass before
+inference. Use immutable committed code, fresh output namespaces, bounded stages
+and the existing GPU scheduler; secrets never enter version control or logs.
+
+## Submission and eligibility
+
+Own code is Apache-2.0; external source/models/data retain their separate terms.
+**Training overlap and source/checkpoint eligibility remain unverified** where
+[licenses](docs/licenses.md) says so. Never equate granted model access with licence
+clearance or claim leakage-free weights without evidence.
+
+Use the original pinned official packer/uploader after numerical/geometry,
+full-trajectory, quality and rules checks. One frozen Parquet goes to all five
+competitions under **World Reward**; Thomas Gomez only where registration needs
+an individual name. Verify accessible exact producing GitHub commit and weekly
+quota before upload. Kaggle team name and all five rule acceptances were verified
+on2026-10-02; recheck submission requirements before uploading, without duplicating
+registration. NVIDIA's separate registration remains to verify.
+
+Credentials use ignored secret storage, never printed. Own-code history is public
+at [mrprokl/world-reward-v2d](https://github.com/mrprokl/world-reward-v2d). No upload
+or licence waiver is implied by repository visibility or current engineering PASS.

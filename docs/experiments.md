@@ -7026,3 +7026,42 @@ all16anchor policy unchanged; noBody/depth/objecttracker/CPUcontinuation.
 KeepidentityfeasibilityFAIL closed, nocoverage/margin relaxation orper-clip
 actorselection. Next untouchedEP11 samefrozenpolicy, independentepisode
 coverage work notmethodhyperparametersearch.
+
+
+2026-10-04 identity/framework follow-up: root independently checks new pure
+`temporal_identity` global supplied-cost graphs against400random tiny exhaustive
+references/1970state min-marginals;173combined identity/pose/actor/shared-scene
+tests PASS0.41s. Persistent joint hypotheses, missing support, all competitors,
+local min-marginals and same-evidence nuisance distinction are explicit. No
+automatic observations/learned costs/calibrated acceptance/3D/contact are produced;
+external DexYCB design remains proposed, not a new held-out result/adoption.
+4DAnyone release/primary audit motivates shared temporal context, not replacement
+of HOI by generated views or MHR70 skeletons.
+
+EP11 first transport stopped before stage-created because exact814179a runtime
+was already published forEP10; independent root hash audit proves146source
+files/digest b7267a11ac0fe583c6da8de010cd695ac25aa4d1a8c061824f2a7355747bf9f0,
+archive b8ba8dd2d36074e51e7d42747f2c7b25bfdd99635ccdf4d44bfe5ed970238c2f,
+noEP11unit/log/staging/targets andGPUidle. No ambiguous dispatch was blindly
+retried. Explicit `--reuse-published` controller c787442 independently verifies
+exactexistingmarkers/files/modes/directories before one metadata-only dispatch;
+no upload/source chmod/republish/result overwrite. Root142PASS18.59s andsame
+localGit archive/digest match. Producer remains original814179a, notc787442.
+
+ActualEP11 uniformfixed_all16 identityFAIL08:46:36UTC: nearesttrack only2/15
+validobject observations, fragmented9tracks. Actualunitfailedexit1/MainPID0,
+3906B logSHA da53bb25ec7cd17117380726421da6a94b1cfa7a04e8232b25d272ec7813cbdc
+retained; noSAM2/Body/depth/objects/tracking followed. No threshold/bystander/
+per-episode rescue. FreshEP12 sameoriginalproducer/globalpolicy starts after
+GPUidle, exactreuse dispatchACK. At08:51:52UTC actualunitactiveMainPID1295652:
+all405 automaticmasks PASS82.766216s (receiptSHA
+d5b93384c11b0268d8aaf2eeafd04c2f64a69be0da228c561f33caeb0174bf1c),
+sparse3Body PASS15.821565s. Full initializer/tracker/input/nativechain still
+unverified; no quality claim. READONLY EP0 inventory confirms original790frame
+inputreport3283B SHA9a9a93481432df5846a9ae94a4bdd32552f02167a30cf7e41d4f5ea629ad2799,
+actualbaba81b/source5719132e and6690.244623s, no newshared stages; missinghistorical
+dataset declaration is not silently supplied/resealed as a currentproducer.
+
+Repository cleanup: redundant stale current-state prose incompute/README replaced
+by concise timedoperational summary and links to original experimentrecords;
+no historical producer, outputs or failures erased. No local heavydata acquired.

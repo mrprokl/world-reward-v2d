@@ -1,7 +1,7 @@
 # Framework World Reward : recherche, scène partagée, preuves
 
-**Statut : architecture proposée ; première primitive SharedScene implémentée,
-framework unifié non encore opérationnel.**
+**Statut : adapters SharedScene et solveur de coûts temporal_identity implémentés ;
+extensions de scène et framework appris unifié non encore opérationnels.**
 Objectif : améliorer la reconstruction Track 1, pas multiplier les wrappers ou
 confondre un pipeline exécutable avec une victoire sur CARI4D. Code et décisions
 restent locaux ; médias, modèles, caches et expérimentations restent sur Azure.
@@ -11,11 +11,13 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 | Brique | Interface existante | Limite actuelle |
 |---|---|---|
 | Contrat final | `contracts.Reconstruction.validate`, `submission.Track1Episode` | Pas de scène avec observations et incertitudes. |
+| Scène partagée | `shared_scene.SharedScene`, `SceneCamera`, `ObservationRef`, adapters Track1/Reconstruction | API readonly sur reconstruction déjà convertie ; K/gauge fournis, support déclaré, pas de caméra/contacts/confiance appris. |
 | Temps original | `timeline.finite_chunks`, `first_occurrence_ownership` | Politique native96 explicite ; pas une fusion temporelle. |
 | Identité humaine | `shared_identity.share_first_frame_identity`, `cari_shared_prepare.prepare_geometry` | Politique frame0 fixe, pas identité optimisée multi-vues. |
 | Hypothèses objet | `point_candidate_pool.CandidatePool`, `pose_selection.PosePath` | Pool natif25 et sélection ; manque un contrat commun aux autres expériences. |
 | Forme partagée | `shape_model.apply_fixed_shape`, `shape_fit.fit_shared_shape`, `shape_selection.select_shape_candidate` | Opérateurs expérimentaux ; pas adoption automatique. |
-| Association temporelle | `point_pose_comparison.compare`, `rgb_pose_tracking.track_rgb_pose` | Coût ou suivi image, pas preuve de précision3D. |
+| Association pose/image | `point_pose_comparison.compare`, `rgb_pose_tracking.track_rgb_pose` | Coût ou suivi image, pas preuve de précision3D. |
+| Identité temporelle | `temporal_identity.IdentityGraph`, `rank_identity_paths` | Ranking global et min-marginales de coûts fournis ; aucun générateur de candidats/costs appris, identité acceptée ou probabilité. |
 | Lacunes | `occlusion_bridge.initialize_occluded_gaps` | Initialiseur conditionnel ; pas contact observé ni validation RGB complète. |
 | Baseline complète | `cari_shared_prepare`, `cari_full_forward`, `cari_full_refine`, `cari_full_export` | Adaptateurs natifs séparés, preuve et exécution souvent imbriquées. |
 | Évaluation externe | `point_motion_evaluation`, `point_bop_evaluation`, `ycbv_point_evaluate` | Portée rigide relative ; pas validation HOI globale. |
@@ -57,7 +59,17 @@ Frontières : modèle→observations, hypothèse→scène ajustée, prédiction 
 Le contrôleur transporte du code et ordonnance des ressources ; il ne sélectionne
 pas une hypothèse parce qu'un job ou une vérification d'intégrité a passé.
 
-## 3. Contrat proposé `SharedScene.v1` (pas encore une API)
+## 3. API `shared_scene.v1` existante et extensions proposées
+
+L'API actuelle porte `SceneCamera`, une `Reconstruction` MHR convertie, le mesh
+objet, l'expression, la provenance et des `ObservationRef` avec support full-T.
+Elle ne contient pas tous les champs riches ci-dessous : timestamps, contrôles
+natifs typés, scores/confiances calibrés, contacts et banque multi-instance sont
+des **extensions proposées**, pas des interfaces déjà exécutables.
+`temporal_identity` reste distinct : il classe une banque de couples persistants
+acteur/objet sur des observations référencées, sans fabriquer de géométrie.
+Voir `docs/identity_association_protocol.md` pour la portée et la validation
+encore proposée de cette primitive.
 
 | Champ | Invariant |
 |---|---|

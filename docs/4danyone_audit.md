@@ -1,10 +1,12 @@
 # 4DAnyone : audit primaire et pertinence Track 1
 
 Audit du **4 octobre 2026**, limité aux publications/releases disponibles au
-**30 septembre 2026**. Lecture de textes/API bornés à 300 KB par réponse ; aucun
-poids, dataset, vidéo, image ou PDF téléchargé. L'abstract et les sources sont
-vérifiés ; le corps HTML du papier dépassait cette borne et n'a pas été lu en
-entier. Les performances ci-dessous sont celles rapportées par les auteurs,
+**30 septembre 2026**. Sources/API initialement bornées à300KB ; aucune vidéo,
+image, dataset, poids ou PDF téléchargé. Le texte HTML complet v1 (342894B,
+SHA256 `22f99ee14c55a3f09d7d81140713a2effb7543889ea955f75da376c8ff9dc130`)
+a ensuite été vérifié intégralement en bytes, sous une borne texte de500KB ;
+méthode, ablations/protocole et limitations ont été lus. Pas d'inspection des
+figures ou preuve d'exécution. Performances rapportées par les auteurs,
 pas des mesures World Reward.
 
 ## Verdict
@@ -65,6 +67,29 @@ preuve de disponibilité historique de modifications ultérieures.
    des vidéos portrait nettes et peu de mouvement caméra. Il faudrait un
    nouveau contrat séquentiel pour nos vidéos complètes : jamais tronquer,
    resampler ou perdre les indices pour satisfaire ce défaut.
+
+## Ce que la méthode/les ablations établissent réellement
+
+Le papier v1 emploie40keypoints :17corps,6pieds,10knuckles et7landmarks
+auxiliaires ;30joints de doigts exclus. Les détails de doigts sont donc
+**générés depuis l'apparence**, pas explicitement reconstruits/validés pour HOI.
+Le z-buffer de squelette résout un ordre d'occlusion estimé, pas un contact.
+RCP conserve le source et3références compressées ×2 plus4 ×4, budget fixe ;
+les références proviennent de **vues générées**, pas d'observations réelles.
+TCR regroupe4vues avec circular sliding à bruit élevé puis groupes adjacents
+fixes à faible bruit. Le gain n'est pas obtenu par regroupement arbitraire :
+l'ablation DNA rapporte PSNR22.63/SSIM.796/LPIPS.191 pour Sliding,
+contre22.20/.788/.197 Random et22.06/.786/.198 Strided. Ces métriques
+sont une cohérence visuelle multivue, pas précision absolue humaine/objet.
+
+L'évaluation principale utilise10scènes DNA et3DyMVHumans,16caméras/98frames ;
+génération121 tronquée à98 pour ce protocole **auteur**, pas permis pour nos
+trajectoires complètes. ReCamMaster est fine-tuné avec mêmes données etRCP/TCR,
+les deux autres modèles comparés zero-shot : ne pas présenter un contrôle
+strictement identique entre tous les systèmes. L'annexeH constate que les
+vues cohérentes peuvent hériter d'une **mauvaise pose HMR**, et que les vêtements
+loin du squelette divergent. Pour World Reward : prior génératif distinct
+avec son incertitude ; cohérence inter-vues ne certifie jamais exactitude3D.
 
 ## Comparaison avec la vraie baseline et faisabilité
 
