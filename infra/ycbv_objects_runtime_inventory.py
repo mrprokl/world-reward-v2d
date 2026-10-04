@@ -74,7 +74,8 @@ def dino_source(root,deadline):
     for raw in control([*git,'ls-tree','-r','-z',objects.DINO_REV,'--',*prefixes],deadline).split(b'\0'):
         if not raw:continue
         meta,name=raw.decode().split('\t',1);mode,kind,blob=meta.split()
-        require(mode in ('100644','100755')and kind=='blob'and source_selection(name),'Only selected DINO Python/card source files allowed')
+        if not source_selection(name):continue  # ls-tree includes YAMLs; never read or mount them.
+        require(mode in ('100644','100755')and kind=='blob'and re.fullmatch('[0-9a-f]{40}',blob),'Only selected regular DINO Python/card source blobs allowed')
         path=folder/name;row=identity(path,empty=True);require(row['bytes']<=1_000_000,'Bounded public DINO source required')
         raw=path.read_bytes();require(hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()==blob,'Original selected DINO Git blob differs')
         rows[objects.DINO+'/'+name]=row

@@ -89,6 +89,8 @@ def test_dino_source_Git_blobs_revision_selected_inventory_only(tmp_path,monkeyp
     for name in ('hubconf.py','LICENSE','MODEL_CARD.md','dinov2/__init__.py','dinov2/models.py'):
         raw=('own '+name).encode();write(folder/name,raw)
         blob=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest();rows.append(('100644 blob '+blob+'\t'+name).encode())
+    rows.append(b'100644 blob '+b'a'*40+b'\tdinov2/configs/default.yaml')
+    # Unselected upstream files are listed, but never opened, hashed or mounted.
     calls=[]
     def control(args,*unused):
         calls.append(args)
