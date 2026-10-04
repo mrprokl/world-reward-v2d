@@ -230,7 +230,8 @@ def test_failure_retains_actual_counts_current_phase_manifest(q, tmp_path):
     assert progress["all_fixture_sources_rehashed_after"] and len(progress["fixture_manifest"]) == 6
 
 
-@pytest.mark.parametrize("mode", ["absent", "daemon", "found", "timeout", "malformed"])
+@pytest.mark.parametrize("mode", ["absent", "absent_array", "absent_lowercase", "daemon", "found", "timeout", "malformed",
+    "foreign_error", "extra_error", "extra_stdout", "nonempty_array", "identifier_stdout", "wrong_rc"])
 def test_independent_post_container_absence_distinguishes_real_daemon_errors(q, monkeypatch, tmp_path, mode):
     monkeypatch.setattr(q, "output", lambda *_: tmp_path / "out")
     cid = "a" * 64; path = tmp_path / "out.container.cid"; path.write_text(cid);path.chmod(0o400)
@@ -248,10 +249,67 @@ def test_independent_post_container_absence_distinguishes_real_daemon_errors(q, 
     def run(args, **kwargs):
         assert kwargs["timeout"] == 5 and args[:3] == ["docker", "inspect", cid]
         if mode == "timeout": raise subprocess.TimeoutExpired(args, 5)
-        return SimpleNamespace(returncode=1 if mode != "found" else 0,
-            stdout=(cid.encode() if mode == "found" else b""),
-            stderr=(f"Error: No such object: {cid}".encode() if mode == "absent" else b"daemon unavailable"))
+        stdout = {"absent_array": b"[]\n", "found": cid.encode(), "extra_stdout": b"[]\nextra",
+                  "nonempty_array": b'["foreign"]', "identifier_stdout": cid.encode()}.get(mode, b"")
+        error = f"Error: No such object: {cid}".encode()
+        if mode == "absent_lowercase": error = f"error: no such object: {cid}\n".encode()
+        if mode in ("daemon", "malformed"): error = b"daemon unavailable"
+        if mode == "foreign_error": error = f"Error: No such object: {'b' * 64}".encode()
+        if mode == "extra_error": error += b"\nextra"
+        return SimpleNamespace(returncode=0 if mode == "found" else 2 if mode == "wrong_rc" else 1,
+            stdout=stdout, stderr=error)
     monkeypatch.setattr(q.subprocess, "run", run)
-    if mode == "absent": assert q.container_absence(tmp_path, "a" * 40)["verified"]
+    if mode in ("absent", "absent_array", "absent_lowercase"): assert q.container_absence(tmp_path, "a" * 40)["verified"]
     else:
         with pytest.raises((ValueError, subprocess.TimeoutExpired)): q.container_absence(tmp_path, "a" * 40)
+
+
+@pytest.mark.parametrize("sibling", [None, "extra-source", "extra-marker"])
+def test_host_source_mount_parent_has_only_original_code_and_two_markers(q, monkeypatch, tmp_path, sibling):
+    snapshot = tmp_path / "snapshot"; snapshot.mkdir()
+    code = snapshot / "code"; code.mkdir()
+    for name in ("revision", "source-sha256"): (snapshot / name).write_text("manufactured marker")
+    if sibling == "extra-source": (snapshot / sibling).mkdir()
+    elif sibling: (snapshot / sibling).write_text("undeclared sibling")
+    real = q.modules()[0]; calls = []
+    runtime = dict(pins={"image_id": q.IMAGE})
+    def load_runtime(*_): calls.append("runtime"); return runtime
+    rt = SimpleNamespace(source=lambda *_: {"frozen": "manufactured"}, require=real.require)
+    official = SimpleNamespace(load_runtime=load_runtime, official_sources=lambda _: {},
+                               native_mesh_sources=lambda _: (tmp_path, {}))
+    monkeypatch.setattr(q, "modules", lambda: (rt, official))
+    monkeypatch.setattr(q, "mount_paths", lambda *_: [snapshot])
+    if sibling:
+        with pytest.raises(ValueError, match="two dispatch markers"):
+            q.host_proof(tmp_path, code, "a" * 40)
+        assert not calls
+    else:
+        proof = q.host_proof(tmp_path, code, "a" * 40)
+        assert proof["source_binding"] == {"frozen": "manufactured"} and calls == ["runtime"]
+
+
+@pytest.mark.parametrize("mode,expected", [("lowercase", 1), ("uppercase", 1), ("daemon", 2),
+    ("extra", 2), ("foreign", 2), ("wrong_rc", 2), ("timeout", 2), ("owned", 0), ("wrong_image", 2)])
+def test_actual_shell_inspect_owned_exact_lowercase_absence(q, mode, expected):
+    # Execute the real shell function with a manufactured command, not Docker.
+    raw = (ROOT / "infra/run_surface_identity_qualify.sh").read_text()
+    function = raw.split("inspect_owned() {", 1)[1].split("\ncleanup() {", 1)[0]
+    cid = "a" * 64
+    error = f"error: no such object: {cid}"
+    if mode == "uppercase": error = f"Error: No such object: {cid}"
+    elif mode == "daemon": error = "error: cannot connect to daemon"
+    elif mode == "extra": error += "\nextra"
+    elif mode == "foreign": error = f"error: no such object: {'b' * 64}"
+    status = 2 if mode == "wrong_rc" else 124 if mode == "timeout" else 1
+    response = "printf '%s\\n' \"$ERROR\" >&2; return \"$MOCK_STATUS\""
+    if mode in ("owned", "wrong_image"):
+        response = 'printf "/%s %s %s\\n" "$NAME" "${MOCK_IMAGE:-$IMAGE}" "$REV"; return 0'
+    script = ('set -u\nNAME=manufactured;IMAGE=sha256:manufactured;REV=manufactured\n'
+              + 'timeout() { ' + response + '; }\ninspect_owned() {' + function
+              + '\ninspect_owned "$CID"\n')
+    import os
+    env = dict(os.environ, CID=cid, ERROR=error, MOCK_STATUS=str(status))
+    if mode == "wrong_image": env["MOCK_IMAGE"] = "sha256:foreign"
+    else: env.pop("MOCK_IMAGE", None)
+    result = subprocess.run(["bash", "-c", script], env=env, capture_output=True, timeout=5)
+    assert result.returncode == expected

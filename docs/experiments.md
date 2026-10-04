@@ -9072,3 +9072,14 @@ finite, fulltimeline and actual history/config exact; all frozen raw inputs and
 nonoptimized blocks byte-preserved. Terminal successful journal, actualimage
 and owned audit-container absence rechecked. No optimizer replay or quality
 claim; refined consumer pins committed only after this audit.
+
+
+Surface identity e571132 actual nativePASS0.684506492s; original host remains
+FAIL at final Docker absent-error capitalization,1324B log aba29014312cdbe2606ee0e79dd814a6ab89b78b7da96c1ab29ccd7be7c60f46.
+Independent audit of same original13067B native89e5ee946c9d88a2c168ba314bbd16798f9f8301bd0190316c8a21926fc511e8
+verifies226-source/archive/ledger, full six fixture identities, three controls,
+six native loader calls/three official budget calls/zeroQEM, all posthashes and
+actual exactCIDabsence. No numerical replay or retrospective hostPASS. Native
+qualification pins preserve historicalFAIL explicitly. Minimal futureCLI fix
+accepts lowercase sameCID return1 only; root318tinytestsPASS0.71s. No whole
+Parquet/physical embedding/3D quality or adoption follows.

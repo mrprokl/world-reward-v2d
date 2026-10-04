@@ -58,6 +58,8 @@ def output(root, revision):
 def host_proof(root, code, revision):
     rt, official = modules()
     binding = rt.source(root, code, revision, ENTRY, HELPERS)
+    rt.require({path.name for path in code.parent.iterdir()} == {"code", "revision", "source-sha256"},
+               "Only the original code and two dispatch markers may enter the source mount")
     runtime = official.load_runtime(root, code)
     rt.require(runtime["pins"]["image_id"] == IMAGE, "Independent actual official CPU image required")
     sources = official.official_sources(root)
@@ -310,8 +312,8 @@ def container_absence(root, revision, *, failed=False):
     cid = raw.decode().strip()
     result = subprocess.run(["docker", "inspect", cid, "--format", "{{.Id}}"], capture_output=True, timeout=5)
     errors = (f"Error: No such object: {cid}", f"Error: No such container: {cid}",
-              f"Error response from daemon: No such container: {cid}")
-    rt.require(result.returncode == 1 and not result.stdout.strip()
+              f"Error response from daemon: No such container: {cid}", f"error: no such object: {cid}")
+    rt.require(result.returncode == 1 and result.stdout.strip() in (b"", b"[]")
         and result.stderr.decode().strip() in errors and rt.identity(path, 65, readonly=False) == pin,
         "Independent exact owned-container absence required; daemon failure is not absence")
     return dict(verified=True, CID_identity=pin)

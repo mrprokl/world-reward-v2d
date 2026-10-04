@@ -1,6 +1,7 @@
 # Surface LOD: official contract and prospective backend
 
-**Prepared 2026-10-05; not implemented, qualified or adopted.** This corrects an
+**Updated 2026-10-05; Phase1 identity implemented/native runtime independently
+verified; Phase2 design and implementation remain unqualified. Not adopted.** This corrects an
 interpretation of the official scorer, not any historical experiment gate.
 EP25 and all other closed failures remain FAIL; no episode reroll, changed
 threshold, mesh repair or production query is authorized by this document.
@@ -166,7 +167,7 @@ their extra physical claim is needed. No QEM is developed or launched here,
 no PASS is asserted, and no production default or adoption decision changes.
 
 
-## 6. Phase1 executable qualification (2026-10-05, not yet run)
+## 6. Phase1 executable qualification (2026-10-05)
 
 `infra/surface_identity_qualify.py` now defines a data-free offline CPU test
 using the existing pinned official packaging image1a04b193…303f0. Only code,
@@ -194,3 +195,146 @@ manufactured tests PASS0.61s; these mocks do not establish the real runtime PASS
 Actual source/image/helper/artifact rechecks and terminal execution must precede
 any production hypothesis. Full Parquet packing, scorer acceptance, physical
 embedding and reconstruction accuracy are separate, still unproved here.
+
+## 7. Phase2 preimplementation contract: fixed-boundary native surface QSlim
+
+**Design only; no new binary, QEM execution or qualification asserted.** Section6
+and the frozen Phase1 sources keep their original meaning. This section specifies
+the first prospective Phase2 variant, not a relaxation of any closed experiment.
+Implementation review and Phase1's actual terminal/runtime proof precede a new
+source freeze. EP25, earlier fixtures and all challenge failures are excluded
+from method selection and this qualification cohort.
+
+### Native construction and committed-event ledger
+
+Reuse the pinned libigl setup from Section4: `connect_boundary_to_infinity`,
+`edge_flaps`, native point-to-plane quadrics, native QSlim cost/placement callbacks
+and a custom `decimate` call with explicit pre/post/stopping callbacks. The closed
+proxy is **algorithmic only**: original open surfaces remain open. Neither the
+closed-source OBJ parser nor the original volume/solid/cavity veto is inherited.
+The original face count `F_source` separates real from synthetic birth IDs.
+After decimation, strip **only** synthetic `J >= F_source` faces and their unused
+synthetic vertex; keep every surviving real face in native order. Do not classify
+real faces as padding from the presence of vertex index0. Verify final `J` range,
+real face lineage and all original components before publishing any candidate.
+
+`I` identifies original surviving vertex births, **not** a coordinate equality
+or a map of every original vertex to its replacement. Track the real vertex
+quotient through actual contractions separately. Record/update the committed
+ledger **only when `collapsed == true`**. In failed post-collapse events, `f1/f2`
+can be undefined: never inspect them, update face counts or retain a speculative
+transaction. Real-face/component counts and live/null face state must reconcile
+against final `G,J,I`; synthetic events cannot consume the last real triangle
+of a component. Single-triangle components are protected, not filtered.
+
+### First variant: freeze every original boundary vertex
+
+Any edge incident to an original boundary vertex has cost `+infinity` and cannot
+collapse. Original boundary coordinates/edges are fixed, not moved toward a
+penalty target. Introduce no boundary weight or tuned aggressiveness. A source
+with **at least4096 referenced boundary vertices is INAPPLICABLE** to this
+variant; do not switch policy or discard a loop. Too many fixed/interior vertices,
+protected tiny components or queue exhaustion can also prevent budget completion.
+Under-budget sources retain Phase1 identity rather than invoking QEM.
+
+Preflight establishes consistently oriented vertex-manifold topology with
+optional boundaries. Illegal link changes, cross-component mergers, removal of
+a component, local face reversal and collapsed representedF32 triangles veto
+the proposed transaction. Boundary loops and component correspondence remain
+mandatory. Keep upstream floating-point intersection blocking with its declared
+limitations; do **not** add a closed-volume, material-forest or exact-embedding
+acceptance requirement to this surface backend. It cannot certify physical
+interiors or resolve pre-existing self-intersection/non-manifold sources.
+
+One target4096, one invocation per positive fixture, no target retry, reordered
+seed or fallback. Stopping requires both real face and real vertex counts
+`<=4096`, plus the declared serialization checks; final official arrays have
+exactly4096 vertex and face rows through unchanged official padding. Do not
+mistake the proxy face count for real output budget. All real components,
+oriented vertex links and fixed boundary geometry must survive exportF32,
+decoded native/raw readers and the **unmodified** official weld/packer. Compare
+complete meaningful oriented surfaces, component births and boundary loops;
+zero-only official padding is excluded separately. No sign flip, healing,
+hole filling, scale fit, meaningful-face deletion to repair or component removal.
+
+### Fresh procedural controls, defined before any QEM values
+
+Use a curved dyadic grid patch: for integer `i,j` from0 through `N`,
+`x=(i-N/2)/32`, `y=(j-N/2)/32`, `z=(x*x+y*y)/16`. A retained cell `(i,j)` has
+faces `(v00,v10,v11)` and `(v00,v11,v01)`, consistently oriented in that order.
+A square hole removes cells whose two indices both lie in `[a,b)`.
+Construct only vertices incident to retained cells, in lexicographic `(i,j)`
+order, before creating the source arrays; this is the authored open shape,
+not removal or repair of an existing source. Store exactF32 coordinates/I64
+faces and freeze every complete source array/hash before preflight or calls.
+
+1. **Fresh curved holed patch:** `N=64`, `[a,b)=[24,40)`. Exactly4000 vertices,
+   7680 faces and two boundary loops/320 boundary vertices; one component.
+2. **Fresh disjoint holed patches:** two patches with `N=48`,
+   `[a,b)=[20,28)`, second translated by `(4,0,0)`. Each has2352 vertices,
+   4480 faces and two loops/224 boundary vertices. Combined4704 vertices,
+   8960 faces, two components/four loops; every component participates.
+3. **Inapplicable boundary excess:** open square-sided tube with exactly2048
+   samples on each rim. In each z-plane0/1, traverse four sides with512 samples
+   each, `s=k/256`, `k=0..511`: `(-1+s,-1)`, `(1,-1+s)`, `(1-s,1)`,
+   `(-1,1-s)`. Connect successive corresponding rim points with two oriented
+   triangles. Exactly4096 vertices,4096 triangles, all vertices on the two
+   boundaries. Expected INAPPLICABLE **before QEM**, despite fitting the row
+   budgets; test the explicit Phase2 domain decision, never erase a rim.
+
+Assert these combinatorial counts, exact positive triangles, referenced-only
+source arrays and fixed-boundary eligibility before either positive QEM call.
+All sources are fresh data-free controls, not external accuracy evidence.
+The negative is a policy test, not a reason to change Phase1's identity domain.
+Freeze procedural definitions and source/helper hashes; any source, native or
+packing failure stops the cohort without adjusting these definitions.
+
+### Cost, utility and unresolved accuracy gate
+
+Use the existing source-bound libigl/Eigen CPU build environment, no downloads,
+installs, model/GPU runtime or new dependencies. Prospective limits are
+**4 CPUs/16GB; compile<=600s; whole control cohort<=300s**, including source
+preflight, both native calls, actual loaders/official packing, posthash and owned
+scratch cleanup. Each native call is clamped to the cohort's remaining budget;
+the second is not guaranteed300s of its own. Total compile+qualification<=900s;
+hard outer deadlines and bounded ownership-checked cleanup must be frozen with
+the future controller. Host source publication/daemon preflight have a separately
+reported bounded scope, not a false claim that the whole lifecycle takes300s.
+
+These controls target real boundary-preserving simplification/representation,
+not3D estimation. Report full-source per-component/boundary surface distances,
+births, serialization changes, native attempts/returns and actual collapse/veto
+counts. Exact source-to-LOD surface equality is not required for simplification;
+exact **LOD-to-serialized/packed** identity is. A new accuracy threshold/cohort
+must still be frozen before external or production adoption; this section does
+not invent a numerical tolerance. Optional Hausdorff/embedding certification
+from Section5 remains separate and must not become an implicit solid-only gate.
+No budget success, silhouette improvement or procedural PASS can establish a
+gain over CARI4D or authorize production defaults/submission changes.
+
+
+### Phase1 actual evidence and separate host failure
+
+Frozen producer e57113213164188434735903a49efe84b012ec13 completed native PASS
+0.684506492s: three exact controls, six loader calls including authentic replays,
+three unchanged official budget calls, zero QEM. Native13067B
+SHA89e5ee946c9d88a2c168ba314bbd16798f9f8301bd0190316c8a21926fc511e8;
+full six-source manifest bfb8bb8dfce620c8f083f5840cd0c7ecb84f9d8be3f4c234a3658cfd2df90166.
+The **host unit remains FAIL**, with no host report: final cleanup expected a
+capitalized Docker error, but the actual pinned CLI emits lowercase exact
+`error: no such object: <sameCID>` with return1/empty stdout. Original1324B log
+SHAaba29014312cdbe2606ee0e79dd814a6ab89b78b7da96c1ab29ccd7be7c60f46 is retained.
+
+An independent data-free audit verified all226 immutable source files/archive
+and readonly ledger, current official/native/runtime hashes, complete six-input
+fingerprints recomputed with stdlib struct, original native counters/results,
+posthash and **actual exactCID absence**. No control/loader/model was rerun.
+`configs/surface_identity_qualification_pins.json` binds this narrowly qualified
+native evidence and explicitly records the historical host FAIL. It is not a
+backdated host report, whole Parquet qualification, arbitrary-mesh proof or3D gain.
+
+Future driver/wrapper accept that exact lowercase sameCID/return1 variant;
+daemon failure, extra text, foreignCID, wrongreturn and timeout stay rejected.
+Snapshot mount inventory is restricted to code and its two original markers.
+Root318 tiny tests PASS0.71s; tests do not replace the actual independent audit.
+Phase2 still needs real build/transactions and full serialized/packed fidelity.

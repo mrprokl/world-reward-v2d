@@ -33,6 +33,7 @@ inspect_owned() {
  else
   rc=$?
   if (( rc == 1 )) && [[ "$value" == "Error: No such object: $cid" \
+   || "$value" == "error: no such object: $cid" \
    || "$value" == "Error: No such container: $cid" \
    || "$value" == "Error response from daemon: No such container: $cid" ]];then return 1;fi
   return 2

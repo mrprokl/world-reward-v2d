@@ -14,7 +14,9 @@ inferred automatically; no hand-labeling of challenge records.
   separates lawful open surfaces from our optional closed-solid backend; no
   historical failure is relabeled. Under-budget identity and
   [mask-conditioned queries](docs/mask_query_quantile_protocol.md) pass289 tiny
-  tests, but real loader/packing and real-object pose quality remain separate.
+  tests. Three fixed open-surface controls now pass an independent actual
+  loader/mesh-budget audit; the original host cleanup FAIL is retained. Whole
+  Parquet and real-object pose quality remain separate.
   EP21 real native point qualification stops before optimization (<8 queries);
   no replay, positive-weight fit or accuracy gain. EP09 full415 preparation,
   forward and301-update refinement pass independent source/full-bundle audits;

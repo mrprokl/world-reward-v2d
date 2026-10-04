@@ -1,0 +1,24 @@
+{
+  "schema": "world_reward.surface_identity_qualification_pins.v1",
+  "producer_revision": "e57113213164188434735903a49efe84b012ec13",
+  "native": {
+    "bytes": 13067,
+    "sha256": "89e5ee946c9d88a2c168ba314bbd16798f9f8301bd0190316c8a21926fc511e8"
+  },
+  "historical_host_status": "fail",
+  "historical_log": {
+    "bytes": 1324,
+    "sha256": "aba29014312cdbe2606ee0e79dd814a6ab89b78b7da96c1ab29ccd7be7c60f46"
+  },
+  "source_archive_sha256": "6dcd89d200b16ee22a762210d8c7008863757e73c50bb4964c10fd1753cd792c",
+  "source_readonly_ledger_sha256": "86e832a2e960441fece3f8da3f3c9b47bbf71375ad9ad628819aeb5ac6b2081b",
+  "source_files": 226,
+  "fixture_manifest_sha256": "bfb8bb8dfce620c8f083f5840cd0c7ecb84f9d8be3f4c234a3658cfd2df90166",
+  "native_loader_calls": 6,
+  "official_budget_calls": 3,
+  "QEM_calls": 0,
+  "independent_native_audit": true,
+  "whole_Parquet_qualified": false,
+  "adoption": false,
+  "reconstruction_accuracy_verified": false
+}
