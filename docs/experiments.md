@@ -6164,3 +6164,15 @@ diff PASS. Source-AST comparison verifies the six model/resize/query/coordinate/
 validation numerical functions are identical to9dfccb7; only permission plumbing,
 fresh namespace and actual failed-preflight lineage change. No inference or
 metric success is inferred from these tiny tests.
+
+Fresh b9ef3ba Boots native infer_v2 **PASS20.983587s**: report19,797B SHA
+`0269625e4fb6097afc3223a08c652d9e09cea4f43024bfdcd931770f633da58a`.
+Three attempted/returned/completed native calls retain all74/1179/1337 frames
+and32/32/29 frozen oracle initial queries. All input/checkpoint/source receipts
+reverified; no private future annotations, GT, adoption or quality evaluation.
+Root independently rehashes all three actual prediction NPZ files before
+freezing evaluation pins. Run the previously committed240s CPU-only evaluator
+once against the preregistered AJ/OA gates; metrics remain pending. Original
+infer_v1 FAIL and root-owned0400 CPU proof stay untouched; the3051B narrow
+read-only receipt mirror is byte-identical. This is execution PASS, not a
+verified tracking improvement, Track1 provenance clearance or CARI4D victory.
