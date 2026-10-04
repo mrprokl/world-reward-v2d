@@ -7539,7 +7539,9 @@ Fresh mask ablation preregistered before subject04 byte acquisition/inference:
 3lex4/39/74 full original clips, identical frozen MediaPipe propositions for
 Abox-only/Bsamebox+17points. Primary mean unionDice over ALL annotated positives,
 including missing/empty zeros; forward only if pooled paired delta>0, each clip
-delta>=0 and each clip has B intervention. No threshold search; failures close
+delta>=0 and each clip has B intervention on an annotated-positive frame.
+Any clip with no annotated-positive frame stops inconclusive, not dropped or
+zero-substituted; pooling uses positive per-frame deltas, not unequal clip means. No threshold search; failures close
 cohort. Intervention/reuse, object1..21/background0 pixel contamination and
 coverage reported separately. No255 means unscorable, not negative. Pure streaming
 evaluator root144tests PASS0.14s; fresh acquisition root93PASS1optionalSkip2.52s.

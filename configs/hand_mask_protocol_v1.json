@@ -16,7 +16,8 @@
   "cohort": "v2",
   "evaluation": {
     "contact_3D_identity_adoption": false,
-    "mask_forward_gate": "pooled_B_minus_A_Dice_strictly_positive_and_each_clip_delta_nonnegative_and_each_clip_B_intervention_present",
+    "mask_forward_gate": "pooled_positive_frame_B_minus_A_Dice_strictly_positive_and_each_clip_delta_nonnegative_and_each_clip_positive_B_intervention_present",
+    "no_positive_clip_policy": "inconclusive_stop_no_drop_no_zero_substitution",
     "primary": "equal_original_positive_frame_mean_union_Dice_including_missing_zero",
     "secondary": [
       "union_IoU",
