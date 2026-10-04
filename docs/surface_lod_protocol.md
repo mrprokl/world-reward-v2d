@@ -338,3 +338,28 @@ daemon failure, extra text, foreignCID, wrongreturn and timeout stay rejected.
 Snapshot mount inventory is restricted to code and its two original markers.
 Root318 tiny tests PASS0.71s; tests do not replace the actual independent audit.
 Phase2 still needs real build/transactions and full serialized/packed fidelity.
+
+
+### Phase2 implementation freeze before native build
+
+A separate328-line `infra/surface_qslim.cpp` now assembles native libigl QSlim
+quadrics, fixed-boundary +infinity costs and its actual floating-point AABB
+intersection callback. Local pre-collapse transactions protect real components,
+vertex links and represented F64/F32 normal activity/orientation. Only committed
+collapses update the ledger; final J/I births and a complete original vertex
+quotient replay reconcile component/Euler/fixed-boundary/unused-vertex bytes.
+No inherited solid/cavity/volume gate, source repair or original solver rewrite.
+Native output remains F64; one required GLB F32 cast must be reported separately
+from exact F32-LOD-to-loaded/packed identity. None is runtime-qualified yet.
+
+`infra/surface_qslim_build.py`/wrapper build this standalone source in the existing
+pinned CPU imagec8fb1632…21137, with original authenticated libigl40e790/Eigen314739
+headers, compiler and Boost inventory. No CGAL child, package installation,
+models, meshes, QEM calls or data; only compile and source-bound `--build-info`.
+Native600s inclusive/host900s inclusive/outer960s include posthash and receipt
+sealing, with bounded owned cleanup. ExactCID absence requires actual return1,
+exact sameCID message and empty or empty-array stdout, never daemon errors.
+
+Root194 manufactured tests PASS0.63s. This is source/API/fixture-contract review,
+not a real C++ compile, collapse qualification, geometry accuracy or adoption.
+Fresh Phase2 control cohort from Section7 remains frozen before native values.
