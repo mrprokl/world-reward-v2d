@@ -8556,3 +8556,24 @@ existing modern algorithms propagate full source inventories and unchanged
 pose/gauge. Independenttests1042PASS2skips57.87s plus exportinventory231PASS0.78s.
 No new modelstack/orchestrator/pathalias/overwrites; canonical cari_inputs remains
 fresh-only. Actual solid pose/prepare/deployment/adoption stillprerequisites.
+
+Actual inertEP09 readerPASS0.609395621s under independentpublished237-file
+tracker31ff94d closure/B47 CPU only. Stored geometry4096V/4096F, all4096faces
+active, dtypeF64/I64; no meaningfulface removal, resimplification, GPU, models
+or nativegeometryqueries. Fullsource/11artifacts rehashedbeforeafter. Directory
+mount correction preserves sealedmetadata exactly. StrictfullTGPUpose queued
+under samepublished31ff94d, no nativecompletion or accuracy inferredfromACK.
+
+EP25 readonlyactual215closure andsource/native/post/cleanupverified. Compiler
+FAILphase=source; itsfirstexactCGALquery exitsSIGSEGV(-11), zeroQEMcalls;
+failure_scope=native_execution_contract, NOT a certified invalidsolid verdict.
+Native92140B SHA82c659e79e028549b0a3a301777f3de582c191d03959056b8143b60adc043c51.
+Preserveoriginaltechnicalfailure, no retry/gate/sourcechange or geometrypins.
+
+EP21 actualfull563directexport6a9c722 PASS35.803140956s. Producer200file
+archive86d96c8e8421d41cad4693f3394dae5d503c5b53a383c92f1eeb992dedea171c
+ledgerf15ade226c035ad5a8521675a080e777cf522460e2323a23dcd6b5b886ab6799
+and oldindependentf6a4fd1/196file readonlyreader rehashedbeforeafter. All5sealed
+exportfiles and original full-N replay/reference/scalar checks validated twice;
+actualtinypins992B SHA1badd19e6d816b9ca0cce459ef91a9c7000820f06574a82773b53169818ac3c3
+frozen locally. No officialpack/quality fromnativeexport alone.
