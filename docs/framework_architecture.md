@@ -46,8 +46,15 @@ Les contrats historiques et leurs preuves restent consultables à leur révision
 La route proposée ne présente ni le planner historique ni les opérateurs purement
 numériques comme un framework complet déjà opérationnel.
 
-L'intervention prioritaire est désormais [un seul objectif joint à points](joint_point_objective.md),
-pas un empilement de corrections par vidéo. Le [rééquilibrage des sommes exactes](balanced_solid_sum.md)
+La route d'estimation reste [un seul objectif joint à points](joint_point_objective.md),
+pas un empilement de corrections par vidéo. Sa qualification réelle a échoué à
+la disponibilité des attaches ; une [allocation masque générique](mask_query_quantile_protocol.md)
+est étudiée séparément avant tout nouveau fit. L'audit du kit a aussi identifié
+une surcontrainte propre : la fermeture solide n'est **pas** une exigence
+universelle Track1. Une [branche surfacique fidèle](surface_lod_protocol.md)
+séparée doit qualifier le domaine ouvert sans modifier les anciens résultats.
+La priorité immédiate est donc l'admissibilité/représentation et les observations,
+non l'achat d'un nouvel empilement de modèles. Le [rééquilibrage des sommes exactes](balanced_solid_sum.md)
 traite séparément la profondeur numérique du compilateur ; il ne change ni la
 géométrie ni les critères d'acceptation. Les qualifications anciennes ne qualifient
 pas ce nouveau source : quinze contrôles puis quatre compilations géométriques

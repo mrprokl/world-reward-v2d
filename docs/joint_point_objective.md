@@ -103,7 +103,17 @@ weight0 are runtime-only values, not positive-weight calibration.
 The first launch failed before any container/model/update because systemd
 expanded a controller FD9 path containing `$$`. Its original failure is retained.
 A scheduling-only replay uses `/proc/self/fd/9`, the **same frozen9d4badf driver**
-and a fresh unit/log; ACK is not native PASS. The later strict container cleanup
-fix does not mutate that frozen job. Independently prove its exact CID absent
-before sealing any result. Real native parity remains pending; accuracy and
-positive-weight validation remain separate prerequisites.
+and a fresh unit/log. That same frozen replay then **failed** in the original
+constructor/query-attachment phase after22.004624s: fewer than8 fixed automatic
+queries, with no refill or fallback. No loss probe, optimizer run,301-update
+pair or positive-weight term executed. The immutable8727B report is SHA256
+`92a0286d43479ef5fe5685916f366cf75c7199d99706ba4684dab2e1ba7cb450`.
+Independent source/input/mask/runtime posthash and exact owned-CID absence checks
+passed. The later strict cleanup fix does not mutate that historical job.
+
+This closes that qualification version, not a successful native parity claim.
+Sparse-grid availability versus shape/pose/K/mask disagreement is not yet
+identified. A [new mask-conditioned operator protocol](mask_query_quantile_protocol.md)
+uses fresh analytic fixtures; it does not rerun EP21 or relax the old min8 gate.
+Actual paired optimizer qualification, licensed calibration and positive-weight
+held-out accuracy remain separate prerequisites.

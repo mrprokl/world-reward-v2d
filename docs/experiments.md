@@ -8974,3 +8974,37 @@ source/model/config refs, automatic original-frame0 anchor and native gauge are
 declarations only. No repair/compaction/scale-fit/solid certificate or adopted
 backend. Root167tinytestsPASS1.03s; source/model/runtime eligibility remains
 separate. This creates a common framework boundary, not measured3D progress.
+
+
+### 2026-10-05 — native query failure and representation correction
+
+Real-model point qualification9d4badf FD9 scheduling-only replay now CLOSED FAIL:
+22.004624s, fewer than8 original fixed frame0 queries. Constructor pipeline
+attempts1/returns0, no loss probes, optimizer runs/updates or B construction.
+Immutable8727B report SHA92a0286d43479ef5fe5685916f366cf75c7199d99706ba4684dab2e1ba7cb450.
+Independent220-source/archive/ledger, historical input assets, full automatic
+PNG, original runtime and exact owned-CID absence verified. The actual native
+constructor internally initialized before query selection; the pipeline return
+counter0 must not be mistaken for proof that no model initialized. No parity or
+accuracy claim. New mask-only quantile operator protocol uses fresh analytic
+fixtures; no EP21 retry, refill, threshold change or positive-weight calibration.
+
+Primary Track1 kit audit corrects an overconstraint: mesh_budget2031B
+SHA42ab8ab35f37b806fb1465eadd96abe43eaac04575da47a4855d08eefe6167b0
+requires budgets/indices/positive surface, not closure or solid forests. General
+winding scorer explicitly tolerates holes; native inside test closure applies
+human mesh, not object. Exact solid checks remain appropriate to their declared
+backend only. EP25 self-intersection and all historical FAIL receipts stay FAIL;
+format acceptance alone would not prove a plausible reconstructed object.
+New surface-identity/LOD protocol distinguishes legality, representation fidelity
+and optional expensive certificates. Phase1 under-budget open identity precedes
+any new solver/model; phase2 uses one source-bound boundary-aware QSlim target.
+No production default, score/3D gain or adopted backend is changed.
+
+TripoSR immutable acquisition source is reviewed but **not dispatched**:31 pinned
+files/1677487448B,180s inclusive acquisition+posthash budget,183s outer deadline,
+MIT/MPL declarations, zero model/packages/data/GPU. Root68tinytestsPASS0.78s.
+Completed exact files retained and only owned partials removed on failure.
+Checkpoint training/challenge overlap and full runtime eligibility unverified.
+Defer this transfer while testing the cheaper representation bottleneck; do not
+call TripoSR SOTA2026 or qualified by these manufactured acquisition tests.
