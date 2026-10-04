@@ -7011,3 +7011,18 @@ completeoriginalCPUinputs butlegacyroute only;4trackingmissingmasks,7emptyanchor
 9geometryfailure remainclosed. Fresh10..14/16..29 noexistingfrontends. Proceed
 next10 withuniformfixed_all16automaticpolicy, notepisode-tailoredprompt,
 originalmasks/initializers/tracker/timebudgets, GPU lock; noqualityclaim.
+
+EP8officialCPUpacker actualPASS634full/454scoredframes16.040684s;11095B
+receiptSHAf4a49a3d53f504973adb5e280a2f551f22f7e322f56b7a8515a8dbd54d3e753d.
+Rootindependent136sourceclosure/hashmodes all15originalinputs+all4native stages
++originalkithelper bytehashes verified. Actualunitinactive/onefinalreceipt,
+fullscratchParquetremoved; no finalsubmission orqualityresult.
+Newintegratedtinycontracts461PASS1optionalTrimeshSKIP3.74s, noactivepytest.
+
+FreshEP10uniformfixed_all16automatic masksFAILbeforemodelsbeyond detection
+08:27:14UTC: closestactortrack lacksrequiredobservations/coverage (5/16),
+notfixedbychoosingthebetter-coveredbystander11/16. Original814179a sources,
+all16anchor policy unchanged; noBody/depth/objecttracker/CPUcontinuation.
+KeepidentityfeasibilityFAIL closed, nocoverage/margin relaxation orper-clip
+actorselection. Next untouchedEP11 samefrozenpolicy, independentepisode
+coverage work notmethodhyperparametersearch.

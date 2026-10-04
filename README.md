@@ -60,7 +60,8 @@ No final Parquet, submission or verified CARI4D improvement yet.
   Full native shared preparation passes (21.70 s), and native forward passes
   all7windows with a twice-rehashed frozen full634frame bundle.
   Original301update refinement passes (115.34 s), native export passes
-  all634frames (38.78 s); original CPU packing is next.
+  all634frames (38.78 s); original CPU packing passes (16.04 s),
+  scratch Parquet deleted.
   The next415-frame episode has complete automatic Body/depth initializers;
   its default topology gate failed before poses. The unchanged CPU
   volume proposal also rejects zero-area source faces; both failures stay

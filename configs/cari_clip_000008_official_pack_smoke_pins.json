@@ -1,0 +1,19 @@
+{
+  "schema": "world_reward.ep8_official_packer_smoke.v1",
+  "producer_revision": "814179a638f856786991da7bc59aba9470c87812",
+  "script_sha256": "031969fcb966178ac94a3c70926d744d3a82b80f7aee3a16c83393412afb2232",
+  "report": {
+    "path": "outputs/episode_000008/official_track1_pack_smoke_v2/report.json",
+    "bytes": 11095,
+    "sha256": "f4a49a3d53f504973adb5e280a2f551f22f7e322f56b7a8515a8dbd54d3e753d"
+  },
+  "status": "pass",
+  "frames": 634,
+  "scored_frames": 454,
+  "elapsed_seconds": 16.04068405801081,
+  "temporary_Parquet_removed": true,
+  "final_Parquet_produced": false,
+  "quality_verified": false,
+  "source_independently_rehashed": true,
+  "all_four_stage_inputs_independently_rehashed": true
+}
