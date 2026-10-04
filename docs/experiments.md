@@ -6483,3 +6483,10 @@ Frozen original and second FAIL receipts remain separate and no third attempt
 is authorized. Objects/point-track/private-evaluator code readiness does not
 create missing real-data evidence. New tiny runtime refs176focused PASS1.16s;
 current fullsuite runs separately from Azure GPU work.
+
+EP5 actual prepare inventory and independent second complete4artifact rehash
+**PASS**, original producer4d8f607923c5abce114bc90150e41ccba3564fe7;
+report28616B SHA cccb16852e9d56ad5e2d52303120f11309aaad82e7d5d251fe0926c84cab972f.
+Exact all668frame shared-initializer/reference replay/nooptimizer receipt and
+native payloads are frozen in committed next-stage pins. Unchanged full native
+forward is next under the scoped GPU lock, before any refinement/packing.
