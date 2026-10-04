@@ -172,6 +172,8 @@ def parser():
     for name in ("frames","height","width"):result.add_argument("--"+name,type=int,required=True,action=Once)
     for name in ("camera-name","producer-revision","producer-script-sha256"):
         result.add_argument("--"+name,required=True,action=Once)
+    result.add_argument("--producer-code", action=Once, default=None,
+        help="Independently authenticated readonly original producer directory; hash only, never execute")
     return result
 
 
@@ -180,7 +182,8 @@ def main(argv=None):
     if platform.system()!="Linux" or os.environ.get("WR_ROOT")!=str(ROOT):
         raise RuntimeError("Original frontend inventory is restricted to the canonical Azure Linux control host")
     spec=inputs.PublicClipSpec(args.episode,args.frames,args.camera_name,args.height,args.width)
-    pins=inventory(ROOT,code,spec,args.producer_revision,args.producer_script_sha256)
+    pins=inventory(ROOT,code,spec,args.producer_revision,args.producer_script_sha256,
+        producer_code=args.producer_code)
     json.dump(pins,sys.stdout,allow_nan=False,separators=(",",":"));sys.stdout.write("\n")
 
 

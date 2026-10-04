@@ -277,6 +277,16 @@ def separate_producer_fixture(gate,tmp_path):
     return root,code,producer,spec,records
 
 
+def test_cli_explicit_original_producer_path_is_optional_and_single_occurrence(gate):
+    args = ['--episode', '0', '--frames', '790', '--height', '1152', '--width', '1536',
+            '--camera-name', 'front_stereo_camera_left', '--producer-revision', 'c' * 40,
+            '--producer-script-sha256', 'd' * 64]
+    assert gate.parser().parse_args(args).producer_code is None
+    assert gate.parser().parse_args(args + ['--producer-code', '/original']).producer_code == '/original'
+    with pytest.raises(SystemExit):
+        gate.parser().parse_args(args + ['--producer-code', '/original', '--producer-code', '/other'])
+
+
 def test_separate_original_producer_keeps_consumer_helpers_and_every_input_unchanged(gate,tmp_path):
     root,code,producer,spec,records=separate_producer_fixture(gate,tmp_path)
     source=records["inputs"]["script_sha256"]
