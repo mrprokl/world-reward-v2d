@@ -7141,3 +7141,29 @@ of firstfew : primarytoolkit groupsobjects by i//5, repeats i%5. Subject02
 fit0/32/64 versusdecision16/48/80, subject01all6blind, fixedcamera/fullframes.
 No archive/model/newprivatevalue acquired yet. VM02GPUidle, owneddata disk
 975.12GBfree, root50.66GBfree; planarchives on data disk, selected<=8GBonroot.
+
+04Oct correction/continuation: EP12 full original frontend and CPU inputs
+PASS3035.001663s, finalized10:17:31UTC under814179a. All15 original hashes pinned
+in `configs/cari_clip_000012_input_pins.json`; receipt3360B
+ff0b79caaec5a89e168c9883ebc2a2fd2fba27e219d4a8248381a994be25d6b5.
+Collected systemd unit alone never implies PASS. Shared native preparation has
+not yet executed. EP0's15 pins and one exact missing dataset receipt field are
+implemented/tested, preserving wrong-dataset/dependency/no-oracle gates; actual
+consumer validation/native reconstruction still pending, old conversion FAIL retained.
+
+EP13 queuefc10a6e actual technical FAIL10:17:34UTC before any child: EP12 unit
+was collected before the next terminal poll. Root independently verified original
+source and all target namespaces absent, then directly dispatched unique v2
+using unchanged814179a fixed_all16, no scientific retuning. Actual loaded v2
+MainPID1330097 active, full425 Body PASS144.844406s10:43:36UTC; depth starting.
+This technical replay is not identity/3D/quality success or an inferred full PASS.
+
+Candidate bank orchestration d114132: all fixed-query hand/object detections
+retained after existing classwise NMS, one SAM2 encoder/batch, 4×4 mask queries
+and 8×8 outside-union background, Q=0 retained. Root215 combined tests
+PASS0.19s with fake callbacks; no actual model accuracy or licence certification.
+External DexYCB download a2e05f4 uses two bounded Azure-only public streams,
+fixed subjects/bytes, no auth/cookies or private labels; measured hashes are not
+publisher checksums. Root64PASS1LinuxSKIP1.14s; actual dispatch initiated, ACK
+and availability still to verify. Full tiny suite12346PASS7SKIP400.83s preceded
+these focused changes; no claim that this exact new HEAD has that full result.

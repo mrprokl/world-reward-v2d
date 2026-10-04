@@ -16,10 +16,12 @@ inferred automatically; no hand-labeling of challenge records.
   complete engineering checks, not held-out accuracy; scratch Parquets deleted.
   EP0's legacy conversion failure stays separate. EP4 missing masks, EP7 empty
   anchor, EP9 invalid geometry and EP10/EP11 actor identity failures remain closed.
-  EP11 stops before SAM2/later frontends. EP12 is active: full405 masks, Body
-  and depth pass; object tracking remains incomplete. EP13 has a dispatch ACK
-  for a bounded queue after EP12 terminates; actual wait is active, not child
-  inference/completion.
+  EP11 stops before SAM2/later frontends. EP12 full405 frontend and CPU inputs
+  pass; original fifteen inputs are pinned before native reconstruction. EP0's
+  exact historical metadata omission is authenticated, not a relaxed legacy
+  gate or a reversal of its old conversion failure. EP13 queue failed before
+  inference because its terminal predecessor was collected; a separately checked
+  technical replay is active, with full425 Body PASS at10:43:36UTC.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
   development scenes/objects and33–38cm absolute errors prevent a generalization
   claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.
@@ -40,6 +42,8 @@ inferred automatically; no hand-labeling of challenge records.
   actor/object hypotheses. It does not infer/calibrate observations or accept an
   identity. `relational_motion` extracts background-compensated 2D movement
   features from supplied automatic tracks, with raw support/degeneracy diagnostics.
+  `automatic_candidate_bank` batches all retained automatic hand/object proposals
+  through model callbacks, preserving empty masks and outside-union background.
   These are tiny-tested primitives, **not an operational new framework,
   integrated learned method or measured improvement**.
 

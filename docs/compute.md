@@ -20,13 +20,14 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 6 | 816 | Same complete chain PASS on qualified fixed volume geometry. |
 | 8 | 634 | Same complete chain PASS; VM02 full pose/result return byte-sealed before VM01 assembly. |
 | 15 | 501 | Same complete chain PASS. |
-| 0 | 790 | Legacy full inputs exist; legacy conversion/fidelity route remains failed, not a held-out quality result. |
+| 0 | 790 | Original full inputs pinned; exact metadata omission compatibility implemented. Old conversion failure remains separate; new native route not yet executed. |
 | 4 | 747 | Tracking stops at18 empty automatic object masks; full trajectory unavailable. |
 | 7 | — | Empty automatic fixed anchor; closed without reroll. |
 | 9 | 415 | Geometry/topology failures before pose; no face deletion or threshold rescue. |
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
-| 12 | 405 | Active original frontend: full405 masks/Body/depth PASS; object tracking has250/405 progress, not full PASS. |
+| 12 | 405 | Full original frontend and CPU inputs PASS; all15 source hashes pinned. Shared native chain not yet executed. |
+| 13 | 425 | Technical queue failure before inference retained; direct replay active with full425 Body PASS144.844406s at10:43:36UTC, depth starting. |
 
 Seven complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
@@ -38,9 +39,12 @@ SAM2 calls. No Objects/Boots trajectory or private3D quality evaluation followed
 Private annotation values/projections were not consulted. This pilot is closed,
 not a reason to change its prompts/margin. **No active VM02 GPU job is reported
 at this snapshot.** EP11 is closed FAIL at08:46:36UTC; its original log and
-producer remain unchanged. EP12 is active, MainPID1295652, with one1886MiB GPU worker at the next readonly check;
-this observation does not predict completion. EP13 actual MainPID1309029 is waiting for the explicit terminal predecessor
-at09:13:01UTC under `fc10a6e`; no child inference is implied.
+producer remain unchanged. EP12 original CPU inputs PASS3035.001663s at10:17:31UTC;
+its collected unit is not the proof of success. EP13 queue under `fc10a6e`
+failed at10:17:34UTC after that predecessor was collected, with no child inference.
+Root independently checked all EP13 targets absent before direct replay under
+the unchanged `814179a` source. Actual v2 MainPID1330097 is active; only full Body
+completion is established at this snapshot, not depth/object/full inputs PASS.
 D107 independent TUM depth validation is REJECT4.904632756% < frozen5%; the
 four-anchor hand-support pilot is also closed REJECT. Neither is adopted.
 
