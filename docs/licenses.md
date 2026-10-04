@@ -12,6 +12,13 @@ The exact84,452B FAQ SHAa1e569e1c83eeac2584de34e9503f1226e20ab369d53d2c67c2e243d
 is byte-identical. Closed/unmerged draftPR164 is not adopted policy; SAM
 inference code, FoundationPose/nvdiffrast research restrictions and legacy
 CARI notices still lack an explicit competition-source waiver verified here.
+The actual Body backbone also imports **DINOv3**, distinct from Apache
+**GroundingDINO** used by the candidate bank. Pinned DINOv3
+[`6876159a11b4df116f30f667f8c9888617df0751/LICENSE.md`](https://github.com/facebookresearch/dinov3/blob/6876159a11b4df116f30f667f8c9888617df0751/LICENSE.md),
+7503B SHA256 `25d122eb8f5b880fd23c736fb6ea8018ee45c12237e00b8a86d14c653904999e`,
+is a custom agreement covering code, inference and weights, not an established
+OSI licence. Add its source exception to the unsent organizer question, not a
+new categorical disqualification or an inferred waiver from HF access.
 Kaggle JavaScript shell is not a new rules reading. Contact remains
 v2d_challenge@nvidia.com; existing question below is unsent. Eligibility is
 separate from successful research execution; no all-clear inferred.
@@ -69,6 +76,7 @@ Official source revision:
 | Native commercial MHR CARI4D checkpoint | The commercial model card designates NVIDIA Open Model Agreement and says commercial/noncommercial use. Exact weights below. | Pretrained-model rerelease exception is relevant. Do not substitute the original research checkpoint or assume its source has changed license. |
 | Native CARI4D source in official release | Parent source license is Apache; e.g. wrapper `lib/__init__.py` explicitly SPDX Apache. Several native files retain proprietary notices requiring an express NVIDIA license; no separate CARI4D module LICENSE was found at this revision. | Scope of parent Apache over legacy native notices needs explicit confirmation; notices are not evidence of an additional commercial source grant by the weight card. This is not a categorical declaration that the parent Apache grant is ineffective. |
 | SAM 3D Body / Objects source **and** weights | Custom SAM License, dated 2025-11-19, explicitly covers machine-learning model code, inference/training/fine-tuning code, weights and algorithms. | Not Apache; no OSI approval/competition source exemption established by this audit. Redistribution of SAM Materials/derivatives must remain under SAM terms. HF access approval does not answer eligibility. |
+| DINOv3 actually used by Body | Custom DINO agreement at6876159 covers source/inference/weights; distinct from GroundingDINO Apache model. | Foundational6.c exception unverified; preserve its original terms, never relabel as Apache. |
 | FoundationPose vendored NVlabs source | Custom NVIDIA license §3.3 limits use to research/evaluation noncommercially; NVIDIA/affiliates alone have a commercial exception. | Fails the commercial-use condition of 6.c if no competition exception applies. Cannot convert it to Apache by copying or wrapping it. |
 | FoundationPose TAO/TensorRT models | Separate commercial ONNX models under NVIDIA Open Model License; HF card says commercial use. | This weight license does **not** relicense vendored NVlabs source. Switching the current wrapper to TensorRT does not eliminate its noncommercial source imports. |
 | MHR reference model/source | MHR v1.0.1 release source license Apache-2.0. | Suitable license-level building block; preserve license/notices. MHR does not confer a license to SMPL/MANO conversion targets. |
