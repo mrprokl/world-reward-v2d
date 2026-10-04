@@ -8234,3 +8234,18 @@ Pure forest correspondence validates whole component bijection by actual QEM
 faceJ/vertexI, original source keys and complete signs/inside/parents/depths;
 does not require all original faces to survive legitimate collapse. No native
 compiler/geometry/HOI qualification is inferred from this array primitive.
+
+EP25 privateAzure transport actualPASS: server42d1248 receipt2551B
+SHA24243e9288c5d0fe0a55325d133e278e2f6f4cbe3218e8b325f592d60fa8b05a;
+receiver1165B SHA62a6b340ccf37a122bd923608eefe2fb28adef9972321c12770f58db349e3d63.
+Root independently validates original219 server sourcefiles and copied219receiver
+bytes (all0400 by its intentional copy policy, not original executable modes),
+full1602242560B archive, first168737B manifest and every1108 readonly input.
+Only tiny transport pins local; no heavy videos/depth/mesh transit. Actual
+sender posthash/cleanup and native365-frame pose execution remain separate.
+
+Tracker-noise source042efc3 dispatched publicCPU-only stage; actual171-file
+closure/modes/archive verified, unit active at last observation, no final receipt.
+Frozen budgets unchanged; no labels/noise result or model/inference success inferred.
+Bounded daemon metadata queries added before any real stage;46tinytestsPASS0.59s,
+own445-entry fixtures removed. Fresh data never used for a parameter rescue.
