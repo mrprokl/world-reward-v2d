@@ -339,4 +339,7 @@ executable is not Apache-only. Preserve upstream notices/corresponding-source
 access and do not infer a challenge Apache-release exception. Primary release
 library5077192B publisherSHA c752737f91d1af71fa96038f0e37945ce82a5f1fffb6200172cfcdd77755a356.
 Pure oriented_solid_forest does not itself import CGAL/certify geometry.
-No compiled runtime, production geometry or submission eligibility claimed.
+The isolated Azure runtime is now compiled and passes fifteen fresh procedural
+controls under253fc9d; actual image/binary/receipts are independently pinned in
+certified_solid_qualification_pins.json. No production geometry or submission
+eligibility is established by these controls.

@@ -8167,3 +8167,16 @@ not inference proof. Original EP21 CPUassembly300/563 depthframes at last query.
 Transport producer contract strengthens queued source pins to require the genuine
 queue shell and both children in that same snapshot; no fabricated child dispatch
 or numerical/mesh/coverage change. Independent audit and104testsPASS1SKIP2.62s.
+
+Before production source diagnosis: freeze one readonly exact-solid query on
+originalEP09 GLB4171828B/87a36b59…, original129file535558 source lineage and
+five original provenance files. RawGLB→unprocessed loader→exactweld oriented
+triangle multiset parity, all faces/orphans retained; component keys preserve
+loaded source face order, not claimed rawGLB accessor order. Single native180s,
+core300s/nativejob315s/host420s,4CPU16GB/networknone; scalar certificate only.
+Native geometric rejection is an explicit allowlist, not any runtime failure.
+No QEM, repair, reorientation, old-gate replacement or prediction adoption.
+Root154 tiny source/job/build/controls testsPASS0.55s, shellsyntax/diffPASS.
+Stricter native scope initially rejected two old incomplete mocks; updated tests
+to actual receipt fields plus14 forged-scope failures, never relaxed the gate.
+Source diagnostic not yet executed; qualified procedural binary remains unchanged.

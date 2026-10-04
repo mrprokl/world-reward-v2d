@@ -1,0 +1,9 @@
+{
+  "schema": "world_reward.certified_solid_source_lineage.v1",
+  "episode_index": 9,
+  "producer_revision": "5355582584396b41e0861e58d9e55758153ca109",
+  "entrypoint": "run_track1_frontends",
+  "files": 129,
+  "archive_sha256": "8e9c99de95e0f5a17adc1266bdba3f6bec84b7a350bd5474a82da00f9b0087a8",
+  "ledger_sha256": "52f026bf81100e2f938c8efb0e8ba449ce2cb304db2a9a498ba1a58ed56919f4"
+}
