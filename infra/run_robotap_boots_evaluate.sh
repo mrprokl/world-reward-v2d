@@ -47,7 +47,7 @@ from pathlib import Path
 code,base,out=map(Path,sys.argv[1:]);sys.path.insert(0,str(code/'infra'))
 import robotap_boots_acquire as source
 protocol=source.read_protocol(code/'configs/robotap_boots_protocol.json');source.azure_vm02_identity(protocol)
-for path in(base,out,base/'public_v1/inputs',base/'public_v1/report.json',base/'public_v1/selection.json',base/'infer_v1/report.json',base/'infer_v1/predictions',*[base/f'eval_private/pickles/robotap/robotap_split{i}.pkl'for i in range(5)],base/'report.json',base/'eval_private/retention-receipt.json'):
+for path in(base,out,base/'public_v2/inputs',base/'public_v2/report.json',base/'public_v2/selection.json',base/'infer_v1/report.json',base/'infer_v1/predictions',*[base/f'eval_private/pickles/robotap/robotap_split{i}.pkl'for i in range(5)],base/'report.json',base/'eval_private/retention-receipt.json'):
  source.canonical(path)
  if path!=out and not path.exists():raise ValueError('Complete original acquisition required')
  if path.is_file()and(path.stat().st_uid!=1000 or path.stat().st_mode&0o222):raise ValueError('Actual immutable private/public artifact owner required')
@@ -58,7 +58,7 @@ export DOCKER_HOST="unix://$ROOT/docker.sock"
 mkdir -m 700 "$OUT";chown 1000:1000 "$OUT"
 CIDFILE="$OUT/.container.cid";[[ ! -e "$CIDFILE" ]] || exit 1
 MOUNTS=(--mount "type=bind,src=$CODE,dst=$CODE,readonly" --mount "type=bind,src=$JOB/revision,dst=$JOB/revision,readonly" --mount "type=bind,src=$JOB/source-sha256,dst=$JOB/source-sha256,readonly" --mount "type=bind,src=$BASE/report.json,dst=$BASE/report.json,readonly" --mount "type=bind,src=$BASE/eval_private/retention-receipt.json,dst=$BASE/eval_private/retention-receipt.json,readonly" --mount "type=bind,src=$OUT,dst=$OUT")
-for P in "$BASE/public_v1/report.json" "$BASE/public_v1/selection.json" "$BASE/public_v1/inputs" "$BASE/infer_v1/report.json" "$BASE/infer_v1/predictions";do MOUNTS+=(--mount "type=bind,src=$P,dst=$P,readonly");done
+for P in "$BASE/public_v2/report.json" "$BASE/public_v2/selection.json" "$BASE/public_v2/inputs" "$BASE/infer_v1/report.json" "$BASE/infer_v1/predictions";do MOUNTS+=(--mount "type=bind,src=$P,dst=$P,readonly");done
 for i in 0 1 2 3 4;do P="$BASE/eval_private/pickles/robotap/robotap_split$i.pkl";MOUNTS+=(--mount "type=bind,src=$P,dst=$P,readonly");done
 set +e
 timeout --signal=TERM --kill-after=10s 250s docker run --rm --interactive --cidfile "$CIDFILE" --label world-reward.job=run_robotap_boots_evaluate --label "world-reward.revision=$REV" --network none --memory 16g --cpus 4 --user 1000:1000 --read-only --cap-drop ALL --security-opt no-new-privileges --tmpfs /tmp:rw,noexec,nosuid,size=64m --entrypoint /usr/bin/env "${MOUNTS[@]}" "$PINNED_IMAGE" \

@@ -23,7 +23,8 @@ import robotap_boots_acquire as source
 ROOT = source.ROOT
 JOB = "run_robotap_boots_public"
 INPUT = "validation/robotap_boots_v1"
-OUTPUT = INPUT + "/public_v1"
+PUBLIC_NAMESPACE = "public_v2"
+OUTPUT = INPUT + "/" + PUBLIC_NAMESPACE
 PINS = "configs/robotap_boots_acquisition_pins.json"
 FILES = ("infra/robotap_boots_public.py", "infra/run_robotap_boots_public.sh", "infra/robotap_boots_acquire.py", "configs/robotap_boots_protocol.json", PINS)
 PICKLES = tuple(f"eval_private/pickles/robotap/robotap_split{i}.pkl" for i in range(5))
@@ -31,6 +32,42 @@ BUDGET = 180
 IMAGE = "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3"
 MAX_VIDEO_BYTES = 2 * 1024**3
 TAP_SOURCE = {"url": "https://raw.githubusercontent.com/google-deepmind/tapnet/730cda1c730877cfedbe01bf87fb1cadb78a565d/tapnet/tapvid/evaluation_datasets.py", "bytes": 24538, "sha256": "90cd01e53e23f6d489d3a6cd840cfd93fed4c1a6f4a0dfd373933cc164f0e570"}
+
+
+ORIGINAL_PUBLIC_FAILURE = {"bytes": 3080, "sha256": "bbf26a80fe4e52905273705fea34aa26d08a89c86f4ce6e5ec33305c54a9902d"}
+MEDIAPY_DECODER_SOURCE = {
+    "repository": "google/mediapy", "version": "1.2.7", "revision": "a1b47c721f821ecb34623d861c48460a1f078692",
+    "source_url": "https://raw.githubusercontent.com/google/mediapy/a1b47c721f821ecb34623d861c48460a1f078692/mediapy/__init__.py",
+    "source_bytes": 73425, "source_sha256": "279aa5b1c1cf1d5b2e2025f76c8594df6312fdc65e9431636448926271eccca2",
+    "license": "Apache-2.0", "license_bytes": 11358, "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "allowed_global": "mediapy._VideoArray", "mediapy_package_imported": False,
+}
+
+
+class MediaPyVideoArray(np.ndarray):
+    """Only the primary `_VideoArray` wrapper, with inherited ndarray pickle."""
+    def __new__(cls, input_array, metadata=None):
+        obj = np.asarray(input_array).view(cls); obj.metadata = metadata; return obj
+    def __array_finalize__(self, obj):
+        if obj is not None: self.metadata = getattr(obj, "metadata", None)
+
+
+def array_digest(array):
+    digest = hashlib.sha256()
+    iterator = np.nditer(array, flags=["external_loop", "buffered", "zerosize_ok"],
+        op_flags=["readonly"], order="C", buffersize=1024 * 1024)
+    for chunk in iterator: digest.update(chunk.tobytes())
+    return digest.hexdigest()
+
+
+def plain_video(video):
+    if type(video) is not MediaPyVideoArray: return video
+    original = (video.dtype, video.shape, video.strides, video.__array_interface__["data"][0])
+    plain = np.asarray(video)
+    if (type(plain) is not np.ndarray or (plain.dtype, plain.shape, plain.strides, plain.__array_interface__["data"][0]) != original
+            or not np.shares_memory(plain, video) or array_digest(plain) != array_digest(video)):
+        raise ValueError("Exact original MediaPy ndarray storage/bytes required")
+    return plain
 
 
 def record(value):
@@ -75,6 +112,17 @@ def check_pinned(path, expected):
     return actual
 
 
+def original_failure(root):
+    path = root / "public_v1/report.json"; check_pinned(path, ORIGINAL_PUBLIC_FAILURE)
+    value = strict_json(path.read_bytes())
+    if (value.get("status") != "fail" or value.get("error_type") != "UnpicklingError"
+            or value.get("producer_revision") != "449c50f583070da52e997ef9a04e0cdc27912b8a"
+            or value.get("source_after_reverified") is not True
+            or "frozen_selection_before_future_label_access" in value or "public_files" in value):
+        raise ValueError("Original failed preselection public receipt required")
+    return ORIGINAL_PUBLIC_FAILURE
+
+
 def acquire_binding(root, pins):
     """All five hashes and sealed source receipts verified BEFORE any unpickle."""
     validate_pins(pins); root = source.canonical(root)
@@ -106,6 +154,7 @@ def acquire_binding(root, pins):
 
 class RestrictedUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
+        if (module, name) == ("mediapy", "_VideoArray"): return MediaPyVideoArray
         if module == "builtins" and name in ("set", "frozenset", "slice"):
             return getattr(builtins, name)
         if module == "numpy" and name in ("dtype", "ndarray"): return getattr(np, name)
@@ -134,7 +183,7 @@ def first_key(data):
 def initial_queries(example):
     if type(example) is not dict or set(example) != {"video", "points", "occluded"}:
         raise ValueError("Exact original video/point/occlusion record required")
-    video, points, occluded = (example[key] for key in ("video", "points", "occluded"))
+    video = plain_video(example["video"]); points, occluded = example["points"], example["occluded"]
     if (type(video) is not np.ndarray or video.dtype != np.uint8 or video.ndim != 4 or video.shape[-1] != 3
             or min(video.shape) <= 0 or video.nbytes > MAX_VIDEO_BYTES
             or type(points) is not np.ndarray or points.dtype != np.float32 or points.ndim != 3
@@ -181,7 +230,7 @@ def publish(original, output, pins, deadline, persist):
         "initial_query_is_external_oracle": True, "query_format": "t,y,x; normalized_xy multiplied by original W,H; no half-pixel offset",
         "future_tracks_or_visibility_public": False, "frame_crop_or_resize": False,
         "training_overlap_verified": False, "challenge_overlap_verified": False, "full_hoi_accuracy_verified": False,
-        "tap_query_source": TAP_SOURCE}
+        "tap_query_source": TAP_SOURCE, "public_namespace": PUBLIC_NAMESPACE, "serialization_decoder": MEDIAPY_DECODER_SOURCE}
 
 
 def source_binding(root, code, revision):
@@ -212,8 +261,10 @@ def main(argv=None):
     cid = source.canonical(output / ".container.cid")
     if not cid.is_file() or re.fullmatch(b"[0-9a-f]{64}\n?", cid.read_bytes()) is None:
         raise ValueError("Exact owned container CID required")
+    original_failure(root / INPUT)
     (output / "inputs").mkdir(mode=0o755); report = {"stage": "external_robotap_oracle_initial_query_public_adapter", "status": "fail", "producer_revision": revision,
-        "source_before": before, "image_id": IMAGE, "azure_vm02_verified_by_host_wrapper": True, "private_future_labels_decoded_by_adapter": True, "future_labels_available_to_inference": False,
+        "source_before": before, "serialization_decoder": MEDIAPY_DECODER_SOURCE, "public_namespace": PUBLIC_NAMESPACE,
+        "original_public_v1_failure_identity": ORIGINAL_PUBLIC_FAILURE, "original_public_v1_failure_preserved": True, "serialization_compatibility_correction_only": True, "image_id": IMAGE, "azure_vm02_verified_by_host_wrapper": True, "private_future_labels_decoded_by_adapter": True, "future_labels_available_to_inference": False,
         "inference_performed": False, "evaluation_performed": False, "gpu_used": False, "challenge_inputs_used": False, "budget_seconds": BUDGET}
     started = time.monotonic(); error = None
     def expired(*_): raise TimeoutError("Fixed public adapter exceeded180s")
@@ -226,12 +277,14 @@ def main(argv=None):
         manifest = publish(root / INPUT, output, pins, started + BUDGET, freeze)
         source.save_bytes(output / "inputs/manifest.json", (json.dumps(manifest, indent=2) + "\n").encode(), 0o444)
         report.update(public_files={p.name: source.identity(p) for p in sorted((output / "inputs").iterdir())}, actual_full_frame_matrix=[r["frames"] for r in manifest["videos"]], initial_queries_are_external_oracles=True)
-    except Exception as caught: error = caught; report.update(error_type=type(caught).__name__, error="Private adapter failed; no inference/evaluation performed")
+    except Exception as caught:
+        error = caught; report.update(error_type=type(caught).__name__, error="Private adapter failed; no inference/evaluation performed",
+            cohort_decode_failed_before_query_selection="frozen_selection_before_future_label_access" not in report)
     finally:
         try:
             after = source_binding(root, code, revision); report["source_after"] = after
             if after != before: raise ValueError("Frozen adapter source changed")
-            acquire_binding(root / INPUT, pins); report.update(source_after_reverified=True, originals_after_reverified=True)
+            original_failure(root / INPUT); acquire_binding(root / INPUT, pins); report.update(source_after_reverified=True, originals_after_reverified=True)
         except Exception as caught:
             if error is None: error = caught; report["error_type"] = type(caught).__name__
             report["final_integrity_recheck_failed"] = True

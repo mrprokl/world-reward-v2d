@@ -90,7 +90,7 @@ def save_npz(gate, path, arrays):
 
 
 def fixture_files(gate, base):
-    public, inference = base / "public_v1", base / "infer_v1"
+    public, inference = base / "public_v2", base / "infer_v1"
     for directory in (public / "inputs", inference / "predictions"): directory.mkdir(parents=True)
     rows, selection, pubfiles, predfiles = [], [], {}, {}
     for i, name in enumerate(gate.NAMES):
@@ -106,7 +106,7 @@ def fixture_files(gate, base):
             static_tracks=np.broadcast_to(queries[:, [2, 1]][:, None], (n, t, 2)).copy(), static_visible=np.ones((n, t), dtype=bool))
         predfiles[name] = save_npz(gate, inference / "predictions" / name, pred)
     manifest = dict(schema="world-reward-robotap-boots-public-v1", initial_query_is_external_oracle=True, future_tracks_or_visibility_public=False,
-        frame_crop_or_resize=False, selection=selection, videos=rows, training_overlap_verified=False, challenge_overlap_verified=False, full_hoi_accuracy_verified=False)
+        frame_crop_or_resize=False, selection=selection, videos=rows, public_namespace=gate.public.PUBLIC_NAMESPACE, serialization_decoder=gate.public.MEDIAPY_DECODER_SOURCE, training_overlap_verified=False, challenge_overlap_verified=False, full_hoi_accuracy_verified=False)
     gate.source.save_bytes(public / "inputs/manifest.json", json.dumps(manifest).encode(), 0o444)
     gate.source.save_bytes(public / "selection.json", json.dumps(selection).encode())
     allpub = {"manifest.json": gate.source.identity(public / "inputs/manifest.json"), **pubfiles}
@@ -115,6 +115,7 @@ def fixture_files(gate, base):
         source_after_reverified=True, originals_after_reverified=True, initial_queries_are_external_oracles=True,
         frozen_selection_before_future_label_access=selection, future_labels_available_to_inference=False, inference_performed=False, evaluation_performed=False, gpu_used=False, challenge_inputs_used=False)
     report["source_after"] = copy.deepcopy(report["source_before"])
+    report["serialization_decoder"] = gate.public.MEDIAPY_DECODER_SOURCE
     infer = dict(status="pass", stage="public_robotap_native_bootstapir_predictions", producer_revision="c" * 40, script_sha256="d" * 64,
         native_calls_attempted=3, native_calls_completed=3, actual_native_inference=True, all_original_frames_retained=True,
         all_original_selected_queries_retained=True, all_input_assets_sources_rechecked=True, oracle_initial_queries=True,

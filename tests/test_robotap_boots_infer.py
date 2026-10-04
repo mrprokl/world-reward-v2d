@@ -46,7 +46,8 @@ def public(directory):
     manifest=dict(schema='world-reward-robotap-boots-public-v1',videos=records,selection=[dict(pickle_file=r['source_pickle'],video_key=r['video_key'])for r in records],
         initial_query_is_external_oracle=True,query_format='t,y,x; normalized_xy multiplied by original W,H; no half-pixel offset',
         future_tracks_or_visibility_public=False,frame_crop_or_resize=False,training_overlap_verified=False,challenge_overlap_verified=False,full_hoi_accuracy_verified=False,
-        tap_query_source=dict(url='immutable primary metrics',bytes=24538,sha256='d'*64))
+        tap_query_source=dict(url='immutable primary metrics',bytes=24538,sha256='d'*64),public_namespace='public_v2',
+        serialization_decoder=dict(source_sha256='279aa5b1c1cf1d5b2e2025f76c8594df6312fdc65e9431636448926271eccca2',source_bytes=73425,allowed_global='mediapy._VideoArray',mediapy_package_imported=False))
     save(directory/'manifest.json',encode(manifest));return manifest
 
 
@@ -273,3 +274,16 @@ def test_main_seals_all_three_or_exact_partial_failure(bound,monkeypatch,failed)
         assert report['status']=='pass' and report['phase']=='complete' and report['native_calls_attempted']==report['native_calls_returned']==report['native_calls_completed']==3
         assert [row['frames']for row in report['videos']]==[3,4,5]
         assert {p.name for p in(out/'predictions').iterdir()}=={f'video_{i:03d}.npz'for i in range(3)}
+
+
+@pytest.mark.parametrize('key,value', [('source_sha256','f'*64),('allowed_global','mediapy.OtherClass'),('mediapy_package_imported',True)])
+def test_public_v2_serialization_evidence_required(tmp_path,key,value):
+    directory=tmp_path/'inputs';manifest=public(directory);manifest['serialization_decoder'][key]=value
+    (directory/'manifest.json').chmod(0o644);save(directory/'manifest.json',encode(manifest))
+    with pytest.raises(ValueError):gate.public_records(directory)
+
+
+def test_public_v1_not_accepted_as_v2(tmp_path):
+    directory=tmp_path/'inputs';manifest=public(directory);manifest['public_namespace']='public_v1'
+    (directory/'manifest.json').chmod(0o644);save(directory/'manifest.json',encode(manifest))
+    with pytest.raises(ValueError):gate.public_records(directory)

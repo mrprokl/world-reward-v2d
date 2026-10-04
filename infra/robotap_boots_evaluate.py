@@ -84,7 +84,7 @@ def validate_prediction(data, queries, indices, row):
 
 def public_predictions(base, pins):
     """Complete frozen public/prediction firewall before any private GT access."""
-    validate_pins(pins); pub, infer = base / "public_v1", base / "infer_v1"
+    validate_pins(pins); pub, infer = base / public.PUBLIC_NAMESPACE, base / "infer_v1"
     for path, pin in ((pub / "report.json", pins["public_report"]), (pub / "inputs/manifest.json", pins["public_manifest"]),
             (pub / "selection.json", pins["public_selection"]), (infer / "report.json", pins["inference_report"])):
         public.check_pinned(path, pin)
@@ -109,6 +109,9 @@ def public_predictions(base, pins):
     require(manifest.get("schema") == "world-reward-robotap-boots-public-v1" and manifest.get("initial_query_is_external_oracle") is True
             and manifest.get("future_tracks_or_visibility_public") is False and manifest.get("frame_crop_or_resize") is False
             and all(manifest.get(k) is False for k in ("training_overlap_verified", "challenge_overlap_verified", "full_hoi_accuracy_verified"))
+            and manifest.get("public_namespace") == public.PUBLIC_NAMESPACE
+            and manifest.get("serialization_decoder") == public.MEDIAPY_DECODER_SOURCE
+            and report.get("serialization_decoder") == public.MEDIAPY_DECODER_SOURCE
             and manifest.get("selection") == selection and report.get("frozen_selection_before_future_label_access") == selection, "Frozen original selection/query disclosure required")
     require(type(prediction.get("videos")) is list and len(prediction["videos"]) == 3, "All three actual inference output receipts required")
     rows = manifest.get("videos"); require(type(rows) is list and len(rows) == 3 and type(selection) is list and len(selection) == 3, "All three frozen original videos required")
@@ -132,7 +135,7 @@ def public_predictions(base, pins):
                 and np.all((indices >= 0) & (indices < 32)) and np.all(queries[:, 0] == np.floor(queries[:, 0]))
                 and np.all((queries[:, 0] >= 0) & (queries[:, 0] < row["frames"])), "Full public RGB/query arrays required")
         pred = load_arrays(infer / "predictions" / name); ambiguous = validate_prediction(pred, queries, indices, row)
-        records.append(dict(row=row, queries=queries, indices=indices, prediction=pred, video_sha256=hashlib.sha256(video.tobytes()).hexdigest(), visibility_numeric_guard_count=ambiguous))
+        records.append(dict(row=row, queries=queries, indices=indices, prediction=pred, video_sha256=public.array_digest(video), visibility_numeric_guard_count=ambiguous))
         del data, video; gc.collect()
     return records
 
@@ -180,7 +183,7 @@ def evaluate_private(base, records, acquisition_pins, deadline):
         example = data[key]; video, queries, indices, unavailable = public.initial_queries(example)
         require(np.array_equal(queries, item["queries"]) and np.array_equal(indices, item["indices"])
                 and unavailable == item["row"]["unavailable_original_indices"]
-                and hashlib.sha256(video.tobytes()).hexdigest() == item["video_sha256"], "Original public RGB/oracle query replay differs")
+                and public.array_digest(video) == item["video_sha256"], "Original public RGB/oracle query replay differs")
         gt = example["points"][indices] * np.array([256, 256]); occ = example["occluded"][indices]
         pred = item["prediction"]; static = pred["static_tracks"] * np.array([256, 256]) / np.array([video.shape[2], video.shape[1]])
         results.append({"video_index": i, "boots": tap_metrics(queries, occ, gt, ~pred["visible"], pred["tracks_256"]),

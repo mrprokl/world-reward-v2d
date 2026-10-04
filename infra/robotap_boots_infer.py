@@ -16,7 +16,7 @@ import robotap_boots_acquire as source
 
 ROOT = source.ROOT
 BASE = "validation/robotap_boots_v1"
-PUBLIC = BASE + "/public_v1"
+PUBLIC = BASE + "/public_v2"
 OUT = BASE + "/infer_v1"
 JOB = "run_robotap_boots_infer"
 STAGE = "public_robotap_native_bootstapir_predictions"
@@ -119,10 +119,15 @@ def bindings(root, code, revision, pins):
 def public_records(directory):
     manifest = strict_json((directory / "manifest.json").read_bytes())
     expected = {'schema','videos','selection','initial_query_is_external_oracle','query_format','future_tracks_or_visibility_public','frame_crop_or_resize',
-                'training_overlap_verified','challenge_overlap_verified','full_hoi_accuracy_verified','tap_query_source'}
+                'training_overlap_verified','challenge_overlap_verified','full_hoi_accuracy_verified','tap_query_source','public_namespace','serialization_decoder'}
     require(type(manifest) is dict and set(manifest) == expected and manifest.get("schema") == "world-reward-robotap-boots-public-v1" and manifest.get("initial_query_is_external_oracle") is True
             and manifest.get("query_format") == "t,y,x; normalized_xy multiplied by original W,H; no half-pixel offset"
             and all(manifest.get(k) is False for k in ("future_tracks_or_visibility_public", "frame_crop_or_resize", "training_overlap_verified", "challenge_overlap_verified", "full_hoi_accuracy_verified")), "Original public RGB/oracle query schema required")
+    decoder=manifest.get('serialization_decoder')
+    require(manifest.get('public_namespace')=='public_v2' and type(decoder) is dict
+            and decoder.get('source_sha256')=='279aa5b1c1cf1d5b2e2025f76c8594df6312fdc65e9431636448926271eccca2'
+            and decoder.get('source_bytes')==73425 and decoder.get('allowed_global')=='mediapy._VideoArray'
+            and decoder.get('mediapy_package_imported') is False, 'Pinned public-v2 ndarray-only serialization decoder required')
     records = manifest.get("videos"); require(type(records) is list and len(records) == 3, "All three selected videos required")
     for i, row in enumerate(records):
         keys={'file','sha256','bytes','source_pickle','video_key','frames','height','width','point_indices','unavailable_original_indices','query_count','all_original_frames_retained'}

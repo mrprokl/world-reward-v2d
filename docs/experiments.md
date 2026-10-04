@@ -6082,3 +6082,29 @@ motion prediction. Execution PASS and scientific ACCEPT/REJECT remain distinct;
 known-benchmark overlap, full-HOI accuracy and CARI4D improvement unverified.
 Root83focusedpublic/infer/eval tests PASS0.67s; producer fake-tensor and formula
 controls test no actual RGB/model/GT. Actual output pins remain absent until PASS.
+
+Actual `449c50f` public adapter **FAIL51.040661s** at restricted-unpickle:
+report3080B SHA`bbf26a80fe4e52905273705fea34aa26d08a89c86f4ce6e5ec33305c54a9902d`.
+Both full-five original hashes and original source/markers reverify afterward;
+no selection or public NPZ emitted. A separate pinned-source, single-pickle
+isolated CPU diagnostic stops at **`mediapy._VideoArray`**, then rehashes the
+original pickle;3.917689s. It potentially decodes allowed private data, but
+exports only the rejected type name, no RGB/annotation values or predictions.
+The first256-byte inert opcode check had found only already-allowed NumPy
+globals, so no speculative `_frombuffer`/arbitrary-global expansion was made.
+
+Primary mediapy1.2.7 source independently SHA-verified in memory:
+commit`a1b47c721f821ecb34623d861c48460a1f078692` (July1,2026),73425B SHA
+`279aa5b1c1cf1d5b2e2025f76c8594df6312fdc65e9431636448926271eccca2`,
+Apache2. `_VideoArray` is an ndarray metadata wrapper with no pickle overrides;
+the publisher notes metadata loss in NumPy operations. Decision: preserve
+failed `public_v1`; a fresh v2 may map only that exact serialized class to a
+minimal faithful ndarray wrapper and strip only the tag with verified shape,
+dtype,strides and RGB bytes unchanged. Keep first3/first32/fullT/budgets/gates;
+no frame/key selection based on future truth, dtype casting or media conversion.
+
+Fresh-v2 decoder/predictor/evaluator compatibility audit: root **165 focused
+PASS1.32s**, including the real runtime resolver and tampered decoder manifests;
+syntax/diff checks pass. Exact mediapy tag removal conserves original ndarray
+dtype/shape/strides/storage and streams byte checks in1MiB buffers. No package
+installation/FFmpeg/model run, new data/cohort choice or inference-math change.

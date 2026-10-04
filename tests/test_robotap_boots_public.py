@@ -167,3 +167,44 @@ def test_actual_public_runtime_bundle_has_all_embedded_python_helpers(gate):
     selected = set(azure_job.runtime_bundle_paths(files, "infra/run_robotap_boots_public.sh"))
     assert set(gate.FILES) <= selected
     assert not any("infer" in path or "evaluate" in path for path in selected if path.startswith("infra/"))
+
+
+def test_exact_mediapy_protocol4_compatibility_only_and_plain_storage_preserved(gate, tmp_path, monkeypatch):
+    import types
+    module = types.ModuleType("mediapy")
+    # Author-only faithful primary class; no third-party package imported.
+    exec("class _VideoArray(np.ndarray):\n def __new__(cls,a,metadata=None):\n  obj=np.asarray(a).view(cls);obj.metadata=metadata;return obj\n def __array_finalize__(self,obj):\n  if obj is not None:self.metadata=getattr(obj,'metadata',None)\n", {"np": np, "__name__": "mediapy"}, module.__dict__)
+    monkeypatch.setitem(sys.modules, "mediapy", module)
+    original = example(); wrapped = module._VideoArray(original["video"], metadata={"fps": 30})
+    original["video"] = wrapped
+    raw = pickle.dumps({"own": original}, protocol=4)
+    assert b"fps" not in raw  # primary class inherits ndarray pickle, no metadata state override
+    path = tmp_path / "own_mediapy.pkl"; gate.source.save_bytes(path, raw)
+    decoded = gate.read_private(path, gate.source.identity(path))["own"]
+    assert type(decoded["video"]) is gate.MediaPyVideoArray
+    before = decoded["video"]
+    plain, queries, indices, _ = gate.initial_queries(decoded)
+    assert type(plain) is np.ndarray and np.shares_memory(plain, before)
+    assert (plain.dtype, plain.shape, plain.strides, plain.tobytes()) == (wrapped.dtype, wrapped.shape, wrapped.strides, wrapped.tobytes())
+    assert queries[0].tolist() == [1., .75, 1.25] and indices.tolist() == [0, 1, 2]
+    class Unrelated(np.ndarray): pass
+    bad = example(); bad["video"] = bad["video"].view(Unrelated)
+    with pytest.raises(ValueError): gate.initial_queries(bad)
+    for name in ("VideoMetadata", "_OtherArray", "read_video", "decompress_video"):
+        with pytest.raises(pickle.UnpicklingError): gate.RestrictedUnpickler(__import__('io').BytesIO()).find_class("mediapy", name)
+    assert gate.OUTPUT.endswith("/public_v2")
+
+
+def test_original_failure_identity_before_json_and_no_relabel(gate, tmp_path, monkeypatch):
+    root = tmp_path / "original"; (root / "public_v1").mkdir(parents=True)
+    gate.source.save_bytes(root / "public_v1/report.json", b"not JSON")
+    def forbidden(*_): raise AssertionError("Original FAIL parsed before exact byte pin")
+    monkeypatch.setattr(gate, "strict_json", forbidden)
+    with pytest.raises(ValueError, match="pinned"): gate.original_failure(root)
+
+
+def test_plain_mediapy_strided_bytes_and_chunk_digest_no_full_rgb_copy(gate):
+    own = np.arange(12 * 9, dtype=np.uint8).reshape(12, 9)[::2, ::2].view(gate.MediaPyVideoArray)
+    plain = gate.plain_video(own)
+    assert plain.strides == own.strides and np.shares_memory(plain, own)
+    assert gate.array_digest(plain) == hashlib.sha256(own.tobytes(order="C")).hexdigest()
