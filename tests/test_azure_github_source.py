@@ -261,3 +261,34 @@ def test_explicit_github_cli_one_invocation_without_local_http(monkeypatch):
     monkeypatch.setattr(launcher, "invoke_transport", lambda *args: calls.append(args))
     launcher.main(["--name", "test", "--script", "infra/run_smoke.sh", "--revision", REV, "--github-source"])
     assert len(calls) == 1 and "github-published-dispatched" in calls[0][1]
+
+
+@pytest.mark.parametrize("github_source", [False, True])
+def test_cli_caps_actual_transport_not_unused_inline_archive(monkeypatch, github_source):
+    raw, _, _, _ = fixture_archive(large=True); calls = []
+    source_archive, paths = launcher.runtime_archive(raw, "infra/run_smoke.sh")
+    encoded, sha = launcher.encoded_runtime_archive(source_archive)
+    assert "configs/payload.json" in paths
+    # Descriptor is tiny; the actual full source remains intact remotely.
+    monkeypatch.setattr(launcher, "MAX_CODE_CONTROL_BYTES", 10000)
+    assert len(encoded) > launcher.MAX_CODE_CONTROL_BYTES
+    monkeypatch.setattr(urllib.request, "build_opener", lambda *args: pytest.fail("no local HTTP"))
+    def git(argv):
+        assert argv[:3] == ["rtk", "proxy", "git"]
+        if argv[3] == "cat-file": return b"commit" if argv[4] == "-t" else b""
+        if argv[3] == "rev-parse": return (REV + "\n").encode()
+        if argv[3] == "archive": return raw
+        pytest.fail(str(argv))
+    monkeypatch.setattr(launcher.subprocess, "check_output", git)
+    monkeypatch.setattr(launcher, "invoke_transport", lambda *args: calls.append(args))
+    argv = ["--name", "test", "--script", "infra/run_smoke.sh", "--revision", REV]
+    if github_source:
+        monkeypatch.setattr(launcher, "encoded_runtime_archive", lambda *_: pytest.fail("unused inline encoding"))
+        launcher.main([*argv, "--github-source"])
+        assert len(calls) == 1 and "github-published-dispatched" in calls[0][1]
+        assert sha in calls[0][0] and '"configs/payload.json"' in calls[0][0]
+        assert len(calls[0][0].encode()) <= launcher.STAGED_SCRIPT_BYTES
+    else:
+        with pytest.raises(RuntimeError, match="256KB"):
+            launcher.main(argv)
+        assert calls == []

@@ -611,7 +611,14 @@ def main(argv=None) -> None:
     git("cat-file", "-e", f"{revision}:{args.script}")
     source_archive, paths = runtime_archive(git("archive", "--format=tar", revision,
                                                "infra", "src", "configs", "pyproject.toml"), args.script)
-    encoded, archive_hash = encoded_runtime_archive(source_archive)
+    if args.github_source:
+        # Only the bounded descriptor crosses this connection in explicit
+        # GitHub mode. Hash the identical XZ archive without constructing or
+        # imposing the inline-payload cap on bytes that are never transmitted.
+        encoded = ""
+        archive_hash = hashlib.sha256(lzma.compress(source_archive, preset=6)).hexdigest()
+    else:
+        encoded, archive_hash = encoded_runtime_archive(source_archive)
     commands = transport_commands(encoded, archive_hash, source_archive, revision, args.script, args.name, args.arguments,
                                   reuse_published=args.reuse_published, github_source=args.github_source)
     print(f"immutable_runtime_bundle_files={len(paths)} encoded_bytes={len(encoded)} revision={revision} transport_phases={len(commands)}", flush=True)

@@ -8060,3 +8060,14 @@ fixedall16, preserves readonly closure/namespace/lock/fulltarget prepost gates;
 default fullfrontend command remains unchanged. No native algorithm, candidate,
 source mesh, weights, original running/queued snapshot or dataset modified.
 Own unique scheduling testroot removed after owner/link checks, foreign preserved.
+
+EP23/24 Azure metadata preflight PASS: original552/420frames, untouched outputs,
+exact existing three VM01 image IDs, original camera gate1629B
+SHA224f02693808d6dc8b83834f7042de16b7bb46dac59109ac3ee635199b8b4903,
+free515783458816B. EP21 active, EP22 loadedwaiting, newEP23unitabsent.
+First EP23 queue call stopped locally before Azure: full209file source encoded
+267368B exceeds inline256KB even with explicitGitHub transport whose actual
+descriptor is39023B. Fix transport to cap the actual descriptor/script in explicit
+GitHub mode while retaining exact full TAR/XZ SHA and per-file verification.
+Inline/reuse default caps remain unchanged; no dropped closure, increased cap,
+algorithm/rule/budget change or Azure launch occurred from that local failure.
