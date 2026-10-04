@@ -16,6 +16,7 @@ import time
 ROOT = Path('/srv/scenesmith/world-reward')
 ENTRY = 'run_solid_chart_v2_qualify'
 BUILD_PINS = 'configs/solid_chart_v2_build_pins.json'
+BALANCED_PINS = 'configs/certified_solid_balanced_qualification_pins.json'
 NATIVE_SECONDS, HOST_SECONDS = 1800, 1900
 OFFICIAL = 'vendor/v2d_submission_kit/v2dlb/mesh_budget.py'
 OFFICIAL_PIN = dict(bytes=2031, sha256='42ab8ab35f37b806fb1465eadd96abe43eaac04575da47a4855d08eefe6167b0')
@@ -74,16 +75,19 @@ def snapshot(code, revision, build):
         source_readonly_ledger_sha256=ledger.hexdigest())
 
 
-def binding(code, revision, build):
+def binding(code, revision, build, *, query_requalification=False):
+    require(type(query_requalification) is bool, 'Explicit query profile required')
     require(re.fullmatch('[0-9a-f]{40}', revision) and code == ROOT/'jobs'/revision/ENTRY/'code' and
             Path(__file__).resolve() == code/'infra/solid_chart_v2_qualify.py', 'Actual new qualification entry required')
     rows, bound = snapshot(code, revision, build)
-    require(set(HELPERS) <= set(rows), 'Complete native qualification closure required')
-    return bound | dict(helpers={n: rows[n] for n in HELPERS})
+    names = HELPERS + ((BALANCED_PINS, 'infra/certified_solid_query.cpp') if query_requalification else ())
+    require(set(names) <= set(rows), 'Complete native qualification closure required')
+    return bound | dict(helpers={n: rows[n] for n in names})
 
 
-def built_qualification(code, build, certificate, built):
+def built_qualification(code, build, certificate, built, *, query_requalification=False):
     """Authenticate independently pinned artifacts and historical source before calls."""
+    require(type(query_requalification) is bool, 'Explicit query profile required')
     pin_identity = build.identity(code/BUILD_PINS, readonly=True, maximum=16384)
     pins = build.strict_json((code/BUILD_PINS).read_bytes())
     keys = {'schema', 'producer_revision', 'report', 'native', 'binary', 'image_id', 'source_archive_sha256',
@@ -115,15 +119,42 @@ def built_qualification(code, build, certificate, built):
             all(r[k] is True for r in (host, native) for k in ('source_rehashed_after', 'qualified_inputs_rehashed_after')) and
             host['owned_container_removed'] is host['owned_scratch_removed'] is True and
             0 < host['elapsed_seconds'] <= 900 and 0 < native['elapsed_seconds'] <= 600, 'Completed original source-bound build required')
-    cgal, cgal_paths, cgal_measured = certificate.qualification(code, build)
+    # The immutable QEM build received the ORIGINAL query. Authenticate that
+    # source/config through its complete independent snapshot, without executing
+    # any historical Python. A new query is a separately qualified composition.
+    original_code = producer if query_requalification else code
+    cgal, cgal_paths, cgal_measured = certificate.qualification(original_code, build)
     require(cgal['child_image_id'] == pins['image_id'] and native['qualified_inputs']['cgal'] == cgal_measured and
-            build.identity(code/'infra/certified_solid_query.cpp', readonly=True) == cgal['native_source'], 'Qualified exact query/image differs')
+            build.identity(original_code/'infra/certified_solid_query.cpp', readonly=True) == cgal['native_source'], 'Qualified exact query/image differs')
     require(all(rows[n] == build.identity(code/n, readonly=True) for n in (
         'infra/mesh_conditioned_chart_v2_source.py', 'infra/mesh_conditioned_chart_v2.hpp', 'src/world_reward/mesh_conditioning_v2.py')),
         'Current new chart differs from original built source')
     paths_tuple = (out, *cgal_paths.values(), producer, producer.parent/'revision', producer.parent/'source-sha256')
-    return pins, paths['binary'], cgal_paths['binary'], paths_tuple, dict(pins_identity=pin_identity, built_artifacts={k: pins[k] for k in paths},
+    proof = dict(pins_identity=pin_identity, built_artifacts={k: pins[k] for k in paths},
         original_source=bound, cgal=cgal_measured, build=native['build'], original_runtime=native['original_runtime'])
+    query = cgal_paths['binary']
+    if query_requalification:
+        active, active_paths, active_measured = certificate.qualification(code, build, query_requalification=True)
+        require(active['child_image_id'] == cgal['child_image_id'] == pins['image_id'] and
+                active['parent_image_id'] == cgal['parent_image_id'] == build.PARENT and
+                build.identity(code/'infra/certified_solid_query.cpp', readonly=True) == active['native_source'],
+                'Active independently qualified query/source/image differs')
+        directories = tuple(dict.fromkeys(p.parent for p in (*cgal_paths.values(), *active_paths.values())))
+        require(all(p.resolve() == p and not p.is_symlink() and stat.S_IMODE(p.lstat().st_mode) == 0o555 for p in directories),
+                'Original and active immutable query directories required')
+        for selected_paths in (cgal_paths, active_paths):
+            require(all(stat.S_IMODE(p.lstat().st_mode) == (0o555 if key == 'binary' else 0o444)
+                        for key, p in selected_paths.items()), 'Original/active query artifact modes differ')
+        proof['query_requalification'] = dict(
+            original_query=dict(pins_identity=build.identity(producer/certificate.QUALIFICATION, readonly=True),
+                artifacts=cgal_measured, native_source=cgal['native_source'], producer_revision=cgal['producer_revision']),
+            active_query=dict(pins_identity=build.identity(code/BALANCED_PINS, readonly=True),
+                artifacts=active_measured, native_source=active['native_source'], producer_revision=active['producer_revision']),
+            original_qualified_inputs=native['qualified_inputs'],
+            original_qem_build_unchanged=True, original_qem_recompiled=False, procedural_controls_required=15)
+        paths_tuple = tuple(dict.fromkeys((*paths_tuple, *directories)))
+        query = active_paths['binary']
+    return pins, paths['binary'], query, paths_tuple, proof
 
 
 def cohort_manifest(controls):
@@ -150,12 +181,14 @@ def validate_controls(report, manifest):
                     'unmodified_official_pack', 'original_grounding_metric_bake'}, 'Full unchanged packed pipeline required')
 
 
-def native(code, revision, work, build, certificate, built):
+def native(code, revision, work, build, certificate, built, *, query_requalification=False):
+    require(type(query_requalification) is bool, 'Explicit query profile required')
+    options = dict(query_requalification=True) if query_requalification else {}
     start = time.monotonic(); left = lambda: built.remaining(start, NATIVE_SECONDS)
     require(sys.platform == 'linux' and os.getuid() == 1000 and work.stat().st_uid == 1000 and
             stat.S_IMODE(work.stat().st_mode) == 0o700 and not any(work.iterdir()) and
             os.environ.get('WR_NATIVE_NETWORK') == 'none' and os.environ.get('CUDA_VISIBLE_DEVICES') == '-1', 'Fresh isolated CPU scratch required')
-    before = binding(code, revision, build)
+    before = binding(code, revision, build, **options)
     proof = None
     report = dict(stage='solid_chart_v2_qualification_native_v1', status='fail', phase='prerequisites', source_binding=before,
         gpu_used=False, gt_used=False, adoption=False, reconstruction_accuracy_verified=False, maximum_qem_calls=4,
@@ -163,7 +196,8 @@ def native(code, revision, work, build, certificate, built):
     old = signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError('Inclusive native qualification deadline')))
     signal.alarm(max(1, int(left())))
     try:
-        pins, binary, query, _, proof = built_qualification(code, build, certificate, built)
+        pins, binary, query, _, proof = built_qualification(code, build, certificate, built, **options)
+        if query_requalification: report['query_requalification'] = proof['query_requalification']
         require(os.environ.get('WR_CPU_IMAGE_ID') == pins['image_id'], 'Actual qualified CPU image required')
         import mesh_conditioned_chart_v2_source as generator
         import oriented_solid_controls_v2 as controls
@@ -183,7 +217,7 @@ def native(code, revision, work, build, certificate, built):
         report.update(qualified_build=proof, image_id=pins['image_id'], control_manifest=manifest,
             control_manifest_sha256=hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest(), phase='native_controls')
         try:
-            report['controls'] = compiler.geometry_controls(binary, query, certificate.qualification(code, build)[0]['native_source']['sha256'],
+            report['controls'] = compiler.geometry_controls(binary, query, certificate.qualification(code, build, **options)[0]['native_source']['sha256'],
                 work, official, controls=source, conditioning_version=2)
         except compiler.SolidCompilerError as error: report['controls'] = error.report; raise
         validate_controls(report['controls'], manifest)
@@ -196,11 +230,11 @@ def native(code, revision, work, build, certificate, built):
     finally:
         signal.alarm(0)
         try:
-            report['source_binding_after'] = binding(code, revision, build)
+            report['source_binding_after'] = binding(code, revision, build, **options)
             require(report['source_binding_after'] == before, 'Qualification source changed')
             report['source_rehashed_after'] = True
             if proof is not None:
-                require(built_qualification(code, build, certificate, built)[4] == proof, 'Original built artifacts changed')
+                require(built_qualification(code, build, certificate, built, **options)[4] == proof, 'Original built artifacts changed')
                 report['artifacts_rehashed_after'] = True
             if 'official_helper' in report:
                 require(official_identity(build) == report['official_helper'], 'Official helper changed after native')
@@ -212,21 +246,28 @@ def native(code, revision, work, build, certificate, built):
     return 0 if report['status'] == 'pass' else 1
 
 
-def host(code, revision, build, certificate, built):
+def host(code, revision, build, certificate, built, *, query_requalification=False):
+    require(type(query_requalification) is bool, 'Explicit query profile required')
+    options = dict(query_requalification=True) if query_requalification else {}
     start = time.monotonic(); left = lambda: built.remaining(start, HOST_SECONDS)
     require(sys.platform == 'linux' and os.getuid() == 0 and os.environ.get('DOCKER_HOST') == 'unix://'+str(ROOT/'docker.sock'), 'Owned Linux control required')
-    before = binding(code, revision, build); pins, _, _, paths, proof = built_qualification(code, build, certificate, built)
-    qualified, _, _ = built.qualified(code, build, certificate); image = built.image_identity(qualified, build, left)
-    name = 'wr-solid-chart-v2-qualify-'+revision
+    before = binding(code, revision, build, **options); pins, _, _, paths, proof = built_qualification(code, build, certificate, built, **options)
+    original_code = ROOT/'jobs'/proof['original_source']['producer_revision']/'run_solid_chart_v2_build'/'code' if query_requalification else code
+    qualified, _, inherited = built.qualified(original_code, build, certificate); image = built.image_identity(qualified, build, left)
+    if query_requalification:
+        require(inherited == proof['query_requalification']['original_qualified_inputs'], 'Original QEM runtime qualification differs')
+    prefix = 'solid-chart-v2-query-requalify-' if query_requalification else 'solid-chart-v2-qualify-'
+    name = 'wr-'+prefix+revision
     require(not build.run(['docker', 'ps', '-aq', '--filter', 'name=^/'+name+'$'], min(10, left())).strip(), 'Foreign/preexisting container')
-    out = ROOT/'results'/('solid-chart-v2-qualify-'+revision); require(not out.exists() and not out.is_symlink(), 'Fresh qualification output required')
+    out = ROOT/'results'/(prefix+revision); require(not out.exists() and not out.is_symlink(), 'Fresh qualification output required')
     out.mkdir(mode=0o755); os.chmod(out, 0o755); work = out/'disposable'; work.mkdir(mode=0o700); os.chown(work, 1000, 1000); owner = work.lstat()
     cid = out/'.container.cid'; report = dict(stage='solid_chart_v2_qualification_host_v1', status='fail', phase='native_controls',
         producer_revision=revision, source_binding=before, qualified_build=proof, image_identity=image,
         gpu_used=False, gt_used=False, adoption=False, reconstruction_accuracy_verified=False, competition_eligibility_verified=False)
+    if query_requalification: report['query_requalification'] = proof['query_requalification']
     old = signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError('Inclusive host qualification deadline'))); signal.alarm(max(1, int(left())))
     try:
-        _, inherited_paths, _ = built.qualified(code, build, certificate)
+        _, inherited_paths, _ = built.qualified(original_code, build, certificate)
         official = ROOT/OFFICIAL; report['official_helper'] = official_identity(build)
         mounts = []
         for p in dict.fromkeys((code, code.parent/'revision', code.parent/'source-sha256', *paths, *inherited_paths, official)):
@@ -238,6 +279,7 @@ def host(code, revision, build, certificate, built):
             'WR_ROOT='+str(ROOT), 'WR_CODE='+str(code), 'WR_CODE_REVISION='+revision, 'WR_CPU_IMAGE_ID='+pins['image_id'], 'WR_NATIVE_NETWORK=none',
             'CUDA_VISIBLE_DEVICES=-1', 'OMP_NUM_THREADS=1', 'OPENBLAS_NUM_THREADS=1', 'PYTHONDONTWRITEBYTECODE=1',
             'python3', '-I', '-B', str(code/'infra/solid_chart_v2_qualify.py'), '--native']
+        if query_requalification: argv.append('--query-requalification')
         build.run(argv, min(NATIVE_SECONDS+10, left()), out/'native.log')
     except Exception as error: report['failure_type'] = type(error).__name__
     finally:
@@ -247,12 +289,16 @@ def host(code, revision, build, certificate, built):
                 build.identity(work/'native.json', readonly=True, maximum=2 << 20)
                 raw = (work/'native.json').read_bytes(); result = build.strict_json(raw); report['native'] = result; build.seal(out/'native.json', raw)
             build.cleanup_container(name, pins['image_id'], revision, cid); report['owned_container_removed'] = True
-            require(binding(code, revision, build) == before and built_qualification(code, build, certificate, built)[4] == proof and
+            require(binding(code, revision, build, **options) == before and built_qualification(code, build, certificate, built, **options)[4] == proof and
                     built.image_identity(qualified, build, left) == image, 'Source/built/image changed after native')
+            if query_requalification:
+                require(built.qualified(original_code, build, certificate)[2] == inherited, 'Original runtime qualification changed')
             report.update(source_binding_after=before, source_rehashed_after=True, artifacts_rehashed_after=True)
             require(official_identity(build) == report['official_helper'], 'Official helper changed after container')
             report['official_rehashed_after'] = True
             if 'native' in report:
+                if query_requalification:
+                    require(result.get('query_requalification') == proof['query_requalification'], 'Native active query proof changed')
                 require(result['source_binding'] == result['source_binding_after'] == before and result['source_rehashed_after'] is True and
                     result['stage'] == 'solid_chart_v2_qualification_native_v1' and result['qualified_build'] == proof and
                     result['image_id'] == pins['image_id'] and all(result[k] is False for k in ('gpu_used', 'gt_used', 'adoption', 'reconstruction_accuracy_verified')),
@@ -282,12 +328,15 @@ def host(code, revision, build, certificate, built):
 
 
 def main():
-    parser = argparse.ArgumentParser(); parser.add_argument('--native', action='store_true'); args = parser.parse_args()
+    parser = argparse.ArgumentParser(); parser.add_argument('--native', action='store_true')
+    parser.add_argument('--query-requalification', action='store_true'); args = parser.parse_args()
     code = Path(os.environ['WR_CODE']); revision = os.environ['WR_CODE_REVISION']
     require(os.environ['WR_ROOT'] == str(ROOT) and code == ROOT/'jobs'/revision/ENTRY/'code' and
             Path(__file__).resolve() == code/'infra/solid_chart_v2_qualify.py', 'Exact own entry required')
     build, certificate, built = helpers(code)
-    return native(code, revision, ROOT/'results'/('solid-chart-v2-qualify-'+revision)/'disposable', build, certificate, built) if args.native else host(code, revision, build, certificate, built)
+    options = dict(query_requalification=True) if args.query_requalification else {}
+    prefix = 'solid-chart-v2-query-requalify-' if args.query_requalification else 'solid-chart-v2-qualify-'
+    return native(code, revision, ROOT/'results'/(prefix+revision)/'disposable', build, certificate, built, **options) if args.native else host(code, revision, build, certificate, built, **options)
 
 
 if __name__ == '__main__': raise SystemExit(main())

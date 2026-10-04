@@ -16,6 +16,7 @@ import time
 ROOT = Path('/srv/scenesmith/world-reward')
 ENTRY = 'run_certified_solid_source'
 QUALIFICATION = 'configs/certified_solid_qualification_pins.json'
+BALANCED_QUALIFICATION = 'configs/certified_solid_balanced_qualification_pins.json'
 LINEAGE = 'configs/certified_solid_source_lineage_pins.json'
 ORIGINAL_PINS = 'configs/mesh_precision_diagnostic_v1.json'
 HOST_SECONDS, NATIVE_SECONDS = 420, 315
@@ -75,8 +76,17 @@ def original_binding(code, build, episode):
     return lineage
 
 
-def qualification(code, build):
-    pins = build.strict_json((code / QUALIFICATION).read_bytes())
+def qualification(code, build, *, query_requalification=False):
+    """Authenticate one fixed independent qualification, never arbitrary pins.
+
+    Opting into the balanced query does not relabel the original query/QEM
+    producer. Every selected query must independently pass all fifteen controls.
+    """
+    require(type(query_requalification) is bool, 'Explicit query profile required')
+    selected = BALANCED_QUALIFICATION if query_requalification else QUALIFICATION
+    if query_requalification:
+        build.identity(code / selected, readonly=True, maximum=16384)
+    pins = build.strict_json((code / selected).read_bytes())
     require(pins['schema'] == 'world_reward.certified_solid_qualification_pins.v1' and pins['qualified_controls'] == 15,
             'Actual qualified native pins required')
     out = ROOT / 'results' / ('certified-solid-build-' + pins['producer_revision'])

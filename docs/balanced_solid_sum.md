@@ -1,4 +1,4 @@
-# Balanced exact component-volume sums — unqualified implementation
+# Balanced exact component-volume sums — query qualified, composition pending
 
 ## Change and scope
 
@@ -57,3 +57,16 @@ would be an explicitly authorized technical experiment in a fresh namespace,
 not a retroactive PASS or evidence of better reconstruction/competition quality.
 Linked CGAL rights remain GPL-3.0-or-later or a separate commercial licence;
 Apache-2.0 glue does not establish competition eligibility.
+
+## Recorded native execution
+
+The balanced query independently passes all 15 frozen native controls on Azure
+(52d4ca4094f071702230afd094a0db3278ac4147, host22.120194s, native14.900310s).
+Its separate qualification pins do not replace the original CGAL or QEM pins.
+The explicit `--query-requalification` route authenticates the entire original
+QEM build and its original query from the original immutable snapshot, without
+executing historical Python. It composes that unchanged QEM binary with the
+independently qualified balanced query in a fresh output namespace. Original
+and active query proofs remain distinct; no QEM recompilation or relabeling.
+159 local qualification/transport regression tests pass in the existing project
+venv. The four full geometric controls and any production replay remain pending.

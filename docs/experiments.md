@@ -8830,3 +8830,13 @@ Nativefixture independentpostauditPASS: bothoriginalFAIL/newPASS receiptbytes,
 fivecommitted sourceleaves/modes, original92824B optimizerhash/livebytecode,
 301updates/scope, privateDockercontainerabsence rechecked. No actualmodel or
 HOIgain. EP09prepare stillactive250/415depth frames at21:28UTC; no report/PASS.
+
+Explicit balancedquery/QEM composition route released: original full QEM build
+and originalCGAL proofs remain unchanged; activequery15controls separately
+authenticated. Newfixed --query-requalification/freshnamespace only, unchanged
+fourcohort/QEM/source/fidelity gates. Root159qualification/transportPASS1.92s
+in existing .venv; initialsystemPython153PASS/2dependencyFAIL(missingSciPy),
+no source/test workaround. Owned9313testfixtureentries removed afterUID/nofollow/
+containedsymlink/hardlinkcensus. No newfourcontrolPASS or productionuse implied.
+EP23 original31ff94d fullpose dispatched under existingGPUlock; ACKonly,
+not completion. No parameter/initializer/geometrybudget or source change.
