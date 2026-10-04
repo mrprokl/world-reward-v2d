@@ -8355,3 +8355,16 @@ SHA091d6632993df565c37e1c4703c9fae869a4af9ec6e966842479d58d1e255605;
 retained704112B binary SHA88d529a3e1578e6983bcea0d4f230bdead5e1d48ff7ebf2f5789d8a869741368.
 Root203-sourceclosure/archive/ledger matches; actualnewbuildinfo+source/runtime
 posthash andownedcleanup passed. Zero QEM/mesh/GPU calls, notgeometryqualified.
+
+Actualbuildindependentfinal seal: native18903B
+SHAfe83d90d9f0e6507cdb4df1b1a0f8509f784075f69bcfbb640e57cd3ba10656c;
+full203sourceJSON SHA5011b1ad00db1474745c4168a959391341206533f36edabf65ac3764c3cd89a6,
+marker/readonlyledger unchanged. Actualbuildinfo carries chart2/cachetrue,
+newgenerated13249B/source0ac32a… and headerfdc345…/policy4fd68f…,
+not historicalbinary pretendingnew. Completedtinybuildpins nowfrozen.
+Newqualification runtime prepared for four fixednewcontrols, no tests execute
+native or choose geometry tolerances. OriginalEP21queuedprepare6e8b501 FAIL
+at18:11:59 beforechild becauseEP28precedessorhadbeenlegitimatelycollected;
+preserveoriginalunit/log/outputabsence. EP28full366initializers actualPASS
+at18:04:45; no GPUjobactiveat18:14. A new explicitexistinglock policy avoids
+interpretingmissingunit asPASS and leaves nativealgorithm/inputpins unchanged.
