@@ -44,11 +44,13 @@ Full-contiguous YCBV CPU acquisition fails its900s download deadline, with
 complete disposable cleanup and no ZIP/private-label interpretation. The authenticated first FAIL
 is atomically archived; the single technical3600s continuation now fails
 archive inventory in1701.101840s with original source/cleanup PASS and zero
-retained public/private inputs. Cause is not yet proved; the independently
-verified tiny base ZIP layout matches exactly. No third acquisition is authorized.
+retained public/private inputs. Publiccentraldirectory diagnosis proves native
+RGB IDs1..96 rather than assumed0..95; originalZIP safety/layout passes. No
+labels/predictions consulted, native IDs unchanged. No third acquisition is
+authorized.
 The first bounded header-only diagnosis stopped beforebody on distinctLFS/Xet
 ETag identities. Actualpublicheaders prove that technical mismatch; the separate
-resolver-LFS→declaredXet→CAS identity-chain diagnosis is now dispatched, retaining
+resolver-LFS→declaredXet→CAS identity-chain diagnosis now passes8.455s, retaining
 both original FAILs and ≤32MiB/300s/no-member-payload guards;
 automatic3D point-pose validation has not run. Its three-anchor depth and
 automatic-mask preflights and identical-pool comparison are separately gated.

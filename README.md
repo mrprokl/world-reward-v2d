@@ -92,8 +92,10 @@ queries, one shared native candidate pool and private CPU-only evaluation
 operators; no real-data3D comparison has run. Its sole technical acquisition
 continuation failed archive inventory after1,701.10 s, before image selection or
 private-label reading. All disposable archives were removed; zero public/private
-inputs remain. No third acquisition is authorized; a bounded metadata-only
-archive-header diagnosis must identify the technical cause first.
+inputs remain. Metadata-only diagnosis now proves the technical cause: original
+RGB filenames start at1, while the protocol incorrectly required0. No labels or
+predictions were consulted, no native IDs renumbered, and no third acquisition
+is authorized under that closed protocol.
 See [protocol](docs/point_pose_protocol.md).
 None of these engineering gates is a reconstruction-quality result.
 Earlier extraction-fixture failures were corrected using authenticated historical

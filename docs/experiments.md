@@ -6573,3 +6573,15 @@ inspection narrows remainingValueErrors to sortedRGBscene set orfirst96 IDs.
 Read SAME measuredpubliccentraldirectory only to diagnose exactnativefilename
 IDs; no fullarchive/model reacquisition. This headerPASS does not validate
 288RGB inputs, sourceCRC, geometry or model quality.
+
+Publicheader-only RGB selector diagnosis **identifies exact cause**: SAME
+fulltestcentralbytes/SHA as sealed62a8d00; sortedRGBscenes48..59, first3correct.
+Scenes48/49/50 contain2243/2401/1916nativeRGBnames. Everyfirst96nativefileID
+is1..96contiguous, not the frozen0..95. Thus historical select_rgb_names
+raises "First96 contiguous original RGB frames missing" before any annotation,
+CRCphase, inference or quality result. Both originalFAILs and headerPASS/source
+receipts unchanged; secondreadonlyRange21829679B remainsAzure. Never renumber
+sourceframes to hide the mismatch. Frozen tiny actualdiagnosis records the
+native IDs. No third full acquisition is authorized by the closed protocol;
+any newtechnical amendment requires explicit independent native-ID contract
+and allconsumers audit before potential authorization, not score-based retuning.
