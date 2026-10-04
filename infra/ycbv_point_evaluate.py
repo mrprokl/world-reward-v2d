@@ -12,6 +12,7 @@ from pathlib import Path, PurePosixPath
 import re
 import signal
 import stat
+import subprocess
 import time
 import tudl_holdout_inputs as files
 
@@ -56,7 +57,7 @@ def checked_json(path,wanted):
     return files.strict_json(raw)
 
 
-def source_binding(code,revision):
+def source_binding(code,revision,*,host=False):
     files._canonical(code);require(code==ROOT/'jobs'/revision/JOB/'code'and re.fullmatch('[0-9a-f]{40}',revision)
       and Path(__file__).resolve()==code/SOURCE[0]and Path(files.__file__).resolve()==code/SOURCE[2],'Actual immutable evaluator source required')
     rows={}
@@ -64,7 +65,7 @@ def source_binding(code,revision):
         files._canonical(p);mode=p.lstat().st_mode
         require(not mode&0o222 and(stat.S_ISDIR(mode)or stat.S_ISREG(mode)),'Complete readonly evaluator source required')
         if p.is_file():rows[str(p.relative_to(code))]=files.identity(p)
-    require(set(rows)==set(SOURCE),'Exact small CPU evaluator closure required')
+    require(set(SOURCE)<=set(rows)if host else set(rows)==set(SOURCE),'Complete host/exact small CPU evaluator closure required')
     markers={}
     for name in('revision','source-sha256'):
         p=files._canonical(code.parent/name);s=files._state(p);raw=p.read_bytes()
@@ -163,6 +164,63 @@ def producer_sources(root,pins,reports):
         result[name]=dict(files=actual,markers=markers)
     return result
 
+
+
+HOST_SEAL_STAGE='ycbv_private_evaluator_host_post_seal'
+
+
+def host_snapshot(root,code,revision):
+    """Opaque public/source ancestry and safe image projection; no private reads."""
+    require(root==ROOT,'Exact owned evaluator root required')
+    full=source_binding(code,revision,host=True)
+    pins=validate_pins(files.strict_json((code/PINS).read_bytes()));_,reports=public_predictions(root,pins,decode=False)
+    producer=producer_sources(root,pins,reports)
+    environment={'PATH':'/usr/bin:/bin:/usr/sbin:/sbin','HOME':'/nonexistent','DOCKER_HOST':'unix://'+str(root/'docker.sock')}
+    result=subprocess.run(['docker','image','inspect',IMAGE,'--format','{"Id":{{json .Id}},"Architecture":{{json .Architecture}},"Os":{{json .Os}},"RootFS":{{json .RootFS}}}'],
+        env=environment,capture_output=True,timeout=10)
+    require(result.returncode==0 and len(result.stdout)<=16384,'Bounded safe image metadata query required')
+    image=files.strict_json(result.stdout)
+    require(type(image)is dict and set(image)=={'Id','Architecture','Os','RootFS'}and image['Id']==IMAGE and image['Architecture']=='amd64'and image['Os']=='linux','Pinned CPU evaluator image/platform required')
+    layers=image['RootFS'];require(type(layers)is dict and set(layers)=={'Type','Layers'}and layers['Type']=='layers'and type(layers['Layers'])is list and layers['Layers']and
+        all(type(value)is str and re.fullmatch('sha256:[0-9a-f]{64}',value)for value in layers['Layers']),'Full actual ordered image layer identity required')
+    digest=lambda value:hashlib.sha256(json.dumps(value,sort_keys=True,allow_nan=False).encode()).hexdigest()
+    return dict(schema='world_reward.ycbv_evaluator_host_snapshot.v1',pins_sha256=digest(pins),public_sha256=digest(reports),producer_sha256=digest(producer),
+        source=dict(files={name:full['files'][name]for name in SOURCE},markers=full['markers'],complete_closure_sha256=digest(full)),image=image)
+
+
+def write_host_seal(root,code,revision,before,report_before,exit_status,cleanup_verified):
+    """Exclusive host-post receipt; never rewrite/reclassify the CPU report."""
+    require(type(exit_status)is int and 0<=exit_status<=255 and type(cleanup_verified)is bool,'Actual wrapper exit/owned-cleanup state required')
+    out=files._canonical(root/BASE/OUTPUT)
+    require(out.is_dir()and out.stat().st_mode&0o777==0o700,'Existing owned private evaluation output required')
+    seal=dict(stage=HOST_SEAL_STAGE,status='fail',producer_revision=revision,wrapper_exit_status=exit_status,
+        owned_container_cleanup_verified=cleanup_verified,private_labels_read=False,model_or_GPU_used=False,quality_decision_exported=False,
+        original_container_report_rewritten=False,source_public_producer_image_post_verified=False)
+    try:
+        after=host_snapshot(root,code,revision)
+        require(type(before)is dict and before==after,'Original source/public/producer/image changed after CPU evaluation')
+        pin(report_before)
+        reportpath=out/'report.json';reportpin=files.identity(reportpath)
+        require(reportpin==report_before,'Original CPU report changed during owned cleanup/post-verification')
+        require(reportpin['bytes']<=262144,'Bounded aggregate-only original CPU report required')
+        report=checked_json(reportpath,reportpin)
+        expected=dict(stage=STAGE,status='pass',phase='complete',producer_revision=revision,
+            script_sha256=before['source']['files'][SOURCE[0]]['sha256'],source_helpers=dict(files=before['source']['files'],markers=before['source']['markers']),
+            host_wrapper_post_verified=False,requires_independent_host_post_receipt=True,public_after_reverified=True,source_after_reverified=True,
+            predictions_frozen_before_private_values=True,gpu_used=False,inference_performed=False,private_arrays_exported=False,
+            alignment_performed=False,scale_fitted=False,budget_seconds=BUDGET)
+        require(type(report)is dict and all(type(report.get(k))is type(v)and report[k]==v for k,v in expected.items()),'Actual complete original CPU evaluation report required')
+        require(type(report.get('elapsed_seconds'))in(int,float)and 0<report['elapsed_seconds']<=BUDGET,'Original frozen CPU budget must pass')
+        require(exit_status==0 and cleanup_verified,'Wrapper execution and exact owned cleanup must both pass')
+        require(files.identity(reportpath)==reportpin,'Original CPU report changed before host seal')
+        seal.update(status='pass',container_report=reportpin,source_public_producer_image_post_verified=True,
+            original_source=before['source'],pins_sha256=before['pins_sha256'],public_sha256=before['public_sha256'],producer_sha256=before['producer_sha256'],image=before['image'])
+    except Exception as error:
+        seal.update(error_type=type(error).__name__,error='Host post-verification failed closed; original source/report preserved')
+    raw=(json.dumps(seal,sort_keys=True,allow_nan=False)+'\n').encode()
+    require(len(raw)<=16384,'Bounded host-only metadata seal required')
+    with (out/'host-post.json').open('xb')as stream:os.fchmod(stream.fileno(),0o400);stream.write(raw);stream.flush();os.fsync(stream.fileno())
+    return seal['status']=='pass'
 
 def private_identities(root,pins):
     """Hash all retained private bytes; do not decode annotations or select GT."""

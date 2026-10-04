@@ -17,42 +17,56 @@ host_identity() {
  /usr/bin/env -i PATH=/usr/bin:/bin WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" PYTHONDONTWRITEBYTECODE=1 \
  /usr/bin/python3 -I -B - "$CODE" "$REV" <<'PY'
 from pathlib import Path
-import hashlib,re,runpy,stat,sys,json
-code=Path(sys.argv[1]);revision=sys.argv[2];sys.path.insert(0,str(code/'infra'));digest=hashlib.sha256()
-for p in(code,*sorted(code.rglob('*'))):
- mode=p.lstat().st_mode
- if p.resolve()!=p or any(x.is_symlink()for x in(p,*p.parents))or mode&0o222 or not(stat.S_ISREG(mode)or stat.S_ISDIR(mode)):raise ValueError('Complete immutable host dispatch required')
- if p.is_file():digest.update(str(p.relative_to(code)).encode()+b'\0'+hashlib.sha256(p.read_bytes()).digest())
-for name in('revision','source-sha256'):
- p=code.parent/name;s=p.lstat();raw=p.read_bytes()
- if not stat.S_ISREG(s.st_mode)or s.st_nlink!=1 or any(getattr(s,k)!=getattr(p.lstat(),k)for k in('st_dev','st_ino','st_mode','st_size','st_mtime_ns','st_ctime_ns','st_nlink')):raise ValueError('Actual immutable markers required')
- if name=='revision'and raw!=(revision+'\n').encode()or name=='source-sha256'and not re.fullmatch(b'[0-9a-f]{64}\n',raw):raise ValueError('Original marker values differ')
- digest.update(raw)
+import json,runpy,sys
+code=Path(sys.argv[1]);sys.path.insert(0,str(code/'infra'))
 driver=runpy.run_path(str(code/'infra/ycbv_point_evaluate.py'),run_name='host_control')
-pins=driver['validate_pins'](driver['files'].strict_json((code/driver['PINS']).read_bytes()));_,reports=driver['public_predictions'](driver['ROOT'],pins,decode=False);producer=driver['producer_sources'](driver['ROOT'],pins,reports);digest.update(json.dumps(producer,sort_keys=True).encode())
-print(hashlib.sha256(json.dumps(pins,sort_keys=True).encode()).hexdigest()+' '+digest.hexdigest())
+print(json.dumps(driver['host_snapshot'](driver['ROOT'],code,sys.argv[2]),sort_keys=True,separators=(',',':')))
 PY
 }
-BEFORE="$(host_identity)";PROOF="${BEFORE%% *}";[[ "$PROOF" =~ ^[0-9a-f]{64}$ ]]
+BEFORE="$(host_identity)"
+PROOF="$(/usr/bin/env -i PATH=/usr/bin:/bin /usr/bin/python3 -I -B -c 'import json,sys;print(json.loads(sys.argv[1])["pins_sha256"])' "$BEFORE")";[[ "$PROOF" =~ ^[0-9a-f]{64}$ ]]
 [[ ! -e "$OUT" && ! -L "$OUT" ]]
 [[ "$(docker image inspect "$IMAGE" --format '{{.Id}}')" == "$IMAGE" ]]
 [[ -z "$(docker ps -aq --filter "name=^/$NAME$")" ]]
 finish() {
- STATUS=$?;trap - EXIT INT TERM;set +e
+ STATUS=$?;trap - EXIT INT TERM;set +e;CLEANUP_OK=0;CLEANUP_ERROR=0
+ REPORT_BEFORE='null'
+ if [[ -n "$CIDFILE" && -d "$OUT" && ! -L "$OUT" ]];then
+  REPORT_BEFORE="$(/usr/bin/env -i PATH=/usr/bin:/bin /usr/bin/python3 -I -B - "$CODE" "$OUT" <<'PYREPORT'
+from pathlib import Path
+import json,sys
+code=Path(sys.argv[1]);sys.path.insert(0,str(code/'infra'));import tudl_holdout_inputs as files
+identity=files.identity(Path(sys.argv[2])/'report.json')
+if identity['bytes']>262144:raise ValueError('Bounded aggregate-only report required')
+print(json.dumps(identity,sort_keys=True,separators=(',',':')))
+PYREPORT
+  )";[[ $? == 0 ]] || { REPORT_BEFORE='null';[[ "$STATUS" != 0 ]] || STATUS=1; }
+ fi
  if [[ -n "$CIDFILE" && -f "$CIDFILE" && ! -L "$CIDFILE" ]];then
   CID="$(cat "$CIDFILE")"
   if [[ "$CID" =~ ^[0-9a-f]{64}$ ]];then
-   IDS="$(timeout 5s docker ps -aq --no-trunc --filter "id=$CID")";[[ $? == 0 ]] || STATUS=1
+   IDS="$(timeout 5s docker ps -aq --no-trunc --filter "id=$CID")";[[ $? == 0 ]] || CLEANUP_ERROR=1
    if [[ -n "$IDS" ]];then
-    OWNED="$(timeout 5s docker inspect "$CID" --format '{{.Image}}|{{.Name}}|{{index .Config.Labels "world-reward.job"}}|{{index .Config.Labels "world-reward.revision"}}')"
-    if [[ "$OWNED" == "$IMAGE|/$NAME|run_ycbv_point_evaluate|$REV" ]];then timeout 15s docker rm -f "$CID" >/dev/null || STATUS=1;else STATUS=1;fi
-    IDS="$(timeout 5s docker ps -aq --no-trunc --filter "id=$CID")";[[ $? == 0 && -z "$IDS" ]] || STATUS=1
+    if [[ "$IDS" == "$CID" ]];then
+     OWNED="$(timeout 5s docker inspect "$CID" --format '{{.Image}}|{{.Name}}|{{index .Config.Labels "world-reward.job"}}|{{index .Config.Labels "world-reward.revision"}}')"
+     if [[ $? == 0 && "$OWNED" == "$IMAGE|/$NAME|run_ycbv_point_evaluate|$REV" ]];then timeout 15s docker rm -f "$CID" >/dev/null || CLEANUP_ERROR=1;else CLEANUP_ERROR=1;fi
+    else CLEANUP_ERROR=1;fi
+    IDS="$(timeout 5s docker ps -aq --no-trunc --filter "id=$CID")";[[ $? == 0 && -z "$IDS" ]] || CLEANUP_ERROR=1
    fi
-   chmod 400 "$CIDFILE"
+   chmod 400 "$CIDFILE";[[ $? == 0 ]] || CLEANUP_ERROR=1
+   if [[ "$CLEANUP_ERROR" == 0 ]];then CLEANUP_OK=1;else STATUS=1;fi
   else STATUS=1;fi
  fi
- AFTER="$(host_identity)";[[ $? == 0 && "$AFTER" == "$BEFORE" ]] || STATUS=1
- [[ "$(docker image inspect "$IMAGE" --format '{{.Id}}')" == "$IMAGE" ]] || STATUS=1
+ if [[ -n "$CIDFILE" && -d "$OUT" && ! -L "$OUT" ]];then
+  /usr/bin/env -i PATH=/usr/bin:/bin WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" PYTHONDONTWRITEBYTECODE=1 \
+  /usr/bin/python3 -I -B - "$CODE" "$REV" "$BEFORE" "$REPORT_BEFORE" "$STATUS" "$CLEANUP_OK" <<'PYSEAL'
+from pathlib import Path
+import json,runpy,sys
+code=Path(sys.argv[1]);sys.path.insert(0,str(code/'infra'));driver=runpy.run_path(str(code/'infra/ycbv_point_evaluate.py'),run_name='host_post')
+if not driver['write_host_seal'](driver['ROOT'],code,sys.argv[2],json.loads(sys.argv[3]),json.loads(sys.argv[4]),int(sys.argv[5]),sys.argv[6]=='1'):raise SystemExit(1)
+PYSEAL
+  [[ $? == 0 || "$STATUS" != 0 ]] || STATUS=1
+ else STATUS=1;fi
  exit "$STATUS"
 }
 trap finish EXIT;trap 'exit 130' INT;trap 'exit 143' TERM
