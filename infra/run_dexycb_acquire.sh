@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # CPU-only original archives and private bytes; never a predictor/model stage.
+# Source closure: /infra/dexycb_acquire.py
 set -euo pipefail
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$CODE" == "$ROOT/jobs/$REV/run_dexycb_acquire/code" && "$REV" =~ ^[0-9a-f]{40}$ ]]

@@ -18,3 +18,4 @@ def test_isolated_driver_and_sibling_are_in_publication_closure():
     wrapper = files['infra/run_dexycb_download.sh'].decode()
     assert "sys.path.insert(0, str(code / 'infra'))" in wrapper
     assert 'python3 -I -B' in wrapper and 'max_workers' not in wrapper
+    assert 'infra/dexycb_acquire.py' in module.runtime_bundle_paths(files, 'infra/run_dexycb_acquire.sh')
