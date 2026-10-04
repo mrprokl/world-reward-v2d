@@ -8323,3 +8323,12 @@ orEuler. Actual2481B FAILreceipt SHA3ed59c220cfa7966f98e06c06014d5aa9a4c4495db27
 native1486B log SHA921ae505375a2f60e3623671e27b5ef395e3dee7493589294a8a19d877fdddc5,
 10.645756s/sourceposthash andownedcleanup complete. No next repeated call or
 relaxedgeometrygate. Fullsource awaits a generally qualified numerical compiler.
+
+Whole-solid v2 compiler integrated through explicit version selection (v1 remains
+default) and exact native chart/header/policy/origin binding; all six full-forest
+stages and prior fidelity gates unchanged. Root207combinedtestsPASS1.20s,
+owned551-entry fixtures removed. Separate build-only entrypoint prepared with
+existing qualified CPU image/headers,600s native900s host, no QEM/data/GPU;
+immutable retainedbinary and actualbuildinfo required before new qualification.
+Static Azure closure now includes committed .hpp/.h and local include chains,
+not fabricated vendor/generated files; original payload cap unchanged.

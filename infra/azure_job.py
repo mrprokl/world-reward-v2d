@@ -131,7 +131,7 @@ def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
                     package_aliases.update(alias.asname or alias.name for alias in node.names if alias.name == "world_reward")
             for node in ast.walk(tree):
                 if isinstance(node, ast.Constant) and isinstance(node.value, str) and re.fullmatch(
-                    r"infra/[a-z0-9_]+\.(?:py|sh|cpp)|src/world_reward/[a-zA-Z0-9_/]+\.py", node.value,
+                    r"infra/[a-z0-9_]+\.(?:py|sh|cpp|hpp|h)|src/world_reward/[a-zA-Z0-9_/]+\.py", node.value,
                 ):
                     # Receipts can name code-relative helpers rather than
                     # sibling filenames. Their complete closure is mandatory.
@@ -139,7 +139,7 @@ def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
                         raise ValueError(f"Literal code-relative source dependency is not committed: {node.value}")
                     dependencies.add(node.value)
                 if isinstance(node, ast.Constant) and isinstance(node.value, str) and re.fullmatch(
-                    r"[a-z0-9_]+\.(?:py|sh|cpp)|Dockerfile\.[a-z0-9_]+", node.value,
+                    r"[a-z0-9_]+\.(?:py|sh|cpp|hpp|h)|Dockerfile\.[a-z0-9_]+", node.value,
                 ):
                     sibling = str(Path(path).with_name(node.value))
                     # External/vendor filenames are not fabricated as our code.
@@ -150,7 +150,7 @@ def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
                 if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
                         and node.func.attr == "with_name" and node.args
                         and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str)
-                        and re.fullmatch(r"[a-z0-9_]+\.(?:py|sh|cpp)|Dockerfile\.[a-z0-9_]+", node.args[0].value)):
+                        and re.fullmatch(r"[a-z0-9_]+\.(?:py|sh|cpp|hpp|h)|Dockerfile\.[a-z0-9_]+", node.args[0].value)):
                     sibling = str(Path(path).with_name(node.args[0].value))
                     if sibling not in files:
                         raise ValueError(f"Literal sibling source dependency is not committed: {sibling}")
@@ -202,8 +202,13 @@ def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
                     dependencies.update(module_paths("world_reward." + node.attr, required=False))
         # Literal $CODE/infra/foo, including Python subprocess child entrypoints.
         dependencies.update("infra/" + name for name in re.findall(
-            r"/infra/([a-z0-9_]+\.(?:py|sh|cpp)|Dockerfile\.[a-z0-9_]+)", source,
+            r"/infra/([a-z0-9_]+\.(?:py|sh|cpp|hpp|h)|Dockerfile\.[a-z0-9_]+)", source,
         ))
+        # Only committed quoted sibling headers; generated/vendor includes are
+        # not fabricated. Headers themselves retain their static include chain.
+        dependencies.update(str(Path(path).with_name(name)) for name in re.findall(
+            r'^\s*#\s*include\s*"([a-z0-9_]+\.(?:hpp|h))"', source, re.MULTILINE,
+        ) if str(Path(path).with_name(name)) in files)
         dependencies.update("src/world_reward/" + name for name in re.findall(
             r"/src/world_reward/([a-zA-Z0-9_/]+\.py)", source,
         ))
