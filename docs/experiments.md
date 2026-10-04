@@ -7879,3 +7879,20 @@ Integrated localtinyfullsuite frozen404855a:13382PASS8optionalSKIP496.69s.
 Entireownedtemporarytestroot removed (readonlyfixture dirs/internal-onlyhardlinks
 audited first); no media/model/dataset acquisition. Postreplay/geometry adapter
 neighbors72PASS1optionalSKIP0.81s, not nativeQEM or scientificquality evidence.
+
+Serializationgeometryphase2 CLOSEDFAIL under980e037: native25.233024s/host
+26.771640s. Two fresh fullF64/F32 source topology/embedding gates pass before
+any nativecall. Thinellipsoid6400faces at frozen2^-16 exhausts bothqueues:
+originalexit3/.049811s and newexit2/.292540s, sameimmutableinput. No candidate/
+export/packing/fidelity PASS; capsule has0calls duepredeclaredSTOP. No rescaling,
+sourcechange, newthreshold, fixture reroll or productionadoption. Predicatesalone
+do not cure unchanged native backend's finite-budget/numerical feasibility.
+Native10263B SHA5f4d7df0d4bd3ccb175bf1fcceafa770be3a89abf067abd3824ee9f4b655d424;
+host4123B SHAb751a50d3da2e5e244bb3415311c44036c65b6180ba0c6b1a470b2f3a46ca77b.
+Independent whole169source/archive/pinnedphase1/runtime/binaryposthash and
+ownedcleanup PASS; bothactualarms use327353B OBJ
+SHAd5d4575134217ec7815c2df5325b86584d4a8bda4e0c8a889af832369f608b67.
+Capsule remainsunexecuted. No scientificPASS or result fabricated.
+Postfreezefocused245PASS1optionalSKIP21.83s/sceneprimitives138PASS.48s.
+Five prioragent-ownedtinytemporaryroots removed afterownership/internal-link
+checks; unknownforeignpaths preserved, no dataset/render/checkpoint onlocal.

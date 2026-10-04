@@ -25,6 +25,10 @@ inferred automatically; no hand-labeling of challenge records.
   no mesh repair. Collected-predecessor scheduling failures
   remain separate. Original controls/reference replay and whole source-chain pins are
   frozen before each next stage; no prediction is inferred from dispatch ACKs.
+- **Geometry compiler:** exact F32/weld predicate controls pass, but the frozen
+  real-collapse comparison **fails** on the thin cavity: both original and new
+  native queues exhaust before the budget. Capsule control not executed; no
+  rescaling, fixture reroll, production repair or adoption.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
   development scenes/objects and33–38cm absolute errors prevent a generalization
   claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.
