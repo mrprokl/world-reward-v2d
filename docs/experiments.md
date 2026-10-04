@@ -7652,6 +7652,11 @@ closed before pose, no face/component deletion or seed/threshold rescue.
 Path-proof fix: explicit selected-contract destination projection only, exact
 model/contract schemas and canonical path; all other fields unchanged or reject.
 Host serializes before reserving namespace; native revalidates same projection
-while original model remains used for installedsource/assets. Root188paired tests
-PASS; realistic Path fixture now covers missing integration. Unchanged protocol/
+while original model remains used for installedsource/assets. Root189paired tests
+PASS1.81s; realistic Path fixture now covers missing integration. Unchanged protocol/
 cohort/MP21 boxes/17points/SAMprecision; originalfe95889 failure remains.
+
+Original algorithms unchanged technical replay uses14cb625 newsource/newowned
+namespace after no learned/private execution in first attempt; CPUsource/runtime
+preflight and data-free CUDA gate remain independently satisfied. EP13 official
+packer66f6138 dispatchedACK only.
