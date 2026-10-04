@@ -164,3 +164,33 @@ Priority order is Phase1 identity correctness → Phase2 single-call LOD/fidelit
 external reconstruction comparison; expensive exact certificates only where
 their extra physical claim is needed. No QEM is developed or launched here,
 no PASS is asserted, and no production default or adoption decision changes.
+
+
+## 6. Phase1 executable qualification (2026-10-05, not yet run)
+
+`infra/surface_identity_qualify.py` now defines a data-free offline CPU test
+using the existing pinned official packaging image1a04b193…303f0. Only code,
+six original Track1/shared kit source leaves, two native mesh-loader sources and
+the independently frozen CPU build receipt are mounted. No sample predictions,
+video, body/model assets, renderer, dataset, GPU or new package installation.
+Three new exactF32 inputs are fixed globally before measurement: curved4V/2F
+sheet; open square8V/8F tube; sheet plus disconnected triangle7V/3F. Three raw
+negative domains (index, collinear, nonmanifold) must abstain without mutation.
+All six complete arrays and manifest are frozen before any predicate/call.
+
+Each positive gets one owned GLB export, actual native CPU loader and full-scene
+source-authenticated replay, then one **unmodified** official `budget_mesh` call.
+Exact oriented surface+F32 representation, all component/boundary geometry and
+zero-only padding must agree. Three budget calls, six native loader calls
+including authority replays, zero QEM; no retry, source healing or tuned tolerance.
+Owned GLBs remain on Azure scratch and are removed, leaving only tiny receipts.
+
+Budget is **60s inclusive native** from initialization through fixtures, imports,
+checks, cleanup, posthash and receipt write; Docker outer63s. Host integrity,
+Docker control, independent exactCIDabsence and final sealing are separately
+bounded. Daemon failure is not container absence. Failure retains phase/counts
+and fixture/source manifests; only receipts are sealed0444 under0555. Root238
+manufactured tests PASS0.61s; these mocks do not establish the real runtime PASS.
+Actual source/image/helper/artifact rechecks and terminal execution must precede
+any production hypothesis. Full Parquet packing, scorer acceptance, physical
+embedding and reconstruction accuracy are separate, still unproved here.

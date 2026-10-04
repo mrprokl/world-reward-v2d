@@ -9051,3 +9051,11 @@ Root339PASS2optionalSKIP51.65s forward/refine/queue tests before dispatch.
 Two new primary camera/body audits (Human3R/HSfM) suggest coupled-state fitting,
 not a new model acquisition: NC/dependency/MHR/identity/overlap limitations remain.
 No weight choice or adoption without real independent authorized fullHOI data.
+
+
+Surface identity real-runtime protocol ready after root238tinytestsPASS0.61s,
+no runtime PASS yet. Three fresh F32 open/disconnected sources+three negative
+rawdomains, fullarrays frozen before calls; source-bound actualnative loaders
+and original budget_mesh,60s inclusive native/63sDocker, no datasets/GPU/QEM.
+Controlled cleanup and independent exactCIDabsence are explicit sealing gates.
+This tests loader/mesh packing fidelity, not full Parquet/scorer/HOI accuracy.
