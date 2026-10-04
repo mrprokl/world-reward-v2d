@@ -31,7 +31,8 @@ inferred automatically; no hand-labeling of challenge records.
   native queues exhaust before the budget. Capsule control not executed; no
   rescaling, fixture reroll, production repair or adoption. A separate
   [fixed-chart numerical hypothesis](docs/mesh_conditioned_qem_protocol.md)
-  is preregistered on four fresh procedural controls, not yet qualified.
+  passes four fresh procedural controls (max CD/diagonal0.006118, shell-volume
+  error0.001015); no production geometry, HOI gain or adoption is claimed.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
   development scenes/objects and33–38cm absolute errors prevent a generalization
   claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.

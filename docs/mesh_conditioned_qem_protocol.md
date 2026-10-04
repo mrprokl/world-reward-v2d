@@ -1,6 +1,6 @@
 # Fixed-chart mesh compiler — new numerical hypothesis
 
-**Preregistered, not executed or adopted at this revision.** The closed earlier
+**Four procedural controls qualified; no production adoption.** The closed earlier
 serialization geometry comparison remains FAIL. Its tiny-source queue failure
 exposed two unit-dependent native operations: squared-cross `<1e-16` and the
 absolute point prior `1e-10`. Neither the failed fixtures nor their thresholds
@@ -64,3 +64,14 @@ procedural range. Physical F32/default8 welding remains unit-sensitive; no
 universal similitude invariance, HOI accuracy, leakage-free pretrained model,
 production adoption or CARI4D superiority follows. No challenge record, GT,
 human label, source calibration, video or mesh is used in these controls.
+
+## Actual result — October4
+
+Producer `8b0568b`: inclusive host44.51s/native43.56s, compilation16.40s.
+All four new arms pass with2464/2464/2944/2944 real collapses to4096faces;
+original two small-unit arms fail, two large-unit arms pass. Maximum all-stage
+CD/diagonal0.006118 and per-shell volume error0.001015. Zero serialization
+vetoes: conditioning robustness is demonstrated here, not veto efficacy.
+Independent complete173-file source/receipts/input pairing/metrics/cleanup
+recheck passes. Tiny qualification pins are committed; the temporary binary
+was removed and is not an install. No production geometry or HOI accuracy test.

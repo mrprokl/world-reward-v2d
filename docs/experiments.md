@@ -7924,3 +7924,23 @@ Fresh2signpowershapes×2similitudes,8pairedcalls600s within5400s, sourceall4gate
 beforeanynative, samephysicalCD1%/volumes5%/embedding/births/export/pack/.375.
 Separate optin sameoriginalCPUimage/operator; compiler/parity/controls first.
 Localtinycombined207PASS1.03s, Bashsyntax/diffPASS; no native/QEMqualityadoption.
+
+FixedchartQEM actualnewqualification PASS under8b0568b: host44.512316s/
+native43.558365s/compile16.403227s, actual128scalar+128orientation+7keys/
+4invalidrejects/zero-collapseidentity PASS thenall4freshgeometryPASS. Original
+small2arms queueexit3; originallarge2armsPASS. New2464/2464/2944/2944real
+collapses to4096faces, native.441116/.429730/.540760/.540475s; maxallstage
+CD/diagonal.005855227/.005855227/.006117486/.006117486 (<.01), maxper-shell
+relativevolumeerror.000675733/.000675741/.001014267/.001014278 (<.05).
+Sourceall4exactF64chart/F32embedding, physicalcandidate/GLB/default8/unchanged
+officialpack/.375bake and completebirthshellsPASS. Serializationvetoes0:
+conditioningmechanism exercised, NOT newly proven collisionveto efficacy.
+Independent whole173files/archive/sourcebinding/scopes/actualpairedinputs/
+allstagearithmetic/originalbuild/helper/posthash/ownedcleanupPASS. Host4958B
+SHA51ce5840fafe04daf3bdc98cbe7624fdf755139bd486edc15597103d61be4f98;
+native48941B SHAa7dbf52569684d7ab4007ccb7693d935ab3ef1a64a163468ef7df0f1d9273909.
+Temporarybinary694736B SHAb754e56111b38b079c6ba9bec185c3858bf81e847bd5d193a2483bf6dd0b118a
+removedperprotocol. Tinyqualificationpins nowfrozen; no persistentbinary
+identity, productionmesh/adoption, universalcovariance or challenge3Dgain.
+Postfreeze local154PASS.72s and401PASS1optionalSKIP69.06s transport/volume
+neighbors; threeagent-ownedtinytestroots189entries987Bremoved, foreignpreserved.

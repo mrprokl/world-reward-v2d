@@ -1,0 +1,34 @@
+{
+  "schema": "world_reward.mesh_conditioned_qem_qualification.v1",
+  "producer_revision": "8b0568bf733d5a420b0bd2fdf60e03a6239b353a",
+  "source_files": 173,
+  "source_archive_sha256": "309a25b10fd37c7d93c011cb6574852fb9ba2ff4ecdf053ad1d844952392ea1f",
+  "source_files_sha256": "16a208d4650826ed2e2f354243eee3b8f1c340734479d6a1d081a56b80712c95",
+  "source_cpp": {
+    "bytes": 13814,
+    "sha256": "2b5dfa9110b00dc289f64fe95a80fd5072381651942d75d8390c6d5e970dd433"
+  },
+  "protocol": {
+    "bytes": 5379,
+    "sha256": "509a3567204c0eeb59b163cc28e4e0ced93a04830b918445d5e5b87fa285def4"
+  },
+  "host_report": {
+    "bytes": 4958,
+    "sha256": "51ce5840fafe04daf3bdc98cbe7624fdf755139bd486edc15597103d61be4f98"
+  },
+  "native_report": {
+    "bytes": 48941,
+    "sha256": "a7dbf52569684d7ab4007ccb7693d935ab3ef1a64a163468ef7df0f1d9273909"
+  },
+  "measured_temporary_binary": {
+    "bytes": 694736,
+    "sha256": "b754e56111b38b079c6ba9bec185c3858bf81e847bd5d193a2483bf6dd0b118a"
+  },
+  "binary_retained": false,
+  "physical_geometry_rescaled": false,
+  "new_numeric_algorithm": true,
+  "qualified_procedural_controls": 4,
+  "production_mesh_validated": false,
+  "challenge_performance_verified": false,
+  "adoption": false
+}
