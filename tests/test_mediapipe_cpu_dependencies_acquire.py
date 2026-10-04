@@ -104,7 +104,9 @@ def setup(gate, tmp_path, monkeypatch):
         row = dict(name=name, version=version, filename=filename, url=url, **digest(wheel),
                    acquisition='reference_existing_mediapipe_hands_acquire_v1' if index == 0 else 'new_Azure_wheel_only',
                    metadata=dict(url=url+'.metadata', **digest(raw), requires_dist=[], license=dict(
-                       declared='Apache 2.0' if index == 0 else 'MIT', expression=None, license_files=declared)))
+                       declared='Apache 2.0' if index == 0 else 'MIT', expression=None, license_files=declared,
+                       declared_text_bytes=10 if index == 0 else 3,
+                       declared_text_sha256=digest(b'Apache 2.0' if index == 0 else b'MIT')['sha256'])))
         rows.append(row); payload[url+'.metadata'] = raw
         if index: payload[url] = wheel
     manifest = dict(schema='world_reward.mediapipe_cpu_dependencies.v1', packages=rows, package_count=26,
@@ -119,6 +121,28 @@ def setup(gate, tmp_path, monkeypatch):
     for folder in (gate.EVIDENCE, gate.RESULT): (root/folder).parent.mkdir(parents=True, exist_ok=True)
     monkeypatch.setattr(mp, 'publish', lambda part, target: (os.link(part, target), part.unlink()))
     return root, code, rev, rows, Opener({u: Response(b, u) for u, b in payload.items()})
+
+
+def setup_verify(gate, tmp_path, monkeypatch):
+    """Manufactured closed v2 downloads then a distinct v3 source/pin snapshot."""
+    root, original, rev, rows, opener = setup(gate, tmp_path, monkeypatch)
+    original_record = gate.wheel_record; calls = []
+    def closed_parser(*args, **kwargs):
+        calls.append(1)
+        if len(calls) == 4: raise gate.mp.AcquisitionError('Wheel dependency/license metadata differs')
+        return original_record(*args, **kwargs)
+    with monkeypatch.context() as patch:
+        patch.setattr(gate, 'RESULT', gate.DOWNLOAD_RESULT); patch.setattr(gate, 'wheel_record', closed_parser)
+        with pytest.raises(gate.mp.AcquisitionError): gate.acquire(root, original, rev, opener=opener)
+    closed_path = root/gate.DOWNLOAD_RESULT/'report.json'
+    pins = dict(schema='world_reward.mediapipe_cpu_dependencies_download_pins.v1', producer_revision=rev,
+                report=digest(closed_path.read_bytes()), helper=digest((original/gate.HELPERS[0]).read_bytes()))
+    files = {str(p.relative_to(original)): p.read_bytes() for p in original.rglob('*') if p.is_file()}
+    files[gate.DOWNLOAD_PINS] = json.dumps(pins).encode()
+    current_rev = 'c'*40; code = readonly_snapshot(root, current_rev, gate.JOB, files)
+    monkeypatch.setattr(gate, '__file__', str(code/gate.HELPERS[0]))
+    monkeypatch.setattr(gate.mp, '__file__', str(code/'infra/mediapipe_hands_acquire.py'))
+    return root, code, current_rev, rows, closed_path
 
 
 def report(gate, root): return json.loads((root/gate.RESULT/'report.json').read_text())
@@ -136,7 +160,7 @@ def test_fresh_full_dependency_orchestration_reuses_original_mp_wheel(gate, tmp_
         p = root/old/'KEEP'; p.parent.mkdir(parents=True); p.write_bytes(b'CLOSED_V1'); p.chmod(0o444)
         old_files.append(p)
     result = gate.acquire(root, code, rev, opener=opener)
-    assert gate.EVIDENCE.endswith('_v2') and gate.RESULT.endswith('-v2')
+    assert gate.EVIDENCE.endswith('_v2') and gate.RESULT.endswith('-v3')
     assert all(p.read_bytes() == b'CLOSED_V1' and stat.S_IMODE(p.stat().st_mode) == 0o444 for p in old_files)
     assert result['status'] == 'pass' and len(result['wheels']) == 26 and len(result['artifacts']) == 51
     assert gate.mp.WHEEL_URL not in opener.calls and len(opener.calls) == 51
@@ -175,6 +199,76 @@ def test_binary_octet_stream_policy_applies_only_to_exact_pinned_assets(gate):
     records = gate.assets(rows)
     assert all('binary/octet-stream' in row['mime'] and row['sha256'] and row['bytes'] > 0 for row in records)
     assert all('text/html' not in row['mime'] for row in records)
+
+
+@pytest.mark.parametrize('declared', [None, 'MIT'])
+def test_license_header_short_preview_or_hash_only(gate, tmp_path, declared):
+    text = 'MIT' if declared else 'Long license\n        continuation with Unicode ©'
+    raw = ('Name: example\nVersion: 1.0\nLicense: '+text+'\n\n').encode('utf-8')
+    parsed_text = str(email.parser.BytesParser().parsebytes(raw).get('License')).encode('utf-8')
+    row = dict(name='example', version='1.0', filename='example-1.0-py3-none-any.whl', bytes=1, sha256='a'*64,
+        metadata=dict(**digest(raw), requires_dist=[], license=dict(expression=None, declared=declared,
+            declared_text_bytes=len(parsed_text), declared_text_sha256=digest(parsed_text)['sha256'], license_files=[])))
+    p, m = tmp_path/'example.whl', tmp_path/'example.metadata'; m.write_bytes(raw)
+    p.write_bytes(zip_bytes([('example-1.0.dist-info/METADATA', raw)]))
+    assert gate.wheel_record(p, m, row, time.monotonic()+5)['unresolved_license_files'] == []
+    row['metadata']['license']['declared_text_sha256'] = 'b'*64
+    with pytest.raises(gate.mp.AcquisitionError, match='License text byte/hash'):
+        gate.wheel_record(p, m, row, time.monotonic()+5)
+
+
+def test_absent_license_is_not_an_empty_or_duplicate_header(gate, tmp_path):
+    for header, accepted in [('', True), ('License: \n', False), ('License: MIT\nLicense: MIT\n', False)]:
+        raw = ('Name: example\nVersion: 1.0\n'+header+'\n').encode()
+        row = dict(name='example', version='1.0', filename='example-1.0-py3-none-any.whl', bytes=1, sha256='a'*64,
+            metadata=dict(**digest(raw), requires_dist=[], license=dict(expression=None, declared=None,
+                declared_text_bytes=0, declared_text_sha256=None, license_files=[])))
+        p, m = tmp_path/'example.whl', tmp_path/'example.metadata'; m.write_bytes(raw)
+        p.write_bytes(zip_bytes([('example-1.0.dist-info/METADATA', raw)]))
+        if accepted: gate.wheel_record(p, m, row, time.monotonic()+5)
+        else:
+            with pytest.raises(gate.mp.AcquisitionError): gate.wheel_record(p, m, row, time.monotonic()+5)
+
+
+def test_verify_closed_downloads_qualifies_all_notices_without_network_or_mutation(gate, tmp_path, monkeypatch):
+    root, code, rev, rows, closed = setup_verify(gate, tmp_path, monkeypatch)
+    old_raw = closed.read_bytes(); snapshots = {p: (p.read_bytes(), p.stat().st_mode, p.stat().st_mtime_ns)
+        for p in (root/gate.EVIDENCE).iterdir()}
+    monkeypatch.setattr(gate.mp, 'fetch', lambda *_: pytest.fail('Verify-only must never fetch'))
+    monkeypatch.setattr(gate.urllib.request, 'build_opener', lambda *_: pytest.fail('Verify-only must never open HTTP'))
+    result = gate.acquire(root, code, rev, verify_acquired=True)
+    assert result['status'] == 'pass' and len(result['wheels']) == 26 and len(result['artifacts']) == 51
+    assert result['mode'] == 'verify_acquired_bytes_and_notices' and result['network_used'] is False
+    assert result['new_downloads'] == 0 and result['stage_adoption'] is False and result['downloads_rehashed_after']
+    assert result['prior_verified_downloads'] == gate.verify_downloads(root, code)
+    assert result['source_binding'] == gate.dependency_source(root, code, rev, verify_acquired=True)
+    assert closed.read_bytes() == old_raw and json.loads(old_raw)['status'] == 'fail'
+    assert all((p.read_bytes(), p.stat().st_mode, p.stat().st_mtime_ns) == before for p, before in snapshots.items())
+
+
+@pytest.mark.parametrize('fault', ['pin', 'source', 'receipt', 'artifact', 'extra', 'readonly'])
+def test_verify_closed_downloads_rejects_changed_or_foreign_inputs(gate, tmp_path, monkeypatch, fault):
+    root, code, rev, rows, closed = setup_verify(gate, tmp_path, monkeypatch)
+    directory = root/gate.EVIDENCE
+    if fault == 'extra':
+        directory.chmod(0o755); (directory/'FOREIGN').write_bytes(b'FOREIGN'); directory.chmod(0o555)
+    else:
+        path = {'pin': code/gate.DOWNLOAD_PINS, 'source': root/'jobs'/('b'*40)/gate.JOB/'code'/gate.HELPERS[0],
+                'receipt': closed, 'artifact': next(directory.iterdir()), 'readonly': next(directory.iterdir())}[fault]
+        path.chmod(0o644)
+        if fault != 'readonly': path.write_bytes(b'CHANGED'); path.chmod(0o444)
+    with pytest.raises(gate.mp.AcquisitionError): gate.acquire(root, code, rev, verify_acquired=True)
+    assert report(gate, root)['status'] == 'fail'
+
+
+def test_verify_closed_receipt_mutation_during_inventory_fails_posthash(gate, tmp_path, monkeypatch):
+    root, code, rev, rows, closed = setup_verify(gate, tmp_path, monkeypatch); original = gate.wheel_record
+    def mutate(*args, **kwargs):
+        result = original(*args, **kwargs); closed.chmod(0o644); closed.write_bytes(b'ALTERED'); closed.chmod(0o444)
+        return result
+    monkeypatch.setattr(gate, 'wheel_record', mutate)
+    with pytest.raises(gate.mp.AcquisitionError): gate.acquire(root, code, rev, verify_acquired=True)
+    assert report(gate, root)['downloads_rehashed_after'] is False
 
 
 def namespace(gate, root, code, rev):
