@@ -55,6 +55,45 @@ The [proposed framework](framework_architecture.md) distinguishes existing
 reusable contracts from the unified system still to implement; scientific
 configurations are global and externally selected, never per-episode repairs.
 
+
+## October5 follow-up: joint camera/body mechanisms, no new model acquisition
+
+Two additional primary implementations were independently inspected at pinned
+pre-cutoff revisions (small text only, no media/checkpoints):
+
+- [Human3R, ICLR2026](https://github.com/fanegg/Human3R/tree/402f2b2c7f20514e99cb42e4126c46b4ff75593f)
+  is a real human/scene/camera model release, not only a project page. README4352B
+  SHA`b78883947802e7f5bbad6cc1471d1d5b68f55d4659fe8aa375be1135bc1f1952`;
+  LICENSE4025B SHA`53039195300552d736cdee1572df632c256909c1f76381b442ae18ce93839e9f`
+  declares CC-BY-NC-SA plus dependency terms. Its SMPL-X output is not a qualified
+  MHR+rigid-object/contact branch. [Published checkpoint revision](https://huggingface.co/faneggg/human3r/tree/1902f6b702547870994f15413ed4c61b19dca6b6)
+  exists, but full training/challenge overlap and eligibility remain unverified.
+- [HSfM, CVPR2025](https://github.com/hongsukchoi/HSfM_RELEASE/tree/75f835e91c1b1dc97713ed7ab78b2d311f3b173a)
+  releases actual common humans/scene/camera optimization. README11875B
+  SHA`a01146cf2d615fd69d2c5275d55b102539938ef42d568c259df70819a84048d9`;
+  MIT LICENSE1069B SHA`d8510c2e4adcc7836f0f1a5564ffea42383e3aa65ca3a44fd82d015fcd6377fe`.
+  This does not clear DUSt3R/WiLoR/SMPL-X dependencies. It assumes consistent
+  people/poses across views and explicitly suggests manual identity correction;
+  neither that manual workflow nor its multiview-static-human assumption can be
+  imported into Track1 full-time inference.
+
+**Decision:** borrow a coupled-state mechanism, not another unqualified stack.
+The current native refine optimizes only object translation and body rotation
+controls: root, object rotation, hands, K and gauge are fixed. A prospective
+A/B experiment may unlock human root+objectSE3 in one full-T graph while keeping
+same automatic tracks, geometry/identity/scale/K, and native contact unchanged.
+This is a NEW confounded variable-domain experiment, not existing zero-weight
+parity or a drop-in observation. First qualify both native gradients/operators;
+then choose weights on a separate licensed external development set. Reserve
+tracks only as video-self-supervised diagnostics, not private3D validation.
+
+Falsifiable goal: lower both object and object-to-wrist3D error without human,
+coverage or true-dynamics regression. Shared-frame reprojection alone leaves
+metric-depth ambiguities. An independent real full-body/object/camera cohort is
+not yet legally qualified for competitive use; no new model acquisition,
+parameter choice on challenge clips, adoption or accuracy gain is authorized.
+Baseline full-surface coverage, query support and proper export remain priority.
+
 ## Priority order
 
 1. Reproduce frozen CARI4D baseline. It is a full-body category-agnostic metric 4D reference, not just a per-image PA-aligned method. It explicitly lacks detailed finger articulation and cannot fix major FoundationPose flips; first-frame object visibility is assumed.

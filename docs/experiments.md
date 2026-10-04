@@ -9041,3 +9041,13 @@ terminal journal and owned audit-container absence PASS. Newforward pins frozen
 only after actual audit; unchanged301-update refinement is next. Initial audit
 controller mistakes (file-mode ledger, duplicate mount and string-array finiteness)
 changed no producer or predictions; corrected audit checks all numeric arrays.
+
+
+EP09 unchanged native301-update refinement scheduled under67de3f39 with same
+existing cooperativeFD9 lock, full415/all prior audited pins and fresh output.
+207-source archive7b6d6fbfbd7d6246b89968e875a97e862e7ba074bc4f885c95b8b3d20e4f369c.
+Dispatch ACK observed only; independent actual terminal/report audit still needed.
+Root339PASS2optionalSKIP51.65s forward/refine/queue tests before dispatch.
+Two new primary camera/body audits (Human3R/HSfM) suggest coupled-state fitting,
+not a new model acquisition: NC/dependency/MHR/identity/overlap limitations remain.
+No weight choice or adoption without real independent authorized fullHOI data.
