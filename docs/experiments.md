@@ -7352,3 +7352,22 @@ model members, no node decoding/load. Genuine receipt, not collected unit,
 establishes PASS. Scoped public directories555/files444, no ownedpartials orGPU.
 Independent pins committed before dependency acquisition. Rights/overlapUNKNOWN,
 no packages installed, data interpreted, inference or quality evidence yet.
+
+Reusable full-timeline hand scan: root138 tiny tests PASS0.12s. Every original
+RGB callback occurs once, streaming without retaining/copying image stacks;
+rawnormalized/world/handedness and missing/saturated slots remain readonly.
+Budget covers core scan only; caller authenticates native settings/source and
+all acquisition/hash/export costs separately. No model run or quality adoption.
+
+CPU runtime qualification implementation root116 prerequisite tests PASS1.05s
+(34runtime,20dependency,44asset,18manifest), no Docker/model execution. Missing
+actual dependency PASS pins block construction; graphs only create/close,
+neverdetect/data. Build600s includes context/copies/child qualification; smoke120s.
+
+Dependency acquisitionv1 actual technical FAIL0.229795s underb38293c before the
+first artifact: publisher PEP658 MIME `binary/octet-stream` was not accepted.
+Source/prior7assets/posthash allverified, private/model/data untouched.
+Report5325B SHA163f7795c179bb52dca1b4077d3e024f9db5340b0746dd71858b540cf19e60d9.
+Independent public HEAD confirms exactURL/HTTP200/identity/2311B and that MIME;
+owned evidence directory empty. Preserve originalFAIL; futurefreshv2 adds this
+actual MIME to byte-SHA-pinned transport only, not arbitrary HTML or new assets.

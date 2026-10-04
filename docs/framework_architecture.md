@@ -21,6 +21,7 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 | Evidence relationnelle | `relational_motion.relational_motion_features` | Résidus 2D après nuisance affine du fond, comptages/support ; tracks fournis, pas génération/identité/contact/confiance ni caméra physique. |
 | Banque automatique | `automatic_candidate_bank.build_automatic_candidate_bank` | Callbacks DINO/SAM2 : toutes les propositions retenues, un encodeur et batch de masques, queries + fond ; pas encore une exécution de modèles ou une identité acceptée. |
 | Mains spécialisées | `hand_observations.HandObservations`, `HandInstances`, `LandmarkEvidence` | Contrat readonly full-T/ragged/21 points, coordonnées et handedness séparés ; pas de modèle exécuté, identité ou visibilité certifiée. |
+| Scan de mains | `hand_scan.scan_hands`, `NativeHandResult`, `HandScanResult` | Callback streaming une fois par frame originale, sorties natives et saturation conservées ; aucun modèle importé, paramètre natif ou précision vérifié par la primitive. |
 | Lacunes | `occlusion_bridge.initialize_occluded_gaps` | Initialiseur conditionnel ; pas contact observé ni validation RGB complète. |
 | Baseline complète | `cari_shared_prepare`, `cari_full_forward`, `cari_full_refine`, `cari_full_export` | Adaptateurs natifs séparés, preuve et exécution souvent imbriquées. |
 | Évaluation externe | `point_motion_evaluation`, `point_bop_evaluation`, `ycbv_point_evaluate` | Portée rigide relative ; pas validation HOI globale. |
@@ -90,6 +91,14 @@ identités persistantes. Handedness n'est jamais confiance de détection/visibil
 L'adapter natif normalisé applique seulement xW/yH, aucun mirror/offset/crop,
 conserve les valeurs hors grille/non supportées et ne crée pas de jauge globale.
 Root152 tests de contrats PASS0.11s ; aucun run MediaPipe ni gain appris.
+
+`hand_scan` fournit l'orchestration streaming commune à une future exécution :
+une seule requête par frame RGB originale, aucun retry/stride/flip/crop, erreurs
+propagées, slots natifs sans identités, conservation des XYZ normalisés et du
+world centré-main. Le budget de la primitive ne couvre pas les hashes ou exports
+du caller ; le budget du pilote doit les inclure séparément. Les valeurs du
+protocole IMAGE/4/.5 sont déclarées, pas vérifiées dans un callback opaque.
+Root138 tests combinés PASS0.12s ; pas de scan MediaPipe réel ou d'adoption.
 
 | Champ | Invariant |
 |---|---|
