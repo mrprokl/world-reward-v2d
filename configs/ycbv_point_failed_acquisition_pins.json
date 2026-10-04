@@ -1,0 +1,19 @@
+{
+  "schema": "world-reward-ycbv-failed-acquisition-pins-v1",
+  "failure": {
+    "bytes": 2038,
+    "sha256": "36377969586fd66d0c01176a3a73484268e45286086c4a859f7c107484afd8e9",
+    "producer_revision": "40ee2cb4710ec15f0b2bda32bbf0e1f727804b18",
+    "script_sha256": "198936284b013c284240aee07aad7bea67ed1cdc5b6b9047421c98fbe6119f9d"
+  },
+  "unit": "world-reward-ycbv-point-acquire-v1.service",
+  "pid": 213665,
+  "log": {
+    "bytes": 65,
+    "sha256": "c06bba97d5871a59995972e15211c9bfeda05095832a5576d1a39bff3a67a562"
+  },
+  "cid": {
+    "bytes": 64,
+    "sha256": "26e7dc22d80a0dcde40f0625e21d8fbbb4dabb91285b463722ef3397590de052"
+  }
+}

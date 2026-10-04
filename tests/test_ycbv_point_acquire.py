@@ -94,7 +94,7 @@ def test_first_three96_filenames_only_never_labels(gate):
 def test_base_and_protocol_exact_no_numeric_or_source_changes(gate):
     expected=copy.deepcopy(gate.EXPECTED_PROTOCOL);gate.exact(expected,gate.EXPECTED_PROTOCOL)
     assert expected["archives"]["ycbv_test_all.zip"]["bytes"]==14969383039
-    assert expected["limits"]["seconds"]==900 and sum(x["bytes"] for x in expected["archives"].values())<30*1024**3
+    assert expected["limits"]["seconds"]==3600 and sum(x["bytes"] for x in expected["archives"].values())<30*1024**3
     for fault in ("bool","extra","sparse","scene","license"):
         value=copy.deepcopy(expected)
         if fault=="bool":value["selection"]["first_frame"]=False
@@ -256,10 +256,77 @@ def test_wrapper_zeroargs_offline_gpu_firewall_and_real_closure(gate):
     shell=(REPO/"infra/run_ycbv_point_acquire.sh").read_text()
     assert "[[ $# == 0 ]]"in shell and "--network host"in shell and "--gpus"not in shell
     assert "--user 1000:1000"in shell and "CUDA_VISIBLE_DEVICES="in shell and "--read-only"in shell
-    assert "910s docker run"in shell and "run_ycbv_point_acquire/code"in shell and "chown 1000:1000"in shell
+    assert "3810s docker run"in shell and "run_ycbv_point_acquire/code"in shell and "chown 1000:1000"in shell
     assert "--mount \"type=bind,src=$OUT,dst=$OUT\""in shell and "world-reward.job=run_ycbv_point_acquire"in shell
     spec=importlib.util.spec_from_file_location("test_ycbv_closure",REPO/"infra/azure_job.py");module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
-    files={str(p.relative_to(REPO)):p.read_bytes() for folder in ("infra","configs","src/world_reward") for p in (REPO/folder).rglob("*") if p.is_file() and p.suffix in (".py",".sh",".json")}
+    files={str(p.relative_to(REPO)):p.read_bytes() for folder in ("infra","configs","src/world_reward") for p in (REPO/folder).rglob("*") if p.is_file() and p.suffix in (".py",".sh",".json",".cpp")}
     files["pyproject.toml"]=(REPO/"pyproject.toml").read_bytes();paths=module.runtime_bundle_paths(files,"infra/run_ycbv_point_acquire.sh")
     assert set(gate.HELPERS)|{"infra/run_ycbv_point_acquire.sh"}<=set(paths)
     assert not any("robotap"in x or "sam3d"in x for x in paths if x.startswith("infra/"))
+    assert {x for x in paths if x.startswith('infra/')}==set(gate.HELPERS[:-1])|{
+        'infra/atomic_metadata.py','infra/ycbv_acquire_transition.py','infra/run_ycbv_acquire_transition.sh'}
+
+
+def test_only_acquisition_time_contract_changes_from_original(gate):
+    import subprocess,ast
+    original=subprocess.run(['git','show','40ee2cb4710ec15f0b2bda32bbf0e1f727804b18:infra/ycbv_point_acquire.py'],cwd=REPO,capture_output=True,check=True,text=True).stdout
+    namespace={'__name__':'original_ycbv_prereg'};exec(compile(original,'original','exec'),namespace)
+    expected=copy.deepcopy(namespace['EXPECTED_PROTOCOL']);expected['limits']['seconds']=3600;expected['limits']['cleanup_seconds']=180
+    assert gate.EXPECTED_PROTOCOL==expected
+    old=ast.parse(original);new=ast.parse(Path(gate.__file__).read_text())
+    for name in ('transfer','zip_inventory','inspect_layout','select_rgb_names','crc_all','png_header','retain_subset','cleanup'):
+        a=next(n for n in old.body if isinstance(n,ast.FunctionDef)and n.name==name)
+        b=next(n for n in new.body if isinstance(n,ast.FunctionDef)and n.name==name)
+        assert ast.dump(a,include_attributes=False)==ast.dump(b,include_attributes=False)
+
+
+def test_absolute_cleanup_grace_does_not_renew_and_never_masks_timeout(gate,monkeypatch):
+    calls=[];handlers={};report={}
+    monkeypatch.setattr(gate.signal,'signal',lambda s,h:handlers.update({s:h}))
+    monkeypatch.setattr(gate.signal,'alarm',lambda seconds:calls.append(seconds))
+    gate.acquisition_alarm(report)
+    with pytest.raises(TimeoutError,match='3600'):handlers[gate.signal.SIGALRM](None,None)
+    gate.cleanup_alarm(report);gate.cleanup_alarm(report)
+    assert calls==[3600,180]
+    with pytest.raises(TimeoutError,match='180'):handlers[gate.signal.SIGALRM](None,None)
+    assert report['cleanup_grace_exhausted']is True
+
+
+def test_timeout_main_seals_failure_and_cleanup_grace_without_retry(gate,tmp_path,monkeypatch):
+    root=tmp_path/'root';out=root/gate.BASE;out.mkdir(parents=True);(out/'.container.cid').write_text('c'*64)
+    monkeypatch.setenv('WR_ROOT',str(root));monkeypatch.setenv('WR_CODE',str(tmp_path/'code'));monkeypatch.setenv('WR_CODE_REVISION','a'*40)
+    monkeypatch.setenv('WR_IMAGE_ID',gate.IMAGE);monkeypatch.setenv('WR_AZURE_VM02_VERIFIED','1');monkeypatch.setenv('WR_YCBV_TECHNICAL_CONTINUATION_SHA256','b'*64)
+    monkeypatch.setattr(gate.platform,'system',lambda:'Linux');monkeypatch.setattr(gate.os,'getuid',lambda:1000)
+    before={'files':{gate.HELPERS[0]:{'sha256':'d'*64,'bytes':1}}};monkeypatch.setattr(gate,'bound_source',lambda *a:before)
+    alarms=[];handlers={}
+    def handler(s,h):old=handlers.get(s);handlers[s]=h;return old
+    monkeypatch.setattr(gate.signal,'signal',handler);monkeypatch.setattr(gate.signal,'alarm',lambda s:alarms.append(s))
+    def failure(output,report,persist):
+        report.update(phase='download',active_archive='ycbv_test_all.zip');persist()
+        handlers[gate.signal.SIGALRM](None,None)
+    monkeypatch.setattr(gate,'acquire',failure)
+    with pytest.raises(SystemExit):gate.main([])
+    result=json.loads((out/'report.json').read_text())
+    assert result['status']=='fail'and result['error_type']=='TimeoutError'and result['budget_seconds']==3600
+    assert result['technical_continuation_attempt']==2 and result['cleanup_grace_seconds']==180
+    assert (out/'report.json').stat().st_mode&0o777==0o400
+    assert alarms.count(3600)==alarms.count(180)==1 and alarms[-1]==0
+
+
+def test_expired_cleanup_not_restarted_or_reported_success(gate,tmp_path,monkeypatch):
+    root=tmp_path/'root';out=root/gate.BASE;out.mkdir(parents=True);(out/'.container.cid').write_text('c'*64)
+    monkeypatch.setenv('WR_ROOT',str(root));monkeypatch.setenv('WR_CODE',str(tmp_path/'code'));monkeypatch.setenv('WR_CODE_REVISION','a'*40)
+    monkeypatch.setenv('WR_IMAGE_ID',gate.IMAGE);monkeypatch.setenv('WR_AZURE_VM02_VERIFIED','1');monkeypatch.setenv('WR_YCBV_TECHNICAL_CONTINUATION_SHA256','b'*64)
+    monkeypatch.setattr(gate.platform,'system',lambda:'Linux');monkeypatch.setattr(gate.os,'getuid',lambda:1000)
+    monkeypatch.setattr(gate,'bound_source',lambda *a:{'files':{gate.HELPERS[0]:{'sha256':'d'*64,'bytes':1}}})
+    alarms=[];handlers={}
+    def handler(s,h):old=handlers.get(s);handlers[s]=h;return old
+    monkeypatch.setattr(gate.signal,'signal',handler);monkeypatch.setattr(gate.signal,'alarm',lambda s:alarms.append(s))
+    def expired(output,report,persist):
+        gate.cleanup_alarm(report);handlers[gate.signal.SIGALRM](None,None)
+    monkeypatch.setattr(gate,'acquire',expired)
+    with pytest.raises(SystemExit):gate.main([])
+    result=json.loads((out/'report.json').read_text())
+    assert result['cleanup_grace_exhausted']is True and result['status']=='fail'
+    assert result['error_type']=='TimeoutError'and (out/'report.json').stat().st_mode&0o777==0o400
+    assert alarms.count(180)==1

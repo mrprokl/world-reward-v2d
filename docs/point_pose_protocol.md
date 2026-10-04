@@ -105,3 +105,18 @@ Truth points/poses are not output, and no private evaluation has run.
 No acquisition/native comparison has run. Even future PASS would demonstrate
 limited external rigid camera-motion gain, not articulated hand-object contact,
 unseen benchmark generalization, full-HOI accuracy or victory over CARI4D.
+
+
+The original CPU acquisition900s download-only timeout was independently sealed
+before any ZIP/annotation interpretation. Exactly one technical continuation
+keeps all source/license/archive/cohort identities fixed and changes only the
+CPU acquisition deadline to3600s plus180s absolute cleanup grace. Archive the
+complete original report/CID directory via Linux NOREPLACE only after original
+unit/PID/cgroup/container inactivity and full disposable cleanup are proved.
+Actual transition/report/source pins authorize the single continuation; occupied
+archive/new-cohort namespaces forbid a third run. This is not a GPU/scientific
+budget change or a validation-selected method. Compact generic stdlib atomic
+primitives avoid carrying unrelated challenge controllers into acquisition.
+Root134focused acquisition/transition/BOP/private-motion tests PASS2.31s plus
+one Linux-only skip; scientific function AST and all non-time protocol fields
+match the original frozen producer. Actual archive/continuation pending.

@@ -18,6 +18,9 @@ import zlib
 
 import tudl_acquire as shared
 
+ACQUISITION_SECONDS = 3600
+CLEANUP_SECONDS = 180
+
 ROOT = Path("/srv/scenesmith/world-reward")
 JOB = "run_ycbv_point_acquire"
 BASE = "validation/ycbv_point_pose_v1"
@@ -42,7 +45,7 @@ EXPECTED_PROTOCOL = {
   "bop_params":{"url":"https://raw.githubusercontent.com/thodan/bop_toolkit/b72b3015c87a96fa6398c2ef4c196e85f798d3e6/bop_toolkit_lib/dataset_params.py","bytes":32303,"sha256":"a935fc4f6fd42f367a0bbf816036f783fb4c5d87200a8615ce1e08e6d51af05e"}},
  "embedded_dataset_info":{"file":"ycbv/dataset_info.md","bytes":4035,"sha256":"4766684f25f165c1c312745e3583fe248161c56c35a862bfa04134141151882e"},
  "selection":{"split_prefix":"test","scene_ids":[48,49,50],"frames_per_scene":96,"first_frame":0,"width":640,"height":480,"rule":SELECTION},
- "limits":{"seconds":900,"download_bytes":32212254720,"expanded_bytes":60000000000,"member_bytes":2000000000,"members":1000000,"min_free_bytes":45000000000},
+ "limits":{"seconds":3600,"cleanup_seconds":180,"download_bytes":32212254720,"expanded_bytes":60000000000,"member_bytes":2000000000,"members":1000000,"min_free_bytes":45000000000},
  "output":{"base":BASE,"public_schema":"world-reward-ycbv-point-rgb-v1"}}
 FIELDS = lambda s:(s.st_dev,s.st_ino,s.st_mode,s.st_size,s.st_mtime_ns,s.st_ctime_ns)
 CHUNK = 1024*1024
@@ -245,6 +248,21 @@ def prune_empty(folder):
     folder.rmdir()
 
 
+def acquisition_alarm(report):
+    def expired(*_): raise TimeoutError("Whole 3600s acquisition budget exhausted")
+    signal.signal(signal.SIGALRM,expired);signal.alarm(ACQUISITION_SECONDS)
+
+
+def cleanup_alarm(report):
+    """One absolute cleanup deadline; repeated cleanup calls never renew it."""
+    if report.get("cleanup_grace_started") is True: return
+    report["cleanup_grace_started"] = True
+    def expired(*_):
+        report["cleanup_grace_exhausted"] = True
+        raise TimeoutError("Bounded 180s acquisition cleanup grace exhausted")
+    signal.signal(signal.SIGALRM,expired);signal.alarm(CLEANUP_SECONDS)
+
+
 def acquire(out,report,persist):
     private,inputs=out/"eval_private",out/"inputs";downloads=private/".downloads";downloads.mkdir(mode=0o700)
     owned=[]; disposable=[];archives={};budget=[0,0];complete=False
@@ -277,14 +295,17 @@ def acquire(out,report,persist):
         complete=True
         return owned
     finally:
+        cleanup_alarm(report)
         for value in archives.values(): (value[0] if isinstance(value,tuple) else value).close()
         try:
             cleanup(disposable);downloads.rmdir();report["disposable_archives_removed"]=True
         except Exception:
-            cleanup(owned);prune_empty(inputs)
+            if report.get("cleanup_grace_exhausted") is not True:
+                cleanup(owned);prune_empty(inputs)
             raise
         if not complete:
             cleanup(owned);prune_empty(private);prune_empty(inputs)
+        report["cleanup_completed"] = True
 
 
 def main(argv=None):
@@ -293,39 +314,48 @@ def main(argv=None):
     if platform.system()!="Linux": raise RuntimeError("Heavy acquisition is Azure-only")
     if args.preflight:
         print(hashlib.sha256(json.dumps(preflight(root,code,revision),sort_keys=True).encode()).hexdigest());return
-    if os.getuid()!=1000 or os.environ.get("WR_IMAGE_ID")!=IMAGE or os.environ.get("WR_AZURE_VM02_VERIFIED")!="1": raise ValueError("Exact CPU image/UID1000/VM02 required")
+    if os.getuid()!=1000 or os.environ.get("WR_IMAGE_ID")!=IMAGE or os.environ.get("WR_AZURE_VM02_VERIFIED")!="1" or re.fullmatch("[0-9a-f]{64}",os.environ.get("WR_YCBV_TECHNICAL_CONTINUATION_SHA256","")) is None: raise ValueError("Exact CPU image/UID1000/VM02 required")
     out=canonical(root/BASE)
     if not out.is_dir() or set(p.name for p in out.iterdir())!={".container.cid"}: raise ValueError("Exclusively reserved new output required")
     before=bound_source(root,code,revision,Path(__file__));oldmask=os.umask(0o077)
     (out/"eval_private").mkdir(mode=0o700);(out/"inputs").mkdir(mode=0o755)
-    report={"stage":STAGE,"status":"fail","phase":"start","producer_revision":revision,"script_sha256":before["files"][HELPERS[0]]["sha256"],"source_helpers":before,"dataset_revision":REVISION,"license":"MIT","image_id":IMAGE,"budget_seconds":900,"device":"cpu","gpu_used":False,"inference_performed":False,"challenge_inputs_used":False,"challenge_overlap_verified":False,"accuracy_verified":False,"models_downloaded":False,"train_downloaded":False,"sparse_test_downloaded":False,"private_annotations_exported_as_inference_inputs":False}
+    report={"stage":STAGE,"status":"fail","phase":"start","producer_revision":revision,"script_sha256":before["files"][HELPERS[0]]["sha256"],"source_helpers":before,"dataset_revision":REVISION,"license":"MIT","image_id":IMAGE,"budget_seconds":ACQUISITION_SECONDS,"cleanup_grace_seconds":CLEANUP_SECONDS,"technical_continuation_attempt":2,"technical_continuation_host_sha256":os.environ["WR_YCBV_TECHNICAL_CONTINUATION_SHA256"],"device":"cpu","gpu_used":False,"inference_performed":False,"challenge_inputs_used":False,"challenge_overlap_verified":False,"accuracy_verified":False,"models_downloaded":False,"train_downloaded":False,"sparse_test_downloaded":False,"private_annotations_exported_as_inference_inputs":False}
     started=time.perf_counter();path=out/"report.json";retained=[]
     with path.open("x") as stream:
         def persist():
             stream.seek(0);json.dump(report,stream,indent=2,allow_nan=False);stream.write("\n");stream.truncate();stream.flush();os.fsync(stream.fileno())
         def timeout(signum,frame): raise TimeoutError("Whole acquisition budget exhausted")
-        previous={signum:signal.signal(signum,timeout) for signum in (signal.SIGALRM,signal.SIGTERM,signal.SIGINT)};signal.alarm(900)
+        previous={signum:signal.signal(signum,timeout) for signum in (signal.SIGALRM,signal.SIGTERM,signal.SIGINT)};acquisition_alarm(report)
         try:
             retained=acquire(out,report,persist)
             if bound_source(root,code,revision,Path(__file__))!=before: raise ValueError("Source/protocol changed")
+            if report.get("cleanup_grace_exhausted") is True: raise TimeoutError("Cleanup exceeded declared grace")
             report.update(status="pass",phase="complete",source_rehashed_after=True)
         except Exception as exc:
             report.update(status="fail",error_type=type(exc).__name__,error="Pinned acquisition contract failed; URLs/tokens and private values omitted")
-            if retained:
+            cleanup_alarm(report)
+            if retained and report.get("cleanup_grace_exhausted") is not True:
                 try: cleanup(retained);prune_empty(out/"eval_private");prune_empty(out/"inputs");retained=[]
                 except Exception as cleanup_error: report["cleanup_error_type"]=type(cleanup_error).__name__
         finally:
-            signal.alarm(0)
-            for signum,handler in previous.items(): signal.signal(signum,handler)
+            cleanup_alarm(report)
             report["elapsed_seconds"]=time.perf_counter()-started
             try: report["source_rehashed_after"]=bound_source(root,code,revision,Path(__file__))==before
             except Exception: report["source_rehashed_after"]=False;report["status"]="fail"
             if not report["source_rehashed_after"]:
                 report["status"]="fail"
-                if retained:
+                if retained and report.get("cleanup_grace_exhausted") is not True:
                     try: cleanup(retained);prune_empty(out/"eval_private");prune_empty(out/"inputs")
                     except Exception as cleanup_error: report["cleanup_error_type"]=type(cleanup_error).__name__
-            persist();path.chmod(0o400);os.umask(oldmask)
+            try:
+                # Stop the cleanup timer only for the small, mandatory receipt seal.
+                signal.alarm(0)
+                if report.get("cleanup_grace_exhausted") is True: report["status"]="fail"
+                report["elapsed_seconds"]=time.perf_counter()-started
+                persist();path.chmod(0o400);os.umask(oldmask)
+            finally:
+                signal.alarm(0)
+                for signum,handler in previous.items(): signal.signal(signum,handler)
     if report["status"]!="pass": raise SystemExit(1)
 
 
