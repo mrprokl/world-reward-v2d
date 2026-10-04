@@ -1,0 +1,23 @@
+{
+  "archive": {
+    "bytes": 32378880,
+    "sha256": "fae0b125568942cde70e959c5fe9da2283c98e0b48ad7f8f466ea7e8a5e91067"
+  },
+  "episode_index": 8,
+  "inventory_report": {
+    "bytes": 2151,
+    "path": "results/pose-return-inventory-000008-f22f0a1063abb00e84957d00ac0ce8eb73776816/report.json",
+    "producer_revision": "f22f0a1063abb00e84957d00ac0ce8eb73776816",
+    "script_sha256": "d61b6c191058dfaec846cd07bea6bdbab4532e4813db310178919b0a70778498",
+    "sha256": "3cd02bfbc1dd820cf5bafe080a24770150afa1d5cdfa136e5db8c3eac3174859"
+  },
+  "manifest": {
+    "bytes": 4520,
+    "sha256": "06741712f354b1513567cb6cf398a44713b7b7f6b329f68f51f1cb62d479814e"
+  },
+  "schema": "world_reward.pose_return.pins.v1",
+  "source_pins": {
+    "bytes": 4277,
+    "sha256": "c421cb10133794a3cd78f73b5961da0f17b8e2fd9878b1b10be88d961c9e28cf"
+  }
+}

@@ -6721,3 +6721,19 @@ explicitly755 newparents/555 allcodedirs and preserveGitfilemodes withoutwrite;
 common postpublication exactsourceSHA/mode gate nowcovers inline/staged/reuse.
 Existing private/changed sources failclosed, never implicitly chmod. Rootfocused
 publication+return tests and actualnewAzurelaunch remain separate gates.
+
+ActualEP9 predriveraccess audit: original02d65e4 revision/job0700 and all
+codedirs0500, files0444; exact191B failurelog
+SHA53c9c00bdb44cbc691070f95c960a8e00c37b3da84b860e4c0ac7d1bde019efe.
+Newpublication166combinedfixtures PASS13.43s. Historicalpathmodes were not
+changed. Newinvocation requires authenticating oldemptyoutput before an explicit
+atomic archive; no automaticretry nor numericalgeometry relaxation.
+
+EP8 actual CPU returninventory f22f0a1063abb00e84957d00ac0ce8eb73776816
+PASS0.721504s,2151B receipt SHA3cd02bfbc1dd820cf5bafe080a24770150afa1d5cdfa136e5db8c3eac3174859.
+Root independently rehashed entire32,378,880B archive and4520B manifest,
+matching frozen source3files/parentlineage. Archive
+SHAfae0b125568942cde70e959c5fe9da2283c98e0b48ad7f8f466ea7e8a5e91067;
+manifestSHA06741712f354b1513567cb6cf398a44713b7b7f6b329f68f51f1cb62d479814e.
+Only834B measuredtransportpins local; original634framepose outputs remainAzure.
+ActualprivateSSHreturn/NOREPLACE/cleanup still required, no qualityPASS.
