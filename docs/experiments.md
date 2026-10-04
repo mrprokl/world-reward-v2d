@@ -8520,3 +8520,22 @@ tinyrefinedpins frozenafteractualcompletion, numericalexecutionnotaccuracy.
 EP25 originalpredictedsource readiness checked; same qualified whole-solid policy
 will run once underexactpublished3952870 snapshot, no reclassification of its
 closed historicaltopologyfailure and no gate/prompt/thresholdchanges.
+
+Solid tracker opt-in adds one inert CPU-qualified geometry reader to the existing
+full-T ICP/Viterbi path; no native pose/cost operator changes. Independent
+readonly audit finds exact mounts, UID1000 reservation, original FD9 lock,
+7200s native budget and source/post/cleanup checks coherent. Wrapper114 focused
+tests pass. Root409 combined checks initially408PASS/1FAIL on historical textual
+assertions, not numerical behavior; conditioned output/padding syntax restored,
+only explicit new renderer enum asserted. Corrected routing31PASS0.25s; exclusive
+fixtures cleaned. First CPU inert smoke used the geometry producer archive,
+whose entrypoint closure lacks the new consumer: ModuleNotFoundError before
+artifact interpretation, no native geometry/GPU/model call. Next smoke must use
+the actual tracker closure; no production failure or accuracy inferred.
+
+EP25 same3952870 whole-solid policy actualhostFAIL14.438431s/native phase,
+172151B SHAf61ea5c476946c42ca01c3d7e7676c24a359c05697c8f097afc035a58a72ed21;
+owned container/scratch removed. Failure reason/source audit pending; no mesh
+pins or tracking allowed from inner failed compiler. EP21 full563 originalexport
+queue reaches child_complete19:43:21UTC under6a9c722; exact sealedoutputs and
+source verification remain required, collected unit is not evidence alone.

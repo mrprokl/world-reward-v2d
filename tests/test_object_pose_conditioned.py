@@ -57,7 +57,7 @@ def test_new_geometry_branch_only_reads_fixed_pins_and_copies_canonical_glb():
     source=(INFRA/'object_pose_smoke.py').read_text()
     assert "output.with_name(output.name+'_conditioned')" in source
     assert "if args.mesh_source=='conditioned' and np.any(faces[inactive] != 0):" in source
-    assert "if args.mesh_source in ('volume','conditioned'):" in source
+    assert "if args.mesh_source in ('volume','conditioned','solid'):" in source
     assert 'indices = list(range(inputs["total_frames"]))' in source
 
 
