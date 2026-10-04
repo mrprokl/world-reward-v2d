@@ -7433,3 +7433,13 @@ Report33358B SHA06ba19e150530c089c02ebdd7b7239e1c9e6870c31c58affd5138ffd280d598a
 runtime pins freeze before fresh RGB acquisition. Package/source integrity and
 native load are not useful-observation accuracy, license eligibility or overlap
 clearance. Fresh subject03 acquisition can now proceed without GPU use.
+
+Private full-T diagnostic adapter: root179 tiny tests PASS0.68s. Predictor
+outputs/all7 artifacts freeze before any private values; separate CPU container
+has only current source snapshot, those predictions, tiny proof/manifest and
+three original label-only camera directories. Explicit DAC_READ_SEARCH only
+preserves original UID1000/700 directories and400 files. Decoder permits only
+seg:uint8[480,640] and joint_2d:float32[1,21,2], no3D/pose/MANO/calibration member.
+Pure evaluation uses17 verified joints, association/missing/ambiguity denominators
+and nullable errors; no best-GT match, prediction edits or adoption threshold.
+Native paths/markers/report/posthash are checked; fixtures are not actual GT.
