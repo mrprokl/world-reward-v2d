@@ -7340,3 +7340,15 @@ Exact full mandatory CPU dependency metadata is frozen atb17ee14:26wheels,
 All selected wheel/PEP658 metadata SHA, platform/cutoff/Requires-Dist markers and
 license declarations checked; root53 tests PASS0.27s. No wheels installed,
 runtime built, task license cleared or model quality measured by this freeze.
+
+MediaPipe source/model acquisitionv2 actual PASS3.481036s under246b235, all7
+original public artifacts and readonly full source/markers rehashed independently.
+Report6167B SHAc7af200b84641113f679dab9183818a35dade02c1a89e07d08538867c2254505;
+actual driver21381B SHA8293510c02777cd5b844865285736ff1a653631a8803849a9047ee9030196570.
+Wheel35,622,638B verified publisherSHA and760safeCRC/member records; task
+7,819,105B generation1682480004222387 verifies publisherMD5, measuredSHA
+fbc2a30080c3c557093b5ddfc334698132eb341044ccee322ccf8bcf3607cde1, two opaque
+model members, no node decoding/load. Genuine receipt, not collected unit,
+establishes PASS. Scoped public directories555/files444, no ownedpartials orGPU.
+Independent pins committed before dependency acquisition. Rights/overlapUNKNOWN,
+no packages installed, data interpreted, inference or quality evidence yet.

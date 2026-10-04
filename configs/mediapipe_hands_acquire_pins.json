@@ -1,0 +1,12 @@
+{
+  "schema": "world_reward.mediapipe_hands_acquire_pins.v1",
+  "producer_revision": "246b2350daf830480d5f4d6355475a5a2063d7c7",
+  "report": {
+    "bytes": 6167,
+    "sha256": "c7af200b84641113f679dab9183818a35dade02c1a89e07d08538867c2254505"
+  },
+  "helper": {
+    "bytes": 21381,
+    "sha256": "8293510c02777cd5b844865285736ff1a653631a8803849a9047ee9030196570"
+  }
+}
