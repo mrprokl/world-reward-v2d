@@ -1377,3 +1377,13 @@ robust inferredZ/safe free-space/tracks; unknown human occlusion is not foregrou
 subtraction. Fresh paired controls and lawfully qualified realHOI required.
 General exact orientedforest certification is an admissibility tool, not
 shape/pose quality or a verifiedCARI4D win. See framework_architecture.md.
+
+TRELLIS checkpoint primary recheck: exact microsoft/TRELLIS-image-large
+25e0d31ffbebe4b5a97464dd851910efc3002d96 (2024-12-06), non-gated cardMIT,
+sourceREADME explicitly MIT models/majoritycode. Native6weights3,006,922,800B
+plus separate DINOv2vitl14reg; no bytes downloaded. TRELLIS500K data mixture
+(ObjaverseXL/ABO/3D-FUTURE/HSSD/Toys4k) does not prove challenge nonoverlap.
+FlexiCubesApache submodule imports Kaolin; customattention/sparseconvolution
+Torch2.5.1cu124 ABI and transitive licences remain unqualified. Do not install
+upstream allflags/renderers/cleanup or call it ready because H100 has memory.
+Defer newstack unless seed validity is independently measured bottleneck.

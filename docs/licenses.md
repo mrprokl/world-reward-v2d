@@ -330,3 +330,13 @@ and [synchronization issue9](https://github.com/leolyliu/CORE4D-Instructions/iss
 also prevent assuming a clean shared SE3 reference. HIMO is explicitly NC;
 HUMOTO public animations are not verified synchronized real RGB. No model
 overlap or derived-label rights are inferred from downloadable files.
+
+## Experimental general solid certificate (October4, not adoption)
+
+The independently written certified_solid_query.cpp glue is Apache-2.0.
+CGAL6.0.1 PMP/Side headers are GPL-3.0-or-later OR commercial; the linked
+executable is not Apache-only. Preserve upstream notices/corresponding-source
+access and do not infer a challenge Apache-release exception. Primary release
+library5077192B publisherSHA c752737f91d1af71fa96038f0e37945ce82a5f1fffb6200172cfcdd77755a356.
+Pure oriented_solid_forest does not itself import CGAL/certify geometry.
+No compiled runtime, production geometry or submission eligibility claimed.

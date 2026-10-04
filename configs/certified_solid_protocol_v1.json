@@ -1,0 +1,90 @@
+{
+  "budgets_seconds": {
+    "cgal_download": 120,
+    "child_build": 180,
+    "compile": 600,
+    "controls": 900,
+    "dependency_download": 180,
+    "inclusive": 2400
+  },
+  "capacities": {
+    "expanded_bytes": 134217728,
+    "member_bytes": 16777216,
+    "members": 100000
+  },
+  "cgal_archive": {
+    "bytes": 5077192,
+    "sha256": "c752737f91d1af71fa96038f0e37945ce82a5f1fffb6200172cfcdd77755a356",
+    "url": "https://github.com/CGAL/cgal/releases/download/v6.0.1/CGAL-6.0.1-library.tar.xz"
+  },
+  "cgal_checksums": {
+    "bytes": 1003,
+    "sha256": "c35a4c4c3c779585e194b3b172f145ccac8d9b3125dc5819762bbfa2ec122ec1",
+    "url": "https://github.com/CGAL/cgal/releases/download/v6.0.1/sha256sum.txt"
+  },
+  "cgal_version": "6.0.1",
+  "compiler_flags": [
+    "-O2",
+    "-std=c++17",
+    "-ffp-contract=off",
+    "-frounding-math",
+    "-fno-fast-math"
+  ],
+  "controls": 15,
+  "cpu_count": 4,
+  "dependencies": [
+    {
+      "architecture": "amd64",
+      "bytes": 9580,
+      "filename": "libgmpxx4ldbl_6.2.1+dfsg-3ubuntu1_amd64.deb",
+      "package": "libgmpxx4ldbl",
+      "sha256": "73e8145633a86c8f01466bb42c5b0734665268f7b2656e82365c1659525f7874",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/g/gmp/libgmpxx4ldbl_6.2.1+dfsg-3ubuntu1_amd64.deb",
+      "version": "2:6.2.1+dfsg-3ubuntu1"
+    },
+    {
+      "architecture": "amd64",
+      "bytes": 336684,
+      "filename": "libgmp-dev_6.2.1+dfsg-3ubuntu1_amd64.deb",
+      "package": "libgmp-dev",
+      "sha256": "e4ce547c5c5e4efd98854d06559349b3a03272eb343f1bd8e4ccac7b783229a3",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/g/gmp/libgmp-dev_6.2.1+dfsg-3ubuntu1_amd64.deb",
+      "version": "2:6.2.1+dfsg-3ubuntu1"
+    },
+    {
+      "architecture": "amd64",
+      "bytes": 271446,
+      "filename": "libmpfr-dev_4.1.0-3build3_amd64.deb",
+      "package": "libmpfr-dev",
+      "sha256": "ee3fc55ad08686f89a1839b5673e38c2dd269b0335bc80f8e881e4b641259116",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/m/mpfr4/libmpfr-dev_4.1.0-3build3_amd64.deb",
+      "version": "4.1.0-3build3"
+    }
+  ],
+  "installed_libraries": {
+    "libgmp10": "2:6.2.1+dfsg-3ubuntu1",
+    "libmpfr6": "4.1.0-3build3"
+  },
+  "linker_flags": [
+    "-lgmpxx",
+    "-lgmp",
+    "-lmpfr"
+  ],
+  "memory_bytes": 17179869184,
+  "parent_image_id": "sha256:c8fb1632a6908a82aeeeb73c36a00f17a26b81f95f4d2d498c53f75894e21137",
+  "rights": {
+    "binary_is_apache_only": false,
+    "cgal_relicense_performed": false,
+    "competition_eligibility_verified": false,
+    "linked_cgal_scope": "GPL-3.0-or-later OR commercial license",
+    "native_query_spdx": "Apache-2.0"
+  },
+  "schema": "world_reward.certified_solid_protocol.v1",
+  "scope": {
+    "adoption": false,
+    "gpu_used": false,
+    "gt_used": false,
+    "production_mesh_validated": false,
+    "reconstruction_accuracy_verified": false
+  }
+}

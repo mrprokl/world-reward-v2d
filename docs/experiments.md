@@ -8110,3 +8110,18 @@ Root94 forest/native-source/procedural-driver tinytests PASS0.15s, mocks not
 CGAL execution; own25-entry fixture root removed with internal aliases checked.
 EP24 initializer lock-only original0444f56 source dispatch in progress, ACK
 or model execution not yet presumed. This does not reclassify earlier jobs.
+
+EP24 actual initializer-only source0444f56 reaches automatic_masks and
+FAIL16:49:37UTC: generic actor affinity lacks clear winner margin. NoSAM2/later
+body/depth/object/pose stages, no prompt/affinitythreshold tune or reroll. Original
+209fileclosure independentlyPASS; EP21 original CPUassembly stillactive100/563
+depthframes, no inputreceipt. FreshEP25 originalmetadata preflight underway.
+GeneralCGALCPUqualification frozen before native execution: strict closed
+manifold/embedded/contact predicates then fullcontainment forest, exactvolume
+signs. Fifteen fresh procedural controls include multiplecavities/island, exact
+contact/crossing and invalidpositive nesting. Downloads publisherSHA-bound,
+originalparent unchanged, offline narrowUID1000 16GB4CPU compile600/control900
+within2400total. Root91focusedPASS0.20s; two ownfixture roots removed. Prelaunch
+review fixes classicbuilder env and077umask header traversal, no math change.
+Ownsource remainsApache; linkedCGAL runtime GPL3/commercial, notApache-only and
+noeligibility presumed. No runtime/model accuracy or production geometry yet.

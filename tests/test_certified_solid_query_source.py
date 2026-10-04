@@ -12,7 +12,8 @@ def section(first, last):
 
 def test_standalone_exact_native_headers_and_license_not_a_repair_backend():
     text = SOURCE.read_text()
-    assert "SPDX-License-Identifier: GPL-3.0-or-later" in text
+    assert "SPDX-License-Identifier: Apache-2.0" in text
+    assert "not an Apache-only runtime" in text and "GPL-3.0-or-later" in text
     for header in ("Exact_predicates_exact_constructions_kernel.h", "Surface_mesh.h",
                    "Polygon_mesh_processing/self_intersections.h",
                    "Polygon_mesh_processing/intersection.h", "Side_of_triangle_mesh.h"):

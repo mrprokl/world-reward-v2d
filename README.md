@@ -136,6 +136,9 @@ and the existing GPU scheduler; secrets never enter version control or logs.
 ## Submission and eligibility
 
 Own code is Apache-2.0; external source/models/data retain their separate terms.
+The experimental CGAL solid-query executable combines Apache glue with GPL-3.0-
+or-later PMP/Side (or commercial CGAL terms); its binary is **not Apache-only**.
+No submission eligibility or Apache rerelease exception is presumed for it.
 **Training overlap and source/checkpoint eligibility remain unverified** where
 [licenses](docs/licenses.md) says so. Never equate granted model access with licence
 clearance or claim leakage-free weights without evidence.

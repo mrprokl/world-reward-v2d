@@ -1,6 +1,8 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 // Standalone CGAL query: certify represented input, never repair or simplify.
 // The GPL CGAL combination is not an Apache-only runtime. No QEM is executed.
+// This independently written glue retains Apache terms; linked CGAL PMP/Side
+// requires GPL-3.0-or-later (or a separately obtained commercial licence).
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Surface_mesh.h>
 #include <CGAL/Polygon_mesh_processing/self_intersections.h>
