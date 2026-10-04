@@ -1,9 +1,14 @@
 # Mask-conditioned frame0 query quantiles — proposed operator control
 
-**Frozen design: 2026-10-05. Not implemented, executed or adopted.** This is a
+**Frozen design: 2026-10-05. Implemented; eight analytic controls PASS; not adopted.** This is a
 new sampling hypothesis, not a replay of the closed EP21 query-availability
 failure. No challenge records, future tracks, private labels, fitted camera,
 model calls or permission-dependent external dataset enter this control.
+
+The first frozen operator cohort ran in 0.014361s with independent scalar
+plane/barycentric checks. Source and fixture identities/results are recorded
+in `experiments.md`. This qualifies only automatic-mask *allocation* on supplied
+analytic inputs, not a learned mask, native MHR/contact fit or full-T tracker.
 
 ## Existing primary implementation and distinct hypothesis
 

@@ -6,6 +6,16 @@ interpretation of the official scorer, not any historical experiment gate.
 EP25 and all other closed failures remain FAIL; no episode reroll, changed
 threshold, mesh repair or production query is authorized by this document.
 
+The first standalone Phase2 build (`4ccefd3`) failed before compilation/QEM:
+the new source-inventory adapter imposed a 2MiB per-file cap on the inherited
+Boost `typeof/vector200.hpp` (2,328,744 bytes). An offline call of that same
+immutable header function reproduced the exact failure; the original 1,418-file
+libigl/Eigen inventory remained hash-identical. The correction uses the existing
+hash helper's 64MiB capacity for Boost only, preserving canonical regular
+single-link files, complete hashes, publisher pins and the libigl/Eigen cap.
+The original sealed FAIL is retained; a fresh build is required before the
+already-frozen two-positive/one-negative QEM cohort. No geometry gate changes.
+
 ## 1. Audited primary sources
 
 Official revision: `7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80`.

@@ -30,6 +30,9 @@ BUILD_RECEIPT = 'results/image-volume-qem.json'
 LIBIGL = '40e7900ccbd767f1f360e0eb10f0f1a6432e0993'
 EIGEN = '3147391d946bb4b6c68edd901f2add6ac1f31f8c'
 NATIVE_SECONDS, HOST_SECONDS = 600, 900
+# Inherited Boost vector200.hpp is 2,328,744B; use the existing identity
+# helper's 64MiB capacity rather than the narrower libigl/Eigen bound.
+BOOST_HEADER_MAXIMUM = 64 << 20
 FLAGS = ('-std=c++17', '-O2', '-frounding-math', '-fno-fast-math', '-ffp-contract=off',
          '-DEIGEN_DONT_PARALLELIZE', '-DEIGEN_MPL2_ONLY')
 WORK_FILES = {'surface_qslim', 'compile.log', 'native.json'}
@@ -114,7 +117,7 @@ def header_environment(config, original, build, left):
     for path in (boost, *sorted(boost.rglob('*'))):
         left(); require(path.resolve() == path and not path.is_symlink(), 'Canonical Boost source required')
         if path.is_dir(): continue
-        boost_inventory[path.relative_to(boost).as_posix()] = build.identity(path, maximum=2 << 20)['sha256']
+        boost_inventory[path.relative_to(boost).as_posix()] = build.identity(path, maximum=BOOST_HEADER_MAXIMUM)['sha256']
     return dict(libigl_revision=LIBIGL, eigen_revision=EIGEN, headers=len(inventory), header_inventory_sha256=digest,
                 boost_headers=len(boost_inventory), boost_inventory_sha256=hashlib.sha256(json.dumps(boost_inventory, sort_keys=True).encode()).hexdigest())
 
@@ -177,6 +180,7 @@ def native(code, revision, work, build):
         report.update(status='pass', phase='complete', headers_rehashed_after=True)
     except Exception as error:
         report['failure_type'] = type(error).__name__
+        report['failure_reason'] = str(error)[:1000]
         if (work/'compile.log').exists(): report['compile_failure_tail'] = (work/'compile.log').read_bytes()[-1000:].decode(errors='replace')
     finally:
         try:

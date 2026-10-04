@@ -135,6 +135,46 @@ def test_full_existing_headers_and_boost_inventory_not_arbitrary_new_sources(tmp
     with pytest.raises(ValueError): gate.header_environment({'boost_cpp_int_header_sha256': cpp_int['sha256']}, old, build, lambda: 500.)
 
 
+def test_inherited_large_boost_uses_full_hash_at_existing_64mib_capacity_only(tmp_path, monkeypatch):
+    base, boost = tmp_path/'base', tmp_path/'boost'; monkeypatch.setattr(gate, 'BASE', base)
+    actual_path = gate.Path
+    monkeypatch.setattr(gate, 'Path', lambda value: boost if value == '/usr/include/boost' else actual_path(value))
+    header = write(base/'source/libigl/include/igl/qslim.h', b'original tiny header')
+    inventory = {'libigl/include/igl/qslim.h': header['sha256']}
+    digest = hashlib.sha256(json.dumps(inventory, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+    authority = dict(status='pass', libigl_revision=gate.LIBIGL, eigen_revision=gate.EIGEN,
+        source_inventory_sha256=digest, pinned_primary_sha256=inventory)
+    authority_pin = write(base/'build.json', json.dumps(authority).encode())
+    cpp_int = write(boost/'multiprecision/cpp_int.hpp', b'original Boost')
+    large = boost/'typeof/vector200.hpp'; write(large, b'tiny stand-in, no real header downloaded')
+    original = build.identity; calls = []
+    def observed(path, **kwargs):
+        calls.append((path, kwargs))
+        if path == large:
+            assert kwargs['maximum'] == 64 << 20
+            # Exercise the real hashing implementation, not a replaced SHA.
+        return original(path, **kwargs)
+    monkeypatch.setattr(build, 'identity', observed)
+    old = dict(inherited_build_report_sha256=authority_pin['sha256'], source_inventory_sha256=digest)
+    result = gate.header_environment({'boost_cpp_int_header_sha256': cpp_int['sha256']}, old, build, lambda: 500.)
+    assert result['boost_headers'] == 2 and (large, {'maximum': 64 << 20}) in calls
+    assert all(k['maximum'] == 2 << 20 for p, k in calls if p.is_relative_to(base/'source'))
+    actual_stat = actual_path.lstat
+    def oversized(path):
+        if path == large:
+            s = actual_stat(path)
+            return SimpleNamespace(st_mode=s.st_mode, st_nlink=s.st_nlink, st_size=(64 << 20)+1)
+        return actual_stat(path)
+    monkeypatch.setattr(actual_path, 'lstat', oversized)
+    with pytest.raises(ValueError, match='type/mode/size'): original(large, maximum=gate.BOOST_HEADER_MAXIMUM)
+    monkeypatch.setattr(actual_path, 'lstat', actual_stat)
+    os.link(large, tmp_path/'foreign-link')
+    with pytest.raises(ValueError, match='type/mode/size'): original(large, maximum=gate.BOOST_HEADER_MAXIMUM)
+    (tmp_path/'foreign-link').unlink()
+    link = tmp_path/'symlink'; link.symlink_to(large)
+    with pytest.raises(ValueError, match='Canonical'): original(link, maximum=gate.BOOST_HEADER_MAXIMUM)
+
+
 def test_cleanup_requires_exact_cid_name_image_owner_and_daemon_errors_not_absence(tmp_path, monkeypatch):
     cid = tmp_path/'cid'; write(cid, b'c'*64)
     name, revision = 'wr-surface-qslim-build-'+('a'*40), 'a'*40
@@ -204,6 +244,26 @@ def test_declared_network_none_does_not_replace_actual_native_isolation(tmp_path
     monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '-1'); listdir = gate.os.listdir
     monkeypatch.setattr(gate.os, 'listdir', lambda path: ['lo', 'eth0'] if str(path) == '/sys/class/net' else listdir(path))
     with pytest.raises(ValueError, match='Actual native network'): gate.native(tmp_path, 'a'*40, work, build)
+
+
+def test_native_header_failure_retains_bounded_actual_reason_without_gate_or_compile_change(tmp_path, monkeypatch):
+    _, code, revision = source(tmp_path, monkeypatch); work = tmp_path/'work'; work.mkdir(mode=0o700)
+    monkeypatch.setattr(gate.sys, 'platform', 'linux'); monkeypatch.setattr(gate.os, 'getuid', lambda: 1000)
+    real_stat = Path.stat
+    monkeypatch.setattr(Path, 'stat', lambda self, *a, **k: SimpleNamespace(st_uid=1000, st_mode=0o40700) if self == work else real_stat(self, *a, **k))
+    listdir = gate.os.listdir
+    monkeypatch.setattr(gate.os, 'listdir', lambda path: ['lo'] if str(path) == '/sys/class/net' else listdir(path))
+    monkeypatch.setenv('WR_CPU_IMAGE_ID', gate.IMAGE); monkeypatch.setenv('WR_NATIVE_NETWORK', 'none')
+    monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '-1')
+    monkeypatch.setattr(gate, 'prerequisite', lambda *_: ({}, {}, {'receipt': 'same independent pin'}))
+    reason = 'Bounded artifact precondition differs: '+('x'*1200)
+    monkeypatch.setattr(gate, 'header_environment', lambda *_: (_ for _ in ()).throw(ValueError(reason)))
+    calls = []; monkeypatch.setattr(gate, 'compile_binary', lambda *_: calls.append('forbidden'))
+    assert gate.native(code, revision, work, build) == 1
+    report = json.loads((work/'native.json').read_bytes())
+    assert report['status'] == 'fail' and report['phase'] == 'headers' and report['failure_type'] == 'ValueError'
+    assert report['failure_reason'] == reason[:1000] and report['original_environment']['receipt'] == 'same independent pin'
+    assert 'headers' not in report and not calls and report['source_rehashed_after'] is True
 
 
 def test_owned_scratch_only_and_no_unknown_alias_cleanup(tmp_path):

@@ -9121,3 +9121,22 @@ frozen refined controls/poses byteexact, no native decode/optimizer replay.
 Originalexport schema passes, downstream consumer not reexecuted in this audit.
 Source/image/terminaljournal/own audit-containerabsence verified; newexportpins
 freeze this actualevidence. These are representation checks, not3D accuracy gains.
+
+Surface QSlim original4ccefd3 actual buildFAIL4.498814s/nativeheadersFAIL3.585705s,
+zero compile/QEM. Sealed host2543B26d6c3934461a600420ecb7c0516fe8ede065a29e637a1482f166cb34868f109
+and native2157B4cf9197b13b86e11c9552168944ed7798fb04c800ed3df32e867134fa427919c;
+own container/scratch removed, no binary. Offline same-original-function audit
+reproduced ValueError on Boost typeof/vector200.hpp2328744B, canonical/nlink1;
+all1418libiglEigen files match original inventory902a24a7e68592c9d56a679c71912853ce9874794073ea7d65b5d459fdde0a8b.
+Diagnostic2883Bb5721527987b691b13da05357904a1a61ada10a06ef3eda68706d223eb1cf650
+uses original immutable source/image and proves posthash/actualCIDabsence, no
+compile/geometry. First audit controller omitted Docker --interactive and read
+empty stdout; stopped without a numerical call, own CID-only scratch removed.
+Future adapter restores existing64MiB hash capacity for Boost only; source
+and all full hashes/pins unchanged, libiglEigen2MiB unchanged. Root74tinytests
+PASS0.50s; independent readonly cohort audit found no concrete false-PASS.
+Fresh build required; originalFAIL not relabeled, no backend/accuracy adoption.
+
+EP09 unchanged original official pack scheduled from b2eef8a/full415exportpins,
+216-source archivef08e7e1aa98882225587723f5f7a3c37c02a40bb172977f6461773625fed1b3b.
+Actual completion/independent packing audit still required; no final submission.
