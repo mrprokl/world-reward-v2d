@@ -34,6 +34,7 @@ inspect_owned() {
   return 0
  else
   rc=$?
+  while [[ "$value" == $'\n'* ]];do value="${value#$'\n'}";done
   if (( rc == 1 )) && [[ "$value" == "Error: No such object: $cid" \
    || "$value" == "error: no such object: $cid" \
    || "$value" == "Error: No such container: $cid" \

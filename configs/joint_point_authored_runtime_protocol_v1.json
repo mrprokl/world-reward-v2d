@@ -1,0 +1,61 @@
+{
+  "schema": "world_reward.joint_point_authored_runtime_protocol.v1",
+  "status": "prospective_not_implemented",
+  "scope": "one_fresh_authored_actual_MHR_runtime_pair_not_inference_or_accuracy",
+  "upstream_revision": "7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80",
+  "runtime_image_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "primary_source_base_url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_cari4d/lib/cari4d/",
+  "primary_sources": {
+    "learning/training/mhr_opt_refineout.py": {"bytes": 92824, "sha256": "84e0e818a3bc0935bb30b75fcd82fd7c5e3730ed812864594cd759697ddb406b"},
+    "lib_mhr/mhr_layer.py": {"bytes": 20514, "sha256": "a753ab8e730b6730fca275384fab629859311983292a407390d88c66ffe68c23"},
+    "lib_mhr/body_pose.py": {"bytes": 4231, "sha256": "6ee1e9ec8b692acf8857e827ed21201a4e8068e84a3cb95e986981e0a7949d23"},
+    "lib_mhr/schema.py": {"bytes": 3748, "sha256": "773b3ce7510daf74fcd27e924fb00da33c40e633d9629a0a7e969e2ede8e6cf9"},
+    "lib_mhr/rotations.py": {"bytes": 2591, "sha256": "50dc720c7ac8853fb179ffd4b064540954eadacee14f9ee71a4bc8206cc9b758"},
+    "lib_mhr/postopt_crop.py": {"bytes": 6108, "sha256": "ef425ec91e29814f565f8ebd3782aa8f80f276cfa1779f4489609c64eb1a4723"},
+    "lib_mhr/hand_surface_contact.py": {"bytes": 16511, "sha256": "f49b899a5262a2da16d43d7fdc93dc24e0453f7354e2e106359e86c7e61b6b06"},
+    "Utils.py": {"bytes": 31288, "sha256": "b5c9accd730ea8b3a3834ceca7221f7fc8a68af06dfe487e4ba6066bd69231c9"}
+  },
+  "body_head_source": {"url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam3d_body/lib/sam_3d_body/models/heads/mhr_head.py", "bytes": 14148, "sha256": "62af48b1f33462bc445d7f342009fcbceabd221f2a6e9bcd1d3739d582bc9fd6"},
+  "refinement_assets": {
+    "mhr_collision_proxy_4000v.npz": {"bytes": 126142, "sha256": "a026fe82599609ee82814b4c18eb0335fa70925740dea5e1c1e1c0930d5edcf7"},
+    "mhr_hand_surface_spec.npz": {"bytes": 47140, "sha256": "65e467ae534281c8c5370b76d672c80cf99b95bc73af9c3ac64d5bea6c7f60c8"}
+  },
+  "source_preflight": "authenticate_actual_image_full_installed_native_and_Body_source_models_acquisition_receipts_and_dispatch_closure_before_decode_no_current_historical_source_mix",
+  "model_prerequisites": {"checkpoint": "independent_existing_SAM3DBody_acquisition_pin_required_not_assumed", "compact_buffer": "explicit_absent_path_never_load_unverified_buffer", "native_model_sha256": "352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc", "model_config_and_LICENSE": "existing_independent_acquisition_pins_required"},
+  "cohort": {"controls": 1, "frames": 3, "frame_indices": [0, 1, 2], "frame_names": ["000000", "000001", "000002"], "image_size": [480, 640], "K": [[800, 0, 320], [0, 800, 240], [0, 0, 1]], "seed": 0, "challenge_or_previous_cohort_inputs": false},
+  "human": {
+    "root_rot6d_interleaved": [1, 0, 0, 1, 0, 0],
+    "body_controls": "primary_compact_model_params_to_cont_body_np_zeros133_to260_not_zeros260",
+    "hand_controls": "primary_compact_model_params_to_cont_hand_np_zeros27_to54_twice_left_then_right",
+    "shape45_scale28_face72": "zeros_float32_clip_constant_scale_is_loaded_PCA_mean_not_factor_zero",
+    "translation_camera_m": "[0.01*t+0.005*t*t,0,4] t=0,1,2 float32",
+    "decoder": "actual_MHRLayer.from_mhr_assets_then_mhr_forward_no_stored_vertex_backend_no_image_network",
+    "units_axes": "native_head_cm_div100_then_MHRLayer_flip_[1,-1,-1]_once_and_add_camera_translation"
+  },
+  "object": {
+    "vertices_float32_m": [[-0.04, -0.03, -0.03], [0.055, -0.026, -0.027], [-0.012, 0.065, -0.019], [0.011, 0.009, 0.067]],
+    "faces_int64_outward": [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]],
+    "rotation": "identity_all3",
+    "translation_camera_m": "mean_actual_frame0_decoded_vertices_at_verified_spec.vertex_indices[left_hand]_plus_[0,0,-0.045]_then_plus_[0.01*t+0.005*t*t,0,0]",
+    "hand_name_binding": "primary_MHR_HAND_ORDER[left_hand,right_hand]_and_source_bound_spec_no_ordinal_joint_guess",
+    "scale": 1,
+    "additional_alignment": "none_identity_storage_to_training_and_mesh_to_training"
+  },
+  "render": {"operator": "actual_Utils.nvdiff_color_depth_render_nvdiffrast_RasterizeCudaContext", "colors": "human_[0.7,0.6,0.5]_object_[0.2,0.8,0.3]_background_zero", "masks_depth_RGB": "separate_native_human_object_render_compose_nearest_positive_Z_ties_fail_no_pixel_fill", "postopt": "native_build_postopt_crop_and_stack_postopt_crops_unchanged_contract_cari4d.smplh_postopt_full_resolution_crop.v1", "mask_dtypes": "full_bool_postopt_float32_binary", "depth": "float32_camera_Z_m_zero_background_invalid_finite_positive_support"},
+  "bundle": {"schema": "cari4d.mhr_wild_inference.v1", "gt": {}, "pr": "all_seven_F32_MHR_blocks_plus_pose_abs_F32[3,4,4]_contact_logits_F32[3,2]", "contact_logits_authored": [[1, -1], [1, -1], [1, -1]], "observations": ["human_mask", "object_mask", "postopt_human_mask", "postopt_object_mask", "postopt_K_rois", "postopt_crop_contract"], "metadata": {
+    "object_mesh": "actual_owned_new_tetra_path_on_Azure",
+    "object_pose_frame": "centered_axis_aligned",
+    "object_pose_frame_revision": "cari4d.object_pose_frame.centered_axis_aligned.v1",
+    "object_pose_storage_frame": "output_aligned_mesh_frame",
+    "object_pose_storage_to_training_transform": "identity4x4",
+    "object_mesh_to_training_transform": "identity4x4",
+    "materialized_input_cache": null, "ground_truth_used": false, "manufactured_not_inferred": true
+  }, "validator": "existing_cari_full_refine.validate_source_bundle_count3_before_constructor"},
+  "point_attachment": {"selector": "canonical_mask_quantile_queries_frame0_32_mask_only_before_raycast_min8_no_refill", "geometry_pose": "actual_native_loaded_F32_mesh_and_A_constructor._object_state_frame0", "evidence": "full3_finite_XY256_query_projection_repeated_native_visible_all_false_no_tracker", "residual_scale_256_px": 1, "weight": 0, "reference": "runtime-only-authored-zero-weight-no-calibration"},
+  "optimizer": {"class": "actual_MHRParityPostOptimizer", "config": "native_defaults_only_explicit_asset_paths_report_every100_checkpoint_None", "num_steps": 300, "batch_size": 0, "freeze_object_rotation": true, "freeze_body_internal_translations": true, "probe_steps": [0, 181], "updates_per_arm": 301, "arms": ["A_original", "B_point_weight_zero"], "total_updates": 602, "reset_each_arm": "Python_NumPy_Torch_CUDA_seed0_TF32_false_deterministic_algorithms_false", "no_loss_or_scheduler_override": true},
+  "gates": ["preflight_all_exact_sources_assets_before_native", "real_decode_finite_positive_height_noncollapsed_surface", "all_original3_full_bundle_and_crop_contract", "positive_effective_left_contact_all3_no_authored_network_inference_claim", "quantile_min8_distinct_unambiguous_actual_native_mesh_hits", "actual_render_contact_and_step181_penetration_paths_finite_executed_not_stubbed", "exact_initial_state_optimizer_scheduler_loss_metrics_all_gradients_at_steps0_181", "exact_full_result_history_and_frozen_inputs_after_only_B_point_objective_metadata_removed", "301_updates_per_arm602total_fullT_no_drop", "source_input_model_result_rehash_and_owned_cleanup_before_success_seal"],
+  "retention_Azure_only": {"before_pair": "full_numeric_pr_observations_K_objectVF_pose_RGB_Z_validity_actual_decoded_vertices_joints_keypoints_faces_and_metadata_plus_source_bundle_full_hash_manifest", "after_pair": "both_full_native_result_bundles_all_four_probe_states_losses_metrics_gradients_history_and_final_source_manifest", "local": "code_protocol_tiny_scalar_receipts_only", "failure": "retain_owned_raw_control_and_phase_counts_bounded_error_no_accepted_partial_prediction_no_recursive_foreign_cleanup"},
+  "budgets_seconds": {"manufacture": 180, "pair": 1200, "inclusive": 1380, "outer": 1440, "owned_cleanup_grace": 30, "each_scope_includes": "load_prehash_compute_serialization_posthash_receipt_sealing_no_extension"},
+  "failure_policy": "stop_whole_one_control_no_rerender_reposition_change_scale_filter_refill_seed_sweep_tolerance_or_closed_cohort_replay",
+  "claims": {"implemented": false, "runtime_qualified": false, "learned_inference": false, "tracker_executed": false, "positive_weight": false, "calibrated": false, "reconstruction_accuracy_verified": false, "adoption": false, "submission": false, "model_training_overlap_verified": false, "competition_license_eligibility_verified": false}
+}
