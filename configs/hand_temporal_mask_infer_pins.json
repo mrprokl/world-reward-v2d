@@ -1,0 +1,8 @@
+{
+  "schema": "world_reward.hand_temporal_mask_infer_pins.v1",
+  "producer_revision": "b54db3916deaf7a978a0b894e220e97cc3c40f04",
+  "report": {
+    "bytes": 255642,
+    "sha256": "fd186f5ce848f3404273d72314085f68da5c1c9a88ad632064c19d9d48fc34f6"
+  }
+}

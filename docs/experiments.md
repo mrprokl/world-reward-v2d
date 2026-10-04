@@ -7793,3 +7793,15 @@ First independent cleanup assertion wrongly expected historical CID-file deletio
 actual documented helper retains readonly CID after verifying container removal.
 No producer rerun or code change: corrected audit verifies original CID, absence
 of that container and stable receipt. Whole freezePASS, before native masks.
+
+Dex05 native temporal masks actualPASS46.057545s inclusive (native39.368844s),
+full220frames/440 A+B artifacts underb54db39. Automatic firstusable anchors
+10/9/4, one originalhand slot each, six independent sequential video states and
+223 native directional outputs (three duplicate anchors validated, not emitted
+twice). Exact184-file source/archive, originalscan/acq/runtime/frontend/assets,
+full2T lossless evidence/support/fixedanchor provenance independently decoded
+on isolated offlineCPU; no private values/models in decoder. Sources/artifacts/
+ownedCID/no remaining GPU application rechecked. Host255642B
+SHAfd186f5ce848f3404273d72314085f68da5c1c9a88ad632064c19d9d48fc34f6;
+native193868B SHA1042cb098bdf333804bf5829aead64338c5c0e4c9753804eed38576ee44ec07c.
+Masks frozen before separate segmentation-only CPU evaluation; no qualityPASS.
