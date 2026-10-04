@@ -8499,3 +8499,24 @@ and fullhost==native/lifecycle/outputs verified. OriginalFAILreceipt unchanged.
 Canonical74704B SHA145116a7f3bf0cec11ef2711581c26c1aa3c1f1c6577310a4160c22df3cbd078;
 NPZ61801B SHAb117754d4c48a440ab379b29872f1c173dd61edae6eadb1b9fe5c0aff16497e0.
 Only geometry feasibility passed; inertloader/nativepose/HOI stillunverified.
+
+Actual EP09 tiny11-artifact/11-helper inventory frozen3705B
+SHA4a170dc5bdbac9abda0bb92b015a1164309292a4f18eeb7677f2438eb7fa4f03,
+every helper independently matches producer3952870 Git+Azure and currentbytes.
+InputRGB SHA4fe69ca521fc2717e2938339b0a37843ada391f4b074753584c7cd8c2e36a277,
+original groundedscalar2.006664752960205 bakedonce. Fullclosure/source/lifecycle
+rehash before/afterpins. Root193pose/loader/camera/candidates testsPASS0.69s;
+1151ownentries removed. ExplicitemptyUIDsame0755 solidoutputreservation added
+to existing tracker only; default/legacy branches and nativepose/Viterbitail
+ASTidentical, missingpins/resume prohibited. No learnedcomparison fromtests.
+
+EP21 actualfull563refinement4ef4bff PASS271.100399s,301updates;
+14628B SHA fba6cdd58f3bc8940a31c57377ec1c0a29499cdb95459faa8bc11da12545c355,
+430788512B bundleSHA88b25c2c2886afc95c1bfc1a8e04d5bbe29f70baaa5786603a9d361ee5313cd5.
+Actual198fullsource archiveecdca970f679b83474c8ad3cf5b11b49cde46edb2e8a49264060c044929c1065
+andreadonlyledger57af5cd51e7d590fcf358ffdebbf0576b723211fb82fe7ef4c8a75b2337b826e
+independently verified. Same oldreadonlyinventory validates andrehashes2payloads;
+tinyrefinedpins frozenafteractualcompletion, numericalexecutionnotaccuracy.
+EP25 originalpredictedsource readiness checked; same qualified whole-solid policy
+will run once underexactpublished3952870 snapshot, no reclassification of its
+closed historicaltopologyfailure and no gate/prompt/thresholdchanges.
