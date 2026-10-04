@@ -18,8 +18,8 @@ volume proposal pass; full tracking now passes668/668 in3605.685147s. One GPU jo
 per VM; scoped locks release before CPU preparation for disjoint overlap.
 
 EP5's original CPU input assembly passes all668frames; shared preparation now
-passes all668frames in21.814658s and native forward in134.227019s. Unchanged
-full native refinement is active under the GPU lock. EP6's default topology
+passes all668frames in21.814658s, native forward in134.227019s, and unchanged
+301update refinement in392.972054s. Directexport is next under the GPU lock. EP6's default topology
 reduction failed before any pose; an independently qualified volume proposal and authenticated
 empty-directory archive preserve that failure. The unchanged full816-frame
 volume tracker passes all816frames in4794.561042s; CPU CARI input assembly is

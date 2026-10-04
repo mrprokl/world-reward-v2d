@@ -6612,3 +6612,8 @@ Originalunitexit0 and independentwhole2output+producerstage audit PASS. Report
 15151B SHAeec7fabeb0912ca983c954837c3723052d9444f00943ef3690c1f72cc5cda697;
 refined511044384B SHA430caca2c286d77d3b8643143c44188c7f4170c2628c21972b258fbc6d4439d2.
 Nextdirectexport onlyafterfrozenpins; no acceleration/CD/CARI4D improvement claim.
+
+EP5 full native directexport dispatched3c22c1bce1cd8a32e5ca04c5c3de1c7c0997c001,
+driverac27278ff86d0cba77f9bc0224da5f0a54feea40d2fb75bd31005368ced711c4,
+600s/unchangedfull668frames, existingGPUlock.112files182816encodedB codeonly.
+Actualfinalexport/officialpack remain separate gates; no finalsubmission.
