@@ -1,0 +1,164 @@
+{
+  "schema": "world_reward.mesh_conditioned_qem_protocol.v1",
+  "phase": "new_conditioned_numeric_algorithm_and_fresh_geometry",
+  "historical_failures_immutable": true,
+  "source_authentication": {
+    "original_image_id": "sha256:c8fb1632a6908a82aeeeb73c36a00f17a26b81f95f4d2d498c53f75894e21137",
+    "original_volume_cpp_sha256": "7e3e55791cf66a89080c327a976cb0e04b5f0af511fef9322885b49d93b9e273",
+    "original_base_cpp_sha256": "964d89560cbbae6fa2dd8b76e480a6ab7dae3073e0fa419604707e4a0d9af081",
+    "original_build_receipt": {
+      "bytes": 3429,
+      "sha256": "8c5441162603260fb768dad688ed7d47ddf29a79de6de53fde603c84994c28ec"
+    },
+    "original_binary_sha256": "eb606febe824f8f0a308e1d78c7677b2ecddc6ffdd0cdfc8f9a3a04fcd8055e7",
+    "boost_cpp_int_header_sha256": "db4a453cde6e23385fc018e28a43d15763b66492cee924da3a8ddc42348302c2",
+    "derived_core_prefix": {
+      "bytes": 10547,
+      "sha256": "0b28aec594ddf1ece8a179ead4253148299504d2936ecebe7a8f05a309405c73"
+    },
+    "derived_prefix_policy": "separate_new_source_exact_prefix_no_original_edits",
+    "libigl_revision": "40e7900ccbd767f1f360e0eb10f0f1a6432e0993",
+    "eigen_revision": "3147391d946bb4b6c68edd901f2add6ac1f31f8c",
+    "trimesh_grouping_sha256": "b69118dd902372cd94d17338a1bf187643295e46b1957f34e5788b56c99ecb89",
+    "official_mesh_budget_helper_sha256": "42ab8ab35f37b806fb1465eadd96abe43eaac04575da47a4855d08eefe6167b0",
+    "position_weld_policy_sha256": "d2aade845efc779e13ba938cd86525c141b46702b8defa130a88670fb165d8d8",
+    "verify_sources_markers_receipts_headers_binaries_before_and_after": true,
+    "original_serialization_cpp_sha256": "103781b0d952a9dee94f6ae00be4b20fb08fc03039cab9d3256ba86d05156c5e",
+    "serialization_core_prefix_sha256": "6c6353e6374e43ad213899579f5717fd52fb81ed234ffbeab78c2f83d960df36"
+  },
+  "compile_seconds": 600,
+  "inclusive_total_seconds": 5400,
+  "cpu_count": 4,
+  "memory_gib": 16,
+  "receipt_publication_grace_seconds": 10,
+  "native_calls_maximum": 8,
+  "native_seconds_per_call": 600,
+  "chart": {
+    "origin": "bbox_min+(bbox_max-bbox_min)/2",
+    "scale": "smallest finite positive power of two >= maximum referenced bbox extent",
+    "fixed_once": true,
+    "source_roundtrip_required": "numeric exact F64, signed zero diagnosed separately",
+    "inverse": "origin+scale*x explicit non-FMA multiply then add",
+    "source_repair": false,
+    "physical_geometry_rescaled": false,
+    "policy_sha256": "d29c607c6245215e6f512bd36e25ef33c4992d9bd2603724e1c82c8b585ec01a"
+  },
+  "algorithm": {
+    "native_qslim_implementation_reused": true,
+    "native_cost_and_placement_unchanged": false,
+    "cost_normalization": true,
+    "new_numeric_algorithm": true,
+    "intersection_guard": "native floating point guard in canonical chart; independent physical embedding required",
+    "volume_relative_limit": 0.05,
+    "volume_frame": "physical original source with original core unmodified",
+    "serialization_frame": "physical inverse F64->F32->default8 exact keys, original scalar core unmodified",
+    "target_faces": 4096,
+    "target_vertices": 4096,
+    "output_birth_maps": "native full I/J unchanged",
+    "robust_solver_added": false
+  },
+  "controls": {
+    "shapes": [
+      "fresh_symmetric_superellipsoid",
+      "fresh_thick_offset_superellipsoid_cavity"
+    ],
+    "outer": {
+      "azimuth": 96,
+      "polar_intervals": 48,
+      "vertices": 4514,
+      "faces": 9024,
+      "axes": [
+        1.0,
+        0.875,
+        0.75
+      ],
+      "sign_power_exponent": 0.8,
+      "antipodal_pair_construction": true
+    },
+    "inner": {
+      "azimuth": 32,
+      "polar_intervals": 16,
+      "vertices": 482,
+      "faces": 960,
+      "scale": 0.4,
+      "offset": [
+        0.05,
+        0.0,
+        0.0
+      ],
+      "faces_inward": true
+    },
+    "similitudes": [
+      {
+        "scale_exponent": -14,
+        "translation_multipliers": [
+          4,
+          -2,
+          1
+        ],
+        "rotation": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      {
+        "scale_exponent": 2,
+        "translation_multipliers": [
+          4,
+          -2,
+          1
+        ],
+        "rotation": [
+          [
+            0,
+            -1,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      }
+    ],
+    "all_source_gates_before_any_native": true,
+    "paired_same_physical_input": true,
+    "original_failures_retained": true,
+    "new_failure_stops": true,
+    "technical_unavailable_stops": true,
+    "real_new_collapses_required": true,
+    "metric_bake_scale": 0.375,
+    "chamfer_diagonal_limit": 0.01,
+    "each_shell_and_net_volume_relative_limit": 0.05,
+    "threshold_tuning": false,
+    "closed_prior_phase2_replayed": false
+  },
+  "claims": {
+    "adoption": false,
+    "challenge_inputs_used": false,
+    "challenge_performance_verified": false,
+    "reconstruction_accuracy_verified": false,
+    "universal_unit_invariance": false,
+    "conditioning_geometry_qualification_only": true
+  },
+  "failure_policy": "stop_preserve_actual_partial_receipt_no_reroll_fixture_change_or_historical_relabel"
+}

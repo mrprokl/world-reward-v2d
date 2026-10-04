@@ -7909,3 +7909,18 @@ theninversephysicalcoords, dimensionalregularization and robustsolve. This is
 a newalgorithmcontract, not unchangednativecost orphysicalobjectrescale. Must
 freeze freshsimilitudecontrols andverifyinversegeometry, physicalshellvolumes,
 original-frameF32/default8weld/export/pack/.375bake; no percliptolerances.
+
+EP20 original fixed_all16 frontend CLOSED15:24:39UTC before object pose:
+full549 bodyPASS188.076655s/depth/allinitializers precede8topologybudget
+rejections (4globalboundary/nonmanifold,4componentorientation/Euler). No source
+repair/thresholdchange/replay. FreshEP21 scheduled against original ea26eda
+explicitterminalpredecessor/GPUlock; dispatch is not input or reconstructionPASS.
+
+Fixedchartnewalgorithm preregistered, not closedphase2replay: sourcebboxmidpoint/
+positivecovering2pow; strictallsourceF64roundtrip, originalphysicalvolume/F32weld
+guards beforecommit, sameinversepre/post/export/fullI/J. QSlimimplementation
+reusedcanonical butglobalcostsemanticsnew; no robustsolve added/physicalrescale.
+Fresh2signpowershapes×2similitudes,8pairedcalls600s within5400s, sourceall4gates
+beforeanynative, samephysicalCD1%/volumes5%/embedding/births/export/pack/.375.
+Separate optin sameoriginalCPUimage/operator; compiler/parity/controls first.
+Localtinycombined207PASS1.03s, Bashsyntax/diffPASS; no native/QEMqualityadoption.

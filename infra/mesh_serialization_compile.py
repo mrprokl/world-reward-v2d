@@ -1,4 +1,4 @@
-"""Offline phase1 compiler/predicate controls, not geometry qualification."""
+"""Offline source-bound compiler; explicit fresh geometry modes, never adoption."""
 import hashlib
 import json
 import math
@@ -20,6 +20,10 @@ REPLAY = 'configs/mesh_serialization_compiler_replay_v1.json'
 PHASE1_PINS = 'configs/mesh_serialization_compiler_phase1_pins.json'
 GEOMETRY_PROTOCOL = 'configs/mesh_serialization_geometry_protocol_v1.json'
 CPP = 'infra/mesh_serialization_qem.cpp'
+CONDITIONED_CPP = 'infra/mesh_conditioned_qem.cpp'
+CONDITIONED_PROTOCOL = 'configs/mesh_conditioned_qem_protocol_v1.json'
+CONDITIONED_HELPERS = (CONDITIONED_CPP, CONDITIONED_PROTOCOL,
+                       'infra/mesh_conditioned_geometry.py', 'src/world_reward/mesh_conditioning.py', PHASE1_PINS)
 HELPERS = (CPP, 'infra/mesh_serialization_compile.py', 'infra/run_volume_qem_build.sh',
            'infra/mesh_volume_qem.cpp', 'infra/mesh_guarded_qem.cpp',
            'src/world_reward/mesh_serialization.py', PROTOCOL)
@@ -76,7 +80,7 @@ def protocol(code):
     return value
 
 
-def source(code, revision, *, historical=False):
+def source(code, revision, *, historical=False, conditioned=False):
     require(re.fullmatch('[0-9a-f]{40}', revision) and code == ROOT / 'jobs' / revision / ENTRY / 'code'
             and code.resolve() == code and (historical or Path(__file__) == code / HELPERS[1]),
             'Exact dispatched source required')
@@ -87,12 +91,13 @@ def source(code, revision, *, historical=False):
         if path.is_dir():
             continue
         rows[str(path.relative_to(code))] = identity(path, empty=True)
-    require(set(HELPERS) <= set(rows), 'Complete adapter closure required')
+    helpers = HELPERS + CONDITIONED_HELPERS if conditioned else HELPERS
+    require(set(helpers) <= set(rows), 'Complete adapter closure required')
     markers = {n: identity(code.parent / n, 100) for n in ('revision', 'source-sha256')}
     require((code.parent / 'revision').read_bytes() == (revision + '\n').encode()
             and re.fullmatch(b'[0-9a-f]{64}\n', (code.parent / 'source-sha256').read_bytes()), 'Original markers required')
     return dict(producer_revision=revision, source_files=len(rows), markers=markers,
-                helpers={n: rows[n] for n in HELPERS},
+                helpers={n: rows[n] for n in helpers},
                 source_files_sha256=hashlib.sha256(json.dumps(rows, sort_keys=True).encode()).hexdigest())
 
 
@@ -186,6 +191,23 @@ def geometry_protocol(code):
     return config
 
 
+def conditioned_protocol(code):
+    value = strict((code / CONDITIONED_PROTOCOL).read_bytes())
+    require(value['schema'] == 'world_reward.mesh_conditioned_qem_protocol.v1'
+            and value['native_calls_maximum'] == 8 and value['native_seconds_per_call'] == 600
+            and value['compile_seconds'] == 600 and value['inclusive_total_seconds'] == 5400
+            and value['cpu_count'] == 4 and value['memory_gib'] == 16
+            and value['receipt_publication_grace_seconds'] == 10 and value['claims']['adoption'] is False,
+            'Exact fresh conditioned-algorithm controls required')
+    original_pins = protocol(code)['source_authentication']
+    pins = value['source_authentication']
+    require(all(pins.get(k) == v for k, v in original_pins.items())
+            and identity(code / CPP)['sha256'] == pins['original_serialization_cpp_sha256']
+            and re.fullmatch('[0-9a-f]{64}', pins['serialization_core_prefix_sha256']),
+            'Conditioning must retain authenticated original sources and policy')
+    return value
+
+
 def original(code, config):
     pins = config['source_authentication']
     def frozen(path):
@@ -225,7 +247,7 @@ def original(code, config):
                     boost_inventory, sort_keys=True, separators=(',', ':')).encode()).hexdigest())
 
 
-def compile_binary(code, scratch, config, remaining):
+def compile_binary(code, scratch, config, remaining, *, conditioned=False):
     pins = config['source_authentication']
     raw = (VOLUME / 'mesh_volume_qem.cpp').read_bytes()
     marker = b'\nint main(int argc, char** argv) {'
@@ -235,32 +257,58 @@ def compile_binary(code, scratch, config, remaining):
             'Authenticated exact original volume prefix differs')
     core = scratch / 'wr_volume_core.hpp'
     write(core, prefix)
+    serialization_core = None
+    if conditioned:
+        raw = (code / CPP).read_bytes()
+        marker = b'\nint main(int argc,char** argv) {'
+        require(raw.count(marker) == 1 and hashlib.sha256(raw).hexdigest()
+                == pins['original_serialization_cpp_sha256'], 'Exact original serialization source required')
+        prefix = raw[:raw.index(marker)]
+        require(hashlib.sha256(prefix).hexdigest() == pins['serialization_core_prefix_sha256'],
+                'Authenticated exact serialization prefix differs')
+        serialization_core = scratch / 'wr_serialization_core.hpp'
+        write(serialization_core, prefix)
     compiler = shutil.which('c++')
     require(compiler is not None, 'Existing compiler required, no install fallback')
     version = subprocess.check_output([compiler, '--version'], text=True, timeout=remaining())
-    binary = scratch / 'mesh_serialization_qem'
+    binary = scratch / ('mesh_conditioned_qem' if conditioned else 'mesh_serialization_qem')
     macros = {'WR_SOURCE_SHA256': pins['original_base_cpp_sha256'],
               'WR_BASE_SOURCE_SHA256': pins['original_base_cpp_sha256'],
               'WR_VOLUME_SOURCE_SHA256': pins['original_volume_cpp_sha256'],
               'WR_SERIALIZATION_SOURCE_SHA256': identity(code / CPP)['sha256'],
               'WR_VOLUME_CORE_PREFIX_SHA256': pins['derived_core_prefix']['sha256']}
+    if conditioned:
+        macros.update(WR_CONDITIONED_SOURCE_SHA256=identity(code / CONDITIONED_CPP)['sha256'],
+                      WR_SERIALIZATION_CORE_PREFIX_SHA256=pins['serialization_core_prefix_sha256'])
     command = [compiler, '-std=c++17', '-O2', '-fno-fast-math', '-ffp-contract=off',
                '-DEIGEN_DONT_PARALLELIZE', '-DEIGEN_MPL2_ONLY',
                *[f'-D{k}="{v}"' for k, v in macros.items()], '-I' + str(scratch),
                '-I' + str(BASE / 'source/libigl/include'), '-I' + str(BASE / 'source/eigen'),
-               str(code / CPP), '-o', str(binary)]
+               str(code / (CONDITIONED_CPP if conditioned else CPP)), '-o', str(binary)]
     start = time.monotonic()
     child = subprocess.run(command, capture_output=True, timeout=min(600, remaining()))
     require(child.returncode == 0, 'Compiler rejected new adapter: ' + child.stderr[-1200:].decode(errors='replace'))
     info = strict(subprocess.check_output([str(binary), '--build-info'], timeout=remaining()))
-    require(info['source_sha256'] == macros['WR_SERIALIZATION_SOURCE_SHA256']
+    require(info['source_sha256'] == macros['WR_CONDITIONED_SOURCE_SHA256' if conditioned
+                                          else 'WR_SERIALIZATION_SOURCE_SHA256']
             and info['volume_core_prefix_sha256'] == macros['WR_VOLUME_CORE_PREFIX_SHA256']
             and info['volume_source_sha256'] == pins['original_volume_cpp_sha256']
             and info['base_source_sha256'] == pins['original_base_cpp_sha256']
-            and info['native_cost_and_placement_unchanged'] is True
+            and info['native_cost_and_placement_unchanged'] is (not conditioned)
             and info['volume_relative_limit'] == .05 and info['adopted'] is False, 'Native compiled ABI differs')
-    return binary, dict(compiler=version, compile_command=command, binary=identity(binary, readonly=False),
-                        derived_core=identity(core), build_info=info, elapsed_seconds=time.monotonic()-start)
+    if conditioned:
+        require(info['serialization_source_sha256'] == macros['WR_SERIALIZATION_SOURCE_SHA256']
+                and info['serialization_core_prefix_sha256'] == pins['serialization_core_prefix_sha256']
+                and info['native_qslim_implementation_reused'] is True and info['new_numeric_algorithm'] is True
+                and info['cost_normalization'] is True and info['physical_geometry_rescaled'] is False
+                and info['block_intersections'] is True and info['target_faces'] == 4096
+                and info['libigl_revision'] == pins['libigl_revision']
+                and info['eigen_revision'] == pins['eigen_revision'], 'Conditioned native algorithm ABI differs')
+    report = dict(compiler=version, compile_command=command, binary=identity(binary, readonly=False),
+                  derived_core=identity(core), build_info=info, elapsed_seconds=time.monotonic()-start)
+    if conditioned:
+        report['derived_serialization_core'] = identity(serialization_core)
+    return binary, report
 
 
 def scalar_reference(vertices, faces):
@@ -406,11 +454,13 @@ def controls(binary, scratch, remaining):
                 identity_native_calls=1, committed_collapses=0, geometry_quality_validated=False)
 
 
-def native(code, revision, out, *, geometry_phase=False):
+def native(code, revision, out, *, geometry_phase=False, conditioned=False):
+    require(not (geometry_phase and conditioned), 'Conditioned and historical geometry modes are exclusive')
     require(sys.platform == 'linux' and os.geteuid() == 0
             and {p.name for p in Path('/sys/class/net').iterdir()} == {'lo'}, 'Offline restricted LinuxCPU required')
     sys.path[:0] = [str(code / 'infra'), str(code / 'src')]
-    before = source(code, revision); config = protocol(code); started = time.monotonic()
+    before = source(code, revision, conditioned=True) if conditioned else source(code, revision)
+    config = conditioned_protocol(code) if conditioned else protocol(code); started = time.monotonic()
     deadline = float(os.environ['WR_PHASE1_DEADLINE'])
     def remaining():
         value = deadline - time.monotonic()
@@ -420,25 +470,42 @@ def native(code, revision, out, *, geometry_phase=False):
                   source_binding=before, predicate_parity_only=True, simplification_validated=False,
                   geometry_quality_validated=False, production_mesh_used=False, challenge_performance_verified=False,
                   gpu_used=False, adoption=False)
+    if conditioned:
+        require(out == ROOT / 'results' / ('mesh-conditioned-qem-' + revision), 'Exact conditioned result path required')
+        report.update(stage='mesh_conditioned_qem_native_v1', predicate_parity_only=False,
+                      new_numeric_algorithm=True, physical_geometry_rescaled=False,
+                      conditioned_protocol_identity=identity(code / CONDITIONED_PROTOCOL))
     prior = None
     failure = None
     try:
         remaining(); prior = original(code, config); report['original_runtime'] = prior
-        if geometry_phase:
-            geometry_protocol(code)
+        if geometry_phase or conditioned:
+            if geometry_phase:
+                geometry_protocol(code)
             phase1 = strict((code / PHASE1_PINS).read_bytes())
             require(prior == phase1['original_runtime'] and identity(code / CPP) == phase1['source_cpp']
                     and identity(code / PROTOCOL) == phase1['protocol'], 'Qualified source/runtime changed before phase2')
         with tempfile.TemporaryDirectory(prefix='serialization-phase1-', dir='/tmp') as tmp:
             scratch = Path(tmp); report['phase'] = 'compile'
-            binary, build = compile_binary(code, scratch, config, remaining); report['build'] = build
+            binary, build = (compile_binary(code, scratch, config, remaining, conditioned=True) if conditioned
+                             else compile_binary(code, scratch, config, remaining)); report['build'] = build
             report['phase'] = 'scalar_parity'; report['parity'] = parity(binary, scratch, remaining)
             report['orientation_parity'] = orientation_parity(binary, remaining)
             report['phase'] = 'controls'; report['controls'] = controls(binary, scratch, remaining)
             require(identity(binary, readonly=False) == build['binary'], 'New compiler binary changed')
             require(report['parity']['policy_sha256'] == config['source_authentication']['position_weld_policy_sha256'],
                     'Audited serialization policy changed')
-            if geometry_phase:
+            if conditioned:
+                from mesh_conditioned_geometry import GeometryControlError, geometry_controls
+                report['phase'] = 'conditioned_geometry_controls'
+                helper = ROOT / 'vendor/v2d_submission_kit/v2dlb/mesh_budget.py'
+                try:
+                    report['geometry'] = geometry_controls(binary, scratch, remaining, official_helper=helper)
+                except GeometryControlError as exc:
+                    report['geometry'] = exc.report
+                    raise
+                require(identity(binary, readonly=False) == build['binary'], 'New binary changed during conditioned geometry')
+            elif geometry_phase:
                 from mesh_serialization_geometry import GeometryControlError, geometry_controls
                 report['phase'] = 'geometry_controls'
                 helper = ROOT / 'vendor/v2d_submission_kit/v2dlb/mesh_budget.py'
@@ -453,7 +520,8 @@ def native(code, revision, out, *, geometry_phase=False):
         failure = exc; report.update(error_type=type(exc).__name__, error=str(exc)[-1500:])
     finally:
         try:
-            require(source(code, revision) == before and (prior is None or original(code, config) == prior),
+            after = source(code, revision, conditioned=True) if conditioned else source(code, revision)
+            require(after == before and (prior is None or original(code, config) == prior),
                     'Original source/header/build/binary changed')
             remaining(); report['originals_rehashed_after'] = True
         except Exception as exc:
@@ -466,13 +534,17 @@ def native(code, revision, out, *, geometry_phase=False):
         raise RuntimeError('Phase1 gate failed; see tiny native receipt')
 
 
-def host(code, revision, *, geometry_phase=False):
-    started = time.monotonic(); budget = 5400 if geometry_phase else 900; deadline = started + budget
-    publication_deadline = deadline + (10 if geometry_phase else 0)
+def host(code, revision, *, geometry_phase=False, conditioned=False):
+    require(not (geometry_phase and conditioned), 'Conditioned and historical geometry modes are exclusive')
+    started = time.monotonic(); budget = 5400 if geometry_phase or conditioned else 900; deadline = started + budget
+    publication_deadline = deadline + (10 if geometry_phase or conditioned else 0)
     require(sys.platform == 'linux' and os.geteuid() == 0 and os.uname().nodename == 'scenesmith-ncc-h100-01',
             'Actual VM01 CPU build driver required')
-    before = source(code, revision); config = protocol(code); pins = config['source_authentication']
-    out = ROOT / 'results' / (('mesh-serialization-geometry-' if geometry_phase else 'mesh-serialization-compiler-') + revision)
+    before = source(code, revision, conditioned=True) if conditioned else source(code, revision)
+    config = conditioned_protocol(code) if conditioned else protocol(code); pins = config['source_authentication']
+    prefix = 'mesh-conditioned-qem-' if conditioned else ('mesh-serialization-geometry-' if geometry_phase
+                                                        else 'mesh-serialization-compiler-')
+    out = ROOT / 'results' / (prefix + revision)
     require(out.parent.is_dir() and not out.exists() and not out.is_symlink(), 'Fresh result namespace required')
     out.mkdir(mode=0o700); out.chmod(0o700)
     image = pins['original_image_id']; name = 'world-reward-serialization-' + revision[:12]
@@ -485,7 +557,11 @@ def host(code, revision, *, geometry_phase=False):
                   predicate_parity_only=True, simplification_validated=False, geometry_quality_validated=False,
                   production_mesh_used=False, challenge_performance_verified=False, adoption=False,
                   gpu_used=False, total_budget_seconds=budget, compile_budget_seconds=600,
-                  receipt_publication_grace_seconds=10 if geometry_phase else 0)
+                  receipt_publication_grace_seconds=10 if geometry_phase or conditioned else 0)
+    if conditioned:
+        report.update(stage='mesh_conditioned_qem_host_v1', predicate_parity_only=False,
+                      new_numeric_algorithm=True, physical_geometry_rescaled=False,
+                      conditioned_protocol_identity=identity(code / CONDITIONED_PROTOCOL))
     failure = None; launched = False
     host_build = ROOT / 'results/image-volume-qem.json'; prior_build = identity(host_build, readonly=False)
     cidfile = out / '.container.cid'
@@ -493,7 +569,9 @@ def host(code, revision, *, geometry_phase=False):
         raise TimeoutError('Compiler phase1 interrupted; owned cleanup only')
     handlers = {s: signal.signal(s, interrupted) for s in (signal.SIGTERM, signal.SIGINT)}
     try:
-        if geometry_phase:
+        if conditioned:
+            report['phase1_qualification'] = phase1_qualification(code)
+        elif geometry_phase:
             report['phase1_qualification'] = phase1_qualification(code)
             geometry_protocol(code); report['geometry_protocol_identity'] = identity(code / GEOMETRY_PROTOCOL)
         else:
@@ -504,6 +582,8 @@ def host(code, revision, *, geometry_phase=False):
         require(not control(['ps', '-aq', '--filter', 'name=^/'+name+'$']).strip(), 'Compiler namespace occupied')
         helper = ROOT / 'vendor/v2d_submission_kit/v2dlb/mesh_budget.py'
         extra_mounts = ['--mount', f'type=bind,src={helper},dst={helper},readonly'] if geometry_phase else []
+        if conditioned:
+            extra_mounts = ['--mount', f'type=bind,src={helper},dst={helper},readonly']
         command = ['docker', 'run', '--rm', '--name', name, '--cidfile', str(cidfile),
                    '--label', 'world_reward.serialization.owner='+revision, '--network', 'none', '--read-only',
                    '--user', '0:0', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges',
@@ -517,7 +597,8 @@ def host(code, revision, *, geometry_phase=False):
                    'PATH=/opt/conda/bin:/usr/local/bin:/usr/bin:/bin', 'HOME=/tmp', 'PYTHONDONTWRITEBYTECODE=1',
                    'OMP_NUM_THREADS=1', 'OPENBLAS_NUM_THREADS=1', 'MKL_NUM_THREADS=1', 'CUDA_VISIBLE_DEVICES=-1',
                    'WR_PHASE1_DEADLINE='+str(deadline), '/opt/conda/bin/python', '-I', '-B', str(code / HELPERS[1]),
-                   '--native-geometry' if geometry_phase else '--native', str(code), revision, str(out)]
+                   '--native-conditioned' if conditioned else ('--native-geometry' if geometry_phase else '--native'),
+                   str(code), revision, str(out)]
         launched = True
         with (out / '.native.log').open('xb') as stream:
             os.fchmod(stream.fileno(), 0o400)
@@ -538,6 +619,21 @@ def host(code, revision, *, geometry_phase=False):
                 and all(native_report[k] is False for k in ('simplification_validated', 'geometry_quality_validated',
                     'production_mesh_used', 'challenge_performance_verified', 'gpu_used', 'adoption')),
                 'Complete native phase1 receipt required')
+        if conditioned:
+            result = native_report['geometry']
+            require(native_report['stage'] == 'mesh_conditioned_qem_native_v1'
+                    and native_report['predicate_parity_only'] is False and native_report['new_numeric_algorithm'] is True
+                    and native_report['physical_geometry_rescaled'] is False
+                    and native_report['conditioned_protocol_identity'] == report['conditioned_protocol_identity']
+                    and result['stage'] == 'mesh_conditioned_geometry_controls_v1' and result['status'] == 'pass'
+                    and result['sources_rehashed_after'] is True and result['owned_scratch_removed'] is True
+                    and result['adoption'] is False and result['maximum_native_calls'] == 8
+                    and result['native_budget_seconds'] == 600 and len(result['paired_fixtures']) == 4
+                    and all(len(f['comparisons']) == 2 and [r['method'] for r in f['comparisons']]
+                            == ['original', 'conditioned'] and f['comparisons'][1]['status'] == 'pass'
+                            and f['comparisons'][1]['committed_collapses'] > 0 for f in result['paired_fixtures']),
+                    'Complete fresh conditioned geometry evidence required')
+            report['geometry_qualification_status'] = result['status']
         if geometry_phase:
             result = native_report['geometry']
             require(result['status'] in ('pass', 'inconclusive') and result['sources_rehashed_after'] is True
@@ -564,10 +660,11 @@ def host(code, revision, *, geometry_phase=False):
                     control(['rm', '-f', cid])
                 require(not control(['ps', '-aq', '--filter', 'id='+cid]).strip(), 'Owned container survives')
                 cidfile.unlink()
-            require(source(code, revision) == before and identity(host_build, readonly=False) == prior_build
+            after = source(code, revision, conditioned=True) if conditioned else source(code, revision)
+            require(after == before and identity(host_build, readonly=False) == prior_build
                     and control(['image', 'inspect', image, '--format', '{{.Id}}']).decode().strip() == image,
                     'Original source/build/image changed')
-            if geometry_phase:
+            if conditioned or geometry_phase:
                 require(phase1_qualification(code) == report['phase1_qualification'], 'Original phase1 proof changed')
             else:
                 require(technical_replay(code) == report['authorized_technical_replay'], 'Original failure replay proof changed')
@@ -584,15 +681,19 @@ def host(code, revision, *, geometry_phase=False):
         for s, handler in handlers.items():
             signal.signal(s, handler)
     require(failure is None, 'Compiler phase1 failed; inspect original tiny receipts')
-    print(json.dumps(dict(stage=report['stage'], status=report['status'], predicate_parity_only=True,
+    print(json.dumps(dict(stage=report['stage'], status=report['status'], predicate_parity_only=report['predicate_parity_only'],
                          adoption=False, elapsed_seconds=report['elapsed_seconds'])))
 
 
 def main(argv=None):
     args = sys.argv[1:] if argv is None else argv
-    if args and args[0] in ('--native', '--native-geometry'):
+    if args and args[0] in ('--native', '--native-geometry', '--native-conditioned'):
         require(len(args) == 4, 'Exact internal native arguments required')
+        if args[0] == '--native-conditioned':
+            return native(Path(args[1]), args[2], Path(args[3]), conditioned=True)
         return native(Path(args[1]), args[2], Path(args[3]), geometry_phase=args[0] == '--native-geometry')
+    if args == ['--conditioned']:
+        return host(Path(os.environ['WR_CODE']), os.environ['WR_CODE_REVISION'], conditioned=True)
     if args == ['--geometry']:
         return host(Path(os.environ['WR_CODE']), os.environ['WR_CODE_REVISION'], geometry_phase=True)
     require(not args, 'No arbitrary compiler arguments')
@@ -603,5 +704,7 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as exc:
-        print(json.dumps(dict(stage='mesh_serialization_compiler_phase1_v1', status='fail', error_type=type(exc).__name__)))
+        stage = ('mesh_conditioned_qem_host_v1' if any(a in ('--conditioned', '--native-conditioned')
+                                                    for a in sys.argv[1:]) else 'mesh_serialization_compiler_phase1_v1')
+        print(json.dumps(dict(stage=stage, status='fail', error_type=type(exc).__name__)))
         sys.exit(1)

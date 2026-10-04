@@ -22,13 +22,16 @@ inferred automatically; no hand-labeling of challenge records.
   and native forward plus301-update refinement, export and official packing pass with independent source-chain pins.
   EP16/EP17 close on topology-budget failure; EP18 rejects a boundary/nonmanifold
   source before object pose. EP19 closes on the same topology-budget gate;
-  no mesh repair. Collected-predecessor scheduling failures
+  EP20 also rejects all eight topology-budget candidates; no mesh repair.
+  Collected-predecessor scheduling failures
   remain separate. Original controls/reference replay and whole source-chain pins are
   frozen before each next stage; no prediction is inferred from dispatch ACKs.
 - **Geometry compiler:** exact F32/weld predicate controls pass, but the frozen
   real-collapse comparison **fails** on the thin cavity: both original and new
   native queues exhaust before the budget. Capsule control not executed; no
-  rescaling, fixture reroll, production repair or adoption.
+  rescaling, fixture reroll, production repair or adoption. A separate
+  [fixed-chart numerical hypothesis](docs/mesh_conditioned_qem_protocol.md)
+  is preregistered on four fresh procedural controls, not yet qualified.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
   development scenes/objects and33–38cm absolute errors prevent a generalization
   claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.
