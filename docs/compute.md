@@ -34,7 +34,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 18 | 535 | Original source boundary/nonmanifold rejection before object pose; closed, no repair. |
 | 19 | 443 | Original topology-budget FAIL before object pose; all eight fixed whole/component candidates rejected, no repair. |
 | 20 | 549 | Original topology-budget FAIL before object pose at15:24:39UTC; all eight fixed whole/component candidates rejected after full body/depth/initializers. Closed without repair. |
-| 21 | — | Unchanged original frontend dispatch acknowledged under ea26eda, explicit terminal predecessor/GPU lock; no input or prediction PASS presumed. |
+| 21 | 563 | Original full body PASS193.100529s at15:40:28UTC; CPU depth running, no complete inputs or prediction PASS presumed. |
 
 Eleven complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or

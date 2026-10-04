@@ -7954,3 +7954,8 @@ intercap@tue.mpg.de; commercialprimary ps-licensing@tue.mpg.de differsfrom
 license ps-license@tue.mpg.de, clarifyratherthanassume. Noregistration/email/
 assets orprivateannotations fetched. Organizer sourceexception question remains
 unsent; code/weightgrant alone notOSI/sourceclearance.
+
+EP21 originalea26eda full563bodyPASS193.100529s at15:40:28UTC, fullCPUdepth
+underway. Objectgrounded264756facesPASS35.024452s earlier. Nofullinputs/pose/
+CARIexecution/adoption presumed. Currentrepo7084ec3publicpushed, noactive
+RunCommand/localtests/foreigncleanup; originalGPUfrontend independentongoing.
