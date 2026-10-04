@@ -35,11 +35,13 @@ No final Parquet, submission or verified CARI4D improvement yet.
   gated volume-constrained proposal retains its three shells, including two
   cavities; full tracking now passes on all 668 frames (3,605.69 s). Its CPU
   CARI input assembly passes on all668 original frames; native shared preparation
-  is queued behind the next episode's volume-based full tracker. The634-frame
+  now passes on all668frames (21.81 s). The next full816-frame volume tracker
+  also passes (4,794.56 s); its CPU CARI input assembly is active. The634-frame
   episode has complete initializers. Its first private Azure full-pose run
   stopped before poses on the unchanged topology gate. A separately qualified
   volume proposal and its full634-frame input archive now pass provenance and
-  fidelity checks; an isolated volume-based tracking run is next. The original
+  fidelity checks; an isolated volume-based full tracking run is active on VM02.
+  The original
   default-backend failure remains closed.
   No frames, components or
   trajectories were dropped to rescue either episode.
@@ -74,8 +76,10 @@ image compiles offline and its thin Python import gate passes. The independent
 SAM2 CUDA connectivity/hole-filling operator gate also passes, without models
 or historical image-parity/eligibility claims. The new four-frame frontend pilot
 passes; complete replica and reconstruction accuracy remain unverified.
-The full `a06b703` lightweight source/test suite passed **10,944 tests,
-3 optional skips** in 399.72 s. The synchronous GPU-lock queue retains unchanged
+The full `b7b24a8` lightweight source/test suite passed **11,802 tests,
+5 optional skips** in 419.62 s. Later runtime-reference changes pass176 focused tests;
+current full-suite recheck is running. The synchronous GPU-lock queue retains
+unchanged
 native stages. Opaque RoboTAP/BootsTAPIR acquisition, independent native CPU
 verification and full2D prediction/evaluation now pass on Azure: three videos
 have meanAJ0.6679 versus0.1778 for a static negative control. Initial queries are
@@ -84,7 +88,12 @@ is unverified; this is not an automatic3D or CARI4D comparison. The dependency
 build's incorrect `einshape.torch` probe failure remains preserved. A separate
 contiguous YCBV relative-motion pilot is preregistered, with automatic canonical
 queries, one shared native candidate pool and private CPU-only evaluation
-operators; no real-data3D comparison has run. See [protocol](docs/point_pose_protocol.md).
+operators; no real-data3D comparison has run. Its sole technical acquisition
+continuation failed archive inventory after1,701.10 s, before image selection or
+private-label reading. All disposable archives were removed; zero public/private
+inputs remain. No third acquisition is authorized; a bounded metadata-only
+archive-header diagnosis must identify the technical cause first.
+See [protocol](docs/point_pose_protocol.md).
 None of these engineering gates is a reconstruction-quality result.
 Earlier extraction-fixture failures were corrected using authenticated historical
 Git bytes; the historical producer and production pins remain unchanged.

@@ -1,0 +1,23 @@
+{
+  "schema": "world_reward.ycbv_acquisition_closed_failure.v1",
+  "producer_revision": "facbf00a4ab01091629301d936c1ea38018bc0e5",
+  "script_sha256": "93c1f716548da6df93de8e8a9f597c6b2b13966f0c984c1292fd5b08c993ffce",
+  "report": {
+    "path": "validation/ycbv_point_pose_v1/report.json",
+    "bytes": 2280,
+    "sha256": "5eea9045ae8038dd2eb6e20463900f7c2bf45dd5bd65014f10280b9eeecd177e"
+  },
+  "status": "fail",
+  "phase": "inventory",
+  "error_type": "ValueError",
+  "elapsed_seconds": 1701.1018400439934,
+  "source_rehashed_after": true,
+  "disposable_archives_removed": true,
+  "cleanup_completed": true,
+  "RGB_inputs_retained": 0,
+  "private_files_retained": 0,
+  "private_annotation_values_decoded": false,
+  "base_archive_layout_independently_verified": true,
+  "full_test_inventory_failure_cause_verified": false,
+  "further_acquisition_authorized": false
+}

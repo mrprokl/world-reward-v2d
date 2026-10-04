@@ -103,7 +103,8 @@ uses only one float64 ULP on error ratios to avoid threshold cancellation.
 Truth points/poses are not output, and no private evaluation has run.
 
 The original download-only acquisition failed its900s deadline; one explicitly
-bounded technical continuation is running. No native comparison has run.
+bounded technical continuation failed inventory before selection/annotation values.
+The failure is technical, not a reconstruction-quality rejection. No native comparison has run.
 Even future PASS would demonstrate
 limited external rigid camera-motion gain, not articulated hand-object contact,
 unseen benchmark generalization, full-HOI accuracy or victory over CARI4D.
@@ -122,7 +123,14 @@ primitives avoid carrying unrelated challenge controllers into acquisition.
 Root134focused acquisition/transition/BOP/private-motion tests PASS2.31s plus
 one Linux-only skip; scientific function AST and all non-time protocol fields
 match the original frozen producer. Actual original FAIL archive and its source/report pins independently pass;
-the one3600s CPU acquisition is active. No third attempt is authorized.
+the one3600s CPU acquisition fails inventory in1701.101840s. Its sealed2280B
+report SHA5eea9045ae8038dd2eb6e20463900f7c2bf45dd5bd65014f10280b9eeecd177e
+is independently source-bound; all downloads/retained inputs are removed, and
+no annotation values or predictions were read. The tiny public base ZIP matches
+its exact layout; full-test header failure remains unproved. No third attempt is
+authorized. A bounded EOCD/central-directory-only diagnostic may inspect public
+filenames/attributes, never member payloads; partial Range identity is not a
+whole-archive SHA proof and cannot fabricate acquisition PASS.
 
 
 The external Objects/track implementation retains **raw native triangles**, not

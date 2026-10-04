@@ -6458,3 +6458,28 @@ No checkpoint load/GPU/GT; rights/overlap remain unresolved. The59KB runtime
 manifest staysAzure; only measured references are stored locally.
 Fullsuitecollectedb7b24a8 **11802PASS5SKIP419.62s**; later final-output correction
 150focusedPASS1.31s. No scientific or challenge victory follows from these tests.
+
+2026-10-04 ~03:27UTC actual native progression: EP6 unchanged volume tracker
+**PASS816/816,4794.561042s** producer e655eed74e55b479e52c104914a4da4fc01d63f6;
+full original coverage/clip-constant geometry, greedy silhouette median0.55605
+is a video proxy only. CPU CARI input assembly is active, no receipt yet.
+EP5 shared prepare **PASS668/668,21.814658s**, producer
+4d8f607923c5abce114bc90150e41ccba3564fe7, actual child/unit exits0;
+queue source postcheck completes and GPU lock is released. Independent stage
+inventory/pins must precede forward; no model/challenge accuracy inferred.
+
+Sole YCBV technical acquisition continuation facbf00a4ab01091629301d936c1ea38018bc0e5
+**FAIL1701.101840s,phase inventory,ValueError**, sealed2280B report SHA
+5eea9045ae8038dd2eb6e20463900f7c2bf45dd5bd65014f10280b9eeecd177e;
+actual driver SHA93c1f716548da6df93de8e8a9f597c6b2b13966f0c984c1292fd5b08c993ffce.
+Independent historical-source rehash, disposable deletion and cleanup pass;
+zero public RGB/private files, no selection/private annotation interpretation,
+no model/3D quality run. Both complete source transfers passed before inventory;
+this is not a scientific rejection. Readonly tiny public base ZIP15805B matches
+its four original member names and SHA, ruling out that layout guess. Full-test
+cause remains unproved; filename/header-only diagnosis is next, never another
+15GB acquisition, member payload/GT inspection or unchanged blind retry.
+Frozen original and second FAIL receipts remain separate and no third attempt
+is authorized. Objects/point-track/private-evaluator code readiness does not
+create missing real-data evidence. New tiny runtime refs176focused PASS1.16s;
+current fullsuite runs separately from Azure GPU work.

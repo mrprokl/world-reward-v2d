@@ -17,11 +17,13 @@ PASS. Episode5 full668 initializers and a separately gated three-shell/cavity
 volume proposal pass; full tracking now passes668/668 in3605.685147s. One GPU job
 per VM; scoped locks release before CPU preparation for disjoint overlap.
 
-EP5's original CPU input assembly passes all668frames; shared preparation is
-queued under the original GPU lock. EP6's default topology reduction failed
+EP5's original CPU input assembly passes all668frames; shared preparation now
+passes all668frames in21.814658s; the GPU lock is released. EP6's default topology
+reduction failed
 before any pose; an independently qualified volume proposal and authenticated
 empty-directory archive preserve that failure. The unchanged full816-frame
-volume tracker is active, most recently500frames complete. EP7's empty fixed
+volume tracker passes all816frames in4794.561042s; CPU CARI input assembly is
+active. EP7's empty fixed
 anchor is closed without reroll; EP8's complete634-frame initializers and minimal
 private archive pass. Its first private transfer stopped on the existing NSG
 deny before any bytes; a temporary exact private-pair TCP2222 rule fixed that
@@ -40,8 +42,11 @@ receipt-access FAILs remain preserved; oracle initial queries, a static negative
 control and unknown training overlap preclude a3D/generalization/CARI4D claim.
 Full-contiguous YCBV CPU acquisition fails its900s download deadline, with
 complete disposable cleanup and no ZIP/private-label interpretation. The authenticated first FAIL
-is atomically archived; the single technical3600s continuation is CPU-active,
-with exactly the same dataset/cohort/scientific gates;
+is atomically archived; the single technical3600s continuation now fails
+archive inventory in1701.101840s with original source/cleanup PASS and zero
+retained public/private inputs. Cause is not yet proved; the independently
+verified tiny base ZIP layout matches exactly. No third acquisition is authorized;
+only a bounded public header-only diagnostic is next;
 automatic3D point-pose validation has not run. Its three-anchor depth and
 automatic-mask preflights and identical-pool comparison are separately gated.
 
