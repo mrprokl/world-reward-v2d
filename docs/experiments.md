@@ -6796,3 +6796,27 @@ SHAb1d97f0eb46232b8465302a3147c6763cef4aa218b71304f0f5b4fbf3e49db5b.
 Tinysharedpreparepins frozenbeforeforward; allnativeoriginalindices/shared
 identity/fullobject retained. EP8 originalCPUassembly active100/634at05:24;
 noquality/eligibility/CARI4D-victory claim.
+
+Scheduling-only EP8 CPU budget audit: directoriginalrun_cari_prepare wrapper
+was dispatched without its usual outer7200s timeout; RuntimeMaxUSec infinity.
+An explicit runtimeproperty attempt was rejectedby systemd (no producer/source
+or numeric changes). Original unit stillactive; do not callboundedexecutionPASS.
+Restore the original7200s outerbudget with exactunit/container-bound control,
+never duplicateCPUjob or reinterpret a late report as timingPASS.
+
+EP8 exactunit/PID1185091/CPUcontainer82e0691 source/command/starttimestamp
+authenticated; original7200s outerdeadline2026-10-04T07:12:53UTC restored
+with ownedtimer + frozenroot400guard, no newCPU/GPUinference/sourcechanges.
+Guard may stopONLYsameboundactiveunit/container atoriginaldeadline; unknown
+state failsclosed. Removeonlyownertimerafterverifiedtimelycompletion; current
+CPUtrajectory assembly stillactive200/634, no boundedPASS yet.
+EP6 unchangedfull9windowforward actualPASS816/816147.764178s,932dc20
+producer/report76676B SHA0d5bd1a5a7551b042eb05bbfea4bde107ce175af174f99d0ccebc3d776d8d998.
+Independent originalsource/twooutput inventory next; no quality/CARI4Dclaim.
+
+Rootindependentfull816forwardtwooutputinventory repeatedPASS/sourcebyte
+binding exact;624,107,260B frozenrawbundle
+SHAff7948bf65467a401edeebd17c3281d3ba0aa84c96f0306fb2fdf7e19fc18500.
+All9nativewindows originalfirstoccurrence indices/clipconstantidentity preserved.
+Tinyforwardpins precede unchanged300requested/301effective fullnative refinement.
+No newalignment, partialtrajectory or qualityclaim.
