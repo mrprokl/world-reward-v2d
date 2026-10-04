@@ -6402,3 +6402,7 @@ allowlisted file. Full634-frame coverage and volume provenance unchanged.
 New isolated private transport is next; old default receive/native FAIL remains
 unmodified. No pose/accuracy PASS inferred. Single YCBV technical acquisition
 facbf00 remains CPU-active; no third acquisition or duplicate GPU launched.
+
+Local full-suite verification collected at5668eace: **11677PASS5SKIP415.26s**.
+Later runtime-inventory/safe-image changes:194focused PASS1.35s, shell syntax
+PASS. These tiny CPU fixtures establish code contracts only, not model accuracy.

@@ -36,8 +36,11 @@ No final Parquet, submission or verified CARI4D improvement yet.
   cavities; full tracking now passes on all 668 frames (3,605.69 s). Its CPU
   CARI input assembly passes on all668 original frames; native shared preparation
   is queued behind the next episode's volume-based full tracker. The634-frame
-  episode has complete initializers and a sealed minimal pose-input archive;
-  private Azure transfer/native pose execution remain pending.
+  episode has complete initializers. Its first private Azure full-pose run
+  stopped before poses on the unchanged topology gate. A separately qualified
+  volume proposal and its full634-frame input archive now pass provenance and
+  fidelity checks; an isolated volume-based tracking run is next. The original
+  default-backend failure remains closed.
   No frames, components or
   trajectories were dropped to rescue either episode.
 - **Depth research:** D106 anchors DA3 to MoGe with one scene-constant median

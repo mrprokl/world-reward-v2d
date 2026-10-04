@@ -102,7 +102,9 @@ The three-distinct-sequence gate rejects zero-baseline unidentified gains and
 uses only one float64 ULP on error ratios to avoid threshold cancellation.
 Truth points/poses are not output, and no private evaluation has run.
 
-No acquisition/native comparison has run. Even future PASS would demonstrate
+The original download-only acquisition failed its900s deadline; one explicitly
+bounded technical continuation is running. No native comparison has run.
+Even future PASS would demonstrate
 limited external rigid camera-motion gain, not articulated hand-object contact,
 unseen benchmark generalization, full-HOI accuracy or victory over CARI4D.
 
@@ -119,7 +121,8 @@ budget change or a validation-selected method. Compact generic stdlib atomic
 primitives avoid carrying unrelated challenge controllers into acquisition.
 Root134focused acquisition/transition/BOP/private-motion tests PASS2.31s plus
 one Linux-only skip; scientific function AST and all non-time protocol fields
-match the original frozen producer. Actual archive/continuation pending.
+match the original frozen producer. Actual original FAIL archive and its source/report pins independently pass;
+the one3600s CPU acquisition is active. No third attempt is authorized.
 
 
 The external Objects/track implementation retains **raw native triangles**, not
@@ -143,3 +146,10 @@ CPU report explicitly requires a separately verified host-wrapper postreceipt;
 a container PASS alone cannot authorize a scientific decision. No real private
 labels or held-out3D quality has been evaluated. Root192combined Objects/track/
 evaluator/BOP/private-motion tests PASS0.91s; later full-suite check follows.
+
+Existing Objects prerequisite inventory is CPU-only: exact installed-source
+fingerprints, original model/card links and a four-field image projection remain
+on Azure. Raw Docker configuration is never copied to pins/submissions. Measured
+installed bytes are not verified source-commit parity, model overlap clearance
+or competition-license eligibility. Input and raw geometry bundles will travel
+privately between Azure VMs; no heavy local transit or full runtime clone.
