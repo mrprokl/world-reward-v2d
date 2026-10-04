@@ -11,6 +11,7 @@ import ast
 import base64
 import hashlib
 import io
+import inspect
 import lzma
 from pathlib import Path
 import re
@@ -26,6 +27,7 @@ MAX_CODE_CONTROL_BYTES = 256_000
 INLINE_SCRIPT_BYTES = 180_000
 STAGED_SCRIPT_BYTES = 120_000
 ACK_PREFIX = "WORLD_REWARD_DISPATCH_ACK_V1:"
+GITHUB_RAW_ROOT = "https://raw.githubusercontent.com/mrprokl/world-reward-v2d/"
 
 
 def encoded_runtime_archive(source_archive: bytes) -> tuple[str, str]:
@@ -230,9 +232,138 @@ def runtime_archive(full_archive: bytes, script: str) -> tuple[bytes, list[str]]
     return output.getvalue(), selected
 
 
+def github_archive_descriptor(source_archive: bytes, revision: str, archive_hash: str) -> dict:
+    """Preserve every TAR/PAX byte except regular-file payloads fetched remotely."""
+    exact_commit_revision(revision)
+    skeleton = bytearray(source_archive); rows = []
+    with tarfile.open(fileobj=io.BytesIO(source_archive), mode="r:") as archive:
+        for member in archive:
+            path = member.name
+            if (not member.isfile() or not (path.startswith(("infra/", "src/", "configs/")) or path == "pyproject.toml")
+                    or "\\" in path or any(x in ("", ".", "..") for x in path.split("/"))):
+                raise ValueError("Only canonical regular runtime code may use GitHub transport")
+            data = archive.extractfile(member).read(); start = member.offset_data
+            rows.append(dict(path=path, offset=start, bytes=len(data), sha256=hashlib.sha256(data).hexdigest()))
+            skeleton[start:start + len(data)] = b"\0" * len(data)
+    descriptor = dict(revision=revision, tar_bytes=len(source_archive), tar_sha256=hashlib.sha256(source_archive).hexdigest(),
+                      archive_sha256=archive_hash, skeleton=base64.b64encode(lzma.compress(skeleton, preset=6)).decode(), files=rows)
+    if len(json.dumps(descriptor, separators=(",", ":")).encode()) > MAX_CODE_CONTROL_BYTES:
+        raise RuntimeError("GitHub descriptor exceeds256KB code-only control budget")
+    return descriptor
 
-def transport_commands(encoded, archive_hash, source_archive, revision, script, name, arguments, *, reuse_published=False):
+
+def reconstruct_github_archive(descriptor, *, opener=None):
+    """Four bounded, credential/proxy/redirect-free HTTPS fetches; no code executes."""
+    import concurrent.futures, time, urllib.parse, urllib.request
+    deadline = time.monotonic() + 90
+    def require(value):
+        if not value: raise RuntimeError("Exact GitHub source retrieval failed closed")
+    def remaining():
+        value = deadline - time.monotonic(); require(value > 0); return value
+    require(re.fullmatch(r"[0-9a-f]{40}", descriptor["revision"]) is not None)
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl): return None
+    if opener is None:
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+    raw = bytearray(lzma.decompress(base64.b64decode(descriptor["skeleton"], validate=True)))
+    require(len(raw) == descriptor["tar_bytes"])
+    rows = descriptor["files"]
+    with tarfile.open(fileobj=io.BytesIO(raw), mode="r:") as archive:
+        members = archive.getmembers()
+        require(len(rows) == len(members) and len({r["path"] for r in rows}) == len(rows))
+        end = 0
+        for row, member in zip(rows, members):
+            path = row["path"]
+            require(member.isfile() and member.name == path and member.offset_data == row["offset"] and member.size == row["bytes"])
+            require((path.startswith(("infra/", "src/", "configs/")) or path == "pyproject.toml") and "\\" not in path and all(x not in ("", ".", "..") for x in path.split("/")))
+            require(type(row["offset"]) is int and type(row["bytes"]) is int and end <= row["offset"] <= row["offset"] + row["bytes"] <= len(raw))
+            end = row["offset"] + row["bytes"]; require(not any(raw[row["offset"]:end]))
+    def fetch(row):
+        url = GITHUB_RAW_ROOT + descriptor["revision"] + "/" + urllib.parse.quote(row["path"], safe="/")
+        request = urllib.request.Request(url, headers={"Accept-Encoding": "identity"})
+        with opener.open(request, timeout=remaining()) as response:
+            require(response.status == 200 and response.geturl() == url and response.headers.get("Content-Encoding", "identity") == "identity")
+            length = response.headers.get("Content-Length")
+            require(length is None or length == str(row["bytes"]))
+            data = bytearray()
+            while len(data) <= row["bytes"]:
+                remaining(); part = response.read(min(65536, row["bytes"] + 1 - len(data)))
+                if not part: break
+                data.extend(part)
+            remaining(); require(len(data) == row["bytes"] and hashlib.sha256(data).hexdigest() == row["sha256"])
+        return row, data
+    pool = concurrent.futures.ThreadPoolExecutor(max_workers=4)
+    try:
+        futures = [pool.submit(fetch, row) for row in rows]
+        for future in futures:
+            row, data = future.result(timeout=remaining()); raw[row["offset"]:row["offset"] + row["bytes"]] = data
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
+    require(hashlib.sha256(raw).hexdigest() == descriptor["tar_sha256"])
+    compressed = lzma.compress(raw, preset=6); remaining()
+    require(hashlib.sha256(compressed).hexdigest() == descriptor["archive_sha256"])
+    return bytes(raw), compressed
+
+
+
+def publication_script(descriptor, identity, script, acquisition, cleanup):
+    """Shared exact-byte publication for chunked and GitHub source acquisition."""
+    return f"""import base64,ctypes,hashlib,io,json,lzma,os,stat,sys,tarfile
+from pathlib import Path,PurePosixPath
+stage,job=map(Path,sys.argv[1:]);wanted=json.loads({descriptor!r})
+def require(value):
+ if not value:raise RuntimeError('Immutable code transport failed closed')
+def canonical(p):return p.is_absolute() and p.resolve()==p and not any(x.is_symlink()for x in(p,*p.parents))
+require(canonical(stage) and stage.is_dir() and stage.stat().st_mode&0o777==0o700)
+identity_file=stage/'identity';s=identity_file.lstat()
+require(stat.S_ISREG(s.st_mode) and s.st_nlink==1 and s.st_mode&0o777==0o400 and identity_file.read_bytes()=={(identity+chr(10)).encode()!r})
+{acquisition}with (stage/'source.tar.xz').open('xb')as f:os.fchmod(f.fileno(),0o400);f.write(compressed);f.flush();os.fsync(f.fileno())
+raw=lzma.decompress(compressed)
+require(len(raw)==wanted['tar_bytes'] and hashlib.sha256(raw).hexdigest()==wanted['tar_sha256'])
+with tarfile.open(fileobj=io.BytesIO(raw),mode='r:')as archive:
+ members=archive.getmembers();seen=set()
+ for m in members:
+  path=PurePosixPath(m.name)
+  require(m.isfile() and m.name not in seen and str(path)==m.name and not path.is_absolute() and '\\\\'not in m.name and all(x not in('','.','..')for x in m.name.split('/')))
+  require(m.name.startswith(('infra/','src/','configs/'))or m.name=='pyproject.toml');seen.add(m.name)
+ require({script!r}in seen)
+ pending=stage/'pending';pending.mkdir(mode=0o755);pending.chmod(0o755);code=pending/'code';code.mkdir(mode=0o755)
+ for m in members:
+  target=code/m.name;target.parent.mkdir(parents=True,exist_ok=True)
+  with target.open('xb')as f:os.fchmod(f.fileno(),m.mode&0o555);f.write(archive.extractfile(m).read());f.flush();os.fsync(f.fileno())
+  os.utime(target,(m.mtime,m.mtime))
+ for p in sorted(code.rglob('*'),reverse=True):
+  if p.is_dir():p.chmod(0o555)
+ code.chmod(0o555)
+ for name,value in(('revision',wanted['revision']),('source-sha256',wanted['archive_sha256'])):
+  with (pending/name).open('x')as f:os.fchmod(f.fileno(),0o444);f.write(value+'\\n');f.flush();os.fsync(f.fileno())
+ require(canonical(job.parent.parent))
+ if not job.parent.exists():job.parent.mkdir(mode=0o755);job.parent.chmod(0o755)
+ require(canonical(job.parent) and job.parent.stat().st_mode&0o005==0o005 and not job.exists() and not job.is_symlink())
+ def syncdir(p):
+  fd=os.open(p,os.O_RDONLY|os.O_DIRECTORY)
+  try:os.fsync(fd)
+  finally:os.close(fd)
+ for p in sorted(code.rglob('*'),reverse=True):
+  if p.is_dir():syncdir(p)
+ syncdir(code);syncdir(pending);syncdir(stage)
+ libc=ctypes.CDLL(None,use_errno=True);rename=getattr(libc,'renameat2',None);require(rename is not None)
+ rename.argtypes=(ctypes.c_int,ctypes.c_char_p,ctypes.c_int,ctypes.c_char_p,ctypes.c_uint);rename.restype=ctypes.c_int
+ require(rename(-100,os.fsencode(pending),-100,os.fsencode(job),1)==0)
+ syncdir(job.parent)
+ require({{str(p.relative_to(job/'code'))for p in(job/'code').rglob('*')if p.is_file()}}==seen)
+ for m in members:
+  target=job/'code'/m.name;require(canonical(target))
+  require(target.stat().st_mode&0o777==m.mode&0o555 and hashlib.sha256(target.read_bytes()).digest()==hashlib.sha256(archive.extractfile(m).read()).digest())
+ require((job/'revision').read_bytes()==(wanted['revision']+'\\n').encode() and (job/'source-sha256').read_bytes()==(wanted['archive_sha256']+'\\n').encode())
+{cleanup}
+"""
+
+
+def transport_commands(encoded, archive_hash, source_archive, revision, script, name, arguments, *, reuse_published=False, github_source=False):
     """Ordered code-only phases; no calls, retries or caller-selected remote paths."""
+    if reuse_published and github_source:
+        raise ValueError("GitHub source and published reuse are mutually exclusive")
     bundle = script.removeprefix("infra/").removesuffix(".sh")
     unit = "world-reward-" + name
     identity = hashlib.sha256((revision + script + name + archive_hash).encode()).hexdigest()
@@ -291,6 +422,54 @@ systemd-run --unit "$UNIT" --property=Type=exec \\
     def phase(label, command):
         ack = ACK_PREFIX + identity + ":" + label
         return label, ack, command + f"printf '%s\\n' '{ack}'\n"
+    if github_source:
+        wanted = github_archive_descriptor(source_archive, revision, archive_hash)
+        descriptor = json.dumps(wanted, separators=(",", ":"))
+        acquisition = "require({p.name for p in stage.iterdir()}=={'identity'})\nraw,compressed=reconstruct_github_archive(wanted)\n"
+        cleanup = "(stage/'source.tar.xz').unlink();identity_file.unlink();stage.rmdir()"
+        publisher = publication_script(descriptor, identity, script, acquisition, cleanup)
+        # Embed this transparent audited helper, never import the fetched repository.
+        helper = "import re\nGITHUB_RAW_ROOT=" + repr(GITHUB_RAW_ROOT) + "\n" + inspect.getsource(reconstruct_github_archive)
+        guarded = "\n".join(" " + line for line in publisher.splitlines())
+        cleanup_guard = """except BaseException:
+ try:
+  require(canonical(stage) and (stage.stat().st_dev,stage.stat().st_ino,stage.stat().st_uid)==stage_identity and identity_file.read_bytes()==identity_bytes)
+  allowed={'identity','source.tar.xz','pending/revision','pending/source-sha256',*('pending/code/'+r['path'] for r in wanted['files'])}
+  parents={'.',*(str(p.parent) for n in allowed for p in (Path(n),*Path(n).parents))}
+  for p in stage.rglob('*'):
+   s=p.lstat();relative=str(p.relative_to(stage));require(not p.is_symlink() and p.resolve()==p)
+   require((stat.S_ISREG(s.st_mode) and s.st_nlink==1 and relative in allowed)or(stat.S_ISDIR(s.st_mode) and relative in parents))
+  for p in stage.rglob('*'):
+   if p.is_dir():p.chmod(0o700)
+  for p in sorted(stage.rglob('*'),key=lambda p:len(p.parts),reverse=True):
+   if p.is_dir():p.chmod(0o700);p.rmdir()
+   else:p.unlink()
+  stage.rmdir()
+ except BaseException:pass
+ os._exit(1)
+finally:
+ signal.setitimer(signal.ITIMER_REAL,0)
+"""
+        setup = """import os,signal,stat
+from pathlib import Path
+stage=Path(sys.argv[1]);state=stage.lstat();stage_identity=(state.st_dev,state.st_ino,state.st_uid)
+identity_file=stage/'identity';identity_bytes=identity_file.read_bytes()
+def timed_out(*unused):raise TimeoutError('GitHub source90s budget exhausted')
+signal.signal(signal.SIGALRM,timed_out);signal.setitimer(signal.ITIMER_REAL,90)
+try:
+"""
+        command = prefix + preflight + f"""test ! -e "$JOB" && test ! -L "$JOB" || exit 1
+test ! -e "$STAGE" && test ! -L "$STAGE" || exit 1
+mkdir -m 700 "$STAGE"
+(set -C; printf '%s\\n' '{identity}' > "$STAGE/identity")
+chmod 400 "$STAGE/identity"
+/usr/bin/python3 -I -B - "$STAGE" "$JOB" <<'PY_PUBLISH'
+import sys
+""" + helper + setup + guarded + "\n" + cleanup_guard + "PY_PUBLISH\n" + launch
+        result = phase("github-published-dispatched", command)
+        if len(result[2].encode()) > STAGED_SCRIPT_BYTES:
+            raise RuntimeError("GitHub source phase exceeds bounded120KB script budget")
+        return [result]
     if reuse_published:
         # Explicit metadata-only dispatch. The local archive independently binds
         # the existing remote bytes; no encoded payload or publication occurs.
@@ -364,17 +543,7 @@ chmod 400 "$STAGE/identity"
 chmod 400 "$STAGE/chunk_{index:04d}"
 """
         commands.append(phase(f"chunk-{index:04d}-stored", body))
-    publish = prefix + preflight + guard + f"""/usr/bin/python3 -I -B - "$STAGE" "$JOB" <<'PY_PUBLISH'
-import base64,ctypes,hashlib,io,json,lzma,os,stat,sys,tarfile
-from pathlib import Path,PurePosixPath
-stage,job=map(Path,sys.argv[1:]);wanted=json.loads({descriptor!r})
-def require(value):
- if not value:raise RuntimeError('Immutable code transport failed closed')
-def canonical(p):return p.is_absolute() and p.resolve()==p and not any(x.is_symlink()for x in(p,*p.parents))
-require(canonical(stage) and stage.is_dir() and stage.stat().st_mode&0o777==0o700)
-identity_file=stage/'identity';s=identity_file.lstat()
-require(stat.S_ISREG(s.st_mode) and s.st_nlink==1 and s.st_mode&0o777==0o400 and identity_file.read_bytes()=={(identity+chr(10)).encode()!r})
-names=['chunk_%04d'%i for i in range(wanted['chunks'])]
+    acquisition = f"""names=['chunk_%04d'%i for i in range(wanted['chunks'])]
 require({{p.name for p in stage.iterdir()}}=={{'identity',*names}})
 parts=[]
 for name in names:
@@ -383,49 +552,9 @@ for name in names:
 encoded=b''.join(parts);require(len(encoded)==wanted['encoded_bytes'])
 compressed=base64.b64decode(encoded,validate=True)
 require(hashlib.sha256(compressed).hexdigest()==wanted['archive_sha256'])
-with (stage/'source.tar.xz').open('xb')as f:os.fchmod(f.fileno(),0o400);f.write(compressed);f.flush();os.fsync(f.fileno())
-raw=lzma.decompress(compressed)
-require(len(raw)==wanted['tar_bytes'] and hashlib.sha256(raw).hexdigest()==wanted['tar_sha256'])
-with tarfile.open(fileobj=io.BytesIO(raw),mode='r:')as archive:
- members=archive.getmembers();seen=set()
- for m in members:
-  path=PurePosixPath(m.name)
-  require(m.isfile() and m.name not in seen and str(path)==m.name and not path.is_absolute() and '\\\\'not in m.name and all(x not in('','.','..')for x in m.name.split('/')))
-  require(m.name.startswith(('infra/','src/','configs/'))or m.name=='pyproject.toml');seen.add(m.name)
- require({script!r}in seen)
- pending=stage/'pending';pending.mkdir(mode=0o755);pending.chmod(0o755);code=pending/'code';code.mkdir(mode=0o755)
- for m in members:
-  target=code/m.name;target.parent.mkdir(parents=True,exist_ok=True)
-  with target.open('xb')as f:os.fchmod(f.fileno(),m.mode&0o555);f.write(archive.extractfile(m).read());f.flush();os.fsync(f.fileno())
-  os.utime(target,(m.mtime,m.mtime))
- for p in sorted(code.rglob('*'),reverse=True):
-  if p.is_dir():p.chmod(0o555)
- code.chmod(0o555)
- for name,value in(('revision',wanted['revision']),('source-sha256',wanted['archive_sha256'])):
-  with (pending/name).open('x')as f:os.fchmod(f.fileno(),0o444);f.write(value+'\\n');f.flush();os.fsync(f.fileno())
- require(canonical(job.parent.parent))
- if not job.parent.exists():job.parent.mkdir(mode=0o755);job.parent.chmod(0o755)
- require(canonical(job.parent) and job.parent.stat().st_mode&0o005==0o005 and not job.exists() and not job.is_symlink())
- def syncdir(p):
-  fd=os.open(p,os.O_RDONLY|os.O_DIRECTORY)
-  try:os.fsync(fd)
-  finally:os.close(fd)
- for p in sorted(code.rglob('*'),reverse=True):
-  if p.is_dir():syncdir(p)
- syncdir(code);syncdir(pending);syncdir(stage)
- libc=ctypes.CDLL(None,use_errno=True);rename=getattr(libc,'renameat2',None);require(rename is not None)
- rename.argtypes=(ctypes.c_int,ctypes.c_char_p,ctypes.c_int,ctypes.c_char_p,ctypes.c_uint);rename.restype=ctypes.c_int
- require(rename(-100,os.fsencode(pending),-100,os.fsencode(job),1)==0)
- syncdir(job.parent)
- require({{str(p.relative_to(job/'code'))for p in(job/'code').rglob('*')if p.is_file()}}==seen)
- for m in members:
-  target=job/'code'/m.name;require(canonical(target))
-  require(target.stat().st_mode&0o777==m.mode&0o555 and hashlib.sha256(target.read_bytes()).digest()==hashlib.sha256(archive.extractfile(m).read()).digest())
- require((job/'revision').read_bytes()==(wanted['revision']+'\\n').encode() and (job/'source-sha256').read_bytes()==(wanted['archive_sha256']+'\\n').encode())
-for name in ['identity',*names,'source.tar.xz']:(stage/name).unlink()
-stage.rmdir()
-PY_PUBLISH
-""" + launch
+"""
+    cleanup = "for name in ['identity',*names,'source.tar.xz']:(stage/name).unlink()\nstage.rmdir()"
+    publish = prefix + preflight + guard + "/usr/bin/python3 -I -B - \"$STAGE\" \"$JOB\" <<'PY_PUBLISH'\n" + publication_script(descriptor, identity, script, acquisition, cleanup) + "PY_PUBLISH\n" + launch
     commands.append(phase("published-dispatched", publish))
     if any(len(command.encode()) > STAGED_SCRIPT_BYTES for _, _, command in commands):
         raise RuntimeError("Code transport phase exceeds bounded120KB script budget")
@@ -455,8 +584,11 @@ def main(argv=None) -> None:
     parser.add_argument("--resource-group", type=azure_resource_group, default=DEFAULT_RESOURCE_GROUP)
     parser.add_argument("--vm-name", type=azure_vm_name, default=DEFAULT_VM_NAME,
                         help="Azure target VM; --name remains only the immutable job name")
-    parser.add_argument("--reuse-published", action="store_true",
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--reuse-published", action="store_true",
                         help="Verify and dispatch the exact existing snapshot only; no upload, repair, retry or publication")
+    modes.add_argument("--github-source", action="store_true",
+                       help="Fetch only the exact public World Reward commit closure on Azure; no credentials, retry or fallback")
     parser.add_argument("arguments", nargs="*")
     args = parser.parse_args(argv)
     if not re.fullmatch(r"[a-z][a-z0-9-]{0,50}", args.name):
@@ -481,7 +613,7 @@ def main(argv=None) -> None:
                                                "infra", "src", "configs", "pyproject.toml"), args.script)
     encoded, archive_hash = encoded_runtime_archive(source_archive)
     commands = transport_commands(encoded, archive_hash, source_archive, revision, args.script, args.name, args.arguments,
-                                  reuse_published=args.reuse_published)
+                                  reuse_published=args.reuse_published, github_source=args.github_source)
     print(f"immutable_runtime_bundle_files={len(paths)} encoded_bytes={len(encoded)} revision={revision} transport_phases={len(commands)}", flush=True)
     for phase, ack, command in commands:
         invoke_transport(command, ack, args.resource_group, args.vm_name)

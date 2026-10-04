@@ -17,10 +17,11 @@ inferred automatically; no hand-labeling of challenge records.
   EP0's legacy conversion failure stays separate. EP4 missing masks, EP7 empty
   anchor, EP9 invalid geometry and EP10/EP11 actor identity failures remain closed.
   EP11 stops before SAM2/later frontends. EP0/full790 and EP12/full405 now pass
-  native301-update refinement and direct export; official packing is next. EP0's
+  native301-update refinement and direct export; EP0 official packing also passes,
+  EP12 packing dispatched only. EP0's
   exact historical metadata omission is authenticated, not a relaxed legacy
   gate or a reversal of its old conversion failure. EP13 full425 inputs and
-  shared preparation pass; collected-predecessor scheduling failures remain
+  shared preparation and full native forward pass; collected-predecessor scheduling failures remain
   separate. Original controls/reference replay and whole source-chain pins are
   frozen before each next stage; no prediction is inferred from dispatch ACKs.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same

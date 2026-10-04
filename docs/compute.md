@@ -20,14 +20,14 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 6 | 816 | Same complete chain PASS on qualified fixed volume geometry. |
 | 8 | 634 | Same complete chain PASS; VM02 full pose/result return byte-sealed before VM01 assembly. |
 | 15 | 501 | Same complete chain PASS. |
-| 0 | 790 | Full native refinement and direct export PASS42.687162s, whole source chain/four outputs pinned. Official packing not yet run; old conversion failure separate. |
+| 0 | 790 | Full native refinement and direct export PASS42.687162s, whole source chain/four outputs pinned. Official packing PASS16.896468s/all790 frames, scratch removed; old conversion failure separate. |
 | 4 | 747 | Tracking stops at18 empty automatic object masks; full trajectory unavailable. |
 | 7 | — | Empty automatic fixed anchor; closed without reroll. |
 | 9 | 415 | Geometry/topology failures before pose; no face deletion or threshold rescue. |
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
 | 12 | 405 | Full native refinement and direct export PASS31.726037s, whole source chain/four outputs pinned. Official packing not yet run. |
-| 13 | 425 | Original full inputs and shared preparation PASS18.417917s/all425 frames; full source/geometry lineage pinned. Original collected-predecessor scheduling FAIL remains separate. Native forward next. |
+| 13 | 425 | Original full inputs and shared preparation PASS18.417917s/all425 frames; full source/geometry lineage pinned. Original collected-predecessor scheduling FAIL remains separate. Native forward PASS109.129234s/all425 frames, independently frozen before301-update refinement. |
 | 14 | — | Fresh unchanged fixed_all16 frontend active; object GPU return established, CPU depth packaging100 frames at12:31 audit. No full input or reconstruction PASS. |
 
 Seven complete packed episodes are engineering/fidelity evidence only. Scratch
@@ -157,3 +157,8 @@ Secrets stay in ignored secret storage, never stdout/raw environment/config dump
 Source/model licence and overlap checks, NVIDIA registration, producing commit
 accessibility, rules/quota and one frozen Parquet to all five **World Reward**
 competitions remain submission gates; see [README](../README.md).
+
+The optional `azure_job --github-source` mode is locally tested only: Azure
+fetches the exact public source closure, verifies every file and original TAR/XZ
+hash, then uses the same atomic publisher. One90s bounded phase; no redirects,
+credentials, retry or fallback. It is not a scientific/runtime qualification.

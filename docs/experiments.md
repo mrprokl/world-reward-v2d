@@ -7508,3 +7508,19 @@ First read-only audit lacked consumer loader in the original closure and failed
 at import; corrected existing generator/full-chain gate without inference rerun.
 Actual export/preparation pins precede forward/official pack. Fidelity is not
 accuracy or eligibility. Final external-hand focused suite234PASS2.00s.
+
+EP0 original official packing actual PASS16.896468s/all790 frames under
+ece0167, report9671B SHAa9bf3db9276dc1048b0e91f91c5315b265aaed99b24cd82c9da2ed57f7cabbb7.
+Exact source helper/receipt/inventory recheck confirms scratch removed; no final
+Parquet or accuracy claim. EP13 native forward PASS109.129234s/all425 under same
+revision; report66041B SHA206d7e693c6fdcce48090c26f755884e6cf5f69ce1e0e4ce00365694b34117b6,
+bundle325276092B SHAa2a9858714db06d9619c1bd04944b3528b9c31585c5604c5f432ec663f4b2453.
+Independent CPU-only entire source/prepare/input/native-bindings posthash PASS,
+no learned replay; forward pins precede refinement.
+
+Opt-in GitHub source transport: root170 tests PASS22.81s (28new/142historical),
+including HTTPS failures, exact TAR/PAX/XZ reconstruction, readonly publication,
+race no-replace and owned cleanup. Fetch fixed public commit closure on Azure,
+4workers/90s global, no proxy/auth/redirect/retry/fallback; existing256KB archive
+cap retained. Offline real closure controls36.5–39.1KB/oneRPC vs current staged
+publication5RPC. No actual remote new-mode qualification or speedup measured yet.
