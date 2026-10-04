@@ -9091,3 +9091,20 @@ replay. Generic CPU builder uses existing c8fb compiler/header runtime with no
 newpackages/GPU/mesh/QEM call,600s native900s host inclusive sealing. Root194
 tinytestsPASS0.63s. Real build/control/packing/quality qualification still absent;
 Phase2 procedural definitions frozen before any native values, no adoption.
+
+
+EP09 directexportb6e3000 scheduled from independently audited refined pins,
+208-source archive0f0486492932968bc06506e9e2e1e47fbc84742e555fcc170f67becbe2cb71c0.
+Actual originalexport reports PASS31.802225s/full415; independent source/array
+audit still pending. Its first audit controller incorrectly imported a
+downstream consumer absent from this producer's actual208-file closure; stopped
+before interpreting predictions. Corrected audit uses original directexport
+schema/helpers only, never reruns optimizer/decoder or modifies predictions.
+
+Surface QSlim standalonebuild4ccefd3 scheduled,199-source
+archive29ffdf5338d6bec5dce5fe9fb690f781ad2ec5eeb0e71d28f6f2fb5cce64babe,
+ledgerdf3fe100b0b03a4106f7df919e30af040f3efc19ba066985a1a9c4651f1c115d.
+Dispatch ACK only; actual compile/runtime receipt must precede any QEM control.
+Fresh two-positive/one-negative geometry cohort wrapper/source now prepared;
+root202tinytestsPASS0.82s. Pins absent until actual build independently verified.
+No QEM replay of earlier failures, packages, newmodels, performance or adoption.
