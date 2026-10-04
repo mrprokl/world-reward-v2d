@@ -185,3 +185,20 @@ fill only originally empty intervals when bilateral masks agreeIoU≥.70, use th
 nearer native mask with no union/erosion. New external microgate/negative controls
 and cohort/source/license/budget must be frozen before any run. This proposal
 remains unvalidated; unresolved gaps stay failures, not fabricated trajectories.
+
+## Proven native-index defect — closed acquisition, no new authorization
+
+The byte-bound public central directory proves that scenes48/49/50 first96
+native RGB filenames are1..96, not0..95. This explains the original acquisition
+selector failure before any private values or model run. Keep the firstsorted
+scenes/first96filenames and all original IDs; do not silently enumerate filenames
+as sourceIDs. A future technical amendment requires an explicit shared map:
+array/Boots/SAM2/query positions0..95 correspond to source_frame_id1..96.
+Public filenames, private metadata/depth/instance-mask lookup and output metadata
+must use sourceIDs; native candidate/metric math stays position-based. Initial
+query_time0 means sourceframe1, never an invented frame0. All6YCB adapters and
+private evaluation must audit this association before a future run. This same
+external cohort would be an engineering replay, not new independent replication.
+The existing one-continuation protocol remains closed; no third acquisition or
+model/label interpretation is authorized by this diagnosis. A tiny mapping helper
+may be implemented/tested without changing old producers or scientific gates.

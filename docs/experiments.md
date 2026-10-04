@@ -6585,3 +6585,15 @@ sourceframes to hide the mismatch. Frozen tiny actualdiagnosis records the
 native IDs. No third full acquisition is authorized by the closed protocol;
 any newtechnical amendment requires explicit independent native-ID contract
 and allconsumers audit before potential authorization, not score-based retuning.
+
+Independent native-ID mapping audit:6YCBV adapters assume sourceID equals
+arrayposition; Objects/track/evaluate have12literalframe0paths plus1wrapper.
+Do not remove onlythe acquisition guard: enumerate(names) would then silently
+renumber sourceIDs, and private lookup would shift labels. Keep mathematically
+native0..95 positions separate from immutable source1..96 IDs in a shared
+metadata contract. A future amendment must test exactRGB/mask/depth/GT-ID
+association before any acquisition; samefirst3scenes would be engineering
+replay, not a fresh independent cohort. Currentauthorization remainsclosed.
+Tinydatafree mapping helper is usefulprep; no adapter/scientific runs changed.
+Diagnostic IDs compacted to first/last/count/stride for useful reproducibility
+rather than192redundant scalar lines.
