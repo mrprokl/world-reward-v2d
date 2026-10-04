@@ -1,0 +1,35 @@
+{
+  "schema": "world_reward.ycbv_masks_dac_failure.v1",
+  "unit": "world-reward-ycbv-point-masks-native-v2.service",
+  "pid": 253776,
+  "original_revision": "79b9c64b943a23cdf54abbab5983c4c0df8ed007",
+  "files": {
+    "validation/ycbv_point_pose_v2/automatic_masks_v1/report.json": {
+      "bytes": 1198,
+      "sha256": "fcc1547d194d0f1d8ec1667eaee52fe865d284132cb360fa69fad9e7f1150fcf"
+    },
+    "validation/ycbv_point_pose_v2/automatic_masks_v1/.container.cid": {
+      "bytes": 64,
+      "sha256": "8ecca358d7be745b3d61522420040abc6359c3fccc21a8d33f5df5e64b6f3ec4"
+    },
+    "jobs/79b9c64b943a23cdf54abbab5983c4c0df8ed007/run_ycbv_point_masks/code/infra/run_ycbv_point_masks.sh": {
+      "bytes": 7183,
+      "sha256": "ed27c142f037ff8077355d61b3ff230986ddb4b212cbd1b87152bd12e7a50d6f"
+    },
+    "jobs/79b9c64b943a23cdf54abbab5983c4c0df8ed007/run_ycbv_point_masks/code/infra/ycbv_point_masks.py": {
+      "bytes": 26059,
+      "sha256": "178474ac23bf53210df2b362afc0087586c8c85fc3be5ac094cdb87229fa7c14"
+    },
+    "results/ycbv-point-masks-native-v2.log": {
+      "bytes": 2129,
+      "sha256": "6b8b588dd256cc2d38ab730c3773fde8d0d8f022f9c6a0f89db32a18676043d2"
+    }
+  },
+  "failed_output_inode": [
+    2049,
+    4190235
+  ],
+  "input_directory_mode": "0o700",
+  "input_directory_uid": 1000,
+  "zero_model_calls": true
+}
