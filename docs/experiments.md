@@ -6788,3 +6788,11 @@ matchtiny2850B actualreadonlyinventory output
 SHA5c23cb212a2ba87c9459a37737851b479d8ba8536d5689884edcc1438830c50d.
 No arrays/videos/models decoded on barehost, noheavy localtransit. Frozen3335B
 clipinputpins precede next603s unchanged native sharedprepare, notqualityPASS.
+
+EP6 unchangedfull native sharedprepare PASS816/81623.504655s actual8112f1b
+producer; outerGPUqueuecompleted/lockreleased. Rootsourcebound readOnly
+complete4outputinventory repeatedPASS;32856B report
+SHAb1d97f0eb46232b8465302a3147c6763cef4aa218b71304f0f5b4fbf3e49db5b.
+Tinysharedpreparepins frozenbeforeforward; allnativeoriginalindices/shared
+identity/fullobject retained. EP8 originalCPUassembly active100/634at05:24;
+noquality/eligibility/CARI4D-victory claim.

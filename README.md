@@ -39,7 +39,9 @@ No final Parquet, submission or verified CARI4D improvement yet.
   (134.23 s). Its unchanged full native301update refinement passes (392.97 s);
   directexport passes all668 frames (39.57 s); original official CPU packing
   passes (16.31 s), with scratch Parquet deleted. The next full816-frame volume tracker
-  also passes (4,794.56 s); its CPU CARI input assembly now passes all816frames (6,148.76 s). The634-frame
+  also passes (4,794.56 s); its CPU CARI input assembly now passes all816frames (6,148.76 s).
+  Independently pinned full native shared preparation also passes (23.50 s);
+  forward inference remains the next gate. The634-frame
   episode has complete initializers. Its first private Azure full-pose run
   stopped before poses on the unchanged topology gate. A separately qualified
   volume proposal and its full634-frame input archive now pass provenance and
