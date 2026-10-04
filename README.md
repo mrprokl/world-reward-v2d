@@ -44,6 +44,15 @@ inferred automatically; no hand-labeling of challenge records.
   operator or acceptance gate. The same fixed geometry now passes full415-frame
   pose execution; automatic mask medianIoU0.244 is not accuracy evidence.
   No HOI gain, licence clearance or adoption is inferred.
+- **Unified fitting:** [persistent point reprojection](docs/joint_point_objective.md)
+  now augments the unchanged native joint objective through an explicit subclass.
+  Original first-frame triangle attachments connect to full-T tracks without
+  refitting. Ten real Torch controls and the original301-update loop on
+  manufactured state pass; real-body/contact execution and independent HOI
+  validation remain required. No challenge-tuned loss weights or measured gain.
+  [Balanced exact sums](docs/balanced_solid_sum.md) pass15 fresh native controls
+  on the authenticated existing CPU runtime; four fresh QEM/query composition
+  controls still precede any new production proposal.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
   development scenes/objects and33–38cm absolute errors prevent a generalization
   claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.

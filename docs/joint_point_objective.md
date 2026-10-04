@@ -1,4 +1,4 @@
-# Persistent points in the native joint objective — prepared, not qualified
+# Persistent points in the native joint objective — limited runtime qualification
 
 `world_reward.joint_point_objective` adds one continuous object-point term to
 the existing joint HOI objective. It does not select poses, track images, estimate
@@ -68,11 +68,16 @@ Output records the new objective and must not pass as unchanged-baseline parity.
 ## Before any experiment
 
 Local tiny tests cover metadata, immutable identity and manufactured native
-source contracts. Real Torch gradient/gradcheck tests run only when Torch is
-already installed; no installation/model/GPU/private data is part of this work.
-An actual source-bound native CPU/autograd compatibility gate and independently
-licensed calibration/held-out cohort are prerequisites. No adapter deployment,
-runtime qualification, probability calibration, HOI/3D gain or adoption is claimed.
+source contracts. Ten actual Torch2.5.1 controls pass on Azure, including
+translation gradients/gradcheck, equal-track occlusion, initializer exclusion,
+invalid geometry/timeline/support rejection and unit similarity. The original
+source-bound class's object state, inherited loss and301-update loop also pass
+with manufactured state and a fake body callback; zero-weight output is exactly
+the baseline and synthetic point residual decreases. Constructor, actual MHR,
+contact/render kernels and upstream scheduler construction are **not qualified**.
+No installation/GPU/model/private inputs enter these controls. A licensed
+calibration/held-out cohort and real-model integration remain prerequisites.
+No production deployment, probability calibration, HOI/3D gain or adoption is claimed.
 Compare same-input native objective versus native-plus-points with rotation fixed
 in **both** arms, all full trajectories and unchanged shape/gauge. Require actual
 3D object/relative-HOI benefit without human, penetration, acceleration,

@@ -8817,3 +8817,16 @@ originalsource unchanged/report2460B SHA7de75c0dc046521464fb6a6d4fb75a8d03e50d41
 preserved. Freshcontroller-only correction calls actualfixture explicitly;
 no repeated10mathcontrols/sourcefix/model/productioninference. Native301loop
 qualification pending; no3D/HOIquality claim.
+
+Corrected controller nativebytecode+actual_object_state+super.loss+originalrun
+manufacturedstate PASS3.851495s/native3.116622s; all301updates, fixedR/fullT,
+zero-weightbaselineexact, actualpositivegradients/syntheticresidualreduced.
+Report1900B SHA046b42a50cdd6d010994728ee369d324643c697ccb79d46947d6c566fe321fc8.
+Same95b5978 source/read-onlynative92824B bytecode, no sourcefix/pinsrelaxation.
+Constructor/bodymodel/contact-renderer/upstreamschedulerconstruction NOTqualified;
+nochallenge/privateinputs/quality/adoption. Independentreceiptpostauditpending.
+
+Nativefixture independentpostauditPASS: bothoriginalFAIL/newPASS receiptbytes,
+fivecommitted sourceleaves/modes, original92824B optimizerhash/livebytecode,
+301updates/scope, privateDockercontainerabsence rechecked. No actualmodel or
+HOIgain. EP09prepare stillactive250/415depth frames at21:28UTC; no report/PASS.
