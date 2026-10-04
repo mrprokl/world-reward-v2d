@@ -9059,3 +9059,16 @@ rawdomains, fullarrays frozen before calls; source-bound actualnative loaders
 and original budget_mesh,60s inclusive native/63sDocker, no datasets/GPU/QEM.
 Controlled cleanup and independent exactCIDabsence are explicit sealing gates.
 This tests loader/mesh packing fidelity, not full Parquet/scorer/HOI accuracy.
+
+
+EP09 unchanged refinement67de3f39 actual PASS301.306543s/full415, one native
+optimizer/301updates. Report13888B SHA5214bfc7fd07e6c75b6f863017cc95f7da421f9cd2f1337ad422b7b4f9bb9aa4;
+bundle317666016B SHA295d7c58eac5059877be6f17770e372f5c5b35173ca25f2b4b8f7e73313052b5.
+Independent207-source/archive7b6d6fbfbd7d6246b89968e875a97e862e7ba074bc4f885c95b8b3d20e4f369c/
+ledgerd421919cffba3ca724d589f00a1e88dac74988e33f905da7d91ef58faeb91fc7,
+15inputs/4prepare/2forward/2refined/9helpers/10refinement sources-assets and
+170inference sources-assets verified before/after. CPU offline full109 arrays
+finite, fulltimeline and actual history/config exact; all frozen raw inputs and
+nonoptimized blocks byte-preserved. Terminal successful journal, actualimage
+and owned audit-container absence rechecked. No optimizer replay or quality
+claim; refined consumer pins committed only after this audit.
