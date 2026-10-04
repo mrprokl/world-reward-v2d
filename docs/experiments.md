@@ -8476,3 +8476,13 @@ Readonlyreceipt diagnosis pending; do not equate innercompilerPASS to production
 Root223 loader/geometry/producer testsPASS1.40s; first test command named a
 nonexistent file and ranzero, corrected invocation separate. Test-created
 containedaliases/hardlinks independently proved and2986ownedentries removed.
+
+EP09 readonly diagnosis65239: originalnative167539B
+SHA6d975a6719070f2d701072c21758a1f98e49c46764d89a036de80d436634cecd;
+all8serializedquerymetadata and complete compilerforest/fidelity checkerPASS,
+originalsealedout only4evidencefiles, zero finalmesh/NPZ andsafecleanup.
+Independent source audit isolates in-memorytuplekeys vs JSONlist-only guard.
+Newmetadata-only tuple/list correction and revisionboundfreshnamespace preserve
+originalFAIL; actualcoretuple andnegativebadtypes regressed. No numerical/source/
+gate/budget/cohort changes. Pure loader binds11actual artifacts and source-math
+identities; neverexecutesnative/CGAL/QEM/build-info, missing independent pinsFAIL.

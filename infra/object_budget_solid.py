@@ -116,7 +116,7 @@ def query_record(row):
         all(c[k] is True for k in ('closed_oriented_vertex_manifold_verified','all_original_faces_retained','all_original_vertices_referenced',
             'exact_nondegenerate_triangles_verified','component_self_intersections_absent','inter_component_surface_contacts_absent')) and
         all(c[k] is False for k in ('geometry_repaired','orientation_changed','qem_executed','forest_adjudicated','reconstruction_accuracy_verified')) and
-        type(f['component_keys']) is list and len(set(f['component_keys'])) == len(f['component_keys']) == n and
+        type(f['component_keys']) in (tuple, list) and len(set(f['component_keys'])) == len(f['component_keys']) == n and
         all(type(k) is str and k for k in f['component_keys']) and all(type(f[k]) is list and len(f[k]) == n for k in ('signs','parents','depths','inside')) and
         c['inside'] == f['inside'] and len(c['components']) == n and top['vertices'] == top['active_vertices'] == c['vertices'] and top['faces'] == c['faces'] and
         top['closed_oriented_vertex_manifold'] is True and len(top['components']) == n, 'Full exact certificate/topology differs')
@@ -297,7 +297,7 @@ def host(episode, code, revision, qual, build, certificate, built, body):
     image = built.image_identity(original, build, left); official = qual.official_identity(build)
     name = f'wr-object-budget-solid-{episode:06d}-'+revision
     require(not build.run(['docker', 'ps', '-aq', '--filter', 'name=^/'+name+'$'], min(10, left())).strip(), 'Foreign/preexisting container')
-    out = ROOT/f'outputs/episode_{episode:06d}/object_budget_solid'; require(out.resolve() == out and
+    out = ROOT/f'outputs/episode_{episode:06d}'/('object_budget_solid_'+revision); require(out.resolve() == out and
         not any(p.is_symlink() for p in out.parents) and not out.exists() and not out.is_symlink(), 'Fresh proposal required')
     out.mkdir(mode=0o755); os.chmod(out, 0o755); work = out/'disposable'; work.mkdir(mode=0o700); os.chown(work, 1000, 1000); owner = work.lstat()
     cid = out/'.container.cid'; published = {}; report = dict(stage='world_reward_object_budget_solid_host_v1', status='fail', phase='native', episode_index=episode,
@@ -377,7 +377,7 @@ def main():
     parser.add_argument('--native', action='store_true'); args = parser.parse_args()
     code, revision = Path(os.environ['WR_CODE']), os.environ['WR_CODE_REVISION']
     require(os.environ['WR_ROOT'] == str(ROOT), 'Fixed root required'); runtime = helpers(code)
-    work = ROOT/f'outputs/episode_{args.episode:06d}/object_budget_solid/disposable'
+    work = ROOT/f'outputs/episode_{args.episode:06d}'/('object_budget_solid_'+revision)/'disposable'
     return native(args.episode, code, revision, work, *runtime) if args.native else host(args.episode, code, revision, *runtime)
 
 

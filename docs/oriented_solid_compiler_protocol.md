@@ -104,3 +104,14 @@ without loosening gates. Episode25 may follow the identical policy only after
 the first complete PASS. Production geometry PASS does not establish pose or
 human-object reconstruction accuracy; downstream use requires independent
 actual artifact pins and a pure loader, never executing CGAL/QEM on the GPU.
+
+The first EP09 attempt completed the native numerical compiler but failed before
+publication: its in-memory component keys are tuples, whereas the new metadata
+validator incorrectly accepted only JSON lists. Read-only audit of the sealed
+original JSON confirms all eight certificates and complete forest/fidelity proof;
+the original failed host/native receipts and cleanup are preserved. A separate
+packaging-only producer accepts exactly tuple/list keys with unchanged contents
+and uses a revision-bound `object_budget_solid_<producer40rev>` directory.
+No native operator, source geometry, threshold, budget or qualification changes.
+The old failure cannot be promoted, overwritten or presented as production PASS;
+its cleaned candidate is absent, so any new run needs a fresh complete receipt.

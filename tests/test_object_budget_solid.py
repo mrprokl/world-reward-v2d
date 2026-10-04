@@ -189,6 +189,27 @@ def test_fidelity_scipy_vertex_order_not_certified_first_face_order():
     extend(c);gate.validate_compiler_proof(c)
 
 
+def test_actual_core_components_returns_tuple_and_json_equivalent_keys():
+    import certified_solid_source as certificate
+    vertices=np.array([[0.,0.,0.],[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]],np.float64)
+    faces=np.array([[0,2,1],[0,1,3],[0,3,2],[1,2,3]],np.int64)
+    _,keys,_=certificate.components(vertices,faces)
+    assert type(keys) is tuple and keys == ('source-loaded-first-face-0',)
+    c=native_result(8,{}, {}, {'video_sha256':'a'*64},dict.fromkeys(gate.OUTPUTS,{'bytes':1,'sha256':'a'*64}))['compiler']
+    c['stages']['physical_source']['forest']['component_keys']=keys
+    gate.successful_queries(c,8)
+    restored=build.strict_json(json.dumps(c,sort_keys=True).encode())
+    assert type(restored['stages']['physical_source']['forest']['component_keys']) is list
+    gate.successful_queries(restored,8)
+
+
+@pytest.mark.parametrize('keys',[{'source0'},'source0',('source0','source0'),[1],[''],np.array(['source0'])])
+def test_component_keys_only_typed_unique_tuple_or_list(keys):
+    c=native_result(8,{}, {}, {'video_sha256':'a'*64},dict.fromkeys(gate.OUTPUTS,{'bytes':1,'sha256':'a'*64}))['compiler']
+    c['stages']['physical_source']['forest']['component_keys']=keys
+    with pytest.raises(ValueError):gate.successful_queries(c,8)
+
+
 def host_fixture(tmp_path, monkeypatch):
     root, code, revision = source(tmp_path, monkeypatch); body, _ = inputs(root)
     image = 'sha256:'+'d'*64; proof = {'build':{'original_runtime':{}}}
@@ -202,7 +223,7 @@ def host_fixture(tmp_path, monkeypatch):
     calls = []; cleanup = []; monkeypatch.setattr(build, 'cleanup_container', lambda *a:cleanup.append(a))
     def run(argv, seconds, log=None):
         if argv[1] == 'ps': return b''
-        calls.append((argv, seconds)); work = root/'outputs/episode_000008/object_budget_solid/disposable'
+        calls.append((argv, seconds)); work = root/'outputs/episode_000008'/('object_budget_solid_'+revision)/'disposable'
         outputs = {n:write(work/n, (n+' exact bytes').encode()) for n in gate.OUTPUTS}
         result = native_result(8, gate.binding(code, revision, qual, build), proof, gate.input_binding(8, body, build)[2], outputs)
         write(work/'native.json', json.dumps(result, sort_keys=True).encode()); write(log, b'owned log')
@@ -213,7 +234,7 @@ def host_fixture(tmp_path, monkeypatch):
 def test_cpu_single_native_public_only_narrow_mounts_and_sealed_outputs(tmp_path, monkeypatch):
     root, code, revision, body, calls, cleanup = host_fixture(tmp_path, monkeypatch)
     assert gate.host(8, code, revision, qual, build, None, built, body) == 0
-    out = root/'outputs/episode_000008/object_budget_solid'; report = json.loads((out/'report.json').read_bytes())
+    out = root/'outputs/episode_000008'/('object_budget_solid_'+revision); report = json.loads((out/'report.json').read_bytes())
     assert report['status'] == 'pass' and report['owned_container_removed'] and report['owned_scratch_removed']
     assert not (out/'disposable').exists() and report['gpu_used'] is report['adoption'] is report['reconstruction_accuracy_verified'] is False
     assert stat.S_IMODE(out.stat().st_mode) == 0o555
@@ -228,10 +249,22 @@ def test_cpu_single_native_public_only_narrow_mounts_and_sealed_outputs(tmp_path
     with pytest.raises(ValueError, match='Fresh'): gate.host(8, code, revision, qual, build, None, built, body)
 
 
+def test_immutable_original_failed_namespace_preserved_with_fresh_revision(tmp_path,monkeypatch):
+    root,code,revision,body,_,_=host_fixture(tmp_path,monkeypatch)
+    old=root/'outputs/episode_000008/object_budget_solid';write(old/'report.json',b'original sealed FAIL receipt');old.chmod(0o555)
+    before=build.identity(old/'report.json',readonly=True);inode=(old/'report.json').stat().st_ino
+    assert gate.host(8,code,revision,qual,build,None,built,body)==0
+    assert build.identity(old/'report.json',readonly=True)==before and (old/'report.json').stat().st_ino==inode and stat.S_IMODE(old.stat().st_mode)==0o555
+    current=old.parent/('object_budget_solid_'+revision)
+    assert json.loads((current/'report.json').read_bytes())['status']=='pass'
+    with pytest.raises(ValueError,match='Fresh'):gate.host(8,code,revision,qual,build,None,built,body)
+    assert build.identity(old/'report.json',readonly=True)==before
+
+
 @pytest.mark.parametrize('change', ['exit', 'missing', 'cleanup', 'source', 'scope', 'extra', 'replaced', 'deadline','badjson','publishfsync','term'])
 def test_host_failures_never_publish_an_accepted_proposal(tmp_path, monkeypatch, change):
     root, code, revision, body, _, _ = host_fixture(tmp_path, monkeypatch); run = build.run
-    out = root/'outputs/episode_000008/object_budget_solid'
+    out = root/'outputs/episode_000008'/('object_budget_solid_'+revision)
     if change == 'cleanup': monkeypatch.setattr(build, 'cleanup_container', lambda *_:(_ for _ in ()).throw(ValueError('cleanup refused')))
     elif change == 'publishfsync':
         fsync = gate.os.fsync
@@ -306,11 +339,11 @@ def test_produce_preserves_single_native_failure_report_without_rescue(tmp_path,
     assert calls == [1] and report['compiler'] is partial and not any((tmp_path/n).exists() for n in gate.OUTPUTS)
 
 
-@pytest.mark.parametrize('change', ['none','native_failure','input_post','scope_guard'])
+@pytest.mark.parametrize('change', ['none','native_failure','input_post','scope_guard','native_tuple'])
 def test_native_cpu_inclusive_seal_and_partial_failure(tmp_path, monkeypatch, change):
     import object_budget_conditioned as cache
     root, code, revision = source(tmp_path, monkeypatch); body, _ = inputs(root)
-    work = root/'outputs/episode_000008/object_budget_solid/disposable'; work.mkdir(parents=True,mode=0o700)
+    work = root/'outputs/episode_000008'/('object_budget_solid_'+revision)/'disposable'; work.mkdir(parents=True,mode=0o700)
     original_stat = Path.stat
     def fake_stat(p, *a, **k):
         s = original_stat(p,*a,**k)
@@ -329,6 +362,14 @@ def test_native_cpu_inclusive_seal_and_partial_failure(tmp_path, monkeypatch, ch
         paths = tuple(work/n for n in gate.OUTPUTS)
         for p in paths: write(p,b'opaque candidate')
         report['compiler'] = native_result(8,{}, {}, {'video_sha256':'a'*64}, {n:build.identity(work/n) for n in gate.OUTPUTS})['compiler']
+        if change == 'native_tuple':
+            def native_keys(value):
+                if isinstance(value,dict):
+                    if 'forest' in value:value['forest']['component_keys']=tuple(value['forest']['component_keys'])
+                    for child in value.values():native_keys(child)
+                elif isinstance(value,list):
+                    for child in value:native_keys(child)
+            native_keys(report['compiler'])
         if change == 'input_post': write(root/'outputs/episode_000008/object_grounded/object.glb',b'changed')
         return paths
     monkeypatch.setattr(gate,'produce',produce)
@@ -337,7 +378,7 @@ def test_native_cpu_inclusive_seal_and_partial_failure(tmp_path, monkeypatch, ch
         with pytest.raises(ValueError): gate.native(8,code,revision,work,qual,build,certificate,built,body)
         assert calls == [] and not (work/'native.json').exists()
     else:
-        assert gate.native(8,code,revision,work,qual,build,certificate,built,body) == (0 if change == 'none' else 1)
+        assert gate.native(8,code,revision,work,qual,build,certificate,built,body) == (0 if change in ('none','native_tuple') else 1)
         report = json.loads((work/'native.json').read_bytes())
         assert report['maximum_qem_calls'] == 1 and report['maximum_query_calls'] == 8 and report['source_rehashed_after'] is True
         assert report['gpu_used'] is report['adoption'] is False and len(calls) == 1 and stat.S_IMODE((work/'native.json').stat().st_mode) == 0o444
@@ -356,6 +397,15 @@ def test_direct_driver_invalid_args_stop_before_runtime(tmp_path,monkeypatch,arg
     monkeypatch.setattr(gate.sys,'argv',['driver',*args])
     monkeypatch.setattr(gate,'helpers',lambda *_:(_ for _ in ()).throw(AssertionError('no runtime before args')))
     with pytest.raises(ValueError): gate.main()
+
+
+def test_main_native_uses_same_revision_namespace_without_path_override(tmp_path,monkeypatch):
+    revision='a'*40;code=tmp_path/'jobs'/revision/gate.ENTRY/'code';captured=[]
+    monkeypatch.setattr(gate,'ROOT',tmp_path);monkeypatch.setattr(gate.sys,'argv',['driver','--episode','29','--native'])
+    monkeypatch.setenv('WR_ROOT',str(tmp_path));monkeypatch.setenv('WR_CODE',str(code));monkeypatch.setenv('WR_CODE_REVISION',revision)
+    monkeypatch.setattr(gate,'helpers',lambda *_:())
+    monkeypatch.setattr(gate,'native',lambda *a:captured.append(a) or 0)
+    assert gate.main()==0 and captured[0][3]==tmp_path/'outputs/episode_000029'/('object_budget_solid_'+revision)/'disposable'
 
 
 def test_wrapper_syntax_strict_scope_and_runtime_closure():
