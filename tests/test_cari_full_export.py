@@ -202,7 +202,7 @@ def test_wrapper_validates_args_without_cli_and_has_ro_firewall():
         assert result.returncode == 2
     source = path.read_text()
     assert "--network none" in source and "603s docker run" in source
-    assert "source_paths(spec)" in source and "validate_pins(spec,pins)" in source
+    assert "source_paths(spec,object_source=source_profile(pins))" in source and "validate_pins(spec,pins)" in source
     assert "src=$ROOT/outputs,dst=$ROOT/outputs" not in source and "src=$ROOT/data" not in source
 
 

@@ -74,6 +74,35 @@ def repin_report(gate,root,spec,records):
     write(root/paths["input_report"],report)
 
 
+def test_inventory_solid_profile_is_explicit_not_self_selected(gate,tmp_path,monkeypatch):
+    root,code,spec,records=actual_fixture(gate,tmp_path,9,97)
+    paths=gate.inputs.relative_paths(spec);old=gate.inputs.dependency_paths(spec)
+    deps=gate.inputs.dependency_paths(spec,object_source="solid")
+    destination=root/deps["object"];destination.parent.mkdir();(root/old["object"]).rename(destination)
+    records["object"]["mesh_source"]="solid";write(destination,records["object"])
+    report=records["inputs"]
+    report.update(object_source="solid",object_pose_source=dict(report=deps["object"],
+        geometry_and_poses=str(destination.with_name("geometry_and_poses.npz").relative_to(root)),geometry_and_poses_sha256="a"*64),
+        input_report_sha256={role:gate.identity(root/name)["sha256"] for role,name in deps.items()})
+    write(root/paths["input_report"],report)
+    source=report["script_sha256"]
+    monkeypatch.setattr(gate.inputs,"verify_public_inputs",lambda *_:pytest.fail("Inventory remains report-only"))
+    pins=gate.inventory(root,code,spec,"c"*40,source,object_source="solid")
+    assert set(pins)=={"schema","clip_spec","input_report","source_files","object_source"}
+    assert pins["schema"]=="world-reward-cari-clip-input-pins-v2" and pins["object_source"]=="solid"
+    assert len(pins["source_files"])==15 and set(pins["source_files"])==gate.inputs.source_paths(spec,object_source="solid")
+    assert old["object"] not in pins["source_files"]
+    # No inference of solid from a self-authored public preparation receipt.
+    with pytest.raises((ValueError,FileNotFoundError)):gate.inventory(root,code,spec,"c"*40,source)
+
+
+def test_optional_source_cli_defaults_legacy_and_rejects_duplicates_or_paths(gate):
+    assert gate.parser().parse_args(controls()).object_source is None
+    assert gate.parser().parse_args(controls()+["--object-source","solid"]).object_source=="solid"
+    for suffix in (["--object-source","../solid"],["--object-source","solid","--object-source","solid"]):
+        with pytest.raises(SystemExit):gate.parser().parse_args(controls()+suffix)
+
+
 @pytest.mark.parametrize("episode,count",[(0,96),(15,501),(29,673)])
 def test_all15_generic_frontend_pins_without_array_decode_or_mutation(gate,tmp_path,episode,count):
     root,code,spec,records=actual_fixture(gate,tmp_path,episode,count)

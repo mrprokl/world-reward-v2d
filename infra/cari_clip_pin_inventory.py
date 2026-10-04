@@ -115,7 +115,7 @@ def validate_current_reports(root,spec,pins,records):
     return report
 
 
-def inventory(root,code,spec,producer_revision,producer_script_sha256,*,producer_code=None):
+def inventory(root,code,spec,producer_revision,producer_script_sha256,*,producer_code=None,object_source="default"):
     """Hash original inputs; a caller-authenticated old source may be separate.
 
     The caller independently verifies the original dispatch/complete Git closure
@@ -140,13 +140,15 @@ def inventory(root,code,spec,producer_revision,producer_script_sha256,*,producer
     helper_names=("infra/cari_clip_pin_inventory.py","infra/run_cari_clip_pin_inventory.sh",
                   "infra/cari_clip_inputs.py","infra/cari96_inputs.py")
     helpers={name:identity(code/name,immutable=True) for name in helper_names}
-    names=inputs.source_paths(spec)
+    names=inputs.source_paths(spec,object_source=object_source)
     if len(names)!=15:raise ValueError("Exactly fifteen original public inputs required")
     observed={name:identity(root/name) for name in sorted(names)}
-    paths,deps=inputs.relative_paths(spec),inputs.dependency_paths(spec)
+    paths,deps=inputs.relative_paths(spec),inputs.dependency_paths(spec,object_source=object_source)
     pins=dict(schema="world-reward-cari-clip-input-pins-v1",clip_spec=asdict(spec),
         input_report=dict(observed[paths["input_report"]],producer_revision=producer_revision,script_sha256=producer_script_sha256),
         source_files=observed)
+    if object_source == "solid":
+        pins.update(schema="world-reward-cari-clip-input-pins-v2",object_source="solid")
     inputs.validate_pins(spec,pins)
     # Preparse all six reports strictly only AFTER every source payload hash.
     records={"inputs":_strict_json((root/paths["input_report"]).read_text())}
@@ -174,6 +176,8 @@ def parser():
         result.add_argument("--"+name,required=True,action=Once)
     result.add_argument("--producer-code", action=Once, default=None,
         help="Independently authenticated readonly original producer directory; hash only, never execute")
+    result.add_argument("--object-source",choices=("default","solid"),action=Once,default=None,
+        help="Explicit fixed source profile; never inferred from an input report")
     return result
 
 
@@ -183,7 +187,7 @@ def main(argv=None):
         raise RuntimeError("Original frontend inventory is restricted to the canonical Azure Linux control host")
     spec=inputs.PublicClipSpec(args.episode,args.frames,args.camera_name,args.height,args.width)
     pins=inventory(ROOT,code,spec,args.producer_revision,args.producer_script_sha256,
-        producer_code=args.producer_code)
+        producer_code=args.producer_code,object_source=args.object_source if args.object_source is not None else "default")
     json.dump(pins,sys.stdout,allow_nan=False,separators=(",",":"));sys.stdout.write("\n")
 
 

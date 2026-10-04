@@ -84,16 +84,37 @@ def relative_paths(spec):
     }
 
 
-def dependency_paths(spec):
+def _object_source(value):
+    if type(value) is not str or value not in {"default", "solid"}:
+        raise ValueError("Only the fixed default or solid object source is permitted")
+    return value
+
+
+def source_profile(pins):
+    """Select only from the exact independent pin schema, before input reads."""
+    if type(pins) is not dict:
+        raise ValueError("Exact independent public input pins required")
+    keys = {"schema", "clip_spec", "input_report", "source_files"}
+    if set(pins) == keys and pins.get("schema") == "world-reward-cari-clip-input-pins-v1":
+        return "default"
+    if (set(pins) == keys | {"object_source"}
+            and pins.get("schema") == "world-reward-cari-clip-input-pins-v2"
+            and type(pins["object_source"]) is str and pins["object_source"] == "solid"):
+        return "solid"
+    raise ValueError("Exact v1 legacy or v2 solid-only public input pin schema required")
+
+
+def dependency_paths(spec, *, object_source="default"):
     base = "outputs/" + _spec(spec).sequence
+    object_directory = "object_pose_full" if _object_source(object_source) == "default" else "object_pose_full_solid"
     return {"body": base + "/body_full/report.json", "depth": base + "/depth_full/report.json",
-            "object": base + "/object_pose_full/report.json", "alignment": base + "/scale_smoke/report.json",
+            "object": base + "/" + object_directory + "/report.json", "alignment": base + "/scale_smoke/report.json",
             "adapter": base + "/body_full/cari_adapter/report.json"}
 
 
-def source_paths(spec):
+def source_paths(spec, *, object_source="default"):
     paths = relative_paths(spec)
-    return {paths[name] for name in paths if name != "export_seq"} | set(dependency_paths(spec).values()) | {
+    return {paths[name] for name in paths if name != "export_seq"} | set(dependency_paths(spec, object_source=object_source).values()) | {
         paths["export_seq"] + "/edex",
         *(paths["export_seq"] + f"/{kind}/{spec.camera_name}.h5" for kind in ("images", "human_masks", "object_masks")),
     }
@@ -111,14 +132,13 @@ def _receipt(value, *, producer=False):
 
 def validate_pins(spec, pins):
     _spec(spec)
-    if (type(pins) is not dict or set(pins) != {"schema", "clip_spec", "input_report", "source_files"}
-            or pins["schema"] != "world-reward-cari-clip-input-pins-v1"
-            or type(pins["clip_spec"]) is not dict or set(pins["clip_spec"]) != set(asdict(spec))):
+    object_source = source_profile(pins)
+    if type(pins["clip_spec"]) is not dict or set(pins["clip_spec"]) != set(asdict(spec)):
         raise ValueError("Complete explicit generic public clip pins required")
     parsed = PublicClipSpec(**pins["clip_spec"])
     if parsed != spec:
         raise ValueError("Pinned clip spec differs from the explicitly requested clip")
-    if type(pins["source_files"]) is not dict or set(pins["source_files"]) != source_paths(spec):
+    if type(pins["source_files"]) is not dict or set(pins["source_files"]) != source_paths(spec, object_source=object_source):
         raise ValueError("Exactly fifteen public input files required; no other predictions or assets")
     for row in pins["source_files"].values():
         _receipt(row)
@@ -150,7 +170,8 @@ def _record_identity(record, spec, *, legacy, dataset_required=False):
 
 def validate_reports(root, spec, pins):
     validate_pins(spec, pins)
-    paths, deps = relative_paths(spec), dependency_paths(spec)
+    object_source = source_profile(pins)
+    paths, deps = relative_paths(spec), dependency_paths(spec, object_source=object_source)
     read = lambda name: json.loads(public.regular(root / name).read_text())
     report = read(paths["input_report"])
     legacy = _legacy(spec, pins)
@@ -200,6 +221,18 @@ def validate_reports(root, spec, pins):
     source_pose = records["object"].get("geometry_and_poses_sha256")
     if type(source_pose) is not str or not re.fullmatch(r"[0-9a-f]{64}", source_pose):
         raise ValueError("Original automatic object pose artifact SHA required")
+    if object_source == "solid":
+        expected_source = dict(report=deps["object"],
+            geometry_and_poses="outputs/" + spec.sequence + "/object_pose_full_solid/geometry_and_poses.npz",
+            geometry_and_poses_sha256=source_pose)
+        if (type(report.get("object_source")) is not str or report["object_source"] != "solid"
+                or report.get("object_pose_source") != expected_source
+                or type(report.get("object_pose_source")) is not dict
+                or set(report["object_pose_source"]) != set(expected_source)
+                or records["object"].get("mesh_source") != "solid"):
+            raise ValueError("Pinned solid source/report/pose SHA must agree with the preparation")
+    elif report.get("object_source", "default") != "default" or "object_pose_source" in report:
+        raise ValueError("Legacy pins cannot select a different object source")
     validation = report.get("depth_validation", {})
     if (validation.get("validation_mode") != "exhaustive"
             or validation.get("frame_counts") != {spec.camera_name: spec.total_frames}
@@ -312,7 +345,7 @@ def verify_public_inputs(root, spec, pins):
         raise ValueError("Canonical existing public runtime root required")
     validate_pins(spec, pins)
     pinned = copy.deepcopy(pins)
-    observed = {name: identity(root / name) for name in sorted(source_paths(spec))}
+    observed = {name: identity(root / name) for name in sorted(source_paths(spec, object_source=source_profile(pinned)))}
     if observed != pinned["source_files"]:
         raise ValueError("Complete public source SHA/bytes differs before deserialization")
     records = validate_reports(root, spec, pinned)

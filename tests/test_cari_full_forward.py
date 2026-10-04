@@ -278,7 +278,7 @@ def test_wrapper_syntax_exact_mounts_no_prefix_private_or_cache():
     wrapper=HERE/"infra/run_cari_full_forward.sh"
     subprocess.run(["bash","-n",str(wrapper)],check=True)
     text=wrapper.read_text()
-    assert "source_paths(spec)" in text and "target.npy" in text and "903s" in text and "--network none" in text
+    assert "source_paths(spec,object_source=source_profile(pins))" in text and "target.npy" in text and "903s" in text and "--network none" in text
     assert "--memory 32g" in text and "--mount \"type=bind,src=$OUT,dst=$OUT\"" in text
     assert "/validation/" not in text and "multiview" not in text and 'src=$ROOT,dst=$ROOT' not in text
 

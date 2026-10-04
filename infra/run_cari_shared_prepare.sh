@@ -25,11 +25,11 @@ IMAGE="$(docker image inspect world-reward/cari4d-source:0.1 --format '{{.Id}}')
 SOURCES="$(PYTHONPATH="$CODE/src:$CODE/infra" python3 - "$PIN" "$EPISODE" <<'PYPATHS'
 import json,sys
 from pathlib import Path
-from cari_clip_inputs import PublicClipSpec,source_paths,validate_pins
+from cari_clip_inputs import PublicClipSpec,source_paths,source_profile,validate_pins
 pins=json.loads(Path(sys.argv[1]).read_text());spec=PublicClipSpec(**pins['clip_spec'])
 if spec.episode_index!=int(sys.argv[2]):raise ValueError('Explicit episode differs from pinned clip')
 validate_pins(spec,pins)
-print('\n'.join(sorted(source_paths(spec))))
+print('\n'.join(sorted(source_paths(spec,object_source=source_profile(pins)))))
 PYPATHS
 )"
 MOUNTS=(--mount "type=bind,src=$CODE,dst=$CODE,readonly")

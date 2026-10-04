@@ -266,6 +266,57 @@ def test_export_original_source_path_schema_matches_existing_public_contract(gat
     assert gate._public_source_paths(asdict(spec))==public.source_paths(spec)
 
 
+def test_solid_public_profile_substitutes_only_one_of_fifteen_paths(gate):
+    spec=dict(episode_index=29,total_frames=673,camera_name="front_stereo_camera_left",height=1152,width=1536)
+    default=gate._public_source_paths(spec);solid=gate._public_source_paths(spec,"solid")
+    base="outputs/episode_000029/"
+    assert gate._public_source_paths(spec,"default")==default
+    assert len(default)==len(solid)==15 and len(default&solid)==14
+    assert default-solid=={base+"object_pose_full/report.json"}
+    assert solid-default=={base+"object_pose_full_solid/report.json"}
+
+
+@pytest.mark.parametrize("profile",[None,True,0,[],{},"","volume","conditioned","solid/../default","SOLID"])
+def test_public_source_profile_is_a_bounded_enum(gate,profile):
+    spec=dict(episode_index=15,total_frames=501,camera_name="front_stereo_camera_left",height=1152,width=1536)
+    with pytest.raises(ValueError):gate._public_source_paths(spec,profile)
+
+
+@pytest.mark.parametrize("episode,count",[(0,96),(15,501),(29,673)])
+def test_solid_export_inventory_uses_exact_fifteen_sources_without_new_claim_fields(gate,tmp_path,episode,count):
+    root,directory,report=fixture(gate,tmp_path,"export",episode,count)
+    original_fields=set(report);base=f"outputs/episode_{episode:06d}/"
+    report["source_files"][base+"object_pose_full_solid/report.json"]=report["source_files"].pop(base+"object_pose_full/report.json")
+    assert set(report["source_files"])==gate._public_source_paths(report["clip_spec"],"solid")
+    write(directory/"report.json",report)
+    before={p.name:(p.stat().st_mode,p.read_bytes())for p in directory.iterdir()}
+    pins=gate.inventory(root,episode,"export","a"*40,"b"*64)
+    assert set(report)==original_fields and len(pins["export_files"])==5
+    assert pins["export"]==gate.identity(directory/"report.json")|dict(producer_revision="a"*40,script_sha256="b"*64)
+    assert before=={p.name:(p.stat().st_mode,p.read_bytes())for p in directory.iterdir()}
+    assert report["quality_verified"] is False and report["adoption_authorized"] is False
+
+
+@pytest.mark.parametrize("fault",["both","missing","volume","conditioned","foreign_episode","prefix","traversal","extra","bad_identity","aligned_mesh"])
+def test_solid_export_never_accepts_mixed_or_arbitrary_source_paths(gate,tmp_path,fault):
+    root,directory,report=fixture(gate,tmp_path,"export");base="outputs/episode_000015/"
+    old=base+"object_pose_full/report.json";new=base+"object_pose_full_solid/report.json"
+    sources=report["source_files"];sources[new]=sources.pop(old)
+    if fault=="both":sources[old]=dict(sources[new])
+    elif fault=="missing":sources.pop(new)
+    elif fault in("volume","conditioned"):
+        sources[base+f"object_pose_full_{fault}/report.json"]=sources.pop(new)
+    elif fault=="foreign_episode":sources[new.replace("000015","000014")]=sources.pop(new)
+    elif fault=="prefix":sources[new+".old"]=sources.pop(new)
+    elif fault=="traversal":sources[base+"object_pose_full_solid/../object_pose_full/report.json"]=sources.pop(new)
+    elif fault=="extra":sources[base+"object_budget_solid/report.json"]=dict(sources[new])
+    elif fault=="bad_identity":sources[new]["bytes"]=True
+    else:
+        mesh=next(name for name in sources if name.endswith("output_aligned.glb"));sources[mesh]["sha256"]="0"*64
+    write(directory/"report.json",report)
+    with pytest.raises(ValueError):gate.inventory(root,15,"export","a"*40,"b"*64)
+
+
 def test_export_independently_supplied_actual_dispatch_identity_not_inferred(gate,tmp_path):
     root,directory,report=fixture(gate,tmp_path,"export")
     revision="bf54ceb75d3b4240f24639184de47a7ac209f02e"

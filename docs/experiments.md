@@ -8525,9 +8525,9 @@ Solid tracker opt-in adds one inert CPU-qualified geometry reader to the existin
 full-T ICP/Viterbi path; no native pose/cost operator changes. Independent
 readonly audit finds exact mounts, UID1000 reservation, original FD9 lock,
 7200s native budget and source/post/cleanup checks coherent. Wrapper114 focused
-tests pass. Root409 combined checks initially408PASS/1FAIL on historical textual
+tests pass. Root409 combined checks repeatedly408PASS/1FAIL on three historical textual
 assertions, not numerical behavior; conditioned output/padding syntax restored,
-only explicit new renderer enum asserted. Corrected routing31PASS0.25s; exclusive
+only explicit new renderer enum/assertions updated. Final routing31PASS0.25s; exclusive
 fixtures cleaned. First CPU inert smoke used the geometry producer archive,
 whose entrypoint closure lacks the new consumer: ModuleNotFoundError before
 artifact interpretation, no native geometry/GPU/model call. Next smoke must use
@@ -8539,3 +8539,20 @@ owned container/scratch removed. Failure reason/source audit pending; no mesh
 pins or tracking allowed from inner failed compiler. EP21 full563 originalexport
 queue reaches child_complete19:43:21UTC under6a9c722; exact sealedoutputs and
 source verification remain required, collected unit is not evidence alone.
+
+Final root tracker/loader/wrapper/pose correctness suite232PASS14.83s,
+10346exclusivefixtureentries removed. Fulltracker31ff94d source-only published
+237files (native NOTdispatched), archive23856387871410365776a715207c069146921cca498ba225c226b3d45b80dd88
+ledger0e6337ce53b039d63e2590b22d20893cbe6a5c266a89f20ff2e497b62e388920.
+Second inert smoke rejected synthetic container-parent mode0755 after artifact
+leaf mounts; actual Azure proposal remains555/unmodified. Controller-only
+correction mounts sealedproposal/qualification directoriesRO exactlyasGPUwrapper,
+no source/math/operator/gate changes.
+
+Modern source contract extends ONLY independently pinned inputv2: bounded
+object_source=solid, stillfive PublicClipSpec fields andfifteen public artifacts,
+exactlyoneobjectreportpath substitution. Oldinputv1 and stagepins remain unchanged;
+existing modern algorithms propagate full source inventories and unchanged
+pose/gauge. Independenttests1042PASS2skips57.87s plus exportinventory231PASS0.78s.
+No new modelstack/orchestrator/pathalias/overwrites; canonical cari_inputs remains
+fresh-only. Actual solid pose/prepare/deployment/adoption stillprerequisites.

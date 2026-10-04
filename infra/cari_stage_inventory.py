@@ -158,16 +158,19 @@ def _bounded_number(value,maximum,label):
         raise ValueError(label)
 
 
-def _public_source_paths(spec):
-    """Exact original fifteen identities; no payload interpretation/imports."""
+def _public_source_paths(spec, source_profile="default"):
+    """Exact fifteen identities; solid substitutes only the pose receipt."""
+    if type(source_profile) is not str or source_profile not in ("default", "solid"):
+        raise ValueError("Exact default or solid public source profile required")
     base=f"outputs/episode_{spec['episode_index']:06d}"
     export=base+f"/cari_inputs/export/episode_{spec['episode_index']:06d}"
+    pose="object_pose_full_solid" if source_profile=="solid" else "object_pose_full"
     return {
         base+"/cari_inputs/aligned_depth.h5",base+"/cari_inputs/own_object_poses.pkl",
         base+"/body_full/cari_adapter/canonical_initializer.pkl",base+"/cari_inputs/report.json",
         export+"/object_mesh/output_aligned.glb",export+"/wild_export.json",export+"/edex",
         *(export+f"/{kind}/{spec['camera_name']}.h5" for kind in ("images","human_masks","object_masks")),
-        *(base+"/"+name+"/report.json" for name in ("body_full","depth_full","object_pose_full","scale_smoke","body_full/cari_adapter")),
+        *(base+"/"+name+"/report.json" for name in ("body_full","depth_full",pose,"scale_smoke","body_full/cari_adapter")),
     }
 
 
@@ -200,7 +203,8 @@ def _validate_export_receipt(report,spec,files):
     for key in ("refined_report_sha256","refined_bundle_sha256","aligned_object_mesh_sha256"):_hex(report.get(key),64,key)
     for key in ("input_pins","refined_pins"):_receipt(report.get(key))
     original=report.get("source_files")
-    if type(original) is not dict or set(original)!=_public_source_paths(spec):
+    if type(original) is not dict or not any(set(original)==_public_source_paths(spec,profile)
+                                           for profile in ("default","solid")):
         raise ValueError("Exact fifteen original public source identities required")
     for row in original.values():_receipt(row)
     mesh=f"outputs/episode_{spec['episode_index']:06d}/cari_inputs/export/episode_{spec['episode_index']:06d}/object_mesh/output_aligned.glb"

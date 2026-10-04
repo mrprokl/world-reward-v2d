@@ -123,6 +123,29 @@ def test_synchronous_unchanged_child_under_existing_lock(runtime, stage, status)
     assert not (runtime['root'] / f'outputs/episode_000005/cari_shared_{stage}_v1').exists()
 
 
+@pytest.mark.parametrize('stage', CHILDREN)
+def test_solid_v2_input_profile_preserves_same_modern_child_and_lock(runtime, stage):
+    path=runtime['pins']['input'];record=json.loads(path.read_text())
+    record.update(schema='world-reward-cari-clip-input-pins-v2',object_source='solid')
+    path.chmod(0o644);path.write_text(json.dumps(record));path.chmod(0o444)
+    args=runtime['args'][:];args[1]=stage;result=runtime['run'](*args)
+    assert result.returncode==0,result.stderr
+    assert runtime['calls']()[-1]==['child',CHILDREN[stage][0],'--episode','5',runtime['lock'].stat().st_ino]
+
+
+@pytest.mark.parametrize('fault',['default','bool','missing','extra','v1solid'])
+def test_solid_queue_schema_rejects_ambiguous_profiles_before_tools(runtime,fault):
+    path=runtime['pins']['input'];record=json.loads(path.read_text())
+    record.update(schema='world-reward-cari-clip-input-pins-v2',object_source='solid')
+    if fault=='default':record['object_source']='default'
+    elif fault=='bool':record['object_source']=True
+    elif fault=='missing':record.pop('object_source')
+    elif fault=='extra':record['object_path']='arbitrary'
+    else:record['schema']='world-reward-cari-clip-input-pins-v1'
+    path.chmod(0o644);path.write_text(json.dumps(record));path.chmod(0o444)
+    assert runtime['run'](*runtime['args']).returncode!=0 and not runtime['calls']()
+
+
 @pytest.mark.parametrize('args', [[], ['--help'], ['--stage', 'prepare'],
     ['--stage', 'other', '--episode', '5', '--wait-for', 'world-reward-test'],
     ['--stage', 'prepare', '--episode', '05', '--wait-for', 'world-reward-test'],

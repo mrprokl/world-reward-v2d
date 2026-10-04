@@ -4,6 +4,7 @@ from dataclasses import FrozenInstanceError, asdict
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 import sys
 from types import SimpleNamespace
 
@@ -130,6 +131,108 @@ def repin(gate, root, spec):
     return dict(schema="world-reward-cari-clip-input-pins-v1", clip_spec=asdict(spec),
                 input_report=gate.identity(root / paths["input_report"]) | {name: row[name] for name in ("producer_revision", "script_sha256")},
                 source_files={name: gate.identity(root / name) for name in gate.source_paths(spec)})
+
+
+def solid_pins(gate, root, spec):
+    """Select the new fixed source using independently supplied tiny pin bytes."""
+    paths = gate.relative_paths(spec)
+    deps = gate.dependency_paths(spec, object_source="solid")
+    row = json.loads((root / paths["input_report"]).read_text())
+    row["input_report_sha256"] = {role: gate.identity(root / name)["sha256"] for role, name in deps.items()}
+    write_json(root / paths["input_report"], row)
+    return dict(schema="world-reward-cari-clip-input-pins-v2", object_source="solid", clip_spec=asdict(spec),
+                input_report=gate.identity(root / paths["input_report"]) | {key: row[key] for key in ("producer_revision", "script_sha256")},
+                source_files={name: gate.identity(root / name) for name in gate.source_paths(spec, object_source="solid")})
+
+
+def solid_fixture(gate, root, spec):
+    fixture(gate, root, spec)
+    old = root / gate.dependency_paths(spec)["object"]
+    new = root / gate.dependency_paths(spec, object_source="solid")["object"]
+    new.parent.mkdir(parents=True); old.rename(new)
+    obj = json.loads(new.read_text()); obj["mesh_source"] = "solid"; write_json(new, obj)
+    path = root / gate.relative_paths(spec)["input_report"]
+    row = json.loads(path.read_text())
+    row.update(object_source="solid", object_pose_source=dict(
+        report=str(new.relative_to(root)), geometry_and_poses=str(new.with_name("geometry_and_poses.npz").relative_to(root)),
+        geometry_and_poses_sha256=obj["geometry_and_poses_sha256"]))
+    write_json(path, row)
+    return solid_pins(gate, root, spec)
+
+
+def test_solid_profile_exactly_one_substitution_and_unchanged_five_field_spec(gate, tmp_path, monkeypatch):
+    spec = gate.PublicClipSpec(9, 97, "front", 2, 4)
+    pins = solid_fixture(gate, tmp_path, spec); before = copy.deepcopy(pins)
+    old, new = gate.source_paths(spec), gate.source_paths(spec, object_source="solid")
+    assert len(old) == len(new) == 15
+    assert old - new == {"outputs/episode_000009/object_pose_full/report.json"}
+    assert new - old == {"outputs/episode_000009/object_pose_full_solid/report.json"}
+    assert len(asdict(spec)) == 5 and set(pins) == {"schema", "clip_spec", "input_report", "source_files", "object_source"}
+    assert gate.source_profile(pins) == "solid"
+    # The fifteen-file consumer does not open a geometry NPZ or re-run a loader.
+    monkeypatch.setattr(np, "load", lambda *_a, **_k: pytest.fail("No new geometry solver/NPZ deserialization"))
+    result = gate.verify_public_inputs(tmp_path, spec, pins)
+    assert result["poses"]["frames"] == [f"{i:06d}" for i in range(97)]
+    assert result["source_files"] == pins["source_files"] and pins == before
+    assert result["paths"] == {key: tmp_path / name for key, name in gate.relative_paths(spec).items()}
+
+
+@pytest.mark.parametrize("fault", ["v1solid", "v2default", "bool", "path", "extra", "mixed", "missing"])
+def test_solid_pin_profile_rejected_before_any_input_read(gate, tmp_path, monkeypatch, fault):
+    spec = gate.PublicClipSpec(9, 96, "front", 2, 4); pins = solid_fixture(gate, tmp_path, spec)
+    if fault == "v1solid": pins["schema"] = "world-reward-cari-clip-input-pins-v1"
+    elif fault == "v2default": pins["object_source"] = "default"
+    elif fault == "bool": pins["object_source"] = True
+    elif fault == "path": pins["object_source"] = "../object_pose_full_solid"
+    elif fault == "extra": pins["other"] = None
+    elif fault == "mixed": pins["source_files"][gate.dependency_paths(spec)["object"]] = pins["source_files"].pop(gate.dependency_paths(spec, object_source="solid")["object"])
+    else: pins.pop("object_source")
+    monkeypatch.setattr(gate, "identity", lambda *_: pytest.fail("No input reads before exact pin selection"))
+    with pytest.raises(ValueError): gate.verify_public_inputs(tmp_path, spec, pins)
+
+
+@pytest.mark.parametrize("fault", ["source", "report", "path", "sha", "extra", "mesh", "metadata", "payload"])
+def test_solid_prepared_source_and_pose_metadata_must_agree_with_independent_pins(gate, tmp_path, monkeypatch, fault):
+    spec = gate.PublicClipSpec(9, 96, "front", 2, 4); pins = solid_fixture(gate, tmp_path, spec)
+    path = tmp_path / gate.relative_paths(spec)["input_report"]; row = json.loads(path.read_text())
+    if fault == "source": row["object_source"] = "default"
+    elif fault == "report": row["object_pose_source"]["report"] = gate.dependency_paths(spec)["object"]
+    elif fault == "path": row["object_pose_source"]["geometry_and_poses"] = "/arbitrary/geometry.npz"
+    elif fault == "sha": row["object_pose_source"]["geometry_and_poses_sha256"] = "f" * 64
+    elif fault == "extra": row["object_pose_source"]["other"] = 1
+    elif fault == "mesh":
+        objpath = tmp_path / gate.dependency_paths(spec, object_source="solid")["object"]
+        obj = json.loads(objpath.read_text()); obj["mesh_source"] = "volume"; write_json(objpath, obj)
+    elif fault == "metadata":
+        objpath = tmp_path / gate.relative_paths(spec)["object_poses"]
+        obj = joblib.load(objpath); obj["metadata"]["source_pose_sha256"] = "f" * 64; joblib.dump(obj, objpath)
+        row["file_sha256"]["object_poses"] = gate.identity(objpath)["sha256"]
+    else:
+        (tmp_path / gate.relative_paths(spec)["object_poses"]).write_bytes(b"changed after pins")
+        monkeypatch.setattr(joblib, "load", lambda *_: pytest.fail("Hashes before any Joblib load"))
+    if fault != "payload":
+        write_json(path, row); pins = solid_pins(gate, tmp_path, spec)
+    with pytest.raises(ValueError): gate.verify_public_inputs(tmp_path, spec, pins)
+
+
+@pytest.mark.parametrize("value", [None, True, "volume", "solid/../default"])
+def test_public_path_enumerator_rejects_nonfixed_sources(gate, value):
+    with pytest.raises(ValueError): gate.source_paths(gate.PublicClipSpec(9, 96, "front", 2, 4), object_source=value)
+
+
+@pytest.mark.parametrize("wrapper", ["run_cari_shared_prepare.sh", "run_cari_full_forward.sh", "run_cari_full_refine.sh", "run_cari_full_export.sh"])
+@pytest.mark.parametrize("profile", ["default", "solid"])
+def test_actual_wrapper_enumerator_remains_stdlib_only_and_selects_exact_fifteen(gate, tmp_path, wrapper, profile):
+    spec = gate.PublicClipSpec(9, 96, "front", 2, 4)
+    pins = solid_fixture(gate, tmp_path, spec) if profile == "solid" else fixture(gate, tmp_path, spec)
+    pin = tmp_path / "pins.json"; write_json(pin, pins)
+    infra = Path(__file__).resolve().parents[1] / "infra"
+    fragment = (infra / wrapper).read_text().split("<<'PYPATHS'\n", 1)[1].split("\nPYPATHS", 1)[0]
+    argv = ["-", str(pin), str(tmp_path / "unused-prepare-pin.json"), "9"] if wrapper == "run_cari_full_forward.sh" else ["-", str(pin), "9"]
+    program = f"import sys;sys.path.insert(0,{str(infra)!r});sys.argv={argv!r}\n" + fragment
+    result = subprocess.run([sys.executable, "-I", "-B", "-S", "-c", program], capture_output=True, text=True, timeout=5)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.splitlines() == sorted(gate.source_paths(spec, object_source=profile))
 
 
 @pytest.mark.parametrize("episode", [0, 15, 29])

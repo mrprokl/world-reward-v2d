@@ -305,6 +305,6 @@ def test_wrapper_bash_syntax_and_no_argument_paths_fail_before_cloud_cli(gate):
     source=path.read_text()
     assert "--network none" in source and "--gpus all" in source
     assert "603s docker run" in source and "read -r relative" in source
-    assert "source_paths(spec)" in source and "validate_pins(spec,pins)" in source
+    assert "source_paths(spec,object_source=source_profile(pins))" in source and "validate_pins(spec,pins)" in source
     assert "src=$ROOT/outputs,dst=$ROOT/outputs" not in source
     assert "src=$ROOT/data" not in source and "track_2" not in source and "track_3" not in source

@@ -73,9 +73,14 @@ for role in roles:
  suffix='input'if role=='input'else 'shared_'+role
  path=code/f'configs/cari_clip_{episode:06d}_{suffix}_pins.json'
  pin=json.loads(raw(path),object_pairs_hook=pairs,parse_constant=lambda _: (_ for _ in ()).throw(ValueError('Nonfinite frozen pin forbidden')))
- expected='world-reward-cari-clip-input-pins-v1'if role=='input'else f'world-reward-cari-shared-{role}-pins-v1'
- keys={'schema','clip_spec','input_report','source_files'}if role=='input'else {'schema','clip_spec',role,role+'_files'}
- if type(pin)is not dict or set(pin)!=keys or pin['schema']!=expected:raise ValueError('Exact required committed stage pin schema required')
+ if role=='input':
+  keys={'schema','clip_spec','input_report','source_files'}
+  if type(pin)is not dict or not(set(pin)==keys and pin.get('schema')=='world-reward-cari-clip-input-pins-v1' or
+      set(pin)==keys|{'object_source'} and pin.get('schema')=='world-reward-cari-clip-input-pins-v2' and
+      type(pin.get('object_source'))is str and pin['object_source']=='solid'):
+   raise ValueError('Exact legacy v1 or solid-only v2 input pin schema required')
+ elif type(pin)is not dict or set(pin)!={'schema','clip_spec',role,role+'_files'} or pin['schema']!=f'world-reward-cari-shared-{role}-pins-v1':
+  raise ValueError('Exact required committed stage pin schema required')
  value=pin['clip_spec']
  if type(value)is not dict or set(value)!={'episode_index','total_frames','camera_name','height','width'} or type(value['episode_index'])is not int or value['episode_index']!=episode or type(value['total_frames'])is not int or value['total_frames']<96 or any(type(value[k])is not int or value[k]<2 for k in('height','width')) or type(value['camera_name'])is not str or not re.fullmatch(r'[A-Za-z0-9_-]{1,64}',value['camera_name']):raise ValueError('Full original selected clip spec required')
  if spec is not None and value!=spec:raise ValueError('Required stage pins must identify the same original clip')
