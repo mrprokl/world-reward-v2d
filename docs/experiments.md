@@ -8921,3 +8921,30 @@ pose/nativeprepare both trace identical independentqueryproof. Default rejects
 balancedprovenance, oldEP09producer untouched. NoICP/Viterbi/F32roundtrip/camera/
 geometrymath or acceptancegatechanged. Agent296PASS35.46s/root130PASS14.42s;
 allrootownedfixtures12343+11239entries cleaned, noproductionPASS implied.
+
+EP25 balanced replay full independent audit now PASS: all221 source leaves,
+original QEM/current query/runtime, separate15+4 qualifications, input binding,
+host/native proof equality and pre/post artifacts rechecked. Native receipt
+103354B SHAb48c72a1dc0d24c6fe910973bd6e85789c35ffc5653855142423d411b08dfccb,
+15.371491s; exact source query rejects self-intersection, zeroQEM. Owned container
+absence and disposable cleanup independently confirmed. This closes the source;
+the retained earlier SIGSEGV cause is still not established.
+
+EP09 shared preparation c80ee35 actualPASS18.766984s/full415, report21246B
+SHA5709e249b4819ed84b7f81696d193b18ddf2594cf986a012da8bae6d53608efc.
+Independent205-file archive0ac71906be2ccf26c3a82f6d6f36c0381a99895bdfb7b2de8d43f176f9b69ced
+ledger6f623fb22beed6430155ed3034cf5b7a4132139a64822dab5d4dbbf9967f8d71,
+exact4 frozen outputs/15 public inputs/10 helpers/3 native-reference bindings,
+actual model assets/source and full415 initializer/direct/target ABI PASS in
+offline readonly CPU audit. All26 original chunks and producer reference gates
+validated: native direct max0.004783621mm, replay0.001011524mm, reference worst
+frame mean0.001340277mm; no new GPU decode or independent accuracy claim.
+New prepare pins frozen only after audit; root595PASS2optionalSKIP53.79s.
+
+Real-native point qualification9d4badf first dispatch FAILED before wrapper,
+container or output creation: systemd expanded the controller's literal `$$`
+and its FD9 check attempted `/proc/$/fd/9`. Original61B log
+SHA6eaa1ffa1a38c2e68a7e284dda288fa9adeb4d7d6166cbe44f8ddc5bc55ee3c9 retained;
+terminal unit status1, output absent and GPU idle independently observed.
+No constructor/update or native qualification PASS. A scheduling-only correction
+must preserve numerical driver/native source and use a fresh namespace.

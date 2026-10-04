@@ -23,7 +23,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 0 | 790 | Full native refinement and direct export PASS42.687162s, whole source chain/four outputs pinned. Official packing PASS16.896468s/all790 frames, scratch removed; old conversion failure separate. |
 | 4 | 747 | Tracking stops at18 empty automatic object masks; full trajectory unavailable. |
 | 7 | — | Empty automatic fixed anchor; closed without reroll. |
-| 9 | 415 | Historical failures preserved. Whole-solid geometry/full415pose PASS. Fresh f5e6030 native input preparation PASS3219.182s; independent224-source/39-input-ledger audit and actual saved F32/native-loaded mesh roundtrip6.260959e-7m PASS under unchanged1e-5m bound. Shared native chain still pending. No HOI quality claim. |
+| 9 | 415 | Historical failures preserved. Whole-solid geometry/full415pose PASS. Fresh f5e6030 native input preparation PASS3219.182s; independent224-source/39-input-ledger audit and actual saved F32/native-loaded mesh roundtrip6.260959e-7m PASS under unchanged1e-5m bound. Shared preparation c80ee35 PASS18.766984s and independently frozen after full415 ABI/source/asset checks; forward/refine/export still pending. No HOI quality claim. |
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
 | 12 | 405 | Full native refinement and direct export PASS31.726037s, whole source chain/four outputs pinned. Official packing PASS13.521699s/all405, scratch removed. |
