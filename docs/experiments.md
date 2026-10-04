@@ -8270,3 +8270,12 @@ canonical EP25 parent does not yet exist on fresh VM02. Original inputs/source
 and existing image pass; no source/array/prompt/numerical change justifies retry.
 Preserve this failed unit/log. A fresh metadata-only parent creation and new
 immutable revision may enable an explicitly recorded packaging-only replay.
+
+Prepared general whole-oriented-solid compiler and four fresh curved controls:
+root88 pure/mocked tests PASS0.38s, owned76-entry fixtures removed. Independent
+audit finds the third full source fails the unchanged midpoint-chart inverse:
+1477 F64 coordinates change, max2^-53, origin(.625,0,0),scale4. Frozen7173B
+manifest SHA766ed8adfbe6a7e232a6c2e2bf6b293b2d24869afcbe54b5fe8dca41acc3f769.
+All-source gate FAIL; zero native QEM/CGAL calls, no qualification/adoption,
+no challenge arrays changed. Preserve fixtures/gates; investigate a separately
+source-bound deterministic chart method on a fresh predeclared cohort.
