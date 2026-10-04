@@ -120,3 +120,26 @@ primitives avoid carrying unrelated challenge controllers into acquisition.
 Root134focused acquisition/transition/BOP/private-motion tests PASS2.31s plus
 one Linux-only skip; scientific function AST and all non-time protocol fields
 match the original frozen producer. Actual archive/continuation pending.
+
+
+The external Objects/track implementation retains **raw native triangles**, not
+Track1's fixed4096 budget geometry. It is a native24+1 motion baseline on the
+same raw predicted mesh in both branches, not a packed Track1/CARI4D baseline.
+Packing/topology/fidelity/submission eligibility remain separate adoption gates.
+The pixel K is exactly diag(W,H,1) times original normalized FP32 intrinsics,
+not rounded to the theoretical800 focal prior. Open/negative-volume surfaces
+are audited without repair; finite nondegenerate triangles, proper transforms
+and unambiguous supported rays are mandatory. All three final prediction NPZs
+are rehashed after the final source/model/input postchecks, including failures.
+
+The separately tested private BOP adapter binds each original instance by its
+unique positive obj_id across all96 frames; repeated/missing IDs fail instead
+of pose-error matching. Original uint16 cameraZ×declared depth_scale/1000 and
+GT translation/1000 are the only millimetre-to-metre conversions. Exact all-frame
+K/depth units and original initial mask order are mandatory. Full private
+inventory is authenticated before any private values are decoded; all3proper
+frozen prediction trajectories and automatic initial masks precede truth access.
+CPU report explicitly requires a separately verified host-wrapper postreceipt;
+a container PASS alone cannot authorize a scientific decision. No real private
+labels or held-out3D quality has been evaluated. Root192combined Objects/track/
+evaluator/BOP/private-motion tests PASS0.91s; later full-suite check follows.
