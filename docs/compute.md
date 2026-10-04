@@ -23,7 +23,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 0 | 790 | Full native refinement and direct export PASS42.687162s, whole source chain/four outputs pinned. Official packing PASS16.896468s/all790 frames, scratch removed; old conversion failure separate. |
 | 4 | 747 | Tracking stops at18 empty automatic object masks; full trajectory unavailable. |
 | 7 | — | Empty automatic fixed anchor; closed without reroll. |
-| 9 | 415 | Historical topology/conditioned failures preserved. Whole-solid compiler passes all six fidelity stages; actual full415posePASS1426.256s under31ff94d. Original nativeprepare FAIL archived without byte changes; exact native Trimesh semantics and procedural controls verified. Fresh f5e6030 CPUprepare running at audit, not PASS. HOI quality unverified. |
+| 9 | 415 | Historical failures preserved. Whole-solid geometry/full415pose PASS. Fresh f5e6030 native input preparation PASS3219.182s; independent224-source/39-input-ledger audit and actual saved F32/native-loaded mesh roundtrip6.260959e-7m PASS under unchanged1e-5m bound. Shared native chain still pending. No HOI quality claim. |
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
 | 12 | 405 | Full native refinement and direct export PASS31.726037s, whole source chain/four outputs pinned. Official packing PASS13.521699s/all405, scratch removed. |
@@ -38,7 +38,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 22 | — | Original predecessor-wait failure preserved. New full initializers complete, then native geometry rejects boundary/nonmanifold or orientation/Euler changes18:57:32UTC; no trajectory. |
 | 23 | 552 | Full original initializers actual PASS17:56:49UTC. Unchanged31ff94d first default fullpose rejects all eight topology-budget candidates; empty reserved directory only, no trajectory/repair. |
 | 24 | — | Automatic actor ambiguity rejected before frontends; no manual selection. |
-| 25 | 365 | Full initializers and Azure-only transfer pass. Whole-solid compiler stops at first exact query SIGSEGV(-11), zeroQEM: technical failure, not invalid-solid certification. Separate generic ASan control reproduces lazy sum stack-overflow and balanced exactzero; mechanism supported, production cause unproved. No revised production query/trajectory. |
+| 25 | 365 | Original exact query SIGSEGV(-11), zeroQEM preserved. Independently qualified15-query/4-QEM controls authorize a fresh balanced-query technical replay under84fad21, dispatched only; original QEM/geometry/gates unchanged. No trajectory or accuracy PASS presumed. |
 | 26 | 399 | Full original initializers pass, no object trajectory yet. |
 | 27 | 440 | Full original initializers pass, no object trajectory yet. |
 | 28 | 366 | Full original initializers pass18:04:45UTC, no object trajectory yet. |

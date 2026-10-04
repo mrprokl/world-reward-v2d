@@ -8866,3 +8866,36 @@ prepostproofs PASS; actual16.675492s native18.078832s host. NoQEMrecompile,
 productioncause orHOIgain. Originalcontroller expected3retainedfiles instead
 of actual4(native.log0644): readonlycensus correction only; originalPASS untouched.
 Separate balancedcompositionpins created ONLY afteractualindependentaudit.
+
+EP09 freshf5e6030 nativeinputprepare actualPASS3219.182013s/full415,
+report20611B SHA690f771f42dfddd339d3ecc18c84ea812dac803427178e95d34e20d421f45982.
+Independent224-file closure/archive/ledger,39solid dependency leaves,6installed
+Trimesh sources+2nativeCPUloader ASTs, fullbody/depth/object framecoverage and
+actualsavedF32poses/nativeF32mesh roundtripPASS6.260959032816361e-7m, inherited
+1e-5m bound unchanged. Nine shells/allmeaningfulfaces retained. Collectedunit
+not-found/PID0 is not success evidence: journal proves Deactivatedsuccessfully
+and finalactualPASS log1356B SHA75e3880b06b009408d546ed9b5974c1a5d7c3b9c1f9d1dc6cd6ba66e33cf11a7.
+Firstrootcontroller expectedloadedunit and stopped beforegeometry; correction
+authenticates journal+actualreceipt, not production. OldpartialFAIL unchanged.
+New232-source hash-only inputinventory dispatched84fad21 (ACKonly);15inputpins
+must be independently checked before the sharednative chain. No quality gain.
+
+EP25 original3952870 host/nativeFAIL/source/runtime/cleanup independently
+rechecked; original SIGSEGV is not a geometry rejection. Fresh balancedquery
+technicalreplay84fad21 dispatched only AFTER15+4actualindependentcontrols and
+newnamespaceabsence.221source archive3fae05c5ef655a836a98ca6f84073bbb18ed6b9bfc9ff59a57dd6c47b65ac612,
+ledgerb990ac2e4960a80c622fae786ccdaf525247084f38aaf2d306293a93fe180979.
+OriginalQEMunchanged, oneQEM/eightqueries/sixfidelitystages/budgets unchanged.
+ACK is not execution PASS, actualshapeaccuracy or originalcrashcausality.
+
+Real-native zero-weight point qualification implemented atd82c456; frozenEP21
+full563 inputs/forward, actualMHR constructor/contact/render/scheduler required.
+Freshpaired originalA and explicitsubclassB, resetRNG0, actualloss/gradient probes
+0+181 and301+301updates, exactinitialstate/history/result parity orSTOP. Only
+newpointmetadata excluded from result comparison. Automatic original192ray
+attachments use actualAconstructor pose/loadedF32mesh; future support allfalse
+and finite coordinates are NUMERICALCONTROL_NOTTRACKER, never predictions.
+Weight0/scale1/reference runtime-only-no-calibration is not a tuned positive
+fit or accuracy test. Root219PASS11optionalSKIP1.72s; no actualGPU PASS yet.
+Rootownedscratch removed; initialmissingtestfilename/readonlycleanup failures
+changed no sources or runtime gates.
