@@ -29,6 +29,19 @@ HELPERS=('infra/hand_mask_infer.py','infra/run_hand_mask_infer.sh','infra/mediap
 HELPERS=tuple(dict.fromkeys(HELPERS))
 
 
+def frontend_json(rt,model):
+    """Project only the authenticated selected-contract destination into JSON."""
+    rt.require(type(model)is dict and set(model)=={'child_image','parent_image','owner','source_files','selected_contract'},
+        'Exact original frontend proof schema required')
+    contract=model['selected_contract']
+    rt.require(type(contract)is dict and set(contract)=={'destination','entries','manifest_identity','extraction_receipt_identity','config_identity'}
+        and isinstance(contract['destination'],Path),'Exact selected-contract path schema required')
+    destination=rt.canonical(contract['destination'])
+    projected=dict(model,selected_contract=dict(contract,destination=str(destination)))
+    json.dumps(projected,allow_nan=False)  # No other Path/unknown object is coerced.
+    return projected
+
+
 def protocol(rt,code):
     pin=rt.identity(code/PROTOCOL)
     value=rt.strict((code/PROTOCOL).read_bytes())
@@ -189,7 +202,7 @@ def run_native(rt,root,code,out,proof_path,proof_pin):
         rt.require(all(rt.identity(p,32<<20)==pin for p,pin in frozen.items()),'ALL scans/RGB frozen before values')
         _,pin=protocol(rt,code);rt.require(pin==proof['protocol_identity'],'Paired protocol changed')
         manifest,_=scan.public_inputs(rt,root,code,proof['acquisition'],'v2')
-        model,assets=frontend.frontend_proof(code);rt.require(model==proof['frontend']and assets==proof['assets'],'Frontend source/model proof differs');check()
+        model,assets=frontend.frontend_proof(code);rt.require(frontend_json(rt,model)==proof['frontend']and assets==proof['assets'],'Frontend source/model proof differs');check()
         import numpy as np
         import torch
         from PIL import Image
@@ -255,12 +268,14 @@ def run(root,code,revision):
     name='world-reward-hand-mask-infer-'+revision[:12]
     rt.require(not rt.control(['docker','ps','-aq','--filter','name=^/'+name+'$']).strip(),'Owned container name occupied')
     control=root/'results'/('hand-mask-infer-'+revision);rt.canonical(control);rt.require(not control.exists(),'Fresh owned inference namespace required')
-    control.mkdir(mode=0o700);out=control/'predictions';out.mkdir(mode=0o700)
+    out=control/'predictions'
     proof=dict(source_binding=source,protocol_identity=protocol_pin,manifest=evidence['acquisition']['manifest'],
-        acquisition=evidence['acquisition'],scan_pins=pins,predictions=str(predictions),frontend=model,assets=assets,
+        acquisition=evidence['acquisition'],scan_pins=pins,predictions=str(predictions),frontend=frontend_json(rt,model),assets=assets,
         frozen={str(p):pin for p,pin in{**evidence['public'],**frozen}.items()if p!=code/SCAN_PINS
                 and p!=predictions.parent/'report.json'},remaining_seconds=remaining)
-    rt.write(control/'native-proof.json',(json.dumps(proof,sort_keys=True)+'\n').encode());proof_pin=rt.identity(control/'native-proof.json')
+    raw_proof=(json.dumps(proof,sort_keys=True,allow_nan=False)+'\n').encode()
+    control.mkdir(mode=0o700);out.mkdir(mode=0o700)
+    rt.write(control/'native-proof.json',raw_proof);proof_pin=rt.identity(control/'native-proof.json')
     report=dict(stage='hand_mask_infer_host_seal',status='fail',
         producer_revision=revision,source_binding=source,protocol_identity=protocol_pin,scan_pins=pins,
         image_id=frontend.binding.IMAGE,private_values_read=False,quality_verified=False,owned_cleanup_verified=False,source_rehashed_after=False)

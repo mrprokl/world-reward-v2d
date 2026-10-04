@@ -18,6 +18,39 @@ from world_reward.hand_observations import HandInstances,HandObservations,Landma
 from world_reward.hand_mask_proposals import propose_hand_masks
 
 
+def frontend_model(destination,image='sha256:'+'d'*64):
+    pin=dict(bytes=1,sha256='e'*64)
+    return dict(child_image=dict(Id=image,Architecture='amd64',Os='linux',RootFS={'Type':'layers','Layers':[]}),
+        parent_image=dict(Id='sha256:'+'c'*64,RootFS={'Type':'layers','Layers':[]}),owner='f'*64,
+        source_files={'sam2/sam2/__init__.py':pin},selected_contract=dict(destination=destination,
+            entries={'results/weights-acquisition.json':dict(type='file',role='source_receipt',**pin)},
+            manifest_identity=pin,extraction_receipt_identity=pin,config_identity=pin))
+
+
+def test_actual_frontend_shape_projection_roundtrip_preserves_every_other_value(tmp_path):
+    model=frontend_model(tmp_path/'frontend-assets-extracted');before=copy.deepcopy(model)
+    projected=adapter.frontend_json(rt,model)
+    expected=copy.deepcopy(model);expected['selected_contract']['destination']=str(model['selected_contract']['destination'])
+    assert projected==json.loads(json.dumps(projected))==expected
+    assert model==before and isinstance(model['selected_contract']['destination'],Path)
+    assert projected is not model and projected['selected_contract']is not model['selected_contract']
+    # A fresh native validation still returns Path; compare its explicit projection.
+    assert adapter.frontend_json(rt,frontend_model(tmp_path/'frontend-assets-extracted'))==json.loads(json.dumps(projected))
+
+
+@pytest.mark.parametrize('fault',['noncanonical','symlink','string','extra','unknown_path','nonfinite'])
+def test_frontend_projection_rejects_unqualified_paths_or_general_object_coercion(tmp_path,fault):
+    model=frontend_model(tmp_path/'assets')
+    if fault=='noncanonical':model['selected_contract']['destination']=tmp_path/'missing'/'..'/'assets'
+    elif fault=='symlink':
+        (tmp_path/'link').symlink_to(tmp_path,target_is_directory=True);model['selected_contract']['destination']=tmp_path/'link'/'assets'
+    elif fault=='string':model['selected_contract']['destination']=str(tmp_path/'assets')
+    elif fault=='extra':model['selected_contract']['unknown']=1
+    elif fault=='unknown_path':model['source_files']['unexpected']=tmp_path/'unknown'
+    else:model['source_files']['unexpected']=float('nan')
+    with pytest.raises((ValueError,TypeError)):adapter.frontend_json(rt,model)
+
+
 def hands(n=1,invalid=False):
     xy=np.empty((n,21,2),np.float64)
     for i in range(n):xy[i,:,0]=np.linspace(1+i,5+i,21);xy[i,:,1]=np.linspace(2,7,21)
@@ -197,7 +230,8 @@ def test_static_closure_shell_nativeprecision_and_no_evaluator_values_or_detecto
     assert 'WR_CODE_REVISION' in shell and '960s'in shell and 'set +x'in shell
 
 
-def test_host_lock_lifecycle_native_labels_posthash_and_cleanup_before_hash(tmp_path,monkeypatch):
+@pytest.mark.parametrize('unserializable',[False,True])
+def test_host_lock_lifecycle_native_labels_posthash_and_cleanup_before_hash(tmp_path,monkeypatch,unserializable):
     import dexycb_identity_infer as frontend
     revision='b'*40;root=tmp_path.resolve();code=root/'jobs'/revision/adapter.ENTRY/'code'
     (code/'infra').mkdir(parents=True);driver=code/'infra/hand_mask_infer.py';driver.write_bytes(b'ownedsource')
@@ -205,7 +239,8 @@ def test_host_lock_lifecycle_native_labels_posthash_and_cleanup_before_hash(tmp_
     monkeypatch.setattr(adapter,'ROOT',root);monkeypatch.setattr(adapter,'__file__',str(driver))
     monkeypatch.setattr(adapter.sys,'platform','linux');monkeypatch.setattr(adapter.os,'geteuid',lambda:0)
     monkeypatch.setattr(adapter.os,'uname',lambda:types.SimpleNamespace(nodename='world-reward-ncc-h100-02'))
-    source={'source':'bound'};events=[];model={'child_image':{'Id':frontend.binding.IMAGE}};assets={'weights':'sealed'}
+    source={'source':'bound'};events=[];model=frontend_model(root/'frontend-assets-extracted',frontend.binding.IMAGE);assets={'weights':'sealed'}
+    if unserializable:assets['unexpected']=root/'not-json'
     frozen={root/'sealed.npz':{'bytes':1,'sha256':'a'*64}};predictions=root/'oldscan/predictions'
     evidence={'public':{},'acquisition':{'manifest':{'bytes':1,'sha256':'b'*64}}}
     pins={'outputs':{},'producer_revision':'c'*40}
@@ -232,10 +267,18 @@ def test_host_lock_lifecycle_native_labels_posthash_and_cleanup_before_hash(tmp_
         assert '--cap-drop'in args and args[args.index('--cap-drop')+1]=='ALL'
         assert args[args.index('--memory')+1]=='16g'and frontend.binding.IMAGE in args
         events.append('native')
+        proof=json.loads((root/'results'/('hand-mask-infer-'+revision)/'native-proof.json').read_bytes())
+        assert proof['frontend']==adapter.frontend_json(rt,model)
+        assert isinstance(model['selected_contract']['destination'],Path)
         out=root/'results'/('hand-mask-infer-'+revision)/'predictions'
         native=dict(status='pass',phase='complete',source_binding=source,source_rehashed_after=True)
         rt.write(out/'report.json',json.dumps(native).encode());return types.SimpleNamespace(returncode=0)
     monkeypatch.setattr(adapter.subprocess,'run',run)
+    if unserializable:
+        with pytest.raises(TypeError):adapter.run(root,code,revision)
+        assert not (root/'results'/('hand-mask-infer-'+revision)).exists()
+        assert 'lock'not in events and 'native'not in events
+        return
     try:original_fd=os.dup(9)
     except OSError:original_fd=None
     try:result=adapter.run(root,code,revision)

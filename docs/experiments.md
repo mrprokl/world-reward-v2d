@@ -7648,3 +7648,10 @@ maxmean0.000805222mm. Independent CPU-only input/native geometry/wholechain
 posthash PASS, frozen before pack/forward. EP16 original topologybudget FAIL:
 none of eight automatic closed-component preserving approximations fit;
 closed before pose, no face/component deletion or seed/threshold rescue.
+
+Path-proof fix: explicit selected-contract destination projection only, exact
+model/contract schemas and canonical path; all other fields unchanged or reject.
+Host serializes before reserving namespace; native revalidates same projection
+while original model remains used for installedsource/assets. Root188paired tests
+PASS; realistic Path fixture now covers missing integration. Unchanged protocol/
+cohort/MP21 boxes/17points/SAMprecision; originalfe95889 failure remains.
