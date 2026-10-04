@@ -7304,3 +7304,20 @@ Full tiny suite collected atc9b2910 (before later forward pin configs/source-onl
 acquisition work) completed **12739PASS8optionalSKIP496.02s**. Exact owned isolated
 `/tmp/world-reward-root-full-20261004-hand-v1` fixture removed only after completion.
 This validates numerical/plumbing contracts, not actual learned accuracy/rights.
+
+Source-only specialist prerequisite: root124 focused tests PASS0.28s (acquisition,
+typed hand observations and relational features); shell syntax/diff clean. No
+wheel/task inference or dataset acquisition is implied. Fresh public namespaces,
+exact publisher hashes/metadata, opaque ZIP/license inventory and post-hashes
+remain separate from unknown exact-task rights/overlap and future CPU runtime.
+Primary DexYCB/MediaPipe order audit verifies only wrist plus four non-thumb
+fingers (17 indices0,5..20). Thumb correspondence remains unverified; proposed
+external evaluation excludes every thumb joint, retaining all21 native outputs.
+
+EP0 refinement transport final phase returned unacknowledged: **not retried**.
+Independent VM01 inspection instead verifies published code/markers and actual
+loaded MainPID1378425 waiting for the GPU lock since11:49:47UTC under7392634.
+EP14 original object tracking100frames/417.908247s; EP13 CPUdepth350/425, both
+active, no complete-stage PASS inferred. EP12 refinement explicitly reuses the
+same independently frozen published7392634 source, separate unit/output and
+waits for EP0 GPUrelease. Dispatch ACK only; not execution/completion evidence.

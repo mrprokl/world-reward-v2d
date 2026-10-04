@@ -20,14 +20,15 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 6 | 816 | Same complete chain PASS on qualified fixed volume geometry. |
 | 8 | 634 | Same complete chain PASS; VM02 full pose/result return byte-sealed before VM01 assembly. |
 | 15 | 501 | Same complete chain PASS. |
-| 0 | 790 | Full shared preparation PASS23.308068s with native/reference replay; original source/four output pins frozen. Forward publication pending. Old conversion failure separate. |
+| 0 | 790 | Shared preparation PASS23.308068s and full native forward PASS145.404580s/9 windows; frozen receipts. Refinement actually waiting for EP14 GPU release. Old conversion failure separate. |
 | 4 | 747 | Tracking stops at18 empty automatic object masks; full trajectory unavailable. |
 | 7 | — | Empty automatic fixed anchor; closed without reroll. |
 | 9 | 415 | Geometry/topology failures before pose; no face deletion or threshold rescue. |
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
-| 12 | 405 | Full original frontend/CPU inputs plus shared preparation PASS18.401943s; all15 inputs/four preparation artifacts pinned. Forward/refinement/export pending. |
+| 12 | 405 | Shared preparation PASS18.401943s and full native forward PASS108.541485s/5 windows; frozen receipts. Refinement reuse-dispatch ACK received; actual execution not yet inspected. Export not run. |
 | 13 | 425 | Technical queue failure retained; direct replay completes object tracking, releases GPU11:13UTC, and remains in CPU input assembly. Full inputs not yet PASS. |
+| 14 | — | Fresh unchanged fixed_all16 frontend active; object tracking100 frames at417.908247s. No full input or reconstruction PASS. |
 
 Seven complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or

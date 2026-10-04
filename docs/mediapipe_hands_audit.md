@@ -100,9 +100,23 @@ on H100 is unverified, and phone latency is not an Azure runtime estimate.
 ## Minimal next experiment
 
 Freeze the new external cohort, runtime budget, capacity, and native defaults
-before its use. First measure **automatic frame-0 hand coverage and saturation**
-with IMAGE/CPU, preserving all hands/missing cases and original image coordinates.
+before its use. The later [full-timeline protocol](specialist_hand_observation_protocol.md)
+supersedes the initial frame-zero-only proposal: measure every original frame
+with IMAGE/CPU and preserve all hands, empty early frames and capacity saturation.
+A missing frame-zero hand does not establish a visible-hand false negative.
 Failure ends the pilot before Boots; do not rescue with another threshold/prompt.
+
+Source/model byte acquisition is implemented separately; it does not install or
+run MediaPipe. Its 300 s budget covers acquisition, archive checks, public artifact
+sealing and post-hashes; the small receipt publishes once under an outer 320 s
+deadline. A future CPU runtime should be a **new child** of the already present
+VM02 classic image `sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3`,
+with an isolated Python 3.11 venv, no system site packages, all declared/transitive
+wheels pinned and installed offline, followed by `pip check`. Do not modify an
+existing SAM2/Boots image, omit JAX, substitute OpenCV headless, or resolve latest
+dependencies after a failure. Build proposal: 600 s; graph-load-only CPU smoke:
+120 s, no `detect`, RGB or annotations. These are proposed prerequisite gates,
+not an acquired dependency closure or operational runtime.
 
 If coverage is adequate, separately validate an automatic 2D hand-seed adapter
 (e.g. deterministic landmark-derived box or points) into unchanged SAM2; do not

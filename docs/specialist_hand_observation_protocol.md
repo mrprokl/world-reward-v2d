@@ -52,11 +52,23 @@ Record capacity saturation whenever four slots return; it is a censoring risk,
 not proof that exactly four hands exist. Model errors remain errors, not empties.
 
 MediaPipe order: wrist; thumb CMC/MCP/IP/tip; index, middle, ring, little each
-MCP/PIP/DIP/tip. This names native output only. **DexYCB's exact 21-joint order
-must be verified from pinned primary annotation/export source before any 2D
-joint comparison.** Freeze the anatomical permutation; no nearest-joint fit,
-error-minimizing remap, left/right mirror, or source-calibration projection.
-If that source proof is unavailable, report coverage only and block joint error.
+MCP/PIP/DIP/tip. A primary-source audit now verifies **17 joints only**:
+MediaPipe indices `[0, 5, ..., 20]` map identically to DexYCB `[0, 5, ..., 20]`
+(wrist; index, middle, ring, little/pinky MCP/PIP/DIP/tip). The pinned
+[DexYCB README L160–161](https://github.com/NVlabs/dex-ycb-toolkit/blob/64551b001d360ad83bc383157a559ec248fb9100/README.md#L160-L161)
+states that `joint_2d` uses the `joint_3d` order, and its
+[joint names L59–81](https://github.com/NVlabs/dex-ycb-toolkit/blob/64551b001d360ad83bc383157a559ec248fb9100/dex_ycb_toolkit/dex_ycb.py#L59-L81)
+match the corresponding MediaPipe native enum. DexYCB names thumb indices
+1–3 MCP/PIP/DIP whereas MediaPipe names them CMC/MCP/IP; exact anatomical
+equivalence is **unverified**. Exclude **all four thumb joints** from joint-error
+evaluation; retain all 21 raw predictions. No nearest-joint fit,
+error-minimizing remap, mirror, or source calibration. Block thumb EPE and
+any all-21 accuracy claim. Source identities: README 40,820 B, SHA256
+`e19797f352bb5615b43b5a3ed4a6a193cee4eee2cd1cd1f5859615165081bb7c`;
+`dex_ycb.py` 8,713 B, SHA256
+`f73074505bb822b01178dc7aae9778f5107efea479d43423f4fe2dc37224d8ad`;
+MediaPipe `hands.py` 6,132 B, SHA256
+`4eea13e0f63eae5cf2dc21448ea78df38f4c90a2a36f43f1db8d8797f788b51a`.
 
 Retain native handedness category/score as classification metadata, not detection
 confidence, per-joint visibility, actor selection, or calibrated probability.
@@ -82,8 +94,8 @@ Report separately for each clip and pooled, keeping every original frame:
    weak association diagnostic, not a calibrated IoU threshold. Exactly one
    overlapping prediction gives a unique match; none is missed, multiple are
    ambiguous. Preserve/report all other predictions; never select minimum error.
-3. Once semantics are source-verified, matched-hand Euclidean xy error in pixels
-   over finite, in-grid, non-sentinel GT joints; per-frame mean and joint-weighted
+3. Matched-hand Euclidean xy error in pixels over the **verified 17-joint subset**
+   and finite, in-grid, non-sentinel GT joints; per-frame mean and joint-weighted
    pooled mean. Report the valid-joint and uniquely matched denominators alongside
    errors: conditional low error must not hide missing/ambiguous hands.
 4. Unmatched/ambiguous annotated-positive frames, extra/bystander-like slots,
