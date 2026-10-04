@@ -31,7 +31,8 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 14 | 442 | Original full frontend/input PASS3319.999303s; independent15-input pins sealed. Shared preparation PASS18.842805s, native forward PASS111.789331s and301-update refinement PASS224.287833s; independently pinned. Direct export PASS32.767795s and original official packing PASS13.783991s, all442 source/83 scored frames and geometry preserved, scratch removed. No accuracy PASS. |
 | 16 | — | Original topology budget FAIL before object pose; all eight fixed automatic candidates rejected, no reroll or face/component deletion. |
 | 17 | — | Original topology-budget FAIL before object pose; all eight fixed automatic candidates rejected. Closed without reroll. |
-| 18 | — | Untouched original frontend dispatched after cooperative GPU lock; ACK only, not presumed ready. |
+| 18 | 535 | Original source boundary/nonmanifold rejection before object pose; closed, no repair. |
+| 19 | 443 | Original topology-budget FAIL before object pose; all eight fixed whole/component candidates rejected, no repair. |
 
 Eleven complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or

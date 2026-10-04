@@ -97,6 +97,7 @@ def test_no_new_install_or_challenge_or_default_runtime_mutation():
                      "'--network', 'none'", "'--read-only'", 'originals_rehashed_after', 'source_rehashed_after']:
         assert required in text
     assert "simplification_validated=False" in text and "adoption=False" in text
+    assert "'/tmp:rw,exec,nosuid,nodev,size=1g'" in text
 
 
 def test_source_is_in_original_runtime_archive_literal_closure():

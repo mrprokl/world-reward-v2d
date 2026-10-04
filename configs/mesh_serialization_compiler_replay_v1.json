@@ -1,0 +1,16 @@
+{
+  "schema": "world_reward.mesh_serialization_compiler_technical_replay.v1",
+  "original_producer_revision": "404855aedd21e414956228e3935b3f85672e824d",
+  "original_source_files": 154,
+  "original_source_files_sha256": "54a736edabcc8c7f845eadabeb86cbfefbf092f9564e36ad7f067e0389befeeb",
+  "original_host_report": {"bytes": 2145, "sha256": "86111b0c758367e00d90744b3b1e1995d7b0c8b890d7bc91b7850cb8984637c8"},
+  "original_native_report": {"bytes": 2455, "sha256": "34beb2cc68e054937438b1478e0562f064ae9d80858034b2db37ea1a9c9734a5"},
+  "unchanged_cpp": {"bytes": 19537, "sha256": "103781b0d952a9dee94f6ae00be4b20fb08fc03039cab9d3256ba86d05156c5e"},
+  "unchanged_protocol": {"bytes": 5255, "sha256": "a23e422d1efc6e1b5e49dbf553284802315bf2b69424a4bc4a2a43ae5e0f95ac"},
+  "demonstrated_cause": "Docker_tmpfs_defaults_noexec_binary_execution_PermissionError_after_compilation_before_any_control",
+  "only_runtime_change": "explicit_exec_on_owned_CPU_scratch_tmpfs_keep_nosuid_nodev_offline_readonly_capdrop",
+  "replays_maximum": 1,
+  "original_failure_remains_fail": true,
+  "algorithm_geometry_controls_and_budgets_unchanged": true,
+  "scientific_adoption": false
+}

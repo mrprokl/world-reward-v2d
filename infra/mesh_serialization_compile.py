@@ -16,6 +16,7 @@ import time
 ROOT = Path('/srv/scenesmith/world-reward')
 ENTRY = 'run_volume_qem_build'
 PROTOCOL = 'configs/mesh_serialization_compiler_protocol_v1.json'
+REPLAY = 'configs/mesh_serialization_compiler_replay_v1.json'
 CPP = 'infra/mesh_serialization_qem.cpp'
 HELPERS = (CPP, 'infra/mesh_serialization_compile.py', 'infra/run_volume_qem_build.sh',
            'infra/mesh_volume_qem.cpp', 'infra/mesh_guarded_qem.cpp',
@@ -98,6 +99,40 @@ def write(path, raw):
         stream.write(raw)
         stream.flush()
         os.fsync(stream.fileno())
+
+
+def technical_replay(code):
+    """Authenticate actual prior execution failure; no scientific reroll."""
+    value = strict((code / REPLAY).read_bytes()); rev = value['original_producer_revision']
+    require(value['schema'] == 'world_reward.mesh_serialization_compiler_technical_replay.v1'
+            and re.fullmatch('[0-9a-f]{40}', rev) and value['replays_maximum'] == 1
+            and value['original_failure_remains_fail'] is True
+            and identity(code / CPP) == value['unchanged_cpp']
+            and identity(code / PROTOCOL) == value['unchanged_protocol'], 'Frozen one technical replay required')
+    old = ROOT / 'jobs' / rev / ENTRY / 'code'
+    rows = {}
+    for path in (old, *sorted(old.rglob('*'))):
+        require(path.resolve() == path and not path.is_symlink() and not path.lstat().st_mode & 0o222,
+                'Original failed source remains readonly')
+        if not path.is_dir():
+            rows[str(path.relative_to(old))] = identity(path, empty=True)
+    require(len(rows) == value['original_source_files'] and hashlib.sha256(json.dumps(
+            rows, sort_keys=True).encode()).hexdigest() == value['original_source_files_sha256']
+            and (old.parent / 'revision').read_bytes() == (rev+'\n').encode(), 'Original failed whole source differs')
+    out = ROOT / 'results' / ('mesh-serialization-compiler-'+rev)
+    records = {}
+    for name, pin in [('report.json', 'original_host_report'), ('native.json', 'original_native_report')]:
+        require(identity(out/name) == value[pin], 'Actual original failure receipt differs')
+        records[name] = strict((out/name).read_bytes())
+    native = records['native.json']; host = records['report.json']
+    require(native['status'] == host['status'] == 'fail' and native['phase'] == 'compile'
+            and native['error_type'] == 'PermissionError' and 'Permission denied' in native['error']
+            and 'parity' not in native and 'controls' not in native
+            and native['originals_rehashed_after'] is True and host['owned_container_removed'] is True,
+            'Original failure must precede all scientific controls')
+    return dict(pins_identity=identity(code / REPLAY), original_revision=rev,
+                original_host=value['original_host_report'], original_native=value['original_native_report'],
+                original_source_files_sha256=value['original_source_files_sha256'], original_failure_preserved=True)
 
 
 def original(code, config):
@@ -390,6 +425,7 @@ def host(code, revision):
         raise TimeoutError('Compiler phase1 interrupted; owned cleanup only')
     handlers = {s: signal.signal(s, interrupted) for s in (signal.SIGTERM, signal.SIGINT)}
     try:
+        report['authorized_technical_replay'] = technical_replay(code)
         require(prior_build == pins['original_build_receipt'], 'Original host build receipt differs')
         require(control(['image', 'inspect', image, '--format', '{{.Id}}']).decode().strip() == image,
                 'Exact existing image required')
@@ -397,7 +433,9 @@ def host(code, revision):
         command = ['docker', 'run', '--rm', '--name', name, '--cidfile', str(cidfile),
                    '--label', 'world_reward.serialization.owner='+revision, '--network', 'none', '--read-only',
                    '--user', '0:0', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges',
-                   '--cpus', '4', '--memory', '16g', '--tmpfs', '/tmp:rw,nosuid,size=1g',
+                   # Docker tmpfs defaults noexec: this isolated compiler needs
+                   # its own generated binary executable, never model/data mounts.
+                   '--cpus', '4', '--memory', '16g', '--tmpfs', '/tmp:rw,exec,nosuid,nodev,size=1g',
                    '--mount', f'type=bind,src={code},dst={code},readonly',
                    '--mount', f'type=bind,src={code.parent}/revision,dst={code.parent}/revision,readonly',
                    '--mount', f'type=bind,src={code.parent}/source-sha256,dst={code.parent}/source-sha256,readonly',
@@ -447,6 +485,7 @@ def host(code, revision):
             require(source(code, revision) == before and identity(host_build, readonly=False) == prior_build
                     and control(['image', 'inspect', image, '--format', '{{.Id}}']).decode().strip() == image,
                     'Original source/build/image changed')
+            require(technical_replay(code) == report['authorized_technical_replay'], 'Original failure replay proof changed')
             report.update(source_rehashed_after=True, original_build_rehashed_after=True, owned_container_removed=True)
             require(time.monotonic() < deadline, 'Inclusive phase1 cleanup budget exhausted')
         except Exception as exc:

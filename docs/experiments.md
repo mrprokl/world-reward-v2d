@@ -7851,3 +7851,13 @@ claim. Compile600s, inclusive900s, offlineCPU4/16GiB; historicalfailures unchang
 Actual datafree existingimage preflight confirms originalPython/NumPy1.26.3/
 Trimesh5.1.0, compiler/Boost14322regular nonempty singlelinkfiles and inherited
 1418sources; host3429B originalbuild remains0644, authenticated without chmod.
+
+Compilerphase1 original404855a actualFAIL22.633963s before any control: compilation
+finished but Docker's default tmpfs is verifiednoexec, so generatedbinary execution
+raisesPermissionError. Native2455B SHA34beb2cc68e054937438b1478e0562f064ae9d80858034b2db37ea1a9c9734a5;
+host2145B SHA86111b0c758367e00d90744b3b1e1995d7b0c8b890d7bc91b7850cb8984637c8.
+Whole154files/current source/runtimeposthash and ownedcontainercleanup confirmed.
+One user-authorized technical replay preregistered: explicitexec only on owned
+scratchtmpfs, sameCPP/protocol/control/budgets; originalfailure remainsFAIL.
+No predicate/QEM/quality PASS implied. EP19 closes originaltopologybudgetFAIL
+15:04:03UTC, all8whole/component candidates rejected, no tuning or repair.
