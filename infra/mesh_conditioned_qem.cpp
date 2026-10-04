@@ -10,6 +10,12 @@
 #ifndef WR_SERIALIZATION_CORE_PREFIX_SHA256
 #error Bind the unmodified serialization prefix
 #endif
+#ifndef WR_CONDITIONED_CACHE
+#define WR_CONDITIONED_CACHE 0
+#endif
+#if WR_CONDITIONED_CACHE != 0 && WR_CONDITIONED_CACHE != 1
+#error Physical coordinate cache must be explicitly zero or one
+#endif
 
 namespace conditioned_qem {
 using serialization_qem::Serialization;
@@ -101,6 +107,11 @@ bool simplify(const Eigen::MatrixXd& physical,const Eigen::MatrixXi& F,const Cha
     Eigen::VectorXi old_to_new; igl::remove_unreferenced(physical,F,U,G,old_to_new,I);
     J=Eigen::VectorXi::LinSpaced(F.rows(),0,F.rows()-1); return true;
   }
+#if WR_CONDITIONED_CACHE
+  // Decode, rather than copy physical: even signed-zero bits must match slow pre.
+  Eigen::MatrixXd physicalVcache=chart.decode_matrix(canonical);
+  Eigen::MatrixXd physicalCcache;
+#endif
   Eigen::VectorXi EMAP; Eigen::MatrixXi E,EF,EI; igl::edge_flaps(F,E,EMAP,EF,EI);
   std::vector<std::tuple<Eigen::MatrixXd,Eigen::RowVectorXd,double>> quadrics;
   igl::per_vertex_point_to_plane_quadrics(canonical,F,EMAP,EF,EI,quadrics);
@@ -112,20 +123,38 @@ bool simplify(const Eigen::MatrixXd& physical,const Eigen::MatrixXi& F,const Cha
   try {
     igl::intersection_blocking_collapse_edge_callbacks(pre,post,tree,pre,post);
     const auto native_pre=pre; const auto native_post=post;
-    pre=[&chart,&state,&volumes,native_pre](const auto& V,const auto& F,const auto& E,
+    pre=[&chart,&state,&volumes,native_pre
+#if WR_CONDITIONED_CACHE
+        ,&physicalVcache,&physicalCcache
+#endif
+        ](const auto& V,const auto& F,const auto& E,
         const auto& EMAP,const auto& EF,const auto& EI,const auto& Q,const auto& EQ,const auto& C,int e) {
       volumes.pending_shell=-1; state.pending=Transaction{};
       // Do not reject unselected Inf queue rows. Only the offered placement
       // is decoded; the full physical V defines both original safety guards.
       if(!C.row(e).allFinite()) return false;
+#if WR_CONDITIONED_CACHE
+      if(physicalVcache.rows()!=V.rows() || physicalVcache.cols()!=3)
+        throw std::runtime_error("Physical vertex cache row count changed");
+      if(physicalCcache.rows()==0) physicalCcache=Eigen::MatrixXd::Zero(C.rows(),3);
+      if(physicalCcache.rows()!=C.rows() || physicalCcache.cols()!=3)
+        throw std::runtime_error("Physical placement cache row count changed");
+      const Eigen::MatrixXd& physicalV=physicalVcache;
+      Eigen::MatrixXd& physicalC=physicalCcache;
+#else
       const Eigen::MatrixXd physicalV=chart.decode_matrix(V);
       Eigen::MatrixXd physicalC=Eigen::MatrixXd::Zero(C.rows(),3);
+#endif
       physicalC.row(e)=chart.decode(Eigen::RowVector3d(C.row(e)));
       return state.allowed(e,physicalV,F,E,EMAP,EF,EI,physicalC)
         && native_pre(V,F,E,EMAP,EF,EI,Q,EQ,C,e)
         && volumes.allowed(e,physicalV,F,E,EMAP,EF,EI,physicalC);
     };
-    post=[&chart,&state,&volumes,&physical,native_post](const auto& V,const auto& F,const auto& E,
+    post=[&chart,&state,&volumes,&physical,native_post
+#if WR_CONDITIONED_CACHE
+        ,&physicalVcache
+#endif
+        ](const auto& V,const auto& F,const auto& E,
         const auto& EMAP,const auto& EF,const auto& EI,const auto& Q,const auto& EQ,const auto& C,
         int e,int e1,int e2,int f1,int f2,bool collapsed) {
       native_post(V,F,E,EMAP,EF,EI,Q,EQ,C,e,e1,e2,f1,f2,collapsed);
@@ -133,7 +162,20 @@ bool simplify(const Eigen::MatrixXd& physical,const Eigen::MatrixXi& F,const Cha
         if(volumes.pending_shell<0) throw std::runtime_error("Collapse lacks original physical volume approval");
         auto& shell=volumes.shells[volumes.pending_shell]; shell.current.add(volumes.pending_delta);
         shell.magnitude+=std::abs(volumes.pending_delta); ++volumes.committed;
+#if WR_CONDITIONED_CACHE
+        const auto& t=state.pending;
+        if(!t.approved || t.s<0 || t.d<0 || t.s>=V.rows() || t.d>=V.rows()
+            || physicalVcache.rows()!=V.rows())
+          throw std::runtime_error("Collapsed endpoints lack approved physical cache transaction");
+        const Eigen::RowVector3d s=chart.decode(Eigen::RowVector3d(V.row(t.s)));
+        const Eigen::RowVector3d d=chart.decode(Eigen::RowVector3d(V.row(t.d)));
+        for(int j=0;j<3;++j) if(s[j]!=t.p[j] || d[j]!=t.p[j])
+          throw std::runtime_error("Cached endpoints differ from approved physical placement");
+        physicalVcache.row(t.s)=s; physicalVcache.row(t.d)=d;
+        state.finish(physicalVcache,F,true,f1,f2);
+#else
         state.finish(chart.decode_matrix(V),F,true,f1,f2);
+#endif
       } else state.finish(physical,F,false,f1,f2);
       volumes.pending_shell=-1;
     };
@@ -143,7 +185,16 @@ bool simplify(const Eigen::MatrixXd& physical,const Eigen::MatrixXi& F,const Cha
     };
     Eigen::MatrixXd canonicalU;
     const bool reached=igl::decimate(canonical,F,cost,stop,pre,post,canonicalU,G,J,I);
-    U=chart.decode_matrix(canonicalU); delete tree; return reached;
+    U=chart.decode_matrix(canonicalU);
+#if WR_CONDITIONED_CACHE
+    if(I.size()!=U.rows()) throw std::runtime_error("Terminal cache birth map row count differs");
+    for(int v=0;v<U.rows();++v) {
+      if(I(v)<0 || I(v)>=physicalVcache.rows()) throw std::runtime_error("Terminal cache birth index invalid");
+      for(int j=0;j<3;++j) if(U(v,j)!=physicalVcache(I(v),j))
+        throw std::runtime_error("Independent full decode differs from terminal physical cache");
+    }
+#endif
+    delete tree; return reached;
   } catch(...) { delete tree; throw; }
 }
 
@@ -191,7 +242,8 @@ int main(int argc,char** argv) {
           "\"native_cost_and_placement_unchanged\":false,\"new_numeric_algorithm\":true,"
           "\"native_qslim_implementation_reused\":true,\"cost_normalization\":true,"
           "\"physical_geometry_rescaled\":false,\"block_intersections\":true,"
-          "\"volume_relative_limit\":0.05,\"target_faces\":4096,\"prepared_only\":true,\"adopted\":false}\n";
+          "\"volume_relative_limit\":0.05,\"target_faces\":4096,\"prepared_only\":true,\"adopted\":false,"
+          "\"physical_coordinate_cache\":"<<(WR_CONDITIONED_CACHE?"true":"false")<<"}\n";
       return 0;
     }
     if(argc==3 && std::string(argv[1])=="--preflight") {

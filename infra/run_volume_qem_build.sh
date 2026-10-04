@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# Exact implementation regression, retaining only the qualified fast artifact.
+if [[ "${1:-}" == --conditioned-cache ]]; then
+  (( $# == 1 )) || exit 2
+  export DOCKER_HOST="unix://${WR_ROOT:?}/docker.sock"
+  exec python3 -I -B "${WR_CODE:?}/infra/mesh_serialization_compile.py" --conditioned-cache
+fi
 # A new source-bound numerical algorithm; never a serialization replay.
 if [[ "${1:-}" == --conditioned ]]; then
   (( $# == 1 )) || exit 2

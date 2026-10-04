@@ -1,0 +1,61 @@
+{
+  "schema": "world_reward.mesh_conditioned_cache_protocol.v1",
+  "phase": "exact_cached_implementation_regression",
+  "historical_failures_immutable": true,
+  "qualification_pins": "configs/mesh_conditioned_qem_qualification_pins.json",
+  "compile_seconds_per_binary": 600,
+  "inclusive_total_seconds": 5400,
+  "cpu_count": 4,
+  "memory_gib": 16,
+  "receipt_publication_grace_seconds": 10,
+  "native_calls_maximum": 8,
+  "native_seconds_per_call": 450,
+  "slow_binary_identity": {
+    "bytes": 694736,
+    "sha256": "b754e56111b38b079c6ba9bec185c3858bf81e847bd5d193a2483bf6dd0b118a"
+  },
+  "implementation": {
+    "fast_compile_macro": "WR_CONDITIONED_CACHE=1",
+    "default_macro_value": 0,
+    "initial_physical_cache": "same full decode_matrix(canonical), not original physical bytes",
+    "mutation": "only two actually committed native collapse endpoints after native post callback",
+    "inverse": "same separate volatile scale*coordinate then origin+delta",
+    "placement_cache": "one persistent C matrix; only selected row(e) decoded, guards read only this row",
+    "all_source_and_final_geometry_checks_unchanged": true,
+    "source_chart_or_thresholds_changed": false,
+    "native_queue_or_cost_changed": false
+  },
+  "controls": {
+    "fixture_source": "exact previous qualified four fresh fixtures, same immutable source array hashes",
+    "branches": [
+      "slow_exact_qualified_binary",
+      "fast_cached_binary"
+    ],
+    "all_source_gates_before_any_native": true,
+    "candidate_obj_byte_exact_required": true,
+    "mapping_json_byte_exact_required": true,
+    "full_births_and_volumes_and_counters_equal": true,
+    "physical_stage_metrics_equal": true,
+    "new_or_replayed_failed_fixture": false,
+    "all_native_failures_stop": true,
+    "timeout_or_technical_unavailable_stops": true,
+    "metric_bake_scale": 0.375
+  },
+  "publication": {
+    "retain_qualified_fast_binary_on_azure": true,
+    "filename": "mesh_conditioned_qem",
+    "mode": "0555",
+    "qualified_only_after_complete_native_and_host_receipts": true,
+    "remove_on_failure": true,
+    "receipt_mode": "0444",
+    "directory_mode": "0555"
+  },
+  "claims": {
+    "adoption": false,
+    "production_mesh_validated": false,
+    "challenge_performance_verified": false,
+    "universal_equivalence": false,
+    "technical_equivalence_on_declared_controls_only": true
+  },
+  "failure_policy": "stop_preserve_partial_receipt_no_fallback_reroll_thresholdchange_or_historical_relabel"
+}
