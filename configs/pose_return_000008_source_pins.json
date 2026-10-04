@@ -1,0 +1,119 @@
+{
+  "episode_index": 8,
+  "frames": 634,
+  "full_original_indices": true,
+  "ground_truth_used": false,
+  "input_pins": {
+    "bytes": 2558,
+    "sha256": "ca395dfd9a43a606dbef29fbadaf610bff4c52d4e75f17f0382c261f494a6e98"
+  },
+  "outputs": {
+    "geometry_and_poses.npz": {
+      "bytes": 120874,
+      "sha256": "72f656a5718ed1cb35a75770a0b44166a01abd09f0f27a6234e287faf3c0d71e"
+    },
+    "object_fixed_canonical.glb": {
+      "bytes": 74512,
+      "sha256": "b7ff3191896008c017df983d7782f1b9cdfe3bcc7ba9200ec5c49ec26572f761"
+    },
+    "report.json": {
+      "bytes": 32164570,
+      "sha256": "8b577baae9ae2a932416c1b36517ab11a4cf631c299874ab8fe9bd05c40e7df5"
+    }
+  },
+  "prediction_algorithm_changed": false,
+  "producer_entrypoint": "run_pose_peer_run",
+  "producer_helpers": {
+    "infra/pose_peer_inputs.py": {
+      "bytes": 24476,
+      "sha256": "8b059783326d309e8528a5f230a76892030db8e0c0aecc31b04cb33e99271a13"
+    },
+    "infra/pose_peer_run.py": {
+      "bytes": 14848,
+      "sha256": "37e748f26a22ca26702f9c346556b090752cbcf405daf73b61003c9bae2c9f35"
+    },
+    "infra/run_pose_peer_run.sh": {
+      "bytes": 1349,
+      "sha256": "05aae3177435b6896efb009092a3e80adf48ab3c2e15add14924584a534b0429"
+    }
+  },
+  "producer_report": {
+    "bytes": 3408,
+    "path": "results/pose-peer-run-000008-3afaf6a86c322497718f1a3272f5c3587261aad7/report.json",
+    "sha256": "7578f33a24d9c810baa88ada2c0d9be2b7c69cb7e5f56ed842ae55e413980765"
+  },
+  "producer_revision": "3afaf6a86c322497718f1a3272f5c3587261aad7",
+  "producer_script_sha256": "37e748f26a22ca26702f9c346556b090752cbcf405daf73b61003c9bae2c9f35",
+  "quality_verified": false,
+  "received_full_input_files_independently_rehashed": true,
+  "received_receipt": {
+    "episode_index": 8,
+    "producer_revision": "ce1d1d67d6864c54cbdb488271d1bb8d9eefca07",
+    "receipt": {
+      "bytes": 1164,
+      "sha256": "51e7c55861a58e815077ae396d38edde05aa9510c8e3b06ea35e251f80cfbf01"
+    },
+    "schema": "world_reward.pose_peer.received_pins.v1"
+  },
+  "schema": "world_reward.pose_return.source_pins.v1",
+  "source_independently_rehashed": true,
+  "source_vm": "world-reward-ncc-h100-02",
+  "tracker_helpers": {
+    "infra/body_smoke.py": {
+      "bytes": 33592,
+      "sha256": "3f662f88cd212ad1a04b59b66ccdb5e32a00829b52f5e224daadfbe519e1bc93"
+    },
+    "infra/camera_render.py": {
+      "bytes": 24558,
+      "sha256": "325fa1c42b6e620f93fe59d6e4f63852557a08343b13e2bea60eee8c88f4743c"
+    },
+    "infra/mesh_endpoint_gate.py": {
+      "bytes": 19531,
+      "sha256": "6684203fdd673752f4167d1926c153784407e07d8eb5c7e2c9cab7d6a078b7a5"
+    },
+    "infra/mesh_link_gate.py": {
+      "bytes": 20356,
+      "sha256": "48fa8c41e8c05e60d7fe492cb50ed7f94fba937d94dbb9fb685fc88d6925c0b0"
+    },
+    "infra/object_budget_endpoint.py": {
+      "bytes": 21978,
+      "sha256": "a541adf8a89823733e02150e49063c8adef5766e46df1af3ccfb6373bd37a119"
+    },
+    "infra/object_pose_smoke.py": {
+      "bytes": 21856,
+      "sha256": "1ece387e2c8010183e4a38757728cd00adf07af069cca54803e28e2a05deb694"
+    },
+    "infra/volume_geometry_loader.py": {
+      "bytes": 7735,
+      "sha256": "f22b5a222a7abf878a9cf3f303d63c78a34420a527cc293ded1047315411ee32"
+    },
+    "infra/volume_mesh_pin_inventory.py": {
+      "bytes": 15475,
+      "sha256": "266556e1a7cc514af4456e58169976ca8ba04e5f0dcaf92c1b45fff37496031b"
+    },
+    "src/world_reward/__init__.py": {
+      "bytes": 81,
+      "sha256": "1ac8c64041277f0c3cf4d8838b3153210d7076dd86a5121d1e6ef494b64b36a1"
+    },
+    "src/world_reward/data.py": {
+      "bytes": 5181,
+      "sha256": "c8200e28900a88394f2821c558cd3693225ae8547331f12f2aff7d225c008a30"
+    },
+    "src/world_reward/mesh_budget.py": {
+      "bytes": 10062,
+      "sha256": "194bae8a9a62d214c4d5cd95b90e8ff1001beae36797902a4de9402a9d3f5579"
+    },
+    "src/world_reward/mesh_geometry.py": {
+      "bytes": 5746,
+      "sha256": "7e1fbeec221665cef1f419459ebe2aa68da4acc39bc5e7475d615c20a980399b"
+    },
+    "src/world_reward/pose_selection.py": {
+      "bytes": 13059,
+      "sha256": "663636ad7bb84ecf2093169313de0301bd2eef0f3a568dd90f84f05a1958549a"
+    },
+    "src/world_reward/rigid_alignment.py": {
+      "bytes": 8376,
+      "sha256": "d165a6a353e5d5557fc6f3256bdb694d72979c64c9779e29627954907b2b3f51"
+    }
+  }
+}

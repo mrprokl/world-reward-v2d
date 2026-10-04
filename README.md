@@ -43,7 +43,9 @@ No final Parquet, submission or verified CARI4D improvement yet.
   episode has complete initializers. Its first private Azure full-pose run
   stopped before poses on the unchanged topology gate. A separately qualified
   volume proposal and its full634-frame input archive now pass provenance and
-  fidelity checks; an isolated volume-based full tracking run is active on VM02.
+  fidelity checks. The unchanged isolated volume tracker now passes all634
+  original frames on VM02 (4,743.69 s), with independent source/full-input/output
+  byte seals. Its output return and CPU assembly remain separate unrun gates.
   The original
   default-backend failure remains closed.
   No frames, components or

@@ -6682,3 +6682,13 @@ Original sixofficialsourcepins/samplebyteidentity unchanged; actual onlyreport
 remains. Tiny packpins now independentlysealed. EP9 actualactive originalparent
 1165309, nativeObjectsinitializer logH100; fourtransportACKs do not certify
 fullfrontends. EP6 CPUassembly stillactive/no receipt, no duplicate launched.
+
+EP8 VM02 unchanged full634 volume tracker actual PASS4,743.693832s; parent
+producer3afaf6a86c322497718f1a3272f5c3587261aad7 PASS4,751.123175s.
+Independent root all original3parenthelpers/14trackerhelpers, sealed receiver
+manifest and ALL received original input files rehashed BEFOREandAFTER. Exact
+three native output bytes/full634 original frame order independentlysealed;
+parent3408B SHA7578f33a24d9c810baa88ada2c0d9be2b7c69cb7e5f56ed842ae55e413980765.
+GPUempty/containerremoved; tiny pose-return sourcepins frozen. No arrays or
+media transferred locally. Private return to VM01 and originalCPUassembly are
+separate unrun gates; no quality, eligibility or CARI4D-improvement claim.
