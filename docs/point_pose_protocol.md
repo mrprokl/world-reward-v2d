@@ -153,3 +153,14 @@ on Azure. Raw Docker configuration is never copied to pins/submissions. Measured
 installed bytes are not verified source-commit parity, model overlap clearance
 or competition-license eligibility. Input and raw geometry bundles will travel
 privately between Azure VMs; no heavy local transit or full runtime clone.
+
+Minimal private initializer transport is frozen and tested:13original public
+files VM02→VM01 (only RGB0/mask0/nativeNPZ0 and original metadata reports),
+13raw Objects outputs/report VM01→VM02 plus6actual source/config files and
+2original producer markers. Replica provenance is explicitly declared, never
+reconstructed or attributed to a new execution. Fresh independently pinned
+phases use only10.0.0.4→10.0.0.9:2222 with forced commands/expiring listeners.
+All member hashes precede publication; originals are never merged/overwritten.
+No dataset/model/private annotation payload moves locally or in this bridge.
+Future actual input/report/archive pins must precede transport; no transfer or
+3D inference is inferred from the172tiny contract tests (1.26s).
