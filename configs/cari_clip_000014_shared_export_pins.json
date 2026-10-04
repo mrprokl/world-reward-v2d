@@ -1,0 +1,38 @@
+{
+  "schema": "world-reward-cari-shared-export-pins-v1",
+  "clip_spec": {
+    "episode_index": 14,
+    "total_frames": 442,
+    "camera_name": "front_stereo_camera_left",
+    "height": 1152,
+    "width": 1536
+  },
+  "export": {
+    "sha256": "67d8e14d752290084e9c2290aa90281fb451ce4b4e55329a58f868d2895d3802",
+    "bytes": 21538,
+    "producer_revision": "f07116adbd84c2e1c706e0c54a35b00385d11832",
+    "script_sha256": "ac27278ff86d0cba77f9bc0224da5f0a54feea40d2fb75bd31005368ced711c4"
+  },
+  "export_files": {
+    "native_parameters.npz": {
+      "sha256": "b285e56d7afd0fb634399a4d233a50c21274cc0864b35dd75af9b8978f91a740",
+      "bytes": 1615537
+    },
+    "trajectory.npz": {
+      "sha256": "091569397065a4b5f2c5245b70aec933135f2dd7642da0cd557f9b47d1473fa0",
+      "bytes": 290266
+    },
+    "target.npy": {
+      "sha256": "6f2f3906aec0256f0df53a97ce050e53661b9fcb19fb680c7b7b0a501792a9e7",
+      "bytes": 97800584
+    },
+    "report.json": {
+      "sha256": "67d8e14d752290084e9c2290aa90281fb451ce4b4e55329a58f868d2895d3802",
+      "bytes": 21538
+    },
+    "object_aligned.glb": {
+      "sha256": "a6491f2efafdfdf8fcd4bd3e535e6106e1464514e0ee5539b1d1d22068115fd8",
+      "bytes": 74880
+    }
+  }
+}

@@ -7733,3 +7733,15 @@ GPUidle/cooperativeinode unchanged; original BF16/TF32off/nativevideo defaults.
 No dataset/private/RGB observations or accuracy claim. Receipt5927B
 SHA5a32ed5287c8ec1fc0a4b01e4d394773adb052b0f3fb02584a7567fe39f140b6,
 results/sam2-hand-video-gate-5371fc7881c7434dad02851f455e76a1/report.json.
+
+EP17 unchanged original fixed_all16 frontend CLOSED topology-budget FAIL before
+object pose: all eight automatic whole/component candidates fail, no repair,
+face deletion or reroll. Fresh EP18 original frontend dispatchedACK under the
+same published ea26eda source after lock release; no completion presumed.
+EP14 direct export actualPASS32.767795s/full442 under f07116a, independently
+frozen with exact166-file source/archive and complete input/prepare/forward/
+refinement/native asset chain; all five output posthashes match. Report21538B
+SHA67d8e14d752290084e9c2290aa90281fb451ce4b4e55329a58f868d2895d3802.
+Reference residual mean-max0.000816255mm and producer native-schema receipt
+verified, not independent trajectory decoding or accuracy. Pins frozen before
+original official packing; no final Parquet or CARI4D comparison.
