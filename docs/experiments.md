@@ -6530,3 +6530,13 @@ Xet to finalCAS ETag before any bounded Range body. This corrects the identity
 chain, not source SHA, corpus, selection or scientific parameters. No third
 full archive acquisition or prediction run authorized. Tiny failed diagnostic
 pins retain originalreport/source and actual public header identities.
+
+EP5 unchanged full native forward actual **PASS668/668,134.227019s**,
+producer e080f7e6b6d3a6653e2fab9f8c38006a58f3e7ed; all7 original96window
+captures [0,96,192,288,384,480,572], single shared identity and first-occurrence
+assembly preserved. Original unit exits0 and independent producer-script hash,
+all2output hashes/reports PASS; GPU idle. Report71614B SHA
+26a782e6c604f1904221e4578976519de863ce1e217567402d8e1f3422487992;
+bundle510994684B SHA9a0f440883f5269e5de16b7596e26fcf6cd5709b737cf6ce0a2c2c1cd6d9c068.
+Tiny committed pins authorize unchanged full native300requested/301effective
+refinement next, never a missing frame or score claim.
