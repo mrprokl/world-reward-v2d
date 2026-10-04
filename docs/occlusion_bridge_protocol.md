@@ -76,3 +76,27 @@ regression >5%, complete original indices, byte-identical observed poses and no
 leading/trailing extrapolation. Report absolute pose/motion errors and all
 abstentions; do not retune or reroll after the first result. A model-inferred
 synthetic result is still not external natural-video generalization.
+
+## Four-anchor predicted-geometry QA — frozen before first evaluation
+
+The four new RGBs and all automatic masks/full Body/MoGe predictions have
+completed and are independently byte-pinned. Before manufacturing 192 frames,
+run CPU-only QA on the *predicted* geometry, with no private authored mesh,
+pose, camera or labels available. Keep all predicted triangles and the original
+640×480 K800 gauge; no alignment, shape/scale fitting or per-record adjustment.
+Require predicted human-only silhouette IoU ≥0.70 against the automatic person
+mask for every anchor. Human-only rendering includes self-occlusion but cannot
+remove human regions hidden by the object; report this limitation rather than
+deleting geometry to improve IoU. Derive a left-hand proper camera-frame basis
+from the actual named 127-joint wrist/index1/middle1 positions. All three must
+have positive Z, lie in the original image and be within 5 pixels of automatic
+person-mask support. Right-hand results are diagnostics, not a selection rule.
+
+These fixed gates establish only a silhouette/support **proxy**, not independent
+RGB finger-keypoint accuracy, contact, metric accuracy or bridge adoption.
+Degenerate/unsupported geometry stops the pilot; never supply ideal hand poses,
+retune the thresholds, alter the bottle/seed or fit this cohort after its result.
+Store scalar decisions and original byte identities only; all heavy arrays and
+masks remain on Azure. Even PASS still requires clip-constant identity/scale,
+RGB-inferred object geometry and independently evidenced hand observations
+before the unchanged availability-ablation can be run.

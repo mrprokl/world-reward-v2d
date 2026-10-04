@@ -5877,3 +5877,25 @@ object1037..1842px, no manualprompt/fallback/retuning. Independent exactnine
 0400file inventory verified original producer/script/receipt/mask byteids;
 freeze bridge_rgb_anchor_mask_pins.json before Body/MoGe. No private/render
 truth in model mounts, localmedia, accuracy/bridgeadoption or eligibility claim.
+
+Full001aa0f source/test suite10685PASS/2optionalSKIP334.94s. During execution
+only actual mask-result pins and documentation were committed; no source/tests
+changed. Four original Body/full+MoGe observations14ebc28 actualPASS30.925696556s
+(one checkpointload each,4attempts/returns/replays each), exactfive0400file
+inventory independentlyhashed. Receipt31090B/
+eb282ac594d9c07e4af51c77165ad6f48c025629c3448fa125bb45425d75e0dc;
+scriptfae89092c23e8bbf491a1d4ed3466ebacde883a4ac836839bea029ddb9618784.
+Native projectionmax4.108554693e-5px; originalMoGenearest64support320..331;
+validgrid23790..24815, person22299..22477, object1028..1841. InvalidMoGe
+pixels retained/excluded by nativevalidity only, nofill or backgroundfallback.
+Fullmodel observations engineeringPASS is NOT handRGBsupport/silhouette/metric
+accuracy/clipconstantidentity/bridgeadoption. Transientcompleted systemdunit
+now GC LoadState=not-found; report/log prove PASS, no nonexistentunitstatus
+used as proof. Next CPU predictedsilhouette and namedcamera-frame support
+gates must precede192frame execution; no private recipe inmodelclosure.
+
+VM01 EP5 tracking remains active: latest preserved progress250/668 at
+1349.875109362s, one1021287 GPUworker1886MiB. Earlier double-prefixedunit
+query returned nonexistentunit defaults; NOT actual completion evidence.
+Actualunit listing and original results/track1-episode5-volume-frontends-v1.log
+confirm continued fulltimeline tracking. No duplicate/restart/trajectorydrop.

@@ -35,20 +35,24 @@ No final Parquet, submission or verified CARI4D improvement yet.
   gated volume-constrained proposal retains its three shells, including two
   cavities; full tracking is running and remains unverified. No frames, components or
   trajectories were dropped to rescue either episode.
-- **Research:** a frozen DA3 depth hypothesis, anchored to MoGe by one
-  scene-constant median ratio on the fixed 10% image border, gains **33.42%**
-  median visible-object camera Chamfer on 12 external TUD-L frames. This is
-  a background **proxy**, not semantic exclusion. The same three scenes/objects
-  were previously used for development; absolute errors remain large.
-  Independent generalization and full human/object/contact/motion accuracy
-  are unverified. This is **not** a CARI4D victory or deployment authorization.
-  Earlier root correction, DWPose prompts, gamma-medoid and global DA3
-  replacement hypotheses were rejected; no post-score retuning/rescoring.
-  The independent T-LESS acquisition stopped at its frozen layout/licence
-  gates before heavy data or predictions; no generalization score exists.
-  A new authored object-only RGBD fixture also stopped at its independent
-  CUDA depth/ray gate before publishing RGB or running models; no score
-  exists and the failed reference was not relaxed or rerun.
+- **Depth research:** D106 anchors DA3 to MoGe with one scene-constant median
+  ratio over whole native-valid support. It gains **56.2007%** median
+  visible-object camera Chamfer on 12 newly selected external TUD-L frames,
+  but these are the **same three development scenes/objects**; absolute errors
+  remain 33–38 cm. This is a narrow proxy, not independent generalization.
+  D107 tests the unchanged recipe on three independent TUM recordings:
+  **REJECT**, median relative AbsRel improvement **4.9046% < 5%**, with large
+  absolute errors. Both cohorts are closed without retuning or frame mining.
+  Neither establishes human/contact/temporal accuracy or a CARI4D victory.
+- **New authored RGB pilot:** four fresh anchors pass the independent CPU
+  triangle-ray rendering gate (`5536090`, 16.472 s). Automatic masks pass
+  (`001aa0f`, 14.529 s): eight Grounding and eight SAM2 calls with fixed
+  `person.`/`bottle.` queries, no manual prompts or model access to private
+  authored geometry. Four full Body/MoGe predictions pass (`14ebc28`, 30.926 s),
+  including native control replay and point-map projection. This is
+  pipeline readiness, **not** mask accuracy, bridge validation or adoption;
+  the future 192-frame experiment has not run. Earlier hypotheses and failed
+  authored references remain closed; the new pilot does not turn them into PASS.
 - **Eligibility:** upstream source/checkpoint licenses, training overlap and
   NVIDIA's separate registration remain unresolved before any submission.
   World Reward and all five Kaggle rule acceptances were verified on October 2.
@@ -58,8 +62,11 @@ completed without local checkpoint traffic. The second runtime is not yet
 ready: the selected Body/DINO source binding passes, and the minimal Grounding
 image compiles offline and its thin Python import gate passes. The independent
 SAM2 CUDA connectivity/hole-filling operator gate also passes, without models
-or historical image-parity/eligibility claims. Replica model readiness is unverified.
-The full frozen `3bee2c7` lightweight suite passed **10,570 tests, 2 optional skips**.
+or historical image-parity/eligibility claims. The new four-frame frontend pilot
+passes; complete replica and reconstruction accuracy remain unverified.
+The full `001aa0f` lightweight source/test suite passed **10,685 tests,
+2 optional skips** in 334.94 s; later changes only freeze actual result pins
+and update this status.
 Earlier extraction-fixture failures were corrected using authenticated historical
 Git bytes; the historical producer and production pins remain unchanged.
 

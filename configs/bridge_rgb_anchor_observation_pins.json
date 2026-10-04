@@ -1,0 +1,27 @@
+{
+  "schema": "world_reward.bridge_rgb_anchor_observation_pins.v1",
+  "producer_revision": "14ebc281eb7a49ec9a0f161d161737b2721b9feb",
+  "script_sha256": "fae89092c23e8bbf491a1d4ed3466ebacde883a4ac836839bea029ddb9618784",
+  "files": {
+    "clip_000000_frame_000000.npz": {
+      "bytes": 4553117,
+      "sha256": "4dd3e7b59727ef20587e74c405e6662321841ed3eb291092488ec437509c8ba0"
+    },
+    "clip_000001_frame_000000.npz": {
+      "bytes": 4541548,
+      "sha256": "80dec764573fcc5bfa6813dd297690d40cece1d21f1f60e3665eff048f7665fd"
+    },
+    "clip_000002_frame_000000.npz": {
+      "bytes": 4560765,
+      "sha256": "30cb85e9537ea698110af34cf820dbac28ee6f4b5894b6bee969194a3010bfd2"
+    },
+    "clip_000003_frame_000000.npz": {
+      "bytes": 4561192,
+      "sha256": "7e970baf4a3ecf90a1adb5c436caaf2a6de85e3a5147b82b2b7e60bf9ee5ba94"
+    },
+    "report.json": {
+      "bytes": 31090,
+      "sha256": "eb282ac594d9c07e4af51c77165ad6f48c025629c3448fa125bb45425d75e0dc"
+    }
+  }
+}
