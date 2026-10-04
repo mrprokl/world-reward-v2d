@@ -6230,3 +6230,17 @@ tests PASS0.22s. No challenge integration, raycasting/model run, external3D
 validation or native pose improvement is inferred. New independent YCBV
 relative-motion pilot is preregistered in `docs/point_pose_protocol.md`; exact
 acquisition pins and a full native/candidate comparison remain prerequisites.
+
+EP6 authenticated empty-directory transition0c037a8 **PASS**: receipt54,377B
+SHA`d071619ad2178c5722091611a94f4a3de2e89c5a0a1b1983c3d4a643c4a4b8ef`.
+Original FAIL/log/source preserved, original empty pose inode atomically archived,
+no files/geometry deleted or failure reinterpreted. New unchanged volume
+continuatione655eed acceptedactive/PID1092396; actual poses remain pending.
+
+New minimal Azure-private pose transport/control has root244 focused PASS /
+1Linux-only SKIP2.55s; final explicit-entrypoint correction64PASS/1SKIP1.70s.
+Independent source/report/Docker/SSH audit finds no further concrete blocker;
+real parent permissions, immutable image/operator availability and actual
+transfer/native execution still need gates. Full dense manifests/archives stay
+Azure, only≤4KB measured pins locally. No image clone, Body prediction transfer,
+Objects weights, GT, new predictor numerics or quality claim.
