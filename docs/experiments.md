@@ -8486,3 +8486,16 @@ Newmetadata-only tuple/list correction and revisionboundfreshnamespace preserve
 originalFAIL; actualcoretuple andnegativebadtypes regressed. No numerical/source/
 gate/budget/cohort changes. Pure loader binds11actual artifacts and source-math
 identities; neverexecutesnative/CGAL/QEM/build-info, missing independent pinsFAIL.
+
+Root260combined tuple/loader/qualification/compiler/pose/closure testsPASS2.32s;
+5360ownedfixtureentries removed. New EP09 packaging-only3952870 actualPASS:
+host65.136660s/256948B SHAe23191af40ac90d55d0ec304bba19811b6e941c6b038fbe1c229783002b071de,
+native63.465060s/167801B SHAd7c623964983b2bd44ee2cb6f26e720d3b24de2522a663254f254c8bd714aff6.
+All9shells/104890collapses/8exactqueries/6stages remain; maxsampledCD .004975962,
+maxshellvolumeerror .049417963 meet unchanged. Rootsource215/archive
+f0afddd5a12202881472bd70336b029104ba735e66af946fde475e76dad2e164,
+readonlyledger6e9e19440e0f8034753dbb8ac859c32d1c19425afa48f3311c5d3a73a3a7af55
+and fullhost==native/lifecycle/outputs verified. OriginalFAILreceipt unchanged.
+Canonical74704B SHA145116a7f3bf0cec11ef2711581c26c1aa3c1f1c6577310a4160c22df3cbd078;
+NPZ61801B SHAb117754d4c48a440ab379b29872f1c173dd61edae6eadb1b9fe5c0aff16497e0.
+Only geometry feasibility passed; inertloader/nativepose/HOI stillunverified.

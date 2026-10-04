@@ -15,7 +15,7 @@ inferred automatically; no hand-labeling of challenge records.
   refinement, direct export and original official packing. These are eleven
   complete engineering checks, not held-out accuracy; scratch Parquets deleted.
   EP0's legacy conversion failure stays separate. EP4 missing masks, EP7 empty
-  anchor, EP9 invalid geometry and EP10/EP11 actor identity failures remain closed.
+  anchor, EP9's original topology-budget failure and EP10/EP11 actor identity failures remain closed.
   EP11 stops before SAM2/later frontends. EP0's exact historical metadata
   omission is authenticated, not a relaxed legacy gate or a reversal of its old
   conversion failure. EP13 full425 complete chain passes. EP14 full442 inputs, shared preparation
@@ -37,7 +37,12 @@ inferred automatically; no hand-labeling of challenge records.
   the qualified binary stays on Azure. First production source rejects an
   unqualified component arrangement before any native call, after its sole
   packaging-only replay. Neither source nor gates are repaired to force PASS.
-  No successful production geometry, HOI gain or adoption is claimed.
+  A distinct whole-solid chart-v2 compiler now passes four frozen procedural
+  controls and the first real predicted EP9 source: nine complete components,
+  one QEM/eight exact queries/six fidelity stages, 65.14 s host. Its original
+  tuple/list packaging FAIL is preserved; the new producer changes no numerical
+  operator or acceptance gate. Geometry feasibility only: no downstream pose,
+  HOI gain, licence clearance or adoption is inferred.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
   development scenes/objects and33–38cm absolute errors prevent a generalization
   claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.
