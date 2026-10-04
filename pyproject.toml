@@ -21,3 +21,6 @@ packages = ["src/world_reward"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Fixtures are disposable; retain only concise asserted test results.
+tmp_path_retention_policy = "none"
+tmp_path_retention_count = 0
