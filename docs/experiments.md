@@ -6287,3 +6287,20 @@ literal native reference. CPU evaluation fixes unique95% mask association,
 all valid initial sensor-Z pixels, every frame and three-distinct-scene gates;
 BOP integer-ray convention independently verified from primary source. No
 private labels, model run, candidate quality or3D gain has been evaluated.
+
+EP8 private expiring SSH listener40ee2cb **actualPASS0.311253s**; independently
+verified original source, private10.0.0.9:2222/PID213368/unit and public hostkey.
+Receipt2550B SHA`38e30ca26cf9be77dedfc559e33a82b6f0d36bbfc1ee02403a98c770b1d1d018`.
+New client key was generated only on VM01; no private key bytes read/logged.
+Actual payload transfer is pending; listener readiness is not transport PASS.
+CPU-only frozen YCBV acquisition40ee2cb is active in its full-test download
+phase; the provisional report's initial FAIL default is not a completed verdict.
+
+New three-frame-zero native MoGe2 preflight adapter is frozen separately:
+root256combined tests PASS4.89s (48ownPASS1.53s). Only host control reads the
+independently pinned original acquisition receipt; the GPU mounts public RGB,
+public pins, native MoGe assets and a narrow genuine helper closure, no YCB
+labels/calibration/acquisition recipe. Original lock is opened read-only and
+held, all288 RGB and model/source bytes are checked before/after; native kwargs
+and saved arrays stay untouched. Actual initialization still requires measured
+acquisition pins and successful Azure execution; no depth/pose quality implied.

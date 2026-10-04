@@ -39,6 +39,21 @@ candidate adds only the point unary with identical pool/transitions. The helper
 has not generated a real-video pool, run Boots or altered the challenge
 pipeline. Its numerical arrays do not certify provenance or metric units.
 
+For an attributable comparison, any canonical witness that is behind the camera
+for an originally valid native candidate stops the **whole pilot**, rather than
+silently pruning one branch or refitting a shared pool. Both rankings therefore
+use exactly the original frozen valid-candidate mask; their only difference is
+the preregistered point unary. No-visible frames keep the native zero added cost.
+
+Initialization preflights are frozen before execution: three native MoGe2
+frame-zero calls (≤300s) retain native validity/XYZ/K without a human scalar;
+three fixed `object.` detections followed by SAM2's full96-frame propagation
+(≤600s) use no actor/person or per-scene label prompt. These times accumulate
+into the3600s total GPU budget. The proven SAM2/Grounding runtime on VM02 avoids
+moving288 RGBs across VMs; only three initialization RGB/mask/XYZ/K bundles need
+to reach the existing Objects runtime on VM01, and three fixed meshes return.
+PNG staging preserves original bytes and indices under numeric filenames.
+
 ## Proposed independent real-data gate
 
 Before acquisition or inference, freeze exact source revisions/licenses/bytes
