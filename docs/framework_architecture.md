@@ -17,6 +17,7 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 | Hypothèses objet | `point_candidate_pool.CandidatePool`, `pose_selection.PosePath` | Pool natif25 et sélection ; manque un contrat commun aux autres expériences. |
 | Forme partagée | `shape_model.apply_fixed_shape`, `shape_fit.fit_shared_shape`, `shape_selection.select_shape_candidate` | Opérateurs expérimentaux ; pas adoption automatique. |
 | Association pose/image | `point_pose_comparison.compare`, `rgb_pose_tracking.track_rgb_pose` | Coût ou suivi image, pas preuve de précision3D. |
+| Objectif joint à points persistants | `joint_point_objective.run_joint_point_refinement` | Extension explicite de la classe native : perte originale + reprojection robuste, géométrie/rotation et attachments fixes, poids/échelle externes obligatoires. Tests data-free ; qualification Torch/native et validation HOI encore requises. |
 | Composition pose commune | `fixed_shape_point_pose.compare_fixed_shape_sequence` | Extraction générique du raccord pool/query/tracks A/B ; callbacks natifs, aucune nouvelle inférence ou amélioration mesurée. |
 | Identité temporelle | `temporal_identity.IdentityGraph`, `rank_identity_paths` | Ranking global et min-marginales de coûts fournis ; aucun générateur de candidats/costs appris, identité acceptée ou probabilité. |
 | Evidence relationnelle | `relational_motion.relational_motion_features` | Résidus 2D après nuisance affine du fond, comptages/support ; tracks fournis, pas génération/identité/contact/confiance ni caméra physique. |
@@ -43,6 +44,13 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 Les contrats historiques et leurs preuves restent consultables à leur révision.
 La route proposée ne présente ni le planner historique ni les opérateurs purement
 numériques comme un framework complet déjà opérationnel.
+
+L'intervention prioritaire est désormais [un seul objectif joint à points](joint_point_objective.md),
+pas un empilement de corrections par vidéo. Le [rééquilibrage des sommes exactes](balanced_solid_sum.md)
+traite séparément la profondeur numérique du compilateur ; il ne change ni la
+géométrie ni les critères d'acceptation. Les qualifications anciennes ne qualifient
+pas ce nouveau source : quinze contrôles puis quatre compilations géométriques
+fraîches sont nécessaires avant une nouvelle proposition de production.
 
 ### Première migration réalisée
 
