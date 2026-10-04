@@ -1,0 +1,68 @@
+{
+  "all_original_frames": true,
+  "budgets_seconds": {
+    "evaluate": 120,
+    "infer": 900,
+    "public": 120
+  },
+  "claims": {
+    "adoption": false,
+    "automatic_track1_queries": false,
+    "causal_camera_noise": false,
+    "contact": false,
+    "full_hoi": false
+  },
+  "decision": "synchronous mean log-likelihood gain strictly positive with support on each of two heldout clips; matched contrast descriptive only",
+  "error_coordinates": "original pixel XY; native original-resolution tracks minus external annotations",
+  "fit": "single split3 clip; one Gaussian4 adjacent-error-increment model; no jitter",
+  "host_control_seconds": 135,
+  "host_lifecycle_seconds": {
+    "evaluate": 900,
+    "infer": 1350,
+    "public": 900
+  },
+  "initial_queries_external_oracles": true,
+  "interval_rule": "both interval endpoints strictly after the original query frame",
+  "namespace": "validation/tracker_noise_v1",
+  "native": {
+    "AMP": false,
+    "TF32": false,
+    "compute_dtype": "float32",
+    "deterministic_algorithms": false,
+    "pyramid_level": 1,
+    "query_chunk_size": 32,
+    "resolution": [
+      256,
+      256
+    ],
+    "seed": 0,
+    "warn_only": false
+  },
+  "null": "shift odd-point interval indices by floor(T/3), no wrap; separate full denominators and matched-anchor contrast",
+  "prefix_original_query_indices": 32,
+  "refill_unavailable": false,
+  "rights": {
+    "challenge_overlap_verified": false,
+    "dataset": "RoboTAP CC-BY-4.0",
+    "native_code_checkpoint": "Apache-2.0",
+    "training_overlap_verified": false
+  },
+  "schema": "world_reward.tracker_noise_protocol.v1",
+  "selection": [
+    {
+      "lex_positions": [
+        0
+      ],
+      "role": "fit",
+      "split": 3
+    },
+    {
+      "lex_positions": [
+        0,
+        1
+      ],
+      "role": "test",
+      "split": 4
+    }
+  ]
+}

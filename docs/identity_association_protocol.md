@@ -125,6 +125,31 @@ Tests procéduraux et énumération vérifient les mathématiques, pas cette hyp
 sur vidéo. Les anciens sujets01/02, score logistique et seuils clos ne sont pas
 réutilisés comme protocole ou calibration de ce nouveau modèle.
 
+### Diagnostic réel proposé du bruit partagé, distinct de l'association
+
+`tracker_noise_null` et le lifecycle unique `infra/tracker_noise_experiment.py`
+figent une expérience RoboTAP CC-BY-4.0 sur split3/lex0 (fit), split4/lex0–1
+(test), distincte de l'ancien split0–2 clos. Pas de nouvelle acquisition.
+Queries initiales annotées explicitement **oracles externes** ; GPU reçoit
+seulement RGB/queries publiques et le runtime Boots déjà vérifié, aucun pickle
+ni annotation future. Toutes les prédictions originales sont scellées avant
+évaluation ; modèle et metadata fit sont rehashés avant d'ouvrir split4.
+
+Groupes pairs/impairs non sémantiques, innovations de l'erreur XY
+prédiction moins annotation, deux endpoints visibles strictement après query.
+MLE Gaussian4 composite pondérée par paire : B covariance complète, A mêmes
+moyennes/marginales avec bloc croisé nul. SPD sans jitter/repli. Gate gelé :
+gain moyen B−A strictement positif avec support sur chacun des deux tests ;
+absence ⇒ INCONCLUSIVE, sinon REJECT. Shift non circulaire floor(T/3) et
+contraste aux mêmes ancres/paires/supports restent **descriptifs**, pas un gate.
+Autocorrélation, hétéroscédasticité et erreurs des annotations interdisent toute
+interprétation causale caméra, contact, identité ou posterior calibré.
+
+Native CPU120s/inférence900s avec hashes ; contrôles hôte135s chacun et total
+900s CPU/1350s inférence déclarés séparément. Source, outputs, wrapper terminal,
+cleanup et pins réels requis : un report du container ou une fixture ne suffit
+pas. Root143 tests combinés PASS0.64s ; aucune exécution réelle encore.
+
 Ne pas appeler le minimum de chemins `temporal_identity` une vraisemblance HMM
 marginalisée : MAP/profilage et log-sum-exp des chemins diffèrent, et des banques
 de nuisance de tailles différentes peuvent biaiser le minimum. Comparabilité,

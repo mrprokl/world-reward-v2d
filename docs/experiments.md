@@ -8224,3 +8224,13 @@ positive B-minus-A mean on EACH test clip, not a camera/identity/contact claim.
 Independent mathematical/scientific audit clear; root156 combined peer/null
 testsPASS1SKIP2.12s and matched extension54PASS0.09s. Root6331-entry fixtures
 removed; no new labels/models executed or quality conclusion from tinytests.
+
+New cohesive three-stage tracker-noise lifecycle and pure forest correspondence
+released after independent audit; root143 combined noise/native/likelihood/forest
+testsPASS0.64s, Bashsyntax/diffPASS. Own445-entry fixtures removed. Native Boots
+functions reused unchanged, all3 frozen outputs before labels, both fit artifact
+pins checked BEFORE split4 open; GPU has no future private annotation mounts.
+Pure forest correspondence validates whole component bijection by actual QEM
+faceJ/vertexI, original source keys and complete signs/inside/parents/depths;
+does not require all original faces to survive legitimate collapse. No native
+compiler/geometry/HOI qualification is inferred from this array primitive.
