@@ -8714,3 +8714,14 @@ Keep native loader/metadata/poses unchanged; forthcoming correction checks
 both exactstages and real nativeF32 vertices/savedF32 poses against original
 camera geometry with inherited1e-5m bound. Zero-pose diagnostic9.573812e-08m
 is not fullT validation or quality. No gate relaxation or episode fitting.
+
+Native-semantics correction released: exact installedTrimesh6file identities,
+two original native loader AST bodies without heavy optimizer imports, one
+canonical geometry/instance with full vertex/face lineage and all components.
+RawA/effectiveB/defaultloader/nativeF32 all checked exactly; actual reloaded
+fullT savedF32 poses used for camera gate. No changed nativeP invA, shape,
+scale, metadata, default numerical statements/report or acceptance threshold.
+Agent422PASS5.03s/root693PASS25.26s;13768owned rootfixture entries removed.
+Predeclare bounded native procedural controls before realprepare replay;
+failedpartial tree must be archived atomically with complete before/after
+inventory/source/failure proof, never overwritten or resumed as valid input.

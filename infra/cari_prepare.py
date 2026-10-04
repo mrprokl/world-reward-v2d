@@ -8,6 +8,7 @@ All large intermediates and model inputs remain on the remote managed disk.
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import os
@@ -22,6 +23,21 @@ import time
 from body_smoke import EPISODE, TRACK1_EPISODE_COUNT, _validate_inputs, _pinned_checkout, UPSTREAM_REVISION
 from world_reward.data import sha256
 from world_reward.mesh_geometry import normalize_degenerate_faces
+
+
+# Actual immutable native image source identities, not a newest-version lookup.
+SOLID_TRIMESH_SOURCES = {
+    'scene/transforms.py': {'bytes': 28938, 'sha256': 'f38beb118974172c42270d035f3bb77eb5d374de8c251aab7bce1a33afbe8ea2'},
+    'transformations.py': {'bytes': 74801, 'sha256': '644b112736124b7803c028a248279926d10f748649634006d493a90722eae360'},
+    'scene/scene.py': {'bytes': 54380, 'sha256': '6dd01efd09edae58f9d3643d73f9ca943904cb353a52f9d8f6633213b684e15b'},
+    'base.py': {'bytes': 110040, 'sha256': '13d002a80f14bfa33cf5e49fab19b60083356c2377d92fc98a701d0d2b3e8706'},
+    'exchange/gltf/__init__.py': {'bytes': 79987, 'sha256': '0bebabb3a28a9e75773ddf4135a51198dc107ad61bbbcf4de280191417e2159c'},
+    'exchange/load.py': {'bytes': 21516, 'sha256': '6b313c1f0ff9295e1cdf6a5567588f5df7d5c02eea12353fc9d15740d19a9e4e'},
+}
+SOLID_NATIVE_LOAD_SOURCES = {
+    'lib_mhr/contact.py': {'bytes': 9646, 'sha256': 'd4e8a92845d75a7bae962f312dee4d747587c39157a978908293a5645beb6d5c'},
+    'learning/training/mhr_opt_refineout.py': {'bytes': 92824, 'sha256': '84e0e818a3bc0935bb30b75fcd82fd7c5e3730ed812864594cd759697ddb406b'},
+}
 
 
 def _argument_parser() -> argparse.ArgumentParser:
@@ -150,41 +166,137 @@ def _solid_recheck(ledger):
         raise ValueError('Immutable solid pose namespace changed after validation')
 
 
-def _solid_serialized_mesh(path, source, topology, trimesh, np, transform=None):
-    """Check actual GLB positions and scene transforms; no guessed baking step."""
+def _solid_native_sources(native_root, trimesh, np):
+    """Authenticate and execute only two original CPU loader function bodies."""
+    import importlib
+    from solid_geometry_loader import identity
+    if trimesh.__version__ != '5.1.0':
+        raise ValueError('Exact qualified native Trimesh version required')
+    package = Path(trimesh.__file__).parent
+    ledger = {}
+    for name, pin in SOLID_TRIMESH_SOURCES.items():
+        path = package / name
+        module = importlib.import_module('trimesh.' + name.removesuffix('/__init__.py').removesuffix('.py').replace('/', '.'))
+        if Path(module.__file__) != path or identity(path, readonly=False) != pin:
+            raise ValueError('Native Trimesh transform/scene source differs from qualified image')
+        ledger[path] = pin
+    if Path(trimesh.transformations.fix_rigid.__code__.co_filename) != package / 'transformations.py':
+        raise ValueError('Native rigid projection must execute the original source function')
+    namespace = {'np': np, 'trimesh': trimesh, 'Path': Path}
+    for name, function in (('lib_mhr/contact.py', 'load_object_mesh'),
+                           ('learning/training/mhr_opt_refineout.py', '_load_object_vertices')):
+        path = native_root / name
+        if identity(path, readonly=False) != SOLID_NATIVE_LOAD_SOURCES[name]:
+            raise ValueError('Original native scene/FP32 mesh-loader source differs')
+        tree = ast.parse(path.read_text(), filename=str(path))
+        definitions = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == function]
+        if (len(definitions) != 1 or definitions[0].decorator_list or len(definitions[0].args.args) != 1
+                or definitions[0].args.args[0].arg != 'path' or definitions[0].args.posonlyargs
+                or definitions[0].args.kwonlyargs or definitions[0].args.defaults
+                or definitions[0].args.vararg or definitions[0].args.kwarg):
+            raise ValueError('Exact original one-path CPU loader function required')
+        futures = [node for node in tree.body if isinstance(node, ast.ImportFrom) and node.module == '__future__']
+        exec(compile(ast.Module(body=[*futures, definitions[0]], type_ignores=[]), str(path), 'exec'), namespace)
+        if namespace[function].__code__.co_filename != str(path):
+            raise ValueError('Original CPU mesh-loader execution binding differs')
+        ledger[path] = SOLID_NATIVE_LOAD_SOURCES[name]
+    _solid_recheck(ledger)
+    return namespace['_load_object_vertices'], ledger
+
+
+def _solid_scene_matrix(scene, expected, trimesh, np):
+    """Single canonical mesh instance; raw edges and native projection distinct."""
+    if not isinstance(scene, trimesh.Scene) or len(scene.geometry) != 1 or len(scene.graph.nodes_geometry) != 1:
+        raise ValueError('Solid canonical consumer supports exactly one geometry and one instance')
+    node = scene.graph.nodes_geometry[0]
+    edges = {}
+    for parent, child, fields in scene.graph.to_edgelist():
+        if child in edges:
+            raise ValueError('Ambiguous native scene parent')
+        matrix = np.asarray(fields['matrix'], np.float64)
+        if matrix.shape != (4, 4) or not np.isfinite(matrix).all() or not np.array_equal(matrix[3], [0., 0., 0., 1.]):
+            raise ValueError('Finite unmodified affine native scene edges required')
+        edges[child] = parent, matrix
+    path = []; seen = set(); current = node
+    while current != scene.graph.base_frame:
+        if current in seen or current not in edges:
+            raise ValueError('Incomplete or cyclic native scene transform path')
+        seen.add(current); parent, matrix = edges[current]; path.append(matrix); current = parent
+    raw = np.eye(4)
+    for matrix in reversed(path): raw = raw @ matrix
+    if not np.array_equal(raw, expected) or scene.graph.repair_rigid != 1e-5:
+        raise ValueError('Raw native scene matrix or qualified rigid-projection policy differs')
+    effective, geometry = scene.graph[node]
+    effective = np.asarray(effective, np.float64)
+    projected = trimesh.transformations.fix_rigid(expected, max_deviance=1e-5)
+    if geometry not in scene.geometry or not np.array_equal(effective, projected):
+        raise ValueError('Effective native scene matrix differs from source-pinned rigid projection')
+    return raw, effective
+
+
+def _solid_serialized_mesh(path, source, topology, trimesh, np, native_load, transform=None):
+    """Exact local/raw stage, then the unchanged native graph/FP32 stage."""
     from mesh_precision_diagnostic import raw_glb, triangle_hash
     from object_budget_endpoint import _load_mesh
     from exact_mesh_geometry import exact_mesh_topology
     local, world, records = raw_glb(path)
     stored = source[0].astype(np.float32).astype(np.float64)
     local_triangles = np.concatenate([v[f] for v, f in local])
-    if triangle_hash(local_triangles) != triangle_hash(stored[source[1]]):
+    if (triangle_hash(local_triangles) != triangle_hash(stored[source[1]]) or len(local) != 1
+            or not np.array_equal(local[0][0], stored) or not np.array_equal(local[0][1], source[1])):
         raise ValueError("GLB POSITION/indices altered meaningful oriented triangles")
     if transform is None:
         if not all(row['node_transform_identity'] for row in records):
             raise ValueError("Metric GLB must not introduce a hidden scene transform")
-        expected = stored
-    else:
-        # Native _write_object_template applies its actual float32 matrix to
-        # the scene graph, then exports. POSITION need not be baked/recast.
-        expected = trimesh.transform_points(stored, transform)
+        transform = np.eye(4)
+    raw, effective = _solid_scene_matrix(trimesh.load(path, force='scene', process=False), transform, trimesh, np)
+    expected = trimesh.transform_points(stored, raw)
     expected_hash = triangle_hash(expected[source[1]])
     loaded_v, loaded_f = _load_mesh(path)
-    if triangle_hash(world) != expected_hash or triangle_hash(loaded_v[loaded_f]) != expected_hash:
+    represented = trimesh.transform_points(stored, effective)
+    if (triangle_hash(world) != expected_hash or not np.array_equal(loaded_f, source[1])
+            or not np.array_equal(loaded_v, represented)
+            or triangle_hash(loaded_v[loaded_f]) != triangle_hash(represented[source[1]])):
         raise ValueError("Native aligned GLB changed represented rigid-transform geometry")
     _solid_topology_equal(topology, exact_mesh_topology(loaded_v, loaded_f))
-    return {'oriented_triangles_sha256': expected_hash, 'position_accessors_float32': True,
+    native_v, native_f = native_load(path)
+    if (type(native_v) is not np.ndarray or native_v.dtype != np.float32
+            or type(native_f) is not np.ndarray or native_f.dtype != np.int64
+            or not np.array_equal(native_v, represented.astype(np.float32))
+            or not np.array_equal(native_f, source[1]) or not np.isfinite(native_v).all()):
+        raise ValueError('Actual native FP32 loader altered the qualified effective mesh')
+    native_metric = native_v.astype(np.float64)
+    quantization_error = float(np.max(np.linalg.norm(native_metric - represented, axis=1)))
+    if quantization_error > 1e-5:
+        raise ValueError('Actual native FP32 consumer exceeds inherited 1e-5 metric bound')
+    _solid_float32_orientation(represented, native_metric, native_f)
+    _solid_topology_equal(topology, exact_mesh_topology(native_metric, native_f))
+    proof = {'oriented_triangles_sha256': expected_hash, 'position_accessors_float32': True,
             'faces': len(loaded_f), 'components': len(topology['components']),
-            'all_meaningful_triangles_preserved': True, 'geometry_repaired': False,
+            'all_meaningful_triangles_preserved': True, 'local_coordinates_or_topology_repaired': False,
+            'canonical_scene_policy': 'single_geometry_single_instance_full_index_lineage',
+            'raw_scene_transform': raw.tolist(), 'effective_native_transform': effective.tolist(),
+            'native_rigidprojection_used': not np.array_equal(raw, effective),
+            'effective_oriented_triangles_sha256': triangle_hash(loaded_v[loaded_f]),
+            'native_float32_oriented_triangles_sha256': triangle_hash(native_metric[native_f]),
+            'native_float32_topology': exact_mesh_topology(native_metric, native_f),
+            'native_float32_quantization_max_error_m': quantization_error,
+            'native_float32_loader_replayed': True,
             'independent_embedding_reverified': False}
+    return proof, (native_v.copy(), native_f.copy())
 
 
-def _solid_camera_roundtrip(source, rotations, translations, aligned_poses, transform, trimesh, np):
-    """Actual GLB positions plus the exact F32 poses written to native input."""
+def _solid_camera_roundtrip(source, rotations, translations, saved_poses, native_mesh, np):
+    """Actual native FP32-loaded positions and the F32 poses written to input."""
     original = source[0][source[1].reshape(-1)]
-    stored = source[0].astype(np.float32).astype(np.float64)
-    aligned = trimesh.transform_points(stored, transform)[source[1].reshape(-1)]
-    saved_poses = aligned_poses.astype(np.float32).astype(np.float64)
+    native_v, native_f = native_mesh
+    if native_v.dtype != np.float32 or native_f.dtype != np.int64 or not np.array_equal(native_f, source[1]):
+        raise ValueError('Exact actual native FP32 mesh/full face lineage required')
+    aligned = native_v.astype(np.float64)[native_f.reshape(-1)]
+    if (type(saved_poses) is not np.ndarray or saved_poses.dtype != np.float32
+            or saved_poses.shape != (len(rotations), 4, 4) or not np.isfinite(saved_poses).all()):
+        raise ValueError('Actual saved full-timeline FP32 native poses required')
+    saved_poses = saved_poses.astype(np.float64)
     error = 0.
     for index in range(len(rotations)):
         before = original @ rotations[index].T + translations[index]
@@ -275,6 +387,8 @@ def main():
             if solid_identity(path, readonly=False) != pin:
                 raise ValueError('Native unprocessed scene alignment/export source differs from pinned upstream')
             solid_ledger[path] = pin
+        solid_native_load, native_source_ledger = _solid_native_sources(native_root, trimesh, np)
+        solid_ledger.update(native_source_ledger)
     else:
         with np.load(pose_path, allow_pickle=False) as arrays:
             vertices, faces = arrays["vertices"].copy(), arrays["faces"].copy()
@@ -317,7 +431,7 @@ def main():
     metric_path = output / "object_metric.glb"
     metric_mesh.export(metric_path)
     if args.mesh_source == 'solid':
-        metric_proof = _solid_serialized_mesh(metric_path, solid_compact, solid_topology, trimesh, np)
+        metric_proof, _ = _solid_serialized_mesh(metric_path, solid_compact, solid_topology, trimesh, np, solid_native_load)
         metric_identity = solid_identity(metric_path, readonly=False)
     focal = float(np.hypot(1152, 1536))
     intrinsics = {"fx": focal, "fy": focal, "cx": 768., "cy": 576., "H": 1152, "W": 1536,
@@ -362,14 +476,24 @@ def main():
         aligned_path = output / 'export' / sequence / 'object_mesh/output_aligned.glb'
         if metadata.get('object_mesh_file') != str(aligned_path) or export_seq != aligned_path.parent.parent:
             raise ValueError('Native solid export must retain the canonical prepared aligned-GLB route')
-        aligned_proof = _solid_serialized_mesh(aligned_path, solid_compact, solid_topology, trimesh, np, A)
-        aligned_proof['represented_mesh_pose_frame_roundtrip_max_error_m'] = _solid_camera_roundtrip(
-            solid_compact, rotations, translations, aligned_poses, A, trimesh, np)
+        aligned_proof, native_aligned_mesh = _solid_serialized_mesh(
+            aligned_path, solid_compact, solid_topology, trimesh, np, solid_native_load, A)
     object_poses_path = output / "own_object_poses.pkl"
     joblib.dump({"frames": names, "obj_pose_world": aligned_poses.astype(np.float32),
                  "metadata": {"source": "World_Reward_fixed_scale_depth_ICP_Viterbi_not_FoundationPose",
                               "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": [],
                               "source_pose_sha256": sha256(pose_path), "mesh_frame_change": A.tolist()}}, object_poses_path)
+    if args.mesh_source == 'solid':
+        saved_object_poses = joblib.load(object_poses_path)
+        if (type(saved_object_poses) is not dict or set(saved_object_poses) != {'frames', 'obj_pose_world', 'metadata'}
+                or saved_object_poses['frames'] != names
+                or not np.array_equal(saved_object_poses['obj_pose_world'], aligned_poses.astype(np.float32))
+                or saved_object_poses['metadata'] != {'source': 'World_Reward_fixed_scale_depth_ICP_Viterbi_not_FoundationPose',
+                    'ground_truth_used': False, 'hand_labeled_test': False, 'oracle_modes': [],
+                    'source_pose_sha256': sha256(pose_path), 'mesh_frame_change': A.tolist()}):
+            raise ValueError('Saved native full-timeline solid poses/metadata changed')
+        aligned_proof['represented_mesh_pose_frame_roundtrip_max_error_m'] = _solid_camera_roundtrip(
+            solid_compact, rotations, translations, saved_object_poses['obj_pose_world'], native_aligned_mesh, np)
     aligned_depth_path = output / "aligned_depth.h5"
     scale = reports["alignment"]["depth_alignment"]["shared_scale"]
     identity = {"depth_backend": "moge2", "depth_model_id": MOGE2_MODEL_ID, "depth_model_revision": MOGE2_MODEL_REVISION,
@@ -446,14 +570,18 @@ def main():
                 or metadata['source_object_mesh'] != {'path': str(metric_path.resolve()),
                     'size': metric_path.stat().st_size, 'mtime_ns': metric_path.stat().st_mtime_ns}):
             raise ValueError('Native solid metric GLB source changed during preparation')
-        _solid_serialized_mesh(metric_path, solid_compact, solid_topology, trimesh, np)
-        _solid_serialized_mesh(aligned_path, solid_compact, solid_topology, trimesh, np, A)
+        final_metric, _ = _solid_serialized_mesh(metric_path, solid_compact, solid_topology, trimesh, np, solid_native_load)
+        final_aligned, _ = _solid_serialized_mesh(aligned_path, solid_compact, solid_topology, trimesh, np, solid_native_load, A)
+        if (final_metric != metric_proof or any(final_aligned[key] != aligned_proof[key] for key in final_aligned)):
+            raise ValueError('Native raw/effective/FP32 solid geometry changed after preparation')
         result['object_source'] = 'solid'
         result['object_pose_source'] = {'report': str(report_paths['object'].relative_to(root)),
             'geometry_and_poses': str(pose_path.relative_to(root)), 'geometry_and_poses_sha256': sha256(pose_path)}
         result['solid_geometry_validation'] = {'metric_glb': metric_proof, 'native_aligned_glb': aligned_proof,
             'source_rehashed_after': True, 'files': {str(p): value for p, value in solid_ledger.items()},
-            'geometry_repaired': False, 'metric_scale_applied_again': False}
+            'local_coordinates_or_topology_repaired': False,
+            'native_rigidprojection_used': aligned_proof['native_rigidprojection_used'],
+            'metric_scale_applied_again': False}
     (output / "report.json").write_text(json.dumps(result, indent=2) + "\n")
     # Transient combined masks are redundant after verified native export.
     masks_path.unlink()

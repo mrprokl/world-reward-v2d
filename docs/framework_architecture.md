@@ -33,7 +33,7 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 | Correspondance de solides | `solid_forest_fidelity.compare_solid_forest_fidelity` | Bijection de composantes par births I/J et forest complet conservé ; prédicats géométriques, Euler, volumes et légalité des collapses restent des gates séparés, pas un compilateur qualifié. |
 | Chart numérique | `mesh_conditioning.prepare_conditioning`, opt-in `--conditioned` du même compilateur | Chart source-derived readonly avec inverse physique ; nouvelle sémantique QSlim, quatre contrôles géométriques frais qualifiés, pas de mesh de production ni adoption. |
 | Implémentation et transfert mesh | `--conditioned-cache`, `object_budget_conditioned`, `conditioned_geometry_loader`, opt-in du tracker existant | Huit bras procéduraux byte-exacts ; ancien transfert fermé sur source non qualifiée. Ne pas lui attribuer le succès du nouveau whole-solid. |
-| Solide entier | `oriented_solid_compiler`, `object_budget_solid`, `solid_geometry_loader`, opt-in strict du tracker existant | Chart-v2 qualifié sur quatre contrôles et première proposition réelle EP9/neuf composantes. Reader CPU réel PASS ; suivi full-T en cours, aucun gain HOI/adoption. Pins v2 bornés raccordent cette source aux mêmes algorithmes CARI modernes sans alias ou changement de coûts. |
+| Solide entier | `oriented_solid_compiler`, `object_budget_solid`, `solid_geometry_loader`, opt-in strict du tracker existant | Chart-v2 qualifié sur quatre contrôles et première proposition réelle EP9/neuf composantes. Reader CPU et suivi réel full415 PASS ; préparation native initiale FAIL sur une sémantique de transform, aucun gain HOI/adoption. Pins v2 bornés raccordent cette source aux mêmes algorithmes CARI modernes sans alias ou changement de coûts. |
 | Lacunes | `occlusion_bridge.initialize_occluded_gaps` | Initialiseur conditionnel ; pas contact observé ni validation RGB complète. |
 | Baseline complète | `cari_shared_prepare`, `cari_full_forward`, `cari_full_refine`, `cari_full_export` | Adaptateurs natifs séparés, preuve et exécution souvent imbriquées. |
 | Évaluation externe | `point_motion_evaluation`, `point_bop_evaluation`, `ycbv_point_evaluate` | Portée rigide relative ; pas validation HOI globale. |
@@ -158,8 +158,21 @@ L’export immuable et son consommateur ont des provenances distinctes : une
 évolution des wrappers ne justifie ni de régénérer les prédictions ni de
 réécrire l’historique. Le consommateur authentifie la closure Git réelle du
 producteur, puis vérifie séparément la compatibilité de ses opérateurs
-numériques actuels. Les receipts d’échec restent à leur emplacement ; tout
-replay technique explicitement motivé utilise une sortie fraîche par révision.
+numériques actuels. Les receipts d’échec restent immuables ; lorsqu'un consommateur
+natif impose un chemin canonique, un échec partiel peut être archivé par renommage
+atomique sans écrasement, après arrêt prouvé et inventaire hashé avant/après.
+Il ne devient jamais une entrée PASS. Tout replay technique explicitement motivé
+dispose d'une sortie fraîche et d'une révision identifiée, sans reprendre le partiel.
+
+La géométrie sérialisée et celle effectivement lue sont distinctes. Trimesh5.1.0
+projette implicitement certaines matrices de rotation F32 par SVD, même avec
+`process=False`. Pour la route solide, authentifier le code installé, démontrer
+exactement POSITION/indices → matrice brute A puis graphe natif B=`fix_rigid(A)`
+→ triangles chargés → vertices natifs F32. Conserver metadata A et poses natives,
+jamais inverser B pour améliorer le résultat. Vérifier toute la timeline dans le
+repère caméra avec les vertices et poses réellement F32 et la borne héritée1e-5m.
+Déclarer explicitement cette projection native ; aucun arrondi supplémentaire,
+modification de surfaces/connectivité, relaxation de seuil ou gain3D n'est déduit.
 
 ## 5. Gates et expérimentation parallèle
 

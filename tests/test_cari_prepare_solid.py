@@ -178,63 +178,223 @@ def test_exact_local_orientation_is_not_only_a_signed_volume_proxy(prepare):
         prepare._solid_float32_orientation(v, stored, f)
 
 
-def test_actual_glb_accessor_and_scene_transform_contract_without_loader_processing(prepare, tmp_path, monkeypatch):
+def homogeneous(points, matrix):
+    return np.dot(matrix, np.column_stack((points, np.ones(len(points)))).T).T[:, :3]
+
+
+def projected(matrix, max_deviance=1e-5):
+    result = matrix.copy()
+    error = np.abs(matrix[:3, :3] @ matrix[:3, :3].T - np.eye(3)).max()
+    if 1e-13 < error < max_deviance:
+        u, _, vt = np.linalg.svd(matrix[:3, :3]); result[:3, :3] = u @ vt
+    return result
+
+
+@pytest.fixture
+def serialized(monkeypatch):
     import mesh_precision_diagnostic as raw
     import object_budget_endpoint as endpoint
-    from exact_mesh_geometry import exact_mesh_topology
     v, f = tetra(); A = np.eye(4); A[:3, 3] = [.25, -.5, .125]
-    transform = lambda points, matrix: points @ matrix[:3, :3].T + matrix[:3, 3]
-    world = transform(v, A)
-    monkeypatch.setattr(raw, 'raw_glb', lambda _: ([(v.astype(np.float32), f)], world[f], [{'node_transform_identity': False}]))
-    monkeypatch.setattr(endpoint, '_load_mesh', lambda _: (world, f))
-    proof = prepare._solid_serialized_mesh(tmp_path / 'opaque.glb', (v, f), exact_mesh_topology(v, f),
-                                            SimpleNamespace(transform_points=transform), np, A)
+    class Scene:
+        def __init__(self, matrix):
+            self.geometry = {'mesh': object()}
+            self.graph = SimpleNamespace(base_frame='world', nodes_geometry=['mesh'], repair_rigid=1e-5)
+            self.edges = [['world', 'mesh', {'matrix': matrix.copy()}]]
+            self.effective = projected(matrix)
+            self.graph.to_edgelist = lambda: self.edges
+        def __getitem__(self, key): return self.effective, 'mesh'
+    scene = Scene(A)
+    # A special method belongs on the graph class, not its instance.
+    class Graph(SimpleNamespace):
+        def __getitem__(self, key): return scene.effective, 'mesh'
+    scene.graph = Graph(**vars(scene.graph))
+    case = SimpleNamespace(v=v, f=f, A=A, scene=scene,
+        records=[{'node_transform_identity': False}], local=[(v.astype(np.float32), f.copy())],
+        world=homogeneous(v, A)[f], loaded=(homogeneous(v, A), f.copy()),
+        native=(homogeneous(v, A).astype(np.float32), f.copy()))
+    case.trimesh = SimpleNamespace(Scene=Scene, load=lambda *args, **kwargs: scene,
+        transform_points=homogeneous, transformations=SimpleNamespace(fix_rigid=projected))
+    case.native_load = lambda _: case.native
+    def set_matrix(matrix):
+        case.A = matrix; scene.edges[0][2]['matrix'] = matrix.copy(); scene.effective = projected(matrix)
+        case.world = homogeneous(v, matrix)[f]
+        case.loaded = homogeneous(v, scene.effective), f.copy()
+        case.native = case.loaded[0].astype(np.float32), f.copy()
+    case.set_matrix = set_matrix
+    monkeypatch.setattr(raw, 'raw_glb', lambda _: (case.local, case.world, case.records))
+    monkeypatch.setattr(endpoint, '_load_mesh', lambda _: case.loaded)
+    return case
+
+
+def serialized_call(prepare, case, tmp_path, transform=True):
+    from exact_mesh_geometry import exact_mesh_topology
+    return prepare._solid_serialized_mesh(tmp_path / 'opaque.glb', (case.v, case.f),
+        exact_mesh_topology(case.v, case.f), case.trimesh, np, case.native_load, case.A if transform else None)
+
+
+def test_actual_glb_accessor_and_scene_transform_contract_without_loader_processing(prepare, serialized, tmp_path):
+    case = serialized; proof, native = serialized_call(prepare, case, tmp_path)
     assert proof['faces'] == 4 and proof['all_meaningful_triangles_preserved']
-    with pytest.raises(ValueError, match='hidden scene'): prepare._solid_serialized_mesh(
-        tmp_path / 'opaque.glb', (v, f), exact_mesh_topology(v, f), SimpleNamespace(transform_points=transform), np)
-    monkeypatch.setattr(endpoint, '_load_mesh', lambda _: (world, f[:, ::-1]))
-    with pytest.raises(ValueError, match='represented rigid'): prepare._solid_serialized_mesh(
-        tmp_path / 'opaque.glb', (v, f), exact_mesh_topology(v, f), SimpleNamespace(transform_points=transform), np, A)
+    assert proof['native_rigidprojection_used'] is False
+    assert proof['local_coordinates_or_topology_repaired'] is False and 'geometry_repaired' not in proof
+    assert np.array_equal(native[0], case.native[0]) and not np.shares_memory(native[0], case.native[0])
+    with pytest.raises(ValueError, match='hidden scene'): serialized_call(prepare, case, tmp_path, False)
+    case.loaded = case.loaded[0], case.f[:, ::-1]
+    with pytest.raises(ValueError, match='represented rigid'): serialized_call(prepare, case, tmp_path)
 
 
-def test_no_meaningful_face_loss_or_coordinate_guess(prepare, tmp_path, monkeypatch):
-    import mesh_precision_diagnostic as raw
-    import object_budget_endpoint as endpoint
-    from exact_mesh_geometry import exact_mesh_topology
-    v, f = tetra(); transform = lambda points, matrix: points @ matrix[:3, :3].T + matrix[:3, 3]
-    monkeypatch.setattr(raw, 'raw_glb', lambda _: ([(v.astype(np.float32), f[:-1])], v[f[:-1]], [{'node_transform_identity': True}]))
-    monkeypatch.setattr(endpoint, '_load_mesh', lambda _: (v, f))
-    with pytest.raises(ValueError, match='POSITION'): prepare._solid_serialized_mesh(
-        tmp_path / 'opaque.glb', (v, f), exact_mesh_topology(v, f), SimpleNamespace(transform_points=transform), np)
+def test_no_meaningful_face_loss_or_coordinate_guess(prepare, serialized, tmp_path):
+    serialized.local = [(serialized.v.astype(np.float32), serialized.f[:-1])]
+    with pytest.raises(ValueError, match='POSITION'): serialized_call(prepare, serialized, tmp_path)
 
 
-def test_scene_matrix_is_retained_not_assumed_baked_float32(prepare, tmp_path, monkeypatch):
-    import mesh_precision_diagnostic as raw
-    import object_budget_endpoint as endpoint
-    from exact_mesh_geometry import exact_mesh_topology
-    v, f = tetra(); A = np.eye(4); A[:3, 3] = [float(np.float32(.1)), 0., 0.]
-    transform = lambda points, matrix: points @ matrix[:3, :3].T + matrix[:3, 3]
-    world = transform(v, A)
-    assert not np.array_equal(world.astype(np.float32).astype(np.float64), world)
-    monkeypatch.setattr(raw, 'raw_glb', lambda _: ([(v.astype(np.float32), f)], world[f], [{'node_transform_identity': False}]))
-    monkeypatch.setattr(endpoint, '_load_mesh', lambda _: (world, f))
-    prepare._solid_serialized_mesh(tmp_path / 'opaque.glb', (v, f), exact_mesh_topology(v, f),
-                                   SimpleNamespace(transform_points=transform), np, A)
-    monkeypatch.setattr(endpoint, '_load_mesh', lambda _: (world.astype(np.float32).astype(np.float64), f))
-    with pytest.raises(ValueError, match='represented rigid'):
-        prepare._solid_serialized_mesh(tmp_path / 'opaque.glb', (v, f), exact_mesh_topology(v, f),
-                                       SimpleNamespace(transform_points=transform), np, A)
+def test_scene_matrix_is_retained_not_assumed_baked_float32(prepare, serialized, tmp_path):
+    case = serialized; A = np.eye(4); A[:3, 3] = [float(np.float32(.1)), 0., 0.]; case.set_matrix(A)
+    assert not np.array_equal(case.loaded[0].astype(np.float32).astype(np.float64), case.loaded[0])
+    proof, native = serialized_call(prepare, case, tmp_path)
+    assert proof['native_float32_loader_replayed'] is True
+    assert native[0].dtype == np.float32 and np.array_equal(native[0], case.loaded[0].astype(np.float32))
+    case.loaded = case.loaded[0].astype(np.float32).astype(np.float64), case.f
+    with pytest.raises(ValueError, match='represented rigid'): serialized_call(prepare, case, tmp_path)
+
+
+def test_float32_rotation_native_projection_is_explicit_not_an_exact_raw_world_claim(prepare, serialized, tmp_path):
+    case = serialized; A = np.eye(4)
+    c, s = float(np.float32(.6)), float(np.float32(.8))
+    A[:3, :3] = [[c, -s, 0.], [s, c, 0.], [0., 0., 1.]]; A[:3, 3] = [float(np.float32(.1)), .25, -.125]
+    case.set_matrix(A)
+    assert not np.array_equal(case.world, case.loaded[0][case.f])
+    proof, native = serialized_call(prepare, case, tmp_path)
+    assert proof['native_rigidprojection_used'] is True
+    assert np.array_equal(proof['raw_scene_transform'], A)
+    assert np.array_equal(proof['effective_native_transform'], projected(A))
+    assert proof['oriented_triangles_sha256'] != proof['effective_oriented_triangles_sha256']
+    rotations = np.repeat(np.eye(3)[None], 3, axis=0); translations = np.zeros((3, 3))
+    poses = np.repeat(np.eye(4)[None], 3, axis=0) @ np.linalg.inv(A)
+    assert prepare._solid_camera_roundtrip((case.v, case.f), rotations, translations, poses.astype(np.float32), native, np) <= 1e-5
+
+
+@pytest.mark.parametrize('fault', ['raw', 'graph', 'policy', 'extra_geometry', 'extra_instance', 'native',
+    'native_dtype', 'native_faces', 'world', 'permuted_lineage', 'orphan_parent'])
+def test_distinct_raw_effective_and_native_stages_fail_closed(prepare, serialized, tmp_path, fault):
+    c = serialized
+    if fault == 'raw': c.scene.edges[0][2]['matrix'][0, 3] += .125
+    elif fault == 'graph': c.scene.effective[0, 3] += .125
+    elif fault == 'policy': c.scene.graph.repair_rigid = None
+    elif fault == 'extra_geometry': c.scene.geometry['orphan'] = object()
+    elif fault == 'extra_instance': c.scene.graph.nodes_geometry.append('another')
+    elif fault == 'native': c.native[0][0, 0] += np.float32(.125)
+    elif fault == 'native_dtype': c.native = c.native[0].astype(np.float64), c.native[1]
+    elif fault == 'native_faces': c.native = c.native[0], c.f[:, ::-1]
+    elif fault == 'world': c.world[0, 0, 0] += .125
+    elif fault == 'permuted_lineage':
+        perm = np.array([1, 0, 2, 3]); c.local = [(c.v[perm].astype(np.float32), perm[c.f])]
+    elif fault == 'orphan_parent': c.scene.edges.clear()
+    with pytest.raises(ValueError): serialized_call(prepare, c, tmp_path)
+
+
+def test_metric_identity_replays_actual_native_fp32_loader(prepare, serialized, tmp_path):
+    case = serialized; case.set_matrix(np.eye(4)); case.records[0]['node_transform_identity'] = True
+    proof, native = serialized_call(prepare, case, tmp_path, False)
+    assert proof['native_rigidprojection_used'] is False
+    assert np.array_equal(native[0], case.v.astype(np.float32))
 
 
 def test_saved_float32_poses_actual_camera_roundtrip_uses_same_inherited_bound(prepare):
     v, f = tetra(); A = np.eye(4); A[:3, 3] = [.25, -.5, .125]
     rotations = np.repeat(np.eye(3)[None], 3, axis=0); translations = np.zeros((3, 3))
     poses = np.repeat(np.eye(4)[None], 3, axis=0); aligned = poses @ np.linalg.inv(A)
-    factory = SimpleNamespace(transform_points=lambda points, matrix: points @ matrix[:3, :3].T + matrix[:3, 3])
-    assert prepare._solid_camera_roundtrip((v, f), rotations, translations, aligned, A, factory, np) == 0.
+    native = homogeneous(v, A).astype(np.float32), f
+    assert prepare._solid_camera_roundtrip((v, f), rotations, translations, aligned.astype(np.float32), native, np) == 0.
     translations[-1, 0] = 1000.000023; poses[-1, 0, 3] = translations[-1, 0]; aligned = poses @ np.linalg.inv(A)
     with pytest.raises(ValueError, match='inherited 1e-5'):
-        prepare._solid_camera_roundtrip((v, f), rotations, translations, aligned, A, factory, np)
+        prepare._solid_camera_roundtrip((v, f), rotations, translations, aligned.astype(np.float32), native, np)
+    with pytest.raises(ValueError, match='Actual saved'):
+        prepare._solid_camera_roundtrip((v, f), rotations, translations, aligned, native, np)
+
+
+def test_camera_roundtrip_never_substitutes_raw_A_positions_for_native_FP32_positions(prepare):
+    v, f = tetra(); rotations = np.repeat(np.eye(3)[None], 3, axis=0); translations = np.zeros((3, 3))
+    saved = np.repeat(np.eye(4, dtype=np.float32)[None], 3, axis=0)
+    native = v.astype(np.float32), f.copy(); native[0][1, 0] += np.float32(.001)
+    with pytest.raises(ValueError, match='inherited 1e-5'):
+        prepare._solid_camera_roundtrip((v, f), rotations, translations, saved, native, np)
+
+
+@pytest.fixture
+def native_sources(prepare, tmp_path, monkeypatch):
+    import importlib
+    from solid_geometry_loader import identity
+    package = tmp_path / 'trimesh'; native = tmp_path / 'native'; modules = {}; pins = {}
+    for name in prepare.SOLID_TRIMESH_SOURCES:
+        path = package / name; path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text('# manufactured source only\n')
+        pins[name] = identity(path, readonly=False)
+        module = 'trimesh.' + name.removesuffix('/__init__.py').removesuffix('.py').replace('/', '.')
+        modules[module] = SimpleNamespace(__file__=str(path))
+    transform_namespace = {}
+    exec(compile('def fix_rigid(matrix, max_deviance=1e-5):\n return matrix\n',
+                 str(package / 'transformations.py'), 'exec'), transform_namespace)
+    texts = {'lib_mhr/contact.py': '''from __future__ import annotations
+import torch  # must never execute this module import
+def load_object_mesh(path: str | Path) -> trimesh.Trimesh:
+    scene = trimesh.load(path, force="scene", process=False)
+    return trimesh.util.concatenate(scene.dump(concatenate=False))
+''', 'learning/training/mhr_opt_refineout.py': '''from __future__ import annotations
+import torch  # must never execute this module import
+def _load_object_vertices(path: str | Path) -> tuple[np.ndarray, np.ndarray | None]:
+    mesh = load_object_mesh(path)
+    return np.asarray(mesh.vertices, dtype=np.float32), np.asarray(mesh.faces, dtype=np.int64)
+'''}
+    native_pins = {}
+    for name, text in texts.items():
+        path = native / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_text(text)
+        native_pins[name] = identity(path, readonly=False)
+    v, f = tetra(); mesh = SimpleNamespace(vertices=v, faces=f); calls = []
+    def load(*args, **kwargs):
+        calls.append(kwargs); return SimpleNamespace(dump=lambda **kw: [mesh])
+    fake = SimpleNamespace(__version__='5.1.0', __file__=str(package / '__init__.py'), load=load,
+        transformations=SimpleNamespace(fix_rigid=transform_namespace['fix_rigid']),
+        util=SimpleNamespace(concatenate=lambda meshes: meshes[0]))
+    monkeypatch.setattr(prepare, 'SOLID_TRIMESH_SOURCES', pins)
+    monkeypatch.setattr(prepare, 'SOLID_NATIVE_LOAD_SOURCES', native_pins)
+    original_import = importlib.import_module
+    monkeypatch.setattr(importlib, 'import_module', lambda name, *args: modules[name] if name in modules else original_import(name, *args))
+    return SimpleNamespace(package=package, native=native, modules=modules, fake=fake, calls=calls, mesh=mesh)
+
+
+def test_original_two_function_execution_has_no_optimizer_or_model_import(prepare, native_sources):
+    c = native_sources; before = set(sys.modules)
+    load, ledger = prepare._solid_native_sources(c.native, c.fake, np)
+    v, f = load(Path('/opaque/synthetic.glb'))
+    assert v.dtype == np.float32 and f.dtype == np.int64
+    assert np.array_equal(v, c.mesh.vertices) and np.array_equal(f, c.mesh.faces)
+    assert c.calls == [{'force': 'scene', 'process': False}]
+    assert len(ledger) == len(prepare.SOLID_TRIMESH_SOURCES) + 2
+    assert load.__code__.co_filename == str(c.native / 'learning/training/mhr_opt_refineout.py')
+    assert not {'torch', 'learning', 'lib_mhr'} & (set(sys.modules) - before)
+    prepare._solid_recheck(ledger)
+
+
+@pytest.mark.parametrize('fault', ['version', 'installed_source', 'native_source', 'import_origin', 'function_origin', 'symlink'])
+def test_installed_and_original_loader_sources_are_authenticated_before_execution(prepare, native_sources, fault):
+    c = native_sources
+    if fault == 'version': c.fake.__version__ = '5.1.1'
+    elif fault == 'installed_source': (c.package / 'base.py').write_text('# changed\n')
+    elif fault == 'native_source': (c.native / 'lib_mhr/contact.py').write_text('# changed\n')
+    elif fault == 'import_origin': c.modules['trimesh.base'].__file__ = '/wrong/source/base.py'
+    elif fault == 'function_origin': c.fake.transformations.fix_rigid = projected
+    elif fault == 'symlink':
+        p = c.package / 'base.py'; content = p.read_bytes(); p.unlink()
+        other = c.package / 'other.py'; other.write_bytes(content); p.symlink_to(other)
+    with pytest.raises(ValueError): prepare._solid_native_sources(c.native, c.fake, np)
+    assert not c.calls
+
+
+def test_authenticated_native_source_posthash_detects_later_mutation(prepare, native_sources):
+    c = native_sources; _, ledger = prepare._solid_native_sources(c.native, c.fake, np)
+    (c.package / 'scene/transforms.py').write_text('# altered after authentication\n')
+    with pytest.raises(ValueError, match='changed'): prepare._solid_recheck(ledger)
 
 
 def test_default_numeric_statements_and_report_literal_preserved(prepare):
