@@ -1,0 +1,22 @@
+{
+  "schema": "world_reward.ycbv_archive_header_closed_failure.v1",
+  "producer_revision": "cd505d2393f9f83bb070b4ece73dc1c487f6d248",
+  "script_sha256": "cae27c5f58672150349f70aa9b240fd58eea1180f9293832d08154f9c4505fce",
+  "report": {
+    "path": "results/ycbv-archive-header-diagnostic-cd505d2393f9f83bb070b4ece73dc1c487f6d248/report.json",
+    "bytes": 14289,
+    "sha256": "c263f8d4b9323c2b07a4bcc811844ba0483bbfcc9123731c38bfb14f40b6490e"
+  },
+  "status": "fail",
+  "phase": "central_headers",
+  "protocol_guard": "range_headers",
+  "range_bytes": 0,
+  "member_payload_read": false,
+  "original_failure_unchanged": true,
+  "public_header_cause": "resolver_LFS_SHA_is_distinct_from_final_CAS_Xet_ETag",
+  "base_primary_LFS_sha256": "98440f8bd403100b21cf11a6729fabe8b3d5ce714472edc57a18b7f1fcd4bb18",
+  "base_primary_Xet_hash": "7da0c2d50e020426eb793d83272d210153cc1c1e8af99bd538ed794e721c4e53",
+  "base_final_CAS_ETag": "7da0c2d50e020426eb793d83272d210153cc1c1e8af99bd538ed794e721c4e53",
+  "base_header_body_read": false,
+  "full_acquisition_authorized": false
+}

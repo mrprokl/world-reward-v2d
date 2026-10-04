@@ -6508,3 +6508,25 @@ payload/CRC/fullSHA/acquisition/inference claim; complete original FAIL/unit/
 CID/source/markers must remain unchanged before/after. Pending diagnostic does
 not authorize third acquisition or model execution. Source closure87files,
 91144encodedB is code-only; heavy artifacts remainAzure.
+
+Actual bounded header diagnostic cd505d2 **FAIL0.601565s** before body bytes:
+sealed14289B report SHA c263f8d4b9323c2b07a4bcc811844ba0483bbfcc9123731c38bfb14f40b6490e.
+HTTP206 arrived for requested22B base trailer but strict header identity gate
+rejected before any Range body read (bytes0/requests0). Original acquisition
+FAIL/source/unit/CID remain independently unchanged;300s budget passes. No
+member payload/private labels/fullCRC/wholeSHA claim. Archive guard cause still
+unproved; inspect only the actual public HTTP response headers before designing
+any distinct diagnostic protocol. No third full acquisition or model run.
+EP8 unchanged volume tracker remains active200/634(~1513s), no final receipt.
+
+Actual public response-header-only proof identifies diagnostic transport defect,
+not archive layout: resolver base X-Linked-ETag is original LFS98440f8b…,
+X-Linked-Size15805; X-Xet-Hash7da0c2d50e020426eb793d83272d210153cc1c1e8af99bd538ed794e721c4e53
+matches finalCAS ETag. Final206/ContentRange/Length22/identity are exact. No body
+was read; original acquisitionFAIL unchanged. OfficialHF Hub v0.34.4 source
+separates LFS identity from Xet transport identity. Preserve first headerFAIL;
+new diagnostic-only revision must bind resolver revision/LFS/size and declared
+Xet to finalCAS ETag before any bounded Range body. This corrects the identity
+chain, not source SHA, corpus, selection or scientific parameters. No third
+full archive acquisition or prediction run authorized. Tiny failed diagnostic
+pins retain originalreport/source and actual public header identities.
