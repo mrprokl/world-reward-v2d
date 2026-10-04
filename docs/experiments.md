@@ -8180,3 +8180,12 @@ Root154 tiny source/job/build/controls testsPASS0.55s, shellsyntax/diffPASS.
 Stricter native scope initially rejected two old incomplete mocks; updated tests
 to actual receipt fields plus14 forged-scope failures, never relaxed the gate.
 Source diagnostic not yet executed; qualified procedural binary remains unchanged.
+
+EP25 peer inventory first invocation FAIL0.000779s before source/array/archive
+work: caller passed a wrong producer-script SHA, while committed source pins
+correctly require a6d4ce99ea93af98485793722a4ed5a6771b001b153e1bcaa176521be58757ae.
+Actual442B failure SHAe549cfabd277fd220d284cd2735d31031a7695888c96a03c24619db0739c4a85,
+only report retained, no archive or model/label read. This is a root invocation
+error, not a scientific failure or permission to weaken source authentication.
+Preserve failed namespace; a corrected argument replay needs a fresh revision
+and exact same original inputs/helpers. No restart or forged producer namespace.
