@@ -16,6 +16,7 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 | Identité humaine | `shared_identity.share_first_frame_identity`, `cari_shared_prepare.prepare_geometry` | Politique frame0 fixe, pas identité optimisée multi-vues. |
 | Hypothèses objet | `point_candidate_pool.CandidatePool`, `pose_selection.PosePath` | Pool natif25 et sélection ; manque un contrat commun aux autres expériences. |
 | Forme partagée | `shape_model.apply_fixed_shape`, `shape_fit.fit_shared_shape`, `shape_selection.select_shape_candidate` | Opérateurs expérimentaux ; pas adoption automatique. |
+| Proposition canonique brute | `raw_shape_proposal.RawShapeProposal`, `AutomaticShapeAnchor` | Frontière générique modèle→géométrie : octets natifs F32/F64/int64 et tous les triangles conservés avant certification, références/ancre/gauge déclarées non authentifiées ; aucune inférence ou adoption. |
 | Association pose/image | `point_pose_comparison.compare`, `rgb_pose_tracking.track_rgb_pose` | Coût ou suivi image, pas preuve de précision3D. |
 | Objectif joint à points persistants | `joint_point_objective.run_joint_point_refinement` | Extension explicite de la classe native : perte originale + reprojection robuste, géométrie/rotation et attachments fixes, poids/échelle externes obligatoires. Dix contrôles Torch et boucle native301 sur état fabriqué PASS ; vrai MHR/contact et validation HOI encore requis. |
 | Composition pose commune | `fixed_shape_point_pose.compare_fixed_shape_sequence` | Extraction générique du raccord pool/query/tracks A/B ; callbacks natifs, aucune nouvelle inférence ou amélioration mesurée. |
@@ -51,6 +52,14 @@ traite séparément la profondeur numérique du compilateur ; il ne change ni la
 géométrie ni les critères d'acceptation. Les qualifications anciennes ne qualifient
 pas ce nouveau source : quinze contrôles puis quatre compilations géométriques
 fraîches sont nécessaires avant une nouvelle proposition de production.
+
+La frontière `RawShapeProposal` ne modifie ni compacte les tableaux : faces
+répétées/dégénérées et vertices inutilisés restent disponibles pour le validateur
+séparé. Son hash porte les octets et déclarations, pas une preuve d'origine ou de
+solidité. Elle n'impose pas le budget final au générateur et ne présente pas les
+unités natives comme des mètres. La certification, le grounding métrique, le
+tracking et l'ajustement joint restent des étapes explicites ; ce contrat ne les
+remplace pas. Aucun backend alternatif réel n'est encore exécuté par cette API.
 
 ### Première migration réalisée
 

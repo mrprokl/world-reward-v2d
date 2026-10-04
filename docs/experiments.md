@@ -8966,3 +8966,11 @@ Only native iso25/grid256/radius0.87/chunk8192 extraction before implicit
 Trimesh processing is proposed, no cleanup/iso sweep or failed-clip reroll.
 Separate bounded runtime qualification and new private procedural cohort are
 required. Prior RGB-only MV fusion/old procedural controls stay closed.
+
+Raw canonical generator boundary implemented as one pure shared primitive,
+not another inference wrapper: native F32/F64 vertices and int64 faces copied
+byte-exact/immutable, including degeneracy/duplicates/unused vertices. Explicit
+source/model/config refs, automatic original-frame0 anchor and native gauge are
+declarations only. No repair/compaction/scale-fit/solid certificate or adopted
+backend. Root167tinytestsPASS1.03s; source/model/runtime eligibility remains
+separate. This creates a common framework boundary, not measured3D progress.
