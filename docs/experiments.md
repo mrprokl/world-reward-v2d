@@ -7569,3 +7569,19 @@ RGB inference. Source profile v2 CPU acquisition dispatchedACK only.
 First EP14 independent source audit failed at absent run_track1_frontends marker;
 no input values or predictions interpreted, no inference replay. Inspect actual
 queued producer namespace rather than fabricate markers or relax byte binding.
+
+Independent EP14 audit confirmed actual producer is run_track1_frontends_queued,
+not the direct frontend namespace. Original source markers absent at the wrong
+path were a control failure, not a data/model failure; no rerun. EP13 actual301
+refinement receiptPASS220.562431s/all425 under6fb9441 (whole-chain freeze next).
+EP12 scratch pack source/receipt/exclusiveinventory independently PASS.
+
+Private paired-mask evaluator opt-in v2: root181focused tiny tests PASS1.70s,
+independent134-test audit PASS; defaultv1 preserved. All original masks restored
+before first private seg value; no RGB/model/task mounts or private joint reads.
+Pooled positive-frame Dice includes missing zeros and no-positive clips stop
+inconclusive. Actual inference/evaluation not yet run; no adoption claim.
+EP14 queued source closure passes its153-file exact digest, but lacks the
+generic input-audit module: independent control stops before reading inputs.
+Use a separately authenticated published auditor closure, never invent producer
+files/markers or repeat prediction inference.

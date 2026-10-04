@@ -299,3 +299,182 @@ def test_genuine_sealed_scan_authentication_all_outputs_before_private_values(tm
     else:
         result=gate.authenticate(scan,rt,root,code)
         assert result['predictions']==out and private_calls==[True]and len(result['frozen'])==10
+
+
+def mask_predictions(folder,index,frames=2):
+    import hand_mask_infer as masks
+    from world_reward.hand_mask_proposals import propose_hand_masks
+    observations=gate.reload_observations(rt,np,predictions(folder/'scan',index),folder/'scan'/f'sequence_{index:03d}.npz.json',frames,{'source':'synthetic'})
+    class Synthetic:
+        def set_image(self,_):pass
+        def predict(self,**kw):
+            n=len(kw['box']);value=np.zeros((n,480,640),bool)
+            value[:,120:210,110:210]=True
+            if 'point_coords'not in kw:value[:,120:210,110:160]=False
+            return(value,np.full(n,.8),None)if n==1 else(value[:,None],np.full((n,1),.8),None)
+    rows=[]
+    for t,hands in enumerate(observations.frames):
+        p=propose_hand_masks(np.zeros((480,640,3),np.uint8),hands,Synthetic(),frame_index=t)
+        file=f'sequence_{index:03d}_frame_{t:06d}.npz';pin=masks.save_frame(rt,np,folder/file,p)
+        rows.append(dict(file=file,sequence_lex_index=index,frame_index=t,slots=len(p.local_ids),usable_boxes=int(p.box_usable.sum()),
+            b_interventions=int((~p.b_reuses_a).sum()),a_supported=int(p.mask_supported_a.sum()),b_supported=int(p.mask_supported_b.sum()),**pin))
+    return rows
+
+
+@pytest.fixture
+def native_masks(native,monkeypatch):
+    import hand_mask_infer as masks
+    root,revision=native['root'],'e'*40;code=source(root,revision,gate.ENTRY,gate.source_helpers('v2'))
+    monkeypatch.setenv('WR_CODE_REVISION',revision);monkeypatch.setattr(gate,'__file__',str(code/gate.HELPERS[0]))
+    folder=root/'masks';folder.mkdir();rows=[]
+    for i in(4,39,74):rows.extend(mask_predictions(folder,i))
+    seal(folder/'report.json',b'{}');frozen={p:rt.identity(p,16<<20)for p in folder.iterdir()if p.is_file()}
+    frozen.update({p:pin for p,pin in native['frozen'].items()if '/private/'in str(p)or p.name=='manifest.json'})
+    out=gate.control_path(root,revision,'v2')/'diagnostics';out.mkdir(parents=True,mode=0o700)
+    proof=json.loads(native['proof_path'].read_bytes());proof.update(source_binding=rt.source(root,code,revision,gate.ENTRY,gate.source_helpers('v2')),
+        mask_cohort='v2',mask_infer_pins={'producer_revision':'c'*40},mask_rows=rows,predictions=str(folder),frozen={str(p):pin for p,pin in frozen.items()})
+    native['proof_path'].chmod(0o600);pin=seal(native['proof_path'],json.dumps(proof).encode())
+    original=Path.stat
+    def owned(p,*a,**kw):
+        s=original(p,*a,**kw)
+        return types.SimpleNamespace(st_uid=0,st_mode=s.st_mode)if p==out else s
+    monkeypatch.setattr(Path,'stat',owned);monkeypatch.setattr(masks,'__file__',str(code/'infra/hand_mask_infer.py'))
+    return dict(native,code=code,out=out,proof_pin=pin,frozen=frozen,rows=rows)
+
+
+def test_mask_native_all_frames_losslessly_restored_before_seg_only_no_joint_or_models(native_masks,monkeypatch):
+    import hand_mask_infer as masks
+    loads=[];real=masks.load_frame;private_reads=[];real_private=gate.private_field
+    monkeypatch.setattr(masks,'load_frame',lambda rt,np,path,t:(loads.append((path.name,t))or real(rt,np,path,t)))
+    def private(rt,np,path,name):
+        private_reads.append(name);assert len(loads)>=6;return real_private(rt,np,path,name)
+    monkeypatch.setattr(gate,'private_field',private)
+    before={p:p.read_bytes()for p in native_masks['frozen']}
+    r=gate.run_native(rt,native_masks['root'],native_masks['code'],native_masks['out'],native_masks['proof_path'],native_masks['proof_pin'],'v2')
+    assert r['private_fields_decoded']==['seg']and private_reads==['seg']*6
+    assert r['pooled']['original_frames']==6 and r['pooled']['positive_frames']==3 and r['pooled']['unlabelled_frames']==3
+    assert r['pooled']['a']['mean_positive_dice']<r['pooled']['b']['mean_positive_dice']==1.
+    assert r['mask_forward_gate']=='pass'and r['pooled']['positive_b_intervention_frames']==3
+    assert not r['false_positive_truth_certified']and not r['physical_identity_inferred']and not r['challenge_adoption']
+    assert all(p.read_bytes()==raw for p,raw in before.items())and not({'mediapipe','torch'}&sys.modules.keys())
+    assert len(loads)==12 and all(len(json.loads((native_masks['out']/f'sequence_{i:03d}.json').read_bytes())['frame_index'])==2 for i in(4,39,74))
+
+
+@pytest.mark.parametrize('fault',['mask_changed','duplicate_frame','counts','reuse','missing_frame','seg_dtype'])
+def test_mask_native_rejects_tamper_before_private_or_typed_seg(native_masks,monkeypatch,fault):
+    proof=json.loads(native_masks['proof_path'].read_bytes());row=proof['mask_rows'][1];path=Path(proof['predictions'])/row['file']
+    if fault=='duplicate_frame':proof['mask_rows'][1]=proof['mask_rows'][0]
+    elif fault=='counts':row['b_interventions']=0
+    elif fault=='missing_frame':proof['mask_rows'].pop()
+    elif fault=='seg_dtype':
+        path=Path(proof['private_folders']['4'])/'labels_000001.npz';path.chmod(0o600)
+        with path.open('wb')as f:np.savez(f,seg=np.zeros((480,640),np.int32))
+        path.chmod(0o400);proof['frozen'][str(path)]=rt.identity(path,16<<20)
+    else:
+        with np.load(path)as a:arrays={k:a[k]for k in a.files}
+        if fault=='reuse':arrays['b_reuses_a'][:]=True
+        else:arrays['masks_b'][0,0,0]=True
+        path.chmod(0o600)
+        with path.open('wb')as f:np.savez_compressed(f,**arrays)
+        path.chmod(0o400)
+        if fault=='reuse':proof['frozen'][str(path)]=rt.identity(path,16<<20)
+    native_masks['proof_path'].chmod(0o600);pin=seal(native_masks['proof_path'],json.dumps(proof).encode())
+    if fault!='seg_dtype':monkeypatch.setattr(gate,'private_field',lambda *_:pytest.fail('All mask schema/counts freeze before private values'))
+    with pytest.raises((ValueError,KeyError)):gate.run_native(rt,native_masks['root'],native_masks['code'],native_masks['out'],native_masks['proof_path'],pin,'v2')
+
+
+def test_mask_pool_weights_every_positive_frame_and_never_drops_inconclusive_or_regressing_clip():
+    def result(delta,interventions=1):
+        arm=lambda values:types.SimpleNamespace(iou=values,dice=values,mean_positive_iou=0.,mean_positive_dice=0.,**{k:0 for k in('positive_empty_union_frames','total_predicted_pixels',
+            'total_object_label_pixels','total_background_label_pixels','positive_predicted_pixels','positive_object_label_pixels','positive_background_label_pixels')})
+        n=len(delta);return types.SimpleNamespace(frame_index=np.arange(n),unlabelled=np.zeros(n,bool),positive_frames=n,
+            no_proposal_frames=0,positive_no_proposal_frames=0,b_intervention_frames=interventions,positive_b_intervention_frames=interventions,
+            paired_dice_delta=tuple(delta),mean_positive_paired_dice_delta=sum(delta)/n if n else None,
+            a=arm((0.,)*n),b=arm(tuple(delta)))
+    pooled,gate_status=gate.mask_pool([result([.2]),result([.1]*3),result([0.])])
+    assert pooled['mean_positive_paired_dice_delta']==pytest.approx(.1)and gate_status=='pass'
+    assert gate.mask_pool([result([.9]),result([-.1]),result([.9])])[1]=='fail'
+    assert gate.mask_pool([result([.9]),result([.1],0),result([.9])])[1]=='fail'
+    assert gate.mask_pool([result([.9]),result([]),result([.9])])[1]=='inconclusive'
+    assert gate.mask_pool([result([])]*3)[0]['mean_positive_paired_dice_delta']is None
+
+
+def test_mask_profile_fixed_cli_and_host_remains_scientific_import_free():
+    assert gate.source_helpers()==gate.HELPERS and 'src/world_reward/hand_mask_evaluation.py'in gate.source_helpers('v2')
+    assert 'configs/dexycb_hand_acquire_pins.json'not in gate.source_helpers('v2')
+    with pytest.raises(ValueError):gate.source_helpers('v3')
+    script='import sys;sys.path[:0]=['+repr(str(REPO/'infra'))+','+repr(str(REPO/'src'))+'];import mediapipe_hand_evaluate as e;import hand_mask_infer;e.source_helpers("v2");assert not({"numpy","torch","mediapipe"}&sys.modules.keys())'
+    subprocess.run([sys.executable,'-I','-B','-S','-c',script],check=True,capture_output=True)
+    shell=(REPO/'infra/run_mediapipe_hand_evaluate.sh').read_text()
+    assert '"$1" == --mask-cohort && "$2" == v2'in shell and '"$@"'in shell
+
+
+@pytest.mark.parametrize('fault',['','host_fail','core_omitted','original_source','missing_frame','native_private','call_counts','output_changed','row_count'])
+def test_mask_genuine_original_host_fullT_source_and_outputs_before_private(tmp_path,monkeypatch,fault):
+    import hand_mask_infer as masks
+    root=tmp_path/'root';revision='b'*40;old=source(root,revision,masks.ENTRY,masks.HELPERS)
+    binding=rt.source(root,old,revision,masks.ENTRY,masks.HELPERS);control=root/'results'/('hand-mask-infer-'+revision);out=control/'predictions'
+    out.mkdir(parents=True);rows=[];seqs=[];images=[]
+    for i in(4,39,74):
+        seqs.append(dict(subject='20200903-subject-04',sequence=f'20200903_{i:06d}',camera='836212060125',sequence_lex_index=i,frames=2))
+        for row in mask_predictions(out,i):
+            image=dict(sequence_lex_index=i,frame_position=row['frame_index'],source_frame_id=row['frame_index'],file=f'{i}_{row["frame_index"]}.jpg',sha256='e'*64)
+            images.append(image);row.update(rgb_file=image['file'],rgb_sha256=image['sha256']);rows.append(row)
+    # Synthetic creation scratch is not part of the immutable producer output.
+    import shutil
+    shutil.rmtree(out/'scan')
+    code=tmp_path/'code';protocol_raw=(REPO/masks.PROTOCOL).read_bytes();protocol_pin=seal(code/masks.PROTOCOL,protocol_raw,0o444)
+    manifest_path=root/scan.profile('v2')['base']/'inputs/manifest.json';manifest={'sequences':seqs,'images':images}
+    manifest_pin=seal(manifest_path,json.dumps(manifest).encode());acq={'manifest':manifest_pin,'report':seal(root/scan.profile('v2')['base']/'report.json',b'{"retained_files":{}}')}
+    evidence=dict(manifest=manifest,acquisition=acq,image={'Id':'sha256:'+'c'*64});scan_pins={'producer_revision':'f'*40}
+    native=dict(stage='public_full_t_paired_hand_sam2',status='pass',phase='complete',producer_revision=revision,source_binding=binding,
+        protocol_identity=protocol_pin,manifest_identity=manifest_pin,scan_pins=scan_pins,image_id=gate.SAM2_IMAGE,budget_seconds=900,
+        source_rehashed_after=True,all_original_frames=True,network='none',device='cuda',sam2_native_postprocessing=True,
+        private_values_read=False,quality_verified=False,identity_accepted=False,contacts_inferred=False,geometry_inferred=False,
+        encoder_attempts=3,encoder_completed=3,a_attempts=3,a_completed=3,b_attempts=3,b_completed=3,outputs=rows)
+    if fault=='core_omitted':binding=copy.deepcopy(binding);binding['helpers'].pop('src/world_reward/hand_mask_proposals.py');native['source_binding']=binding
+    elif fault=='native_private':native['private_values_read']=True
+    elif fault=='call_counts':native['b_completed']=2
+    elif fault=='row_count':rows[1]['b_interventions']=2
+    seal(out/'report.json',json.dumps(native).encode());outputs={p.name:rt.identity(p,16<<20)for p in out.iterdir()}
+    host=dict(stage='hand_mask_infer_host_seal',status='fail'if fault=='host_fail'else'pass',producer_revision=revision,source_binding=binding,
+        protocol_identity=protocol_pin,scan_pins=scan_pins,image_id=gate.SAM2_IMAGE,private_values_read=False,quality_verified=False,
+        owned_cleanup_verified=True,source_rehashed_after=True,elapsed_seconds=1.,native_report=native,outputs=outputs)
+    pins=dict(schema='world_reward.hand_mask_infer_pins.v1',producer_revision=revision,report=seal(control/'report.json',json.dumps(host).encode()))
+    seal(code/gate.MASK_PINS,json.dumps(pins).encode(),0o444)
+    if fault=='missing_frame':(out/rows[0]['file']).unlink()
+    elif fault=='output_changed':p=out/rows[0]['file'];p.chmod(0o600);p.write_bytes(b'changed');p.chmod(0o400)
+    elif fault=='original_source':p=old/'infra/hand_mask_infer.py';p.chmod(0o600);p.write_bytes(b'changed');p.chmod(0o444)
+    monkeypatch.setattr(masks,'__file__',str(code/'infra/hand_mask_infer.py'))
+    monkeypatch.setattr(masks,'authenticate_scan',lambda *_:(evidence,scan_pins,root/'oldscan',{}))
+    private_calls=[];monkeypatch.setattr(gate,'private_inventory',lambda *_:(private_calls.append(True)or ({},[])))
+    if fault:
+        with pytest.raises((ValueError,FileNotFoundError)):gate.authenticate_masks(scan,rt,root,code)
+        assert private_calls==[]
+    else:
+        result=gate.authenticate_masks(scan,rt,root,code)
+        assert private_calls==[True]and len(result['mask_rows'])==6 and result['predictions']==out
+        assert len(result['native_frozen'])==11 and result['mask_infer_pins']==pins
+
+
+def test_mask_host_mounts_only_exact_private_mask_artifacts_and_marker_parent(host,monkeypatch):
+    root,_,revision,evidence,cleanups=host;code=source(root,'e'*40,gate.ENTRY,gate.source_helpers('v2'));revision='e'*40
+    evidence=dict(evidence,mask_infer_pins={'producer_revision':'c'*40},mask_rows=[])
+    monkeypatch.setattr(gate,'__file__',str(code/gate.HELPERS[0]));monkeypatch.setattr(gate,'authenticate_masks',lambda *_:evidence)
+    command=[]
+    def fake(args,**_):
+        command.extend(args);out=gate.control_path(root,revision,'v2')/'diagnostics'
+        r=dict(stage='mediapipe_hand_mask_private_evaluation',status='pass',phase='complete',producer_revision=revision,
+            source_binding=rt.source(root,code,revision,gate.ENTRY,gate.source_helpers('v2')),private_fields_decoded=['seg'],
+            private_values_read=True,native_graphs=0,prediction_values_modified=False,models_loaded=False,gpu_used=False,
+            accuracy_threshold_calibrated=False,adoption=False,quality_claim=False,cohort='v2',mask_infer_pins=evidence['mask_infer_pins'],
+            physical_identity_inferred=False,false_positive_truth_certified=False,challenge_adoption=False)
+        seal(out/'report.json',json.dumps(r).encode())
+        for i in(4,39,74):seal(out/f'sequence_{i:03d}.json',b'{}')
+        return subprocess.CompletedProcess(args,0)
+    monkeypatch.setattr(gate.subprocess,'run',fake)
+    result=gate.run(root,code,revision,'v2');mounts=[command[i+1]for i,v in enumerate(command)if v=='--mount']
+    assert result['status']=='pass'and result['cohort']=='v2'and cleanups==[True]and command[-2:]==['--mask-cohort','v2']
+    assert f'type=bind,src={code.parent},dst={code.parent},readonly'in mounts
+    assert not any(word in '|'.join(mounts)for word in('weights','vendor','hand_landmarker.task','inputs','RGB','wheels'))
+    assert command[command.index('--cap-add')+1]=='DAC_READ_SEARCH'and '--gpus'not in command

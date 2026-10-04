@@ -19,7 +19,7 @@ inferred automatically; no hand-labeling of challenge records.
   EP11 stops before SAM2/later frontends. EP0's exact historical metadata
   omission is authenticated, not a relaxed legacy gate or a reversal of its old
   conversion failure. EP13 full425 inputs, shared preparation and native forward
-  pass; refinement is dispatched only. EP14 full442 frontend/input receipt passes
+  and301-update refinement pass; direct export is not yet run. EP14 full442 frontend/input receipt passes
   pending independent input sealing. Collected-predecessor scheduling failures
   remain separate. Original controls/reference replay and whole source-chain pins are
   frozen before each next stage; no prediction is inferred from dispatch ACKs.
