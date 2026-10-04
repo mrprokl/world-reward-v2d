@@ -29,6 +29,9 @@ transport barrier, not the prediction algorithm. The complete private transfer
 passes, but the unchanged VM02 tracker fails topology before any pose. Its
 isolated empty failed output is preserved; no canonical pose is promoted. The
 temporary ingress/listener and both newly generated private keys are removed.
+A separately qualified volume proposal and new full634-frame archive/transfer
+pass independently; its unchanged volume-based native tracker is active on
+VM02. New transport ingress/listener/keys are also removed after receive sealing.
 All masks/frames/shape/scale contracts remain unchanged.
 
 VM02 Boots native CPU verification, full three-video inference and preregistered
@@ -45,7 +48,8 @@ automatic-mask preflights and identical-pool comparison are separately gated.
 D107 real-depth independent validation is closedREJECT: median4.904632756%
 gain is below frozen5%; no retuning or rounded success. Native offline temporal
 depth is a new hypothesis, not acquired/adopted; OpenLORIS registration is not
-yet proved exact color-camera Z. Fullsuite40ee2cb11398PASS/4optionalSKIP406.42s.
+yet proved exact color-camera Z. Fullsuiteb7b24a8 **11802PASS5optionalSKIP419.62s**; later final
+Objects-output rehash correction150focusedPASS1.31s.
 No final Parquet or verified CARI4D
 improvement. Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
@@ -623,3 +627,11 @@ transport usedzero incomingbytes, so sharedGPUresearch continued untouched.
 A diagnostic AzureRC was rejectedConflict before any execution while
 sender-dispatchRCstillrunning; later read-only dispatch waited for that
 client tocomplete. No unit/namespace blindlyrestarted.
+
+Existing VM01 Objects CPU runtime inventory951868e0 actualPASS19.230776s.
+Independent full asset/report/image rehash passes; restricted root/cap-drop
+CPU probe reads181narrow selected assets/source leaves and verifies actual
+image_to_mesh signature includes stage1_only, without models/CUDA. The59KB
+runtime staysAzure, referenced by tiny measured pins; no image/weights copied.
+Installed180PY fingerprints and37actualLayers are measured runtime facts only,
+not upstream commit parity, training-overlap exclusion or source-license waiver.

@@ -6448,3 +6448,13 @@ The first cleanup diagnostic stopped before deleting anything because generated
 public key had an optional comment; canonical public-key parsing fixed only
 the cleanup check, never the key/source/predictions. Private key bytes unread.
 YCBV CPU acquisition remains in download phase; pending status is not a FAIL.
+
+Existing Objects runtime independent full rehash **PASS**; exact37image layers
+ordered SHA `c7da731c39fc7e7151eeabde26852c6a10ad7fe10f79ab58e06015d1dea213f4`,
+safe image2939B SHA `7d9e116f33c832d831129c7e48eccbcbf459d40da07905f1901e22103a082536`.
+Restricted CPU probe with exact root/cap-drop/read-only/no-network runtime
+mounts reads181assets/source leaves and confirms native stage1_only argument.
+No checkpoint load/GPU/GT; rights/overlap remain unresolved. The59KB runtime
+manifest staysAzure; only measured references are stored locally.
+Fullsuitecollectedb7b24a8 **11802PASS5SKIP419.62s**; later final-output correction
+150focusedPASS1.31s. No scientific or challenge victory follows from these tests.
