@@ -6,10 +6,18 @@ Track2/3 assets, challenge multiview, hidden meshes/trajectories, source camera
 calibration or sequence-matched FORM-HOI. All masks/identity/geometry must be
 inferred automatically; no hand-labeling of challenge records.
 
-## Status — 2026-10-04
+## Status — 2026-10-05
 
 **No final Parquet, submission or verified CARI4D improvement yet.**
 
+- **New generic operators:** [surface identity/LOD](docs/surface_lod_protocol.md)
+  separates lawful open surfaces from our optional closed-solid backend; no
+  historical failure is relabeled. Under-budget identity and
+  [mask-conditioned queries](docs/mask_query_quantile_protocol.md) pass289 tiny
+  tests, but real loader/packing and real-object pose quality remain separate.
+  EP21 real native point qualification stops before optimization (<8 queries);
+  no replay, positive-weight fit or accuracy gain. EP09 full415 preparation and
+  forward pass independent audits; refinement/export/packing remain pending.
 - **Engineering:** all30 original videos pass byte/metadata readiness. Episodes
   **0,1,2,3,5,6,8,12,13,14,15,21** pass full native shared preparation, forward,301-update
   refinement, direct export and original official packing. These are twelve

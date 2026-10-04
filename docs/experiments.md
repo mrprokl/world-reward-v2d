@@ -9026,3 +9026,18 @@ shiftedanchor abstain,32 tied rays reject. Two calls perarm/case byte-identical,
 independent plane/bary reference1e-12, no mutation or refill. Root verification
 reuses only these operator fixtures, not a held-out-performance cohort or EP21.
 No actual native mask/track/6D/HOI benefit or adoption follows from this PASS.
+
+
+EP09 shared forward94204da actualPASS109.020572s/full415. Immutable65988B
+report SHA2ff4d9f3237a854d7e4534c242cac1dd3c9beed25c607d3b0934e50ef39ffcb8,
+bundle317633340B SHA96a4376a44aa689417166c6eb7741ca790224684904e8e686f6f6791a25afc96.
+Independent206-source archivec58e3e2131627e7cd9fc14fb346ac73eb1ac6c794180b2a4f9c421de89ab59ce
+ledger8be0f916feb8f1f5783e54b3106f5c4f2bd8b6cdf496c88b0adb60efcf93ddf5,
+15inputs/4prepare/2forward/16helpers/body+native sources/170inference assets rehashed.
+Full native bundle CPU ABI54arrays,415indices/shared identity bytes/masks/K,
+unchanged windows[0,96,192,288,319]/ownership[96,96,96,96,31] verified.
+No GPU repeat/reference3D accuracy claim; independent posthash/source/image/unit
+terminal journal and owned audit-container absence PASS. Newforward pins frozen
+only after actual audit; unchanged301-update refinement is next. Initial audit
+controller mistakes (file-mode ledger, duplicate mount and string-array finiteness)
+changed no producer or predictions; corrected audit checks all numeric arrays.
