@@ -35,14 +35,21 @@ def native_report(raw,sha):
         **{k:True for k in p.certificate.TRUE_FLAGS},**{k:False for k in p.certificate.FALSE_FLAGS})
 
 
-def document(mesh):
-    chart=p.prepare_conditioning(*mesh);m=p.identity_mapping(mesh)
+def document(mesh,conditioning_version=1):
+    chart=p.conditioning_function(conditioning_version)(*mesh);m=p.identity_mapping(mesh)
     m.update(native_cost_and_placement_unchanged=False,cost_normalization=True,final_shell_volumes_verified=True,
              volume_relative_limit=.05,committed_collapses=0)
-    return dict(conditioning=dict(origin=chart.origin.tolist(),scale=chart.scale,scale_exponent=chart.scale_exponent,
+    conditioning=dict(origin=chart.origin.tolist(),scale=chart.scale,scale_exponent=chart.scale_exponent,
         source_roundtrip_vertices=len(mesh[0]),chart_scale_positive=True,source_roundtrip_numerically_exact=True,
         physical_geometry_rescaled=False,new_numeric_algorithm=True,native_qslim_implementation_reused=True,
-        chart_refitted=False,adopted=False),serialization=dict(serialization_safe=True,committed_collapses=0,serialization_vetoes=0),native_volume=m)
+        chart_refitted=False,adopted=False)
+    if conditioning_version==2:
+        conditioning.update(chart_version=2,origin_modes=list(chart.origin_modes),
+            policy_sha256=p.chart_v2_helper.POLICY_SHA256,
+            header_sha256=p.certificate.identity(p.CHART_V2_HEADER)['sha256'],
+            source_roundtrip_byte_exact=chart.diagnostics['roundtrip_byte_exact'],
+            origin_search_performed=False,native_backend_qualified=False)
+    return dict(conditioning=conditioning,serialization=dict(serialization_safe=True,committed_collapses=0,serialization_vetoes=0),native_volume=m)
 
 
 @pytest.fixture
@@ -168,19 +175,22 @@ def test_source_default8_collision_is_diagnostic_not_deleted():
     p.float32_orientation((v,mesh[1]))
 
 
-def test_all_four_exact_source_preflights_before_any_qem_and_stop_no_retry(tmp_path,monkeypatch):
+@pytest.mark.parametrize('conditioning_version',[1,2])
+def test_all_four_exact_source_preflights_before_any_qem_and_stop_no_retry(tmp_path,monkeypatch,conditioning_version):
     import oriented_solid_controls as controls
     items=controls.fixtures();events=[]
-    def preflight(mesh,binary,sha,remaining,record):
+    def preflight(mesh,binary,sha,remaining,record,*,conditioning_version=1):
+        assert conditioning_version in (1,2)
         found=next(meta for _,candidate,meta in items if candidate[0] is mesh[0])
         events.append('preflight')
         return found['face_components'],SimpleNamespace(parents=found['expected_parents'],signs=found['expected_signs']),None
     def compile(*args,**kwargs):
         assert events==['preflight']*4
+        assert kwargs['conditioning_version']==conditioning_version
         events.append('qem');raise p.SolidCompilerError(dict(status='fail',native_attempts=1))
     monkeypatch.setattr(p,'preflight_source',preflight);monkeypatch.setattr(p,'compile_solid',compile)
     with pytest.raises(p.SolidCompilerError) as error:p.geometry_controls(Path('/mock/qem'),Path('/mock/query'),'a'*64,
-        tmp_path,Path('/mock/helper'),controls=items)
+        tmp_path,Path('/mock/helper'),controls=items,conditioning_version=conditioning_version)
     assert events==['preflight']*4+['qem'] and error.value.report['owned_scratch_removed']
     assert len(error.value.report['controls'])==4 and not (tmp_path/'oriented-solid-controls').exists()
 
@@ -188,7 +198,8 @@ def test_all_four_exact_source_preflights_before_any_qem_and_stop_no_retry(tmp_p
 def test_bad_last_source_forest_blocks_all_qem(tmp_path,monkeypatch):
     import oriented_solid_controls as controls
     items=controls.fixtures();events=[]
-    def preflight(mesh,binary,sha,remaining,record):
+    def preflight(mesh,binary,sha,remaining,record,*,conditioning_version=1):
+        assert conditioning_version==1
         found=next(meta for _,candidate,meta in items if candidate[0] is mesh[0]);events.append('query')
         parents=found['expected_parents'].copy()
         if len(events)==4:parents[0]=1
@@ -198,3 +209,72 @@ def test_bad_last_source_forest_blocks_all_qem(tmp_path,monkeypatch):
     with pytest.raises(p.SolidCompilerError):p.geometry_controls(Path('/mock/qem'),Path('/mock/query'),'a'*64,
         tmp_path,Path('/mock/helper'),controls=items)
     assert len(events)==4
+
+
+def test_explicit_v2_whole_pipeline_bound_to_source_chart_and_actual_header(runtime,monkeypatch):
+    mesh,binary,query,sha,work,helper,calls=runtime;original=p.subprocess.run
+    def run(argv,**kw):
+        result=original(argv,**kw)
+        if len(argv)==4:Path(argv[3]).write_text(json.dumps(document(mesh,2)))
+        return result
+    monkeypatch.setattr(p.subprocess,'run',run)
+    _,report=p.compile_solid(mesh,binary,query,sha,work,helper,metric_scale=.375,conditioning_version=2)
+    assert report['stage']=='oriented_solid_compiler_v2' and report['conditioning_version']==2
+    assert tuple(report['stages'])==p.STAGES
+    assert report['native_mapping']['conditioning']['origin_modes']==['zero']*3
+    assert report['native_mapping']['conditioning']['chart_version']==2
+    assert report['native_mapping']['conditioning']['native_backend_qualified'] is False
+    assert report['stages'][p.STAGES[0]]['conditioning']['schema']==p.chart_v2_helper.SCHEMA
+    assert report['stages'][p.STAGES[0]]['conditioning_header']==p.certificate.identity(p.CHART_V2_HEADER)
+    for path in (p.chart_v2_helper.__file__,p.CHART_V2_HEADER,p.chart_v2_source.__file__):
+        assert str(Path(path)) in report['artifacts_before']
+    assert report['artifacts_before']==report['artifacts_after']
+    assert len([c for c in calls if c[0]=='qem'])==1
+
+
+@pytest.mark.parametrize('bad',['header','policy','version','bool_version','modes','search','qualified',
+                                'byte_roundtrip','extra','origin_bool'])
+def test_v2_document_requires_actual_bound_header_policy_and_complete_chart_evidence(bad):
+    mesh=tetra();chart=p.prepare_conditioning_v2(*mesh);doc=document(mesh,2);c=doc['conditioning']
+    if bad=='header':c['header_sha256']='0'*64
+    if bad=='policy':c['policy_sha256']='0'*64
+    if bad=='version':c['chart_version']=1
+    if bad=='bool_version':c['chart_version']=True
+    if bad=='modes':c['origin_modes'][0]='sterbenz_midpoint'
+    if bad=='search':c['origin_search_performed']=True
+    if bad=='qualified':c['native_backend_qualified']=True
+    if bad=='byte_roundtrip':c['source_roundtrip_byte_exact']=False
+    if bad=='extra':c['new_unknown_field']=True
+    if bad=='origin_bool':c['origin'][0]=False
+    with pytest.raises(ValueError):
+        p.validate_conditioned_mapping(mesh,mesh,doc,chart,conditioning_version=2)
+
+
+def test_legacy_document_is_not_implicitly_accepted_as_v2_and_default_is_legacy():
+    mesh=tetra()
+    assert p.conditioning_function(1) is p.prepare_conditioning
+    assert p.conditioning_function(2) is p.prepare_conditioning_v2
+    legacy=document(mesh)
+    assert p.validate_conditioned_mapping(mesh,mesh,legacy,p.prepare_conditioning(*mesh))[0]['mapping_complete']
+    with pytest.raises(ValueError):
+        p.validate_conditioned_mapping(mesh,mesh,legacy,p.prepare_conditioning_v2(*mesh),conditioning_version=2)
+
+
+@pytest.mark.parametrize('version',[True,False,0,3,'2',2.])
+def test_invalid_conditioning_version_fails_before_preflight_or_scratch_creation(tmp_path,version):
+    with pytest.raises(ValueError):
+        p.geometry_controls(Path('/missing/qem'),Path('/missing/query'),'a'*64,tmp_path,
+                            Path('/missing/helper'),controls=(),conditioning_version=version)
+    assert not any(tmp_path.iterdir())
+
+
+def test_original_chart_failure_and_frozen_source_remain_identifiable(monkeypatch):
+    import oriented_solid_controls as controls
+    _,source,metadata=controls.fixtures()[2]
+    before=tuple(a.tobytes() for a in source)
+    assert not p.prepare_conditioning(*source).diagnostics['roundtrip_numerically_exact']
+    monkeypatch.setattr(p,'certify_arrays',lambda *a:(None,None))
+    with pytest.raises(ValueError,match='Source fixed chart must roundtrip exactly'):
+        p.preflight_source(source,Path('/not-executed'),'a'*64,lambda:180,{})
+    assert before==tuple(a.tobytes() for a in source)
+    assert tuple(p.array_hashes(source))==metadata['source_array_sha256']

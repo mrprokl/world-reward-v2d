@@ -8303,3 +8303,23 @@ no origin retry; generated cached backend exposes new chart/build hashes and
 preserves cached collapse/mapping/main body bytes. Root90mixedtestsPASS1.03s
 and52chart/cohorttestsPASS0.16s, exact ownedfixtures520+520+14removed.
 No C++ compilation/QEM/CGAL/qualification or geometry/HOI gain claimed.
+
+Tracker-noise CPUevaluation4713e62 actualPASS64.015973s, scientific **REJECT**:
+frozen model heldout pair-balanced gains+0.00059801234 and−0.01040509512;
+complete92863/320512 and168113/314112 pairintervals,254/256supportedpairs.
+Matched-anchor deltas+0.00614666/−0.01242010 are descriptiveonly. Full293732B
+receipt SHAb9dd2b41551b0a23e07ca56530806aa78725bf9369de9ec831f96073fa381ac9,
+fit artifacts unchanged beforetestlabels; actual174sourceclosure/posthash/output
+hashes verified, terminalexit0/ownedcontainergone. Closecohort; no rescore,
+refit aftertest, covariancejitter, aggregationrescue or contact/identity/HOIadoption.
+This rejects transfer of this homogeneous Gaussian4 tracker/annotation nuisance
+model, not all dependence-aware association. Keep math primitive experimental;
+a new substantive model requires new data and a predeclared paired decision.
+
+EP25 parent-onlyreplay4713e62 now reaches unchanged native geometry gate,
+then scientific topology rejection beforetrajectorytracking: globalbudget meshes
+have boundary/nonmanifold edges; componentwisebudget changes shellorientation
+orEuler. Actual2481B FAILreceipt SHA3ed59c220cfa7966f98e06c06014d5aa9a4c4495db274d42950d55463ffaf1c5,
+native1486B log SHA921ae505375a2f60e3623671e27b5ef395e3dee7493589294a8a19d877fdddc5,
+10.645756s/sourceposthash andownedcleanup complete. No next repeated call or
+relaxedgeometrygate. Fullsource awaits a generally qualified numerical compiler.

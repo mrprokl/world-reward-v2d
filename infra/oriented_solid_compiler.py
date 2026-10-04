@@ -21,6 +21,8 @@ import mesh_serialization_geometry as serialized_geometry
 import object_budget_guarded as export_helper
 import precision_volume_gate as volume_helper
 import world_reward.mesh_conditioning as chart_helper
+import world_reward.mesh_conditioning_v2 as chart_v2_helper
+import mesh_conditioned_chart_v2_source as chart_v2_source
 import world_reward.mesh_serialization as serialization_helper
 import world_reward.oriented_solid_forest as forest_helper
 from object_budget_conditioned import validate_mapping
@@ -28,6 +30,7 @@ from object_budget_guarded import export_birth_mapping
 from precision_volume_gate import packed_mapping
 from mesh_serialization_geometry import array_hashes, math_mesh
 from world_reward.mesh_conditioning import prepare_conditioning
+from world_reward.mesh_conditioning_v2 import prepare_conditioning_v2
 from world_reward.mesh_serialization import serialization_preflight
 from world_reward.oriented_solid_forest import adjudicate_oriented_solid_forest
 from world_reward.solid_forest_fidelity import compare_solid_forest_fidelity
@@ -37,6 +40,7 @@ TOTAL_SECONDS, QEM_SECONDS, QUERY_SECONDS = 1800, 1200, 180
 STAGES = ('physical_source','native_candidate','float32_glb','default8_exact_weld',
           'unmodified_official_pack','original_grounding_metric_bake')
 FILES = frozenset(('input.obj','candidate.obj','mapping.json','candidate.glb'))
+CHART_V2_HEADER = Path(__file__).with_name(chart_v2_source.HEADER_FILE)
 
 
 class SolidCompilerError(RuntimeError):
@@ -46,6 +50,39 @@ class SolidCompilerError(RuntimeError):
 
 def require(ok,message):
     if not ok:raise ValueError(message)
+
+
+def conditioning_function(version):
+    require(type(version) is int and version in (1,2),'Explicit conditioning_version integer1 or2 required')
+    return prepare_conditioning if version==1 else prepare_conditioning_v2
+
+
+def validate_conditioned_mapping(source,candidate,document,chart,*,conditioning_version=1):
+    """Same numeric mapping gates; v2 additionally binds the new source chart.
+
+    Binary build/qualification authentication remains the immutable caller's
+    responsibility. A v2 source/header identity is not a qualification claim.
+    """
+    conditioning_function(conditioning_version)
+    if conditioning_version==2:
+        require(isinstance(chart,chart_v2_helper.MeshConditioningChartV2),'Actual source v2 chart required')
+        c=document['conditioning']
+        keys={'chart_version','header_sha256','policy_sha256','origin','origin_modes','scale','scale_exponent',
+              'source_roundtrip_vertices','chart_scale_positive','source_roundtrip_numerically_exact',
+              'source_roundtrip_byte_exact','origin_search_performed','physical_geometry_rescaled',
+              'new_numeric_algorithm','native_qslim_implementation_reused','chart_refitted',
+              'native_backend_qualified','adopted'}
+        require(type(c) is dict and set(c)==keys and type(c['chart_version']) is int and c['chart_version']==2
+                and c['header_sha256']==certificate.identity(CHART_V2_HEADER)['sha256']
+                and c['policy_sha256']==chart_v2_helper.POLICY_SHA256==chart.diagnostics['policy_sha256']
+                and type(c['origin_modes']) is list and c['origin_modes']==list(chart.origin_modes)
+                and c['origin_search_performed'] is False and c['native_backend_qualified'] is False
+                and c['source_roundtrip_byte_exact'] is chart.diagnostics['roundtrip_byte_exact']
+                and type(c['origin']) is list and len(c['origin'])==3
+                and all(type(x) in (int,float) and np.isfinite(x) for x in c['origin'])
+                and type(c['scale']) in (int,float),
+                'Native v2 chart version/header/policy/origin evidence differs')
+    return validate_mapping(source,candidate,document,chart)
 
 
 def deadline(outer=None):
@@ -149,19 +186,24 @@ def matched_stage(source,source_labels,source_forest,mesh,mapping,binary,sha,rem
     remaining();return labels,forest
 
 
-def preflight_source(source,binary,sha,remaining,record):
+def preflight_source(source,binary,sha,remaining,record,*,conditioning_version=1):
     """Full source F64/F32 gate before QEM; default8 collisions are diagnostic."""
+    prepare=conditioning_function(conditioning_version)
     labels,forest=certify_arrays(source,binary,sha,remaining,record)
-    chart=prepare_conditioning(*source)
+    chart=prepare(*source)
     require(chart.diagnostics['roundtrip_numerically_exact'],'Source fixed chart must roundtrip exactly')
     record['conditioning']=dict(chart.diagnostics);record['serialization']=dict(serialization_preflight(*source))
+    if conditioning_version==2:
+        record['conditioning_version']=2
+        record['conditioning_header']=certificate.identity(CHART_V2_HEADER)
     record['float32_orientation']=float32_orientation(source);record['float32_certificate']={}
     matched_stage(source,labels,forest,(source[0].astype(np.float32),source[1]),identity_mapping(source),
                   binary,sha,remaining,record['float32_certificate'],measure=False)
     return labels,forest,chart
 
 
-def compile_solid(source,qem_binary,query_binary,query_source_sha256,scratch,official_helper,*,metric_scale,remaining=None):
+def compile_solid(source,qem_binary,query_binary,query_source_sha256,scratch,official_helper,*,metric_scale,
+                  remaining=None,conditioning_version=1):
     """Return padded metric arrays and scalar proof; no automatic adoption.
 
     Source is full exact-welded F64/I64 geometry. `load_source` supplies raw GLB
@@ -170,8 +212,10 @@ def compile_solid(source,qem_binary,query_binary,query_source_sha256,scratch,off
     Every stage uses exact embedding and a full birth-matched material forest.
     Caller supplies the ORIGINAL positive grounded scalar, never a fitted scale.
     """
+    conditioning_function(conditioning_version)
     remaining=deadline(remaining);work=Path(scratch)
-    report=dict(stage='oriented_solid_compiler_v1',status='fail',phase='source',stages={},native_attempts=0,
+    report=dict(stage=f'oriented_solid_compiler_v{conditioning_version}',conditioning_version=conditioning_version,
+        status='fail',phase='source',stages={},native_attempts=0,
         native_returned=False,geometry_repaired=False,components_deleted=False,orientation_changed=False,
         cost_backend_changed=False,adoption=False,reconstruction_accuracy_verified=False,ground_truth_used=False,
         budget_seconds=TOTAL_SECONDS,qem_seconds=QEM_SECONDS,query_seconds=QUERY_SECONDS)
@@ -180,6 +224,8 @@ def compile_solid(source,qem_binary,query_binary,query_source_sha256,scratch,off
         validate_mapping.__code__.co_filename,Path(certificate.__file__).with_name('certified_solid_query.cpp'),
         serialized_geometry.__file__,export_helper.__file__,volume_helper.__file__,chart_helper.__file__,
         serialization_helper.__file__,forest_helper.__file__))
+    if conditioning_version==2:
+        paths+=tuple(Path(p) for p in (chart_v2_helper.__file__,CHART_V2_HEADER,chart_v2_source.__file__))
     before=None;source_hashes=None
     try:
         require(type(metric_scale) is float and np.isfinite(metric_scale) and metric_scale>0,'Original positive grounded scalar required')
@@ -194,7 +240,8 @@ def compile_solid(source,qem_binary,query_binary,query_source_sha256,scratch,off
         require(source[0].dtype==np.float64 and source[1].dtype==np.int64,'Represented F64/I64 source required')
         source_hashes=array_hashes(source);report['source_array_sha256']=source_hashes
         stage=report['stages'].setdefault(STAGES[0],{})
-        labels,forest,chart=preflight_source(source,query_binary,query_source_sha256,remaining,stage)
+        labels,forest,chart=preflight_source(source,query_binary,query_source_sha256,remaining,stage,
+                                          conditioning_version=conditioning_version)
         report['phase']='native';a,b,m=(work/n for n in ('input.obj','candidate.obj','mapping.json'))
         geometry.write_obj(a,*source);input_pin=certificate.identity(a);report['native_input']=input_pin
         report['native_attempts']=1
@@ -211,7 +258,8 @@ def compile_solid(source,qem_binary,query_binary,query_source_sha256,scratch,off
         require(child.returncode==0,'Cached native QEM failed; no retry')
         report['native_artifacts']={p.name:certificate.identity(p) for p in (a,b,m)}
         candidate=geometry.read_obj(b);document=certificate.strict_json(m.read_bytes())
-        mapping,native=validate_mapping(source,candidate,document,chart);report['native_mapping']=native
+        mapping,native=validate_conditioned_mapping(source,candidate,document,chart,
+            conditioning_version=conditioning_version);report['native_mapping']=native
         report['phase']=STAGES[1];stage=report['stages'].setdefault(STAGES[1],{})
         matched_stage(source,labels,forest,candidate,mapping,query_binary,query_source_sha256,remaining,stage)
         require(serialization_preflight(*candidate)['position_weld_admissible'],'Actual candidate cannot surviveF32/default8')
@@ -269,11 +317,14 @@ def compile_solid(source,qem_binary,query_binary,query_source_sha256,scratch,off
     return (metric,pf),report
 
 
-def geometry_controls(qem_binary,query_binary,query_source_sha256,scratch,official_helper,*,controls):
+def geometry_controls(qem_binary,query_binary,query_source_sha256,scratch,official_helper,*,controls,
+                      conditioning_version=1):
     """Four NEW curved controls, one immutable total1800s budget, no reroll."""
+    conditioning_function(conditioning_version)
     remaining=deadline();root=Path(scratch);work=root/'oriented-solid-controls'
     require(root.is_absolute() and root.resolve()==root and root.is_dir() and not work.exists(),'Fresh caller controls scratch')
-    work.mkdir(mode=0o700);owner=work.stat();report=dict(stage='oriented_solid_compiler_controls_v1',status='fail',
+    work.mkdir(mode=0o700);owner=work.stat();report=dict(stage=f'oriented_solid_compiler_controls_v{conditioning_version}',
+        conditioning_version=conditioning_version,status='fail',
         controls=[],adoption=False,reconstruction_accuracy_verified=False,maximum_native_calls=4,budget_seconds=TOTAL_SECONDS)
     error=None;sources=()
     try:
@@ -285,7 +336,8 @@ def geometry_controls(qem_binary,query_binary,query_source_sha256,scratch,offici
             require(len(source[1])>4096,'Control must require actual reduction')
             require(tuple(array_hashes(source))==metadata['source_array_sha256'],'Frozen procedural source changed')
             row=dict(control=name,status='fail',source_preflight={});report['controls'].append(row)
-            sl,sforest,_=preflight_source(source,query_binary,query_source_sha256,remaining,row['source_preflight'])
+            sl,sforest,_=preflight_source(source,query_binary,query_source_sha256,remaining,row['source_preflight'],
+                                        conditioning_version=conditioning_version)
             require(np.array_equal(sl,metadata['face_components']) and
                     np.array_equal(sforest.parents,metadata['expected_parents']) and
                     np.array_equal(sforest.signs,metadata['expected_signs']), 'Frozen procedural forest differs before any QEM')
@@ -293,7 +345,8 @@ def geometry_controls(qem_binary,query_binary,query_source_sha256,scratch,offici
             directory=work/name;directory.mkdir(mode=0o700)
             try:
                 _,result=compile_solid(source,qem_binary,query_binary,query_source_sha256,directory,official_helper,
-                                      metric_scale=metadata['metric_scale'],remaining=remaining)
+                                      metric_scale=metadata['metric_scale'],remaining=remaining,
+                                      conditioning_version=conditioning_version)
                 physical=result['stages'][STAGES[0]]['forest']
                 require(physical['parents']==metadata['expected_parents'].tolist() and
                         physical['signs']==metadata['expected_signs'].tolist(),'Procedural expected full forest differs')

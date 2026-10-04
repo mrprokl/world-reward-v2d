@@ -320,3 +320,11 @@ not used for pose fitting. First require lower wrong-ID without reduced full-T
 coverage, then paired object and object-to-wrist 3D gains under the same downstream
 CARI fit, without human regression or per-frame alignment. A 2D residual alone
 cannot establish a reconstruction-quality gain.
+
+The first actual homogeneous tracker-noise pilot is now **closed REJECT**:
+the frozen Gaussian4 composite model gains density on one heldout clip but loses
+on the second. It is not an adopted correction or learned association prior.
+Do not tune that cohort, pool away its regression or use its descriptive shift
+contrast as a new acceptance gate. Dependence-aware association remains a
+research hypothesis requiring a substantively new model, fresh validation and
+actual paired wrong-ID/3D/coverage evidence before integration.
