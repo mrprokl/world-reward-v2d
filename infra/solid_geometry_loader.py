@@ -22,6 +22,8 @@ PROCESSOR = 'infra/object_budget_solid.py'
 QUALIFICATION = 'configs/solid_chart_v2_qualification_pins.json'
 BUILD = 'configs/solid_chart_v2_build_pins.json'
 CGAL = 'configs/certified_solid_qualification_pins.json'
+BALANCED_QUALIFICATION = 'configs/solid_chart_v2_balanced_qualification_pins.json'
+BALANCED_CGAL = 'configs/certified_solid_balanced_qualification_pins.json'
 SOURCE_HELPERS = ('infra/exact_mesh_geometry.py', 'infra/object_budget_endpoint.py',
     'infra/mesh_link_gate.py', 'infra/mesh_endpoint_gate.py', 'infra/guarded_mesh_gate.py',
     'infra/body_smoke.py', 'src/world_reward/data.py', 'src/world_reward/exact_triangle_predicates.py',
@@ -95,11 +97,13 @@ def _number(value, *, maximum=None, positive=False):
             and (maximum is None or value <= maximum), 'Finite bounded measurement required')
 
 
-def paths(episode, qualification_revision, producer_revision):
+def paths(episode, qualification_revision, producer_revision, *, query_requalification=False):
+    require(type(query_requalification) is bool, 'Explicit query profile required')
     require(type(episode) is int and 0 <= episode < 30, 'Exact Track1 episode required')
     _hex(qualification_revision,40); _hex(producer_revision,40)
-    base = f'outputs/episode_{episode:06d}'; q = 'results/solid-chart-v2-qualify-' + qualification_revision
-    proposal=base+'/object_budget_solid_'+producer_revision
+    base = f'outputs/episode_{episode:06d}'
+    q = ('results/solid-chart-v2-query-requalify-' if query_requalification else 'results/solid-chart-v2-qualify-') + qualification_revision
+    proposal=base+('/object_budget_solid_balanced_' if query_requalification else '/object_budget_solid_')+producer_revision
     return dict(report=proposal+'/report.json', native=proposal+'/native.json',
         geometry=proposal+'/geometry.npz', glb=proposal+'/object_fixed_canonical.glb',
         object=base+'/object_grounded/report.json', source_glb=base+'/object_grounded/object.glb',
@@ -230,7 +234,34 @@ def _compiler(c, scale, query_sha):
     visit(c); require(len(queries) == 8, 'Exactly eight original full geometry queries required')
 
 
-def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha,scale):
+def _query_composition(row, original, active, configs):
+    """Metadata-only composition; old QEM inputs never become the new query."""
+    require(type(row) is dict and set(row)=={'original_query','active_query','original_qualified_inputs',
+        'original_qem_build_unchanged','original_qem_recompiled','procedural_controls_required'}, 'Exact query composition required')
+    _fields(row,dict(original_qem_build_unchanged=True,original_qem_recompiled=False,procedural_controls_required=15))
+    for key,record,config in (('original_query',original,CGAL),('active_query',active,BALANCED_CGAL)):
+        _fields(record,dict(schema='world_reward.certified_solid_qualification_pins.v1',qualified_controls=15))
+        _hex(record['producer_revision'],40); _pin(record['native_source'])
+        for name in ('report','native','binary'): _pin(record[name])
+        item=row[key]
+        require(type(item) is dict and set(item)=={'pins_identity','artifacts','native_source','producer_revision'}, 'Explicit query identity required')
+        require(item==dict(pins_identity=configs[config],artifacts={n:record[n] for n in ('report','native','binary')},
+            native_source=record['native_source'],producer_revision=record['producer_revision']), 'Pinned original/active query differs')
+    require(original['parent_image_id']==active['parent_image_id'] and original['child_image_id']==active['child_image_id'] and
+        original['producer_revision']!=active['producer_revision'] and original['native_source']['sha256']!=active['native_source']['sha256'],
+        'Distinct qualified query under unchanged runtime required')
+    inherited=row['original_qualified_inputs']
+    require(type(inherited) is dict and set(inherited)=={'cgal','cache','historical_image_receipt'} and
+        inherited['cgal']==row['original_query']['artifacts'], 'Original qualified inputs must retain old query')
+    _pin(inherited['historical_image_receipt']); cache=inherited['cache']
+    require(type(cache) is dict and set(cache)=={'pins_identity','artifacts','build_info','compiler'} and
+        type(cache['artifacts']) is dict and set(cache['artifacts'])=={'host_report','native_report','retained_binary'}, 'Original qualified cache required')
+    _pin(cache['pins_identity'])
+    for value in cache['artifacts'].values(): _pin(value)
+
+
+def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha,scale,*,query_requalification=False):
+    require(type(query_requalification) is bool, 'Explicit query profile required')
     root=Path(root); require(root.is_absolute() and root.resolve()==root and not root.is_symlink(), 'Canonical root required')
     require(type(episode) is int and 0 <= episode < 30 and type(scale) is float, 'Exact episode and original scale required'); _number(scale,positive=True)
     for value in (input_sha,object_sha,alignment_sha): _hex(value)
@@ -238,10 +269,13 @@ def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha
     _fields(pins,dict(schema=SCHEMA,episode_index=episode,input_sha256=input_sha,metric_scale_baked_once=scale))
     producer=pins['report']; require(type(producer) is dict and set(producer)=={'bytes','sha256','producer_revision','script_sha256'}, 'Independent processor identity required')
     _pin({k:producer[k] for k in ('bytes','sha256')}); _hex(producer['producer_revision'],40); _hex(producer['script_sha256'])
-    configs={name:identity(CODE/name) for name in (QUALIFICATION,BUILD,CGAL)}
-    q,b,g=(strict_json((CODE/name).read_bytes()) for name in (QUALIFICATION,BUILD,CGAL))
+    selected = BALANCED_QUALIFICATION if query_requalification else QUALIFICATION
+    config_names=(selected,BUILD,CGAL)+((BALANCED_CGAL,) if query_requalification else ())
+    configs={name:identity(CODE/name) for name in config_names}
+    q,b,g=(strict_json((CODE/name).read_bytes()) for name in (selected,BUILD,CGAL))
+    active=strict_json((CODE/BALANCED_CGAL).read_bytes()) if query_requalification else g
     _fields(q,dict(schema='world_reward.solid_chart_v2_qualification_pins.v1',qualified_controls=4,native_qem_calls=4,native_query_calls=40,adoption=False,reconstruction_accuracy_verified=False))
-    _hex(q['producer_revision'],40); names=paths(episode,q['producer_revision'],producer['producer_revision'])
+    _hex(q['producer_revision'],40); names=paths(episode,q['producer_revision'],producer['producer_revision'],query_requalification=query_requalification)
     require(type(pins['files']) is dict and set(pins['files'])==set(names.values()), 'Exact eleven source/qualification artifacts required')
     for pin in pins['files'].values(): _pin(pin)
     ro={names[k] for k in ('report','native','geometry','glb','qualification_host','qualification_native')}
@@ -265,7 +299,7 @@ def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha
     require(host['outputs']==native['outputs']=={Path(names[k]).name:before[names[k]] for k in ('geometry','glb')}, 'Frozen output identities differ')
     require(type(pins['source_helpers']) is dict and set(pins['source_helpers'])==set(SOURCE_HELPERS), 'Exact reused pure source allowlist required')
     for name,pin in pins['source_helpers'].items(): _pin(pin); require(identity(CODE/name)==pin, 'Reused math source differs')
-    qualification=host['qualification']; require(native['qualification']==qualification and qualification['pins_identity']==configs[QUALIFICATION] and
+    qualification=host['qualification']; require(native['qualification']==qualification and qualification['pins_identity']==configs[selected] and
         qualification['report']==q['report']==before[names['qualification_host']] and qualification['native']==q['native']==before[names['qualification_native']], 'Actual qualification byte evidence differs')
     qhost,qnative=records['qualification_host'],records['qualification_native']; require(qhost['native']==qnative and
         qhost['source_binding']==qhost['source_binding_after']==qnative['source_binding']==qnative['source_binding_after'], 'Qualification source changed')
@@ -280,6 +314,11 @@ def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha
         and qnative['image_id']==native['image_id']==host['image_identity']['child_id']==b['image_id']==g['child_image_id'], 'Qualified actual build/image differs')
     _fields(g,dict(schema='world_reward.certified_solid_qualification_pins.v1',qualified_controls=15))
     require(qualification['build']['cgal']=={k:g[k] for k in ('report','native','binary')}, 'Qualified exact query differs')
+    if query_requalification:
+        qr=qualification['build']['query_requalification']; _query_composition(qr,g,active,configs)
+        require(all(row.get('query_requalification')==qr for row in (host,native,qualification,qhost,qnative)),
+            'Full original/active query composition must match every producer proof')
+        require(active['child_image_id']==b['image_id'], 'Active query runtime differs')
     source=native['source_hashes']; obj,alignment=records['object'],records['alignment']
     for row,stage in ((obj,'sam3d_objects_grounded_fixed_frame'),(alignment,'predicted_human_anchored_moge2_pointmaps')):
         _fields(row,dict(stage=stage,status='pass',episode_index=episode,input_track='track_1',input_sha256=input_sha,ground_truth_used=False,hand_labeled_test=False,oracle_modes=[]))
@@ -290,7 +329,7 @@ def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha
         and float(values[0])==scale and all(abs(x-values[0])<=1e-5*abs(values[0]) for x in values), 'Original scale cannot be averaged/rebaked')
     for role,key,field in (('source_glb','object.glb','object_sha256'),('transform','transform.json','transform_sha256'),('intrinsics','intrinsics.json','intrinsics_sha256')):
         require(before[names[role]]['sha256']==source[key]==obj[field], 'Original constant artifact differs')
-    c=native['compiler']; _compiler(c,scale,g['native_source']['sha256']); require(c['glb_identity']==before[names['glb']], 'Canonical GLB differs')
+    c=native['compiler']; _compiler(c,scale,active['native_source']['sha256']); require(c['glb_identity']==before[names['glb']], 'Canonical GLB differs')
     proof=native['source_geometry']; weld=proof['exact_welding']; source_top=c['stages']['physical_source']['topology']
     require(proof['source_identity']==before[names['source_glb']], 'Original raw source identity differs')
     _hex(proof['raw_oriented_triangles_sha256'])
@@ -302,8 +341,11 @@ def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha
     return host,native,before,names
 
 
-def load(root,episode,input_sha,object_report_sha,alignment_sha,scale,*,pins=None):
-    root=Path(root); host,native,before,names=verify_pinned_artifacts(root,pins,episode,input_sha,object_report_sha,alignment_sha,scale)
+def load(root,episode,input_sha,object_report_sha,alignment_sha,scale,*,pins=None,query_requalification=False):
+    require(type(query_requalification) is bool, 'Explicit query profile required')
+    root=Path(root)
+    options=dict(query_requalification=True) if query_requalification else {}
+    host,native,before,names=verify_pinned_artifacts(root,pins,episode,input_sha,object_report_sha,alignment_sha,scale,**options)
     geometry=_module('exact_mesh_geometry','infra/exact_mesh_geometry.py'); endpoint=_module('object_budget_endpoint','infra/object_budget_endpoint.py')
     with np.load(root/names['geometry'],allow_pickle=False) as data:
         require(set(data.files)=={'vertices','faces','episode_index','object_scale','grounded_scale_baked'}, 'Exact five-array payload required')
@@ -325,4 +367,5 @@ def load(root,episode,input_sha,object_report_sha,alignment_sha,scale,*,pins=Non
         cpu_producer_revision=pins['report']['producer_revision'],cpu_script_sha256=pins['report']['script_sha256'],original_artifacts_rehashed=True,
         metric_scale_already_baked=True,resimplification_performed=False,actual_topology_verified=True,metric_oriented_triangle_fidelity=fidelity,
         independent_embedding_reverified_here=False,source_geometry_repaired=False,challenge_performance_verified=False,cpu_source_binding=host['source_binding'])
+    if query_requalification: receipt['query_requalification']=host['query_requalification']
     return v,f,active,cleanup,root/names['glb'],receipt
