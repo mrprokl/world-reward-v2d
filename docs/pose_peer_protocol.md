@@ -28,6 +28,12 @@ then the independently hashed FIRST bounded manifest before parsing/extraction.
 Fresh root0700 namespaces never merge originals; only new public copied leaf
 files become0444 for individual read-only UID1000 container mounts.
 
+The VM02 NSG denies all inbound traffic, including same-VNet defaults. Any
+transport therefore requires one temporary owned allow rule for source
+10.0.0.4/32→destination10.0.0.9/32, TCP2222 only, before that deny. Preserve
+all existing rules, never open Internet/whole-VNet access, and delete only the
+verified newly owned rule after the independently sealed receiver receipt.
+
 VM02 requires original immutable image7eb/44layers and exact tracker helpers.
 Acquire/recheck the existing FD9 GPU lock and empty compute apps; use explicit
 Python entrypoint, UID1000, network none, read-only/cap-drop/no-new-privileges.

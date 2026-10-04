@@ -6304,3 +6304,12 @@ labels/calibration/acquisition recipe. Original lock is opened read-only and
 held, all288 RGB and model/source bytes are checked before/after; native kwargs
 and saved arrays stay untouched. Actual initialization still requires measured
 acquisition pins and successful Azure execution; no depth/pose quality implied.
+
+Full40ee2cb source/test suite **11,398 PASS/4optional SKIP406.42s**; later
+native depth preflight has separate focused tests. EP8 sender40ee2cb FAIL16.89s
+before receiving bytes: original receiver-summary remains empty, source/archive
+and private-key metadata rechecks PASS. Azure control audit identified VM02's
+existing explicit deny-all-inbound NSG (not an algorithm failure). Add only one
+fresh owned exact10.0.0.4/32→10.0.0.9/32 TCP2222 rule at4095, preserving the deny
+and every original rule; remove this exact rule after sealed transfer. No broad
+network exposure, credential/key replacement or reinterpretation of the FAIL.
