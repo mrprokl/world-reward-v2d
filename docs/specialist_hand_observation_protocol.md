@@ -7,6 +7,9 @@ implemented; the offline CPU graph qualification is independently verified.
 Fresh subject-03 RGB/opaque labels are independently byte-qualified: three
 original72-frame clips (216 full original frames). Actual hand predictions and
 private-array diagnostics have not run yet; no annotation values were read.
+The complete native scan is now independently sealed:216 original calls,
+9.314269s inclusive CPU,70/58/48 nonempty frames across the three72-frame clips,
+no capacity saturation. Availability is not accuracy or actor identity.
 It tests automatic 2D observation availability, not identity, tracking, contact,
 shared metric geometry, full HOI, or superiority over CARI4D.
 

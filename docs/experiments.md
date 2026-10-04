@@ -7464,3 +7464,13 @@ Report66503B SHA370f15498a945a042ae9dd56f8f0cca6f9298f7ea1060400e78ade6d4e07f061
 manifest64344B SHA60434a4d54dfc9fb6a50931d0aedd937bcb77b81ebda80c9b589fb8d49575313.
 No private values, images decoded, model/GPU or challenge assets used. Exact
 acquisition pins precede native full-T scan; CC-BY-NC4/overlap remain disclosed.
+
+Fresh native hand scan actual PASS9.314269s under5e0b0cb,216 original RGB calls
+in one CPU graph; native load/scan/serialization6.633371s. Lex4/39/74 returned
+70/58/48 native hands on70/58/48 of72 original frames,0 saturation, all21 raw
+coordinates/native handedness/support retained. No crop/flip/filter/interpolation
+or GPU/private values. CPU XNNPACK used; upstream EGL/squareROI warnings retained
+remotely, not silenced with changed graph or hidden settings. Independent source,
+runtime/task/dependencies/allRGB and seven original outputs/posthash PASS.
+Hostreport6270B SHA900a37e75ae0b6e1bbef2d4b11e47a81016dc305ea5be5fad1b9b9b59c5c97f7
+freeze precedes private evaluation. Nonempty rate is availability, not accuracy.
