@@ -8443,3 +8443,16 @@ EP21 full563 originalnativeforward queued underbeb339b afteractualpreparepins;
 own196sourcefiles archive26e9de35e495ee10e8298fe6683025d07f60bf0220408bcc98f4996e77f763e8
 ledger2cfe56bdff8504ddba07890e1aeb27120b5c25158ee2a5eb18879996fc3f12e3,
 no nativecompletion presumed fromdispatch.
+
+Generic whole-solid production driver released after independent read-only
+audit. Corrected four concrete lifecycle/namespace defects before any native
+production: exclusive inode registered before partial write; Docker cleanup
+independent of bad receipt parsing; scoped TERM finally; SciPy vertex-component
+vs first-face CGAL signs mapped by authoritative witness vertex. Explicit
+fchmod preserves444 under077umask. Qualified math/cohort/thresholds unchanged.
+Root256 combined production/qualification/compiler/forest/closure testsPASS2.02s.
+Owned fixture cleanup initially refused a wrong /tmp ancestor assumption on
+macOS; corrected to the actual canonical tempfile ancestor and removed only
+the uniquely owned run directory. No tests/native jobs were rerun for cleanup.
+First fresh actual EP09 proposal is predeclared, one QEM/eight queries/sixstages;
+no production geometry, downstream pose or HOI success inferred from tinytests.

@@ -84,3 +84,23 @@ Maximum sampled CD/diagonal0.003068 and shell-volume error0.013716 meet the
 unchanged0.01/0.05 gates. Actual build+qualification pins are frozen separately.
 This qualifies the numerical compiler on procedural sources, **not production
 geometry, RGB accuracy, HOI, legal eligibility, adoption or CARI4D superiority**.
+
+### Qualified production proposal (not adoption)
+
+`object_budget_solid.py` uses this exact qualified compiler/image, with one QEM
+and eight exact queries over the original source, source F32, metric source and
+five candidate stages. It authenticates the historical qualification and full
+current source closure before execution. Original RGB and full-T masks are only
+hashed; no media, labels, models, GT or camera calibration are consumed here.
+One canonical GLB and one already metric-scaled 4096-row NPZ are sealed only
+after complete source/forest/birth/Euler/CD/volume and lifecycle checks. All
+thresholds and numerical operators remain unchanged. A fresh proposal directory
+is mandatory; no fallback, repair, repeated QEM or historical overwrite.
+
+First actual production source is episode09 (the independently certified
+original nine-shell source), selected before execution. A source-chart/F32,
+native budget, forest, serialization or fidelity failure closes this proposal
+without loosening gates. Episode25 may follow the identical policy only after
+the first complete PASS. Production geometry PASS does not establish pose or
+human-object reconstruction accuracy; downstream use requires independent
+actual artifact pins and a pure loader, never executing CGAL/QEM on the GPU.
