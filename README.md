@@ -35,7 +35,8 @@ No final Parquet, submission or verified CARI4D improvement yet.
   gated volume-constrained proposal retains its three shells, including two
   cavities; full tracking now passes on all 668 frames (3,605.69 s). Its CPU
   CARI input assembly passes on all668 original frames; native shared preparation
-  now passes on all668frames (21.81 s). The next full816-frame volume tracker
+  now passes on all668frames (21.81 s), and native forward passes all7 windows
+  (134.23 s). Its unchanged full native refinement is active. The next full816-frame volume tracker
   also passes (4,794.56 s); its CPU CARI input assembly is active. The634-frame
   episode has complete initializers. Its first private Azure full-pose run
   stopped before poses on the unchanged topology gate. A separately qualified

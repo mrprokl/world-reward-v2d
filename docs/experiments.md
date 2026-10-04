@@ -6555,3 +6555,8 @@ ETag and perarchive identity are required before206body; ContentLength/range/
 32MiB/300s preserved. Original parsing/audit mathematics are ASTidentical.
 Old headerFAIL fullsource/report/unit and original acquisitionFAIL source/
 markers/CID remain sealedbefore/after; no third full acquisition authorized.
+
+EP5 refined unit is actually active (one1142269parent), no final receipt;
+source/forward remain frozen. Corrected header-only diagnosticv2 now dispatched
+62a8d00 on VM02 in its own revision-specific report namespace;89sourcefiles,
+92776encodedB only. No new full archive acquisition and no duplicate model job.

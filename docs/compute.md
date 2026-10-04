@@ -18,9 +18,9 @@ volume proposal pass; full tracking now passes668/668 in3605.685147s. One GPU jo
 per VM; scoped locks release before CPU preparation for disjoint overlap.
 
 EP5's original CPU input assembly passes all668frames; shared preparation now
-passes all668frames in21.814658s; the GPU lock is released. EP6's default topology
-reduction failed
-before any pose; an independently qualified volume proposal and authenticated
+passes all668frames in21.814658s and native forward in134.227019s. Unchanged
+full native refinement is active under the GPU lock. EP6's default topology
+reduction failed before any pose; an independently qualified volume proposal and authenticated
 empty-directory archive preserve that failure. The unchanged full816-frame
 volume tracker passes all816frames in4794.561042s; CPU CARI input assembly is
 active. EP7's empty fixed
@@ -45,8 +45,11 @@ complete disposable cleanup and no ZIP/private-label interpretation. The authent
 is atomically archived; the single technical3600s continuation now fails
 archive inventory in1701.101840s with original source/cleanup PASS and zero
 retained public/private inputs. Cause is not yet proved; the independently
-verified tiny base ZIP layout matches exactly. No third acquisition is authorized;
-only a bounded public header-only diagnostic is next;
+verified tiny base ZIP layout matches exactly. No third acquisition is authorized.
+The first bounded header-only diagnosis stopped beforebody on distinctLFS/Xet
+ETag identities. Actualpublicheaders prove that technical mismatch; the separate
+resolver-LFS→declaredXet→CAS identity-chain diagnosis is now dispatched, retaining
+both original FAILs and ≤32MiB/300s/no-member-payload guards;
 automatic3D point-pose validation has not run. Its three-anchor depth and
 automatic-mask preflights and identical-pool comparison are separately gated.
 
