@@ -6891,3 +6891,18 @@ prioritizing leaderboard gains. One corrected YCBv2 engineeringreplay authorized
 same288RGB/three scenes, immutablebudgets/qualitythresholds andoriginalfailures.
 No retuning after scores or newclaimofindependentreplication. Acquisition only
 after actualhistory/cleanup/source/runtime audit, not merely flippingauthorization.
+
+Verification hygiene: simultaneous local pytest runs reused the default temporary
+root with retention-none, removing another active run's fixtures. The interrupted
+318.70s run (9674PASS/4SKIP/1016missingfixtureERROR/oneearlierFAIL) is not a code
+qualityPASS. Explicitly unique basetemp isolated rerun completed12098PASS6SKIP
+444.46s; newexactpredicate51fixtures separatelyPASS0.28s. No unchanged prediction
+or acceptance thresholds altered to fix this tooling race. Future paralleltests
+use exclusive named basetemps; retain only these counts/decision, discardnoise.
+
+New independent exacttriangle gate/datafreecontrols: IEEE754outwardintervals
+plus exactdyadic Fraction fallback, no tunableglobalextent/tolerance. 6144interval
+enclosures checked against rationalarithmetic;10,000face syntheticbenchmark
+0.013814s/9122certified878fallback, sourcearraysunchanged. Exactcollinearity
+rejects entiregeometry; every other topology/embedding/volume/backendquality
+certificate explicitlyfalse. No historicalhelper modified or EP9adoption.
