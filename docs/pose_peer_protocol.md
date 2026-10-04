@@ -44,10 +44,13 @@ before atomic Linux RENAME_NOREPLACE promotes the owned pose directory into
 the still-absent canonical target. Source/input/image/lock checks run afterward;
 preserve any failure without overwriting, merging or guessing poses.
 
-Tiny control tests and read-only independent audit pass. No real archive,
-private SSH transfer or VM02 full-pose execution is claimed until each actual
-sealed Azure receipt independently verifies. Image entrypoint/parent traversal
-are runtime concerns; mocked tests are not successful native execution.
+Tiny control tests and read-only independent audit pass. The original EP8
+default archive/receive receipts independently pass, while native tracking
+fails before poses at the unchanged topology gate. A separately qualified
+volume archive is frozen for an isolated new transfer. Each new receipt requires
+independent verification; historical transport PASS never becomes pose accuracy.
+Image entrypoint/parent traversal are runtime concerns; mocked tests are not
+successful native execution.
 
 The server installer uses the frozen source closure to create a separate genuine
 read-only receiver namespace with the same original dispatch markers/bytes.
