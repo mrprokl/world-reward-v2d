@@ -8125,3 +8125,11 @@ within2400total. Root91focusedPASS0.20s; two ownfixture roots removed. Prelaunch
 review fixes classicbuilder env and077umask header traversal, no math change.
 Ownsource remainsApache; linkedCGAL runtime GPL3/commercial, notApache-only and
 noeligibility presumed. No runtime/model accuracy or production geometry yet.
+
+Prelaunch CPU header-root traversal regression: dispatcher umask077 also affects
+the extracted root itself, not only child directories. Explicit public-header
+root755 with independent real077 regression; no numerical/protocol change.
+Root92focusedPASS0.21s, owned fixture tree removed. This is packaging validation,
+not native CGAL compilation or a geometry/quality result. EP25 original0444f56
+initializer-only lock scheduling dispatch ACK received; no inference presumed
+from transport acknowledgment alone.

@@ -185,6 +185,7 @@ def extract_headers(archive, destination, capacities):
         required = ('CGAL-6.0.1/include/CGAL/version.h', 'CGAL-6.0.1/include/CGAL/Exact_predicates_exact_constructions_kernel.h')
         require(all(paths.get(n) == 'file' for n in required), 'CGAL expected header layout differs')
         destination.mkdir(mode=0o755)
+        os.chmod(destination, 0o755)
         retained = {}
         for m in rows:
             if m.isfile() and m.name.startswith('CGAL-6.0.1/include/'):

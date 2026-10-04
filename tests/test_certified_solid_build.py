@@ -3,6 +3,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import os
 from pathlib import Path
 import stat
 import tarfile
@@ -111,6 +112,18 @@ def test_archive_inventory_before_only_headers_extracted(tmp_path):
         'CGAL/version.h', 'CGAL/Exact_predicates_exact_constructions_kernel.h'}
     assert all(stat.S_IMODE(p.stat().st_mode) == 0o444 for p in target.rglob('*') if p.is_file())
     assert all(stat.S_IMODE(p.stat().st_mode) == 0o755 for p in target.rglob('*') if p.is_dir())
+
+
+def test_headers_traversable_under_dispatch_private_umask(tmp_path):
+    archive = tmp_path / 'library.xz'; make_archive(archive)
+    target = tmp_path / 'headers'
+    previous = os.umask(0o077)
+    try:
+        build.extract_headers(archive, target, build.EXPECTED['capacities'])
+    finally:
+        os.umask(previous)
+    assert all(stat.S_IMODE(p.stat().st_mode) == 0o755
+               for p in (target, *(p for p in target.rglob('*') if p.is_dir())))
 
 
 @pytest.mark.parametrize('extra', [('CGAL-6.0.1/../bad', b'a'), ('/absolute', b'a'),
