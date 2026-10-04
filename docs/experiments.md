@@ -6597,3 +6597,10 @@ replay, not a fresh independent cohort. Currentauthorization remainsclosed.
 Tinydatafree mapping helper is usefulprep; no adapter/scientific runs changed.
 Diagnostic IDs compacted to first/last/count/stride for useful reproducibility
 rather than192redundant scalar lines.
+
+Purestdlib native-frame-map metadata helper6961f24 **120combinedPASS0.29s**
+(54mappingfixtures+66headers). Immutable position/sourceID tuples, exactordered
+rows and byte/SHA attachment prevent queryposition0/source1 or privateID
+misassociation.97LOC no models/NumPy/I/O, no existing adapter/math changes.
+This is preparation for a future explicittechnical protocol, not authorization
+or an executed external validation result.
