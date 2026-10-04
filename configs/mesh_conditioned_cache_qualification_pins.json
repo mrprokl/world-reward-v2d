@@ -1,0 +1,40 @@
+{
+  "schema": "world_reward.mesh_conditioned_cache_qualification.v1",
+  "producer_revision": "23c5731e792482cc9a229422d32aacf370b084fc",
+  "source_files": 176,
+  "source_archive_sha256": "cb47b4646b6adaf6f7e14954a9e2dc0b5c8bc7d4cac8f324e6115ec56ef73952",
+  "source_files_sha256": "744da8f9e999e9bbd0579bf437d563b6a5883eeb611d6b3e4dca9480188bd1c3",
+  "source_cpp": {
+    "bytes": 16162,
+    "sha256": "f97d826d8543822c7ebbe11b4ef12c69a29c246a0902a0ea7484515c3f79148b"
+  },
+  "protocol": {
+    "bytes": 2476,
+    "sha256": "ba0194777de817c507be459287ed53cd45a69f5473e8514ff09b507a86227a2a"
+  },
+  "host_report": {
+    "bytes": 12033,
+    "sha256": "68526ae25d835b84644964ef45c239a1329b3f855e25fb8ca34b53a5f903f280"
+  },
+  "native_report": {
+    "bytes": 72603,
+    "sha256": "4c19efa1e2e09e41128394e82892febcf748468b1f21fcf15d42c79470b1a07c"
+  },
+  "retained_binary": {
+    "bytes": 695224,
+    "sha256": "830239bb6eedaadc06f798730993f9a43ff1c7aae7d701a82f9e7c07e573b4a1"
+  },
+  "previous_qualification_pins": {
+    "bytes": 1223,
+    "sha256": "678ffeff106cfefee6cc850d2a2c32d65af549bcfdf9015ff886f436c7392adf"
+  },
+  "binary_mode": "0555",
+  "receipt_mode": "0444",
+  "directory_mode": "0555",
+  "exact_implementation_regression_verified": true,
+  "qualified_procedural_controls": 4,
+  "native_calls": 8,
+  "production_mesh_validated": false,
+  "challenge_performance_verified": false,
+  "adoption": false
+}

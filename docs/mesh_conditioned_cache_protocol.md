@@ -26,4 +26,16 @@ receipts0444 and result directory0555. Remove an owned retained binary on failur
 This is a bounded implementation regression, not universal equivalence, a
 production-mesh validation, HOI accuracy evidence or a CARI4D victory.
 
-Status: preregistered; actual Azure results are not yet available.
+## Actual result — October4
+
+Producer `23c5731`: host64.36s/native63.46s; slow compilation15.79s and cached
+compilation15.99s. Independent complete176-file source/archive, both completed
+receipts, eight real-collapse arms, byte-exact candidates/full mappings and
+physical-stage evidence all PASS. Predicate128+orientation128/key7/reject4 and
+zero-collapse identity also PASS. Cached native times0.212/0.210/0.259/0.245s
+versus slow0.427/0.428/0.540/0.532s on these four sources only (about2×).
+No repeated trials or large-source scaling claim.
+
+Qualified fast binary695224B is retained on Azure with immutable modes and
+actual qualification pins. Source geometry and thresholds are unchanged;
+no production mesh, HOI accuracy or challenge improvement has been verified.

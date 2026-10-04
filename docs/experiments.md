@@ -7959,3 +7959,21 @@ EP21 originalea26eda full563bodyPASS193.100529s at15:40:28UTC, fullCPUdepth
 underway. Objectgrounded264756facesPASS35.024452s earlier. Nofullinputs/pose/
 CARIexecution/adoption presumed. Currentrepo7084ec3publicpushed, noactive
 RunCommand/localtests/foreigncleanup; originalGPUfrontend independentongoing.
+
+Cached fixed-chart implementation preregistered then actualPASS under23c5731:
+host64.363562s/native63.455543s, original-qualifiedslowcompile15.786569s and
+cachecompile15.985175s. Originalslowbinary matches actualb754e561 exactly.
+All128scalar/128orientation/7key/4reject/zero-collapseidentity gates and eight
+real-collapse arms on the exactprevious4SUCCESSsources PASS. Inputs, candidate
+OBJ/fullmappingJSON/counters and physical candidate/F32GLB/default8/officialpack/
+.375metricstage evidence byte-exact/equal. Cache0.211680/.209585/.259054/.245247s
+vs slow.426679/.427508/.539605/.532301s; no repetitions/universal speedclaim.
+Independent complete176source/archive/sourcebinding/actualallstagearithmetic/
+before-after hashes/ownedCID+scratchcleanup+immutablepublication recheckPASS.
+Host12033B SHA68526ae25d835b84644964ef45c239a1329b3f855e25fb8ca34b53a5f903f280;
+native72603B SHA4c19efa1e2e09e41128394e82892febcf748468b1f21fcf15d42c79470b1a07c.
+Fast695224B SHA830239bb6eedaadc06f798730993f9a43ff1c7aae7d701a82f9e7c07e573b4a1
+retainedAzure0555, receipts0444/dir0555; no media fetched locally. Exactqualified
+implementationpins frozen afterPASS, notdummy. No productionmesh or HOIgain.
+Localfocused113PASS1.10s and207PASS4.24s, syntax/diffPASS. EP21originalfullpose
+100/563frames processed at lastmetadataquery, stillactive/no reconstructionPASS.
