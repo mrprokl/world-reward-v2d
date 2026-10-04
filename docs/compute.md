@@ -26,7 +26,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 9 | 415 | Geometry/topology failures before pose; no face deletion or threshold rescue. |
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
-| 12 | 405 | Active original frontend: full automatic masks PASS82.77s, sparse Body PASS15.82s; remaining full stages unverified. |
+| 12 | 405 | Active original frontend: full405 masks/Body/depth PASS; object tracking has50/405 progress, not full PASS. |
 
 Seven complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
@@ -38,8 +38,9 @@ SAM2 calls. No Objects/Boots trajectory or private3D quality evaluation followed
 Private annotation values/projections were not consulted. This pilot is closed,
 not a reason to change its prompts/margin. **No active VM02 GPU job is reported
 at this snapshot.** EP11 is closed FAIL at08:46:36UTC; its original log and
-producer remain unchanged. EP12 is active, MainPID1295652, with one4420MiB GPU worker at08:51:52UTC;
-this observation does not predict completion.
+producer remain unchanged. EP12 is active, MainPID1295652, with one1886MiB GPU worker at the next readonly check;
+this observation does not predict completion. EP13 queued dispatch under `fc10a6e`
+is acknowledged, but its wait/child state has not yet been independently checked.
 D107 independent TUM depth validation is REJECT4.904632756% < frozen5%; the
 four-anchor hand-support pilot is also closed REJECT. Neither is adopted.
 
@@ -108,6 +109,10 @@ source and selected assets against the producing stage's independent pins.
 - Explicit `--reuse-published` performs metadata-only verification of the exact
   existing bytes/modes/markers/canonical closure, then dispatches a new unique
   unit/log. No upload, chmod, republishing, retry or result reuse is implied.
+- `run_track1_frontends_queued --after-terminal <unit>` starts a distinct untouched
+  clip only after a loaded, coherent terminal predecessor (success or retained
+  failure). Source/targets/lock/GPU are rechecked; missing/unknown units fail.
+  Bounded12h wait, unchanged fixed_all16 child, no retry or failure reclassification.
 - Fresh outputs only; reuse successful artifacts solely after their full lineage
   checks. Authenticate historical producer helpers, not current consumer hashes.
 - Budgets are predeclared per stage. CPU assembly retains7200s; no longer timeout

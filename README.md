@@ -16,8 +16,9 @@ inferred automatically; no hand-labeling of challenge records.
   complete engineering checks, not held-out accuracy; scratch Parquets deleted.
   EP0's legacy conversion failure stays separate. EP4 missing masks, EP7 empty
   anchor, EP9 invalid geometry and EP10/EP11 actor identity failures remain closed.
-  EP11 stops before SAM2/later frontends. EP12 is active: automatic masks cover all405 original frames and sparse
-  Body inference passes; the remaining full chain is not yet complete.
+  EP11 stops before SAM2/later frontends. EP12 is active: full405 masks, Body
+  and depth pass; object tracking remains incomplete. EP13 has a dispatch ACK
+  for a bounded queue after EP12 terminates; ACK is not execution/completion.
 - **Depth:** D106 gains56.2007% on twelve external TUD-L frames, but the same
   development scenes/objects and33–38cm absolute errors prevent a generalization
   claim. D107's independent TUM test **REJECTS** the recipe:4.9046% < frozen5%.
@@ -36,7 +37,9 @@ inferred automatically; no hand-labeling of challenge records.
   camera/gauge, constant geometry/identity and missing-observation support.
   `temporal_identity` provides raw globally associated path costs over supplied
   actor/object hypotheses. It does not infer/calibrate observations or accept an
-  identity. Both are tiny-tested primitives, **not an operational new framework,
+  identity. `relational_motion` extracts background-compensated 2D movement
+  features from supplied automatic tracks, with raw support/degeneracy diagnostics.
+  These are tiny-tested primitives, **not an operational new framework,
   integrated learned method or measured improvement**.
 
 Detailed receipts, producing revisions and decisions live in

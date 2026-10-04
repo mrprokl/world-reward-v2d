@@ -7089,3 +7089,23 @@ exclusive `/tmp/world-reward-root-framework-full-20261004`; no heavydata/model
 processing. Code/source/control correctness only, notscientificperformance.
 EP12 actualoriginal405 fullBody PASS138.256485s, allinitializerchildren complete
 08:59:19UTC and objecttracking active; no fulltrajectory/input/qualityPASS inferred.
+
+
+04Oct relational evidence: `relational_motion` adds raw automatic-track feature
+extraction, shared background affine OLS, image-diagonal/actual-Δt residual speeds
+and pair contrast; counts/dispersion/degeneracy explicit, missing/all competitors
+retained. Root189 integrated tiny tests PASS0.44s, child148PASS0.15s. Outlier
+background and rotational median cancellation deliberately exposed; no learned
+candidate producer, calibrated acceptance, camera/contact truth or quality gain.
+Next producer must preserve ALL automatic candidate masks/queries before scoring,
+not reuse the two selected historical entities. Learned relation needs separate
+external calibration; MAP mincost is not a marginal HMM likelihood.
+
+Scheduling-only terminal policy `fc10a6e5d5922c61bee7b8c2b44833b366da4ce1`:
+root194 focused PASS83.69s, child114PASS67.52s. Explicit terminal predecessor
+allows an independent next clip despite a retained failure; sources/targets/lock/
+GPU checks unchanged. EP13 fresh queued dispatch acknowledged after four exact
+transport phases,148sourcefiles/193676encodedB; no retry or EP12failure rescue.
+EP12 original producer814179a remains active: full405Body138.256485s/depth
+224.729919s PASS, tracker progress50/405227.459412s. Whole trajectory, CPU inputs,
+native chain and quality not yet complete.

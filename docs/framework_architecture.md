@@ -1,6 +1,6 @@
 # Framework World Reward : recherche, scène partagée, preuves
 
-**Statut : adapters SharedScene et solveur de coûts temporal_identity implémentés ;
+**Statut : SharedScene, temporal_identity et features relational_motion implémentés ;
 extensions de scène et framework appris unifié non encore opérationnels.**
 Objectif : améliorer la reconstruction Track 1, pas multiplier les wrappers ou
 confondre un pipeline exécutable avec une victoire sur CARI4D. Code et décisions
@@ -18,6 +18,7 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 | Forme partagée | `shape_model.apply_fixed_shape`, `shape_fit.fit_shared_shape`, `shape_selection.select_shape_candidate` | Opérateurs expérimentaux ; pas adoption automatique. |
 | Association pose/image | `point_pose_comparison.compare`, `rgb_pose_tracking.track_rgb_pose` | Coût ou suivi image, pas preuve de précision3D. |
 | Identité temporelle | `temporal_identity.IdentityGraph`, `rank_identity_paths` | Ranking global et min-marginales de coûts fournis ; aucun générateur de candidats/costs appris, identité acceptée ou probabilité. |
+| Evidence relationnelle | `relational_motion.relational_motion_features` | Résidus 2D après nuisance affine du fond, comptages/support ; tracks fournis, pas génération/identité/contact/confiance ni caméra physique. |
 | Lacunes | `occlusion_bridge.initialize_occluded_gaps` | Initialiseur conditionnel ; pas contact observé ni validation RGB complète. |
 | Baseline complète | `cari_shared_prepare`, `cari_full_forward`, `cari_full_refine`, `cari_full_export` | Adaptateurs natifs séparés, preuve et exécution souvent imbriquées. |
 | Évaluation externe | `point_motion_evaluation`, `point_bop_evaluation`, `ycbv_point_evaluate` | Portée rigide relative ; pas validation HOI globale. |

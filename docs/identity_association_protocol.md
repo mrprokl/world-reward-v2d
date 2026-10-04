@@ -1,6 +1,6 @@
 # Association temporelle multi-instance — proposition scientifique
 
-**4 octobre 2026 : primitive mathématique implémentée ; protocole externe
+**4 octobre 2026 : solveur de coûts et features de mouvement implémentés ; protocole externe
 PROPOSÉ, pas encore gelé ni exécuté.** Les seuils, modèles,
 coûts, budgets, licences complètes et pins d'acquisition restent à geler.
 YCB48–50 et les pilotes clos ne sont pas recyclés pour ajuster cette méthode.
@@ -39,6 +39,42 @@ association à une géométrie canonique, calibration et décision d'abstention.
 Forme, échelle, K et jauge sont hors graph, clip-constants. Indices de mains
 conditionnels, pas attraction universelle ni rigidité main–objet imposée.
 
+### Features relationnelles implémentées, pas encore mesurées sur vidéo
+
+`relational_motion.relational_motion_features` extrait des caractéristiques 2D
+à partir de tracks automatiques **fournis**, par instance main/objet. Un affine
+OLS unique est estimé sur les correspondances de fond, partagé par tous les
+couples ; ce nuisance image n'est pas une caméra physique. Moins de trois points
+ou rang dégénéré ⇒ support absent, jamais mouvement nul crédible de secours.
+
+Résidus médians par instance, contraste de vitesse main–objet et énergies sont
+normalisés par diagonale image et Δt réel. Comptages, dispersion, résidus et
+condition du fond restent bruts. Toutes les instances/frames et absences sont
+conservées ; aucune proximité ne choisit l'identité. OLS est sensible au fond
+mobile, aux outliers/parallaxe ; une rotation symétrique peut annuler la médiane.
+Les tests exposent ces limites : **189 tests intégrés PASS0.44s**, pas gain vidéo.
+
+L'étape suivante doit produire une même banque automatique complète pour A/B :
+DINO `hand.`/`object.` fixes, propositions SAM2 et queries Boots par grille de
+masque automatique, plus fond hors de l'union de toutes les instances. Pas de
+requête cible privée, point oracle RoboTAP ou sélection top1. Les anciens outputs
+`automatic_masks` ne contiennent que deux entités sélectionnées : cette banque
+n'existe pas déjà et ne peut être fabriquée depuis leurs diagnostics incomplets.
+
+Choix scientifique proposé : contraste discriminatif de faible dimension appris
+sur sujet02 externe **après gel des features automatiques**, puis modèle/règle
+d'abstention gelés avant sujet01. La cible privée sert uniquement à entraîner
+l'association dans ce split distinct, jamais aux inputs GPU. Sans labels contact,
+les régimes de co-mouvement ne doivent pas être nommés contact/prise/relâchement.
+Stationnarité ou mouvement caméra commun ne permet pas toujours l'identité.
+Un score calibré n'est pas encore un gain de pose absolue.
+
+Ne pas appeler le minimum de chemins `temporal_identity` une vraisemblance HMM
+marginalisée : MAP/profilage et log-sum-exp des chemins diffèrent, et des banques
+de nuisance de tailles différentes peuvent biaiser le minimum. Comparabilité,
+modèle d'absence et calibration doivent être explicitement résolus, pas cachés
+par des poids ad hoc. Aucun nouveau checkpoint relationnel n'est encore adopté.
+
 ## 2. Tests discriminants avant acquisition
 
 Tests data-free : optimum/min-marginales contre énumération exhaustive,
@@ -46,7 +82,7 @@ permutations/ties, influence de futures observations, absence conservée,
 concurrents all-missing/distracteurs et overflow/malformed/infeasible.
 Ces **coûts synthétiques fournis** sont un oracle de test du solveur, pas des
 observations apprises ni une mesure de qualité ou un entraînement ML.
-Avant modèles, ajouter contrôles croisement, distracteur proche de la main,
+Avant modèle appris, compléter les contrôles croisement, distracteur proche de la main,
 relâchement/glissement et symétrie indiscernable ; tester l'évaluateur pour
 qu'une abstention ou mauvaise identité ne gagne pas par suppression de frames.
 
@@ -109,3 +145,8 @@ sur le split externe de calibration distinct. Pas de nombres empruntés après
 résultats ni tuning sur ces six séquences. Gel/preuves avant privé ; PASS technique,
 soutien scientifique et adoption restent séparés. Même succès ne certifierait
 ni full-HOI Track1 ni supériorité SOTA/CARI4D. Aucun nouveau transport requis ici.
+
+Ablations discriminantes proposées : même banque/visibilité avec nuisance de
+fond supprimé ; permutation temporelle des mouvements objet conservant support
+et couverture. Une amélioration venant seulement du candidat le plus visible
+ne prouve pas une relation main–objet. Les seuils de ces essais ne sont pas gelés.
