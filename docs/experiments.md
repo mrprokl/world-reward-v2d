@@ -7585,3 +7585,9 @@ EP14 queued source closure passes its153-file exact digest, but lacks the
 generic input-audit module: independent control stops before reading inputs.
 Use a separately authenticated published auditor closure, never invent producer
 files/markers or repeat prediction inference.
+
+EP13 full425 refined original301updates independently CPU-only fullchain freeze
+PASS before export; bundle325309472B SHA142c5e73b39557b6c8db67ac96f64d68ffa4d2e6fefc82eaa46084df4f1cf164,
+report13937B SHA85a5933dcd0955678526f15a3c44f637cb4f527858c33b10cbc6fd60eb9b28cd.
+Original6fb9441 source/input/prepare/forward/refinement assets rehashed, no learned
+replay or private values. EP16 original frontend actualrunning, not outputPASS.
