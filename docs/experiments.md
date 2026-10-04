@@ -6652,3 +6652,33 @@ hashes precede Linux atomicNOREPLACE and original systemd launch. No automatic
 retry/resume/merge, no producer or inference changes. Root109 transport fixtures
 PASS4.93s (mocked systemd; macOS only syscall emulated); actual staged Azure
 transport remains a separate unrun gate. Unknown receipt is not experimentPASS.
+
+Actual staged EP5 officialpack dispatch016c909257b90c9c14f7abddc8020c90cb5e292f
+passed all4 exact Azure phase acknowledgements: stage creation,112000/90384B
+code chunks and atomic publication+systemd launch. Fullcode closure119files
+encoded202384B archiveSHA631529c269ce29f46b69d44416c4223807167ec918d90e060b1aa99b915da765.
+No payloads/models moved locally, no automatic retry. Producer packPASS/report
+and original scratch cleanup still require independent actual audit.
+
+Actual EP5 officialCPU pack smokePASS16.309900s, all668 sourceframes and412
+original scoredframes/28831rows; original unmodifiedpacker1call/1return/1validated.
+10885B reportSHA25a387ca8a6a569f0d866b25cbf8c843a3482f3b91d557c1fbb0a147b269fe14.
+Only readonly report remains, temporary0.8MBParquet/rowID-onlyCSV/full-array
+scratch deleted. Full119source readonly, archive/producer markers exact and
+staging absent. Independent full original source/inputs/export postinventory
+will seal the tiny pins; no challengequality or finalsubmission claim.
+EP9 untouched alltargetsabsence confirmed; frozen5355582 direct globalfixed_all16
+frontends transportdispatched, no per-episode policy/threshold retuning.
+
+Full repository verification at frozen5355582584396b41e0861e58d9e55758153ca109:
+**12000PASS5SKIP433.95s**; includes native-ID interfaces and Azure staged
+transport contracts. No real benchmark data/model run inferred from tests.
+Disposable pytest fixtures auto-remove; ~12GiB localfree remains, heavyworkAzure.
+
+Independent root EP5 packsealPASS: all119 committedoriginalsourcefiles and
+markers hashed against localGit exactproducer, allfour preparation/forward/
+refinement/export stage inventories match frozenpins BEFOREandAFTER receipt.
+Original sixofficialsourcepins/samplebyteidentity unchanged; actual onlyreport
+remains. Tiny packpins now independentlysealed. EP9 actualactive originalparent
+1165309, nativeObjectsinitializer logH100; fourtransportACKs do not certify
+fullfrontends. EP6 CPUassembly stillactive/no receipt, no duplicate launched.
