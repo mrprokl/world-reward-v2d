@@ -24,6 +24,35 @@ def write(path, raw=b'owned tiny metadata', mode=0o444):
     return dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
 
 
+@pytest.mark.parametrize('mode', [0o644, 0o444, 0o600, 0o666])
+def test_official_historical_mode_not_changed_to_manufacture_readonly(tmp_path, monkeypatch, mode):
+    monkeypatch.setattr(gate, 'ROOT', tmp_path)
+    path = tmp_path/gate.OFFICIAL
+    pin = write(path, mode=mode); monkeypatch.setattr(gate, 'OFFICIAL_PIN', pin)
+    if mode == 0o644:
+        with pytest.raises(ValueError): build.identity(path, readonly=True)  # Actual old startup failure.
+        assert gate.official_identity(build) == pin | dict(original_mode=mode)
+    else:
+        with pytest.raises(ValueError, match='mode'): gate.official_identity(build)
+    assert stat.S_IMODE(path.stat().st_mode) == mode
+
+
+@pytest.mark.parametrize('change', ['bytes', 'symlink', 'hardlink', 'during_hash'])
+def test_official_byte_or_metadata_change_is_not_repaired(tmp_path, monkeypatch, change):
+    monkeypatch.setattr(gate, 'ROOT', tmp_path); path = tmp_path/gate.OFFICIAL
+    pin = write(path, mode=0o644); monkeypatch.setattr(gate, 'OFFICIAL_PIN', pin)
+    if change == 'bytes': write(path, b'changed original', 0o644)
+    elif change == 'symlink':
+        target = tmp_path/'alias'; write(target, mode=0o644); path.unlink(); path.symlink_to(target)
+    elif change == 'hardlink': os.link(path, tmp_path/'foreign')
+    else:
+        identity = build.identity
+        def mutate(*a, **k):
+            result = identity(*a, **k); path.chmod(0o444); return result
+        monkeypatch.setattr(build, 'identity', mutate)
+    with pytest.raises(ValueError): gate.official_identity(build)
+
+
 def source(tmp_path, monkeypatch, *, revision='a'*40, entry=gate.ENTRY):
     root = tmp_path/'root'; code = root/'jobs'/revision/entry/'code'
     for name in set(gate.HELPERS) | set(built.HELPERS) | {'infra/certified_solid_query.cpp'}:
@@ -162,7 +191,7 @@ def host_fixture(tmp_path, monkeypatch):
     monkeypatch.setattr(gate, 'built_qualification', lambda *_: (pins, root/'retained-qem', root/'qualified-query', paths, proof))
     monkeypatch.setattr(built, 'qualified', lambda *_: ({}, (root/'cgal-dir', root/'cache-dir'), {}))
     monkeypatch.setattr(built, 'image_identity', lambda *_: {'child_id': image})
-    monkeypatch.setattr(gate, 'OFFICIAL_PIN', write(root/gate.OFFICIAL))
+    monkeypatch.setattr(gate, 'OFFICIAL_PIN', write(root/gate.OFFICIAL, mode=0o644))
     calls = []; cleanup = []; monkeypatch.setattr(build, 'cleanup_container', lambda *a: cleanup.append(a))
     def run(argv, seconds, log=None):
         if argv[1] == 'ps': return b''
@@ -170,6 +199,7 @@ def host_fixture(tmp_path, monkeypatch):
         manifest, full = controls(); before = gate.binding(code, revision, build)
         native = dict(stage='solid_chart_v2_qualification_native_v1', status='pass', phase='complete', source_binding=before,
             source_binding_after=before, source_rehashed_after=True, artifacts_rehashed_after=True, source_arrays_unchanged=True,
+            official_helper=gate.official_identity(build), official_rehashed_after=True,
             qualified_build=proof, image_id=image, gpu_used=False, gt_used=False, adoption=False,
             reconstruction_accuracy_verified=False, elapsed_seconds=1., control_manifest=manifest, controls=full,
             control_manifest_sha256=hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest())
@@ -239,7 +269,7 @@ def test_native_one_frozen_cohort_and_partial_failure_seal(tmp_path, monkeypatch
     monkeypatch.setattr(gate.os, 'getuid', lambda: 1000); monkeypatch.setenv('WR_NATIVE_NETWORK', 'none')
     monkeypatch.setenv('CUDA_VISIBLE_DEVICES', '-1'); monkeypatch.setenv('WR_CPU_IMAGE_ID', 'sha256:'+'d'*64)
     proof = {'build': {'derivation': {'new': True}, 'build_info': {'chart_version': 2}}, 'original_runtime': {'exact': True}}
-    monkeypatch.setattr(gate, 'OFFICIAL_PIN', write(root/gate.OFFICIAL))
+    monkeypatch.setattr(gate, 'OFFICIAL_PIN', write(root/gate.OFFICIAL, mode=0o644))
     def qualified(*_):
         if failure == 'prerequisites': raise FileNotFoundError('Pinned build unavailable')
         return {'image_id': 'sha256:'+'d'*64}, root/'binary', root/'query', (), proof

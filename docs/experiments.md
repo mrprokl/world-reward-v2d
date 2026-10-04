@@ -8376,3 +8376,20 @@ after independently preserved originalpredecessorwaitFAIL/nooutputs; notnativePA
 Generic CARI stage queue adds explicit bounded --after-gpu-lock policy, retaining
 source/pin/GPU-idle checks and FD9 acrosschild, without interpreting unitabsence
 as success. Root90schedulingtestsPASS/2Linux-onlySKIP53.80s; no prediction change.
+
+Actual chartv2 qualification25f7b93 is technicalFAIL0.884417238s beforeDocker:
+official helper historical0644 failed incorrectreadonly-bit guard; original
+2031B SHA42ab8ab35f37b806fb1465eadd96abe43eaac04575da47a4855d08eefe6167b0
+unchanged. No native.log/native.json/QEM/CGAL/scientific verdict. Host11314B
+SHAf1376c95e9b34fd209a1c250034c507a95ef8a6d974dfaa4d4abeaffcf083ae8,
+source/archive/210-fileledger/sourcepost/ownedcleanup independently verified.
+One root metadata-command quoting error failed shellparse beforePython; corrected
+read-only audit, no native rerun. Separate packaging-only correction explicitly
+authenticates original0644+bytes pre/posthost/native and unchangedRObind, no
+chmod/historychange/cohort/gate/budgetchange. Root112tinytestsPASS1.35s;
+owncleanup first safelyrefused test-createdlinks then proved everyalias/inode
+whollycontained and removed2066entries, no foreign sweep.
+
+Actual EP22 lock-only replay222-sourcefiles and EP21 shared-prepare195-sourcefiles
+independently byte/ledger/markerverified. Both active at18:50UTC, EP21 waiting
+on sameGPUlock; no nativePASS inferred from Result=success on a runningunit.

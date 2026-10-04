@@ -65,3 +65,12 @@ on Azure: 24.440325 s native, 25.699164 s host. The retained executable is
 704112 B, SHA256 `88d529a3e1578e6983bcea0d4f230bdead5e1d48ff7ebf2f5789d8a869741368`.
 Actual full build-info, old/new source identities and cleanup passed. This run
 made zero mesh/QEM calls: geometry and procedural qualification remain pending.
+
+The first full qualification `25f7b93` is a preserved **technical FAIL before
+Docker**, not a rejected chart or geometry result. The official helper has its
+original `0644` mode and unchanged 2031 B/SHA; an incorrect readonly-file guard
+stopped the host in0.884417s. No native log/receipt, mesh, QEM or CGAL call exists.
+The separate packaging-only replay authenticates that historical mode and bytes
+before/after and keeps the input bind RO; no historical chmod, source reroll,
+budget/gate change or qualification claim. Actual independent source210 and
+receipt hashes are recorded in experiments.

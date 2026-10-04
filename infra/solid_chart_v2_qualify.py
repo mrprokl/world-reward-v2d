@@ -30,6 +30,23 @@ def require(ok, reason):
     if not ok: raise ValueError(reason)
 
 
+def official_identity(build):
+    """Authenticate historical 0644 bytes; isolation is the unchanged RO bind.
+
+    Never chmod the official producer or mistake its original mode for a
+    writable container input. Every host/native pre/postcheck uses this gate.
+    """
+    path = ROOT/OFFICIAL
+    before = path.lstat()
+    require(stat.S_IMODE(before.st_mode) == 0o644, 'Original official helper mode differs')
+    pin = build.identity(path, readonly=False)
+    after = path.lstat()
+    require(pin == OFFICIAL_PIN and all(getattr(before, k) == getattr(after, k) for k in
+        ('st_dev', 'st_ino', 'st_mode', 'st_nlink', 'st_size', 'st_mtime_ns', 'st_ctime_ns')),
+        'Original unmodified official helper changed')
+    return pin | dict(original_mode=0o644)
+
+
 def helpers(code):
     require(code.is_absolute() and code.resolve() == code and not any(p.is_symlink() for p in (code, *code.parents)), 'Canonical source required')
     sys.path[:0] = [str(code/'infra'), str(code/'src')]
@@ -160,7 +177,7 @@ def native(code, revision, work, build, certificate, built):
         original = cache.cache_qualification(ROOT, code)[1]
         runtime = cache.runtime_identity(ROOT, code, original, left)
         require(runtime == proof['original_runtime'], 'Original cached compiler runtime differs')
-        official = ROOT/OFFICIAL; require(build.identity(official, readonly=True) == OFFICIAL_PIN, 'Single official helper differs')
+        official = ROOT/OFFICIAL; report['official_helper'] = official_identity(build)
         source = controls.fixtures(); manifest = cohort_manifest(source)
         require(tuple(n for n, _, _ in source) == controls.FIXTURE_NAMES and len(source) == 4, 'Only frozen new v2 cohort allowed')
         report.update(qualified_build=proof, image_id=pins['image_id'], control_manifest=manifest,
@@ -171,7 +188,7 @@ def native(code, revision, work, build, certificate, built):
         except compiler.SolidCompilerError as error: report['controls'] = error.report; raise
         validate_controls(report['controls'], manifest)
         require(cohort_manifest(source) == manifest and all(tuple(compiler.array_hashes(mesh)) == meta['source_array_sha256'] for _, mesh, meta in source), 'Whole original sources changed')
-        require(cache.runtime_identity(ROOT, code, original, left) == runtime and build.identity(official, readonly=True) == OFFICIAL_PIN,
+        require(cache.runtime_identity(ROOT, code, original, left) == runtime and official_identity(build) == report['official_helper'],
                 'Runtime/official artifacts changed')
         report.update(status='pass', phase='complete', qualified_procedural_controls=4,
                       source_arrays_unchanged=True)
@@ -185,6 +202,9 @@ def native(code, revision, work, build, certificate, built):
             if proof is not None:
                 require(built_qualification(code, build, certificate, built)[4] == proof, 'Original built artifacts changed')
                 report['artifacts_rehashed_after'] = True
+            if 'official_helper' in report:
+                require(official_identity(build) == report['official_helper'], 'Official helper changed after native')
+                report['official_rehashed_after'] = True
         except Exception as error: report.update(status='fail', posthash_failure_type=type(error).__name__)
         report['elapsed_seconds'] = time.monotonic()-start
         if report['elapsed_seconds'] > NATIVE_SECONDS: report.update(status='fail', failure_type='NativeInclusiveDeadline')
@@ -207,7 +227,7 @@ def host(code, revision, build, certificate, built):
     old = signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError('Inclusive host qualification deadline'))); signal.alarm(max(1, int(left())))
     try:
         _, inherited_paths, _ = built.qualified(code, build, certificate)
-        official = ROOT/OFFICIAL; require(build.identity(official, readonly=True) == OFFICIAL_PIN, 'Exact official helper required')
+        official = ROOT/OFFICIAL; report['official_helper'] = official_identity(build)
         mounts = []
         for p in dict.fromkeys((code, code.parent/'revision', code.parent/'source-sha256', *paths, *inherited_paths, official)):
             mounts.extend(['--mount', f'type=bind,src={p},dst={p},readonly'])
@@ -230,11 +250,15 @@ def host(code, revision, build, certificate, built):
             require(binding(code, revision, build) == before and built_qualification(code, build, certificate, built)[4] == proof and
                     built.image_identity(qualified, build, left) == image, 'Source/built/image changed after native')
             report.update(source_binding_after=before, source_rehashed_after=True, artifacts_rehashed_after=True)
+            require(official_identity(build) == report['official_helper'], 'Official helper changed after container')
+            report['official_rehashed_after'] = True
             if 'native' in report:
                 require(result['source_binding'] == result['source_binding_after'] == before and result['source_rehashed_after'] is True and
                     result['stage'] == 'solid_chart_v2_qualification_native_v1' and result['qualified_build'] == proof and
                     result['image_id'] == pins['image_id'] and all(result[k] is False for k in ('gpu_used', 'gt_used', 'adoption', 'reconstruction_accuracy_verified')),
                     'Native source/runtime/qualification scope differs')
+                require(result['official_helper'] == report['official_helper'] and result['official_rehashed_after'] is True,
+                    'Native original official helper evidence differs')
                 require('failure_type' not in report and result['status'] == 'pass' and result['phase'] == 'complete' and
                     result['artifacts_rehashed_after'] is result['source_arrays_unchanged'] is True and 0 < result['elapsed_seconds'] <= NATIVE_SECONDS,
                     'Completed in-budget native qualification required')
