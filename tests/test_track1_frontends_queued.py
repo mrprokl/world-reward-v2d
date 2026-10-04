@@ -205,3 +205,85 @@ def test_complete_static_closure_no_native_or_network_work(monkeypatch):
     child=set(azure_job.runtime_bundle_paths(files,'infra/run_track1_frontends.sh'))
     assert child<=selected
     assert {'infra/run_track1_frontends_queued.sh','infra/object_pose_smoke.py','src/world_reward/rigid_alignment.py'}<=selected
+
+
+def terminal_args(runtime):
+    return [*runtime['args'][:2],'--after-terminal',runtime['args'][3]]
+
+
+@pytest.mark.parametrize('active,result,status',[
+    ('failed','exit-code','1'),('failed','exit-code','124'),('failed','signal','15'),
+    ('failed','core-dump','11'),('failed','timeout','0'),('failed','oom-kill','9'),
+    ('inactive','success','0'),
+])
+def test_terminal_policy_starts_distinct_successor_and_records_failure_not_reclassified(runtime,active,result,status):
+    runtime['env'].update(FAKE_ACTIVE=active,FAKE_RESULT=result,FAKE_MAIN=status)
+    before=runtime['lock'].read_bytes();completed=runtime['run'](*terminal_args(runtime))
+    assert completed.returncode==0,completed.stderr
+    calls=runtime['calls']();assert calls[-1][1:]==['--episode','5','--actor-policy','fixed_all16',True]
+    assert [row[0]for row in calls]==['systemctl','systemctl','flock','systemctl','nvidia-smi','flock','child']
+    phases=[json.loads(line)for line in completed.stdout.splitlines()]
+    summary=next(row for row in phases if row['phase']=='predecessor_terminal')
+    assert summary['predecessor_state']==active and summary['predecessor_result']==result
+    assert summary['exec_main_status']==int(status) and summary['predecessor_unit']==runtime['args'][3]+'.service'
+    assert phases[1]['phase']=='waiting_for_terminal_predecessor'
+    assert runtime['lock'].read_bytes()==before and not runtime['base'].exists()
+
+
+@pytest.mark.parametrize('tail',[
+    ['--after-terminal'],['--after-terminal','world-reward-test;echo'],
+    ['--after-terminal','../../unit'],['--after-terminal','world-reward-a','--after-terminal','world-reward-b'],
+    ['--wait-for','world-reward-a','--after-terminal','world-reward-b'],
+    ['--after-terminal','world-reward-a','--wait-for','world-reward-b'],
+])
+def test_terminal_arguments_mutually_exclusive_once_and_canonical(runtime,tail):
+    assert runtime['run']('--episode','5',*tail).returncode==2 and not runtime['calls']()
+
+
+@pytest.mark.parametrize('settings',[
+    dict(FAKE_LOAD='not-found'),dict(FAKE_LOAD='masked'),dict(FAKE_ACTIVE='unknown'),
+    dict(FAKE_ACTIVE='failed',FAKE_RESULT='success'),
+    dict(FAKE_ACTIVE='failed',FAKE_RESULT='exit-code',FAKE_MAIN='0'),
+    dict(FAKE_ACTIVE='failed',FAKE_RESULT='foreign',FAKE_MAIN='1'),
+    dict(FAKE_ACTIVE='inactive',FAKE_RESULT='exit-code',FAKE_MAIN='1'),
+    dict(FAKE_MAIN='-1'),dict(FAKE_MAIN='256'),dict(FAKE_MAIN='00'),dict(FAKE_MAIN='garbage'),
+    dict(FAKE_DETAIL='LoadState=loaded\nActiveState=failed\nResult=exit-code\nExecMainStatus=1\nResult=exit-code'),
+])
+def test_terminal_unknown_inconsistent_or_missing_never_runs_child(runtime,settings):
+    runtime['env'].update(settings)
+    assert runtime['run'](*terminal_args(runtime)).returncode!=0
+    assert all(row[0]=='systemctl'for row in runtime['calls']())
+
+
+def test_terminal_active_waits_and_post_lock_checks_original_source_targets_gpu(runtime):
+    runtime['env']['FAKE_ACTIVE']='transition'
+    result=runtime['run'](*terminal_args(runtime));assert result.returncode==0,result.stderr
+    assert [row[0]for row in runtime['calls']()][:5]==['systemctl','systemctl','sleep','systemctl','flock']
+
+
+@pytest.mark.parametrize('fault',['gpu','target','lock','source'])
+def test_terminal_mode_does_not_bypass_existing_guards(runtime,fault):
+    runtime['env'].update(FAKE_ACTIVE='failed',FAKE_RESULT='exit-code',FAKE_MAIN='1')
+    if fault=='gpu':runtime['env']['FAKE_APPS']='foreign'
+    elif fault=='target':runtime['env']['FAKE_WAIT_TARGET']='1'
+    elif fault=='lock':runtime['env']['FAKE_WAIT_LOCK']='1'
+    else:(runtime['code']/'infra/run_episode_initializers.sh').chmod(0o644)
+    assert runtime['run'](*terminal_args(runtime)).returncode!=0
+    assert not any(row[0]=='child'for row in runtime['calls']())
+
+
+def test_terminal_never_accepts_reloading_as_ready(runtime):
+    wrapper=runtime['wrapper'];wrapper.chmod(0o644)
+    wrapper.write_text(wrapper.read_text().replace('43200','0'));wrapper.chmod(0o444)
+    runtime['env']['FAKE_ACTIVE']='reloading'
+    result=runtime['run'](*terminal_args(runtime));assert result.returncode!=0
+    assert all(row[0]=='systemctl'for row in runtime['calls']())
+
+
+@pytest.mark.parametrize('status',[7,124,137])
+def test_terminal_predecessor_does_not_hide_or_retry_successor_failure(runtime,status):
+    runtime['env'].update(FAKE_ACTIVE='failed',FAKE_RESULT='exit-code',FAKE_MAIN='1',FAKE_STATUS=str(status))
+    result=runtime['run'](*terminal_args(runtime));assert result.returncode==status,result.stderr
+    assert sum(row[0]=='child'for row in runtime['calls']())==1
+    phases=[json.loads(line)['phase']for line in result.stdout.splitlines()]
+    assert phases[-1]=='fail'and'child_complete'not in phases

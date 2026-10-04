@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
-# Scheduling only. Wait for the explicit successful predecessor and its released
+# Scheduling only. Wait for the explicit predecessor policy and its released
 # cooperative GPU lock; the original frontend child reacquires its own lock.
 # Source closure: /infra/run_track1_frontends.sh /infra/run_episode_initializers.sh
 # /infra/run_automatic_masks.sh /infra/run_object_pose_smoke.sh /infra/run_cari_prepare.sh
 set -euo pipefail
-EPISODE='' WAIT_FOR='' episode_seen=0 wait_seen=0
+EPISODE='' WAIT_FOR='' WAIT_MODE=success episode_seen=0 wait_seen=0
 while (( $# ));do
  case "$1" in
   --episode)
    if (( episode_seen || $# < 2 )) || [[ ! "$2" =~ ^(0|[1-9]|[12][0-9])$ ]];then exit 2;fi
    EPISODE="$2";episode_seen=1;shift 2 ;;
-  --wait-for)
+  --wait-for|--after-terminal)
    if (( wait_seen || $# < 2 )) || [[ ! "$2" =~ ^world-reward-[a-z0-9][a-z0-9-]{0,80}(\.service)?$ ]];then exit 2;fi
+   if [[ "$1" == --after-terminal ]];then WAIT_MODE=terminal;fi
    WAIT_FOR="${2%.service}.service";wait_seen=1;shift 2 ;;
   *) exit 2 ;;
  esac
@@ -94,12 +95,22 @@ unit_state() {
   esac
   count=$((count+1))
  done <<< "$state"
- [[ "$count" == 4 && "$load" == loaded && "$main" =~ ^[0-9]+$ ]] || return 1
+ [[ "$count" == 4 && "$load" == loaded && "$main" =~ ^(0|[1-9][0-9]{0,2})$ ]] || return 1
+ (( main<=255 )) || return 1
  case "$active" in
   inactive) [[ "$result" == success && "$main" == 0 ]] || return 1;UNIT_READY=1 ;;
+  failed)
+   [[ "$WAIT_MODE" == terminal ]] || { echo 'Explicit preceding unit failed; success wait aborted' >&2;return 1; }
+   case "$result" in
+    exit-code|signal|core-dump) (( main>0 )) || return 1 ;;
+    timeout|watchdog|oom-kill|resources|protocol|start-limit-hit) ;;
+    *) echo 'Unknown or inconsistent terminal predecessor result' >&2;return 1 ;;
+   esac
+   UNIT_READY=1 ;;
   active|activating|deactivating|reloading) UNIT_READY=0 ;;
   *) echo 'Explicit preceding unit did not complete successfully' >&2;return 1 ;;
  esac
+ UNIT_RESULT="$result";UNIT_MAIN="$main";UNIT_ACTIVE="$active"
 }
 BEFORE='' LOCK_BEFORE='' LOCK_OPEN=0
 finish() {
@@ -126,7 +137,7 @@ LOAD="$(systemctl show "$WAIT_FOR" --property=LoadState --value)"
 [[ "$LOAD" == loaded ]] || { echo 'Explicit preceding unit is not loaded' >&2;exit 1; }
 LOCK_BEFORE="$(lock_identity)"
 START=$SECONDS;UNIT_READY=0
-phase waiting_for_successful_predecessor
+if [[ "$WAIT_MODE" == terminal ]];then phase waiting_for_terminal_predecessor;else phase waiting_for_successful_predecessor;fi
 while :;do
  unit_state
  (( UNIT_READY )) && break
@@ -146,6 +157,10 @@ phase waiting_for_gpu_lock
 flock --timeout "$REMAINING" 9
 [[ "$(lock_identity fd)" == "$LOCK_BEFORE" && "$(integrity)" == "$BEFORE" ]] || exit 1
 targets_absent;unit_state;(( UNIT_READY )) || exit 1
+if [[ "$WAIT_MODE" == terminal ]];then
+ printf '{"stage":"track1_frontends_queued","phase":"predecessor_terminal","episode_index":%s,"predecessor_unit":"%s","predecessor_state":"%s","predecessor_result":"%s","exec_main_status":%s}\n' \
+  "$EPISODE" "$WAIT_FOR" "$UNIT_ACTIVE" "$UNIT_RESULT" "$UNIT_MAIN"
+fi
 APPS="$(nvidia-smi --query-compute-apps=pid --format=csv,noheader,nounits)"
 [[ -z "${APPS//[[:space:]]/}" ]] || { echo 'GPU compute applications present after lock; queued frontend aborted' >&2;exit 1; }
 # The original child has its own nonblocking lock+GPU-idle preflight. A handoff
