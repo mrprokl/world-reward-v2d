@@ -1,0 +1,78 @@
+{
+  "schema": "world-reward-cari-clip-input-pins-v1",
+  "clip_spec": {
+    "episode_index": 0,
+    "total_frames": 790,
+    "camera_name": "front_stereo_camera_left",
+    "height": 1152,
+    "width": 1536
+  },
+  "input_report": {
+    "sha256": "9a9a93481432df5846a9ae94a4bdd32552f02167a30cf7e41d4f5ea629ad2799",
+    "bytes": 3283,
+    "producer_revision": "baba81be965dff878d7c16c9f132f85dcf712bd7",
+    "script_sha256": "5719132ec864cad59b907f47835691f9e53657bd91a372dff84ec61997259b3c"
+  },
+  "source_files": {
+    "outputs/episode_000000/body_full/cari_adapter/canonical_initializer.pkl": {
+      "bytes": 3526051,
+      "sha256": "80544cd05c04cff37f2c818e800cafff8dd36737b1d2d3aca888644de4963a89"
+    },
+    "outputs/episode_000000/body_full/cari_adapter/report.json": {
+      "bytes": 2540,
+      "sha256": "62236c29117fa5505e5f6782bcb8889190bc232a80206a8296e9fac15f2fd7af"
+    },
+    "outputs/episode_000000/body_full/report.json": {
+      "bytes": 504222,
+      "sha256": "d11d9caf37c8f1d2a92731799f6c05395f7b77cfdd200b01c98f778bf77e0fa5"
+    },
+    "outputs/episode_000000/cari_inputs/aligned_depth.h5": {
+      "bytes": 779800696,
+      "sha256": "80509ffa390ce8a23f395fc869284824a6994667c255c20cc18ac5f2c6dee10d"
+    },
+    "outputs/episode_000000/cari_inputs/export/episode_000000/edex": {
+      "bytes": 541,
+      "sha256": "c1b9a52b71c7f33ab30338f540ec5b2a6d4e7ab6e1f7a8bf3419730a78301892"
+    },
+    "outputs/episode_000000/cari_inputs/export/episode_000000/human_masks/front_stereo_camera_left.h5": {
+      "bytes": 18625544,
+      "sha256": "e12a9c6bdb6d82fada436c2f2a96132843ef44a5dfdac75462037d753529af4d"
+    },
+    "outputs/episode_000000/cari_inputs/export/episode_000000/images/front_stereo_camera_left.h5": {
+      "bytes": 621346048,
+      "sha256": "ea584ea8d07dae9dff967e38ecff2983b6ff1f580aedf560ba66d4ac899f7a33"
+    },
+    "outputs/episode_000000/cari_inputs/export/episode_000000/object_masks/front_stereo_camera_left.h5": {
+      "bytes": 16683345,
+      "sha256": "0ed11ff30e74e8bdc6a2a2462eb1813c9e96b3b31ef7e2f51479b8a744e4c26d"
+    },
+    "outputs/episode_000000/cari_inputs/export/episode_000000/object_mesh/output_aligned.glb": {
+      "bytes": 75908,
+      "sha256": "83fb39b52d3108153211328362dd2dcdf7b51025a02cb985535dc4422b6a43ae"
+    },
+    "outputs/episode_000000/cari_inputs/export/episode_000000/wild_export.json": {
+      "bytes": 2803,
+      "sha256": "e0634ac919fd7c7310a5617e9e6a4c18d9ddc05cde7d3481512fe27bbe9a0678"
+    },
+    "outputs/episode_000000/cari_inputs/own_object_poses.pkl": {
+      "bytes": 58366,
+      "sha256": "a8d9f417aba4fb484650160dc7dcfc7456284677e86219ba3e567c34b47036a2"
+    },
+    "outputs/episode_000000/cari_inputs/report.json": {
+      "bytes": 3283,
+      "sha256": "9a9a93481432df5846a9ae94a4bdd32552f02167a30cf7e41d4f5ea629ad2799"
+    },
+    "outputs/episode_000000/depth_full/report.json": {
+      "bytes": 1196399,
+      "sha256": "e243c07e70ee71c67756c102bc4deb25134b876b5f2a48986427627916c0ab0c"
+    },
+    "outputs/episode_000000/object_pose_full/report.json": {
+      "bytes": 40234311,
+      "sha256": "8a0c8cef69daa6333e3197c5186e32b2dae3be6dd009c56600746ec7db7436bb"
+    },
+    "outputs/episode_000000/scale_smoke/report.json": {
+      "bytes": 9432,
+      "sha256": "2349e5543cc5fef4605615354071e54bda65ac3ff21942e61a874cbcddeab669"
+    }
+  }
+}

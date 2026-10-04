@@ -268,6 +268,77 @@ def test_actual_immutable_runtime_archive_includes_explicit_entrypoint_and_helpe
         "infra/cari_clip_inputs.py","infra/cari96_inputs.py","infra/cari_prepare.py"}<=set(selected)
 
 
+def separate_producer_fixture(gate,tmp_path):
+    root,code,spec,records=actual_fixture(gate,tmp_path,episode=0,count=790)
+    producer=(tmp_path/"original_producer").resolve()
+    write(producer/gate.PRODUCER_SCRIPT,(code/gate.PRODUCER_SCRIPT).read_bytes(),True)
+    (producer/"infra").chmod(0o555);producer.chmod(0o555)
+    write(code/gate.PRODUCER_SCRIPT,b"new consumer source is not the historical producer",True)
+    return root,code,producer,spec,records
+
+
+def test_separate_original_producer_keeps_consumer_helpers_and_every_input_unchanged(gate,tmp_path):
+    root,code,producer,spec,records=separate_producer_fixture(gate,tmp_path)
+    source=records["inputs"]["script_sha256"]
+    before={name:(root/name).read_bytes() for name in gate.inputs.source_paths(spec)}
+    with pytest.raises(ValueError,match="Original frontend source"):
+        gate.inventory(root,code,spec,"c"*40,source)
+    pins=gate.inventory(root,code,spec,"c"*40,source,producer_code=producer)
+    assert pins["input_report"]["script_sha256"]==source and pins["input_report"]["producer_revision"]=="c"*40
+    assert before=={name:(root/name).read_bytes() for name in before}
+    assert gate.identity(code/gate.PRODUCER_SCRIPT)["sha256"]!=source
+
+
+@pytest.mark.parametrize("fault",["writable","symlink","missing","wrong_source","writable_source","consumer_helper"])
+def test_separate_producer_source_and_consumer_helper_guards(gate,tmp_path,fault):
+    root,code,producer,spec,records=separate_producer_fixture(gate,tmp_path)
+    source=records["inputs"]["script_sha256"]
+    if fault=="writable":producer.chmod(0o755)
+    elif fault=="symlink":
+        alias=tmp_path/"alias";alias.symlink_to(producer,target_is_directory=True);producer=alias
+    elif fault=="missing":producer=tmp_path/"missing"
+    elif fault=="wrong_source":write(producer/gate.PRODUCER_SCRIPT,b"tampered original source",True)
+    elif fault=="writable_source":(producer/gate.PRODUCER_SCRIPT).chmod(0o644)
+    else:(code/"infra/cari_clip_inputs.py").chmod(0o644)
+    with pytest.raises((ValueError,FileNotFoundError)):
+        gate.inventory(root,code,spec,"c"*40,source,producer_code=producer)
+
+
+@pytest.mark.parametrize("target",["producer_source","producer_directory","consumer_helper","public_file"])
+def test_separate_original_source_and_public_closure_rehashed_after_audit(gate,tmp_path,monkeypatch,target):
+    root,code,producer,spec,records=separate_producer_fixture(gate,tmp_path)
+    source=records["inputs"]["script_sha256"];original=gate.inputs.validate_reports
+    def validate(*args):
+        result=original(*args)
+        if target=="producer_source":write(producer/gate.PRODUCER_SCRIPT,b"changed original source",True)
+        elif target=="producer_directory":producer.chmod(0o755)
+        elif target=="consumer_helper":write(code/"infra/cari_clip_inputs.py",b"changed consumer helper",True)
+        else:write(root/gate.inputs.relative_paths(spec)["mesh"],b"changed public geometry")
+        return result
+    monkeypatch.setattr(gate.inputs,"validate_reports",validate)
+    with pytest.raises(ValueError):gate.inventory(root,code,spec,"c"*40,source,producer_code=producer)
+
+
+def test_historical_input_omission_inventory_does_not_rewrite_or_bypass_dependencies(gate,tmp_path,monkeypatch):
+    root,code,producer,spec,records=separate_producer_fixture(gate,tmp_path)
+    records["inputs"].pop("input_dataset_revision");repin_report(gate,root,spec,records)
+    source=records["inputs"]["script_sha256"]
+    # Bind procedural receipt bytes; production constant is separately checked.
+    receipt=dict(gate.identity(root/gate.inputs.relative_paths(spec)["input_report"]),
+        producer_revision="c"*40,script_sha256=source)
+    monkeypatch.setattr(gate.inputs,"HISTORICAL_INPUT_DATASET_OMISSION",receipt)
+    before={name:(root/name).read_bytes() for name in gate.inputs.source_paths(spec)}
+    pins=gate.inventory(root,code,spec,"c"*40,source,producer_code=producer)
+    assert pins["input_report"]==receipt and not gate.inputs._legacy(spec,pins)
+    assert before=={name:(root/name).read_bytes() for name in before}
+    assert "input_dataset_revision" not in json.loads((root/gate.inputs.relative_paths(spec)["input_report"]).read_text())
+    for role in ("body","depth"):
+        bad=copy.deepcopy(records);bad[role].pop("input_dataset_revision")
+        with pytest.raises(ValueError):gate.validate_current_reports(root,spec,pins,bad)
+    bad=copy.deepcopy(records);bad["inputs"]["input_dataset_revision"]="f"*40
+    with pytest.raises(ValueError):gate.validate_current_reports(root,spec,pins,bad)
+
+
 def test_fresh_host_process_runs_full_inventory_without_heavy_imports(gate,tmp_path):
     root,code,spec,records=actual_fixture(gate,tmp_path,0,96)
     program='''import importlib.abc,json,sys

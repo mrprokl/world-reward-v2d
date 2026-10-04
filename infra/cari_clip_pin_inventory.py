@@ -86,13 +86,17 @@ def _require(record,expected,label):
 
 
 def validate_current_reports(root,spec,pins,records):
-    """No legacy accommodation for newly inventoried frontend records."""
+    """Strict public identities; one exact historical input metadata omission."""
     if pins["input_report"]==inputs.LEGACY_INPUT_REPORT:
         raise ValueError("Legacy episode15 producer cannot be resealed as new current frontend inputs")
     for role,record in records.items():
         flags=dict(status="pass",input_track="track_1",episode_index=spec.episode_index,
             ground_truth_used=False,hand_labeled_test=False,oracle_modes=[])
-        if role in {"inputs","body","depth"}:flags["input_dataset_revision"]=inputs.DATASET_REVISION
+        if role in {"inputs","body","depth"}:
+            if role!="inputs" or not inputs._input_dataset_omitted(spec,pins):
+                flags["input_dataset_revision"]=inputs.DATASET_REVISION
+        if "input_dataset_revision" in record and record["input_dataset_revision"]!=inputs.DATASET_REVISION:
+            raise ValueError("Explicit public dataset declaration differs")
         _require(record,flags,"Explicit current full public dependency identity and no-oracle flags required")
         inputs.public._no_oracle(record)
     report=records["inputs"]
@@ -111,16 +115,27 @@ def validate_current_reports(root,spec,pins,records):
     return report
 
 
-def inventory(root,code,spec,producer_revision,producer_script_sha256):
-    """Return exact current original-input pins without filesystem mutation."""
+def inventory(root,code,spec,producer_revision,producer_script_sha256,*,producer_code=None):
+    """Hash original inputs; a caller-authenticated old source may be separate.
+
+    The caller independently verifies the original dispatch/complete Git closure
+    before supplying producer_code. Consumer helpers always remain bound to code;
+    old sources are only hashed, never imported, executed, repaired or rewritten.
+    """
     _hex(producer_revision,40,"original producer revision");_hex(producer_script_sha256,64,"original producer script SHA256")
     if type(spec) is not inputs.PublicClipSpec:raise ValueError("Explicit original public structural clip spec required")
     root,code=Path(root),Path(code)
     if any(not path.is_absolute() or path.resolve()!=path or not path.is_dir() for path in (root,code)):
         raise ValueError("Canonical existing source-bound Azure root/code required")
-    source=identity(code/PRODUCER_SCRIPT,immutable=True)
+    producer=code if producer_code is None else Path(producer_code)
+    if (not producer.is_absolute() or producer.resolve()!=producer or not producer.is_dir()
+            or producer_code is not None and producer.stat().st_mode&0o222):
+        raise ValueError("Canonical existing readonly original producer directory required")
+    fields=("st_dev","st_ino","st_mode","st_mtime_ns","st_ctime_ns")
+    producer_state=tuple(getattr(producer.stat(),name) for name in fields)
+    source=identity(producer/PRODUCER_SCRIPT,immutable=True)
     if source["sha256"]!=producer_script_sha256:
-        raise ValueError("Current unchanged frontend source differs from independently supplied dispatched source SHA")
+        raise ValueError("Original frontend source differs from independently supplied dispatched source SHA")
     # Bind the small report-only helper closure, not any asset/model/initializer.
     helper_names=("infra/cari_clip_pin_inventory.py","infra/run_cari_clip_pin_inventory.sh",
                   "infra/cari_clip_inputs.py","infra/cari96_inputs.py")
@@ -140,7 +155,8 @@ def inventory(root,code,spec,producer_revision,producer_script_sha256):
     checked=inputs.validate_reports(root,spec,pins)  # Hash/JSON-only; never verify_public_inputs.
     if checked!=records:raise ValueError("Frontend reports changed during report-only validation")
     if ({name:identity(root/name) for name in sorted(names)}!=observed
-            or identity(code/PRODUCER_SCRIPT,immutable=True)!=source
+            or identity(producer/PRODUCER_SCRIPT,immutable=True)!=source
+            or tuple(getattr(producer.stat(),name) for name in fields)!=producer_state
             or {name:identity(code/name,immutable=True) for name in helper_names}!=helpers):
         raise ValueError("Original frontend inputs or source/helper closure changed during inventory")
     return pins

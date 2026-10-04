@@ -398,3 +398,67 @@ def test_specific_known_legacy_ep15_input_identity_only_not_arbitrary_missing_fi
     assert "episode_index" not in row and "input_dataset_revision" not in row
     with pytest.raises(ValueError): gate._record_identity(row, spec, legacy=False, dataset_required=True)
     with pytest.raises(ValueError): gate._record_identity(dict(row, episode_index=0), spec, legacy=True)
+
+
+def test_historical_dataset_omission_matches_independently_frozen_metadata(gate):
+    root = Path(__file__).resolve().parents[1]
+    pins = json.loads((root / "configs/cari_clip_000000_input_pins.json").read_text())
+    spec = gate.PublicClipSpec(**pins["clip_spec"])
+    assert gate.HISTORICAL_INPUT_DATASET_OMISSION == pins["input_report"]
+    assert gate._input_dataset_omitted(spec, pins) and not gate._legacy(spec, pins)
+
+
+@pytest.mark.parametrize("field,value", [("episode_index", 1), ("total_frames", 789),
+    ("camera_name", "front"), ("height", 1151), ("width", 1535)])
+def test_historical_omission_requires_exact_structural_spec(gate, field, value):
+    values = dict(episode_index=0, total_frames=790, camera_name="front_stereo_camera_left", height=1152, width=1536)
+    values[field] = value
+    assert not gate._input_dataset_omitted(gate.PublicClipSpec(**values),
+        {"input_report": copy.deepcopy(gate.HISTORICAL_INPUT_DATASET_OMISSION)})
+
+
+@pytest.mark.parametrize("field,value", [("producer_revision", "f" * 40), ("script_sha256", "f" * 64),
+    ("sha256", "f" * 64), ("bytes", 3284)])
+def test_historical_omission_requires_exact_receipt_identity(gate, field, value):
+    spec = gate.PublicClipSpec(0, 790, "front_stereo_camera_left", 1152, 1536)
+    receipt = copy.deepcopy(gate.HISTORICAL_INPUT_DATASET_OMISSION); receipt[field] = value
+    assert not gate._input_dataset_omitted(spec, {"input_report": receipt})
+
+
+def historical_fixture(gate, root, monkeypatch):
+    """Procedural stand-in: bind its actual bytes, never fabricate real hashes."""
+    spec = gate.PublicClipSpec(0, 790, "front_stereo_camera_left", 1152, 1536)
+    pins = fixture(gate, root, spec)
+    path = root / gate.relative_paths(spec)["input_report"]
+    row = json.loads(path.read_text()); row.pop("input_dataset_revision"); write_json(path, row)
+    pins = repin(gate, root, spec)
+    monkeypatch.setattr(gate, "HISTORICAL_INPUT_DATASET_OMISSION", copy.deepcopy(pins["input_report"]))
+    return spec, pins
+
+
+def test_exact_historical_metadata_keeps_full_public_arrays_receipts_and_legacy_unchanged(gate, tmp_path, monkeypatch):
+    spec, pins = historical_fixture(gate, tmp_path, monkeypatch)
+    before = {name: (tmp_path / name).read_bytes() for name in gate.source_paths(spec)}
+    legacy = copy.deepcopy(gate.LEGACY_INPUT_REPORT)
+    result = gate.verify_public_inputs(tmp_path, spec, pins)
+    assert "input_dataset_revision" not in result["reports"]["inputs"]
+    assert result["reports"]["body"]["input_dataset_revision"] == gate.DATASET_REVISION
+    assert result["reports"]["depth"]["input_dataset_revision"] == gate.DATASET_REVISION
+    assert result["initializer"]["frames"] == result["poses"]["frames"] == [f"{i:06d}" for i in range(790)]
+    assert before == {name: (tmp_path / name).read_bytes() for name in before}
+    assert not gate._legacy(spec, pins) and gate.LEGACY_INPUT_REPORT == legacy
+
+
+@pytest.mark.parametrize("role,fault", [("inputs", "episode"), ("inputs", "wrong_dataset"),
+    ("inputs", "GT"), ("body", "missing_dataset"), ("depth", "missing_dataset")])
+def test_historical_metadata_does_not_relax_episode_dataset_or_no_oracle(gate, tmp_path, monkeypatch, role, fault):
+    spec, _ = historical_fixture(gate, tmp_path, monkeypatch)
+    relative = gate.relative_paths(spec)["input_report"] if role == "inputs" else gate.dependency_paths(spec)[role]
+    row = json.loads((tmp_path / relative).read_text())
+    if fault == "episode": row.pop("episode_index")
+    elif fault == "wrong_dataset": row["input_dataset_revision"] = "f" * 40
+    elif fault == "GT": row["ground_truth_used"] = True
+    else: row.pop("input_dataset_revision")
+    write_json(tmp_path / relative, row); pins = repin(gate, tmp_path, spec)
+    monkeypatch.setattr(gate, "HISTORICAL_INPUT_DATASET_OMISSION", copy.deepcopy(pins["input_report"]))
+    with pytest.raises(ValueError): gate.validate_reports(tmp_path, spec, pins)

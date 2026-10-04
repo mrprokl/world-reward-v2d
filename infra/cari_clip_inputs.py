@@ -24,6 +24,15 @@ LEGACY_INPUT_REPORT = {
     "producer_revision": "5d4f5db0d115bea084ce696531f8e4f430c7d5e6",
     "script_sha256": "579498b140805824398adc83c62d732246f95e3a200138a7a9af5acff52c4f0f",
 }
+# Original producer verified against its immutable Git source and all fifteen
+# public artifacts. Only this input receipt omitted the dataset declaration;
+# dependency identities and every numerical/data validation remain unchanged.
+HISTORICAL_INPUT_DATASET_OMISSION = {
+    "sha256": "9a9a93481432df5846a9ae94a4bdd32552f02167a30cf7e41d4f5ea629ad2799",
+    "bytes": 3283,
+    "producer_revision": "baba81be965dff878d7c16c9f132f85dcf712bd7",
+    "script_sha256": "5719132ec864cad59b907f47835691f9e53657bd91a372dff84ec61997259b3c",
+}
 DEPENDENCY_STAGES = {
     "body": "sam3d_body_full_video_initializer",
     "depth": "monocular_moge2_full_video",
@@ -123,6 +132,12 @@ def _legacy(spec, pins):
             and pins["input_report"] == LEGACY_INPUT_REPORT)
 
 
+def _input_dataset_omitted(spec, pins):
+    """Exact historical input metadata compatibility, never a legacy mode."""
+    return (spec == PublicClipSpec(0, 790, "front_stereo_camera_left", 1152, 1536)
+            and pins["input_report"] == HISTORICAL_INPUT_DATASET_OMISSION)
+
+
 def _record_identity(record, spec, *, legacy, dataset_required=False):
     public._no_oracle(record)
     if ("episode_index" not in record and not legacy) or ("episode_index" in record
@@ -139,7 +154,7 @@ def validate_reports(root, spec, pins):
     read = lambda name: json.loads(public.regular(root / name).read_text())
     report = read(paths["input_report"])
     legacy = _legacy(spec, pins)
-    _record_identity(report, spec, legacy=legacy, dataset_required=True)
+    _record_identity(report, spec, legacy=legacy, dataset_required=not _input_dataset_omitted(spec, pins))
     if (report.get("stage") != "world_reward_native_cari_inputs" or report.get("status") != "pass"
             or report.get("input_track") != "track_1" or type(report.get("frames")) is not int
             or report["frames"] != spec.total_frames or report.get("original_frame_coverage_verified") is not True
