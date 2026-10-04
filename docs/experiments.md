@@ -5982,3 +5982,17 @@ the original archive's inode/state/SHA must remain unchanged before disposal.
 Only two stdlib infra helpers enter its code closure; no models/GT are imported.
 Acquisition source is frozen before any remote download. Selection/inference
 and evaluation remain pending; there is no hidden-label-driven tuning.
+
+Fullf4d2bee source/test suite **10,845 PASS, 3 SKIP** in365.82s. Only later
+disjoint source files were added outside that tested committed snapshot; its
+passed numerical helpers are unchanged. New initializer-only scheduling wrapper
+stops before poses, keeps16/16 global automatic policy and holdsFD9 through
+all8 children: independent150 PASS43.49s; root70 PASS28.21s. This enables
+future VM01 initializers/VM02 pose-only overlap without cloning Objects.
+
+Five small Boots runtime dependencies are pinned to pre-cutoff PyPI wheels
+(493,734 B total) plus primary OSI permission texts. VM02 identity is explicitly
+world-reward-ncc-h100-02/WORLD-REWARD-RESEARCH. Root29tinytests PASS0.21s;
+build/install/nativeCPU operator gates remain unexecuted. It reads no
+checkpoint/private dataset and cannot establish TAPIR accuracy or full licence
+eligibility. Existing Torch2.5.1cu124/NumPy1.26.3 must stay unchanged.

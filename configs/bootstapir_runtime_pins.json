@@ -1,0 +1,60 @@
+{
+  "schema": "world_reward.bootstapir_runtime.pins.v1",
+  "base_image_id": "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3",
+  "target_image": "world-reward/bootstapir:0.1",
+  "azure_vm_name": "world-reward-ncc-h100-02",
+  "azure_resource_group": "WORLD-REWARD-RESEARCH",
+  "budget_seconds": 600,
+  "publication_cutoff": "2026-09-30",
+  "platform": {"os": "linux", "architecture": "amd64", "python": "3.11", "torch": "2.5.1+cu124", "numpy": "1.26.3"},
+  "scope": "CPU dependency installation/import gate only; no TAPIR source/checkpoint/data read, GPU execution or benchmark accuracy",
+  "wheels": [
+    {
+      "name": "dm-tree", "version": "0.1.10", "publication_date": "2026-03-31",
+      "filename": "dm_tree-0.1.10-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/78/10/587a2cdc05995069aa63b659d884eb3e58a3c86a5b4a00acdb7a316bddf3/dm_tree-0.1.10-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl",
+      "bytes": 185008, "sha256": "f0e8907bb6809dc195be3af077e382126eaebe06c00f835d09ae26e36d2165ff",
+      "pypi_url": "https://pypi.org/pypi/dm-tree/0.1.10/json",
+      "license": "Apache-2.0",
+      "publisher_license": {"url": "https://raw.githubusercontent.com/google-deepmind/tree/9330c9565222ca83905aabe9c3ad737037328269/LICENSE", "bytes": 11358, "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"}
+    },
+    {
+      "name": "einshape", "version": "1.0", "publication_date": "2022-12-19",
+      "filename": "einshape-1.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/71/bb/34cc02f13b438d550e4709216ee1df9da8e55e15b0cc87a2cb5dee19a729/einshape-1.0-py3-none-any.whl",
+      "bytes": 21392, "sha256": "42da4c2dea3a27f87ee45a7cee5072a636b97cb184bb07bf5d6412ba0ff7b965",
+      "pypi_url": "https://pypi.org/pypi/einshape/1.0/json",
+      "license": "Apache-2.0",
+      "publisher_license": {"url": "https://raw.githubusercontent.com/google-deepmind/einshape/d91ab136da3d97f4ba2b4582531cdc2dfd9fab0a/LICENSE", "bytes": 11359, "sha256": "600cc67cc4cb2f5ea317dcfc687ad1c74dc4bec8782bbe9db0afd83513b935b7"},
+      "publisher_version_source": {"url": "https://raw.githubusercontent.com/google-deepmind/einshape/d91ab136da3d97f4ba2b4582531cdc2dfd9fab0a/setup.py", "bytes": 1839, "sha256": "69a816f30eb72c1fc6b31f4144e12341d2d8fde26db3f7378201820f4fbadc6f"},
+      "release_note": "No release tag; pinned publisher setup.py declares version1.0/Apache2. Wheel/publisher source equivalence is not proven."
+    },
+    {
+      "name": "absl-py", "version": "2.5.0", "publication_date": "2026-07-03",
+      "filename": "absl_py-2.5.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/58/0a/a10b45aab35b175aded078a462dc8d0c698f5b13946e7cb0869097b78bb6/absl_py-2.5.0-py3-none-any.whl",
+      "bytes": 137410, "sha256": "0f17b89f2a4eaaedc4f28c622998aa690564b3012a396a4ffad0821007fe03ba",
+      "pypi_url": "https://pypi.org/pypi/absl-py/2.5.0/json",
+      "license": "Apache-2.0",
+      "publisher_license": {"url": "https://raw.githubusercontent.com/abseil/abseil-py/a742ec37ace382ea1e6a0c30db168ed104533fa6/LICENSE", "bytes": 11358, "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"}
+    },
+    {
+      "name": "attrs", "version": "26.1.0", "publication_date": "2026-03-19",
+      "filename": "attrs-26.1.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl",
+      "bytes": 67548, "sha256": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309",
+      "pypi_url": "https://pypi.org/pypi/attrs/26.1.0/json",
+      "license": "MIT",
+      "publisher_license": {"url": "https://raw.githubusercontent.com/python-attrs/attrs/7bfc49e9b22d5ba25b6e429524c3d49fee27cb36/LICENSE", "bytes": 1109, "sha256": "882115c95dfc2af1eeb6714f8ec6d5cbcabf667caff8729f42420da63f714e9f"}
+    },
+    {
+      "name": "wrapt", "version": "1.17.3", "publication_date": "2025-08-12",
+      "filename": "wrapt-1.17.3-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/5d/8f/a32a99fc03e4b37e31b57cb9cefc65050ea08147a8ce12f288616b05ef54/wrapt-1.17.3-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl",
+      "bytes": 82376, "sha256": "b32888aad8b6e68f83a8fdccbf3165f5469702a7544472bdf41f582970ed3311",
+      "pypi_url": "https://pypi.org/pypi/wrapt/1.17.3/json",
+      "license": "BSD-2-Clause",
+      "publisher_license": {"url": "https://raw.githubusercontent.com/GrahamDumpleton/wrapt/99130c02842c87001f40dbe73e21934c0615398d/LICENSE", "bytes": 1304, "sha256": "5974efbbc8b626b2050810d63c3a907ee21c92bf64b3740fc623ad05eb3448ab"}
+    }
+  ]
+}
