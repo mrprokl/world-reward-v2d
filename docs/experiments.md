@@ -7805,3 +7805,16 @@ ownedCID/no remaining GPU application rechecked. Host255642B
 SHAfd186f5ce848f3404273d72314085f68da5c1c9a88ad632064c19d9d48fc34f6;
 native193868B SHA1042cb098bdf333804bf5829aead64338c5c0e4c9753804eed38576ee44ec07c.
 Masks frozen before separate segmentation-only CPU evaluation; no qualityPASS.
+
+Integrated local tiny-suite after temporal v3 adapters and serialization primitive:
+13348PASS8optionalSKIP520.03s. Source/provenance/cohort fullT/contracts retained;
+code correctness only, not 3D/quality. No media/data/model transferred locally.
+Independent method audit: 2Dmemory support cannot alone diagnose3D/contact/gauge.
+Next scientifically causal fullHOI comparison must share RGB/automatic evidence/
+K/mesh/identity across initializer, nativeCoCoNet and fullrefine, measure both
+entities under one baseline-defined initialtransform plus relativeobject-wrists,
+all occludedframes/3Derrors/accelerations. Currently no qualified fresh real
+fullHOI reference: HODome NCpermission and independent MHR annotation provenance,
+pairedtimelines/units and training overlap are unresolved. No newmodels/cohort
+acquisition or3Dsuccess claimed. Stop adding hand variants after this frozen
+Dex05 decision; engineering/sourceclarification proceeds independently.
