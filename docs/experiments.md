@@ -6328,3 +6328,17 @@ every received original file before freezing receipt1164B SHA
 New canonical output parents are UID1000 and absent for pose output; no existing
 files were overwritten or original private parent permissions changed. No
 native pose/quality success inferred; VM02 GPU is idle, native execution next.
+
+Automatic YCBV masks adapter is frozen: root260combined PASS6.36s; original
+SAM2/build/kernel/asset receipts bind the existing VM02 runtime, not a forged
+historical image identity. Restricted UID0 is disclosed to read original root400
+model files through nine read-only binds; no original chmod/promotion/model copy.
+Three fixed `object.` detections precede all native96-frame propagations, with
+immutable byte-only numeric PNG staging and explicit failure on any missing mask.
+Current GPU source exposure is narrow and distinct from complete host-dispatch
+proof, without YCB acquisition/evaluation recipes. No model/quality result yet.
+
+After independent receive verification, the exact owned temporary TCP2222 NSG
+rule was deleted; original deny-all remains. Private listener/keys cleanup is
+next, not kept as a broad research ingress. EP8 unchanged VM02 full-pose job
+f63554f accepted under the original lock; actual native result still pending.
