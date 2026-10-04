@@ -7082,3 +7082,10 @@ method/ablations/limitations read withoutfigure/model/mediafetch.40keypoints
 exclude30finefingerjoints; generatedfinehandsnotobservedcontact. Random/strided
 routing do notmatch Sliding ablation; consistentviews inherit wrongHMRpose.
 These areprior/coherenceideas only, notmetrictruth orfullTrack1replacement.
+
+
+Isolated full tiny suite postframework **12274PASS7optionalSKIP443.76s** using
+exclusive `/tmp/world-reward-root-framework-full-20261004`; no heavydata/model
+processing. Code/source/control correctness only, notscientificperformance.
+EP12 actualoriginal405 fullBody PASS138.256485s, allinitializerchildren complete
+08:59:19UTC and objecttracking active; no fulltrajectory/input/qualityPASS inferred.
