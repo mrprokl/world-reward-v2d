@@ -71,8 +71,10 @@ pins stay in experiments; source/task eligibility and overlap remain unresolved.
 Dex04 paired mask ablation is CLOSED qualityFAIL: meanDice0.367→0.376 but
 one clip regresses and object-label contamination rises; no tracking extension.
 Separate Dex05 IMAGE-versus-native-video-memory protocol is preregistered.
-Data-free two-state SAM2 CUDA API gate PASS11.442363s; fresh acquisition dispatched
-on VM02, not yet independently qualified. No new private metrics or adoption.
+Data-free two-state SAM2 CUDA API PASS11.442363s; fresh acquisition/220-frame scan,
+440 paired masks46.057545s and separate segmentation-only evaluation6.758222s
+independently qualified. Quality gate CLOSED FAIL despite Dice0.547→0.642 and
+empty positives50→0: object-label pixels40086→48203. No retuning or adoption.
 
 ## Azure identities and storage
 

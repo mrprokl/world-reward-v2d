@@ -1,6 +1,6 @@
 # Automatic hand availability: IMAGE versus native video memory
 
-**Preregistered; native API and acquisition qualified, masks not yet evaluated or adopted.** Dex03 and Dex04 remain
+**Executed; quality gate rejected, not adopted.** Dex03 and Dex04 remain
 closed. The rejected 17-point ablation is not extended or retuned.
 
 Hypothesis: temporal memory can maintain an automatically seeded hand hypothesis
@@ -49,3 +49,14 @@ false-positive truth. Record background pixels and IoU separately.
 Budgets and exact policies are in the committed JSON protocol. Failure closes
 the recipe: no anchor/threshold/seed/clip tuning, no Dex04 rescue. Even passing
 this diagnostic cannot establish CARI4D superiority or competitive eligibility.
+
+## Frozen result
+
+Full220 frames/440 masks sealed before separate segmentation-only CPU evaluation.
+On197 annotated positives (23 unlabelled), Dice IMAGE0.547225 versus VIDEO0.641882;
+all three clip deltas positive and empty positive unions50→0. However, positive
+object-label pixels increase40086→48203: **the preregistered gate fails**. Higher
+background contamination63992→620569 is an additional diagnostic, not calibrated
+semantic false-positive truth. No anchor/threshold/reseed change, new-subject
+reroll or competitive adoption follows. Immutable receipts stay on Azure and
+their identities/decision are recorded in `docs/experiments.md`.

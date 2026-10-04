@@ -64,9 +64,10 @@ inferred automatically; no hand-labeling of challenge records.
   frozen before private segmentation. Dice0.367→0.376, but one clip regresses
   and object-pixel contamination rises: preregistered gate **REJECTS**. Missing
   proposals affect82/175 annotated positives; no tuning or tracking extension.
-- **Next hand ablation:** separate Dex05 protocol freezes IMAGE versus native
-  video memory before acquisition. Data-free CUDA API gate passes11.44s; this
-  is neither fresh-mask accuracy nor a new tracker. Diagnostic-only, no adoption.
+- **Temporal hand ablation:** distinct Dex05/full220 frames, all masks frozen
+  before segmentation. Native memory improves Dice0.547→0.642 and reduces
+  positive empty unions50→0, but object-label contamination rises40086→48203:
+  preregistered gate **REJECTS**. No anchor/reseed tuning or challenge adoption.
 
 Detailed receipts, producing revisions and decisions live in
 [experiments](docs/experiments.md). [Compute](docs/compute.md) is the compact

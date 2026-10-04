@@ -7818,3 +7818,18 @@ fullHOI reference: HODome NCpermission and independent MHR annotation provenance
 pairedtimelines/units and training overlap are unresolved. No newmodels/cohort
 acquisition or3Dsuccess claimed. Stop adding hand variants after this frozen
 Dex05 decision; engineering/sourceclarification proceeds independently.
+
+Dex05 temporal availability CLOSED qualityFAIL despite actual private execution
+PASS6.758222s under2bc0b08:197positive/220original,23unlabelled notnegative.
+MeanDiceA0.547224609/B0.641881556, pooleddelta+0.094656947, perclipdeltas
+[+0.084602225,+0.041974259,+0.159015362]; positiveemptyunions50→0. Frozen
+no-object-contamination regression gate FAILS:positiveobjectlabelpixels
+40086→48203, background63992→620569. Pixelsare diagnosticnotsemanticFPtruth.
+No anchor/threshold/reseed/fusion/subject reroll, challenge3D/contact/ID or adoption.
+Independent exact185-file source/archive/allmask/rawscan/acq/runtime/private
+opaque bytes/diagnostic posthash PASS; diagnostic arithmetic and all4gates
+recomputed without redecoding private segmentation. Host13211B
+SHA173ebaf758941d40f69fdf5cc51bc7b5762455c0dfb9a49da180bdd7f9ccbcd0;
+native7886B SHAbcdc10871c10365d1760ff1911bd1492c24174d54528ddfc0b9f6290d32f7fb7.
+Temporal memory solves2Davailability here but leaks foreground; this is not
+qualified evidence for3Dcoupling. Retain generic adapters, stop handrecipe.
