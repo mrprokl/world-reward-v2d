@@ -21,6 +21,7 @@ class SurfaceQueries:
     grid_indices: np.ndarray
     face_indices: np.ndarray
     camera_depth_m: np.ndarray
+    barycentric: np.ndarray  # Same original first-frame face weights, never refitted.
 
 
 def canonical_surface_queries(vertices, faces, R0, t0, K, automatic_mask,
@@ -115,7 +116,7 @@ def canonical_surface_queries(vertices, faces, R0, t0, K, automatic_mask,
             queries = np.column_stack((np.zeros(len(selected)), selected[:, 0]+.5, selected[:, 1]+.5))
     except FloatingPointError as exc:
         raise ValueError('Original ray/triangle arithmetic exceeds finite numeric range') from exc
-    arrays = (points, queries, selected.copy(), ids[chosen].copy(), best[chosen].copy())
+    arrays = (points, queries, selected.copy(), ids[chosen].copy(), best[chosen].copy(), bary[chosen].copy())
     for array in arrays:
         array.flags.writeable = False
     return SurfaceQueries(*arrays)

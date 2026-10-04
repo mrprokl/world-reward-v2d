@@ -8791,3 +8791,10 @@ FAIL cannot retain disposable inputs. Replaced/aliased namespace stays untouched
 never falselypasses. Root540pipeline/regressionPASS6.34s; historicalCGALpins
 retained explicitly as historical values, not newsourcequalification. Rootowned
 15357fixtureentries removed afternofollow/owner/hardlinkcensus; no artifactsadopted.
+
+Exactpoint-evidence bridge released: existingfirstframe selector retains same
+originalF64barycentric weights (firstfive numericalfields unchanged). Adapter
+binds same actualnativeF32mesh/frame and fullT PointTrackEvidence exactly,
+noattachmentrefit/nearestmatching/reselection. Root253PASS11optionalruntimeSKIP
+2.76s combined; actualTorch/native qualification dispatched separately onAzure,
+notpresumedPASS. Sameoriginalsurface/trackgenerator parameters preserved.

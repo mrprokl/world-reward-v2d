@@ -17,6 +17,13 @@ No future reselection, refill, reweighting by confidence, clipping, or identitie
 are introduced. Coordinates outside the native grid reject input, including
 unsupported coordinates; nonfinite placeholders are not converted to evidence.
 
+`canonical_surface_queries` now retains the original selected F64 barycentrics
+alongside its five unchanged outputs. `joint_point_evidence.bind_joint_point_evidence`
+binds these exact first-frame attachments to existing `PointTrackEvidence` and
+the actual native F32 loaded mesh. No barycentric recomputation or approximate
+frame matching is permitted. A selector run on a different pre-alignment mesh
+must generate fresh attachments **before** tracking, not refit them afterward.
+
 For a fixed triangle attachment `p_q = sum_i bary[q,i] * V[F[q,i]]`,
 `u_hat = [256/W,256/H] * pi_K(R_t p_q + t_t)` and `r = (u_hat-u)/s`.
 The robust isotropic term is `rho(r)=sqrt(1+||r||²)-1`, computed in a stable

@@ -1,7 +1,8 @@
 """Independent tiny planes/box/perspective: no assets, images or GT records."""
+from dataclasses import fields
 import numpy as np
 import pytest
-from world_reward.point_surface_queries import canonical_surface_queries
+from world_reward.point_surface_queries import SurfaceQueries, canonical_surface_queries
 
 
 def fixture():
@@ -142,3 +143,36 @@ def test_float32_input_preserves_original_camera_and_metres_scale_not_fitted():
 def test_positive_z_numeric_overflow_is_not_hidden_as_no_surface():
     data=fixture();data['K'][0,0]=np.nextafter(0.,1.)
     with pytest.raises(ValueError,match='finite numeric range'):canonical_surface_queries(**data)
+
+
+def test_appended_original_barycentrics_preserve_prior_five_field_api():
+    data = fixture(); result = canonical_surface_queries(**data)
+    assert [f.name for f in fields(SurfaceQueries)] == ['canonical_points', 'query_points',
+        'grid_indices', 'face_indices', 'camera_depth_m', 'barycentric']
+    with pytest.raises(TypeError):
+        SurfaceQueries(*(getattr(result, f.name) for f in fields(SurfaceQueries)[:5]))
+    assert result.barycentric.shape == (32, 3) and result.barycentric.dtype == np.float64
+    assert not result.barycentric.flags.writeable and np.all(result.barycentric > 0)
+    reconstructed = np.sum(data['vertices'][data['faces'][result.face_indices]]
+        * result.barycentric[:, :, None], axis=1)
+    np.testing.assert_array_equal(result.canonical_points, reconstructed)
+
+
+def test_selected_barycentrics_use_same_scaled_ray_triangle_expression_not_refit():
+    data = fixture(); data['vertices'][:, 2] = 2+.13*data['vertices'][:, 0]-.07*data['vertices'][:, 1]
+    result = canonical_surface_queries(**data)
+    # Preserve the original192-ray vectorized arithmetic too: a single-row
+    # BLAS dot can have different last bits despite an equivalent formula.
+    y, x = np.meshgrid(np.arange(1, 24, 2), np.arange(1, 32, 2), indexing='ij')
+    grid = np.column_stack((y.ravel(), x.ravel()))
+    rays = np.column_stack(((grid[:, ::-1]+.5-[16, 12])/[32, 24], np.ones(192)))
+    triangle = data['vertices'][data['faces']]
+    a, b, c = (triangle/np.max(np.abs(triangle), axis=(1, 2))[:, None, None]).transpose(1, 0, 2)
+    cross = np.cross(rays[:, None], (c-a)[None])
+    determinant = np.einsum('qfi,fi->qf', cross, b-a)
+    u = np.einsum('qfi,fi->qf', cross, -a)/determinant
+    s = (rays @ np.cross(-a, b-a).T)/determinant
+    weights = np.stack((1-u-s, u, s), axis=-1)
+    lookup = {tuple(pixel): i for i, pixel in enumerate(grid)}
+    chosen = np.array([lookup[tuple(pixel)] for pixel in result.grid_indices])
+    np.testing.assert_array_equal(result.barycentric, weights[chosen, result.face_indices])
