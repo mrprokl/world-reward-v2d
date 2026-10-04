@@ -6837,3 +6837,28 @@ SHAef7dfce4fbaf083984e1b26d288e39a1fad63dc938166b2493baa0d07a8183cc;
 15,888B finalreceiptSHA26f6a8eecbac3b923ee1b74f14141c79e238903080a1c67f39ee70ec2678841b.
 Tinyrefinedpins precede originalexport; this is fullpipeline engineering, not
 externalquality/CARI4D-victory evidence. No YCB replay authorized.
+
+EP6 export code dispatch transport stopped after Azure failed to acknowledge
+chunk0001; no inference retry. Root readOnly target audit07:02:57UTC proves
+original output/log/unit absent, no published job, and exact identity+two chunks
+in original private staging directory. Both chunk bytecounts/SHA match independently
+regenerated originaled11fa5 committed archive. Resume only unpublished final
+publish/dispatch phase after this audit; do not rewrite existing chunks or call
+an unknown unit successful. Original refined predictions stay frozen.
+
+EP8 actual originalCPUassembly PASS634/6344,982.713029s, final3357B receipt
+SHAf57e32fa8df532548184b894bf13f3902ea61ad8bfa89d731797fe57f54ce474.
+Sameoriginalecd6e7a producer, actualunit inactive/MainPID0 before its7200s
+deadline. Ownedtimer stopped07:04:44UTC before07:12:53deadline; frozen2,511B
+guardSHA5324041f25689bb4118155efc7627bceb89dfb14284026632492b7c031013940
+and596B schedulingreceiptSHAfe66803c922cf1ca0236b15635b74d08040ed753a5104be8f8e8795eef07fe1a
+retained for reproducibility. No duplicate CPUjob or quality inference.
+
+New immutable CPUprecision diagnostic gate: originalEP9 GLB/source/failure/image
+evidence pinned before run, three data-free real-loader controls precede challenge
+measurement under60s4CPU8GB. Originalgeometry/sourcefiles are bind-readonly,
+no models/GT/GPU/repair/seuil changes or arrays exported. Root281focused PASS1SKIP
+plus122publication PASS; localrealtrimesh absence explicit, actualAzurecontrols
+required. Distinguish exact arithmetic zeros, norm-underflow and positive areas
+below globalextent guard; historicalpre-export arrays absent, no attribution to
+historical serialization invented. Measurement/adoption/CARI4Dquality separate.
