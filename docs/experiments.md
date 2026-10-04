@@ -6906,3 +6906,13 @@ enclosures checked against rationalarithmetic;10,000face syntheticbenchmark
 0.013814s/9122certified878fallback, sourcearraysunchanged. Exactcollinearity
 rejects entiregeometry; every other topology/embedding/volume/backendquality
 certificate explicitlyfalse. No historicalhelper modified or EP9adoption.
+
+YCBv2 historical prerequisite audit actualPASS07:22:50UTC on VM02:207original
+source/markers/reports/logs/CIDs rehashed twice, originaltwoFAILs+bothheader
+receipts preserved, bothoriginalcontainers/PIDs/cgroups absent, v2namespacefresh,
+free50,880,282,624B. Tinyfingerprint1021ab1f31a8a51a94621dad5469739791f08393ecb5aca5e9c4d0a5017b4664.
+OriginalsecondPID216752/log65B SHA9fe4ad658efafb7f4049f19ef08b092d5e0b8e5011322eaa0a1663947dc4a9bb.
+Read-only firstaudit aborted because historicalheaderproducer could not contain
+its own futurepin; correctedcontrol supplies independent committedheaderpin,
+no source/data/run changed. Correctedoneengineeringacquisition dispatch frozen
+1a0f494 ACK; actualexecution/completearchivehash/layout/CRC/cleanup stillnext.

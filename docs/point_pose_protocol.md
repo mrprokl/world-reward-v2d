@@ -215,3 +215,19 @@ original FAIL directories and every historical pin. Its protocol is intentionall
 non-executable before filesystem/network/model calls. No future input/report pins
 are fabricated. Independent audit/tests precede any proposed technical amendment;
 this same-cohort engineering replay is not an independent replication.
+
+## Authorized corrected engineering replay — October 4
+
+The user now explicitly authorizes necessary honest technical replays. One v2
+replay is frozen at `1a0f494421912f74df6881495750987366a4bc54`: only execution
+authorization changes; scenes48–50,288RGBs,3600s acquisition +180s cleanup,
+3600s GPU total and≥10% median/no>5% scene regression gates stay unchanged.
+All historical closed statuses above describe their original protocols, not
+permission to overwrite them. Actual root audit07:22:50UTC rehashes207original
+metadata/source/marker/log/CID files twice, proves both cleanup inventories and
+old process/container/cgroup absence; fingerprint
+1021ab1f31a8a51a94621dad5469739791f08393ecb5aca5e9c4d0a5017b4664.
+The new untouched v2 namespace and50.88GB remote free space are verified before
+dispatch. A code-transport ACK is not acquisition/model/quality PASS. Full ZIP
+SHA/CRC remain mandatory; partial-header evidence is never substituted. This
+same-cohort engineering replay is not independent replication or CARI4D victory.
