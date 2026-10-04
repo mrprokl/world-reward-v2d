@@ -7944,3 +7944,13 @@ removedperprotocol. Tinyqualificationpins nowfrozen; no persistentbinary
 identity, productionmesh/adoption, universalcovariance or challenge3Dgain.
 Postfreeze local154PASS.72s and401PASS1optionalSKIP69.06s transport/volume
 neighbors; threeagent-ownedtinytestroots189entries987Bremoved, foreignpreserved.
+
+Independent frameworkROIaudit: next integratedhypothesis isjointpersistent
+actor/objectassociation+visibleownership ononeautomaticbank, unchangedCARI
+follow-up; needactualcostproducer andfreshfullsinglecameraHOIevaluation.
+InterCap officiallicense1a137474...9cd9d7c/registration/downloadlogin verified;
+competition-relatedNCpermission andmodel/mappingrights unresolved. Contact
+intercap@tue.mpg.de; commercialprimary ps-licensing@tue.mpg.de differsfrom
+license ps-license@tue.mpg.de, clarifyratherthanassume. Noregistration/email/
+assets orprivateannotations fetched. Organizer sourceexception question remains
+unsent; code/weightgrant alone notOSI/sourceclearance.

@@ -204,3 +204,38 @@ de transport. Une seule scène/ledger minimal doit rendre les échecs comparable
 Le résultat final reste un Parquet gelé pour les cinq compétitions **World Reward**,
 avec commit accessible, règles acceptées et quota vérifié ; aucune victoire
 annoncée à partir d'un proxy, d'un gate CPU ou d'un packing PASS.
+
+
+## 6. Next integrated experiment decision — October4
+
+The fixed-chart compiler has passed four procedural geometry controls, not a
+production/adoption gate. Before large predicted meshes, evaluate an exact
+transactional physical-coordinate cache against the qualified whole-decode
+implementation: native collapse changes only its two endpoints, but source
+numeric roundtrip is not a byte proof. Initialize cache by the same inverse,
+keep native queue/AABB/volume/serialization callback order unchanged, recompute
+full final physical geometry, and require frozen source/prediction/counter/birth
+parity. This is a technical scaling hypothesis, not another mesh-quality gain.
+No such cache or persistent native install exists at this revision.
+
+The next substantive reconstruction hypothesis is **joint persistent actor/object
+association plus explicit visible ownership** over one shared automatic evidence
+bank, followed by unchanged CARI initialization/refinement. Appearance, point
+correspondences and rigid reprojection supply global costs; relational co-motion
+is secondary evidence, not contact or object truth. Ambiguous hand/object overlap
+stays unknown instead of subtracting intersections. Missing observations stay
+missing and all original frames remain in the scene. A real cost producer is
+required: another graph contract alone is not an experiment.
+
+Current hand-memory results motivate this intervention but do not validate it:
+better availability also increased object contamination. Use three fresh full
+single-camera HOI recordings selected by a naming rule before references,
+freeze both automatic predictions, then a separate evaluator measures coverage,
+wrong-ID, human/object error and object-to-wrist relative error. Native topology
+or 2D tracking PASS must not be called measured HOI gain. All source/body/object
+mappings, private reference provenance and lawful competition-related evaluation
+rights must be verified before acquisition; no qualified cohort is currently
+available. InterCap requires account access and explicit clarification of its
+noncommercial/research terms for this context. No registration or request has
+been sent. No model, rendering stack or per-episode threshold is added merely
+because validation access is missing.
