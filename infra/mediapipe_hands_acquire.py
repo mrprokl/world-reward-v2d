@@ -17,9 +17,9 @@ import zipfile
 
 ROOT = Path('/srv/scenesmith/world-reward')
 JOB = 'run_mediapipe_hands_acquire'
-EVIDENCE = 'vendor/research/mediapipe_hands_v1'
-WEIGHTS = 'weights/mediapipe_hand_landmarker_v1'
-RESULT = 'results/mediapipe-hands-acquire-v1'
+EVIDENCE = 'vendor/research/mediapipe_hands_v2'
+WEIGHTS = 'weights/mediapipe_hand_landmarker_v2'
+RESULT = 'results/mediapipe-hands-acquire-v2'
 BUDGET, BLOCK, TIMEOUT = 300, 1 << 20, 20
 SOURCE_REV = 'cad7f3ab99ebf175947e40c5252c642612aae927'
 WHEEL = 'mediapipe-0.10.21-cp311-cp311-manylinux_2_28_x86_64.whl'
@@ -135,6 +135,42 @@ def publish(part, target):
         raise OSError(ctypes.get_errno(), 'Artifact publication refused')
 
 
+def create_namespace_lease(folders, uid, gid, source_closure_sha256):
+    """Root bootstraps only fresh leaves; never changes a shared parent."""
+    require(os.getuid() == 0 and type(uid) is int and uid > 0 and type(gid) is int and gid >= 0,
+            'Root bootstrap and unprivileged target required')
+    folders = [canonical(p) for p in folders]
+    require(len(set(folders)) == len(folders) and all(not p.exists() and p.parent.is_dir() for p in folders),
+            'Only fresh canonical leaf namespaces may be bootstrapped')
+    records = []
+    for p in folders:
+        p.mkdir(mode=0o700); p.chmod(0o700); os.chown(p, uid, gid)
+        s = p.lstat()
+        records.append(dict(path=str(p), device=s.st_dev, inode=s.st_ino, uid=uid, gid=gid, mode=0o700))
+    return dict(schema='world_reward.fresh_namespace_lease.v1',
+                source_closure_sha256=source_closure_sha256, directories=records)
+
+
+def validate_namespace_lease(lease, folders, source_closure_sha256):
+    require(type(lease) is dict and set(lease) == {'schema', 'source_closure_sha256', 'directories'} and
+            lease['schema'] == 'world_reward.fresh_namespace_lease.v1' and
+            lease['source_closure_sha256'] == source_closure_sha256 and
+            type(lease['directories']) is list and len(lease['directories']) == len(folders),
+            'Exact source-bound fresh namespace lease required')
+    owned = []
+    for p, row in zip(folders, lease['directories']):
+        p = canonical(p); s = p.lstat()
+        expected = dict(path=str(p), device=s.st_dev, inode=s.st_ino,
+                        uid=os.getuid(), gid=os.getgid(), mode=0o700)
+        require(type(row) is dict and set(row) == set(expected) and
+                all(type(row[k]) is type(v) and row[k] == v for k, v in expected.items()) and
+                stat.S_ISDIR(s.st_mode) and s.st_mode & 0o777 == 0o700 and
+                s.st_uid == os.getuid() and s.st_gid == os.getgid() and not any(p.iterdir()),
+                'Bootstrap lease changed, occupied, foreign, or not empty')
+        owned.append((p, (s.st_dev, s.st_ino)))
+    return owned
+
+
 def fetch(row, root, opener, deadline, owned):
     require(time.monotonic() < deadline, 'Inclusive acquisition budget exceeded')
     target = root/row['folder']/row['name']; part = target.with_name(target.name+'.part')
@@ -228,10 +264,12 @@ def zip_inventory(path, deadline, *, wheel=False):
     return result
 
 
-def acquire(root, code, revision, *, opener=None):
+def acquire(root, code, revision, *, opener=None, namespace_lease=None):
     started = time.monotonic(); root = canonical(root); code = canonical(code)
     folders = [canonical(root/n) for n in (EVIDENCE, WEIGHTS, RESULT)]
-    require(all(not p.exists() and p.parent.is_dir() for p in folders), 'Fresh existing-parent namespaces required; no resume')
+    require(all(p.parent.is_dir() for p in folders) and not folders[-1].exists() and
+            (namespace_lease is not None or all(not p.exists() for p in folders[:-1])),
+            'Fresh existing-parent namespaces required; no resume')
     out = folders[-1]; out.mkdir(mode=0o700); out.chmod(0o700)
     owned, artifacts, created, before, failure = [], [], [], None, None
     report = dict(stage='mediapipe_hands_source_model_acquisition', status='fail', budget_seconds=BUDGET,
@@ -242,8 +280,12 @@ def acquire(root, code, revision, *, opener=None):
                   training_overlap_verified=False, challenge_overlap_verified=False, artifacts=artifacts)
     try:
         before = source_binding(root, code, revision); report['source_binding'] = before
-        for path in folders[:-1]:
-            path.mkdir(mode=0o700); created.append((path, state(path)[:2])); path.chmod(0o700)
+        if namespace_lease is None:
+            for path in folders[:-1]:
+                path.mkdir(mode=0o700); created.append((path, state(path)[:2])); path.chmod(0o700)
+        else:
+            created = validate_namespace_lease(namespace_lease, folders[:-1], before['closure_sha256'])
+            report['namespace_lease'] = namespace_lease
         opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler({}), PublicRedirect())
         for row in ASSETS:
             artifacts.append(fetch(row, root, opener, started+BUDGET, owned))
@@ -290,7 +332,8 @@ def main():
     signal.signal(signal.SIGTERM, cancel); signal.signal(signal.SIGALRM, cancel)
     signal.setitimer(signal.ITIMER_REAL, BUDGET+5)
     try:
-        report = acquire(ROOT, Path(os.environ['WR_CODE']), os.environ['WR_CODE_REVISION'])
+        report = acquire(ROOT, Path(os.environ['WR_CODE']), os.environ['WR_CODE_REVISION'],
+                         namespace_lease=json.loads(os.environ['WR_NAMESPACE_LEASE']) if 'WR_NAMESPACE_LEASE' in os.environ else None)
         print(json.dumps({k: report[k] for k in ('stage', 'status', 'elapsed_seconds')}))
     finally: signal.setitimer(signal.ITIMER_REAL, 0)
 

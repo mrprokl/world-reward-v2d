@@ -7321,3 +7321,22 @@ EP14 original object tracking100frames/417.908247s; EP13 CPUdepth350/425, both
 active, no complete-stage PASS inferred. EP12 refinement explicitly reuses the
 same independently frozen published7392634 source, separate unit/output and
 waits for EP0 GPUrelease. Dispatch ACK only; not execution/completion evidence.
+
+MediaPipe source/model acquisitionv1 actual technical FAIL0.063502s under245c0e1:
+PermissionError before any network/body/artifact (all7 absent), source unchanged,
+ownedpartials absent, models/data/private values never used. Original readonly
+receipt1618B SHAd49ecb82b3718df38bf53969806ba94934bcaad78de696fc0d5467f50294a543.
+Independent VM02 audit establishes `vendor/research` UID0/mode755, not writable
+by scenesmith; shared parent modes/ownership remain unchanged. The fresh v2
+wrapper bootstraps only its two empty leaf namespaces as scenesmith-owned700,
+bound by source SHA and device/inode/UID/GID lease before dropping privileges.
+Unknown/occupied/mutated leases fail before network. Root62 tiny tests PASS0.28s;
+the inherited macOS fixture group required an explicit fixture-only own-group
+assignment, not a relaxed runtime check. Originalv1 is preserved; this corrects
+runtime permission only, with exactly the same assets, budget and no inference.
+
+Exact full mandatory CPU dependency metadata is frozen atb17ee14:26wheels,
+282,981,523B total,247,358,885B new excluding the existing planned MediaPipewheel.
+All selected wheel/PEP658 metadata SHA, platform/cutoff/Requires-Dist markers and
+license declarations checked; root53 tests PASS0.27s. No wheels installed,
+runtime built, task license cleared or model quality measured by this freeze.

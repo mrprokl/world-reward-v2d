@@ -272,6 +272,64 @@ def test_midstream_failure_removes_only_owned_partial_preserves_receipt(gate, tm
     assert 'SECRET_URL' not in json.dumps(result)
 
 
+def test_source_bound_root_bootstrap_creates_only_fresh_leaves(gate, tmp_path, monkeypatch):
+    parent = tmp_path/'shared-parent'; parent.mkdir(); parent.chmod(0o755)
+    prior = gate.state(parent); uid, gid = os.getuid(), os.getgid(); calls = []
+    monkeypatch.setattr(gate.os, 'getuid', lambda: 0)
+    monkeypatch.setattr(gate.os, 'chown', lambda p, u, g: calls.append((p, u, g)))
+    leaves = [parent/'owned-evidence', parent/'owned-model']
+    lease = gate.create_namespace_lease(leaves, 1000, 1000, 'c'*64)
+    assert len(calls) == 2 and all(p.stat().st_mode & 0o777 == 0o700 for p in leaves)
+    assert gate.state(parent)[2] == prior[2] and parent.stat().st_uid == uid
+    assert lease['source_closure_sha256'] == 'c'*64
+    with pytest.raises(gate.AcquisitionError):
+        gate.create_namespace_lease(leaves, 1000, 1000, 'c'*64)
+    assert len(calls) == 2  # No chown, overwrite or resume of existing leaves.
+
+
+def lease_for(gate, folders, closure):
+    return dict(schema='world_reward.fresh_namespace_lease.v1', source_closure_sha256=closure,
+                directories=[dict(path=str(p), device=p.stat().st_dev, inode=p.stat().st_ino,
+                                  uid=os.getuid(), gid=os.getgid(), mode=0o700) for p in folders])
+
+
+def test_precreated_empty_leased_leaves_are_used_once_and_sealed(gate, tmp_path, monkeypatch):
+    root, code, rev, payload, opener = setup(gate, tmp_path, monkeypatch)
+    folders = [root/gate.EVIDENCE, root/gate.WEIGHTS]
+    for p in folders:
+        p.mkdir(); p.chmod(0o700); os.chown(p, -1, os.getgid())
+    closure = gate.source_binding(root, code, rev)['closure_sha256']
+    lease = lease_for(gate, folders, closure)
+    result = gate.acquire(root, code, rev, opener=opener, namespace_lease=lease)
+    assert result['status'] == 'pass' and result['namespace_lease'] == lease
+    assert all(p.stat().st_mode & 0o777 == 0o555 for p in folders)
+    with pytest.raises(gate.AcquisitionError):
+        gate.acquire(root, code, rev, opener=opener, namespace_lease=lease)
+    assert len(opener.calls) == 7
+
+
+@pytest.mark.parametrize('fault', ['closure', 'inode', 'uid', 'mode', 'occupied', 'boolean_inode', 'extra'])
+def test_bootstrap_lease_mutations_block_network_and_foreign_cleanup(gate, tmp_path, monkeypatch, fault):
+    root, code, rev, _, opener = setup(gate, tmp_path, monkeypatch)
+    folders = [root/gate.EVIDENCE, root/gate.WEIGHTS]
+    for p in folders:
+        p.mkdir(); p.chmod(0o700); os.chown(p, -1, os.getgid())
+    closure = gate.source_binding(root, code, rev)['closure_sha256']
+    lease = lease_for(gate, folders, closure)
+    if fault == 'closure': lease['source_closure_sha256'] = 'd'*64
+    elif fault == 'inode': lease['directories'][0]['inode'] += 1
+    elif fault == 'uid': lease['directories'][0]['uid'] += 1
+    elif fault == 'mode': folders[0].chmod(0o755)
+    elif fault == 'occupied': (folders[0]/'KEEP').write_bytes(b'FOREIGN')
+    elif fault == 'boolean_inode': lease['directories'][0]['inode'] = True
+    else: lease['directories'][0]['extra'] = 'unapproved'
+    with pytest.raises(gate.AcquisitionError):
+        gate.acquire(root, code, rev, opener=opener, namespace_lease=lease)
+    assert not opener.calls and report(gate, root)['status'] == 'fail'
+    if fault == 'occupied': assert (folders[0]/'KEEP').read_bytes() == b'FOREIGN'
+    assert folders[1].stat().st_mode & 0o777 == 0o700  # Unaccepted lease not cleaned/sealed.
+
+
 def test_frozen_actual_pins_and_source_only_shell(gate):
     assert sum(r['bytes'] for r in gate.ASSETS) < 44_000_000 and gate.BUDGET == 300
     task = gate.ASSETS[-1]; assert task['bytes'] == 7819105 and 'sha256' not in task
