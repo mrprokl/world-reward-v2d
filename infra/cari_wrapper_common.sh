@@ -2,10 +2,11 @@
 # Sourced by immutable CARI wrappers. No Docker, artifact mutation or retries.
 
 wr_parse_cari_arguments() {
-  local mode="$1" episode_seen=0 wait_seen=0 kernel_seen=0 no_wait_seen=0 bundle_seen=0 mesh_seen=0
+  local mode="$1" episode_seen=0 wait_seen=0 kernel_seen=0 no_wait_seen=0 bundle_seen=0 mesh_seen=0 query_seen=0
   shift
   WR_EPISODE=15 WR_WAIT_FOR='' WR_KERNEL_ONLY=0 WR_BUNDLE_SOURCE=forward
   WR_MESH_SOURCE=default
+  WR_QUERY_REQUALIFICATION=0
   while (( $# )); do
     case "$1" in
       --episode)
@@ -38,9 +39,17 @@ wr_parse_cari_arguments() {
           echo 'Require one prepare-only --mesh-source default|solid' >&2; return 2
         fi
         WR_MESH_SOURCE="$2"; mesh_seen=1; shift 2 ;;
+      --query-requalification)
+        if [[ "$mode" != prepare ]] || (( query_seen )); then
+          echo 'Require one prepare-only --query-requalification' >&2; return 2
+        fi
+        WR_QUERY_REQUALIFICATION=1; query_seen=1; shift ;;
       *) echo "Unsupported wrapper argument: $1" >&2; return 2 ;;
     esac
   done
+  if (( WR_QUERY_REQUALIFICATION )) && [[ "$WR_MESH_SOURCE" != solid ]]; then
+    echo '--query-requalification requires --mesh-source solid' >&2; return 2
+  fi
   if (( no_wait_seen && wait_seen )); then
     echo '--no-wait and --wait-for are mutually exclusive' >&2; return 2
   fi

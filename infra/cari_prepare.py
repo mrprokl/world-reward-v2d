@@ -40,10 +40,17 @@ SOLID_NATIVE_LOAD_SOURCES = {
 }
 
 
+class _QueryFlag(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        if getattr(namespace, self.dest, False): parser.error('Repeated --query-requalification')
+        setattr(namespace, self.dest, True)
+
+
 def _argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
     parser.add_argument("--mesh-source", choices=("default", "solid"), default="default")
+    parser.add_argument('--query-requalification', action=_QueryFlag, nargs=0, default=False)
     return parser
 
 
@@ -92,11 +99,15 @@ def _solid_topology_equal(before, after):
         raise ValueError("Solid serialization changed whole-shell Euler/orientation/counts")
 
 
-def _solid_preflight(root, episode, inputs, report, pose_path, np):
+def _solid_preflight(root, episode, inputs, report, pose_path, np, *, query_requalification=False):
     """Independent frozen proposal and full trajectory, before reserving output."""
     from solid_geometry_loader import load, identity, strict_json, SOURCE_HELPERS
     code = Path(__file__).resolve().parent.parent
     base = root / f'outputs/episode_{episode:06d}'
+    if type(query_requalification) is not bool: raise ValueError('Explicit query profile required')
+    if pose_path != base/'object_pose_full_solid/geometry_and_poses.npz':
+        raise ValueError('Canonical solid pose source required')
+    options = dict(query_requalification=True) if query_requalification else {}
     pin_path = code / 'configs' / f'solid_mesh_{episode:06d}_pins.json'
     pin = identity(pin_path)
     pins = strict_json(pin_path.read_text())
@@ -108,8 +119,14 @@ def _solid_preflight(root, episode, inputs, report, pose_path, np):
             or not np.allclose(scale, scale[0], atol=0, rtol=1e-5)):
         raise ValueError("Original positive grounding scale is fixed; never average or rebake")
     values = load(root, episode, inputs['video_sha256'], sha256(object_path), sha256(alignment_path),
-                  float(scale[0]), pins=pins)
+                  float(scale[0]), pins=pins, **options)
     expected_v, expected_f, expected_active, _, canonical, receipt = values
+    if query_requalification:
+        if ('query_requalification' not in receipt or report.get('query_requalification') != receipt['query_requalification']
+                or report.get('topology_budget', {}).get('query_requalification') != receipt['query_requalification']):
+            raise ValueError('Native pose/CPU balanced query provenance differs')
+    elif any('query_requalification' in row for row in (receipt, report, report.get('topology_budget', {}))):
+        raise ValueError('Balanced query must not be relabeled as the default solid profile')
     pose_canonical = pose_path.parent / 'object_fixed_canonical.glb'
     pose_report_path = pose_path.parent / 'report.json'
     parent = pose_path.parent.lstat()
@@ -311,6 +328,8 @@ def main():
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux container with network none")
     args = _argument_parser().parse_args()
+    if args.query_requalification and args.mesh_source != 'solid':
+        raise ValueError('Query requalification is solid-only')
     root = Path(os.environ["WR_ROOT"])
     inputs = _validate_inputs(root, episode_index=args.episode)
     import cv2
@@ -378,7 +397,8 @@ def main():
             raise RuntimeError(f"{key} lacks exact full original-frame coverage")
     if args.mesh_source == 'solid':
         vertices, faces, active, rotations, translations, solid_compact, solid_topology, solid_ledger = _solid_preflight(
-            root, args.episode, inputs, reports['object'], pose_path, np)
+            root, args.episode, inputs, reports['object'], pose_path, np,
+            **(dict(query_requalification=True) if args.query_requalification else {}))
         from solid_geometry_loader import identity as solid_identity
         native_pins = {'prep/prepare_mhr_wild_export.py': {'bytes': 13145, 'sha256': 'b465516cc96a8c5472aec995cff12e32a9d033c7c5157a6a601b96e332e45f4f'},
             'prep/mhr_export_utils.py': {'bytes': 25383, 'sha256': 'a9f499dad2f73eb7b8c526f33c94a785cc9468423760afcf6e5ced46d2f49e3b'}}
@@ -575,6 +595,7 @@ def main():
         if (final_metric != metric_proof or any(final_aligned[key] != aligned_proof[key] for key in final_aligned)):
             raise ValueError('Native raw/effective/FP32 solid geometry changed after preparation')
         result['object_source'] = 'solid'
+        if args.query_requalification: result['query_requalification'] = reports['object']['query_requalification']
         result['object_pose_source'] = {'report': str(report_paths['object'].relative_to(root)),
             'geometry_and_poses': str(pose_path.relative_to(root)), 'geometry_and_poses_sha256': sha256(pose_path)}
         result['solid_geometry_validation'] = {'metric_glb': metric_proof, 'native_aligned_glb': aligned_proof,

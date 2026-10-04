@@ -23,25 +23,36 @@ from world_reward.mesh_budget import fit_topology_preserving_budget
 from world_reward.pose_selection import select_pose_path
 
 
+class _QueryFlag(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        if getattr(namespace, self.dest, False): parser.error('Repeated --query-requalification')
+        setattr(namespace, self.dest, True)
+
+
 def _argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
     parser.add_argument("--full-video", action="store_true")
     parser.add_argument("--mesh-source", choices=('default','volume','conditioned','solid'), default='default')
+    parser.add_argument('--query-requalification', action=_QueryFlag, nargs=0, default=False)
     return parser
 
 
-def _load_solid_mesh(root, episode, input_sha, object_report_path, alignment_path, scale, output, fixed_mesh_path):
+def _load_solid_mesh(root, episode, input_sha, object_report_path, alignment_path, scale, output, fixed_mesh_path, *, query_requalification=False):
     """Only consume the pinned CPU proposal; no mesh fitting or second scale."""
     from solid_geometry_loader import load, identity, strict_json
     import shutil
+    if type(query_requalification) is not bool: raise ValueError('Explicit query profile required')
+    options = dict(query_requalification=True) if query_requalification else {}
     pin_path = Path(__file__).resolve().parent.parent / 'configs' / f'solid_mesh_{episode:06d}_pins.json'
     pin_identity = identity(pin_path)  # Missing pins stop before output reservation.
     pins = strict_json(pin_path.read_text())
-    values = load(root, episode, input_sha, sha256(object_report_path), sha256(alignment_path), scale, pins=pins)
+    values = load(root, episode, input_sha, sha256(object_report_path), sha256(alignment_path), scale, pins=pins, **options)
     if identity(pin_path) != pin_identity:
         raise ValueError('Committed solid mesh pins changed during loading')
     vertices, faces, active_indices, geometry_cleanup, qualified_glb, topology_budget = values
+    if ('query_requalification' in topology_budget) != query_requalification:
+        raise ValueError('Explicit native query profile differs from frozen CPU receipt')
     source_identity = identity(qualified_glb)
     if not _solid_output_reserved(output):
         output.mkdir(exist_ok=False)
@@ -73,6 +84,8 @@ def main() -> None:
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux GPU container with network none")
     args = _argument_parser().parse_args()
+    if args.query_requalification and args.mesh_source != 'solid':
+        raise ValueError('Query requalification is solid-only')
     if args.mesh_source == 'solid' and not args.full_video:
         raise ValueError('Solid geometry requires the complete original video')
     root = Path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"))
@@ -176,7 +189,8 @@ def main() -> None:
             raise ValueError('Conditioned canonical GLB changed during remote-only copying')
     elif args.mesh_source=='solid':
         vertices,faces,active_indices,geometry_cleanup,qualified_glb,topology_budget=_load_solid_mesh(
-            root,args.episode,inputs['video_sha256'],object_report_path,alignment_path,float(scale[0]),output,fixed_mesh_path)
+            root,args.episode,inputs['video_sha256'],object_report_path,alignment_path,float(scale[0]),output,fixed_mesh_path,
+            **(dict(query_requalification=True) if args.query_requalification else {}))
     else:
         output.mkdir(exist_ok=False)
         source_raw = trimesh.load(object_dir / "object.glb", force="mesh", process=False)
@@ -368,6 +382,7 @@ def main() -> None:
               "budget_source_sha256": sha256(budget_source_path),
               "geometry_library_versions": {name: importlib.metadata.version(name) for name in ("trimesh", "fast-simplification")},
               "elapsed_seconds": time.perf_counter() - started, "script_sha256": sha256(Path(__file__))}
+    if args.query_requalification: result['query_requalification'] = topology_budget['query_requalification']
     (output / "report.json").write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({"stage": result["stage"], "status": "pass", "extent": mesh.extents.tolist(),
                       "frames": len(indices), "greedy_silhouette_iou_median": float(np.median([frame["selected"]["selected_silhouette_iou"] for frame in candidate_reports])),

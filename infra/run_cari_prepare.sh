@@ -8,6 +8,7 @@ wr_parse_cari_arguments prepare "$@"
 wr_cari_dependency prepare
 set -- --episode "$WR_EPISODE"
 if [[ "$WR_MESH_SOURCE" == solid ]]; then set -- "$@" --mesh-source solid; fi
+if (( WR_QUERY_REQUALIFICATION )); then set -- "$@" --query-requalification; fi
 docker run --rm --network none \
   --user "$(id -u scenesmith):$(id -g scenesmith)" \
   --env WR_ROOT="$ROOT" --env WR_CODE_REVISION="${WR_CODE_REVISION:?}" --env PYTHONPATH="$CODE/src" \
