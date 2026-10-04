@@ -8349,3 +8349,9 @@ input3358B SHAe254d266376f309ed9a30a9f25507594c9ffcc06ae695f3954667ce3897c497e.
 OriginalEP22waiter exits on vanishedcollected predecessor beforecreatinginputs;
 EP23initializers actualPASSfull552frames17:56:49UTC; EP28body366PASS,depthrunning.
 Do not mistake pipelineavailability/proxyIoU for precision/leaderboard gain.
+
+Actual chartv2 build67039f1 PASS25.699164host/24.440325native,28217B receipt
+SHA091d6632993df565c37e1c4703c9fae869a4af9ec6e966842479d58d1e255605;
+retained704112B binary SHA88d529a3e1578e6983bcea0d4f230bdead5e1d48ff7ebf2f5789d8a869741368.
+Root203-sourceclosure/archive/ledger matches; actualnewbuildinfo+source/runtime
+posthash andownedcleanup passed. Zero QEM/mesh/GPU calls, notgeometryqualified.

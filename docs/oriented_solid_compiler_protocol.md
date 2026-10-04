@@ -59,3 +59,9 @@ procedural expectations are fixed, with no native certificate or adoption.
 Build-only, native chart parity, complete F64/F32 embedding, simplification,
 serialization, full forest fidelity and metric grounding remain distinct gates.
 A mocked test or source-derived build-info string does not pass any native gate.
+
+The separately source-bound **build-only** run at revision `67039f1` completed
+on Azure: 24.440325 s native, 25.699164 s host. The retained executable is
+704112 B, SHA256 `88d529a3e1578e6983bcea0d4f230bdead5e1d48ff7ebf2f5789d8a869741368`.
+Actual full build-info, old/new source identities and cleanup passed. This run
+made zero mesh/QEM calls: geometry and procedural qualification remain pending.
