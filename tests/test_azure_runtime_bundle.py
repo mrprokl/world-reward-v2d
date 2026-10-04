@@ -5,6 +5,11 @@ import hashlib
 import lzma
 from pathlib import Path
 import tarfile
+import subprocess
+import types
+import sys
+import random
+import shlex
 
 import pytest
 
@@ -316,6 +321,11 @@ def test_symlink_runtime_aliases_rejected():
         launcher.runtime_archive(full_archive(files(), symlink=True), "infra/run_smoke.sh")
 
 
+def remote_ack(command):
+    script=command[command.index('--scripts')+1]
+    return script.rsplit("printf '%s\\n' '",1)[1].split("'",1)[0].encode()+b'\n'
+
+
 def launch_stub(monkeypatch, args, *, returncode=0):
     """Capture argv and frozen remote script; no Git/Azure subprocess executes."""
     calls = []; revision = "a"*40
@@ -329,10 +339,10 @@ def launch_stub(monkeypatch, args, *, returncode=0):
     monkeypatch.setattr(launcher.subprocess, "check_output", git)
     def azure(command, **kwargs):
         calls.append((command, kwargs))
-        return type('Result', (), {'returncode': returncode})()
+        return types.SimpleNamespace(returncode=returncode,stdout=remote_ack(command),stderr=b'')
     monkeypatch.setattr(launcher.subprocess, "run", azure)
     launcher.main(["--name", "unit-test", "--script", "infra/run_smoke.sh", *args])
-    assert len(calls) == 1 and calls[0][1] == {"check": False}
+    assert len(calls) == 1 and calls[0][1] == {"check": False,"capture_output":True,"timeout":300}
     return calls[0][0]
 
 
@@ -419,7 +429,7 @@ def exact_revision_stub(monkeypatch, *, explicit=True, kind=b"commit\n", resolve
         raise AssertionError(command)
     monkeypatch.setattr(launcher.subprocess, "check_output", git)
     def azure(command, **kwargs):
-        calls.append(command); return type("Result", (), {"returncode": 0})()
+        calls.append(command); return types.SimpleNamespace(returncode=0,stdout=remote_ack(command),stderr=b'')
     monkeypatch.setattr(launcher.subprocess, "run", azure)
     args = ["--name", "test", "--script", "infra/run_smoke.sh"]
     if explicit: args += ["--revision", revision]
@@ -460,3 +470,163 @@ def test_explicit_resolved_mismatch_or_missing_commit_never_calls_azure(monkeypa
     args, _, calls, archives, _ = exact_revision_stub(monkeypatch, missing=True)
     with pytest.raises(launcher.subprocess.CalledProcessError): launcher.main(args)
     assert not calls and not archives
+
+
+@pytest.mark.parametrize('output',[b'',b'EnableSucceeded\n',b'[stdout]\n',b'WORLD_REWARD_DISPATCH_ACK_V1:wrong\n',
+    b'WORLD_REWARD_DISPATCH_ACK_V1:expected\nWORLD_REWARD_DISPATCH_ACK_V1:expected\n'])
+def test_azure_exit_zero_without_exact_unique_stdout_sentinel_is_not_ack(monkeypatch,output):
+    calls=[]
+    def fake(command,**kwargs):
+        calls.append(command);return types.SimpleNamespace(returncode=0,stdout=output,stderr=b'PRIVATE_ERROR_MUST_NOT_ESCAPE')
+    monkeypatch.setattr(launcher.subprocess,'run',fake)
+    with pytest.raises(RuntimeError,match='inspect target before any retry')as caught:
+        launcher.invoke_transport('CODE_PAYLOAD_MUST_NOT_ESCAPE','WORLD_REWARD_DISPATCH_ACK_V1:expected','rg','vm')
+    assert len(calls)==1 and 'CODE_PAYLOAD'not in str(caught.value)and 'PRIVATE_ERROR'not in str(caught.value)
+
+
+def test_exact_ack_capture_does_not_print_payload_or_remote_errors(monkeypatch,capsys):
+    ack=launcher.ACK_PREFIX+'a'*64+':phase'
+    monkeypatch.setattr(launcher.subprocess,'run',lambda *a,**k:types.SimpleNamespace(returncode=0,stdout=('[stdout]\n'+ack+'\n[stderr]\n').encode(),stderr=b'not-printed'))
+    launcher.invoke_transport('not-printed-code',ack,'rg','vm')
+    assert capsys.readouterr().out==''
+
+
+def staged_fixture():
+    payload=base64.b64encode(random.Random(310427).randbytes(155_000))
+    source=files();source['configs/transport_fixture.json']=b'{"code_only":"'+payload+b'"}'
+    archive=launcher.runtime_archive(full_archive(source),'infra/run_smoke.sh')[0]
+    encoded,sha=launcher.encoded_runtime_archive(archive)
+    commands=launcher.transport_commands(encoded,sha,archive,'b'*40,'infra/run_smoke.sh','stage-test',['--episode','8'])
+    assert len(commands)>2
+    return archive,encoded,sha,commands
+
+
+def test_staged_script_caps_full_exact_reassembly_and_only_final_can_launch():
+    archive,encoded,sha,commands=staged_fixture()
+    assert launcher.INLINE_SCRIPT_BYTES==180_000 and launcher.STAGED_SCRIPT_BYTES==120_000
+    assert all(len(script.encode())<=120_000 for _,_,script in commands)
+    parts=[script.split("printf '%s' '",1)[1].split("' >",1)[0]for phase,_,script in commands if phase.startswith('chunk-')]
+    assert ''.join(parts)==encoded
+    compressed=base64.b64decode(''.join(parts),validate=True)
+    assert hashlib.sha256(compressed).hexdigest()==sha and lzma.decompress(compressed)==archive
+    assert all('systemd-run'not in script and 'WR_CODE='not in script for _,_,script in commands[:-1])
+    assert 'renameat2'in commands[-1][2]and ',1)==0)'in commands[-1][2]
+    assert commands[-1][2].index('hashlib.sha256(compressed)')<commands[-1][2].index('renameat2')<commands[-1][2].index('systemd-run')
+    assert commands[-1][2].index('hashlib.sha256(raw)')<commands[-1][2].index('renameat2')
+    assert 'stage-test'in commands[0][2]and '.runtime-stage-'in commands[0][2]
+    assert len({ack for _,ack,_ in commands})==len(commands)
+
+
+def local_transport_runtime(tmp_path):
+    root=tmp_path/'remote';(root/'jobs').mkdir(parents=True);(root/'results').mkdir()
+    bindir=tmp_path/'bin';bindir.mkdir()
+    for name in('systemctl','systemd-run'):
+        path=bindir/name
+        path.write_text('#!/bin/bash\n'+('printf "%s\\n" "$*" >> "$HOME/launched"\n'if name=='systemd-run'else'exit 0\n'))
+        path.chmod(0o755)
+    return root,{'PATH':str(bindir)+':/usr/bin:/bin','HOME':str(tmp_path)}
+
+
+def run_local_phase(script,root,environment):
+    script=script.replace('ROOT=/srv/scenesmith/world-reward','ROOT='+shlex.quote(str(root)))
+    if sys.platform!='linux'and "<<'PY_PUBLISH'"in script:
+        # Only the Linux NOREPLACE syscall is emulated; all assembly/TAR gates run unchanged.
+        old="libc=ctypes.CDLL(None,use_errno=True);rename=getattr(libc,'renameat2',None);require(rename is not None)"
+        new="""def rename(a,old,b,new,flags):
+  require(flags==1 and not Path(os.fsdecode(new)).exists());os.rename(old,new);return 0"""
+        assert old in script;script=script.replace(old,new)
+    return subprocess.run(['bash','-c',script],env=environment,capture_output=True)
+
+
+def test_staged_execution_exact_code_publish_no_unit_before_final_and_no_resume(tmp_path):
+    archive,_,_,commands=staged_fixture();root,environment=local_transport_runtime(tmp_path)
+    for _,ack,script in commands[:-1]:
+        result=run_local_phase(script,root,environment)
+        assert result.returncode==0 and ack.encode()in result.stdout
+        assert not(tmp_path/'launched').exists()and not(root/'jobs'/('b'*40)/'run_smoke').exists()
+    duplicate=run_local_phase(commands[-2][2],root,environment)
+    assert duplicate.returncode!=0 and commands[-2][1].encode()not in duplicate.stdout
+    result=run_local_phase(commands[-1][2],root,environment)
+    assert result.returncode==0 and commands[-1][1].encode()in result.stdout
+    job=root/'jobs'/('b'*40)/'run_smoke'
+    assert (tmp_path/'launched').exists()and len((tmp_path/'launched').read_text().splitlines())==1
+    with tarfile.open(fileobj=io.BytesIO(archive))as tar:
+        assert {str(p.relative_to(job/'code'))for p in(job/'code').rglob('*')if p.is_file()}==set(tar.getnames())
+        for member in tar:
+            assert (job/'code'/member.name).read_bytes()==tar.extractfile(member).read()
+            assert (job/'code'/member.name).stat().st_mode&0o777==member.mode&0o555
+    assert not list((root/'jobs').glob('.runtime-stage-*'))
+    assert run_local_phase(commands[0][2],root,environment).returncode!=0  # Existing JOB is never resumed.
+    assert len((tmp_path/'launched').read_text().splitlines())==1
+
+
+@pytest.mark.parametrize('fault',['chunk_tamper','chunk_missing','extra_stage_file','job_exists','stage_symlink','identity_tamper','identity_writable'])
+def test_staged_unknown_or_tampered_state_never_publishes_or_starts(tmp_path,fault):
+    _,_,_,commands=staged_fixture();root,environment=local_transport_runtime(tmp_path)
+    for _,_,script in commands[:-1]:assert run_local_phase(script,root,environment).returncode==0
+    stage=next((root/'jobs').glob('.runtime-stage-*'));job=root/'jobs'/('b'*40)/'run_smoke'
+    if fault=='chunk_tamper':
+        path=stage/'chunk_0000';path.chmod(0o600);path.write_bytes(b'x'*path.stat().st_size);path.chmod(0o400)
+    elif fault=='chunk_missing':(stage/'chunk_0000').unlink()
+    elif fault=='extra_stage_file':(stage/'unexpected').write_text('unowned')
+    elif fault=='job_exists':job.mkdir(parents=True)
+    elif fault=='stage_symlink':
+        saved=stage.with_name(stage.name+'-saved');stage.rename(saved);stage.symlink_to(saved,target_is_directory=True)
+    elif fault=='identity_tamper':
+        path=stage/'identity';path.chmod(0o600);path.write_bytes(b'changed');path.chmod(0o400)
+    else:(stage/'identity').chmod(0o600)
+    result=run_local_phase(commands[-1][2],root,environment)
+    assert result.returncode!=0 and commands[-1][1].encode()not in result.stdout
+    assert not(tmp_path/'launched').exists()and not(job/'code').exists()
+
+
+def test_staging_duplicate_initial_namespace_never_resumes(tmp_path):
+    *_,commands=staged_fixture();root,environment=local_transport_runtime(tmp_path)
+    assert run_local_phase(commands[0][2],root,environment).returncode==0
+    assert run_local_phase(commands[0][2],root,environment).returncode!=0
+    assert not(tmp_path/'launched').exists()
+
+
+def test_transport_main_serializes_phases_and_stops_immediately_on_unknown_ack(monkeypatch):
+    source=files();source['configs/big.json']=base64.b64encode(random.Random(310427).randbytes(155_000))
+    revision='a'*40;calls=[]
+    def git(argv):
+        if argv[3]=='status':return b''
+        if argv[3]=='rev-parse':return (revision+'\n').encode()
+        if argv[3]=='cat-file':return b''
+        if argv[3]=='archive':return full_archive(source)
+        raise AssertionError('Unexpected Git fixture call')
+    def azure(argv,**kwargs):
+        calls.append(argv)
+        return types.SimpleNamespace(returncode=0,stdout=remote_ack(argv)if len(calls)==1 else b'',stderr=b'')
+    monkeypatch.setattr(launcher.subprocess,'check_output',git);monkeypatch.setattr(launcher.subprocess,'run',azure)
+    with pytest.raises(RuntimeError,match='unacknowledged'):launcher.main(['--name','test','--script','infra/run_smoke.sh'])
+    assert len(calls)==2 and not any('systemd-run'in x[x.index('--scripts')+1]for x in calls)
+
+
+@pytest.mark.parametrize('fault',[None,'markers','symlink'])
+def test_inline_existing_snapshot_reused_only_exact_markers_and_canonical_job(tmp_path,fault):
+    source=launcher.runtime_archive(full_archive(files()),'infra/run_smoke.sh')[0]
+    encoded,sha=launcher.encoded_runtime_archive(source);revision='b'*40
+    commands=launcher.transport_commands(encoded,sha,source,revision,'infra/run_smoke.sh','reuse-test',[])
+    assert len(commands)==1 and len(commands[0][2].encode())<=180_000
+    root,environment=local_transport_runtime(tmp_path);job=root/'jobs'/revision/'run_smoke';job.mkdir(parents=True)
+    (job/'revision').write_text(revision+'\n');(job/'source-sha256').write_text((sha if fault!='markers'else'c'*64)+'\n')
+    (job/'code').mkdir();original=job/'code/unchanged';original.write_bytes(b'existing snapshot not rewritten')
+    if fault=='symlink':
+        saved=job.with_name('saved');job.rename(saved);job.symlink_to(saved,target_is_directory=True)
+    result=run_local_phase(commands[0][2],root,environment)
+    assert (result.returncode==0)is(fault is None)
+    assert (tmp_path/'launched').exists()is(fault is None)
+    assert original.read_bytes()==b'existing snapshot not rewritten'
+
+
+def test_staged_published_source_rehash_stops_tamper_before_systemd(tmp_path):
+    *_,commands=staged_fixture();root,environment=local_transport_runtime(tmp_path)
+    for _,_,script in commands[:-1]:assert run_local_phase(script,root,environment).returncode==0
+    publish=commands[-1][2]
+    old=' syncdir(job.parent)\n'
+    new=" syncdir(job.parent)\n p=job/'code'/'infra/run_smoke.sh';p.chmod(0o600);p.write_bytes(b'changed at publication');p.chmod(0o555)\n"
+    assert old in publish;result=run_local_phase(publish.replace(old,new),root,environment)
+    assert result.returncode!=0 and not(tmp_path/'launched').exists()
+    assert commands[-1][1].encode()not in result.stdout

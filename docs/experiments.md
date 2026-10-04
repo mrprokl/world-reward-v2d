@@ -6642,3 +6642,13 @@ queries plus native-ID attachment/mask export/private metadata copy are tested.
 New v2 is intentionally closed before IO; no acquisition/inference/GT evaluation
 was authorized. ActualAzure old2280B inventoryFAIL and2038B downloadFAIL remain
 unchanged; v2 output absent. Correctness preparation is not held-out quality.
+
+Azure immutable-code transport repair: two>200KB single-script invocations
+were acknowledged by the extension with0B scripts and no job/log/output.
+New controller splits only the full exact frozen code archive into bounded
+120KB phases when needed; every phase requires one exact unique stdout receipt.
+Full compressed+TAR hashes, safe member inventory and postpublication file
+hashes precede Linux atomicNOREPLACE and original systemd launch. No automatic
+retry/resume/merge, no producer or inference changes. Root109 transport fixtures
+PASS4.93s (mocked systemd; macOS only syscall emulated); actual staged Azure
+transport remains a separate unrun gate. Unknown receipt is not experimentPASS.

@@ -17,11 +17,15 @@ import re
 import shlex
 import subprocess
 import tarfile
+import json
 
 
 DEFAULT_RESOURCE_GROUP = "SCENESMITH-H100"
 DEFAULT_VM_NAME = "scenesmith-ncc-h100-01"
 MAX_CODE_CONTROL_BYTES = 256_000
+INLINE_SCRIPT_BYTES = 180_000
+STAGED_SCRIPT_BYTES = 120_000
+ACK_PREFIX = "WORLD_REWARD_DISPATCH_ACK_V1:"
 
 
 def encoded_runtime_archive(source_archive: bytes) -> tuple[str, str]:
@@ -226,6 +230,161 @@ def runtime_archive(full_archive: bytes, script: str) -> tuple[bytes, list[str]]
     return output.getvalue(), selected
 
 
+
+def transport_commands(encoded, archive_hash, source_archive, revision, script, name, arguments):
+    """Ordered code-only phases; no calls, retries or caller-selected remote paths."""
+    bundle = script.removeprefix("infra/").removesuffix(".sh")
+    unit = "world-reward-" + name
+    identity = hashlib.sha256((revision + script + name + archive_hash).encode()).hexdigest()
+    prefix = f"""set -eu
+set +x
+umask 077
+ROOT=/srv/scenesmith/world-reward
+UNIT={shlex.quote(unit)}
+JOB="$ROOT/jobs/{revision}/{bundle}"
+STAGE="$ROOT/jobs/.runtime-stage-{revision}-{bundle}-{name}-{identity[:16]}"
+/usr/bin/python3 -I -B - "$ROOT" "$JOB" "$STAGE" <<'PY_PATHS'
+from pathlib import Path
+import sys
+for value in sys.argv[1:]:
+ p=Path(value)
+ if not(p.is_absolute() and p.resolve()==p and not any(x.is_symlink()for x in(p,*p.parents))):raise RuntimeError('Canonical immutable transport paths required')
+PY_PATHS
+"""
+    preflight = f"""test -d "$ROOT/jobs" && test -d "$ROOT/results" || exit 1
+test ! -L "$ROOT" && test ! -L "$ROOT/jobs" && test ! -L "$ROOT/results" || exit 1
+test -z "$(systemctl list-units --all --plain --no-legend "$UNIT.service")"
+test ! -e "$ROOT/results/{name}.log" && test ! -L "$ROOT/results/{name}.log" || exit 1
+"""
+    launch = f"""test "$(cat "$JOB/revision")" = '{revision}'
+test "$(cat "$JOB/source-sha256")" = '{archive_hash}'
+systemd-run --unit "$UNIT" --property=Type=exec \\
+  --property=StandardOutput=append:"$ROOT/results/{name}.log" \\
+  --property=StandardError=append:"$ROOT/results/{name}.log" \\
+  /usr/bin/env WR_ROOT="$ROOT" WR_CODE="$JOB/code" WR_CODE_REVISION='{revision}' \\
+  /bin/bash "$JOB/code/{script}" {' '.join(shlex.quote(value) for value in arguments)}
+"""
+    def phase(label, command):
+        ack = ACK_PREFIX + identity + ":" + label
+        return label, ack, command + f"printf '%s\\n' '{ack}'\n"
+    inline = prefix + preflight + f"""if test ! -d "$JOB"; then
+  test ! -e "$JOB" && test ! -L "$JOB" || exit 1
+  mkdir -p "$JOB"
+  printf '%s' '{encoded}' | base64 -d > "$JOB/source.tar.xz"
+  echo '{archive_hash}  '"$JOB/source.tar.xz" | sha256sum -c - >/dev/null
+  mkdir "$JOB/code"
+  tar -xJf "$JOB/source.tar.xz" -C "$JOB/code"
+  rm "$JOB/source.tar.xz"
+  printf '%s\\n' '{revision}' > "$JOB/revision"
+  printf '%s\\n' '{archive_hash}' > "$JOB/source-sha256"
+  chmod -R a-w "$JOB/code"
+fi
+""" + launch
+    inline_phase = phase("inline-dispatched", inline)
+    if len(inline_phase[2].encode()) <= INLINE_SCRIPT_BYTES:
+        return [inline_phase]
+    chunks = [encoded[i:i + 112_000] for i in range(0, len(encoded), 112_000)]
+    descriptor = json.dumps(dict(revision=revision, archive_sha256=archive_hash, encoded_bytes=len(encoded),
+        tar_bytes=len(source_archive), tar_sha256=hashlib.sha256(source_archive).hexdigest(), chunks=len(chunks)), sort_keys=True)
+    guard = f"""test -d "$STAGE" && test ! -L "$STAGE" || exit 1
+test "$(cat "$STAGE/identity")" = '{identity}'
+test ! -e "$JOB" && test ! -L "$JOB" || exit 1
+"""
+    commands = [phase("stage-created", prefix + preflight + f"""test ! -e "$JOB" && test ! -L "$JOB" || exit 1
+test ! -e "$STAGE" && test ! -L "$STAGE" || exit 1
+mkdir -m 700 "$STAGE"
+(set -C; printf '%s\\n' '{identity}' > "$STAGE/identity")
+chmod 400 "$STAGE/identity"
+""")]
+    for index, chunk in enumerate(chunks):
+        prior = "" if index == 0 else f'test -f "$STAGE/chunk_{index-1:04d}" && test ! -L "$STAGE/chunk_{index-1:04d}" || exit 1\n'
+        body = prefix + guard + prior + f"""test ! -e "$STAGE/chunk_{index:04d}" && test ! -L "$STAGE/chunk_{index:04d}" || exit 1
+(set -C; printf '%s' '{chunk}' > "$STAGE/chunk_{index:04d}")
+chmod 400 "$STAGE/chunk_{index:04d}"
+"""
+        commands.append(phase(f"chunk-{index:04d}-stored", body))
+    publish = prefix + preflight + guard + f"""/usr/bin/python3 -I -B - "$STAGE" "$JOB" <<'PY_PUBLISH'
+import base64,ctypes,hashlib,io,json,lzma,os,stat,sys,tarfile
+from pathlib import Path,PurePosixPath
+stage,job=map(Path,sys.argv[1:]);wanted=json.loads({descriptor!r})
+def require(value):
+ if not value:raise RuntimeError('Immutable code transport failed closed')
+def canonical(p):return p.is_absolute() and p.resolve()==p and not any(x.is_symlink()for x in(p,*p.parents))
+require(canonical(stage) and stage.is_dir() and stage.stat().st_mode&0o777==0o700)
+identity_file=stage/'identity';s=identity_file.lstat()
+require(stat.S_ISREG(s.st_mode) and s.st_nlink==1 and s.st_mode&0o777==0o400 and identity_file.read_bytes()=={(identity+chr(10)).encode()!r})
+names=['chunk_%04d'%i for i in range(wanted['chunks'])]
+require({{p.name for p in stage.iterdir()}}=={{'identity',*names}})
+parts=[]
+for name in names:
+ p=stage/name;s=p.lstat();require(stat.S_ISREG(s.st_mode) and s.st_nlink==1 and s.st_mode&0o777==0o400 and 0<s.st_size<=112000)
+ parts.append(p.read_bytes())
+encoded=b''.join(parts);require(len(encoded)==wanted['encoded_bytes'])
+compressed=base64.b64decode(encoded,validate=True)
+require(hashlib.sha256(compressed).hexdigest()==wanted['archive_sha256'])
+with (stage/'source.tar.xz').open('xb')as f:os.fchmod(f.fileno(),0o400);f.write(compressed);f.flush();os.fsync(f.fileno())
+raw=lzma.decompress(compressed)
+require(len(raw)==wanted['tar_bytes'] and hashlib.sha256(raw).hexdigest()==wanted['tar_sha256'])
+with tarfile.open(fileobj=io.BytesIO(raw),mode='r:')as archive:
+ members=archive.getmembers();seen=set()
+ for m in members:
+  path=PurePosixPath(m.name)
+  require(m.isfile() and m.name not in seen and str(path)==m.name and not path.is_absolute() and '\\\\'not in m.name and all(x not in('','.','..')for x in m.name.split('/')))
+  require(m.name.startswith(('infra/','src/','configs/'))or m.name=='pyproject.toml');seen.add(m.name)
+ require({script!r}in seen)
+ pending=stage/'pending';pending.mkdir(mode=0o755);pending.chmod(0o755);code=pending/'code';code.mkdir(mode=0o755)
+ for m in members:
+  target=code/m.name;target.parent.mkdir(parents=True,exist_ok=True)
+  with target.open('xb')as f:os.fchmod(f.fileno(),m.mode&0o555);f.write(archive.extractfile(m).read());f.flush();os.fsync(f.fileno())
+  os.utime(target,(m.mtime,m.mtime))
+ for p in sorted(code.rglob('*'),reverse=True):
+  if p.is_dir():p.chmod(0o555)
+ code.chmod(0o555)
+ for name,value in(('revision',wanted['revision']),('source-sha256',wanted['archive_sha256'])):
+  with (pending/name).open('x')as f:os.fchmod(f.fileno(),0o444);f.write(value+'\\n');f.flush();os.fsync(f.fileno())
+ require(canonical(job.parent.parent))
+ if not job.parent.exists():job.parent.mkdir(mode=0o755);job.parent.chmod(0o755)
+ require(canonical(job.parent) and not job.exists() and not job.is_symlink())
+ def syncdir(p):
+  fd=os.open(p,os.O_RDONLY|os.O_DIRECTORY)
+  try:os.fsync(fd)
+  finally:os.close(fd)
+ for p in sorted(code.rglob('*'),reverse=True):
+  if p.is_dir():syncdir(p)
+ syncdir(code);syncdir(pending);syncdir(stage)
+ libc=ctypes.CDLL(None,use_errno=True);rename=getattr(libc,'renameat2',None);require(rename is not None)
+ rename.argtypes=(ctypes.c_int,ctypes.c_char_p,ctypes.c_int,ctypes.c_char_p,ctypes.c_uint);rename.restype=ctypes.c_int
+ require(rename(-100,os.fsencode(pending),-100,os.fsencode(job),1)==0)
+ syncdir(job.parent)
+ require({{str(p.relative_to(job/'code'))for p in(job/'code').rglob('*')if p.is_file()}}==seen)
+ for m in members:
+  target=job/'code'/m.name;require(canonical(target))
+  require(target.stat().st_mode&0o777==m.mode&0o555 and hashlib.sha256(target.read_bytes()).digest()==hashlib.sha256(archive.extractfile(m).read()).digest())
+ require((job/'revision').read_bytes()==(wanted['revision']+'\\n').encode() and (job/'source-sha256').read_bytes()==(wanted['archive_sha256']+'\\n').encode())
+for name in ['identity',*names,'source.tar.xz']:(stage/name).unlink()
+stage.rmdir()
+PY_PUBLISH
+""" + launch
+    commands.append(phase("published-dispatched", publish))
+    if any(len(command.encode()) > STAGED_SCRIPT_BYTES for _, _, command in commands):
+        raise RuntimeError("Code transport phase exceeds bounded120KB script budget")
+    return commands
+
+
+def invoke_transport(command, ack, resource_group, vm_name):
+    """Require explicit remote phase evidence; an empty Azure success is unknown."""
+    try:
+        result = subprocess.run(["rtk", "proxy", "az", "vm", "run-command", "invoke",
+            "--resource-group", resource_group, "--name", vm_name, "--command-id", "RunShellScript", "--scripts", command,
+            "--query", "value[0].message", "-o", "tsv"], check=False, capture_output=True, timeout=300)
+        stdout = result.stdout
+        if isinstance(stdout, bytes): stdout = stdout.decode("utf-8", errors="strict")
+        acknowledged = [line for line in stdout.splitlines() if line.startswith(ACK_PREFIX)]
+        if result.returncode != 0 or len(stdout.encode()) > 2_000_000 or acknowledged != [ack]:
+            raise RuntimeError("Unknown dispatch state")
+    except Exception:
+        raise RuntimeError("Azure phase unacknowledged; inspect target before any retry (payload omitted)") from None
+
 def main(argv=None) -> None:
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--name", required=True)
@@ -258,42 +417,12 @@ def main(argv=None) -> None:
     source_archive, paths = runtime_archive(git("archive", "--format=tar", revision,
                                                "infra", "src", "configs", "pyproject.toml"), args.script)
     encoded, archive_hash = encoded_runtime_archive(source_archive)
-    unit = "world-reward-" + args.name
-    command_arguments = " ".join(shlex.quote(value) for value in args.arguments)
-    bundle_id = args.script.removeprefix("infra/").removesuffix(".sh")
-    command = f"""set -eu
-ROOT=/srv/scenesmith/world-reward
-UNIT={shlex.quote(unit)}
-test -z "$(systemctl list-units --all --plain --no-legend "$UNIT.service")"
-JOB="$ROOT/jobs/{revision}/{bundle_id}"
-test ! -e "$ROOT/results/{args.name}.log"
-if test ! -d "$JOB"; then
-  mkdir -p "$JOB"
-  printf '%s' '{encoded}' | base64 -d > "$JOB/source.tar.xz"
-  echo '{archive_hash}  '"$JOB/source.tar.xz" | sha256sum -c - >/dev/null
-  mkdir "$JOB/code"
-  tar -xJf "$JOB/source.tar.xz" -C "$JOB/code"
-  rm "$JOB/source.tar.xz"
-  printf '%s\\n' '{revision}' > "$JOB/revision"
-  printf '%s\\n' '{archive_hash}' > "$JOB/source-sha256"
-  chmod -R a-w "$JOB/code"
-fi
-test "$(cat "$JOB/revision")" = '{revision}'
-test "$(cat "$JOB/source-sha256")" = '{archive_hash}'
-systemd-run --unit "$UNIT" --property=Type=exec \\
-  --property=StandardOutput=append:"$ROOT/results/{args.name}.log" \\
-  --property=StandardError=append:"$ROOT/results/{args.name}.log" \\
-  /usr/bin/env WR_ROOT="$ROOT" WR_CODE="$JOB/code" WR_CODE_REVISION='{revision}' \\
-  /bin/bash "$JOB/code/{args.script}" {command_arguments}
-systemctl show "$UNIT" -p ActiveState -p ExecMainStatus -p MainPID
-"""
-    print(f"immutable_runtime_bundle_files={len(paths)} encoded_bytes={len(encoded)} revision={revision}", flush=True)
-    result = subprocess.run(["rtk", "proxy", "az", "vm", "run-command", "invoke",
-                    "--resource-group", args.resource_group, "--name", args.vm_name,
-                    "--command-id", "RunShellScript", "--scripts", command,
-                    "--query", "value[0].message", "-o", "tsv"], check=False)
-    if result.returncode:
-        raise RuntimeError("Azure dispatch failed; inspect target unit/log before any retry (payload omitted)")
+    commands = transport_commands(encoded, archive_hash, source_archive, revision, args.script, args.name, args.arguments)
+    print(f"immutable_runtime_bundle_files={len(paths)} encoded_bytes={len(encoded)} revision={revision} transport_phases={len(commands)}", flush=True)
+    for phase, ack, command in commands:
+        invoke_transport(command, ack, args.resource_group, args.vm_name)
+        print(f"immutable_transport_phase={phase} acknowledged=true dispatch_only=true", flush=True)
+
 
 
 if __name__ == "__main__":
