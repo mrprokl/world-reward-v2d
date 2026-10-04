@@ -1,0 +1,38 @@
+{
+  "schema": "world_reward.object_budget_conditioned_marker_technical_replay.v1",
+  "original_producer_revision": "2856020c487aa1ac57af6ddbf1e1c3b7a0dbe56a",
+  "original_source_files": 175,
+  "original_source_archive_sha256": "9203392e9c5f10d79d94f8155ffb7593becd3bccc500d6cb24a495f84605c7bc",
+  "original_source_files_sha256": "2991aa2e9e88584aa2d11cb84bb2bd691c11c28408c51a273d3829b16a4656cc",
+  "original_episode": 9,
+  "original_unit": "world-reward-conditioned-mesh-ep09-v1.service",
+  "original_output": "outputs/episode_000009/object_budget_conditioned",
+  "preserved_failure_archive": "outputs/episode_000009/object_budget_conditioned_failed-2856020c487aa1ac57af6ddbf1e1c3b7a0dbe56a",
+  "original_failure_report": {
+    "bytes": 1208,
+    "sha256": "a12cc415b4364e5161da8ccfb317f5cd8adbfdb237cceba3f11f4d55d835151f"
+  },
+  "unchanged_pipeline": {
+    "bytes": 34173,
+    "sha256": "8e4308fc877f04391d7294d7f11b2a0a6a90de46f16111bf3db415dda96cf971"
+  },
+  "unchanged_cpp": {
+    "bytes": 16162,
+    "sha256": "f97d826d8543822c7ebbe11b4ef12c69a29c246a0902a0ea7484515c3f79148b"
+  },
+  "unchanged_protocol": {
+    "bytes": 1681,
+    "sha256": "73e326d521ce7febae057f800b6b477aca34f24dca1961e75e01e0dd3f3ab46a"
+  },
+  "demonstrated_cause": "Two readonly source-publication markers exist on host but were not mounted in container; source_binding FileNotFoundError before any geometry or native invocation",
+  "only_runtime_change": "Validate two regular nonsymlink parent markers before output reservation and bind each readonly at its original path",
+  "archive_policy": "Reauthenticate complete original closure, exact lone failure, terminal unit and absent CPU container; atomic renameat2 RENAME_NOREPLACE; preserve report bytes, inode, ownership and mode; exclusive tiny receipt; no overwrite or deletion",
+  "replay_unit": "world-reward-conditioned-mesh-ep09-v1-markers.service",
+  "replays_maximum": 1,
+  "original_native_attempts": 0,
+  "original_science_started": false,
+  "original_failure_remains_fail": true,
+  "algorithm_geometry_inputs_and_budgets_unchanged": true,
+  "scientific_adoption": false,
+  "challenge_performance_verified": false
+}

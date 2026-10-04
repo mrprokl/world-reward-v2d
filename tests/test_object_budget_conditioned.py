@@ -87,6 +87,8 @@ def runtime(tmp_path):
     helper = root/'vendor/v2d_submission_kit/v2dlb/mesh_budget.py'
     helper.parent.mkdir(parents=True); helper.write_text('public official helper fixture')
     code = tmp_path/'code'; code.mkdir(); binary = tmp_path/'bin'; binary.mkdir(); log = tmp_path/'docker.json'
+    (code.parent/'revision').write_text('a'*40+'\n')
+    (code.parent/'source-sha256').write_text('b'*64+'\n')
     for name, body in {'id': 'printf "1000\\n"', 'chown': 'exit 0',
                        'timeout': 'shift 3; exec "$@"'}.items():
         p = binary/name; p.write_text('#!/bin/sh\n'+body+'\n'); p.chmod(0o755)
@@ -120,6 +122,8 @@ def test_conditioned_single_container_exact_narrow_readonly_cpu_mounts(runtime, 
     assert args[args.index('--tmpfs')+1] == '/tmp:rw,nosuid,nodev,noexec,size=8g'
     mounts = [args[i+1] for i, item in enumerate(args) if item == '--mount']
     assert f'type=bind,src={helper},dst={helper},readonly' in mounts
+    for name in ('revision', 'source-sha256'):
+        assert mounts.count(f'type=bind,src={code}/../{name},dst={code}/../{name},readonly') == 1
     assert f'type=bind,src={root}/vendor/v2d_submission_kit,dst={root}/vendor/v2d_submission_kit,readonly' not in mounts
     assert not any('validation/volume_qem_v1' in item for item in mounts)
     assert f'type=bind,src={base},dst={base},readonly' in mounts
@@ -159,6 +163,30 @@ def test_conditioned_image_and_helper_fail_closed_before_docker(runtime):
     (root/'outputs/episode_000009').mkdir()
     (root/'results/image-volume-qem.json').write_text(json.dumps({'status': 'pass', 'image_id': 'sha256:'+'a'*64}))
     assert run(['--episode', '9', '--backend', 'conditioned']).returncode != 0 and not log.exists()
+
+
+@pytest.mark.parametrize('name', ['revision', 'source-sha256'])
+@pytest.mark.parametrize('kind', ['absent', 'symlink', 'directory'])
+def test_conditioned_missing_or_unsafe_parent_marker_fails_before_output_reservation(runtime, name, kind):
+    root, code, helper, log, env, run = runtime
+    base = root/'outputs/episode_000009'; base.mkdir()
+    marker = code.parent/name; marker.unlink()
+    if kind == 'symlink':
+        target = code.parent/'unrelated'; target.write_text('not a marker'); marker.symlink_to(target)
+    elif kind == 'directory':
+        marker.mkdir()
+    assert run(['--episode', '9', '--backend', 'conditioned']).returncode != 0
+    assert not log.exists() and not (base/'object_budget_conditioned').exists()
+
+
+def test_default_volume_does_not_require_or_mount_new_conditioned_parent_markers(runtime):
+    root, code, helper, log, env, run = runtime
+    (root/'outputs/episode_000009').mkdir()
+    for name in ('revision', 'source-sha256'):
+        (code.parent/name).unlink()
+    assert run(['--episode', '9']).returncode == 0
+    args = json.loads(log.read_text())
+    assert not any('/../revision' in item or '/../source-sha256' in item for item in args)
 
 
 def test_shell_syntax_shared_route_and_no_automatic_adoption():

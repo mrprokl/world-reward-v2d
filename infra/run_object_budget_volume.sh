@@ -14,6 +14,10 @@ export DOCKER_HOST="unix://$ROOT/docker.sock"
 printf -v PADDED '%06d' "$EPISODE"
 BASE="$ROOT/outputs/episode_$PADDED"
 OUT="$BASE/object_budget_$BACKEND"
+if [[ $BACKEND == conditioned ]]; then
+ [[ -f "$CODE/../revision" && ! -L "$CODE/../revision" ]] || exit 1
+ [[ -f "$CODE/../source-sha256" && ! -L "$CODE/../source-sha256" ]] || exit 1
+fi
 [[ ! -L "$ROOT/outputs" && ! -L "$BASE" && ! -e "$OUT" && ! -L "$OUT" ]]
 mkdir "$OUT"
 chown "$(id -u scenesmith):$(id -g scenesmith)" "$OUT"
@@ -33,6 +37,8 @@ if [[ $BACKEND == conditioned ]]; then
  [[ -f "$HELPER" && ! -L "$HELPER" ]]
  EXTRA+=(--read-only --cap-drop ALL --security-opt no-new-privileges
   --tmpfs /tmp:rw,nosuid,nodev,noexec,size=8g --env WR_CODE="$CODE"
+  --mount "type=bind,src=$CODE/../revision,dst=$CODE/../revision,readonly"
+  --mount "type=bind,src=$CODE/../source-sha256,dst=$CODE/../source-sha256,readonly"
   --mount "type=bind,src=$HELPER,dst=$HELPER,readonly")
 else
  EXTRA+=(--mount "type=bind,src=$ROOT/vendor/v2d_submission_kit,dst=$ROOT/vendor/v2d_submission_kit,readonly"

@@ -7999,3 +7999,16 @@ unresolved, objectSE3/synchronization issues13/9/15 also unresolved. HIMO is
 explicitNC; HUMOTO publicanimations not established realRGB/HOI reference.
 Permission requests remain UNSENT, no accounts/datasets/labels fetched. Prefer
 one targeted rights/provenance clarification to another unrelated proxy pipeline.
+
+First production conditioned-mesh attempt under2856020 ended authentication FAIL
+after0.022222s, native_attempts0: wrapper omitted two readonly publication-marker
+mounts needed by source_binding. No source geometry, cache qualification or native
+attempt was reached; output is only report1208B
+SHAa12cc415b4364e5161da8ccfb317f5cd8adbfdb237cceba3f11f4d55d835151f.
+Independent full175file/source-marker/terminal-unit/removedCPUcontainer audit PASS;
+original failure stays FAIL. Preregister exactly one packaging-only technical
+replay in object_budget_conditioned_marker_replay_v1.json; archive exclusively
+with atomic no-replace rename and retain original bytes/owner/mode. Pipeline,
+CPP, protocol, inputs and budgets remain unchanged. Wrapper validates two regular
+nonsymlink markers before reserving output, mounts each readonly; legacy volume
+does not require them. No scientific result or geometry adoption from this fix.
