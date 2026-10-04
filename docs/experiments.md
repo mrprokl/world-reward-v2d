@@ -7724,3 +7724,12 @@ values unchanged; mandatory future acquisition pins not fabricated. Pure streami
 operator has32proceduraltests; root605integratedPASS6.76s. Actual data-free native
 CUDA API gate dispatched separately, not presumedPASS. No new dataset/private
 values yet; unknown overlap/CC-BY-NC4 retains diagnostic-only scope.
+
+Native SAM2 video API data-free CUDA gate actualPASS11.442363s within frozen90s:
+one model/two independent sequential states, automatic-procedural two boxes at
+frame2, forward[2,3,4]/reverse[2,1,0], all `[2,1,480,640]` finite logits and exact
+slots. Source126files/installedSAM2/assets pre/posthash, owncontainer/CID removed,
+GPUidle/cooperativeinode unchanged; original BF16/TF32off/nativevideo defaults.
+No dataset/private/RGB observations or accuracy claim. Receipt5927B
+SHA5a32ed5287c8ec1fc0a4b01e4d394773adb052b0f3fb02584a7567fe39f140b6,
+results/sam2-hand-video-gate-5371fc7881c7434dad02851f455e76a1/report.json.
