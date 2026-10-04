@@ -44,6 +44,9 @@ for an originally valid native candidate stops the **whole pilot**, rather than
 silently pruning one branch or refitting a shared pool. Both rankings therefore
 use exactly the original frozen valid-candidate mask; their only difference is
 the preregistered point unary. No-visible frames keep the native zero added cost.
+`world_reward.point_pose_comparison` now tests this two-ranking contract against
+an independent manual unary/native Viterbi reference. It is not an executed
+tracker or a validated improvement.
 
 Initialization preflights are frozen before execution: three native MoGe2
 frame-zero calls (≤300s) retain native validity/XYZ/K without a human scalar;

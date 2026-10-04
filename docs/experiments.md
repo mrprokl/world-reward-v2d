@@ -6313,3 +6313,9 @@ existing explicit deny-all-inbound NSG (not an algorithm failure). Add only one
 fresh owned exact10.0.0.4/32→10.0.0.9/32 TCP2222 rule at4095, preserving the deny
 and every original rule; remove this exact rule after sealed transfer. No broad
 network exposure, credential/key replacement or reinterpretation of the FAIL.
+
+Same-pool comparison operator is frozen and independently tested: root283
+point/ray/pool/private-motion/native-selection combined PASS0.63s. Both native
+Viterbi paths retain identical original25-slot pool/validity/transition weights;
+any originally valid nonfront witness stops both, preventing a pruning confound.
+Only the point unary differs. No model run or private3D evaluation yet.
