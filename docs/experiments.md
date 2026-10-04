@@ -7193,3 +7193,19 @@ performance yet. Calibration rule fixed before acquired private labels :
 all-supported score>0/gap>0, decision3 all initial identities correctly covered,
 evaluation6 ≥one additional initial identity success with no wrong-ID increase.
 Only a mechanism micro-test, not full-T masks, 3D/contact gain or CARI4D victory.
+
+Actual DexYCB downloadv2 PASS224.717368s undera1b55f5, two parallel original
+archives sealed444 onAzure, source/markers rehashed and ownparts removed.
+Receipt2370B SHA5430305207ac6a19f54167b97c5829355067d7ef3271c420d2ccfec03baf62eb.
+Subject01 12,412,314,463B SHAce44e97a7567f7fb128b474ae33f327715314956a1c7b24cb08b08bc51cf4303
+(167.593748s); subject02 12,004,145,048B SHAdf785049fdaf9266cbba4102084bd435e72ae12836fa603bdce00182c449bd89
+(224.651084s). Measured original archive identities, not publisher checksums;
+gzip CRC/extraction/GT/model quality not yet checked. No24GB laptop transit.
+
+Full tiny suite at4d4a049 (before CPUcalibration newfiles collected) completed
+**12594PASS8optionalSKIP482.26s**; exact isolated own/tmp removed after receipt.
+CPUidentity micro-gate83e41c9 root116PASS2.10s, reservationacefda8 root87PASS1.63s.
+Public features and all twelve raw scores/proposals freeze before decisionlabels,
+decisionFAIL forbids subject01 labels. Onlyseg andtwo targetmetafields constructed;
+safe YAML syntax node audit never constructs other private camera/MANO values.
+No acquired private labels or actualtrainedmodel/accuracy evidence yet.

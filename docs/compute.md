@@ -45,6 +45,13 @@ failed at10:17:34UTC after that predecessor was collected, with no child inferen
 Root independently checked all EP13 targets absent before direct replay under
 the unchanged `814179a` source. Actual v2 MainPID1330097 is active; only full Body
 completion is established at this snapshot, not depth/object/full inputs PASS.
+
+VM02 external identity research : DexYCB original two-subject downloadv2
+PASS224.717368s,24,416,459,511B entirely on the owned Azure data disk. SHA values
+are caller-measured, not publisher checksums; extraction/full gzip CRC and
+predictor validation remain separate. No labels were interpreted or model run.
+Candidate-bank, full-clip tracker and CPU calibration stages are implemented;
+initial-identity micro-gate is frozen before private labels, not a3D victory.
 D107 independent TUM depth validation is REJECT4.904632756% < frozen5%; the
 four-anchor hand-support pilot is also closed REJECT. Neither is adopted.
 
