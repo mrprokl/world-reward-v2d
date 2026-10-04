@@ -17,19 +17,29 @@ PASS. Episode5 full668 initializers and a separately gated three-shell/cavity
 volume proposal pass; full tracking now passes668/668 in3605.685147s. One GPU job
 per VM; scoped locks release before CPU preparation for disjoint overlap.
 
-EP5's original CPU input assembly remains active. EP6's untouched scheduling-
-only queue was cancelled before any producer ran; a fresh direct fixed-all16
-frontend route uses the released GPU. No frame/threshold changes. VM02 opaque
-RoboTAP acquisition passes. Its Boots dependency build's incorrect API probe
-remains FAIL; independent native CPU verification of the unchanged installed
-image now **PASS2.510988s**, before model/checkpoint execution. The first public-
-adapter launch failed in host source-closure preflight before private decoding
-or output creation; benchmark inference/evaluation is pending.
+EP5's original CPU input assembly passes all668frames; shared preparation is
+queued under the original GPU lock. EP6's default topology reduction failed
+before any pose; an independently qualified volume proposal and authenticated
+empty-directory archive preserve that failure. The unchanged full816-frame
+volume tracker is active, most recently200frames complete. EP7's empty fixed
+anchor is closed without reroll; EP8's complete634-frame initializers and minimal
+private archive pass. Its first private transfer stopped on the existing NSG
+deny before any bytes; a temporary exact private-pair TCP2222 rule fixes that
+transport barrier, not the prediction algorithm. A new transfer is pending.
+All masks/frames/shape/scale contracts remain unchanged.
+
+VM02 Boots native CPU verification, full three-video inference and preregistered
+CPU evaluation pass: meanAJ0.6679 versus static0.1778. The earlier API/format/
+receipt-access FAILs remain preserved; oracle initial queries, a static negative
+control and unknown training overlap preclude a3D/generalization/CARI4D claim.
+New full-contiguous YCBV acquisition is CPU-active under a900s fixed budget;
+automatic3D point-pose validation has not run. Its three-anchor depth and
+automatic-mask preflights and identical-pool comparison are separately gated.
 
 D107 real-depth independent validation is closedREJECT: median4.904632756%
 gain is below frozen5%; no retuning or rounded success. Native offline temporal
 depth is a new hypothesis, not acquired/adopted; OpenLORIS registration is not
-yet proved exact color-camera Z. Fullsuitea06b70310944PASS/3optionalSKIP399.72s.
+yet proved exact color-camera Z. Fullsuite40ee2cb11398PASS/4optionalSKIP406.42s.
 No final Parquet or verified CARI4D
 improvement. Heavy models/RGB/arrays stayAzure.
 Frozen receipts, producing commits, budgets and decisions are in
@@ -70,7 +80,9 @@ mutation. Inference uses `--network none`; acquisition downloads directly toAzur
 
 ## Reproducible jobs
 
-`infra/azure_job.py` requires a clean committed worktree, sends only source import
+`infra/azure_job.py` defaults to a clean committed worktree; optional strict
+40-hex `--revision` archives only that verified commit during disjoint edits.
+It sends only source import
 closure plus small package/config as SHA-verified XZ (≤256KB base64), extracts
 read-only, and creates one unique systemd unit/log. Never replace active readers,
 restart on an observation timeout, or reuse a failed result path. Earlier legacy
