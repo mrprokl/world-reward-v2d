@@ -6429,3 +6429,22 @@ Private YCB evaluator now requires an exclusive host-post seal after exact owned
 cleanup and source/public/producer/full-image postchecks; original container
 report remains unchanged. Root227focused tests PASS7.20s and Bash syntax PASS.
 Neither the adapter nor its mock tests constitute an actual3D quality result.
+
+2026-10-04 ~03:17UTC actual existing Objects CPU inventory **PASS19.230776s**,
+producer951868e0; report3325B SHA
+`6329efa998d47fdf54e4ec94983596ff7c317fcb3361635acc3b4ea38f7cc078`,
+Azure-only runtime59010B SHA
+`d06e6f606adc617d6b6d5c15024e2ee1aece99dbed3d760971bf2d622adbaf68`,
+180installed Python source fingerprints. No RGB, checkpoint loading or GPU.
+Independent full asset/receipt/image rehash and restricted-read/native-API probe
+are next; first-observed source facts are not commit parity or overlap/license
+clearance. Native Objects12outputs now rehash after final host postchecks;
+150tiny Objects/track/transport tests PASS1.31s, not a held-out model result.
+
+EP8 volume tracker3afaf6a actual unit active, single218724GPU worker1886MiB;
+no final pose receipt yet. Exact newly owned transport NSG/listener/hostkey and
+client key pair are removed; original denied inbound rule and failures remain.
+The first cleanup diagnostic stopped before deleting anything because generated
+public key had an optional comment; canonical public-key parsing fixed only
+the cleanup check, never the key/source/predictions. Private key bytes unread.
+YCBV CPU acquisition remains in download phase; pending status is not a FAIL.
