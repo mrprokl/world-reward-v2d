@@ -8393,3 +8393,14 @@ whollycontained and removed2066entries, no foreign sweep.
 Actual EP22 lock-only replay222-sourcefiles and EP21 shared-prepare195-sourcefiles
 independently byte/ledger/markerverified. Both active at18:50UTC, EP21 waiting
 on sameGPUlock; no nativePASS inferred from Result=success on a runningunit.
+
+Shared fixed-shape pose composition extracted from existing YCB glue into one
+typed numerical primitive, leaving historical producer/math unchanged. Same
+automatic queries/native25pool/existingA–B unary/transitions, fullT/sourceIDs;
+one trackcallback onlyafterpool. Independent audit reproduced stale mask/depth/
+pointmap mutation bycallbackclosure; fixed beforeadoption via individualhashes
+andweakrefs toalivearrays, no fullTpointmapretention. Sixnegative mutationtests
+plusgeneratorGC preserveRGB andprovepointmaprelease. Root223combinedtests
+PASS0.94s/40newtests, own1-entryfixture removed. Preliminary216testsPASS0.81s
+cleanup name-shadowing exception corrected read-only/no native rerun. No actual
+learnedexecution, heldoutquality, challengeprediction or HOIgain from extraction.

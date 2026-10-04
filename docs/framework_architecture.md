@@ -17,6 +17,7 @@ restent locaux ; médias, modèles, caches et expérimentations restent sur Azur
 | Hypothèses objet | `point_candidate_pool.CandidatePool`, `pose_selection.PosePath` | Pool natif25 et sélection ; manque un contrat commun aux autres expériences. |
 | Forme partagée | `shape_model.apply_fixed_shape`, `shape_fit.fit_shared_shape`, `shape_selection.select_shape_candidate` | Opérateurs expérimentaux ; pas adoption automatique. |
 | Association pose/image | `point_pose_comparison.compare`, `rgb_pose_tracking.track_rgb_pose` | Coût ou suivi image, pas preuve de précision3D. |
+| Composition pose commune | `fixed_shape_point_pose.compare_fixed_shape_sequence` | Extraction générique du raccord pool/query/tracks A/B ; callbacks natifs, aucune nouvelle inférence ou amélioration mesurée. |
 | Identité temporelle | `temporal_identity.IdentityGraph`, `rank_identity_paths` | Ranking global et min-marginales de coûts fournis ; aucun générateur de candidats/costs appris, identité acceptée ou probabilité. |
 | Evidence relationnelle | `relational_motion.relational_motion_features` | Résidus 2D après nuisance affine du fond, comptages/support ; tracks fournis, pas génération/identité/contact/confiance ni caméra physique. |
 | Vraisemblance conditionnelle | `relational_likelihood.conditional_relational_likelihood` | Gaussian HMM forward sur innovations fournies, marginales communes, null et poids relatifs ; hypothèses d'indépendance non validées, pas modèle appris/calibration/identité/contact. |
@@ -208,6 +209,41 @@ de transport. Une seule scène/ledger minimal doit rendre les échecs comparable
 Le résultat final reste un Parquet gelé pour les cinq compétitions **World Reward**,
 avec commit accessible, règles acceptées et quota vérifié ; aucune victoire
 annoncée à partir d'un proxy, d'un gate CPU ou d'un packing PASS.
+
+### Audit complémentaire : prior adaptatif dans les propositions, pas guidance3D
+
+Le [code Do-as-I-Do pré-cutoff](https://github.com/malik-group/do-as-i-do/tree/824591b808c342b20079c3b4198a8c2bdf88c74e)
+isole un cœur Fast-SAM3D sans mains, mais ses points règlent la force du prior via
+une rotation **2D image**, pas une perte géométrique de reprojection. Son CLI
+interpole des vitesses mal supportées, saute des masques vides et peut lire des
+extrinsèques HDF5 : il ne respecte pas notre full-T et ne sera pas importé tel
+quel. Le [papier](https://arxiv.org/abs/2606.19333) emploie des mains GT dans
+son évaluation HOI, donc ne prouve pas le gain RGB-only recherché.
+
+Hypothèse distincte, **différée** : prior précédent constant contre prior modulé
+par mouvement image observé, à forme/échelle/caméra/observations identiques.
+Avant tout run, prouver la compatibilité exacte des poids/configurations et
+l'injection explicite de nos pointmaps/K, sans nouveau modèle caché. Aucun
+modèle forké non audité, oracle, frame supprimée ou interpolation présentée
+comme observation. Le code racine et le fork sont MIT ; droits des checkpoints
+et overlap restent séparés et non vérifiés. Source principale Fast-SAM3D
+`track_object.py` au pin823d4784dbf73a9a58ca8b2384dee1eaf8fc1c6b :83898B,
+SHA136531d4248fd2f57c1f812d9a770839bf2de5d91eb48d14efe81f3185001cca.
+Pas d'expérience ou gain revendiqué ; le diagnostic ne justifie pas une nouvelle
+stack de wrappers. Réutiliser d'abord les primitives actuelles de scène/pool/points.
+
+Le raccord déjà présent dans l'expérience YCB est maintenant extrait dans
+`fixed_shape_point_pose`, sans modifier cet ancien producteur ou rouvrir sa
+cohorte : géométrie/caméra/gauge unique, temps original et sourceIDs explicites,
+queries automatiques figées, pool natif25 complet avant un unique callback de
+tracks. A/B partagent le même pool et les opérateurs/poids existants ; pas de
+feedback tracks→seeds, nouveau score, PnP, Gaussian ou fallback statique.
+Copies readonly et preuves de mutation encadrent les callbacks. Les pointmaps
+streamées ne sont pas retenues : weakrefs vérifient les arrays encore vivants ;
+seuls RGB restent présents jusqu'au callback natif. Le test générateur/GC vérifie
+ce contrat mémoire. Root223 tests combinés PASS0.94s, dont40 nouveaux tests ;
+aucun modèle/Azure/cohorte/mesure3D. `<40` observations par frame reste un échec :
+la composition ne résout pas seule l'occlusion, l'identité ou la jauge absolue.
 
 
 ## 8. Next integrated experiment decision — October4

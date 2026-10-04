@@ -34,9 +34,15 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 18 | 535 | Original source boundary/nonmanifold rejection before object pose; closed, no repair. |
 | 19 | 443 | Original topology-budget FAIL before object pose; all eight fixed whole/component candidates rejected, no repair. |
 | 20 | 549 | Original topology-budget FAIL before object pose at15:24:39UTC; all eight fixed whole/component candidates rejected after full body/depth/initializers. Closed without repair. |
-| 21 | 563 | Original full body/depth/initializers PASS; full object pose PASS2872.496811s/all563 at16:33:58UTC. CPU input assembly active (50 depth frames at last query); no complete inputs or accuracy presumed. |
-| 22 | — | Original full frontend unit queued behind EP21; no model execution presumed. |
-| 23 | 552 | New initializer-only scheduler source209files independently verified under0444f56. Unit waiting for terminal EP22 since16:28:37UTC, no output/model execution yet. Future pose-only may run on VM02 after actual initializer input pins/transfer. |
+| 21 | 563 | Original full frontend/input PASS,15 inputs pinned. Explicit lock-only shared-prepare replay actual PASS20.261004s/full563; next-stage inventory pending. No forward/refinement/export or accuracy presumed. |
+| 22 | — | Original predecessor-wait failure preserved. New lock-only full frontend replay reached native execution and failed; scalar reason under audit, no successful full trajectory presumed. |
+| 23 | 552 | Full original initializers actual PASS17:56:49UTC, no object trajectory yet. Future pose-only may run on VM02 after actual initializer input pins/transfer. |
+| 24 | — | Automatic actor ambiguity rejected before frontends; no manual selection. |
+| 25 | 365 | Full initializers and exact private Azure transfer pass. Parent-only pose replay reaches native geometry then rejects boundary/nonmanifold/orientation/Euler changes; no trajectory. |
+| 26 | 399 | Full original initializers pass, no object trajectory yet. |
+| 27 | 440 | Full original initializers pass, no object trajectory yet. |
+| 28 | 366 | Full original initializers pass18:04:45UTC, no object trajectory yet. |
+| 29 | 419 | Original inputs ready, initializer targets verified untouched; not yet dispatched. |
 
 Eleven complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
