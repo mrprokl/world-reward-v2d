@@ -2,11 +2,15 @@
 import hashlib,json,os,re,signal,stat,struct,subprocess,time,urllib.parse,urllib.request
 from pathlib import Path,PurePosixPath
 ROOT=Path('/srv/scenesmith/world-reward');JOB='run_ycbv_archive_headers'
-PINS='configs/ycbv_point_inventory_failed_pins.json';MAX=32*1024**2;SECONDS=300
+PINS='configs/ycbv_point_inventory_failed_pins.json';HEADER_PINS='configs/ycbv_archive_header_failed_pins.json';MAX=32*1024**2;SECONDS=300
 REV='5c2c4aa229800355648cd268040aa814f8dc94f0'
 FAILED_REV='facbf00a4ab01091629301d936c1ea38018bc0e5'
 FAILED_SCRIPT='93c1f716548da6df93de8e8a9f597c6b2b13966f0c984c1292fd5b08c993ffce'
 FAILURE_REPORT=dict(path='validation/ycbv_point_pose_v1/report.json',bytes=2280,sha256='5eea9045ae8038dd2eb6e20463900f7c2bf45dd5bd65014f10280b9eeecd177e')
+HEADER_REV='cd505d2393f9f83bb070b4ece73dc1c487f6d248'
+HEADER_SCRIPT='cae27c5f58672150349f70aa9b240fd58eea1180f9293832d08154f9c4505fce'
+HEADER_REPORT=dict(path='results/ycbv-archive-header-diagnostic-'+HEADER_REV+'/report.json',bytes=14289,sha256='c263f8d4b9323c2b07a4bcc811844ba0483bbfcc9123731c38bfb14f40b6490e')
+BASE_XET='7da0c2d50e020426eb793d83272d210153cc1c1e8af99bd538ed794e721c4e53'
 STABLE=lambda s:(s.st_dev,s.st_ino,s.st_mode,s.st_size,s.st_mtime_ns,s.st_ctime_ns,s.st_nlink)
 PIN_KEYS={'schema','producer_revision','script_sha256','report','status','phase','error_type','elapsed_seconds','source_rehashed_after','disposable_archives_removed','cleanup_completed','RGB_inputs_retained','private_files_retained','private_annotation_values_decoded','base_archive_layout_independently_verified','full_test_inventory_failure_cause_verified','further_acquisition_authorized'}
 ARCHIVES={'ycbv_base.zip':(15805,'98440f8bd403100b21cf11a6729fabe8b3d5ce714472edc57a18b7f1fcd4bb18'),'ycbv_test_all.zip':(14969383039,'fea2ab5f18aba1857acd320827cec10d9dbf258e4940ea4b52f5dd51cb2356a7')}
@@ -20,28 +24,38 @@ def public_url(url,redirect=False):
     p=urllib.parse.urlsplit(url);h=p.hostname or ''
     need(p.scheme=='https' and not p.username and not p.password and p.port in (None,443) and not p.fragment and (h=='huggingface.co' or redirect and (h.endswith('.hf.co') or h.endswith('.huggingface.co'))) and (redirect or not p.query) and not any(k.lower()in ('token','access_token','authorization','api_key')for k,v in urllib.parse.parse_qsl(p.query)),'public_https')
 class Redirect(urllib.request.HTTPRedirectHandler):
-    def __init__(self,sha):self.sha=sha
+    def __init__(self,sha,size,url):self.sha=sha;self.size=size;self.url=url;self.primary=None;self.target=None;self.hops=0
     def http_error_302(self,req,fp,code,msg,headers):
-        self.hops=getattr(self,'hops',0)+1;need(self.hops<=5,'redirect_bound');newurl=headers.get('Location')or headers.get('URI');need(newurl is not None,'redirect_location')
-        new=self.redirect_request(req,fp,code,msg,headers,newurl);fp.close();return self.parent.open(new,timeout=req.timeout)
+        try:
+            self.hops+=1;need(self.hops<=5,'redirect_bound');newurl=headers.get('Location')or headers.get('URI');need(newurl is not None,'redirect_location')
+            new=self.redirect_request(req,fp,code,msg,headers,newurl)
+        finally:fp.close()
+        return self.parent.open(new,timeout=req.timeout)
     http_error_301=http_error_303=http_error_307=http_error_308=http_error_302
     def redirect_request(self,req,fp,code,msg,headers,newurl):
-        public_url(newurl,True);linked=headers.get('X-Linked-ETag')
-        if linked is not None:need(linked.strip('"')==self.sha,'linked_etag')
+        public_url(newurl,True)
+        if req.full_url==self.url:
+            linked=headers.get('X-Linked-ETag','').strip('"');xet=headers.get('X-Xet-Hash','')
+            need(self.primary is None and headers.get('X-Repo-Commit')==REV and linked==self.sha and headers.get('X-Linked-Size')==str(self.size) and re.fullmatch('[0-9a-f]{64}',xet),'primary_identity_chain')
+            self.primary=dict(revision=REV,LFS_sha256=linked,bytes=self.size,Xet_hash=xet)
+        else:need(self.primary is not None and req.full_url==self.target,'redirect_chain')
+        self.target=newurl
         return super().redirect_request(req,fp,code,msg,headers,newurl)
 class Ranges:
-    def __init__(self):self.bytes=0;self.requests=0;self.proofs=[]
+    def __init__(self):self.bytes=0;self.requests=0;self.proofs=[];self.identities={}
     def get(self,name,start,end):
         size,sha=ARCHIVES[name];need(0<=start<=end<size and self.bytes+end-start+2<=MAX,'range_budget')
-        url=f'https://huggingface.co/datasets/bop-benchmark/ycbv/resolve/{REV}/{name}';public_url(url)
-        opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),Redirect(sha))
+        url=f'https://huggingface.co/datasets/bop-benchmark/ycbv/resolve/{REV}/{name}';public_url(url);redirect=Redirect(sha,size,url)
+        opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),redirect)
         req=urllib.request.Request(url,headers={'Range':f'bytes={start}-{end}','Accept-Encoding':'identity'})
         with opener.open(req,timeout=30)as response:
-            public_url(response.geturl(),True);h=response.headers;n=end-start+1
-            if not (response.status==206 and h.get('Content-Range')==f'bytes {start}-{end}/{size}' and h.get('Content-Encoding','identity').lower()=='identity' and h.get('Content-Length')==str(n) and h.get('ETag','').strip('"')==sha):
+            public_url(response.geturl(),True);h=response.headers;n=end-start+1;primary=redirect.primary;etag=h.get('ETag','').strip('"')
+            if not (primary is not None and response.geturl()==redirect.target and response.status==206 and h.get('Content-Range')==f'bytes {start}-{end}/{size}' and h.get('Content-Encoding','identity').lower()=='identity' and h.get('Content-Length')==str(n) and etag==primary['Xet_hash']):
                 raise ContractError('range_headers',dict(status=response.status,requested_bytes=n,headers_sha256=hashlib.sha256(json.dumps({k:h.get(k)for k in ('Content-Range','Content-Length','Content-Encoding','ETag')},sort_keys=True).encode()).hexdigest()))
+            need(name!='ycbv_base.zip'or primary['Xet_hash']==BASE_XET,'base_header_identity_changed')
+            need(name not in self.identities or self.identities[name]==primary,'range_identity_changed');self.identities[name]=primary
             data=response.read(n+1);self.bytes+=len(data);self.requests+=1;need(len(data)==n,'range_body')
-        self.proofs.append(dict(archive=name,start=start,end=end,bytes=n,sha256=hashlib.sha256(data).hexdigest(),primary_etag=sha));return data
+        self.proofs.append(dict(archive=name,start=start,end=end,bytes=n,sha256=hashlib.sha256(data).hexdigest(),primary_identity=primary,CAS_ETag=etag));return data
 
 def directory(get,name):
     total,_=ARCHIVES[name];end=total-22;e=get(name,end,total-1)
@@ -122,15 +136,29 @@ def json_value(data):
         return d
     return json.loads(data,object_pairs_hook=pairs,parse_constant=lambda _:(_ for _ in ()).throw(ContractError('nonfinite_json')))
 
-def inactive(cid):
+def inactive(cid,unit='world-reward-ycbv-point-acquire-technical-v2.service'):
     def query(args):
         r=subprocess.run(args,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,timeout=5,env={'PATH':'/usr/bin:/bin','DOCKER_HOST':'unix://'+str(ROOT/'docker.sock')})
         need(r.returncode==0 and len(r.stdout)<=4096,'bounded_runtime_query');return r.stdout
-    fields=('LoadState','ActiveState','SubState','MainPID','ExecMainStatus');text=query(['systemctl','show','--no-pager',*('--property='+k for k in fields),'world-reward-ycbv-point-acquire-technical-v2.service']);values={}
+    fields=('LoadState','ActiveState','SubState','MainPID','ExecMainStatus');text=query(['systemctl','show','--no-pager',*('--property='+k for k in fields),unit]);values={}
     for line in text.splitlines():
         k,sep,v=line.partition('=');need(sep and k in fields and k not in values,'unit_fields');values[k]=v
     need(values==dict(LoadState='loaded',ActiveState='failed',SubState='failed',MainPID='0',ExecMainStatus='1'),'original_failed_unit')
-    need(not query(['docker','ps','-aq','--no-trunc','--filter','id='+cid]).strip(),'original_container_still_exists');return values
+    if cid is not None:need(not query(['docker','ps','-aq','--no-trunc','--filter','id='+cid]).strip(),'original_container_still_exists')
+    return values
+
+def previous_header_failure(code,acquisition):
+    pins=json_value(metadata(code/HEADER_PINS)[0])
+    expected=dict(schema='world_reward.ycbv_archive_header_closed_failure.v1',producer_revision=HEADER_REV,script_sha256=HEADER_SCRIPT,report=HEADER_REPORT,status='fail',phase='central_headers',protocol_guard='range_headers',range_bytes=0,member_payload_read=False,original_failure_unchanged=True,public_header_cause='resolver_LFS_SHA_is_distinct_from_final_CAS_Xet_ETag',base_primary_LFS_sha256=ARCHIVES['ycbv_base.zip'][1],base_primary_Xet_hash=BASE_XET,base_final_CAS_ETag=BASE_XET,base_header_body_read=False,full_acquisition_authorized=False)
+    need(type(pins)is dict and set(pins)==set(expected)and all(type(pins[k])is type(v)and pins[k]==v for k,v in expected.items()),'exact_header_failure_pins')
+    data,proof=metadata(ROOT/HEADER_REPORT['path'],HEADER_REPORT);report=json_value(data)
+    need(all(type(report.get(k))is type(v)and report[k]==v for k,v in dict(stage='ycbv_archive_central_directory_metadata_diagnostic',status='fail',phase='central_headers',producer_revision=HEADER_REV,range_bytes=0,member_payload_read=False,original_failure_unchanged=True,protocol_guard='range_headers',whole_archive_SHA_verified=False,CRC_verified=False,private_annotation_values_read=False).items())and report.get('protocol_facts',{}).get('status')==206 and report.get('protocol_facts',{}).get('requested_bytes')==22 and report.get('range_proofs')==[] and report.get('archives')==[],'sealed_zero_body_header_failure')
+    old=ROOT/'jobs'/HEADER_REV/JOB/'code';source=report['source_bindings'];need(set(source)==set(acquisition),'header_failure_source_keys')
+    need(set(source['files'])=={str(p.relative_to(old))for p in old.rglob('*')if p.is_file()}and not any(p.is_symlink()or p.lstat().st_mode&0o222 or not(stat.S_ISREG(p.lstat().st_mode)or stat.S_ISDIR(p.lstat().st_mode))for p in (old,*old.rglob('*'))),'header_failure_full_source_inventory')
+    files={n:metadata(old/n,pin,allow_empty=True)[1]for n,pin in source['files'].items()};markers={n:metadata(old.parent/n,pin,False)[1]for n,pin in source['markers'].items()}
+    need(files['/'.join(('infra','ycbv_archive_headers.py'))]['sha256']==HEADER_SCRIPT and (old.parent/'revision').read_bytes()==(HEADER_REV+'\n').encode()and re.fullmatch(b'[0-9a-f]{64}\n',(old.parent/'source-sha256').read_bytes()),'header_failure_source')
+    need({k:v for k,v in source.items()if k not in ('files','markers')}=={k:v for k,v in acquisition.items()if k not in ('files','markers')},'header_failure_acquisition_chain')
+    return dict(report=proof,source_files=files,markers=markers,unit=inactive(None,'world-reward-ycbv-header-diagnostic-v1.service'))
 
 def bindings(code,revision):
     need(re.fullmatch('[0-9a-f]{40}',revision)and code==ROOT/'jobs'/revision/JOB/'code'and Path(__file__).resolve()==code/'infra/ycbv_archive_headers.py','actual_dispatch')
@@ -152,14 +180,15 @@ def bindings(code,revision):
     need(historical['/'.join(('infra','ycbv_point_acquire.py'))]['sha256']==pins['script_sha256'],'original_script')
     protocol=json_value(metadata(old/'configs'/'ycbv_point_protocol.json')[0])
     need({k:(v['bytes'],v['sha256'])for k,v in protocol['archives'].items()}==ARCHIVES and protocol['limits']['expanded_bytes']==60000000000 and protocol['limits']['member_bytes']==2000000000 and protocol['limits']['members']==1000000 and protocol['selection']['split_prefix']=='test','original_inventory_constants')
-    return dict(files=files,markers=markers,original_failure=proof,historical_sources=historical,historical_markers=historical_markers,original_cid_identity=cid_identity,original_unit=runtime)
+    result=dict(files=files,markers=markers,original_failure=proof,historical_sources=historical,historical_markers=historical_markers,original_cid_identity=cid_identity,original_unit=runtime)
+    result['previous_header_failure']=previous_header_failure(code,result);return result
 
 def main():
     code=Path(os.environ['WR_CODE']);revision=os.environ['WR_CODE_REVISION']
     need(os.environ['WR_ROOT']==str(ROOT)and os.getuid()==0 and os.uname().sysname=='Linux'and os.uname().nodename=='world-reward-ncc-h100-02'and re.fullmatch('[0-9a-f]{40}',revision),'azure_host_only')
     start=time.monotonic();previous=signal.signal(signal.SIGALRM,lambda *_:(_ for _ in ()).throw(TimeoutError()));signal.alarm(SECONDS)
     out=ROOT/'results'/('ycbv-archive-header-diagnostic-'+revision);out.mkdir(mode=0o700);before=None;client=Ranges()
-    report=dict(stage='ycbv_archive_central_directory_metadata_diagnostic',status='fail',phase='source_binding',producer_revision=revision,device='cpu',gpu_used=False,budget_seconds=SECONDS,max_range_bytes=MAX,whole_archive_SHA_verified=False,CRC_verified=False,acquisition_performed=False,inference_performed=False,private_annotation_values_read=False,member_payload_read=False,original_failure_unchanged=False)
+    report=dict(stage='ycbv_archive_central_directory_metadata_diagnostic',diagnostic_version=2,status='fail',phase='source_binding',producer_revision=revision,device='cpu',gpu_used=False,budget_seconds=SECONDS,max_range_bytes=MAX,whole_archive_SHA_verified=False,CRC_verified=False,acquisition_performed=False,inference_performed=False,private_annotation_values_read=False,member_payload_read=False,original_failure_unchanged=False,previous_header_failure_unchanged=False)
     try:
         before=bindings(code,revision);report['source_bindings']=before;report['phase']='central_headers';budget=[0,0];report['archives']=[]
         for name in ARCHIVES:
@@ -172,6 +201,7 @@ def main():
     finally:
         try:report['original_failure_unchanged']=before is not None and bindings(code,revision)==before
         except Exception:report['original_failure_unchanged']=False
+        report['previous_header_failure_unchanged']=report['original_failure_unchanged']
         if not report['original_failure_unchanged']:report['status']='fail'
         report.update(elapsed_seconds=time.monotonic()-start,range_bytes=client.bytes,range_requests=client.requests,range_proofs=client.proofs)
         report['whole_budget_respected']=report['elapsed_seconds']<=SECONDS

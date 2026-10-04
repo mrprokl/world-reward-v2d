@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Source closure: /infra/ycbv_archive_headers.py /configs/ycbv_point_inventory_failed_pins.json
+# Source closure: /infra/ycbv_archive_headers.py /configs/ycbv_point_inventory_failed_pins.json /configs/ycbv_archive_header_failed_pins.json
 set +x
 set -euo pipefail
 [[ $# == 0 && "$(id -u)" == 0 ]] || exit 2

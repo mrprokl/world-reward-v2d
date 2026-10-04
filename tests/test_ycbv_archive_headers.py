@@ -116,7 +116,7 @@ def test_http206_etag_and_bounded_reads_only(gate,monkeypatch,fault):
   def __init__(self):super().__init__(payload);self.status=status;self.headers=h
   def geturl(self):return 'https://evil.invalid/archive'if fault=='redirect'else'https://cas-bridge.xethub.hf.co/archive?temporary=redacted'
   def read(self,n):reads.append(n);return super().read(n)
- monkeypatch.setattr(gate.urllib.request,'build_opener',lambda *a:SimpleNamespace(open=lambda *a,**k:Response()))
+ install_http(gate,monkeypatch,Response,100,sha)
  client=gate.Ranges()
  if fault=='budget':client.bytes=gate.MAX
  with pytest.raises(gate.ContractError):client.get('ycbv_test_all.zip',78,99)
@@ -127,12 +127,12 @@ def test_http_success_evidence_and_redirect_safe(gate,monkeypatch):
  monkeypatch.setitem(gate.ARCHIVES,'ycbv_test_all.zip',(22,'a'*64))
  class Response(io.BytesIO):
   status=206;headers={'Content-Range':'bytes 0-21/22','Content-Length':'22','ETag':'a'*64}
-  def geturl(self):return'https://huggingface.co/exact'
- monkeypatch.setattr(gate.urllib.request,'build_opener',lambda *a:SimpleNamespace(open=lambda *a,**k:Response(b'x'*22)))
+  def geturl(self):return'https://cas-bridge.xethub.hf.co/archive?temporary=redacted'
+ install_http(gate,monkeypatch,lambda:Response(b'x'*22),22,'a'*64)
  c=gate.Ranges();assert c.get('ycbv_test_all.zip',0,21)==b'x'*22 and c.bytes==22 and c.requests==1
  for url in ('http://huggingface.co/a','https://u:p@huggingface.co/a','https://huggingface.co/a?token=secret','https://evil.invalid/a'):
   with pytest.raises(gate.ContractError):gate.public_url(url)
- with pytest.raises(gate.ContractError):gate.Redirect('a'*64).redirect_request(None,None,302,'',{'X-Linked-ETag':'wrong'},'https://cas-bridge.xethub.hf.co/a')
+ with pytest.raises(gate.ContractError):gate.Redirect('a'*64,22,'https://huggingface.co/immutable').redirect_request(gate.urllib.request.Request('https://huggingface.co/immutable'),None,302,'',{'X-Linked-ETag':'wrong'},'https://cas-bridge.xethub.hf.co/a')
 
 
 def test_wrapper_closure_host_cpu_no_payload_claim(gate):
@@ -143,6 +143,19 @@ def test_wrapper_closure_host_cpu_no_payload_claim(gate):
  source=Path(gate.__file__).read_text()
  assert 'whole_archive_SHA_verified=False'in source and 'CRC_verified=False'in source and 'member_payload_read=False'in source
 
+
+def install_http(gate,monkeypatch,response,size,sha,xet=None,missing_primary=False,header_fault=None):
+ xet=xet or sha;url=f'https://huggingface.co/datasets/bop-benchmark/ycbv/resolve/{gate.REV}/ycbv_test_all.zip';target='https://cas-bridge.xethub.hf.co/archive?temporary=redacted'
+ def build(*handlers):
+  redirect=next(h for h in handlers if isinstance(h,gate.Redirect))
+  def open(req,**kwargs):
+   if not missing_primary:
+    headers={'X-Repo-Commit':gate.REV,'X-Linked-ETag':sha,'X-Linked-Size':str(size),'X-Xet-Hash':xet}
+    if header_fault:header_fault(headers)
+    redirect.redirect_request(req,None,302,'',headers,target)
+   return response()
+  return SimpleNamespace(open=open)
+ monkeypatch.setattr(gate.urllib.request,'build_opener',build)
 
 def sealed(path,data,mode=0o444):
  path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(data);path.chmod(mode)
@@ -169,7 +182,19 @@ def binding_fixture(gate,tmp_path,monkeypatch):
   for p in sorted(base.rglob('*'),reverse=True):
    if p.is_dir():p.chmod(0o555)
   base.chmod(0o555)
- (root/'results').mkdir();monkeypatch.setattr(gate,'ROOT',root);monkeypatch.setattr(gate,'__file__',str(code/'infra/ycbv_archive_headers.py'));monkeypatch.setattr(gate,'inactive',lambda cid:dict(MainPID='0'))
+ (root/'results').mkdir();monkeypatch.setattr(gate,'ROOT',root);monkeypatch.setattr(gate,'__file__',str(code/'infra/ycbv_archive_headers.py'));monkeypatch.setattr(gate,'inactive',lambda cid,unit=None:dict(MainPID='0'))
+ header=root/'jobs'/gate.HEADER_REV/gate.JOB/'code';header_files={'infra/ycbv_archive_headers.py':sealed(header/'infra/ycbv_archive_headers.py',b'original-header-source\n'),'configs/ycbv_point_inventory_failed_pins.json':sealed(header/gate.PINS,json.dumps(pins).encode())}
+ monkeypatch.setattr(gate,'HEADER_SCRIPT',header_files['infra/ycbv_archive_headers.py']['sha256'])
+ header_markers={n:sealed(header.parent/n,((gate.HEADER_REV if n=='revision'else'f'*64)+'\n').encode(),0o644)for n in ('revision','source-sha256')}
+ source=dict(files=header_files,markers=header_markers,original_failure=reportpin,historical_sources=hist,historical_markers=markers,original_cid_identity=gate.metadata(root/'validation/ycbv_point_pose_v1/.container.cid')[1],original_unit=dict(MainPID='0'))
+ header_report=dict(stage='ycbv_archive_central_directory_metadata_diagnostic',status='fail',phase='central_headers',producer_revision=gate.HEADER_REV,range_bytes=0,member_payload_read=False,original_failure_unchanged=True,protocol_guard='range_headers',whole_archive_SHA_verified=False,CRC_verified=False,private_annotation_values_read=False,protocol_facts=dict(status=206,requested_bytes=22),range_proofs=[],archives=[],source_bindings=source)
+ header_identity=sealed(root/gate.HEADER_REPORT['path'],json.dumps(header_report).encode(),0o400)
+ monkeypatch.setattr(gate,'HEADER_REPORT',dict(path=gate.HEADER_REPORT['path'],**header_identity))
+ hp=json.loads((REPO/gate.HEADER_PINS).read_bytes());hp['script_sha256']=gate.HEADER_SCRIPT;hp['report']=copy.deepcopy(gate.HEADER_REPORT)
+ code.chmod(0o755);(code/'configs').chmod(0o755);sealed(code/gate.HEADER_PINS,json.dumps(hp).encode());(code/'configs').chmod(0o555);code.chmod(0o555)
+ for p in sorted(header.rglob('*'),reverse=True):
+  if p.is_dir():p.chmod(0o555)
+ header.chmod(0o555)
  return root,code,rev,pins
 
 
@@ -250,10 +275,10 @@ def test_redirect_never_reads_intermediate_body(gate):
   closed=False
   def read(self,*a):raise AssertionError('Redirect payload read forbidden')
   def close(self):self.closed=True
- response=Forbidden();redirect=gate.Redirect('a'*64)
+ response=Forbidden();redirect=gate.Redirect('a'*64,22,'https://huggingface.co/immutable')
  redirect.parent=SimpleNamespace(open=lambda req,timeout:b'next-response')
  req=gate.urllib.request.Request('https://huggingface.co/immutable',headers={'Range':'bytes=1-2'});req.timeout=30
- result=redirect.http_error_302(req,response,302,'',{'Location':'https://cas-bridge.xethub.hf.co/public?temporary=secret','X-Linked-ETag':'a'*64})
+ result=redirect.http_error_302(req,response,302,'',{'Location':'https://cas-bridge.xethub.hf.co/public?temporary=secret','X-Linked-ETag':'a'*64,'X-Linked-Size':'22','X-Repo-Commit':gate.REV,'X-Xet-Hash':'b'*64})
  assert result==b'next-response'and response.closed
 
 
@@ -261,3 +286,74 @@ def test_empty_source_initializer_only_not_metadata_reports(gate,tmp_path,monkey
  root,code,rev,pins=binding_fixture(gate,tmp_path,monkeypatch);code.chmod(0o755);sealed(code/'empty.py',b'');code.chmod(0o555)
  assert gate.bindings(code,rev)['files']['empty.py']['bytes']==0
  with pytest.raises(gate.ContractError):gate.metadata(code/'empty.py')
+
+
+@pytest.mark.parametrize('fault',['linked_sha','linked_size','revision','missing_primary','xet_cas','xet_shape','repeated_xet'])
+def test_v2_primary_LFS_to_Xet_chain_before_read(gate,monkeypatch,fault):
+ sha='a'*64;xet='b'*64;monkeypatch.setitem(gate.ARCHIVES,'ycbv_test_all.zip',(100,sha));reads=[]
+ class Response(io.BytesIO):
+  status=206;headers={'Content-Range':'bytes 78-99/100','Content-Length':'22','ETag':xet}
+  def __init__(self):super().__init__(b'x'*22)
+  def geturl(self):return'https://cas-bridge.xethub.hf.co/archive?temporary=redacted'
+  def read(self,n):reads.append(n);return super().read(n)
+ def alter(h):
+  if fault=='linked_sha':h['X-Linked-ETag']='c'*64
+  elif fault=='linked_size':h['X-Linked-Size']='101'
+  elif fault=='revision':h['X-Repo-Commit']='d'*40
+  elif fault=='xet_cas':h['X-Xet-Hash']='e'*64
+  elif fault=='xet_shape':h['X-Xet-Hash']='invalid'
+ install_http(gate,monkeypatch,Response,100,sha,xet,missing_primary=fault=='missing_primary',header_fault=alter)
+ client=gate.Ranges()
+ if fault=='repeated_xet':client.identities['ycbv_test_all.zip']=dict(revision=gate.REV,LFS_sha256=sha,bytes=100,Xet_hash='f'*64)
+ with pytest.raises(gate.ContractError):client.get('ycbv_test_all.zip',78,99)
+ assert reads==[] and client.bytes==0
+
+
+def test_v2_distinct_LFS_Xet_accepted_exact_across_ranges_no_URL_export(gate,monkeypatch):
+ sha='a'*64;xet='b'*64;monkeypatch.setitem(gate.ARCHIVES,'ycbv_test_all.zip',(100,sha))
+ class Response(io.BytesIO):
+  status=206;headers={'Content-Range':'bytes 78-99/100','Content-Length':'22','ETag':'"'+xet+'"'}
+  def geturl(self):return'https://cas-bridge.xethub.hf.co/archive?temporary=redacted'
+ install_http(gate,monkeypatch,lambda:Response(b'x'*22),100,sha,xet)
+ client=gate.Ranges();assert client.get('ycbv_test_all.zip',78,99)==b'x'*22 and client.get('ycbv_test_all.zip',78,99)==b'x'*22
+ assert client.proofs[0]['primary_identity']['LFS_sha256']==sha and client.proofs[0]['CAS_ETag']==xet and client.requests==2
+ assert 'https'not in json.dumps(client.proofs)and 'redacted'not in json.dumps(client.proofs)
+
+@pytest.mark.parametrize('fault',['report','source','marker','config'])
+def test_original_header_failure_preserved_and_rehashed(gate,tmp_path,monkeypatch,fault):
+ root,code,rev,pins=binding_fixture(gate,tmp_path,monkeypatch);before=gate.bindings(code,rev)
+ assert before['previous_header_failure']['report']=={k:gate.HEADER_REPORT[k]for k in ('bytes','sha256')}
+ old=root/'jobs'/gate.HEADER_REV/gate.JOB/'code'
+ path=(root/gate.HEADER_REPORT['path']if fault=='report'else old/'infra/ycbv_archive_headers.py'if fault=='source'else old.parent/'source-sha256'if fault=='marker'else code/gate.HEADER_PINS)
+ path.chmod(0o644);path.write_bytes(b'changed')
+ with pytest.raises(gate.ContractError):gate.bindings(code,rev)
+
+
+def test_v2_inventory_math_AST_unchanged_from_first_diagnostic(gate):
+ import subprocess
+ original=subprocess.run(['git','show',gate.HEADER_REV+':infra/ycbv_archive_headers.py'],cwd=REPO,check=True,text=True,capture_output=True).stdout
+ def functions(source):return {n.name:ast.dump(n,include_attributes=False)for n in ast.parse(source).body if isinstance(n,ast.FunctionDef)}
+ old=functions(original);new=functions(Path(gate.__file__).read_text())
+ for name in ('directory','central','audit'):assert new[name]==old[name]
+
+
+def test_v2_original_header_source_extra_file_rejected(gate,tmp_path,monkeypatch):
+ root,code,rev,pins=binding_fixture(gate,tmp_path,monkeypatch);old=root/'jobs'/gate.HEADER_REV/gate.JOB/'code';old.chmod(0o755);sealed(old/'extra.py',b'NO');old.chmod(0o555)
+ with pytest.raises(gate.ContractError):gate.bindings(code,rev)
+
+
+def test_v2_base_Xet_matches_independent_header_pin_before_read(gate,monkeypatch):
+ sha=gate.ARCHIVES['ycbv_base.zip'][1];wrong='f'*64;read=[]
+ class Response(io.BytesIO):
+  status=206;headers={'Content-Range':'bytes 15783-15804/15805','Content-Length':'22','ETag':wrong}
+  def geturl(self):return'https://cas-bridge.xethub.hf.co/archive?temporary=redacted'
+  def read(self,n):read.append(n);return super().read(n)
+ def opener(*handlers):
+  r=next(h for h in handlers if isinstance(h,gate.Redirect))
+  def open(req,**kwargs):
+   r.redirect_request(req,None,302,'',{'X-Repo-Commit':gate.REV,'X-Linked-ETag':sha,'X-Linked-Size':'15805','X-Xet-Hash':wrong},'https://cas-bridge.xethub.hf.co/archive?temporary=redacted')
+   return Response(b'x'*22)
+  return SimpleNamespace(open=open)
+ monkeypatch.setattr(gate.urllib.request,'build_opener',opener)
+ with pytest.raises(gate.ContractError):gate.Ranges().get('ycbv_base.zip',15783,15804)
+ assert read==[]
