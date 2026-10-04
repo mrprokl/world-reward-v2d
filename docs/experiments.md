@@ -6617,3 +6617,11 @@ EP5 full native directexport dispatched3c22c1bce1cd8a32e5ca04c5c3de1c7c0997c001,
 driverac27278ff86d0cba77f9bc0224da5f0a54feea40d2fb75bd31005368ced711c4,
 600s/unchangedfull668frames, existingGPUlock.112files182816encodedB codeonly.
 Actualfinalexport/officialpack remain separate gates; no finalsubmission.
+
+EP5 full native directexport actual **PASS668/668,39.565390s**, producer
+3c22c1bce1cd8a32e5ca04c5c3de1c7c0997c001; unchangedfrozenrefinedbundle,
+full42native/reference replaychunks, objectGLB allthreecomponents/cavities
+identical to original input. Unit/source/full5artifact inventory independently
+PASS. Report28034B SHAcd61aed6cc6691a99a217eb560eb55dbe42e8aa7fad2372f9deb72206762b729.
+Tinyexportpins frozenbeforeoriginalofficialCPUpacker smoke; no geometry/data
+transferredlocally. No finalParquet/leaderboardquality claim.
