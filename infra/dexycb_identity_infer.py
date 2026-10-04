@@ -555,6 +555,8 @@ def main(argv=None):
                 binding.recheck(frozen)
                 if model is not None:
                     require((frontend_proof(code)[1] if stage == "masks" else boots_proof(code)) == model, "Original model/runtime assets changed")
+                require(time.monotonic() - started <= BUDGETS[stage],
+                    "Inclusive native stage budget exceeded during post-verification")
                 report["original_rehashed_after"] = True
             except BaseException:
                 report.update(status="fail", original_rehashed_after=False, integrity_error="Post-run original proof changed")

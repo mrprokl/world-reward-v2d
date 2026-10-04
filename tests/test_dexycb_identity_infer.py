@@ -360,6 +360,17 @@ def test_no_oracle_adapter_contact_or_personcrop_paths():
     assert not any(c in calls for c in ("boots.bindings", "boots.public_records", "boots.validate_video", "binding.authenticate"))
     assert all(x not in source for x in ("ycbv_point_depth", "DWPose", "robotap_boots_public", "ycb_grasp_ind", "np.interp"))
     assert "original_frame_index_not_seconds" in source and "identity_accepted=False" in source
+
+
+def test_inclusive_native_budget_covers_postverification():
+    source = (REPO / 'infra/dexycb_identity_infer.py').read_text()
+    tree = ast.parse(source)
+    main = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'main')
+    checks = [node for node in ast.walk(main) if isinstance(node, ast.Call)
+              and isinstance(node.func, ast.Name) and node.func.id == 'require']
+    assert any(ast.unparse(node.args[0]) == 'time.monotonic() - started <= BUDGETS[stage]'
+               and node.args[1].value == 'Inclusive native stage budget exceeded during post-verification'
+               for node in checks)
     builds = [n for n in ast.walk(tree) if isinstance(n, ast.Call) and ast.unparse(n.func) == "build_sam2"]
     assert len(builds) == 1
     assert {k.arg: ast.literal_eval(k.value) for k in builds[0].keywords}["apply_postprocessing"] is True
