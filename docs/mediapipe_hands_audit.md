@@ -115,8 +115,13 @@ with an isolated Python 3.11 venv, no system site packages, all declared/transit
 wheels pinned and installed offline, followed by `pip check`. Do not modify an
 existing SAM2/Boots image, omit JAX, substitute OpenCV headless, or resolve latest
 dependencies after a failure. Build proposal: 600 s; graph-load-only CPU smoke:
-120 s, no `detect`, RGB or annotations. These are proposed prerequisite gates,
-not an acquired dependency closure or operational runtime.
+120 s, no `detect`, RGB or annotations. These prerequisite gates have now passed:
+the original source/model acquisition and all26 pinned wheel notices are sealed;
+offline child construction/native create-close PASS101.550092s, including
+99.046815s construction and0.967879s native graph smoke. Independent image,
+source and artifact pins are in `configs/mediapipe_cpu_runtime_pins.json`.
+Zero images/detect calls/private reads were used; quality, exact task-constituent
+rights and pretraining overlap are still unverified.
 
 If coverage is adequate, separately validate an automatic 2D hand-seed adapter
 (e.g. deterministic landmark-derived box or points) into unchanged SAM2; do not
