@@ -7497,3 +7497,14 @@ not an adopted challenge estimator. Any landmark→SAM2/fullT tracking test need
 a distinct fresh preregistered cohort, unchanged parameters and identity/mask
 gates. Do not tune on these three clips, reopen closed cohorts, attract hands to
 objects, suppress missing objects or infer contact/visibility from availability.
+
+EP13 shared preparation actual PASS18.417917s under95fdd40 explicit idle replay,
+425 full frames, max per-frame reference residual0.000846245mm. EP0/12 direct
+native exports PASS42.687162s/31.726037s undera53e429, all790/405 frames and four
+readonly artifacts; reference fidelity max means0.000820256/0.000848693mm.
+Independent entire public/prepare/forward/refined/source/native-asset/five export
+files audit PASS; native schema receipt verified, no second trajectory decode.
+First read-only audit lacked consumer loader in the original closure and failed
+at import; corrected existing generator/full-chain gate without inference rerun.
+Actual export/preparation pins precede forward/official pack. Fidelity is not
+accuracy or eligibility. Final external-hand focused suite234PASS2.00s.
