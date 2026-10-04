@@ -6560,3 +6560,16 @@ EP5 refined unit is actually active (one1142269parent), no final receipt;
 source/forward remain frozen. Corrected header-only diagnosticv2 now dispatched
 62a8d00 on VM02 in its own revision-specific report namespace;89sourcefiles,
 92776encodedB only. No new full archive acquisition and no duplicate model job.
+
+Actual corrected header-only diagnostic62a8d00 **PASS8.455032s**, sealed
+30479B SHA521992c41c5650e53675addc1e791a7ba811f0ae68d462be3d21c509c66f1f0e.
+Independentcomplete source/oldfailures/postaudit PASS. Base502B/5headers and
+fulltest21829581B/238647headers preserve exactprimaryidentitychains. Sixbounded
+ranges total21830203B, no memberpayload/labels/CRC/fullarchiveSHA. OriginalZIP
+safety/budget/layout guards all pass; **no original rejection reproduced**.
+The acquisition phaseinventory also includes RGB filename selection BEFORECRC
+phasepersist. That selector was not covered by the first diagnostic: source
+inspection narrows remainingValueErrors to sortedRGBscene set orfirst96 IDs.
+Read SAME measuredpubliccentraldirectory only to diagnose exactnativefilename
+IDs; no fullarchive/model reacquisition. This headerPASS does not validate
+288RGB inputs, sourceCRC, geometry or model quality.

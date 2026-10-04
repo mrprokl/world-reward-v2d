@@ -1,0 +1,32 @@
+{
+  "schema": "world_reward.ycbv_archive_header_diagnostic.pins.v2",
+  "producer_revision": "62a8d005eff20257a4b3351e7a4f7a5d7400877b",
+  "script_sha256": "525f5712a155ee7862f58478b98ac9f208f7412cf748ca3507ba3f871fd1eae3",
+  "report": {
+    "path": "results/ycbv-archive-header-diagnostic-62a8d005eff20257a4b3351e7a4f7a5d7400877b/report.json",
+    "bytes": 30479,
+    "sha256": "521992c41c5650e53675addc1e791a7ba811f0ae68d462be3d21c509c66f1f0e"
+  },
+  "status": "pass",
+  "elapsed_seconds": 8.455032018013299,
+  "range_bytes": 21830203,
+  "range_requests": 6,
+  "base_central": {
+    "bytes": 502,
+    "members": 5,
+    "sha256": "37ec209bacf6fde4d0f2e2e901848b01d341f26464bb0429270ccd7d8d99119d"
+  },
+  "test_central": {
+    "bytes": 21829581,
+    "members": 238647,
+    "sha256": "62e347f9e74eebec86a18e4c884c8990ecea8fc1f31b73692197bd86b973e0c6"
+  },
+  "inventory_and_layout_guards_reproduced": false,
+  "RGB_filename_selector_audited": false,
+  "whole_archive_SHA_verified": false,
+  "member_payload_read": false,
+  "private_annotation_values_read": false,
+  "original_failure_unchanged": true,
+  "previous_header_failure_unchanged": true,
+  "full_acquisition_authorized": false
+}
