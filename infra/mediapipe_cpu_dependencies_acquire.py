@@ -17,8 +17,8 @@ import mediapipe_hands_acquire as mp
 
 ROOT = mp.ROOT
 JOB = 'run_mediapipe_cpu_dependencies_acquire'
-EVIDENCE = 'vendor/research/mediapipe_cpu_dependencies_v1'
-RESULT = 'results/mediapipe-cpu-dependencies-acquire-v1'
+EVIDENCE = 'vendor/research/mediapipe_cpu_dependencies_v2'
+RESULT = 'results/mediapipe-cpu-dependencies-acquire-v2'
 MANIFEST = 'configs/mediapipe_cpu_dependencies_v1.json'
 PRIOR_PINS = 'configs/mediapipe_hands_acquire_pins.json'
 MANIFEST_PIN = dict(bytes=59268, sha256='efb697fd458156a93520db3add265b75b3506f84e62b681920ce6f7c75375c81')
@@ -158,10 +158,11 @@ def assets(rows):
     result = []
     for row in rows:
         meta = row['metadata']; result.append(dict(name=row['filename']+'.metadata', folder=EVIDENCE,
-            url=meta['url'], bytes=meta['bytes'], sha256=meta['sha256'], mime=('application/octet-stream', 'text/plain')))
+            url=meta['url'], bytes=meta['bytes'], sha256=meta['sha256'],
+            mime=('application/octet-stream', 'binary/octet-stream', 'text/plain')))
         if row['acquisition'] == 'new_Azure_wheel_only':
             result.append(dict(name=row['filename'], folder=EVIDENCE, url=row['url'], bytes=row['bytes'],
-                sha256=row['sha256'], mime=('application/octet-stream', 'application/zip')))
+                sha256=row['sha256'], mime=('application/octet-stream', 'binary/octet-stream', 'application/zip')))
         else: require(row['name'] == 'mediapipe' and row['acquisition'] == 'reference_existing_mediapipe_hands_acquire_v1', 'Only original MediaPipe wheel may be referenced')
     require(len({r['name'] for r in result}) == len(result), 'Dependency publication filename collision')
     return result

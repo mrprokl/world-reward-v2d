@@ -126,7 +126,18 @@ def report(gate, root): return json.loads((root/gate.RESULT/'report.json').read_
 
 def test_fresh_full_dependency_orchestration_reuses_original_mp_wheel(gate, tmp_path, monkeypatch):
     root, code, rev, rows, opener = setup(gate, tmp_path, monkeypatch)
+    # Actual PyPI HEAD for the first absl-py PEP658 document returned this
+    # media type. Bodies remain manufactured, independently exact-SHA checked.
+    first_url = next(iter(opener.responses))
+    opener.responses[first_url].headers.replace_header('Content-Type', 'binary/octet-stream')
+    old_files = []
+    for old in ('vendor/research/mediapipe_cpu_dependencies_v1',
+                'results/mediapipe-cpu-dependencies-acquire-v1'):
+        p = root/old/'KEEP'; p.parent.mkdir(parents=True); p.write_bytes(b'CLOSED_V1'); p.chmod(0o444)
+        old_files.append(p)
     result = gate.acquire(root, code, rev, opener=opener)
+    assert gate.EVIDENCE.endswith('_v2') and gate.RESULT.endswith('-v2')
+    assert all(p.read_bytes() == b'CLOSED_V1' and stat.S_IMODE(p.stat().st_mode) == 0o444 for p in old_files)
     assert result['status'] == 'pass' and len(result['wheels']) == 26 and len(result['artifacts']) == 51
     assert gate.mp.WHEEL_URL not in opener.calls and len(opener.calls) == 51
     assert all(result[k] for k in ('source_rehashed_after', 'prior_rehashed_after', 'artifacts_rehashed_after'))
@@ -139,6 +150,31 @@ def test_fresh_full_dependency_orchestration_reuses_original_mp_wheel(gate, tmp_
     assert all(result[k] is False for k in ('models_loaded', 'packages_installed', 'gpu_used', 'dataset_read',
         'private_values_read', 'quality_claim', 'license_eligibility_verified', 'training_overlap_verified', 'challenge_overlap_verified'))
     assert gate.dependency_source(root, code, rev) == result['source_binding']
+
+
+@pytest.mark.parametrize('fault', ['html', 'encoding', 'body_sha256'])
+def test_pypi_binary_mime_does_not_relax_body_or_encoding(gate, tmp_path, monkeypatch, fault):
+    root, code, rev, rows, opener = setup(gate, tmp_path, monkeypatch)
+    first_url = next(iter(opener.responses)); response = opener.responses[first_url]
+    response.headers.replace_header('Content-Type', 'binary/octet-stream')
+    if fault == 'html': response.headers.replace_header('Content-Type', 'text/html')
+    elif fault == 'encoding': response.headers['Content-Encoding'] = 'gzip'
+    else:
+        response.seek(0); response.write(b'X'); response.seek(0)  # same length, different exact hash
+    with pytest.raises(gate.mp.AcquisitionError): gate.acquire(root, code, rev, opener=opener)
+    result = report(gate, root)
+    assert opener.calls == [first_url] and result['status'] == 'fail' and result['artifacts'] == []
+    assert result['source_rehashed_after'] and result['prior_rehashed_after'] and result['owned_partials_removed']
+    assert not list(root.rglob('*.part'))
+
+
+def test_binary_octet_stream_policy_applies_only_to_exact_pinned_assets(gate):
+    raw = (REPO/gate.MANIFEST).read_bytes()
+    assert digest(raw) == gate.MANIFEST_PIN
+    rows = json.loads(raw)['packages']
+    records = gate.assets(rows)
+    assert all('binary/octet-stream' in row['mime'] and row['sha256'] and row['bytes'] > 0 for row in records)
+    assert all('text/html' not in row['mime'] for row in records)
 
 
 def namespace(gate, root, code, rev):
