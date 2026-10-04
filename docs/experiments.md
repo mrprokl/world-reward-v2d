@@ -8840,3 +8840,18 @@ no source/test workaround. Owned9313testfixtureentries removed afterUID/nofollow
 containedsymlink/hardlinkcensus. No newfourcontrolPASS or productionuse implied.
 EP23 original31ff94d fullpose dispatched under existingGPUlock; ACKonly,
 not completion. No parameter/initializer/geometrybudget or source change.
+
+Balancedcomposition producer/reader explicitprofiles released without replacing
+historicaldefaults. Newfixedpins must exist beforeinput/model/namespacework;
+originalQEM/input/runtimeproof kept separately from activequery. Pure geometry
+produce/fidelity/querygates remainunchanged; inertreader decodes noGT/nativecode.
+Root195producerPASS3.54s,182consumerPASS4.67s,405solid/prepare/transportregression
+PASS6.07s; ownedfixturetrees removed9796+9115+13847entries. Actualfourcontrols
+801ede8 hostPASS18.078832s/report265409B SHA0ff2f547fc94f2c83e23f1295188cb98d29aebad89523db84c995b2501aae615;
+independentwholeclosure/fullreceipt auditpending, no productionpermissionyet.
+EP23 defaultclosed terminalExec1: all8fixedwhole/componentcandidatesreject,
+emptyreservednamespace only. Full237source/ledger0e6337ce53b039d63e2590b22d20893cbe6a5c266a89f20ff2e497b62e388920 PASS;
+log2021B SHAf543f53f3fcfddf2aa58b5e2935126ae9ea1fd8663c6a43782cf990db5062e30
+coincides with EP29 categoricalfailure. Two rootreadonlylog-textassertionsFAIL
+(wrongexpectedexceptionwording); corrected exactbyte/full8reasoninspection
+withoutproduction/sourcechange. EP09prepare active400/415depth at21:41UTC.
