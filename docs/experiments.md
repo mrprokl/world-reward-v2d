@@ -7896,3 +7896,16 @@ Capsule remainsunexecuted. No scientificPASS or result fabricated.
 Postfreezefocused245PASS1optionalSKIP21.83s/sceneprimitives138PASS.48s.
 Five prioragent-ownedtinytemporaryroots removed afterownership/internal-link
 checks; unknownforeignpaths preserved, no dataset/render/checkpoint onlocal.
+
+Independent primarylibigl unitconditioning audit explains plausiblequeuefailure,
+not a reason to rerun closedphase2. Frozen collapse_edge_would_create_intersections.cpp
+6018B SHAb70fe52dfaf03c5544cd3660ee626f6fbfc91f1109d7d2137a2293b1a6466c3a
+L86 hasabsolute cross.squaredNorm()<1e-16; scalesasL^4. Frozenquadricssource
+5715B SHA30c1d39cf798aaad719d9a404ef2059e0fe4b029cd8a05defd90945d18bfc046
+L37 retainsabsolute1e-10pointprior vsareaweightedfacequadrics. Smallsourceunit
+therefore changesfeasibility/cost, evenexactF32trianglesvalid. Adoptneitherbackend.
+Newprospectivehypothesis: automaticone-source conditioningchart x'=(x-o)/L,
+theninversephysicalcoords, dimensionalregularization and robustsolve. This is
+a newalgorithmcontract, not unchangednativecost orphysicalobjectrescale. Must
+freeze freshsimilitudecontrols andverifyinversegeometry, physicalshellvolumes,
+original-frameF32/default8weld/export/pack/.375bake; no percliptolerances.
