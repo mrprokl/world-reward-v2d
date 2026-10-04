@@ -7453,3 +7453,14 @@ No private truth or learned inference in refinement; fidelity not quality.
 EP13 shared prepare v1 scheduling FAIL12:26:14UTC: predecessor was collected,
 zero child execution. Original failure preserved; exact published95fdd40 snapshot
 reused explicitly in fresh v2 idle dispatch after target absence check, ACK only.
+
+Fresh Dex03 acquisition actual PASS482.979987s underbeda057: original
+12,197,037,343-byte archive downloaded325.346254s on Azure, whole gzip/header/
+selected retention157.633733s. Lex4/39/74 exact sequences20200820_135508,
+20200820_141550,20200820_143802 each72 frames, total216 original640x480 RGB;
+24,689,185B retained RGB+opaque labels. Independent original source/protocol,
+all RGB/private byte pins/modes/inventory/posthash PASS; owned archive removed.
+Report66503B SHA370f15498a945a042ae9dd56f8f0cca6f9298f7ea1060400e78ade6d4e07f061;
+manifest64344B SHA60434a4d54dfc9fb6a50931d0aedd937bcb77b81ebda80c9b589fb8d49575313.
+No private values, images decoded, model/GPU or challenge assets used. Exact
+acquisition pins precede native full-T scan; CC-BY-NC4/overlap remain disclosed.

@@ -4,7 +4,9 @@
 Public model/source bytes and offline dependency notices have been acquired and
 qualified. The full-T native adapter and pure private-array evaluator are
 implemented; the offline CPU graph qualification is independently verified.
-Fresh subject-03 RGB/opaque labels and actual hand predictions are not acquired.
+Fresh subject-03 RGB/opaque labels are independently byte-qualified: three
+original72-frame clips (216 full original frames). Actual hand predictions and
+private-array diagnostics have not run yet; no annotation values were read.
 It tests automatic 2D observation availability, not identity, tracking, contact,
 shared metric geometry, full HOI, or superiority over CARI4D.
 
