@@ -33,7 +33,8 @@
     "original_RGB_decodes": 32
   },
   "decision": "CLOSED_DEVELOPMENT_RECALL_FAILURE_RESERVED_UNOPENED",
-  "independent_metric_audit_pending": true,
+  "independent_metric_audit": "results/audits/coco_proposal_native_and_dev_recall_v1_actual.json",
+  "independent_metric_audit_pending": false,
   "ownership_verified": false,
   "producer_revision": "4657c8b45f733a1043c5a8af2f5b9d6ac027196a",
   "quality_verified": false,
