@@ -1,0 +1,38 @@
+{
+  "RGB_bytes_Azure_only": 100776311,
+  "acquired": 50,
+  "acquired_split": {
+    "DEV": 27,
+    "TEST": 23
+  },
+  "adopted": false,
+  "all_original_MD5_and_JPEG_headers_verified": true,
+  "challenge_overlap_verified": false,
+  "cohort": {
+    "bytes": 31043,
+    "sha256": "441bdc57e101cb4e8291ca6bbebc554ca397619e2a892469d9e410a16359a456"
+  },
+  "creator_account_identity_independently_verified": false,
+  "creator_name_license_landing_verified_only": true,
+  "elapsed_seconds": 0.537147623981582,
+  "frozen_selection_recomputed_without_RGB": true,
+  "gpu_used": false,
+  "manifest": {
+    "bytes": 76232,
+    "sha256": "57135ee4853afaff9d5820f11128fc2c8da9c42b2cb14b40597909c9f0f0eeb4"
+  },
+  "missing": 14,
+  "prediction_accuracy_verified": false,
+  "producer_elapsed_seconds": 122.8537521570106,
+  "producer_revision": "e2b6019f502e18694a221aa6b1818804ef3d6d83",
+  "schema": "world_reward.openimages_joint_pair_acquisition_saved_integrity.v1",
+  "sealed_files_verified": true,
+  "slots": 64,
+  "source_archive_sha256": "307635d97e623a19fc53c0e0e944c8143a0eb7f3759cdd122433f280ecf3ed66",
+  "source_closure_sha256": "eaa80f092acbfa280968f6878c7488bcc34b5b9c50cab3cc38fc7375b1f6e8bb",
+  "source_entries": 258,
+  "source_inputs_after_verified": true,
+  "status": "pass",
+  "training_overlap_verified": false,
+  "unit": "MainPID=0\nResult=success\nExecMainStatus=0\nActiveState=inactive\nSubState=dead"
+}

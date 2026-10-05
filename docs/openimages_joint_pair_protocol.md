@@ -107,3 +107,20 @@ or mean regression=>REJECT. No widening/resampling/test switching on a closed
 cohort. A positive outcome is promising only for observed static relation
 retrieval and still needs explicit ownership/task/temporal3D non-regression
 before any Track1 adoption.
+
+## Actual frozen acquisition (no predictions)
+
+Producer e2b6019f502e18694a221aa6b1818804ef3d6d83 completed in122.853752s.
+Exactly64slots remain:50original files acquired (27DEV/23TEST),14missing,
+100776311RGB bytes retained only on Azure. Cohort31043B SHA
+441bdc57e101cb4e8291ca6bbebc554ca397619e2a892469d9e410a16359a456;
+manifest76232B SHA57135ee4853afaff9d5820f11128fc2c8da9c42b2cb14b40597909c9f0f0eeb4.
+Independent saved-only audit rederived the same metadata-only selection, all
+original MD5/JPEG headers, seals and full source/input closure. It verifies
+creator-name/license landing declarations, not independent account identity,
+training/challenge overlap, decoded quality or prediction accuracy.
+
+Two earlier preflight failures read no RGB and acquired no sample: Flickr
+metadata identity parsing omitted set/direct route variants. Fixes broadened
+only exclusion identity parsing, not the stricter new creator-page requests;
+no failed selected slot was substituted and no predictions informed selection.
