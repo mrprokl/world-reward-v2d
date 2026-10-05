@@ -1,0 +1,97 @@
+{
+  "azure_runcommand_terminal": true,
+  "child_exit_code": 0,
+  "current_source": {
+    "archive_xz": {
+      "bytes": 256940,
+      "sha256": "6eb181f08240eaebcf851fe70425095043250a4d5a813477dd0dece83d21df37"
+    },
+    "closure_sha256": "cfb613f47e946704d1dbec0d93552bee63ec802bc378fd1811b209c50f2128ac",
+    "entries": 317,
+    "files": 312,
+    "git_bytes_and_modes_verified": true
+  },
+  "decision": "METADATA_DIAGNOSTIC_ONLY_ORIGINAL_CONTROL_REMAINS_FAIL",
+  "elapsed_seconds": 1.1396341109648347,
+  "fixtures_rerun": false,
+  "gpu_used": false,
+  "image_before_after": true,
+  "image_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "installation_performed": false,
+  "limitation": "Metadata-only mirror identified the first original gate and relative RECORD row. The bounded_regular_record_file predicate combines regular type, nlink=1 and 0<size<=200MiB; this receipt does not discriminate its individual failed term. No numerical import/execution or solver qualification; original V2 remains FAIL.",
+  "metadata_diagnostic": {
+    "elapsed_seconds": 0.026121172995772213,
+    "error_family": "ValueError",
+    "first_row_index": 4,
+    "first_violated_condition": "bounded_regular_record_file",
+    "gpu_used": false,
+    "installation_performed": false,
+    "models_loaded": false,
+    "numeric_modules_imported": false,
+    "observed_version": "1.16.3",
+    "record_identity": {
+      "bytes": 196853,
+      "sha256": "c34263ef30380bff9837a2311899667249d27ea73c6a6f226209e762582f38a5"
+    },
+    "record_rows": 2381,
+    "relative_record_name": "scipy-1.16.3.dist-info/REQUESTED",
+    "schema": "world_reward.scipy_record_diagnostic.v1",
+    "status": "gate_failure",
+    "validated_rows": 4,
+    "visited_files_rehashed_after": true
+  },
+  "objective_executed": false,
+  "observer_source_identity": {
+    "child_bytes": 4111,
+    "child_sha256": "a85b69ad84d5efa20ae6ab747b9e4543e506eac360f2f4d5a502b2319fd6ee1a",
+    "compiled": true,
+    "failed_receipt_omitted_solvers_pass": true,
+    "host_bytes": 15185,
+    "host_sha256": "28bddd86b291f062710eaa5a73c819c7768877f8112bd66110a08ad437af6bdb"
+  },
+  "observer_target": {
+    "resource_group": "SCENESMITH-H100",
+    "vm": "scenesmith-ncc-h100-01"
+  },
+  "original_control_status": "fail",
+  "original_failure_not_converted_to_pass": true,
+  "original_receipts": {
+    "fd_calls": 72,
+    "native_error_family": "ValueError",
+    "native_phase": "scipy_native_inventory",
+    "pins": {
+      "container.cid": {
+        "bytes": 64,
+        "sha256": "6021345c5705e08dfca9e1523c02dcd09c3c0e88844048440ae94934885e41aa"
+      },
+      "native.json": {
+        "bytes": 14463,
+        "sha256": "217666a8bd5b168389d6d16657a3acd48d6685007edbf74e934f036d5f52af95"
+      },
+      "proof.json": {
+        "bytes": 15057,
+        "sha256": "662824ad5edbbfd967ecff70d9ac2b31a0722b44c856ef3609fd43029e53c73b"
+      },
+      "report.json": {
+        "bytes": 15663,
+        "sha256": "04de0a2f833f408d9ec40d881f206dddae0f30278ba06d58dd729bfcb6faaeb3"
+      }
+    },
+    "solver_count": 0
+  },
+  "original_receipts_before_after": true,
+  "owned_cid_absent": true,
+  "owned_name_absent": true,
+  "owned_scratch_removed": true,
+  "previous_observer_audit_preserved": "results/audits/coherent_pair_scipy_native_inventory_v1_actual.json",
+  "producer_revision": "8db0500a09589dd288ecd8494f00ad33f61983ec",
+  "rootfs_sha256": "5ae610524943c42f72e2fa1ac06a9dbe8fa14bf2d572efd8a57cded6ead3503d",
+  "saved_only": true,
+  "schema": "world_reward.scipy_native_inventory_saved_diagnostic.v2",
+  "scipy_imported": false,
+  "solver_executed": false,
+  "source_before_after": true,
+  "status": "pass",
+  "torch_imported": false,
+  "transport_cli_exit": 0
+}

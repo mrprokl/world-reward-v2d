@@ -1,0 +1,52 @@
+{
+  "audit_failure_source_diagnosis": {
+    "error_family": "KeyError",
+    "field": "native.solvers",
+    "reason": "The frozen measure assigns solvers only after successful scipy_evidence; native FAIL before that assignment legitimately omits the field. Diagnostic observer incorrectly indexed native['solvers']."
+  },
+  "audit_stage": "closed_v2_receipts_before",
+  "azure_runcommand_terminal": true,
+  "current_source": {
+    "archive_xz": {
+      "bytes": 256940,
+      "sha256": "6eb181f08240eaebcf851fe70425095043250a4d5a813477dd0dece83d21df37"
+    },
+    "closure_sha256": "cfb613f47e946704d1dbec0d93552bee63ec802bc378fd1811b209c50f2128ac",
+    "entries": 317,
+    "files": 312,
+    "git_bytes_and_modes_verified": true
+  },
+  "elapsed_seconds": 0.37499991903314367,
+  "error_family": "OtherError",
+  "fixtures_rerun": false,
+  "gpu_used": false,
+  "image_before_after": true,
+  "image_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "installation_performed": false,
+  "limitation": "No SciPy metadata examined; original V2 failure remains closed. Source Git/modes and B47 image were checked pre/post only.",
+  "metadata_child_executed": false,
+  "objective_executed": false,
+  "observer_source_identity": {
+    "child_bytes": 4111,
+    "child_sha256": "a85b69ad84d5efa20ae6ab747b9e4543e506eac360f2f4d5a502b2319fd6ee1a",
+    "compiled": true,
+    "host_bytes": 15178,
+    "host_sha256": "6116e2e08597b04ae3585437493840290a24df1d531d7d002a2cbe482269b2d2"
+  },
+  "observer_target": {
+    "resource_group": "SCENESMITH-H100",
+    "vm": "scenesmith-ncc-h100-01"
+  },
+  "original_control_status": "fail",
+  "original_failure_not_converted_to_pass": true,
+  "producer_revision": "8db0500a09589dd288ecd8494f00ad33f61983ec",
+  "rootfs_sha256": "5ae610524943c42f72e2fa1ac06a9dbe8fa14bf2d572efd8a57cded6ead3503d",
+  "saved_only": true,
+  "schema": "world_reward.scipy_native_inventory_saved_diagnostic.v1",
+  "scipy_imported": false,
+  "solver_executed": false,
+  "source_before_after": true,
+  "status": "inconclusive",
+  "torch_imported": false,
+  "transport_cli_exit": 0
+}
