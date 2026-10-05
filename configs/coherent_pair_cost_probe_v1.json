@@ -1,0 +1,66 @@
+{
+  "schema": "world_reward.coherent_pair_cost_probe.v1",
+  "budget_seconds": 720,
+  "cpu_count": 4,
+  "memory_bytes": 6442450944,
+  "object_slots": 3600,
+  "fixtures": [
+    {
+      "persons": 2,
+      "hands": 2,
+      "direct_objects": 2,
+      "native_pairs": 4
+    },
+    {
+      "persons": 4,
+      "hands": 8,
+      "direct_objects": 8,
+      "native_pairs": 64
+    }
+  ],
+  "measurements": [
+    "zero_geometry",
+    "dyadic_geometry",
+    "dyadic_relational"
+  ],
+  "alpha": 0.25,
+  "fit_images_for_cost": 32,
+  "evaluations_per_fit_image": 1026,
+  "source_tokens": 1500,
+  "output_prefix": "results/coherent-pair-cost-probe-",
+  "image_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "reused_helper_pins": {
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "src/world_reward/__init__.py": {
+      "bytes": 81,
+      "sha256": "1ac8c64041277f0c3cf4d8838b3153210d7076dd86a5121d1e6ef494b64b36a1"
+    },
+    "src/world_reward/coherent_pair_learning.py": {
+      "bytes": 15335,
+      "sha256": "1c0f4f352bd09729cb6c671c2987d430961dc15cb841cd17bd99d039df2f5f96"
+    },
+    "src/world_reward/coherent_route_scorer.py": {
+      "bytes": 21201,
+      "sha256": "a91ba827bddad2f4376e1fc5f16cf253a9a9749218c6df4115c47552f9086b9a"
+    },
+    "src/world_reward/interaction_candidate_evidence.py": {
+      "bytes": 11997,
+      "sha256": "5fb3db6b0a97ef396e01fa9c7852857b02c93625ebb65ee07637136432211235"
+    },
+    "src/world_reward/interaction_tuple_evidence.py": {
+      "bytes": 8799,
+      "sha256": "1c4cdb80a45b6e8a3840d1ff87c033e24d40f80cd8d0b1caf005349ae3211930"
+    },
+    "src/world_reward/person_pose_observations.py": {
+      "bytes": 7614,
+      "sha256": "c93fa24f4ce4bd6b5f4c53f4e48943b2c61d0c20a2211b36ef6d0ccb6b3ce375"
+    },
+    "src/world_reward/hoi_detr_observations.py": {
+      "bytes": 14388,
+      "sha256": "047a80cb618fb98da19b233c199fb927c9b9930b1a6573f62abb2e07ac6ebd8f"
+    }
+  }
+}
