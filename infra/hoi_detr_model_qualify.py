@@ -27,7 +27,7 @@ ROOT = Path('/srv/scenesmith/world-reward')
 DATA = Path('/srv/world-reward-data/hoi_detr_v1')
 ENTRY = 'run_hoi_detr_model_qualify'
 PROTOCOL = 'configs/hoi_detr_model_qualify_v1.json'
-PROTOCOL_PIN = dict(bytes=3701, sha256='15254cca114d01bf0cf8653e56d8dfb754c41f61ed32656494599e0bbecc589d')
+PROTOCOL_PIN = dict(bytes=3701, sha256='a8bfea4ac4a0e97b516244ca1c420cc4991fc8b37ddbdb108e7bae7fcb2d5436')
 HELPERS = ('infra/hoi_detr_model_qualify.py', 'infra/run_hoi_detr_model_qualify.sh', PROTOCOL,
            'infra/hoi_detr_runtime_verify.py', 'infra/hoi_detr_acquire.py',
            'infra/mediapipe_cpu_runtime_verify.py', 'infra/mediapipe_hands_acquire.py',
@@ -65,8 +65,8 @@ def source(rt, code, revision):
 
 def protocol(rt, code):
     p = rt.pinned(code/PROTOCOL, PROTOCOL_PIN, 16 << 10)
-    require(p['schema'] == 'world_reward.hoi_detr_model_qualification.v1' and p['scope'] == 'one_procedural_RGB_full_native_model_runtime_only'
-            and p['root'] == str(ROOT) and p['output'] == 'results/hoi-detr-model-qualify-v1'
+    require(p['schema'] == 'world_reward.hoi_detr_model_qualification.v2' and p['scope'] == 'one_procedural_RGB_full_native_model_runtime_only'
+            and p['root'] == str(ROOT) and p['output'] == 'results/hoi-detr-model-qualify-v2'
             and (p['budget_seconds'], p['cleanup_grace_seconds'], p['outer_seconds']) == (1800, 60, 1860)
             and (p['cpu_cpus'], p['cpu_memory'], p['gpu_cpus'], p['gpu_memory']) == (4, '16g', 4, '64g')
             and p['amp'] is False and p['tf32'] is False and p['seed'] == 0 and all(p[k] is False for k in FLAGS), 'Frozen one-forward scope required')
@@ -77,6 +77,7 @@ def protocol(rt, code):
 
 MODEL_REQUIREMENTS = frozenset({
     'Actual independently pinned MMCV PASS is not yet available',
+    'Readonly full overlay inventory changed',
     'Complete original native operator PASS required',
     'Offline original FairScale wheel build failed',
     'Offline wheel install/source preservation failed',
@@ -185,7 +186,10 @@ def inventory(rt, folder, maximum=16 << 20, *, readonly=True):
         require(stat.S_ISDIR(s.st_mode) or stat.S_ISREG(s.st_mode) and s.st_nlink == 1, 'Only unaliased overlay files/directories permitted')
         if path.is_file(): rows.append(dict(file=str(path.relative_to(folder)), **rt.identity(path, maximum, readonly=readonly, empty=True)))
     require(rows, 'Empty overlay forbidden')
-    return rows
+    # pathlib component ordering differs from relative-string ordering for
+    # package versus package-version.dist-info. Bind all rows in one canonical
+    # ordering; never omit files to satisfy an inventory comparison.
+    return sorted(rows, key=lambda row: row['file'])
 
 
 def check_inventory(rt, folder, rows):

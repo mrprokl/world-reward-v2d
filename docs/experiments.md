@@ -10134,3 +10134,14 @@ preprocessing and one proceduralRGB forward. Approved changes are one exact
 author foreign-path Expr removal in derived copy and explicit inference
 load_from=None/model.train_cfg=None; no mathematical source/config retuning.
 291 combined tiny tests PASS; actual full-model result remains prospective.
+
+7345e8e full-model v1 actual CLOSED HOSTFAIL12.289932s after pure offline
+FairScale wheel/install/source-preservation CPU PASS. No GPU or checkpoint
+decode. Host2685B/c6d56745bfe67ae2ee8e7107f92710050b29baa78577bf63dfdc3554f21b88b6;
+overlay2597B/fe2b1916d713cf292eaa3efde37a2c9d00d9d647bfbf84673e337b1e07b91c8b.
+Original sources/checkpoint/runtime posthash and owned containers/overlay cleanup
+pass. Saved137-row site manifest is complete but pathlib component-order differs
+from the relative-string order used by comparison (firstdiff15 fairscale package
+versus fairscale-0.4.13.dist-info). Fresh v2 canonicalizes ALLinventory rows by
+relative-string order without dropping/rewriting files or loosening byte/mode
+checks. Model/preprocessing/load/budget unchanged; original failure stays closed.

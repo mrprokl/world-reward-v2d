@@ -321,3 +321,15 @@ def test_original_failsafe_writer_demotes_after_final_fsync(tmp_path, monkeypatc
     stored = json.loads(path.read_bytes()); assert stored['status'] == 'fail' and stored['phase'] == 'receipt_sealing'
     assert stat.S_IMODE(path.stat().st_mode) == 0o444
     with pytest.raises(FileExistsError): acq.write_receipt(path, dict(status='fail'), 1, 2)
+
+
+def test_inventory_package_and_distinfo_have_one_complete_canonical_order(gate,rt,tmp_path):
+    root=tmp_path/'site';root.mkdir()
+    for name in ('fairscale/__init__.py','fairscale-0.4.13.dist-info/INSTALLER','fairscale/z.py','fairscale/nn/a.py'):
+        path=root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(b'Original');path.chmod(0o444)
+    gate.seal_tree(root);rows=gate.inventory(rt,root)
+    assert [r['file']for r in rows]==sorted(['fairscale/__init__.py','fairscale-0.4.13.dist-info/INSTALLER','fairscale/z.py','fairscale/nn/a.py'])
+    gate.check_inventory(rt,root,list(reversed(rows)))
+    with pytest.raises(ValueError):gate.check_inventory(rt,root,rows[:-1])
+    root.chmod(0o755);p=root/'fairscale/z.py';p.chmod(0o644);p.write_bytes(b'Changed');p.chmod(0o444)
+    with pytest.raises(ValueError):gate.check_inventory(rt,root,rows)

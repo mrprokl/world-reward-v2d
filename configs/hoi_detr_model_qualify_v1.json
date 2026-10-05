@@ -1,8 +1,8 @@
 {
-  "schema": "world_reward.hoi_detr_model_qualification.v1",
+  "schema": "world_reward.hoi_detr_model_qualification.v2",
   "scope": "one_procedural_RGB_full_native_model_runtime_only",
   "root": "/srv/scenesmith/world-reward",
-  "output": "results/hoi-detr-model-qualify-v1",
+  "output": "results/hoi-detr-model-qualify-v2",
   "budget_seconds": 1800,
   "cleanup_grace_seconds": 60,
   "outer_seconds": 1860,
