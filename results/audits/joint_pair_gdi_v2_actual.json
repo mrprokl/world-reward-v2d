@@ -2,6 +2,8 @@
   "adopted": false,
   "all50banks_hashed": true,
   "bank_bytes": 94039352,
+  "full_git_source_independently_verified": true,
+  "gpu_used": false,
   "host_report": {
     "bytes": 67368,
     "sha256": "576057693bec11cea8a35e1c16f7f45488218bcf74a6a9aaa069530106fed82f"
@@ -9,17 +11,21 @@
   "native_elapsed_seconds": 30.967953704006504,
   "native_forwards": 100,
   "native_model_loads": 1,
+  "native_query_banks_independently_checked": 100,
   "native_report": {
     "bytes": 76598,
     "sha256": "b520c10085cd70023c5db1f5f8d639671be5377fed2b3d907f718b23896c5d9e"
   },
   "object_proposals": 15,
   "original_padding_masks_verified_by_producer": true,
+  "original_padding_negative_infinities": 22680000,
   "owned_container_removed": true,
   "person_proposals": 224,
   "producer_revision": "038f65aa9405cebb1adcbb0eaa50f0cb5fbb034b",
   "quality_verified": false,
+  "raw_to_nms_bytes_independently_verified": true,
   "schema": "world_reward.joint_pair_gdi_saved_integrity.v2",
+  "source_archive_sha256": "2828f642519dde50382550d8c56a2be72cc382ec93f7b77c90c2e084d38beea2",
   "source_closure_sha256": "df33b1ed7f4aff725a75dcda3f13e6358ed3a07c3590ef8840323b7b0ba8b593",
   "source_entries": 269,
   "status": "pass"

@@ -169,3 +169,9 @@ Next research must qualify a principled high-recall automatic proposal generator
 on a separately declared independent DEV protocol, not salvage this closed
 comparison or choose target labels from challenge annotations. Static joint
 retrieval, anatomical ownership and temporal identity remain unverified.
+
+Cleanup after closure: remove the unexecuted cohort-specific DWPose/HOI dispatch
+scaffolds rather than maintain two unnecessary transport stacks. Tested reusable
+person/HOI observation adapters, full hypothesis ledger, scorer and original
+native drivers remain; pinned Azure DWPose assets and actual acquisition receipt
+remain reusable. No production prediction or closed failure was overwritten.
