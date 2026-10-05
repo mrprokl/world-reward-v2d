@@ -10205,3 +10205,18 @@ quality. Independent root audit authenticates full current/historical source,
 all original source/checkpoint bytes, exact runtime/image, saved evidence,
 readonly sealing and completed cleanup; no GPU apps remain. Historicalv1–3
 FAILs are preserved. No challenge RGB/private reference/quality/adoption claim.
+
+54437d8 external image probe actual COMPLETE PASS45.957866s, full native load/
+forward40.010575s. Frozen licensed original image1800×2062; two native hands,
+one direct-object and both ordered H→O raw-logit pairs genuinely executed,
+zero object→target pairs. No demo threshold/softmax/top1/manual target input.
+Host3019B/874806c2b996a7b038279a449ccfd10f18286c3d56d83427f8ea8d6382a0ee2a;
+native3868B/a1457b4d8b1f30fcf61517dc3030d7729531fce53d3e55ca2c68b60c5236d092;
+all1500-query evidence1464521B/a1a10d0509e627bff6e54e7aee90ad564ade6b2bfb2a2a9f379ea39597552131
+Azure-only. Independent root rechecks whole current/historical source, exact
+original source/checkpoint/runtime/image, creator/acquisition/actual JPEG bytes,
+saved evidence, sealing/cleanup and GPU idle. Scope pair-head execution, **not**
+correct attribution, contact/calibration/temporal identity/3D or CARI4D improvement.
+331 combined tests PASS2.01s. Ten native math/load/overlay/auth/cleanup functions
+remain AST-identical to the procedural qualified producer. No closed cohort
+reuse, parameter retune, challenge/private geometry or backend adoption.

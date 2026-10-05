@@ -30,8 +30,9 @@ not manual episode reassignment or another downstream fit of the wrong pair.
 - **Learned relationship runtime:** original HOI-DETR/MMCV CUDA operators and
   the full detector now pass independent H100 execution audits. All1796 native
   checkpoint fields load strictly; one procedural image forward completes in
-  the45.29s host gate. No surviving relation pair on that procedural image,
-  hence no real pair-head or semantic-quality qualification yet. Next: a fresh
+  the45.29s host gate. A separate licensed external image now executes both
+  native hand→object pairs in45.96s, with all proposal/query evidence retained.
+  This qualifies pair-head execution, not semantic-quality. Next: a fresh
   lawful attribution control on the same automatic proposals, not tuning the
   rejected HO-Cap cohort or challenge episodes. Benchmark rights/training
   overlap and submission eligibility remain separate unresolved gates.
