@@ -9176,3 +9176,31 @@ Fresh Surface QSlim numericalcohortfc4fb4e nowDISPATCHED after actualbuildpins;
 ledger7113b6b2640ebe43eced98559a975fb0d558d83b67c32c9386684542051e50ac.
 Threefixedsources/preflights before twoQEM; native300s inclusive, originaltwo
 budgets/fourloaders fixed. ACKonly atthispoint; noadaptedthreshold/retry/adoption.
+
+Fresh Surface QSlim fc4fb4e actualnativePASS17.724530s/twoQEM/4224commits:
+curved holed4000V7680F→2208V4096F1792commits, disjoint4704V8960F→2272V4096F2432.
+All3fullsources preflight beforeQEM, third4096fixedboundary expectedINAPPLICABLE.
+Original wholeJ/I/quotient/everyevent/componentEuler/boundary/F64F32orientation/
+rawnativepacked4096activeface gatesPASS,4loaders2budgets. Percomponent unsigned
+vertex-surface maxima3.049e-5/6.087e-5 authoredunits, boundaries0; notHausdorff.
+Native18039B5d3686cf2f0fb6b289d7780aeb70d9d4470a009d77906a4608c2aa9aebdb8f83.
+OriginalhostFAIL7112Bbd458f3eb92f889e28407788f97afd4cd80af20d27858a2034111193eba92757:
+actualdocker stdoutLF +lowercaseabsence stderr →leadingLFmergedexactcheckfail,
+isolatedsameoriginalfunction return2 beforeCIDchmod400; actualsameCIDgone.
+OriginalCID64B5b3035c39d16e4ad9df5e8d20d1f422ee0530f9c425675ca392fd575dcc9c20b
+0644unchanged. Independentall248source/runtime/full3fixturemanifests/receipt
+predicates/sourceprepost/originalfailedterminalunit/exactoriginal+ownCIDabsence
+PASS1.368128s; noQEM/ELF/packer/deletedgeometry replay. Independent1675B
+41a5fb072e7be256f24e3a12f80200831e13bc7a50bd69b2148a194a8bf7c736 frozen.
+Initialreceipt-only controller had a vacuous optional-artifact count predicate;
+corrected exact9artifact-key/type/hash census passes without numerical rerun.
+Future2surfacewrappers stripONLYleadingLF afterrc capture;39streamcases reject
+daemon/foreignCID/[]/extra/malformedrc, root119testsPASS0.82s. HistoricalFAIL
+retained; nowholeParquet/fullsurface/embedding/3Dgain/eligibility/adoption.
+
+Fresh authored real-MHR point-runtime protocol frozen2dc67f1: newT3 native
+neutral decoded body and asymmetric tetra, actualrender/nativecrop, mask-only
+32quantile/min8 attaches, originalvsweight0 probes0/181 and301+301updates,
+180manufacture+1200pair/1380inclusive. This is numerical runtime qualification,
+not predictedRGB, tracker, positiveweight calibration or held-out HOI evidence.
+Caller under implementation; no manufacture/model/run observed yet.

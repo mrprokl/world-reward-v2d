@@ -1,0 +1,40 @@
+{
+  "schema": "world_reward.surface_qslim_qualification_pins.v1",
+  "producer_revision": "fc4fb4e342e0be66d4070f5f513fa17d6731b56e",
+  "native": {
+    "bytes": 18039,
+    "sha256": "5d3686cf2f0fb6b289d7780aeb70d9d4470a009d77906a4608c2aa9aebdb8f83"
+  },
+  "historical_host_status": "fail",
+  "historical_host_report": {
+    "bytes": 7112,
+    "sha256": "bd458f3eb92f889e28407788f97afd4cd80af20d27858a2034111193eba92757"
+  },
+  "historical_CID": {
+    "bytes": 64,
+    "sha256": "5b3035c39d16e4ad9df5e8d20d1f422ee0530f9c425675ca392fd575dcc9c20b"
+  },
+  "historical_CID_mode": "0644_unchanged",
+  "independent_audit_report": {
+    "bytes": 1675,
+    "sha256": "41a5fb072e7be256f24e3a12f80200831e13bc7a50bd69b2148a194a8bf7c736"
+  },
+  "independent_audit_path": "results/surface-qslim-independent-v2/report.json",
+  "source_archive_sha256": "638f1ab2f0a1c7e5d9d418b730337af5a837f8f8c7a0a67c46fe7cdb0fe17e94",
+  "source_readonly_ledger_sha256": "7113b6b2640ebe43eced98559a975fb0d558d83b67c32c9386684542051e50ac",
+  "source_files": 248,
+  "fixture_manifest_sha256": "110ea57122bfa7d1acbef89f53e1b197bd039d9933aaa94f7107956ccf7b5ae0",
+  "elapsed_native_seconds": 17.72453022300033,
+  "native_loader_calls": 4,
+  "official_budget_calls": 2,
+  "QEM_calls": 2,
+  "committed_collapses": 4224,
+  "independent_native_receipt_audit": true,
+  "independent_geometry_replay": false,
+  "actual_original_CID_absence_verified": true,
+  "whole_Parquet_qualified": false,
+  "full_surface_fidelity_certified": false,
+  "embedding_certified": false,
+  "adoption": false,
+  "reconstruction_accuracy_verified": false
+}

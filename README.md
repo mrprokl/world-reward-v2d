@@ -17,6 +17,9 @@ inferred automatically; no hand-labeling of challenge records.
   tests. Three fixed open-surface controls now pass an independent actual
   loader/mesh-budget audit; the original host cleanup FAIL is retained. Whole
   Parquet and real-object pose quality remain separate.
+  Two fresh over-budget open-surface QSlim controls pass in17.725s (4224 actual
+  contractions), with source/result receipts independently authenticated; their
+  separate host cleanup FAIL is preserved. No full-surface accuracy/adoption.
   EP21 real native point qualification stops before optimization (<8 queries);
   no replay, positive-weight fit or accuracy gain. EP09 full415 preparation,
   forward,301-update refinement and directexport pass independent source/full-
@@ -61,6 +64,8 @@ inferred automatically; no hand-labeling of challenge records.
   refitting. Ten real Torch controls and the original301-update loop on
   manufactured state pass; real-body/contact execution and independent HOI
   validation remain required. No challenge-tuned loss weights or measured gain.
+  A [fresh three-frame real-MHR runtime pair](docs/joint_point_authored_runtime_protocol.md)
+  is now preregistered; manufacture/render/602-update execution remain unverified.
   [Balanced exact sums](docs/balanced_solid_sum.md) pass15 fresh native controls
   on the authenticated existing CPU runtime; four fresh QEM/query composition
   controls also pass, with the original QEM unchanged and query proofs separate.

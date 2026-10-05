@@ -1,7 +1,8 @@
 # Surface LOD: official contract and prospective backend
 
 **Updated 2026-10-05; Phase1 identity implemented/native runtime independently
-verified; Phase2 design and implementation remain unqualified. Not adopted.** This corrects an
+verified; Phase2 fixed native controls pass with independently authenticated
+receipts, historical host FAIL retained. Not adopted.** This corrects an
 interpretation of the official scorer, not any historical experiment gate.
 EP25 and all other closed failures remain FAIL; no episode reroll, changed
 threshold, mesh repair or production query is authorized by this document.
@@ -20,8 +21,31 @@ That corrected build (`e5f82ea`) now passes independently: same CPP, existing
 compiler/image, all 1,418 libigl/Eigen and 14,322 Boost files verified twice;
 the retained ELF and host/native receipts are frozen in
 `configs/surface_qslim_build_pins.json`. Build-only wall time22.814s, zero mesh/QEM
-calls. The numerical cohort, physical fidelity and real HOI accuracy remain
-unqualified; a successful compiler is not a successful reconstruction method.
+calls. The compiler alone did not qualify the numerical cohort or reconstruction.
+
+The fresh Phase2 cohort (`fc4fb4e`) subsequently passed its native controls in
+17.725s: curved holed patch4000V/7680F→2208V/4096F (1792 contractions), and
+two disjoint holed patches4704V/8960F→2272V/4096F (2432 contractions).
+All three full sources were frozen/preflighted before two QEM calls; the
+4096-fixed-boundary negative abstained before QEM. Original J/I/whole quotient
+and every committed-event replay, component/Euler/fixed-boundary invariants,
+F64/F32 orientation and raw/native/official-packed surfaces passed. Four native
+loader calls and two unchanged official budgets; no geometry retained locally.
+Unsigned bidirectional **vertex-to-surface diagnostics**, not Hausdorff bounds,
+maxima were3.05e-5 and6.09e-5 authored units; boundary distances were zero.
+
+The original host receipt is **FAIL**: Docker's absent-container command emits
+a leading blank stdout line before its lowercase error. Exact merged-stream
+comparison failed before sealing the CID0400, despite the actual CID being gone.
+Isolation of the same original shell function reproduced return2 without QEM.
+The original report/CID0644 remain unchanged. An independent receipt audit
+verified all248 source files, full three-source manifests in the actual CPU
+runtime, original result predicates/packing records and exact container absence;
+it did **not** replay deleted geometry, QEM or packing. Future shell parsers remove
+only leading empty lines after capturing rc;39 simulated-stream controls pass.
+Frozen evidence is in `configs/surface_qslim_qualification_pins.json`.
+This narrow technical evidence is not whole-Parquet, full-surface fidelity,
+embedding, real-object pose accuracy, legal eligibility or backend adoption.
 
 ## 1. Audited primary sources
 
