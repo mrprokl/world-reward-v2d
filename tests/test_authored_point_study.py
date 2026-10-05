@@ -127,6 +127,35 @@ def test_material_anchor_tie_is_original_face_order():
     assert s.select_hand_triangle(f, hand, idx, w, names, 'l') == 0
 
 
+@pytest.mark.parametrize('dtype',[np.uint32,np.int64])
+def test_actual_momentum_lbs_identifier_abi_preserves_source_bytes(dtype):
+    f,hand,idx,w,names=hand_fixture();idx=idx.astype(dtype);idx.flags.writeable=False
+    original=(idx.dtype.str,idx.shape,idx.tobytes())
+    assert s.select_hand_triangle(f,hand,idx,w,names,'l')==1
+    assert (idx.dtype.str,idx.shape,idx.tobytes())==original
+    permutation=np.array([5,2,0,4,1,3]);inverse=np.argsort(permutation)
+    assert s.select_hand_triangle(inverse[f],inverse[hand],idx[permutation],w[permutation],names,'l')==1
+    w[:]=[.5,.5]
+    assert s.select_hand_triangle(f,hand,idx,w,names,'l')==0
+
+
+@pytest.mark.parametrize('dtype',[np.int8,np.int16,np.int32,np.uint8,np.uint16,np.uint64,
+    np.float32,np.float64,np.bool_,object])
+def test_unobserved_lbs_abi_is_not_silently_cast(dtype):
+    f,hand,idx,w,names=hand_fixture()
+    with pytest.raises(ValueError):s.select_hand_triangle(f,hand,idx.astype(dtype),w,names,'l')
+
+
+@pytest.mark.parametrize('fault',['masked','large_unsigned','shape','weights'])
+def test_actual_unsigned_lbs_still_requires_all_original_validity(fault):
+    f,hand,idx,w,names=hand_fixture();idx=idx.astype(np.uint32)
+    if fault=='masked':idx=np.ma.array(idx,mask=np.zeros_like(idx,bool))
+    elif fault=='large_unsigned':idx[0,0]=np.iinfo(np.uint32).max
+    elif fault=='shape':idx=idx[:,0]
+    else:w[0]=[.1,.2]
+    with pytest.raises(ValueError):s.select_hand_triangle(f,hand,idx,w,names,'l')
+
+
 @pytest.mark.parametrize('bad', ['no_hand_face', 'no_wrist', 'no_mass', 'invalid_index', 'weights'])
 def test_no_anchor_no_placeholder_or_nearest_fallback(bad):
     f, hand, idx, w, names = hand_fixture()

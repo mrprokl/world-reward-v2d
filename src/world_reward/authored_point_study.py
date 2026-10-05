@@ -149,7 +149,14 @@ def select_hand_triangle(faces, hand_vertex_indices, lbs_indices, lbs_weights, j
     """
     f = _array(faces, "faces", dtype=np.int64)
     hand = _array(hand_vertex_indices, "hand spec", dtype=np.int64)
-    idx = _array(lbs_indices, "LBS indices", dtype=np.int64)
+    # Momentum's actual MHR get_lbsw() exports uint32 joint indices. Preserve
+    # those source bytes: these are identifiers, not tensor gather operands.
+    # Int64 is retained for existing tiny fixtures; no implicit cast or generic
+    # integer-kind relaxation is needed for the independently observed ABI.
+    native_dtype = np.asarray(lbs_indices).dtype
+    if native_dtype not in (np.dtype('uint32'), np.dtype('int64')):
+        raise ValueError('LBS indices: original uint32/int64 ABI required')
+    idx = _array(lbs_indices, "LBS indices", dtype=native_dtype)
     w = _array(lbs_weights, "LBS weights")
     if (side not in ("l", "r") or not isinstance(joint_names, (list, tuple))
             or len(set(joint_names)) != len(joint_names) or side + "_wrist" not in joint_names
