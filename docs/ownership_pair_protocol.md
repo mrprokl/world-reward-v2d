@@ -172,3 +172,24 @@ arm and513 evaluations per arm by carrying the evaluated gradient. This is
 **not a frozen real-study optimizer recipe**: full3600-object/native-K cost has
 not passed a bounded qualification. No FIT/CAL/RESERVED labels or real images
 were consumed by this prototype, and no trained selector has been adopted.
+
+Data-free full-bank cost probe producer
+`1bf7109d0d24d3618ee74f458d72e5107011ecf5` executes the same learner, not a
+pruned surrogate:2 persons/3600 objects/4 native routes and4 persons/3600
+objects/64 routes,1500 native tokens, explicit missing anatomy. Parent189 tests
+PASS1.56s; actual Azure CPU host technical PASS13.834795298s, six measurements,
+117858304B peak RSS, owned container removed, terminal exit0. Geometry zero-start
+ties cost0.586206s/10.234581s; nonzero geometry0.281462s/0.678967s and relational
+passes0.286288s/0.614361s. Fastest observed pass×32 images×1026 evaluations is
+9240.96s, not within the proposed720s cost gate. This optimistic extrapolation
+is not a rigorous runtime lower bound or convergence/quality measure.
+
+Decision: **COST_RECIPE_UNQUALIFIED_NO_REAL_FIT**. Do not fit real references
+with this draft recipe. Exact factor caching and alias-index reuse are general
+optimization candidates; they require independent arithmetic/tie/immutability
+qualification, not truncating3600 candidates or silently changing scientific
+gates. Native report6628B/SHA
+`eb2ed10363bd933b018db3db127144f72668bfdc7e3602cfdc88c3ff4f1c9790`;
+host2432B/SHA
+`c0a6f2b291e93fe2edaa5979db4b2da4df6cfe15d3fe48c2e5de1dde1c43c02d`.
+Independent saved-only source/result audit remains a separate stage.
