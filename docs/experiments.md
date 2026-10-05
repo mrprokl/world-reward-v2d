@@ -10440,3 +10440,17 @@ c9c33343295a1baf9e3d9369d1ce9ca94a72cf5e94b7e8f47fa59966207f01b5;
 driver25754B/c564cdf0c51dc39a384b6eec4cca56de610e19db5733f5992168dfcae69189f6;
 shell1134B/d4237ec1c2e06f5186bd1c30303000e1d4445dd59d307173822038f18aa86055.
 No build, H100 ABI, strict checkpoint, association gain or adoption inferred.
+
+603272b fourth preregistered native-coverage surface proposal EP19 COMPLETE PASS
+204.233443s, full443source frames, one unchanged QSlim/2032V/4096F/six components.
+Host1029638B/b678290ae1c8373e55cff782ea1c94737215c1af5f03c011bd749adebdc0273b;
+native921414B/1cb20fc2bbf9801342ae3f6c841ddbcfa46d90c2f34c6ac949fdab7f4aab8020.
+Parent independently authenticates original complete producer source, image/
+qualification/full443input, native validation, every output/posthash and owned
+CID/scratch absence. Actual fifteen-artifact/sixteen-current-helper pins5974B/
+3adc0bbe8258aa006d3ad4ed62c0341dd79e57abf919eb13265192b71c4ced26 freeze for
+the unchanged full-index pose consumer. A second read-only audit retains only
+the tiny pins previously displayed, not a geometry rerun. Original topology
+failure remains unchanged; no component deletion/scale repair/accuracy claim.
+EP16 actual GPU progress confirms200/360 native frames; EP17 wrapper waits the
+cooperative lock with no duplicate GPU process. Neither trajectory PASS inferred.
