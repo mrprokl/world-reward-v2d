@@ -1,0 +1,41 @@
+{
+  "schema": "world_reward.openimages_joint_pair_scorer.v1",
+  "scope": "observed_static_holds_joint_pair_retrieval_not_ownership_contact_OFF_task_or_3D",
+  "architecture": "linear_30_numerical_values_plus_30_availability_indicators_no_intercept",
+  "alias_policy": "exact_original_pixel_coordinate_P_and_O_groups_independent_GT_distinct_supported_values_per_feature_and_distinct_full_HOI_route_evidence",
+  "baseline": "lexicographic_negative_object_center_outside_person_box_then_center_distance_over_original_person_diagonal_exact_ordinal_ties",
+  "features": {
+    "base_distance_columns_0_to_4": ["min", "max", "mean"],
+    "base_person_object_iou_column_5": ["max"],
+    "base_raw_scores_columns_6_to_9": ["mean"],
+    "geometry": ["object_center_outside_person_over_person_diagonal", "person_object_center_distance_over_person_diagonal"],
+    "hoi": ["hoi_body_wrist_hand_box_distance_min", "hoi_hand_root_hand_box_distance_min", "hoi_direct_generic_iou_max", "hoi_direct_generic_center_distance_min", "hoi_margin_max", "hoi_margin_geometry_weighted_mean", "hoi_hand_raw_score_geometry_weighted_mean", "hoi_direct_raw_score_geometry_weighted_mean"],
+    "hoi_weight": "IoU_direct_generic/(1+body_wrist_to_hand_box_over_image_diagonal+hand_root_to_hand_box_over_image_diagonal)",
+    "no_supported_HOI": "numerical_values_zero_availability_false_no_dummy_route",
+    "availability": "numerical_only_not_visibility_owner_or_contact"
+  },
+  "fit": {
+    "image_slots": 24,
+    "minimum_usable_distinct_authors": 12,
+    "eligibility": "observed_positive_mask_has_at_least_one_true_and_one_false_competing_hypothesis_not_GT_negative",
+    "objective": "mean_image(logsumexp_all_automatic_pair_scores-logsumexp_observed_positive_pair_scores)+0.5*L2*sum(coefficients_squared)",
+    "L2": 1.0,
+    "unknown_alternatives": "implicitly_suppressed_by_denominator_not_binary_negative_OFF_contact_labels_or_unbiased_PU",
+    "missing_positive": "count_as_FIT_support_failure_no_GT_proposal_injection_no_replacement_keep_evaluation_slot",
+    "standardization": "available_usable_FIT_values_only_equal_images_then_equal_unique_pairs_feature_conditional_mass_scale1_if_constant_or_absent",
+    "optimizer": "full_gradient_Armijo_descent",
+    "initial_coefficients": "all_zero_single_start_no_randomness",
+    "initial_step": 1.0,
+    "step_halving": 0.5,
+    "armijo_constant": 0.0001,
+    "maximum_iterations": 1000,
+    "maximum_backtracks": 50,
+    "gradient_inf_tolerance": 1e-7,
+    "budget_seconds": 120,
+    "numerical_gate": "finite_objective_gradient_coefficients_and_gradient_tolerance_before_return_no_fallback_optimizer"
+  },
+  "decision": {"image_slots": 8, "use": "diagnostic_only_no_threshold_hyperparameter_or_grid_selection"},
+  "test": {"image_slots": 32, "opens": 1, "metric": "joint_annotated_holds_pair_top_choice_retrieval_all_frozen_slots_exact_tie_fraction", "comparison": "same_automatic_bank_A_vs_B", "no_adoption_claim": true},
+  "training_overlap_verified": false,
+  "implementation_PASS_is_quality_PASS": false
+}
