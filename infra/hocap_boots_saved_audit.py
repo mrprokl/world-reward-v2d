@@ -146,7 +146,9 @@ def absent_result(r,cid):
 
 
 def absence(cid,name):
-    r=command(['docker','inspect',cid])
+    # Match the independently observed formatted-inspect contract. Unformatted
+    # inspect emits a JSON [] on absence and is deliberately not accepted.
+    r=command(['docker','inspect',cid,'--format','{{.Id}}'])
     require(absent_result(r,cid),'Exact absent CID required; daemon failure is not absence')
     for expression in ('id='+cid,'name=^/'+name+'$'):
         r=command(['docker','ps','-aq','--no-trunc','--filter',expression])

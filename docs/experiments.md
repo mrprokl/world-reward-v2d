@@ -9979,3 +9979,12 @@ and independent contract review; launch/source/license/download/posthash/sealing
 share900s budget with late receipt demotion. All acquisition stays on Azure.
 No actual download, runtime compatibility, model execution, full-stack rights,
 training-overlap clearance or scientific quality is claimed at this stage.
+
+400d261 saved-only audit v2 passes independent full source/public authentication
+but CLOSED pre-container FAIL at Docker absence census. Actual unformatted
+inspect emits stdout `[]` plus LF, while the separately observed formatted
+inspect emits LF; exact lowercase error and both empty CID/name listings match.
+Minimal fix requests `--format {{.Id}}`, preserving the strict previously pinned
+absence parser rather than accepting arbitrary output. Both FAILED units/logs
+and original seven prediction artifacts remain unchanged; zero labels/models
+or new GPU calls. This is lifecycle compatibility, not a scientific result.

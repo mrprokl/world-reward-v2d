@@ -119,6 +119,7 @@ def test_independent_cid_and_name_absence_no_removal(monkeypatch):
     monkeypatch.setattr(m,'command',command)
     assert m.absence('CID','name')
     assert len(calls)==3 and not any(a[1]=='rm'for a in calls)
+    assert calls[0]==['docker','inspect','CID','--format','{{.Id}}']
     def present(argv,seconds=5):
         return command(argv,seconds)if argv[1]=='inspect'else subprocess.CompletedProcess(argv,0,b'CID\n',b'')
     monkeypatch.setattr(m,'command',present)
