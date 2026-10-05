@@ -105,6 +105,12 @@ now fails exact A/B parity after real manufacture/contact/render/Kaolin probes:
 state audit localizes initial reference-foot and forward/gradient discrepancies;
 baseline bit self-reproducibility is unknown, not an established subclass defect.
 The original failure stays closed; no tolerance or accuracy/adoption follows.
+The fresh original-only A/A also fails at initial/probe parity (first301,
+second0). Saved-array CPU analysis finds only reference-foot constructor
+differences, with no point factory involved. This closes bitwise qualification,
+not the point hypothesis or an established JIT/kernel mechanism. A separately
+preregistered same-invocation delegation check can test the zero-weight branch
+without pretending independent stochastic optimizer trajectories are identical.
 The next actual tracking seam needs no new model: BootsTAPIR already preserves
 full-T query slots, raw logits and native global XY256. The point objective's
 `diag(256/W,256/H)` maps **full-image** pixels, not native silhouette crop pixels.

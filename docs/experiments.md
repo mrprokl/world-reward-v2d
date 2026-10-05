@@ -9242,3 +9242,16 @@ snapshots/four probes persisted before comparison; separate result namespace.
 Root targeted integration521PASS11SKIP25.22s; strict names51PASS1.04s.
 Broad suite interrupted deliberately after2133PASS57.78s, not a full-suite PASS.
 No native execution yet; no closed A/B replay or tolerance change.
+
+Fresh original-only native A/A e2b084a CLOSEDFAIL: host33.907104s,
+native29.837638s, manufacture14.801716s;32distinctunambiguous queries,
+2constructors4probes/first301updates/second0. Exact initial/probe0/probe181
+all differ; no point factory or bound evidence. Host6355B4986361f…60b57,
+native8962Be680e514…682ad,233sources/archivef70c5510…00277 sealed. Six
+precomparison hash/count records and12fullfiles retainedAzure, source/assets
+posthash/ownedCIDabsence verified. CPU-only saved-array diagnosticPASS1.184319s,
+5771B9f264234…dda57; alloriginalreceipts/12files unchanged, no native calls.
+Initialonlyreference_foot_vertices138/2304 differsmax4.47034836e-8m; probe0
+5fields/1817fields differ. No subclass causality or universal nondeterminism
+inferred; previous cold/strict MHR R68–R70/D80 already show scope-limited
+repeatability. Do not add repeated bitwise runs or change closed gates.
