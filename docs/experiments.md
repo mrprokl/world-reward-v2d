@@ -9610,3 +9610,47 @@ existing report-only surfaceconsumer validates these15pins beforepublication.
 No arrays/media/checkpoints transferred locally, no nativeprep rerun. Native
 depth449580724B and RGB355130064B stay onAzure; preparation itself remains
 originalHOSTFAIL with distinct authenticnativePASS attestation, neverrelabeled.
+
+Actual06459ec direct-MHR directional component native/hostPASS4.832571s.
+Independent savedsource/release/model/exactCID auditPASS219entries,
+closuredd6db7fb81e35253eebfbc6baf8b63d3de12be819bf50168e9d50ae2461dd6b3.
+Native7368B/506547d0568270d2b6196978e2170041c309659884013d68ed296b37307f2ef2;
+host379B/9cdcf6649e5e93c7453be0546185cb0878dabbd3f470a3ea47e714e7d7762c6b;
+proof4396B/9442e3f9175cacf346e33a21057e7acfdd7bf1149c73936d147c8d775e03540c.
+Exactly2forward/17poses/1VJP, allfour named gradients nonzero, bothfixedsteps
+pass; maxdirectionalabsolute4.373236344e-6m/unit, relative.0010368943.
+Nativeweights/scales/identity/inputs unchanged. No newGPU/model in audit,
+no fullJacobian/root/70/contact/optimizer/quality or backendadoption claim.
+
+EP26full399 shared initializer c2106d7 actualnativePASS18.237121s; original
+queuedunit exited0. Saved-only independentauditPASS235sourceentries/closure
+80ebb0071c2584e721d2ffaef7dfcb87607fab6899028d322160bf5536a5649e,
+all15inputs/4outputs/fullsource/nativehelperbindings unchanged. Native direct
+max.002404634mm/replay.000538301mm/reference per-frame meanmax.000835551mm;
+unchanged gates .01mm/2mm. Pins retain actualc2106d7producer, report20991B
+e938d4b6c43fa10b248a26fd866c8fb3b57617d3f936aa2ede9fb3414f62fccb.
+No GPU/model/arraydecoding in saved audit. First audits lacked hostlibraries;
+one auditimport created its own CPythoncache, removed only after UID/inode/name/
+magic verification. Whole originalsource/output rehash thenPASS. No predictions
+rewritten/rerun and no qualitygain claimed.
+
+New conditional study uses6distinct knot-controlled SAME-SAM scenes, unchanged
+learnedscale68 explicitlysoft-limitreport vsstrict actualarticulation/root/identity;
+old six CLOSEDFAIL unchanged. Three phases full144render->oneBootsload/6fullT
+calls->twoDEVoperationalRMS/step181gradientratio->fourreservedAB/BA/AB/BA
+8x301nativeupdates. Suppliedgeometry/K/body/masks/init are syntheticoracles;
+no automaticRGB/fullHOI or challengeaccuracy/adoption claim. Initialsource
+byteidenticalbotharms; constructedCUDAstate hashes/deltas descriptive, not
+bitparitygates. One scopeddriver reuses nativeasset/source/cleanuphelpers with
+olddefaults unchanged. Root233tinyPASS1.34s includingprotocol/closure/mounts/
+oldcaller/transfer tests; no actual studyexecution yet. Independentreview
+corrected syntheticDockerancestor directory-mode check without exposing
+privateartifacts toBoots.
+
+Bootsruntime exists onlyVM02. Prepare narrow Azure-only byte replica ofexact
+ef12image/sevenpinnedsourcefiles/checkpoint218886140B/3051B CPUreceipt; no
+RoboTAPdata/GT/challenge/assetsystem clone. Newtaskowned storageaccount
+stworldrewardresearch26/container runtime-transfers, HTTPS/TLS1.2 private
+blobs/publicblobdisabled; priorotherprojectstorage networkblocked and unchanged.
+SAS neverprinted/versioned. Actualtransfer/import/imageABI remainsunexecuted;
+strictclassicconfig/47layergate, no speculativeOCI alias or retag.

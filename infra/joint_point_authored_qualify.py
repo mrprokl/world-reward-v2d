@@ -153,7 +153,7 @@ def observed_call(callback,functions,delegate=None):
         if delegate is not None:delegate.clear()
 
 
-def cleanup(rt,name,revision,path):
+def cleanup(rt,name,revision,path,*,image=IMAGE):
     """Separate stdout/stderr; daemon failure never means exact CID absence."""
     pin=rt.identity(path,65,readonly=False);raw=path.read_bytes()
     rt.require(re.fullmatch(b'[0-9a-f]{64}\n?',raw),'Owned exact CID required');cid=raw.decode().strip()
@@ -167,7 +167,7 @@ def cleanup(rt,name,revision,path):
     if result.returncode:rt.require(absent(result),'Daemon failure is not owned absence')
     else:
         rows=rt.strict(result.stdout);rt.require(len(rows)==1 and rows[0]['Id']==cid and rows[0]['Name']=='/'+name
-            and rows[0]['Image']==IMAGE and rows[0]['Config']['Labels'].get('world_reward.authored_pair.owner')==revision,'Foreign container refused')
+            and rows[0]['Image']==image and rows[0]['Config']['Labels'].get('world_reward.authored_pair.owner')==revision,'Foreign container refused')
         rt.require(subprocess.run(['docker','rm','-f',cid],capture_output=True,timeout=10).returncode==0,'Owned cleanup failed')
         rt.require(absent(inspect()),'Exact owned absence not verified')
     rt.require(rt.identity(path,65,readonly=False)==pin,'CID replaced');path.chmod(0o400)
@@ -226,8 +226,9 @@ def archive_model_pins(rt,root,code):
     return selected,pins['manifest_identity']
 
 
-def prerequisites(rt,root,code,revision,mode=None):
-    c=protocol(rt,code,mode);source=rt.source(root,code,revision,ENTRY,helpers(mode))
+def prerequisites(rt,root,code,revision,mode=None,*,entry=ENTRY,source_helpers=None):
+    """Shared asset/source verifier; alternate callers do not change old modes."""
+    c=protocol(rt,code,mode);source=rt.source(root,code,revision,entry,helpers(mode) if source_helpers is None else source_helpers)
     vendor=root/'vendor/video_to_data'
     result=subprocess.run(['git','-c','safe.directory='+str(vendor),'-C',str(vendor),'rev-parse','HEAD'],capture_output=True,timeout=10)
     rt.require(result.returncode==0 and result.stdout.decode().strip()==c['upstream_revision'],'Actual pinned upstream checkout required')
