@@ -10027,3 +10027,9 @@ Host5915B/c6b67c9a3070efeebcd56c1c9cf916d9bedc348ff2358dd239cd132a45d4e086;
 native2899095B/6ce2357e98f48ea74518760f6cf5dc85ec2aa3b9a8db66b4dd1b912f016da20a.
 Source/prediction/private archive posthash and owned cleanup verified; original
 prediction HOSTFAIL preserved. Full reference/diagnostic arrays stay on Azure.
+
+User-facing aggregate plot is generated solely from the authenticated counts
+above:43717B PNG, no reference arrays/videos transferred. The visual explicitly
+shows both correct-support gains and the second-clip wrong-object regression;
+it is not a reconstruction-quality or leaderboard plot. Disposable plot script
+removed; scientific report pins/counts suffice to reproduce this presentation.
