@@ -85,3 +85,15 @@ no actual selection, acquisition, model or quality result is implied.
 Implementation validation uses authored metadata, synthetic JPEG **headers** and
 mock HTTP only. It qualifies code/lifecycle, not actual acquisition, model
 quality, complete image decoding, fitting or a victory over CARI4D.
+
+## Actual frozen selection
+
+Producer a8da2da838dc4ef513e7819be4d25ece99488207 completes selection in
+886.417580879s: same561-photo inventory,16 unique slots8DEV/8RESERVED, no RGB,
+HTTP, models or FIT. Independent saved-only audit authenticates all five full
+Git closures, original41 input/asset bindings, sealed18-leaf output and every
+reference SHA before/after. The collected systemd unit no longer provides its
+historical exit; PASS is the sealed, source-bound selection receipt, not the
+unit's default exit0. See `results/audits/vcoco_role_pilot_select_v1_actual.json`.
+References remain private/hash-only to the observer. This permits only the
+separately frozen original-JPEG acquisition, not inference or quality claims.

@@ -1,0 +1,95 @@
+{
+  "Azure_RC_calls": 1,
+  "DEV_slots": 8,
+  "FIT_performed": false,
+  "GPU_used": false,
+  "HTTP_used": false,
+  "RESERVED_slots": 8,
+  "RGB_read": false,
+  "actual_state": "SEALED_SELECT_PASS",
+  "adopted": false,
+  "all_input_and_asset_bytes_modes_before_after": true,
+  "all_output_bytes_modes_before_after": true,
+  "all_reference_pinset_identity": {
+    "bytes": 1935,
+    "sha256": "4da3ce3c86e8bb4e982e956bb125c32c6b551598f92151b9d2d940ac9530383c"
+  },
+  "audit_elapsed_seconds": 763.4650370969903,
+  "audit_status": "pass",
+  "azure_runcommand_terminal": true,
+  "census_input_count": 23,
+  "census_rerun": false,
+  "current_archive_xz": {
+    "bytes": 235804,
+    "sha256": "bf2a89a90781d306253cb27558c2c2d2fac127b442e44984a067d6a03f8acea4"
+  },
+  "current_source_closure_sha256": "098811fa1eac670cfa081b8d5d10dcdc3b405ed4b9cc67356345e8de42b4ae0a",
+  "decision": "FROZEN16_PENDING_SEPARATE_ORIGINAL_RGB_ACQUISITION",
+  "frozen_input_and_asset_entries": 41,
+  "full_source_and_markers_before_after": true,
+  "geometry_references_decoded": false,
+  "historical_known_md5_excluded": 432,
+  "historical_photos_excluded": 432,
+  "host_elapsed_seconds": 886.4175808790023,
+  "metadata_output_count": 18,
+  "metadata_output_identities": {
+    "cohort.json": {
+      "bytes": 12849,
+      "sha256": "2b5048e6816abcbf45dffe7d1c42f5aa9fc22adfd411c8703a5c6f917661970c"
+    },
+    "report.json": {
+      "bytes": 41759,
+      "sha256": "d2908db8bc0488bcec7836e938b49fea942214ab729afaffde7296f00baab3d6"
+    }
+  },
+  "metadata_reference_files": 16,
+  "metadata_sealed": true,
+  "models_loaded": false,
+  "native_status": "pass",
+  "observed_unit_exit": null,
+  "observer_command_identity": {
+    "bytes": 30910,
+    "sha256": "1d5a79ed552a7ff0c221a10672161d61e4dac087a8ca87c4a8b89feb9937b779"
+  },
+  "observer_mechanical_repairs": 0,
+  "observer_source_identity": {
+    "bytes": 11050,
+    "sha256": "a4e1ef8786f7398373ddf9f003768fb943b10217c66dac6dd5373f01a3476c08"
+  },
+  "original_Git_files": {
+    "census": 300,
+    "coco": 268,
+    "current": 303,
+    "metadata": 292,
+    "ownership": 296
+  },
+  "original_eligible_photos": {
+    "test": 362,
+    "val": 199
+  },
+  "parent_root_private": true,
+  "predictions_read": false,
+  "producer_driver_absent": true,
+  "producer_revision": "a8da2da838dc4ef513e7819be4d25ece99488207",
+  "reference_values_hash_only": true,
+  "reproduced_inventory_identity": {
+    "bytes": 36117,
+    "sha256": "7c374f0ff34d340983d93a117e51a4fcf09d4d4425e4d56392a327d84dd6c733"
+  },
+  "role_values_decoded": false,
+  "saved_only": true,
+  "schema": "world_reward.vcoco_role_pilot_select_saved_audit.v1",
+  "scope_limitation": "Saved selection/source integrity only. References SHA-only, no geometry or role semantics decoded; no selection/reproduction/acquisition/model/RGB. Collected systemd exit is unavailable, not inferred. Publisher grant is not independent creator/challenge eligibility.",
+  "selected_slots": 16,
+  "selection_rerun": false,
+  "unique_selected_photos": 16,
+  "unit_exit_independently_available": false,
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  }
+}

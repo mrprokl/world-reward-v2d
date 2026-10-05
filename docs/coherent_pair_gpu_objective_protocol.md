@@ -83,3 +83,20 @@ and the manufactured positive mask is checked even on failure. Root316 combined
 tiny tests passed in1.95s, including41 dedicated controls; AST/shell passed.
 Tests use original tiny procedural inputs and fake Torch/mock optimizer only.
 They do not execute native Torch, SciPy, Azure, fitting or quality evaluation.
+
+## Actual frozen attempt: closed failure
+
+Producer7281db2a3f7c7298a0d2a22e6ad7e7036fbe4e18 fails in
+`objective_oracle` after17.545248223s host elapsed, native exit1. Full bank
+preparation retained1,843,200 routes, but no objective control/finite-difference
+or solver completed; SciPy was not reached. The saved native error family is
+`OtherError`, without a message or numerical delta, so the receipt alone cannot
+identify a discrepancy versus an exception. Do not claim native objective or
+optimizer qualification from the earlier scorer PASS.
+
+Independent saved-only observer authenticates current311-file/316-entry source,
+both original tiny/full-bank sources, immutable image and sealed receipts
+before/after; owned CID/name/label and producer process are absent. The failed
+unit's exit1 was actually available, not inferred from systemd defaults. See
+`results/audits/coherent_pair_gpu_objective_probe_v1_actual.json`.
+No native replay, parameter change, FIT, adoption or quality result follows.

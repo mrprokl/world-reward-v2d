@@ -1,0 +1,149 @@
+{
+  "schema": "world_reward.coherent_pair_gpu_objective_saved_audit.v1",
+  "status": "fail",
+  "actual_state": "CLOSED_ORIGINAL_CONTROL_FAIL",
+  "producer_revision": "7281db2a3f7c7298a0d2a22e6ad7e7036fbe4e18",
+  "saved_only": true,
+  "observer_gpu_used": false,
+  "observer_numeric_execution": false,
+  "fixtures_rerun": false,
+  "fit_executed": false,
+  "quality_verified": false,
+  "adoption": false,
+  "limitation": "Saved source/receipt integrity only; no numerical replay. Collected unit exit unavailable, never inferred from defaults. Not FIT/ownership/quality qualification.",
+  "unit": "world-reward-coherent-pair-gpu-objective-probe-v1.service",
+  "unit_state": {
+    "LoadState": "loaded",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "MainPID": "0",
+    "Result": "exit-code",
+    "ExecMainStatus": "1"
+  },
+  "unit_exit_independently_available": true,
+  "observed_unit_exit": 1,
+  "output_present": true,
+  "host_identity": {
+    "bytes": 11725,
+    "sha256": "2b6de394c25e0ed93167a540fc7a7be21b806555349f81ec8c613108695dcdd5"
+  },
+  "host_status": "fail",
+  "host_phase": null,
+  "host_errors": {
+    "error_type": "ValueError"
+  },
+  "native_identity": {
+    "bytes": 9351,
+    "sha256": "ce79dae97060d8044cb9065470088bfa53fe9271d390d6e5523f9338d984fcf6"
+  },
+  "native_status": "fail",
+  "native_phase": "objective_oracle",
+  "native_errors": {
+    "error_type": "OtherError"
+  },
+  "sources": [
+    {
+      "revision": "7281db2a3f7c7298a0d2a22e6ad7e7036fbe4e18",
+      "files": 311,
+      "entries": 316,
+      "closure": "b31a3d3b97215c33b3f2db5d34b15ae0aded11774409bd328159e0a2059fa6a0",
+      "xz": {
+        "bytes": 256080,
+        "sha256": "82b790318f5ecd4ccb0f7a528dd8fe1686c83de3152a9fd4aaf29bc7a1524f63"
+      }
+    },
+    {
+      "revision": "504539cd25eb7a0630e79966e89bb542d5feb88d",
+      "files": 307,
+      "entries": 312,
+      "closure": "6951381662d652ca87878275b20be3c0bf4f3155a69178c21d06634458650e07",
+      "xz": {
+        "bytes": 248028,
+        "sha256": "c8d026188977743bdaa8bc4fb6ec163c4da82865a8e2255e348dd080efa911d2"
+      }
+    },
+    {
+      "revision": "d3506722efb77d034ee329d04609c621188d6c0b",
+      "files": 302,
+      "entries": 307,
+      "closure": "3b48823bc5a0788f8af49fe3bf7d94d920a0ec573e7379d6743042c6be76ef63",
+      "xz": {
+        "bytes": 237376,
+        "sha256": "0a4e527857af45d4017cd70410c9a262d7590fd5a4656116d4067870bb581b02"
+      }
+    }
+  ],
+  "output_identities": {
+    "proof.json": {
+      "bytes": 11121,
+      "sha256": "f93cdc4db34a4a220e7424aa489007f076a7b99eb66ca0f0bc06f5b357180b92"
+    },
+    "native.json": {
+      "bytes": 9351,
+      "sha256": "ce79dae97060d8044cb9065470088bfa53fe9271d390d6e5523f9338d984fcf6"
+    },
+    "report.json": {
+      "bytes": 11725,
+      "sha256": "2b6de394c25e0ed93167a540fc7a7be21b806555349f81ec8c613108695dcdd5"
+    },
+    "container.cid": {
+      "bytes": 64,
+      "sha256": "3b255c0c2e0fa9827909f4ec6eed49e123e4d37364a727d7d9a8dcc6d64217d2"
+    }
+  },
+  "outputs_sealed": true,
+  "host_elapsed_seconds": 17.545248223003,
+  "decision": "CLOSED_OBJECTIVE_CONTROL",
+  "native_exit_code": 1,
+  "prior_tiny_fullbank_verified": true,
+  "fd_calls": 0,
+  "counts": [
+    4,
+    3600,
+    64
+  ],
+  "route_references": 1843200,
+  "runtime": {
+    "capability": [
+      9,
+      0
+    ],
+    "cublas_workspace_config": ":4096:8",
+    "cuda": "12.4",
+    "deterministic_algorithms": true,
+    "gpu_name": "NVIDIA H100 NVL",
+    "gpu_total_bytes": 99456909312,
+    "numpy": "1.26.3",
+    "python": "3.11.10",
+    "tf32": false,
+    "torch": "2.5.1+cu124"
+  },
+  "scipy_version": null,
+  "controls": [],
+  "solvers": [],
+  "native_metadata_validation": false,
+  "cid_absent": true,
+  "container_name_absent": true,
+  "owner_label_containers_absent": true,
+  "producer_driver_absent": true,
+  "image_rootfs_sha256": "5ae610524943c42f72e2fa1ac06a9dbe8fa14bf2d572efd8a57cded6ead3503d",
+  "source_before_after": true,
+  "outputs_before_after": true,
+  "prior_before_after": true,
+  "image_before_after": true,
+  "audit_elapsed_seconds": 1.2612608829513192,
+  "azure_runcommand_terminal": true,
+  "transport_cli_exit": 0,
+  "transport_target": {
+    "resource_group": "SCENESMITH-H100",
+    "vm_name": "scenesmith-ncc-h100-01"
+  },
+  "observer_source_identity": {
+    "bytes": 73830,
+    "sha256": "d4665ebd2c8cef317d5d9cf20ebc760728d776d584c85f113fc8b7837abb1a30"
+  },
+  "observer_command_identity": {
+    "bytes": 73925,
+    "sha256": "492b513664953aed8e56d000ba503054ca04cdc504fb8794db7a081052ccde53"
+  }
+}
