@@ -11113,3 +11113,19 @@ hashed only, not opened. No replacement, threshold/crop tuning, rescue or
 reserved score. Independent saved-only audit delegated. Reject AMG-only endpoint
 proposal strategy; preserve source/results and pursue substantively new person+
 objectness+relational evidence on a fresh protocol. No CARI4D gain claimed.
+
+Independent actual saved-only COCO full-bank/DEV audit PASS4.294886s confirms
+the scientific rejection, all32 raw region banks and exact fixedDEV aggregates;
+reserved16 references hash-only/unmounted. This closes the pending audit, not
+the failure itself. Public OWLv2 acquisition is frozen at042c94c with99combined
+mock/source testsPASS.69s. Native runtime metadata/source RECORD auditPASS.876465s
+is readiness only: no checkpoint decode/model/operator yet. Only the four
+original pinned public assets are dispatched for acquisition on Azure.
+
+EP19sharedprepare443, EP17refined419/301updates and EP16export360 independently
+pass saved-only audits with three separate CPU namespaces41.305089s. Complete
+original Git modes/bytes, all73/252/258 bindings, native full-T parameter/geometry
+schemas and posthashes pass; no new model/GPU/optimizer. The two mechanical
+observer errors (readonly memmap exact type, absent non-required consumer module)
+remain recorded, original producers untouched. Six downstream pins/audits are
+frozen. EP16 official packing and EP17export/EP19forward remain separate gates.

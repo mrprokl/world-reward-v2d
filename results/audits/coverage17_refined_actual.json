@@ -1,0 +1,79 @@
+{
+  "CPU_observer_removed": true,
+  "GPU_calls": 0,
+  "VM01_slot": "free",
+  "adoption": false,
+  "effective_optimizer_updates": 301,
+  "elapsed_seconds": 126.5414744609734,
+  "episode": 17,
+  "files": {
+    "refined.pth": {
+      "bytes": 320723424,
+      "sha256": "0789135126cf42d754f4718d4980495004b82a9bf4ccff045ec376f693792251"
+    },
+    "report.json": {
+      "bytes": 13914,
+      "sha256": "774059a916c41c996dd39a7e4ea3e4424ba0983eb284947eb514c367bce00af4"
+    }
+  },
+  "frames": 419,
+  "historical_CID_receipt_not_retained_by_original_wrapper": true,
+  "models_executed": false,
+  "observer_elapsed_seconds": 41.305088552995585,
+  "observer_mechanical_errors": [
+    {
+      "attempt": 1,
+      "error": "strict ndarray rejected legitimate readonly np.memmap",
+      "gate": "19_prepare_saved_CPU",
+      "producer_unchanged": true
+    },
+    {
+      "attempt": 2,
+      "error": "consumer helper not included by original runtimearchive",
+      "gate": "16_export_saved_CPU",
+      "producer_unchanged": true
+    }
+  ],
+  "observer_sha256": "c581c4b54fb4a792d89b5448fda4488b059dbd1299dcabe58b4795b72fac7012",
+  "original_asset_input_output_bindings": 252,
+  "original_container_current_absence_verified": true,
+  "original_public_input_files": 15,
+  "producer_revision": "45730bd455498ea4609a158ea00bfe70874f1796",
+  "quality_verified": false,
+  "saved_CPU_native_validation": {
+    "clip_constant_identity_and_original_timeline": true,
+    "cuda_initialized": false,
+    "frames": 419,
+    "full_saved_native_parameters_finite": true,
+    "model_or_solver_calls": 0,
+    "official_parameter_schema": false,
+    "original_JSON_public_and_model_chain": true,
+    "original_geometry_and_poses_retained": true,
+    "role": "refined",
+    "saved_target_finite": false,
+    "source_weights_not_loaded": true,
+    "status": "pass"
+  },
+  "schema": "world_reward.coverage_shared_refined_saved_audit.v1",
+  "script_sha256": "fb5ff78a3168693fde1d72523adca1ec99f7c468e7232b277a03613148fd91a2",
+  "source_archive_sha256": "b5c9393e61e716a0a3eb4f609f179ce603c495f070a5bbcb0d69cda952b9807a",
+  "source_binding": {
+    "closure_sha256": "94f0af7a28caf738990c48276a9f049cea8a0ab807d55b4341aadc8dc38f001b",
+    "entries": 290,
+    "markers": {
+      "revision": {
+        "bytes": 41,
+        "sha256": "6eeef1f467740f04dca043314c7532bde966e7298e351460757dbd3fea6b1c81"
+      },
+      "source-sha256": {
+        "bytes": 65,
+        "sha256": "64164ef1a0ea2da2484b325f13753db3bb306c7a74e1941c7327ab21fbed07b2"
+      }
+    },
+    "producer_revision": "45730bd455498ea4609a158ea00bfe70874f1796"
+  },
+  "source_files": 285,
+  "source_inputs_assets_outputs_rehashed_beforeafter": true,
+  "status": "pass",
+  "whole_Git_source_exact_original_modes_beforeafter": true
+}

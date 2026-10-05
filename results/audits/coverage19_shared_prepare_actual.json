@@ -1,0 +1,87 @@
+{
+  "CPU_observer_removed": true,
+  "GPU_calls": 0,
+  "VM01_slot": "free",
+  "adoption": false,
+  "elapsed_seconds": 18.686906446004286,
+  "episode": 19,
+  "files": {
+    "direct_parameters.npz": {
+      "bytes": 228266,
+      "sha256": "502393014d08d2af0fcc2451a310a8371865582e09293cb9b65c22f4d64ea631"
+    },
+    "report.json": {
+      "bytes": 22228,
+      "sha256": "81a242ffbf695e859ba1e46261bd8b4587c4f242b3c0aa2c911d6aa6096d965b"
+    },
+    "shared_initializer.pkl": {
+      "bytes": 1979874,
+      "sha256": "1b7f42e10bfdea02062b2bf9db11e206d6d497629649ed93b95f7f29e48b7229"
+    },
+    "target.npy": {
+      "bytes": 98021852,
+      "sha256": "d146a10c8a8274c55b98db09ccef40fe181f5a3fb5b3b7274c4668125b639f3d"
+    }
+  },
+  "frames": 443,
+  "historical_CID_receipt_not_retained_by_original_wrapper": true,
+  "models_executed": false,
+  "native_geometry_chunks": 28,
+  "observer_elapsed_seconds": 41.305088552995585,
+  "observer_mechanical_errors": [
+    {
+      "attempt": 1,
+      "error": "strict ndarray rejected legitimate readonly np.memmap",
+      "gate": "19_prepare_saved_CPU",
+      "producer_unchanged": true
+    },
+    {
+      "attempt": 2,
+      "error": "consumer helper not included by original runtimearchive",
+      "gate": "16_export_saved_CPU",
+      "producer_unchanged": true
+    }
+  ],
+  "observer_sha256": "c581c4b54fb4a792d89b5448fda4488b059dbd1299dcabe58b4795b72fac7012",
+  "original_asset_input_output_bindings": 73,
+  "original_container_current_absence_verified": true,
+  "original_public_input_files": 15,
+  "producer_revision": "4657c8b45f733a1043c5a8af2f5b9d6ac027196a",
+  "quality_verified": false,
+  "saved_CPU_native_validation": {
+    "clip_constant_identity_and_original_timeline": true,
+    "cuda_initialized": false,
+    "frames": 443,
+    "full_saved_native_parameters_finite": true,
+    "model_or_solver_calls": 0,
+    "official_parameter_schema": false,
+    "original_JSON_public_and_model_chain": true,
+    "original_geometry_and_poses_retained": true,
+    "role": "prepare",
+    "saved_target_finite": true,
+    "source_weights_not_loaded": true,
+    "status": "pass"
+  },
+  "schema": "world_reward.coverage_shared_prepare_saved_audit.v1",
+  "script_sha256": "ba5d431ace4a55f1bfcc3f5bb926685a5270fa206b8a7bef831aeeeaa7c1d0b6",
+  "source_archive_sha256": "88100c602f41fde99170f9cfce7544e2e7575389c67f3b514e8e49f4b0818b54",
+  "source_binding": {
+    "closure_sha256": "05d8bf4e568f5ea475791e7668f4a85108537beb507068893f77f8d70f1dc2e5",
+    "entries": 288,
+    "markers": {
+      "revision": {
+        "bytes": 41,
+        "sha256": "0a83c9b69138fdb3594dd6e84d6fa5183e9311e26e914bf61d9679f83c5b22e5"
+      },
+      "source-sha256": {
+        "bytes": 65,
+        "sha256": "4b5ee1cf22a5b405ba7567c8ab5cc4ccc70025268aa2ed30a9522a68f04982ca"
+      }
+    },
+    "producer_revision": "4657c8b45f733a1043c5a8af2f5b9d6ac027196a"
+  },
+  "source_files": 283,
+  "source_inputs_assets_outputs_rehashed_beforeafter": true,
+  "status": "pass",
+  "whole_Git_source_exact_original_modes_beforeafter": true
+}
