@@ -410,6 +410,10 @@ SURFACE_HELPERS = ('infra/object_budget_solid.py', 'infra/run_object_budget_soli
     'configs/surface_qslim_qualification_pins.json')
 SURFACE_CONTROL = 'configs/surface_consumer_control_protocol_v1.json'
 SURFACE_CONTROL_PIN = dict(bytes=2844, sha256='8f92c9da55a4a87d7ceb64c384ff53d7aca5e9c716c878fc20214a2b5b9b02eb')
+SURFACE_REPLAY_PROTOCOL = 'configs/surface_replay_protocol_v1.json'
+SURFACE_REPLAY_PIN = dict(bytes=1568, sha256='1326037566980f7e6276a0632f27947aa80fa06c5b6b5ef355f494fe385dfb93')
+SURFACE_REPLAY_HELPERS = ('infra/surface_replay_adapter.py', 'src/world_reward/surface_mapping_replay.py',
+    'src/world_reward/exact_normal_dot.py', SURFACE_REPLAY_PROTOCOL)
 SURFACE_TRIMESH_SOURCES = {
     'scene/transforms.py': dict(bytes=28938, sha256='f38beb118974172c42270d035f3bb77eb5d374de8c251aab7bce1a33afbe8ea2'),
     'transformations.py': dict(bytes=74801, sha256='644b112736124b7803c028a248279926d10f748649634006d493a90722eae360'),
@@ -421,7 +425,7 @@ SURFACE_TRIMESH_SOURCES = {
 
 
 def surface_profile(domain, control=None):
-    require(type(domain) is str and domain == 'surface' and (control is None or type(control) is str and control=='surface_consumer_v1'),
+    require(type(domain) is str and domain == 'surface' and (control is None or type(control) is str and control in ('surface_consumer_v1','surface_replay_v1')),
         'Only explicitly selected surface profile/control allowed')
 
 
@@ -453,10 +457,72 @@ def surface_report(path, report, build, left, *, finalize=lambda:None):
     try:
         write(); finalize(); left()
     except Exception:
-        report.update(status='fail',failure_type='ReceiptSealingFailure')
+        report.update(status='fail',receipt_failure_type='ReceiptSealingFailure')
+        report.setdefault('failure_type','ReceiptSealingFailure')
         require((os.fstat(fd).st_dev,os.fstat(fd).st_ino)==(owner.st_dev,owner.st_ino),'Owned receipt descriptor differs')
         write()  # Same still-open owned inode, not a replaceable filesystem path.
         raise
+    finally:os.close(fd)
+
+
+def surface_failure_report(path, report, deadline, *, computation_finished=False):
+    """Exclusive bounded FAIL evidence only; never extend computation or publish geometry."""
+    require(computation_finished is True and report.get('status') == 'fail', 'Late reporting is FAIL-only after computation')
+    now=time.monotonic()
+    require(type(deadline) in (int,float) and math.isfinite(deadline) and 0 < deadline-now <= 10,
+        'At most ten seconds of failure reporting grace')
+    def check():require(time.monotonic() < deadline, 'Failure reporting grace exhausted')
+    def text(value, limit):
+        require(type(value) is str, 'Scalar failure metadata required')
+        return value[:limit]
+    elapsed=report.get('elapsed_seconds')
+    require(type(elapsed) in (int,float) and math.isfinite(elapsed) and elapsed >= 0, 'Actual finite elapsed time required')
+    value=dict(status='fail', stage=text(report['stage'],128), producer_revision=text(report['producer_revision'],40),
+        domain=text(report['domain'],32), episode_index=report['episode_index'], phase=text(report['phase'],128),
+        elapsed_seconds=elapsed, failure_type=text(report.get('failure_type','ReceiptSealingFailure'),128),
+        failure_reason=text(report.get('failure_reason',''),400), computation_finished=True,
+        failure_only_receipt=True, budget_seconds=SURFACE_SECONDS, reporting_grace_seconds=10,
+        computation_deadline_exceeded=elapsed >= SURFACE_SECONDS, adoption=False,
+        geometry_published=False, qualification_verified=False)
+    require(type(value['episode_index']) is int and (0 <= value['episode_index'] < 30
+        or value['episode_index']==-1 and value['stage'] in ('world_reward_surface_consumer_control_native_v1','world_reward_surface_replay_control_native_v1'))
+        and re.fullmatch('[0-9a-f]{40}',value['producer_revision']), 'Original episode/revision required')
+    source=report.get('source_binding')
+    if source is not None:
+        raw=json.dumps(source,sort_keys=True,separators=(',',':'),allow_nan=False).encode()
+        require(len(raw)<=65536, 'Bounded source identity metadata required')
+        value['source_binding_sha256']=hashlib.sha256(raw).hexdigest()
+    for name in ('receipt_failure_type','last_completed_operation'):
+        if name in report:value[name]=text(report[name],128)
+    progress=report.get('phase_progress',{})
+    require(type(progress) is dict and len(progress)<=32,'Bounded scalar phase progress required')
+    value['phase_progress']={text(k,128):v for k,v in progress.items()
+        if type(v) in (str,int,float,bool) and (type(v) is not str or len(v)<=400)
+        and (type(v) is not float or math.isfinite(v))}
+    timings=report.get('phase_timings',[])
+    require(type(timings)is list and len(timings)<=32,'Bounded phase timing records required')
+    for row in timings:
+        require(type(row)is dict and len(row)<=16 and all(type(k)is str and len(k)<=128
+            and (v is None or type(v) in (str,int,float,bool))
+            and (type(v)is not str or len(v)<=400) and (type(v)is not float or math.isfinite(v))
+            for k,v in row.items()) and len(json.dumps(row,allow_nan=False).encode())<=2048,
+            'Scalar finite original phase timing required')
+    value['phase_timings']=timings[-8:]
+    value['phase_timings_omitted']=max(0,len(timings)-8)
+    counters=report.get('compiler',{}).get('native_counts',{})
+    require(type(counters)is dict and len(counters)<=16,'Bounded native counters required')
+    value['native_counts']={text(k,64):v for k,v in counters.items() if type(v)is int and 0<=v<=1_000_000_000}
+    raw=(json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False)+'\n').encode()
+    while len(raw)>16384 and value['phase_timings']:
+        value['phase_timings']=value['phase_timings'][1:];value['phase_timings_omitted']+=1
+        raw=(json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False)+'\n').encode()
+    require(len(raw)<=16384, 'Bounded scalar failure receipt required');check()
+    fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444)
+    try:
+        offset=0
+        while offset<len(raw):
+            check();count=os.write(fd,raw[offset:]);require(count>0,'Short failure receipt write');offset+=count
+        os.fchmod(fd,0o444);os.fsync(fd);check()
     finally:os.close(fd)
 
 
@@ -473,7 +539,8 @@ def surface_modules(code):
 def surface_source(code, revision, rt, *, control=False):
     require(Path(__file__).resolve() == code/'infra/object_budget_solid.py' and
         set(p.name for p in code.parent.iterdir()) == {'code', 'revision', 'source-sha256'}, 'Actual immutable dispatcher required')
-    names = SURFACE_HELPERS + ((SURFACE_CONTROL, 'src/world_reward/surface_pose_geometry.py') if control else ())
+    names = SURFACE_HELPERS + (SURFACE_REPLAY_HELPERS if control=='surface_replay_v1' else
+        (SURFACE_CONTROL, 'src/world_reward/surface_pose_geometry.py') if control else ())
     return rt.source(ROOT, code, revision, ENTRY, names)
 
 
@@ -585,6 +652,17 @@ def surface_readonly_source(original, work, rt):
     return path,pin
 
 
+def surface_checkpoint(report, phase, started, **fields):
+    """Small flushed diagnostic; never a result or source of prediction values."""
+    row = dict(phase=phase, elapsed_seconds=time.monotonic()-started, **fields)
+    raw = json.dumps(row, sort_keys=True, separators=(',', ':'), allow_nan=False)
+    require(len(raw.encode()) <= 2048, 'Bounded scalar surface progress required')
+    report['phase'] = phase
+    report.setdefault('phase_timings', []).append(row)
+    require(len(report['phase_timings']) <= 32, 'Bounded operation count required')
+    print('WORLD_REWARD_SURFACE_PROGRESS_V1:'+raw, flush=True)
+
+
 def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, authored=None):
     import numpy as np
     import trimesh
@@ -593,6 +671,9 @@ def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, 
     from world_reward.surface_identity import SurfaceIdentity
     from world_reward.mesh_serialization import serialization_preflight
     from official_pack_geometry import verify_exact_dual_surfaces, canonical_oriented_triangles, nonzero_triangle_mask
+    started = time.monotonic()
+    checkpoint = lambda phase, **kw: surface_checkpoint(report, phase, started, **kw)
+    checkpoint('runtime_and_input')
     official = q.modules()[2]; official.check_runtime_packages(report['qualification']['runtime']['pins']['versions'])
     installed = surface_trimesh_sources(rt, trimesh); report['installed_trimesh_sources'] = installed
     if authored is None:
@@ -600,6 +681,7 @@ def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, 
         report.update(source_hashes=sources, original_grounded_scale=scale, input_sha256=inputs['video_sha256'], phase='raw_source')
         original=ROOT/f'outputs/episode_{episode:06d}/object_grounded/object.glb'
         authority_path,original_pin=surface_readonly_source(original,work,rt)
+        checkpoint('raw_source_decode')
         v, f, report['source_geometry'] = surface_raw_source(authority_path, rt, official, np, trimesh)
         report['source_geometry'].update(original_path=str(original),authority_copy_path=str(authority_path),
             original_source_rehashed=True,authority_copy_byte_exact=True,original_source_mode_changed=False)
@@ -607,18 +689,27 @@ def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, 
         source_glb, scale = authored
         v, f, report['source_geometry'] = surface_raw_source(source_glb, rt, official, np, trimesh)
         report.update(original_grounded_scale=scale, phase='raw_source')
+    checkpoint('source_domain', vertices=len(v), faces=len(f))
     compiler = dict(status='fail', phase='source_domain'); report['compiler'] = compiler
     def simplify(sv, sf):
+        checkpoint('source_obj_write')
         q.write_obj(work/'input.obj', sv, sf)
         counts = dict(preflight_attempts=0, preflight_returns=0, qem_attempts=0, qem_returns=0)
         compiler['native_counts'] = counts
+        checkpoint('native_preflight')
         q.run_native(binary, ['--preflight', work/'input.obj'], left, counts, 'preflight')
+        checkpoint('native_qem', **counts)
         q.run_native(binary, [work/'input.obj', work/'candidate.obj', work/'native_mapping.json'], left, counts, 'qem')
-        u, g = q.read_obj(work/'candidate.obj'); mapping = rt.strict((work/'native_mapping.json').read_bytes())
+        checkpoint('candidate_obj_decode', **counts)
+        u, g = q.read_obj(work/'candidate.obj')
+        checkpoint('mapping_json_decode', vertices=len(u), faces=len(g))
+        mapping = rt.strict((work/'native_mapping.json').read_bytes())
+        checkpoint('mapping_replay', committed_collapses=mapping.get('committed_collapses'))
         return u, g, mapping
     try: proposal = prepare_surface_budget(v, f, simplify=simplify, verify_mapping=q.verify_mapping)
     except SurfaceBudgetError as error: compiler.update(error.report); raise
     compiler.update(proposal.proof); left()
+    checkpoint('metric_f32_serialization')
     canonical_v = (proposal.vertices.astype(np.float64)*scale).astype(np.float32)
     canonical_f = proposal.faces.copy()
     require(np.isfinite(canonical_v).all(), 'Original scale/F32 conversion overflow')
@@ -630,6 +721,7 @@ def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, 
     glb = work/SURFACE_OUTPUTS[0]; trimesh.Trimesh(canonical_v, canonical_f, process=False).export(glb); glb.chmod(0o444)
     actual_v, actual_f, authority = surface_raw_source(glb, rt, official, np, trimesh)
     require(np.array_equal(actual_v, canonical_v) and np.array_equal(actual_f, canonical_f), 'Canonical native loader changed full candidate rows')
+    checkpoint('official_budget')
     sys.path.insert(0, str(ROOT/'vendor/v2d_submission_kit'))
     from v2dlb.mesh_budget import budget_mesh
     require(Path(budget_mesh.__code__.co_filename) == ROOT/'vendor/v2d_submission_kit/v2dlb/mesh_budget.py', 'Original official helper required')
@@ -651,6 +743,7 @@ def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, 
         payload_role='native_canonical_arrays_plus_only_repeat_first_vertex_zero_faces',
         official_arrays_role='independent_original_packer_surface_audit_not_retained_payload',
         official_unreferenced_source_vertices=metric.diagnostics['unused_vertices_preserved'])
+    checkpoint('output_serialization')
     candidate = dict(source_vertices=proposal.source_vertices, source_faces=proposal.source_faces,
         candidate_vertices=proposal.vertices, candidate_faces=proposal.faces, canonical_vertices=canonical_v, canonical_faces=canonical_f)
     for name, arrays in ((SURFACE_OUTPUTS[1], dict(vertices=payload_v, faces=payload_f, episode_index=np.array(episode, np.int64),
@@ -662,11 +755,13 @@ def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, 
                 for n,a in arrays.items()), 'Saved full arrays changed')
     build.write_json(work/SURFACE_OUTPUTS[3], proposal.mapping); compiler['mapping_identity'] = rt.identity(work/SURFACE_OUTPUTS[3])
     if authored is None:
+        checkpoint('original_input_posthash')
         require(endpoint.prerequisites(ROOT, episode)[1:] == (sources, scale)
             and rt.identity(original,256<<20,readonly=False)==original_pin
             and rt.identity(authority_path,256<<20)==original_pin, 'Source ancestry or original authority copy changed')
     require(surface_trimesh_sources(rt,trimesh)==installed, 'Installed raw/native geometry source changed')
-    left(); report.update(frame_poses_changed=False, metric_scale_baked_once=scale, object_scale=1.)
+    left(); checkpoint('geometry_complete')
+    report.update(frame_poses_changed=False, metric_scale_baked_once=scale, object_scale=1.)
 
 
 def surface_validate(result, episode, source, proof, inputs):
@@ -761,16 +856,145 @@ def surface_control_validate(result, source, proof):
         0<result['elapsed_seconds']<=SURFACE_SECONDS,'Whole fresh surface consumer control required')
 
 
+def surface_replay_control(code, binary, work, left, report, rt, q, build):
+    """Two fresh authored QSlim outputs, each independently checked both ways."""
+    import copy
+    import numpy as np
+    from surface_replay_adapter import verifier
+    from world_reward.raw_shape_proposal import _identity
+    protocol=rt.pinned(code/SURFACE_REPLAY_PROTOCOL,SURFACE_REPLAY_PIN,16<<10)
+    require(protocol['schema']=='world_reward.surface_replay_protocol.v1'
+        and protocol['native_seconds']==600 and protocol['native_QEM_calls']==2,
+        'Frozen exact replay-only qualification required')
+    fast=verifier(q);rows=q.fixtures(np);frozen=[(_identity(v),_identity(f))for _,(v,f)in rows]
+    counts=dict(preflight_attempts=0,preflight_returns=0,qem_attempts=0,qem_returns=0)
+    report['compiler']={'native_counts':counts};started=time.monotonic()
+    checkpoint=lambda phase,**kw:surface_checkpoint(report,phase,started,**kw)
+    report['control_protocol']=SURFACE_REPLAY_PIN
+    records=[];report['control']=dict(status='fail',records=records,fixture_arrays=frozen,
+        QEM_calls=0,challenge_inputs_used=False,models_loaded=False,geometry_adopted=False)
+    def same(a,b):
+        for x,y in zip(a,b):
+            require(x.vertices.dtype==y.vertices.dtype and x.vertices.tobytes()==y.vertices.tobytes()
+                and x.faces.tobytes()==y.faces.tobytes() and x.face_components.tobytes()==y.face_components.tobytes()
+                and x.component_keys==y.component_keys and x.boundary_loops==y.boundary_loops
+                and x.boundary_components==y.boundary_components
+                and [dict(s)for s in x.stats]==[dict(s)for s in y.stats], 'Full original/optimized topology differs')
+    def changed(kind,u,g,m):
+        u,g,m=u.copy(),g.copy(),copy.deepcopy(m)
+        if kind=='vertex_birth':m['I'][0]=m['I'][1]
+        elif kind=='face_birth':m['J'][0]=m['J'][1]
+        elif kind=='quotient':m['original_vertex_to_output'][0]=-1
+        elif kind=='placement':u[0,0]+=1
+        elif kind=='removed_faces':m['ledger'][0]['removed_faces']=[-1,-2]
+        elif kind=='native_count':m['native_attempts']+=1
+        elif kind=='face_orientation':g[0]=g[0,::-1]
+        elif kind=='boolean_birth':m['J'][0]=True
+        elif kind=='component_bijection':m['candidate_component_to_source'][0]=-1
+        elif kind=='boundary_coordinate':
+            boundary={n for loop in q.topology(u,g).boundary_loops for n in loop}
+            require(boundary,'Authored fixed boundary required');u[min(boundary),0]+=1
+        elif kind=='ledger_extra':m['ledger'][0]['hidden']=1
+        elif kind=='nonroot':m['ledger'][1]['survivor']=m['ledger'][0]['removed_vertex']
+        elif kind=='invalid_placement':m['ledger'][0]['placement']=[0,0]
+        elif kind=='boolean_counter':m['native_failed']=True
+        elif kind=='drop_last_face':g=g[:-1];m['J']=m['J'][:-1];m['output_faces']=len(g)
+        elif kind=='wrong_source_sha':m['source_sha256']='0'*64
+        else:raise ValueError('Unknown fixed mutation')
+        return u,g,m
+    source_obj_pins={}
+    for index,(name,(v,f))in enumerate(rows):
+        left();checkpoint('control_source',case=name)
+        source=q.topology(v,f)
+        wanted=((4000,7680,1,2,320),(4704,8960,2,4,448),(4096,4096,1,2,4096))[index]
+        require((len(v),len(f),len(source.component_keys),len(source.boundary_loops),sum(map(len,source.boundary_loops)))==wanted,
+            'Fixed original procedural source census differs')
+        obj=work/(name+'.obj');q.write_obj(obj,v,f)
+        source_obj_pins[str(obj)]=rt.identity(obj,64<<20)
+        result=q.run_native(binary,['--preflight',obj],left,counts,'preflight',4 if index==2 else 0)
+        if index==2:
+            require(result.stderr.strip()==b'INAPPLICABLE: Fixed referenced boundary vertices reach the phase2 target',
+                'Original boundary negative differs')
+        else:
+            q.equal(rt.strict(result.stdout),dict(source_vertices=len(v),source_faces=len(f),components=wanted[2],
+                boundary_vertices=wanted[4],unused_vertices=0,float32_triangles_exactly_active=True,
+                oriented_vertex_manifold=True,volume_or_closure_required=False,qem_calls=0,adoption=False),
+                'Original complete authored native preflight required')
+    require(counts['preflight_returns']==3 and counts['qem_attempts']==0,'Every fixed preflight must precede QEM')
+    require(source_obj_pins=={path:rt.identity(Path(path),64<<20)for path in source_obj_pins},'All original preflight OBJ inputs changed')
+    for name,(v,f)in rows[:2]:
+        obj=work/(name+'.obj')
+        out=work/(name+'.candidate.obj');mp=work/(name+'.mapping.json')
+        checkpoint('control_native_qem',case=name)
+        q.run_native(binary,[obj,out,mp],left,counts,'qem')
+        before={str(p):rt.identity(p,64<<20,readonly=False)for p in (obj,out,mp)}
+        u,g=q.read_obj(out);m=rt.strict(mp.read_bytes())
+        arrays=(_identity(u),_identity(g));checkpoint('control_original_verifier',case=name)
+        clock=time.monotonic();original=q.verify_mapping(v,f,u,g,m);slow_seconds=time.monotonic()-clock
+        checkpoint('control_local_verifier',case=name)
+        clock=time.monotonic();optimized=fast(v,f,u,g,m);fast_seconds=time.monotonic()-clock;same(original,optimized)
+        negatives=[];checkpoint('control_paired_mutations',case=name)
+        for kind in protocol['mutation_negatives']:
+            left();a,b,c=changed(kind,u,g,m)
+            for check in (q.verify_mapping,fast):
+                try:check(v,f,a,b,c)
+                except ValueError:pass
+                else:raise ValueError('Required paired mutation accepted: '+kind)
+            negatives.append(kind)
+        require((_identity(u),_identity(g))==arrays
+            and before=={str(p):rt.identity(p,64<<20,readonly=False)for p in (obj,out,mp)}, 'Original native output changed')
+        records.append(dict(name=name,status='pass',source_vertices=len(v),source_faces=len(f),
+            candidate_vertices=len(u),candidate_faces=len(g),committed_collapses=m['committed_collapses'],
+            original_verifier_seconds=slow_seconds,local_verifier_seconds=fast_seconds,
+            complete_topology_equal=True,negatives_rejected_by_both=negatives,output_files=before,
+            source_vertices_identity=_identity(v),source_faces_identity=_identity(f)))
+    records.append(dict(name=rows[2][0],status='inapplicable_pre_qem',QEM_calls=0))
+    require(frozen==[(_identity(v),_identity(f))for _,(v,f)in rows] and counts['qem_returns']==counts['qem_attempts']==2
+        and counts['preflight_returns']==counts['preflight_attempts']==3,'Original fixed fixture/native census differs')
+    require(source_obj_pins=={path:rt.identity(Path(path),64<<20)for path in source_obj_pins},'Any original native input changed')
+    report['control']['all_original_obj_input_pins']=source_obj_pins
+    report['control'].update(status='pass',QEM_calls=2,source_arrays_unchanged=True,outputs_unchanged=True,
+        historical_failed_receipts_relabelled=False,production_qualified=False,accuracy_verified=False,adoption=False)
+    report['geometry_binary_calls']=counts['preflight_attempts']+counts['qem_attempts']
+    checkpoint('control_complete');left()
+
+
+def surface_replay_validate(result, source, proof):
+    require(result['stage']=='world_reward_surface_replay_control_native_v1' and result['status']=='pass'
+        and result['phase']=='complete' and result['source_binding']==result['source_binding_after']==source
+        and result['qualification']==proof and result['source_rehashed_after'] is True
+        and result['inputs_qualification_rehashed_after'] is True and result['runtime_rehashed_after'] is True
+        and result['control_protocol']==SURFACE_REPLAY_PIN and result['maximum_qem_calls']==2
+        and result['geometry_binary_calls']==5 and result['native_binary_metadata_calls']==1
+        and result['compiler']['native_counts']==dict(preflight_attempts=3,preflight_returns=3,qem_attempts=2,qem_returns=2)
+        and all(type(x)is int for x in result['compiler']['native_counts'].values())
+        and all(result[k]is False for k in ('gpu_used','ground_truth_used','hand_labeled_test','media_decoded',
+            'adoption','reconstruction_accuracy_verified','competition_eligibility_verified'))
+        and 0<result['elapsed_seconds']<=600,
+        'Complete replay-only source/runtime proof required')
+    c=result['control'];require(c['status']=='pass' and c['QEM_calls']==2 and c['source_arrays_unchanged'] is True
+        and c['outputs_unchanged'] is True and c['production_qualified'] is False and c['adoption'] is False,
+        'Replay qualification cannot become production or accuracy evidence')
+    require(all(c[k]is False for k in ('challenge_inputs_used','models_loaded','geometry_adopted','accuracy_verified',
+        'historical_failed_receipts_relabelled')) and len(c['all_original_obj_input_pins'])==3,'Replay-only provenance scope required')
+    protocol=json.loads((Path(os.environ['WR_CODE'])/SURFACE_REPLAY_PROTOCOL).read_bytes())
+    require([r['name']for r in c['records']]==protocol['fixture_names']
+        and all(r['status']=='pass' and r['complete_topology_equal'] is True
+            and r['negatives_rejected_by_both']==protocol['mutation_negatives']for r in c['records'][:2])
+        and c['records'][2]['status']=='inapplicable_pre_qem' and c['records'][2]['QEM_calls']==0,'Full fixed paired controls required')
+
+
 def surface_native(episode, code, revision, work, rt, q, build, body, *, control=False):
     started = time.monotonic(); left = lambda: q.modules()[3].remaining(started, SURFACE_SECONDS)
     require(sys.platform == 'linux' and os.getuid() == 1000 and work.resolve() == work and work.stat().st_uid == 1000 and
         stat.S_IMODE(work.stat().st_mode) == 0o700 and not list(work.iterdir()) and
         {p.name for p in Path('/sys/class/net').iterdir()} == {'lo'} and os.environ.get('CUDA_VISIBLE_DEVICES') == '-1', 'Restricted offline CPU required')
-    source = surface_source(code, revision, rt, control=control); report = dict(stage='world_reward_surface_consumer_control_native_v1'if control else 'world_reward_object_budget_surface_native_v1', status='fail',
+    source = surface_source(code, revision, rt, control=control); report = dict(stage='world_reward_surface_replay_control_native_v1'if control=='surface_replay_v1'else 'world_reward_surface_consumer_control_native_v1'if control else 'world_reward_object_budget_surface_native_v1', status='fail',
         phase='qualification', domain='surface', episode_index=episode, producer_revision=revision, source_binding=source,
         input_track='authored_operator_only'if control else 'track_1', gpu_used=False, ground_truth_used=False, hand_labeled_test=False, oracle_modes=[],
         adoption=False, reconstruction_accuracy_verified=False, competition_eligibility_verified=False,
-        input_video_hashed=not control, media_decoded=False, budget_seconds=SURFACE_SECONDS, maximum_qem_calls=0 if control else 1)
+        input_video_hashed=not control, media_decoded=False, budget_seconds=SURFACE_SECONDS,
+        maximum_qem_calls=2 if control=='surface_replay_v1'else 0 if control else 1)
     old = {s: signal.signal(s, lambda *_: (_ for _ in ()).throw(TimeoutError('Surface inclusive deadline'))) for s in (signal.SIGALRM,signal.SIGTERM)}
     signal.alarm(SURFACE_SECONDS)
     try:
@@ -781,8 +1005,9 @@ def surface_native(episode, code, revision, work, rt, q, build, body, *, control
             _, _, inputs = input_binding(episode, body, build); report['input_binding'] = inputs
         report['binary_runtime'] = q.binary_runtime(binary, proof['build']['source_cpp']['sha256'], left)
         report['native_binary_metadata_calls']=1
-        report['geometry_binary_calls']=0 if control else None
-        if control:surface_control_produce(code,binary,work,left,report,rt,q,build)
+        report['geometry_binary_calls']=None if control=='surface_replay_v1'else 0 if control else None
+        if control=='surface_replay_v1':surface_replay_control(code,binary,work,left,report,rt,q,build)
+        elif control:surface_control_produce(code,binary,work,left,report,rt,q,build)
         else:surface_produce(episode, code, binary, work, left, report, rt, q, build)
         if not control:report['outputs'] = {n:rt.identity(work/n, 256<<20) for n in SURFACE_OUTPUTS}
         require(surface_source(code,revision,rt,control=control) == source and surface_qualification(code,rt,q)[2] == proof and
@@ -791,8 +1016,22 @@ def surface_native(episode, code, revision, work, rt, q, build, body, *, control
             inputs_qualification_rehashed_after=True, runtime_rehashed_after=True)
     except Exception as error: report.update(status='fail', failure_type=type(error).__name__, failure_reason=str(error)[:400])
     finally:
+        signal.alarm(0)  # Computation has ended; the grace below permits reporting only.
         report['elapsed_seconds'] = time.monotonic()-started
-        try: surface_report(work/'native.json',report,build,left)
+        receipt=work/'native.json'
+        try:
+            try:
+                remaining=left();signal.alarm(max(1,math.ceil(remaining)))
+                surface_report(receipt,report,build,left)
+            except Exception as error:
+                report['status']='fail';report['receipt_failure_type']=type(error).__name__
+                report.setdefault('failure_type',type(error).__name__)
+                report.setdefault('failure_reason',str(error)[:400])
+                report['elapsed_seconds']=time.monotonic()-started
+                if not receipt.exists() and not receipt.is_symlink():
+                    deadline=min(time.monotonic()+10,started+SURFACE_SECONDS+10)
+                    signal.alarm(max(1,math.ceil(deadline-time.monotonic())))
+                    surface_failure_report(receipt,report,deadline,computation_finished=True)
         finally:
             signal.alarm(0)
             for s,h in old.items(): signal.signal(s,h)
@@ -821,6 +1060,9 @@ def surface_remove_work(work, owner, rt, *, control=False):
     require(rt.canonical(work)==work and (work.lstat().st_dev,work.lstat().st_ino)==(owner.st_dev,owner.st_ino), 'Scratch owner changed')
     allowed={*SURFACE_OUTPUTS,'native.json','input.obj','candidate.obj','native_mapping.json',
         *(('authored_source.glb','authored_aligned.glb')if control else ('original_source.glb',))}
+    if control=='surface_replay_v1':
+        allowed={'native.json',*(name+suffix for name in ('fresh_curved_holed_patch','fresh_disjoint_holed_patches','boundary_excess_inapplicable')
+            for suffix in ('.obj','.candidate.obj','.mapping.json'))}
     require(all(p.name in allowed and not p.is_symlink() and stat.S_ISREG(p.lstat().st_mode) and p.lstat().st_nlink==1
         and p.lstat().st_uid==owner.st_uid for p in work.iterdir()), 'Unknown scratch refused')
     shutil.rmtree(work)
@@ -834,12 +1076,12 @@ def surface_host(episode, code, revision, rt, q, build, body, *, control=False):
     if not control:_,inputpaths,inputs=input_binding(episode,body,build)
     image=rt.image(SURFACE_IMAGE)
     require(image['Id']==SURFACE_IMAGE,'Actual qualified image required')
-    name='wr-object-budget-surface-'+str(episode).zfill(6)+'-'+revision
+    name=('wr-surface-replay-control-'if control=='surface_replay_v1'else 'wr-object-budget-surface-'+str(episode).zfill(6)+'-')+revision
     require(not build.run(['docker','ps','-aq','--filter','name=^/'+name+'$'],min(10,left())).strip(),'Preexisting container refused')
-    out=ROOT/'results'/('object-budget-surface-control-'+revision)if control else ROOT/f'outputs/episode_{episode:06d}'/('object_budget_surface_'+revision)
+    out=ROOT/'results'/('surface-replay-control-'+revision)if control=='surface_replay_v1'else ROOT/'results'/('object-budget-surface-control-'+revision)if control else ROOT/f'outputs/episode_{episode:06d}'/('object_budget_surface_'+revision)
     require(rt.canonical(out)==out and not out.exists(),'Fresh surface-only output required')
     out.mkdir(mode=0o755);out.chmod(0o755);work=out/'disposable';work.mkdir(mode=0o700);work.chmod(0o700);os.chown(work,1000,1000)
-    owner=work.lstat();cid=out/'.container.cid';published={};report=dict(stage='world_reward_surface_consumer_control_host_v1'if control else 'world_reward_object_budget_surface_host_v1',status='fail',phase='native',
+    owner=work.lstat();cid=out/'.container.cid';published={};report=dict(stage='world_reward_surface_replay_control_host_v1'if control=='surface_replay_v1'else 'world_reward_surface_consumer_control_host_v1'if control else 'world_reward_object_budget_surface_host_v1',status='fail',phase='native',
         domain='surface',episode_index=episode,producer_revision=revision,source_binding=source,qualification=proof,input_binding=inputs,
         image_identity=image,gpu_used=False,ground_truth_used=False,adoption=False,reconstruction_accuracy_verified=False,competition_eligibility_verified=False)
     old={s:signal.signal(s,lambda *_:(_ for _ in ()).throw(TimeoutError('Host inclusive deadline')))for s in(signal.SIGALRM,signal.SIGTERM)};signal.alarm(max(1,int(left())))
@@ -854,7 +1096,7 @@ def surface_host(episode, code, revision, rt, q, build, body, *, control=False):
             'WR_ROOT='+str(ROOT),'WR_CODE='+str(code),'WR_CODE_REVISION='+revision,'WR_CPU_IMAGE_ID='+SURFACE_IMAGE,
             'CUDA_VISIBLE_DEVICES=-1','OMP_NUM_THREADS=1','OPENBLAS_NUM_THREADS=1','PYTHONDONTWRITEBYTECODE=1',
             'python3','-I','-B',str(code/'infra/object_budget_solid.py')]
-        argv+=['--domain','surface','--control','surface_consumer_v1','--native']if control else ['--episode',str(episode),'--domain','surface','--native']
+        argv+=['--domain','surface','--control','surface_replay_v1'if control=='surface_replay_v1'else 'surface_consumer_v1','--native']if control else ['--episode',str(episode),'--domain','surface','--native']
         build.run(argv,min(SURFACE_SECONDS+10,left()),out/'native.log')
     except Exception as error:report['failure_type']=type(error).__name__
     finally:
@@ -867,7 +1109,8 @@ def surface_host(episode, code, revision, rt, q, build, body, *, control=False):
             result=rt.pinned(work/'native.json',rt.identity(work/'native.json',2<<20),2<<20)
             publish(out/'native.json',(work/'native.json').read_bytes(),published);report['native']=result;report['native_identity']=rt.identity(out/'native.json')
             require(report.get('owned_container_removed')is True and 'failure_type'not in report,'Native exit0 and owned cleanup required')
-            if control:surface_control_validate(result,source,proof)
+            if control=='surface_replay_v1':surface_replay_validate(result,source,proof)
+            elif control:surface_control_validate(result,source,proof)
             else:surface_validate(result,episode,source,proof,inputs)
             require(surface_source(code,revision,rt,control=control)==source and surface_qualification(code,rt,q)[2]==proof and (control or input_binding(episode,body,build)[2]==inputs) and rt.image(SURFACE_IMAGE)==image,'Host source/input/runtime changed')
             for n in (()if control else SURFACE_OUTPUTS):
@@ -901,6 +1144,12 @@ def surface_host(episode, code, revision, rt, q, build, body, *, control=False):
 
 
 def surface_main():
+    if sys.argv[1:5]==['--domain','surface','--control','surface_replay_v1']:
+        require(sys.argv[5:]in([],['--native']),'Only explicit fresh replay control allowed')
+        surface_profile(sys.argv[2],sys.argv[4])
+        code,revision=Path(os.environ['WR_CODE']),os.environ['WR_CODE_REVISION'];require(os.environ['WR_ROOT']==str(ROOT),'Fixed root required')
+        work=ROOT/'results'/('surface-replay-control-'+revision)/'disposable';runtime=surface_modules(code)
+        return surface_native(-1,code,revision,work,*runtime,control='surface_replay_v1')if sys.argv[5:]else surface_host(-1,code,revision,*runtime,control='surface_replay_v1')
     if sys.argv[1:5]==['--domain','surface','--control','surface_consumer_v1']:
         require(sys.argv[5:]in([],['--native']),'Only explicit fresh surface control allowed')
         surface_profile(sys.argv[2],sys.argv[4])

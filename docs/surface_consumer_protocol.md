@@ -59,3 +59,21 @@ audit authenticates full source/runtime/qualification/receipts and exact owned
 CID absence; all disposable geometry removed. Qualification pins record actual
 four-file sealed Azure namespace. This is operator integration only: no
 human/contact/HDF5/Parquet or accuracy/adoption claim.
+
+## Proof-equivalent replay qualification
+
+The first dense EP26 proposal exhausted600s and did not retain native.json;
+its original failure remains closed. File existence and the final sealing
+traceback do not establish where computation stopped. No blind rerun follows.
+
+The prospective `surface_replay_v1` control is verifier-only: same three frozen
+procedural sources and native preflights, then two unchanged native QSlim calls.
+Check each saved output with the original whole verifier and local-incidence
+replay/exact outward-interval normal-dot filtering. The original source and
+all final I/J/quotient/positions/component/Euler/boundary gates remain exact AST;
+historical qualification source and native queue/cost/binary remain unchanged.
+Sixteen predetermined mutations must fail both. All sources/outputs/runtime
+prepost hashed;600s computation/PASS seal,700s host,10s FAIL-only reporting grace.
+Only scalar phase/timing checkpoints and bounded late FAIL evidence survive a
+deadline; no geometry publication or successful qualification beyond600s.
+Local tests do not qualify the native route, dense production or accuracy.

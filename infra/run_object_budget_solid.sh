@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 if [[ ( $# == 4 && $1 == --episode && $2 =~ ^(0|[1-9]|[12][0-9])$ && $3 == --domain && $4 == surface ) ||
-      ( $# == 4 && $1 == --domain && $2 == surface && $3 == --control && $4 == surface_consumer_v1 ) ]]; then
+      ( $# == 4 && $1 == --domain && $2 == surface && $3 == --control && ( $4 == surface_consumer_v1 || $4 == surface_replay_v1 ) ) ]]; then
   SURFACE=1
 else
   [[ ( $# == 2 || ( $# == 3 && $3 == --query-requalification ) ) && $1 == --episode && $2 =~ ^(0|[1-9]|[12][0-9])$ ]] || exit 2

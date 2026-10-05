@@ -9378,3 +9378,34 @@ Technicalcopy-onlycorrection makesbyteidenticalowned0444GLBonAzure, original
 preposthash/modeunchanged, nogeometrytransform/repair/thresholdchange; native
 authorityunchanged. Copygoesonlyinexistingowneddisposablescratch.100PASS2SKIP
 0.66s tinyintegration; freshrevision/unitreplay required, notscientificretuning.
+
+Actual EP26 d6ec444 closes FAIL601.510803s host, receipt92665B
+77403ecd6ef9ce1139d4d761e4a63844641359f205a9063858f33b0ff701d8e3.
+Native deadline exhausted; its FAIL writer checks remaining time before
+reserving native.json, so no native receipt or qualified candidate exists.
+Saved native.log2225B ba340559bb069ae087459b7362a0d9e12b6ffcdd17a6bc328461f0d25d68e40e
+proves final sealing deadline, not the preceding computation phase. A readonly
+snapshot observed candidate.obj193972B/native_mapping.json53576943B before
+owned scratch deletion; it proves files existed, not native PASS or replay.
+Independent saved-only audit rechecks original source298entries/closure
+db46d2804e99ceb795b8ed67583f9406c2a8d3a86fadccf1ffb898dd402e3fbb,
+all original inputs/qualification/runtime and exact CID absence; three sealed
+failure files remain unchanged. No GPU, geometry replay or failure relabel.
+
+Decision: no uninstrumented scientific rerun or deadline relaxation. Qualify
+a proof-equivalent local-incidence replay and outward-interval normal-dot
+filter on independent procedural controls, with unchanged original final
+birth/quotient/positions/topology checks. Add bounded phase/timing checkpoints
+and failure-only reporting grace; it cannot publish geometry or PASS. Exact
+phase/cost remains unknown until evidence, and native qualification helpers
+must remain byte-identical to their historical source.
+
+Prospective replay-only control:297-file closure, unchanged native QSlim/source
+59bf5bbc…6b2a74. Local-incidence terminal parent/quotient/wholelive/positions
+equals the frozen original replay on adjacent/disjoint procedural collapses;
+three precision comparisons use exact outward intervals with dyadic fallback.
+The adapter authenticates original full verifier bytes/function AST and replaces
+only replay/root; source and final gates remain verbatim. Root combined172PASS
+1SKIP1.44s, historical13solid-function AST/syntax/diffPASS. These tests overlap
+agents and are not summed into scientific evidence. Native paired2QEM control
+has not executed; no production acceleration/adoption/accuracy claim.
