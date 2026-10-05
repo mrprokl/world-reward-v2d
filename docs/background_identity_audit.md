@@ -338,3 +338,23 @@ not merely increase AMG thresholds/crops until this closed cohort passes.
 Validate each endpoint first on genuinely fresh licensed external records,
 then annotated joint pairs and full-T reconstruction. Neither successful RGB
 acquisition nor1024masks establishes foreground target selection.
+
+The next candidate has a source-audited **image-only OWLv2** seam, not another
+generic `object.` prompt. Original Transformers4.53.3
+[model](https://github.com/huggingface/transformers/blob/v4.53.3/src/transformers/models/owlv2/modeling_owlv2.py)
+78926B SHA98e94770…05e executes image_embedder→all3600patches→raw objectness
+and normalizedcxcywh box heads, without text/class head, NMS/topK/threshold.
+[Processor](https://github.com/huggingface/transformers/blob/v4.53.3/src/transformers/models/owlv2/image_processing_owlv2.py)
+28040B SHAb20c2be9…253f uses rescale1/255, bottom/right gray square padding,
+original SciPy resize and CLIP normalization. Its exact native inverse multiplies
+all corner coordinates bymax(H,W), retaining padding/out-of-image proposals.
+FP32 source/config/whole-bank checks are numerical contracts, not detections.
+
+Official prospective [google checkpoint](https://huggingface.co/google/owlv2-base-patch16-ensemble/tree/57beb61adb5abda3de4a9796bc35ae60bc4b9802)
+619918824B SHAe1e130b9…99e7 is **not acquired or qualified**. Processor425B
+SHAcf3e3966…0064/config414B SHAba9df8c2…acb2 and Apache2 notice are separate
+source pins; COCO/OpenImages/web training overlap remains explicit/unknown in
+detail. No claim of unseen validation or general physical-object truth.
+Root157combined numerical seam/person/candidate/scorer testsPASS.54s, including
+28new OWLv2 fixtures. Next native runtime/strict checkpoint qualification must
+precede a new photo-disjoint cohort; the closed COCO32 is not reopened.
