@@ -27,7 +27,7 @@ ROOT = Path('/srv/scenesmith/world-reward')
 DATA = Path('/srv/world-reward-data/hoi_detr_v1')
 ENTRY = 'run_hoi_detr_model_qualify'
 PROTOCOL = 'configs/hoi_detr_model_qualify_v1.json'
-PROTOCOL_PIN = dict(bytes=3401, sha256='9a797e3af51835b758a1dc4616f9016e3436c57b02d4561dee90768dee75f762')
+PROTOCOL_PIN = dict(bytes=3701, sha256='15254cca114d01bf0cf8653e56d8dfb754c41f61ed32656494599e0bbecc589d')
 HELPERS = ('infra/hoi_detr_model_qualify.py', 'infra/run_hoi_detr_model_qualify.sh', PROTOCOL,
            'infra/hoi_detr_runtime_verify.py', 'infra/hoi_detr_acquire.py',
            'infra/mediapipe_cpu_runtime_verify.py', 'infra/mediapipe_hands_acquire.py',

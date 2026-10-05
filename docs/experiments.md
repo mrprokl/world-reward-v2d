@@ -10115,3 +10115,22 @@ assertion/reference-device bookkeeping, keeps exact indices/scores/boxes and
 all original sources/tolerances/budgets. No numerical backend patch, acceptance
 tolerance change or old result relabel. Backend CPU versus returned CUDA device
 are recorded separately; original native GPU qualification remains incomplete.
+
+ad0ffc8 MMCV v4 actual COMPLETE PASS121.276561s; full unchanged native compile
+64.725890s and four operator controls4.943897s. Actual CUDA MSDeformAttn
+[1,3,256] versus original PyTorch maxabs9.313225746e-10; CUDA NMS exact0,2;
+originalCPU soft-NMS output CUDA exact0,2/raw .9,.7; CUDA RoIAlign analytic
+[1,1,2,2] error0. Scope remains operators-only, zero checkpoint/RGB/datasets.
+Host13248B/906bf42aaeaf6612586de1b93c4039a5f969233022f346d64ae84a975debb445;
+compile2512B/1f59784d6885a98aeeb9d0e90acf656a76b844ef03df3d8f555afdea456ca8c4;
+operators3213B/dc181d58021429f88359190e5ca0559925a7c96c9c8fe0e594cf83ba9c5d5224.
+Full-source/input/base preservation and owned containers/scratch cleanup pass;
+prior v1/v2/v3 failures remain unchanged, no inference/quality claim.
+
+Full native HOI model gate now freezes that independently read v4PASS before
+first checkpoint decode. Pure offline FairScale overlay (no image/base installs),
+complete originalmodel/strict weights_only CPU load, original image-only test
+preprocessing and one proceduralRGB forward. Approved changes are one exact
+author foreign-path Expr removal in derived copy and explicit inference
+load_from=None/model.train_cfg=None; no mathematical source/config retuning.
+291 combined tiny tests PASS; actual full-model result remains prospective.

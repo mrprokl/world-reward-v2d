@@ -12,25 +12,41 @@
   "gpu_memory": "64g",
   "runtime": {
     "path": "results/hoi-detr-runtime-v4/report.json",
-    "report": null,
+    "report": {
+      "bytes": 13248,
+      "sha256": "906bf42aaeaf6612586de1b93c4039a5f969233022f346d64ae84a975debb445"
+    },
     "unresolved_pin_is_fail_before_checkpoint_decode": true
   },
   "acquisition": {
     "producer_revision": "bee1d8e49c90f8926e6ff0f63347daef3ddfa99e",
-    "report": {"bytes": 4471, "sha256": "b424f6227cefe69a9e112310a226b84cfcd44780f14fa3cf31f71934dad709a3"},
-    "source_manifest": {"bytes": 755745, "sha256": "8ed68b93269dd216272c702603b56487ff47debaa38b72d891740d417f69b0fd"},
+    "report": {
+      "bytes": 4471,
+      "sha256": "b424f6227cefe69a9e112310a226b84cfcd44780f14fa3cf31f71934dad709a3"
+    },
+    "source_manifest": {
+      "bytes": 755745,
+      "sha256": "8ed68b93269dd216272c702603b56487ff47debaa38b72d891740d417f69b0fd"
+    },
     "source_revision": "1b367292f3833afd64a204bd4d9d84519541d035",
     "git_root_tree_sha1": "e93a418345712fc6c011bfcc84bdddc90f496a70",
-    "checkpoint": {"bytes": 5855053598, "sha256": "4708fd0ddc5c3d386bad67c31152de58676840b911f6d01219e0092a603277d3"}
+    "checkpoint": {
+      "bytes": 5855053598,
+      "sha256": "4708fd0ddc5c3d386bad67c31152de58676840b911f6d01219e0092a603277d3"
+    }
   },
   "fairscale": {
-    "name": "fairscale", "version": "0.4.13", "license": "BSD-3-Clause",
+    "name": "fairscale",
+    "version": "0.4.13",
+    "license": "BSD-3-Clause",
     "url": "https://files.pythonhosted.org/packages/c1/08/b3334d7b543ac10dcb129cef4f84723ab696725512f18d69ab3a784b0bf5/fairscale-0.4.13.tar.gz",
-    "file": "fairscale-0.4.13.tar.gz", "bytes": 266261,
+    "file": "fairscale-0.4.13.tar.gz",
+    "bytes": 266261,
     "sha256": "1b797825c427f5dba92253fd0d8daa574e8bd651a2423497775fab1b30cfb768",
     "publisher_license": {
       "url": "https://raw.githubusercontent.com/facebookresearch/fairscale/v0.4.13/LICENSE",
-      "file": "FairScale.LICENSE", "bytes": 1739,
+      "file": "FairScale.LICENSE",
+      "bytes": 1739,
       "sha256": "0a9b773f521ede2910204567bbe69c4f2a8ee8bede07dde0e667bcc6dfd268a0"
     },
     "maximum_expanded_bytes": 4194304,
@@ -40,26 +56,55 @@
   },
   "native_config": {
     "path": "projects/configs/co_dino_vit/co_dino_5scale_vit_large_coco_with_relation_only_all_losses_custom.py",
-    "identity": {"bytes": 19637, "sha256": "018acf8bc176daf671959466726d928486977e5e43cc7bf03b4ce509ba6c00d9"},
+    "identity": {
+      "bytes": 19637,
+      "sha256": "018acf8bc176daf671959466726d928486977e5e43cc7bf03b4ce509ba6c00d9"
+    },
     "original_load_from": "work_dirs/01_inter_full_low_1e4_corrected_auto80_100_h_f_s_w_3/epoch_5.pth",
-    "inference_overrides": {"load_from": null, "model.train_cfg": null},
+    "inference_overrides": {
+      "load_from": null,
+      "model.train_cfg": null
+    },
     "custom_imports": false,
     "full_model_components_retained": true
   },
   "compatibility_patch": {
     "path": "projects/models/co_detr.py",
-    "identity": {"bytes": 27476, "sha256": "d63adcaa1e62b9ddf1f835a50ef4023332be28cfcc3039b7e9fdd9847b4f3212"},
+    "identity": {
+      "bytes": 27476,
+      "sha256": "d63adcaa1e62b9ddf1f835a50ef4023332be28cfcc3039b7e9fdd9847b4f3212"
+    },
     "remove_exact_sys_path_append": "/lus/lfs1aip2/projects/u6ev/ahmad/Co-DETR",
     "all_other_AST_unchanged": true
   },
   "extra_base_distributions": {
-    "fvcore": "0.1.5.post20221221", "iopath": "0.1.10", "portalocker": "4.4.0",
-    "termcolor": "3.3.0", "yacs": "0.1.8", "tabulate": "0.10.0", "tqdm": "4.66.5",
-    "typing_extensions": "4.16.0", "timm": "1.0.30", "scipy": "1.16.3", "einops": "0.8.2"
+    "fvcore": "0.1.5.post20221221",
+    "iopath": "0.1.10",
+    "portalocker": "4.4.0",
+    "termcolor": "3.3.0",
+    "yacs": "0.1.8",
+    "tabulate": "0.10.0",
+    "tqdm": "4.66.5",
+    "typing_extensions": "4.16.0",
+    "timm": "1.0.30",
+    "scipy": "1.16.3",
+    "einops": "0.8.2"
   },
-  "procedural_RGB": {"height": 96, "width": 128, "original_frame_index": 0, "generator": "uint8_xy_integer_ramp_v1"},
-  "seed": 0, "amp": false, "tf32": false,
-  "quality_verified": false, "actor_identity_verified": false, "contact_verified": false,
-  "training_overlap_verified": false, "license_eligibility_verified": false,
-  "ground_truth_used": false, "challenge_inputs_used": false, "adoption": false
+  "procedural_RGB": {
+    "height": 96,
+    "width": 128,
+    "original_frame_index": 0,
+    "generator": "uint8_xy_integer_ramp_v1"
+  },
+  "seed": 0,
+  "amp": false,
+  "tf32": false,
+  "quality_verified": false,
+  "actor_identity_verified": false,
+  "contact_verified": false,
+  "training_overlap_verified": false,
+  "license_eligibility_verified": false,
+  "ground_truth_used": false,
+  "challenge_inputs_used": false,
+  "adoption": false
 }

@@ -42,9 +42,10 @@ def pin(raw): return dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()
 
 def test_protocol_exact_null_dependency_is_not_qualification(gate, rt, p):
     assert pin((REPO/gate.PROTOCOL).read_bytes()) == gate.PROTOCOL_PIN
-    assert p['runtime']['report'] is None and p['budget_seconds'] == 1800
+    assert p['runtime']['report'] == dict(bytes=13248,sha256='906bf42aaeaf6612586de1b93c4039a5f969233022f346d64ae84a975debb445') and p['budget_seconds'] == 1800
     assert p['gpu_memory'] == '64g' and all(p[k] is False for k in gate.FLAGS)
     assert all(x in gate.HELPERS for x in ('infra/hoi_detr_runtime_verify.py', 'src/world_reward/hoi_detr_observations.py'))
+    p=copy.deepcopy(p);p['runtime']['report']=None
     with pytest.raises(ValueError, match='not yet available'):
         gate.authenticate_runtime(SimpleNamespace(pinned=lambda *_: pytest.fail('No unpinned receipt read')), None, p, 1)
 
