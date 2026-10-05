@@ -1,0 +1,95 @@
+{
+  "schema": "world_reward.coverage_17_19_20_handoff.v1",
+  "audit_read_only": true,
+  "quality_verified": false,
+  "ep20": {
+    "status": "artifact_PASS",
+    "producer_revision": "861e68601ec7df27d75a1f4ffc9672622ded067c",
+    "frames": 549,
+    "elapsed_seconds": 3231.849837807007,
+    "source_files": 343,
+    "source_closure_sha256": "43246f412ed913b341bb560c2953cccc81524f50e99d117f1308fb6109e3faf5",
+    "archive_sha256": "fbfeba72311021f34a9ba880b8f62ab0edbc6f3912ce90f556581177eb4e6214",
+    "input_files": 1672,
+    "source_inputs_before_after_exact": true,
+    "output_seals_verified": true,
+    "owned_CID_process_cgroup_absent": true,
+    "historical_unit_exit": "unknown_collected_exit",
+    "proof": {"bytes": 320863, "sha256": "636d70aad2b45909799264ee64bbe56096251c2cd10eea8b5f7967b3bec36464"},
+    "files": {
+      "report.json": {"bytes": 27971358, "sha256": "0d0176ef329001535e6d37fb25d4eb4cce03b87d71128055437f6c4ea1488087"},
+      "geometry_and_poses.npz": {"bytes": 96511, "sha256": "8eb6e6e8ffe0da1c54a4ef8fae266b98cee2db710d843a59f45059a299e704ce"},
+      "object_fixed_canonical.glb": {"bytes": 74632, "sha256": "aa6e29e7be41df0983597bd030df702a50631c48ba18f8f1a1cc88480f14dbe6"}
+    }
+  },
+  "adapter_scope": {
+    "status": "validated_native_adapter_receipts",
+    "helper_sha256": "1b1f71532c8af6c830657f0fe69d1ce0e49a408fbebac69cb2c145fe05f97c26",
+    "source_matches_clean_upstream": true,
+    "source_inputs_outputs_rehashed": true,
+    "fullpose_sealed_current_hash_verified": true,
+    "adapter_output_readonly": false,
+    "provenance_limit": "Original adapter execution has no owned CID/before-after manifest; no historical source candidate uniquely binds that execution. Current byte and native receipt validation is not a reconstruction quality claim.",
+    "decoder_identity": {
+      "mhr_decoder_revision": "cari4d.mhr_layer.vertices.v1",
+      "mhr_buffer_sha256": "b5a2f9d305dd02626b967aa2e86021fba07065df66ce7a7e00ffb9664f150abf",
+      "mhr_model_sha256": "352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc"
+    }
+  },
+  "adapters": [
+    {
+      "episode": 17, "frames": 419,
+      "report": {"bytes": 2540, "sha256": "d0f4cf17ef49376439fdd5efec41310aec934e9e6183249f29f526be2f648590"},
+      "initializer": {"bytes": 1871011, "sha256": "a3dd2d28558e46a2ca4c518aaaf7555dd8a9fb8ad1e820afc6539a0ef55589d6"},
+      "body_report": {"bytes": 273129, "sha256": "996ec4b20300d44d01526d059346a6ebcd70306185108328fe2216c61d436de0"},
+      "body_prediction": {"bytes": 167065018, "sha256": "735637551da13e15c019e5352c48ec0fa39601405737bdf5d3b4619e964623b1"},
+      "max_native_error_m": 0.0000011087104819857046,
+      "translation_error_m": 0.0,
+      "projection_error_px": 0.00008631674575031098
+    },
+    {
+      "episode": 19, "frames": 443,
+      "report": {"bytes": 2539, "sha256": "f912181dec271f39f1b87157d66ef96fe680c4c667dcbda56a56bcab26accf2f"},
+      "initializer": {"bytes": 1978075, "sha256": "eed0968885b44706387862748cbdb78a81c904c23a9441812043e2c265093314"},
+      "body_report": {"bytes": 287787, "sha256": "f0b620fc963ed024d04d23301fccc5a7325443ff36c63079e54c63db24a665be"},
+      "body_prediction": {"bytes": 177096296, "sha256": "79f6c87668f09bb69631ce508be4344c878767ebbb4a3a1f501afec645248d08"},
+      "max_native_error_m": 0.0000011411799191561813,
+      "translation_error_m": 0.0,
+      "projection_error_px": 0.00008631674575031098
+    }
+  ],
+  "prepare17_preflight": {
+    "status": "ready",
+    "mem_available_bytes": 327729680384,
+    "load1": 1.27,
+    "docker_cpu_percent_sum": 100.41,
+    "docker_memory_percent_sum": 5.96,
+    "containers": 1,
+    "unit_output_control_fresh": true,
+    "native_budget_seconds": 7200,
+    "native_gpu_requested": false,
+    "container_resource_limits": false,
+    "dispatch_one_only": true
+  },
+  "person_bank_metadata": {
+    "producer_revision": "5e4255d192a657bec3428806ded272f457804a01",
+    "source_entries_including_directories": 257,
+    "source_closure_sha256": "7d62218ad1f929a29a5f18b237f0fa1984b9a39306d8c7a5a96f217a65a68109",
+    "source_helper_count": 11,
+    "input_pin_count": 8
+  },
+  "dispatch17": {
+    "status": "acknowledged_dispatch_only",
+    "producer_revision": "ea3de92a337648e4d1b6c8f50a157a7868cbeba4",
+    "unit": "world-reward-coverage-cari-inputs-17.service",
+    "entrypoint": "infra/run_cari_prepare.sh",
+    "arguments": ["--episode", "17", "--no-wait", "--mesh-source", "surface"],
+    "source_files": 342,
+    "source_closure_sha256": "208c00672e9402548381e996228cb21b87c3f291adc5e8ed295b7ec2cc18b175",
+    "archive_sha256": "8cc5e6c77cada6e02e2b71584d8e785c173dde11b5241cc9c3fa3c79727c48e6",
+    "script_sha256": "0edc2b49ba9cbbbb418b45c9f04789025b31181d46bf11452614a0b095ba01e2",
+    "native_script_sha256": "9d6e9028653ca43f1eb184cb0ed85102279289dd97840c7f89cb8c69a40a79e8",
+    "execution_result_observed": false
+  },
+  "dispatch19": {"status": "not_launched", "reason": "Unbounded Docker CPU/memory; only one preparation authorized."}
+}
