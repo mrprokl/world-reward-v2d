@@ -9792,3 +9792,21 @@ Azure rendering; only these bounded previews may reach the laptop. Private
 dedicated Blob container has VM01 contributor/local reader scopes, no account
 keys or public access. Eight procedural tests PASS; real preview dispatch is not
 yet a render PASS or held-out accuracy claim.
+
+Actual353af50 previews PASS onAzure: EP26 fixed[0,199,398],4.258428s,
+116971B/5924e47438fb13731a0287719203446857e9562e04c3a43a3bd38eb8cc757eac;
+EP9 fixed[0,207,414],4.462068s,
+119745B/37adc2849d3cf2e38ff9826e0e80c27b9c01ae3991f139989b57cb221fcbf9c0.
+Private uploads and tiny local bytes independently verified; total236716B,
+no video/checkpoint/mesh transfer. Sources rehashed, owned containers absent.
+Canonical imported runtime receipt independently roundtrips its exact7487bytes.
+
+Visual QA exposes a disqualifying EP9 baseline failure: projected human follows
+a seated background person and object geometry is away from the actual foreground
+interaction. This is an observation, not a quantified GT score or permission to
+hand-label/change that record. Engineering pack PASS must not be interpreted as
+correct actor/object reconstruction. Reject quality/adoption of that candidate;
+audit generic automatic entity-to-mask/contact association and introduce a
+prospective all-clip consistency gate, not a manual EP9 reassignment. EP26 looks
+more coherent in these three views but contact, geometry and temporal accuracy
+remain unverified. No verified CARI4D superiority or leaderboard result.
