@@ -114,6 +114,25 @@ def test_private_sas_never_exposed_in_http_failure_or_redirect(transfer):
         with pytest.raises(ValueError): transfer.Blob(bad, 'a'*40)
 
 
+def test_managed_identity_unsigned_url_is_fixed_account_only(transfer, monkeypatch):
+    url = 'https://stworldrewardresearch26.blob.core.windows.net/runtime-transfers/articulated-runtime-'+'a'*40+'.tar'
+    blob = transfer.Blob(url, 'a'*40, managed_identity=True)
+    blob.token = 'IN_MEMORY_ONLY'; blob.token_expiry = 10**12
+    assert blob.authorization() == {'Authorization': 'Bearer IN_MEMORY_ONLY'}
+    with pytest.raises(ValueError): transfer.Blob(url, 'a'*40)
+    with pytest.raises(ValueError): transfer.Blob(url.replace('stworldrewardresearch26', 'foreignaccount'), 'a'*40, managed_identity=True)
+
+
+def test_managed_identity_refresh_failure_never_exposes_token(transfer, monkeypatch):
+    class Fails:
+        def open(self, *_a, **_k): raise RuntimeError('LEAK TOKEN')
+    monkeypatch.setattr(transfer.urllib.request, 'build_opener', lambda *_: Fails())
+    url = 'https://stworldrewardresearch26.blob.core.windows.net/runtime-transfers/articulated-runtime-'+'a'*40+'.tar'
+    blob = transfer.Blob(url, 'a'*40, managed_identity=True)
+    with pytest.raises(RuntimeError) as failure: blob.authorization()
+    assert 'TOKEN' not in str(failure.value) and failure.value.__suppress_context__
+
+
 def test_install_no_overwrite_readonly_leaf_and_owned_failure_rollback(transfer, tmp_path, monkeypatch):
     monkeypatch.setattr(transfer.os, 'chown', lambda *args: None)
     monkeypatch.setattr(transfer.os, 'fchown', lambda *args: None)

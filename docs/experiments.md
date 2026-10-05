@@ -9654,3 +9654,11 @@ stworldrewardresearch26/container runtime-transfers, HTTPS/TLS1.2 private
 blobs/publicblobdisabled; priorotherprojectstorage networkblocked and unchanged.
 SAS neverprinted/versioned. Actualtransfer/import/imageABI remainsunexecuted;
 strictclassicconfig/47layergate, no speculativeOCI alias or retag.
+
+Final protocol/caller review corrects native frame names to unchanged000000..
+000023 (scene identity remains separate). This was found before any scientific
+GPU execution, not a failed-cohort rescue. Narrow runtime transfer now uses
+Azure managed identities rather than staged SAS: exporter container-only Blob
+Contributor; importer same-container Reader. Tokens stay in RAM and never
+appear in shell/log/source. Root235tinychecks include no-secret failure gates;
+actualimage save/import and scientific runs still require their own receipts.

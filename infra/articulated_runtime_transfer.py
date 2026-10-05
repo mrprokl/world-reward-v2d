@@ -2,7 +2,7 @@
 
 Host stdlib/CPU only: exact Docker image, seven source files, one checkpoint and
 one CPU receipt. No model/data/GPU execution, retagging or qualification replay.
-Private SAS is read only from WR_BOOTSTRAP_BLOB_URL and is never recorded.
+Managed-identity tokens stay in RAM; optional SAS is never recorded.
 """
 from __future__ import annotations
 import argparse
@@ -160,19 +160,40 @@ def verify_image_archive(path):
 
 
 class Blob:
-    """No redirects/proxies/URL in errors; caller supplies one private SAS in RAM."""
-    def __init__(self, url, export_revision, opener=None):
+    """No redirects/proxies/credentials in errors; narrowly scoped Azure identity."""
+    def __init__(self, url, export_revision, opener=None, *, managed_identity=False):
         p = urllib.parse.urlsplit(url)
         require(p.scheme == 'https' and re.fullmatch(r'[a-z0-9]{3,24}\.blob\.core\.windows\.net', p.netloc)
                 and not p.fragment and re.fullmatch(rf'/[a-z0-9][a-z0-9-]{{1,61}}/articulated-runtime-{export_revision}\.tar', p.path)
-                and any(k == 'sig' and v for k, v in urllib.parse.parse_qsl(p.query)), 'Private expected Azure blob SAS required')
+                and (any(k == 'sig' and v for k, v in urllib.parse.parse_qsl(p.query))
+                     or managed_identity is True and not p.query
+                        and p.netloc == 'stworldrewardresearch26.blob.core.windows.net'),
+                'Private expected Azure blob credential required')
         self.url = url; self.opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+        self.managed_identity = managed_identity
+        self.token = None; self.token_expiry = 0
+
+    def authorization(self):
+        if not self.managed_identity: return {}
+        if time.time()+300 >= self.token_expiry:
+            try:
+                request = urllib.request.Request('http://169.254.169.254/metadata/identity/oauth2/token'
+                    '?api-version=2018-02-01&resource=https%3A%2F%2Fstorage.azure.com%2F', headers={'Metadata': 'true'})
+                opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+                with opener.open(request, timeout=10) as response: raw = response.read(32769)
+                require(len(raw) <= 32768, 'Bounded managed identity response required')
+                value = strict_json(raw)
+                require(value['token_type'].lower() == 'bearer' and type(value['access_token']) is str
+                    and 0 < len(value['access_token']) < 16384, 'Managed identity credential required')
+                self.token = value['access_token']; self.token_expiry = int(value['expires_on'])
+            except Exception: raise RuntimeError('Private Azure identity request failed') from None
+        return {'Authorization': 'Bearer '+self.token}
 
     def request(self, method, data=None, query='', headers=None):
         try:
-            url = self.url+('&'+query if query else '')
+            url = self.url+(('?' if '?' not in self.url else '&')+query if query else '')
             request = urllib.request.Request(url, data=data, method=method,
-                headers={'x-ms-version': '2023-11-03', **(headers or {})})
+                headers={'x-ms-version': '2023-11-03', **self.authorization(), **(headers or {})})
             return self.opener.open(request, timeout=90)
         except Exception:
             raise RuntimeError('Private Azure byte transfer request failed') from None
@@ -319,7 +340,8 @@ def main(argv=None):
     proof = source_proof(code, revision); files = asset_pins(code)
     export_revision = revision if args.command == 'export' else args.export_revision
     require(type(export_revision) is str and re.fullmatch('[0-9a-f]{40}', export_revision), 'Exact original export revision required')
-    blob = Blob(os.environ.pop('WR_BOOTSTRAP_BLOB_URL', ''), export_revision)
+    managed = os.environ.pop('WR_BOOTSTRAP_MANAGED_IDENTITY', '') == '1'
+    blob = Blob(os.environ.pop('WR_BOOTSTRAP_BLOB_URL', ''), export_revision, managed_identity=managed)
     expected = {'bytes': args.expected_bytes, 'sha256': args.expected_sha256}
     require(args.command == 'export' and args.export_revision is None and args.expected_bytes is None and args.expected_sha256 is None
             or args.command == 'import' and type(expected['bytes']) is int and 0 < expected['bytes'] <= MAX_ARCHIVE
