@@ -259,3 +259,32 @@ def test_expired_contaminated_identity_cannot_restart_clean_after_missing_gap():
     assert restarted
     assert all(score.contaminated for score in restarted)
     assert all(40 in score.ambiguous_frame_indices for score in restarted)
+
+
+@pytest.mark.parametrize("observations", [3, 16, 32])
+@pytest.mark.parametrize("permuted", [False, True])
+def test_high_confidence_wrong_object_can_select_stable_wrong_person(observations, permuted):
+    """Expose the existing selector's limit, not a passing identity-quality test.
+
+    Both object boxes survive NMS. Which one is actually manipulated is not
+    input to this selector. More observations, permutation-invariant tracking,
+    coverage and a large score gap do not resolve missing relational evidence.
+    These are invented data-free boxes, not an episode-specific correction.
+    """
+    foreground_object = target(30, score=0.7)
+    background_object = target(160, score=0.98)
+    rows = [frame(i * 7, objects=(foreground_object, background_object))
+            for i in range(observations)]
+    if permuted:
+        rows = [frame(r.frame_index, tuple(reversed(r.persons)),
+                      tuple(reversed(r.objects))) for r in reversed(rows)]
+    result = select_interacting_actor(rows)
+    assert result.scores[0].coverage == 1
+    assert result.scores[0].observations == observations
+    assert not result.scores[0].contaminated
+    assert all(r.persons[0].box == DISTRACTOR for r in result.frames)
+    assert all(len(r.objects) == 2 for r in result.frames)
+    seed = select_seed_prompts(result.frames, object_prompt="generic procedural object",
+                               total_frames=(observations - 1) * 7 + 1)
+    assert seed.person.box == DISTRACTOR
+    assert seed.object.box == background_object.box

@@ -10585,3 +10585,45 @@ device, but does not inventory the wheel's exact cubin/PTX architectures.
 Preserve all previous failures. Next legitimate technical branch is a fresh
 isolated full original MMCV2.1 build for SM90 against the same author Torch2.1/
 CUDA11.8 ABI, not a kernel rewrite, Torch2.5/MMCV1.7 substitution or relaxed gate.
+
+603272b sixth preregistered surface proposal EP22 COMPLETE PASS129.156646s
+(native125.650860s). Independent original source/qualification/input/image
+posthash audit verifies323 sourcefiles,545 inputfiles, eight sealed outputs,
+owned CID/name and scratch absence. Host772398B/
+8af82acf2b4e29218de230514ab143bb5e6ca81b5669d37a605de98ff485a170;
+native647975B/0fcbeed69bd02eef9dc7cdff5551195203e9c876f5e70e8607add8e10808585e.
+Fifteen geometry leaves/sixteen unchanged helpers frozen5971B/
+88d61f40d7b56c53d12da1d37ca0bc4a2ad9513dd772881df25d52cd1ea46a2e.
+This is geometry/coverage engineering, not reconstructed interaction accuracy.
+Read-only audit's missing WR_CODE observer environment was corrected before
+assertion; no producer rerun or numerical/source modification.
+
+8eeb5a6 actual EP17 native fixed-shape surface pose COMPLETE PASS1786.930850s,
+all419 original indices. Independent source/1282inputs/proof/output seals and
+owned CID absence PASS. Report21298605B/
+1de44ccd252549ccaf6ac369373de6737c3c476e071ae88a1fdd7d1518f81670;
+NPZ84105B/255655b2152d5cd7b96545e4d5468959507c6b6713cc219d151f25a49fc30b07;
+GLB74440B/bd020e7a66efd390b8c0a6d21c8c12926c2ba54f17f8993d74d21edd8c3d7e9e.
+EP16 CPU preparation remains running at the last actual observation, not PASS.
+Parent147tests PASS/two optional skips24.24s across surface/CARI/transport gates;
+local tiny controls are not native-video quality evidence.
+
+User-prioritized background identity audit changes the next research action:
+CARI original SAM3 preprocessing unions concept instances and V2D requires
+already assigned target prompts; neither supplies robust automatic ownership.
+New September10 SingleQuery-BHOI paper directly models person/twohands/target
+relations, but public code is404/comingsoon. Actual dataset publishes explicit
+person/hand/target IDs with CC-BY-NC4 annotation grant; original image rights and
+competition eligibility remain separate. Tiny metadata/source texts only;
+no dataset/archive/label/model read. Prioritize full-bank anatomical ownership
+plus learned relations before replacing memory; static, conditional, tracking
+and metric3D claims stay separate. See background_identity_audit.md for pins,
+primary function evidence and a disjoint validation plan. No challenge retuning
+or reopening the128-image INCONCLUSIVE study.
+
+Six new tiny negative controls exercise unchanged actor_selection at3/16/32
+observations with/without bank permutations: the higher-confidence background
+object produces a fully covered uncontaminated wrong actor and wrong seed.
+This explicitly demonstrates that sparse continuity/coverage alone do not fix
+initial target attribution. Parent136related tests PASS0.46s; no model, data,
+challenge prediction, parameter change or claimed quality improvement.

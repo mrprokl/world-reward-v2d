@@ -1,0 +1,111 @@
+# Background distractors: choose the interaction before tracking it
+
+Primary-source audit, October5,2026; methods available by September30. This is
+an architectural decision, not a corrected challenge prediction or quality gain.
+
+## What CARI4D actually does
+
+- [Original CARI4D paper, v3](https://arxiv.org/html/2512.11988v3), sections3,
+  3.1,3.2 and7: reconstructs an already targeted person/object interaction;
+  the object mask identifies the target. Its dynamic hypothesis selection
+  chooses **poses of that object**, not a partner among competing instances.
+  The mostly-visible initial object is an assumption, not an automatic selector.
+- [Original preprocessing at71fa7cbe](https://github.com/NVlabs/CARI4D/blob/71fa7cbe46081467edadd11ab534b0c14aa9d913/prep/run_sam3_masks.py#L69-L151):
+  `merge_masks_from_output` takes the union of all SAM3 instances for each text
+  concept (69–80). Chunked segmentation starts a new session every300frames
+  (95–151). This can merge matching bystanders; it is not persistent joint
+  person/object identity. Independently read10349B/SHA256
+  `7d74990996e13df4ac8f6d8e6c53b37d0d9a37db88bb26d0b515ecb93057d8d9`.
+- [NLF initialization](https://github.com/NVlabs/CARI4D/blob/71fa7cbe46081467edadd11ab534b0c14aa9d913/prep/run_nlf_sepK.py#L86-L102)
+  uses the supplied mask bbox and suppresses competing detections; missing masks
+  can reuse an earlier mask. This cannot establish the actor. Read9405B/SHA256
+  `72994fa0b769c830053a01130de7f58f030ec76c8d96ac622200daefbb98c092`.
+- [V2D CARI4D README at our executed7c0d pin](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_cari4d/README.md#L58-L85)
+  offers interactive target annotation. [Its SAM2 adapter](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_sam2/lib/video_to_masks.py#L86-L115)
+  propagates supplied IDs0/1, not a learned interaction assignment. We cannot
+  manually provide challenge targets. The independent audit finds these two
+  files and FoundationPose byte-identical at the October5 V2D HEAD; no switch
+  of executed producer or post-cutoff adoption follows.
+
+Our automatic alternative has a separate vulnerability: `actor_selection`
+first uses the top confidently separated **object detection**, then spatial
+affinity chooses a person. A highly scored background object can therefore
+produce a stable but semantically wrong pair. Mask/mesh agreement and low
+identity-switch counts cannot certify this pair. EP8/9 quality remains rejected;
+no hand reassignment, private prompt, parameter tuning or historical overwrite.
+
+## Methods address different failure classes
+
+| Component | Useful mechanism | What it does not establish |
+|---|---|---|
+| [DAM4SAM, CVPR2025](https://arxiv.org/html/2411.17576v2), [cutoff code](https://github.com/jovanavidenovic/dam4sam/blob/aad389b85c224bd408da8923e8fcb96410cf7e30/dam4sam_tracker.py#L121-L168) | Distractor-aware recent/anchor memory after an initial bbox/mask. | Which initial person/object is task-relevant. SAM2.1 is a separate release, not DAM4SAM. |
+| [SAM3.1, March27,2026](https://github.com/facebookresearch/sam3/blob/2345a4ad109ac29c569da749c91d84f10dc08c40/RELEASE_SAM3p1.md) | Separate concept instances and multiplexed multiobject memory; lower bank execution cost. | Manipulation ownership. Never union its instances as the CARI helper does. Author speed/benchmark claims are not our measurements. |
+| [MASA, CVPR2024](https://arxiv.org/html/2406.04221v1) | Appearance correspondence across a complete automatic proposal bank. | Person–hand ownership or physical interaction. Our pre-checkpoint CUDA failure remains closed pending an isolated original-source build. |
+| [HOI-DETR, June2026](https://arxiv.org/html/2606.17384v1), section3.3 | Explicit learned hand→direct-object→tool-target links. | Hand-to-body owner, left/right slots, temporal identity or calibrated contact. Our128-image proxy study is closed INCONCLUSIVE, not adopted. |
+| [SingleQuery-BHOI, September10,2026](https://arxiv.org/html/2609.12155v1), sections3,5,6.3 | One person query attaches body pose and both hands; a hand-to-entity relation matrix has off/self/other targets. | Published executable/checkpoint availability, robust crowded-video reconstruction, or correct Track1 predictions. |
+
+The September paper is unusually relevant to our actual failure. It reports
+strict tuple accuracy54.00/33.09/22.02% for1/2–4/≥5people, **conditional on matched
+persons**. Crowding remains difficult; this is not an all-person retrieval score.
+Training-label wrist-nearest/IoU/VLM verification is annotation construction,
+not a permitted way to correct individual challenge labels. Our design must
+retain unknown ownership, not inherit those rules as ground-truth guarantees.
+
+## Availability and rights: fail fast before another model stack
+
+The [SingleQuery project page](https://lgecto-ail-vil.github.io/SingleQuery-BHOI/)
+marks code coming soon. Actual primary page22146B/SHA256
+`666d7a1608b35a371ff15073bb4b7e7ebf281fe01938b38b58bb8be0fbf1ce93`.
+Its separately announced code repository returns404 on this audit: no verified
+published model to install. This is evidence of unavailable public access, not
+proof that the authors have no implementation.
+
+[Dataset release atb23fec9f](https://github.com/LGECTO-AIL-VIL/SingleQuery-BHOI-Dataset/tree/b23fec9f3aecfc80435ac329ad73320565a80926)
+contains actual person/left-hand/right-hand/target IDs and no-contact/self-contact/
+person-contact/object-contact validity flags. Source tree metadata shows
+trainZIP36442716B/Git blob7f80165303a8a5dbea060f6413c3fbcb2ed8c339 and
+valZIP2880378B/e320060f3c4fdd210515818b6e47cc0695d65ad0. These are Git blob
+identities, not publisher SHA256 or an assertion about decoded archive contents.
+Neither archive, examples, labels nor image bytes were read in this audit.
+
+Only tiny primary texts were read:
+
+| File | Bytes | SHA256 |
+|---|---:|---|
+| README.md |10362|389f6d0d37b1a156f3b17b00c0231e69fcf75be0028f44c0145caa1656b4d3f2|
+| LICENSE-DATA.md |784|b5771123b84cd9babecd2ae4ce819d5723efa9e49c8bb92488f677c64be8b128|
+| annotation_schema.md |18884|94605645e0a1122d39fbaf3ec9f47ef19177e75b84985c12a9618b20f05a1402|
+| annotations/README.md |8527|2f3cb8f3508d6089a6d51904b6d4092b4d5d508c846427136b5d745342a2a70a|
+
+The explicit annotation grant is CC-BY-NC4.0 for research/education. Competition
+use eligibility is not assumed. Original COCO image rights remain separate;
+the released annotations explicitly remove image license/source URLs, so those
+must be joined from original COCO metadata. This is a promising **static
+multiperson ownership reference**, not temporal/metric3D validation. Defer heavy
+acquisition and training until those rights, overlap and a disjoint protocol
+are cleared. Code-license badges never override data/model terms.
+
+## Decision and next actual experiment
+
+Prioritize **joint target identity and visible anatomical ownership**, then
+memory robustness. Keep all automatic people/objects and competing pair routes;
+body pose supplies person-attached wrists, HOI links supply candidate interaction
+evidence, appearance supplies persistence. Null/no-contact/occluded ownership is
+explicit. Proximity, depth, co-motion or one pair logit alone cannot select truth;
+do not hardcode foreground, largest person, nearest hand, or moving object.
+
+Reuse the existing observation/scene ledger and native HOI producer, not another
+transport framework. First qualify person-attached wrist observations for the
+whole bank and preserve all ambiguous hand-owner hypotheses. Then freeze a
+new external comparison before labels: identical detector bank and downstream
+CARI; spatial-only versus anatomy+relation selection. Measure proposal recall,
+initial correct person–object pair and complete tuple precision/recall on **all**
+records, counting missed people/objects and abstentions. Separately measure
+identity drift on new videos; an externally assisted initialization is only a
+tracker control. Final adoption additionally needs full-T body/object/relative
+3D non-regression, no per-frame alignment and unchanged legitimate input scope.
+
+No re-evaluation of the closed OpenImages pilots, no manual episode fix and no
+claim that a literature result, procedural test or prettier overlay solves the
+leaderboard objective. Useful memory operators may run in parallel, but they
+must not be mistaken for the missing initial interaction selector.

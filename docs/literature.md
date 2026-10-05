@@ -1732,3 +1732,35 @@ DCNv2 itself is identified by RuntimeError alone. Project exact bounded builtin
 diagnostics to fixed error-family labels in RAM; never serialize exception text,
 secrets or arbitrary class names. Preserve the original recipe/numerical gates
 and historical FAILs before any separately published technical diagnostic.
+
+### October5 — bystanders: ownership before tracking memory
+
+Primary CARI4D preprocessing unions all SAM3 instances for each text concept;
+V2D instead accepts already assigned target prompts. Neither is an automatic
+person–object ownership solution. A new independent source audit distinguishes
+target selection from FoundationPose pose selection and temporal tracking.
+Our top-object-then-person affinity likewise accepts a stable wrong pair;
+six new procedural controls reproduce this with3/16/32observations and permuted
+banks without changing the selector. Parent136 related tests PASS0.46s; this
+is a documented counterexample, not identity validation.
+
+[SingleQuery-BHOI, September10,2026](https://arxiv.org/html/2609.12155v1)
+directly addresses person–left/right-hands–target ownership through structured
+person queries and relation/off/self target selection. Static crowding results
+remain conditional on matched people and decline sharply with>=5people.
+Published training annotation construction uses wrist/box rules plus VLM checks;
+these cannot become challenge hand-labeling or guaranteed inference assignments.
+The actual public code link is404/comingsoon, so no ready checkpoint is asserted.
+Its dataset does have a primary CC-BY-NC4 research annotation grant and explicit
+person/hand/target IDs, unlike our insufficient OpenImages region proxy, but
+original image rights, competition eligibility and overlap remain unverified.
+No archive/labels/images acquired. See background_identity_audit.md for exact
+sources/pins and the discriminating whole-bank validation decision.
+
+[DAM4SAM](https://arxiv.org/html/2411.17576v2) suppresses distractor drift after
+a supplied initial target; [SAM3.1 March27 release](https://github.com/facebookresearch/sam3/blob/2345a4ad109ac29c569da749c91d84f10dc08c40/RELEASE_SAM3p1.md)
+multiplexes instance tracking. Both may efficiently preserve the wrong initial
+task identity. Prioritize anatomical ownership plus explicit interaction links;
+appearance/temporal memory is complementary, not a substitute. Preserve every
+competitor and unknown/no-contact route; no largest/foreground/nearest rule,
+test-specific correction or reopening the closed128-image study.
