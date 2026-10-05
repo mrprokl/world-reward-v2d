@@ -103,3 +103,24 @@ and changes owner when only object confidence changes. Complete evidence keeps
 both persons, both sides and both objects; missing anatomy never becomes OFF.
 214 relevant tiny tests PASS0.79s. These are algorithm/API controls, not dataset
 validation, proof of correct ownership, or a change to any challenge prediction.
+
+## Executable coherent route core (not fitted or adopted)
+
+`coherent_route_scorer` now accepts caller-supplied finite linear weights and
+returns both arms on every original person×side×object slot. It computes
+`base + max_k(tuple_k + bridge_k,o [+ B margin_k])`: the same native route's
+geometry and logit meet **before** reduction. No incompatible independent
+feature extrema, topK object deletion, side pooling or physical-ID fusion.
+Object blocks bound workspace without altering the bank or arithmetic. Native
+IDs remain aligned with explicit unavailability when the upstream Cartesian
+bank has no person; unavailable IDs are not invented detections.
+
+Active-feature numerical support is shared by both arms; unsupported base is
+NaN, absent/unusable HOI leaves the base with route support false, never OFF.
+This narrow raw-linear core does not learn parameters, standardize features,
+model availability, assign a winning owner or calibrate probabilities. A future
+FIT-only learner must explicitly define these before any held-out reference.
+199 parent tiny tests PASS1.02s include50 dedicated controls, two independently
+found zero-bank ABI corrections,3600-object block equivalence, permutation and
+duplicate invariance, and falsification of an impossible mixed route. No real
+data, trained selector, temporal improvement or leaderboard gain follows.
