@@ -74,8 +74,8 @@ inferred automatically; no hand-labeling of challenge records.
   renderer/penetration execution, full9-artifact saved-file audit. This verifies
   semantic delegation only, not independent bit parity, tracking or HOI gain.
   A [six-scene articulated component preflight](docs/authored_point_study_protocol.md)
-  now has frozen named-rig/PCA, texture, visibility and material-query gates.
-  Native execution is pending; no tracker or positive-weight fit is implied.
+  **fails before decoding**: the frozen recipe violates actual rig limits.
+  Zero decoded/rendered frames or fits; cohort closed, no bounds clipping/rescue.
   [Balanced exact sums](docs/balanced_solid_sum.md) pass15 fresh native controls
   on the authenticated existing CPU runtime; four fresh QEM/query composition
   controls also pass, with the original QEM unchanged and query proofs separate.

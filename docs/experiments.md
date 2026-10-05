@@ -9304,3 +9304,18 @@ without support refill, clipping or post-value retuning.300s native/360s host.
 Root focused integration240PASS11SKIP1.06s plus shellsyntax/diffcheckPASS.
 Native component execution pending; future positive-weight A/B remains a separate
 unimplemented scope, not authorized by this preflight.
+
+Actual articulated component8e7c14d CLOSEDFAIL atcomponent0 frozenlimits check:
+host15.979850s/native12.266240s;0decodeframes/calls/0renders/0fits/0trackers.
+Host6503Bf441e26b…1129ed, native3506Bd34c84b7…de625a; native rig metadata
+retainedAzure. Source/asset posthash+ownedcleanupPASS. No scientificreplay,
+controlangle clipping/scale adjustment or futureBoots/A/B implied. Exact offending
+named bound remains to diagnose read-only; local puretests were not nativeproof.
+
+New selective MHR acquisition scope freezes the complete19metadata rows from
+the verified diagnostic, but decodes only LICENSE.txt and the standalone JIT.
+Generic v1 limits remain unchanged; oldFAIL/diagnostic/fullsources/4texts prepost
+required. Selected696121606Bcap, wholearchiveSHA and selectedstreamCRCs/SHAs;
+noinactivepayload/modelcopy/load/SAMrelabel/eligibilityclaim. Root189tinytests
+PASS1.40s (oneexpectedduplicate-ZIP warning), syntax/defaulttail/v1inventory
+AST/diffchecksPASS. Newv2 runtime not yet executed.

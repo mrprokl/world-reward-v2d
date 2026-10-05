@@ -1,0 +1,243 @@
+{
+  "schema": "world_reward.mhr_official_release_selected_protocol.v1",
+  "namespace": "results/mhr-official-release-license-v2",
+  "budget_seconds": 300,
+  "base_protocol": {
+    "path": "configs/mhr_official_release_protocol_v1.json",
+    "bytes": 1914,
+    "sha256": "7b5128a0acee793501d685299510933ee4beb2f4605d222beebaae7fa7b84ce1"
+  },
+  "previous_inventory": {
+    "revision": "bd58681a04fa7e5f82807997ab5d92a7bdc9723c",
+    "namespace": "results/mhr-official-release-inventory-v1",
+    "report": {
+      "bytes": 17451,
+      "sha256": "5e3188aa1fefa41ffe231575fbe445f3b476a683c9067b076f12e5fde623b193"
+    },
+    "source_archive_sha256": "81b1a95ca303a68ca7bc871e0e4a0e2b660e50abe0af66c7ae403cbdfb5eb2b7"
+  },
+  "inventory_columns": [
+    "name",
+    "bytes",
+    "compressed_bytes",
+    "CRC",
+    "directory",
+    "flags",
+    "mode_octal",
+    "compression"
+  ],
+  "inventory_rows": [
+    [
+      "assets/",
+      0,
+      0,
+      0,
+      true,
+      0,
+      "0o40755",
+      0
+    ],
+    [
+      "assets/corrective_blendshapes_lod0.npz",
+      2651004394,
+      84066850,
+      3961550297,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/corrective_blendshapes_lod1.npz",
+      663804298,
+      18993698,
+      3148609201,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/corrective_blendshapes_lod3.npz",
+      176364298,
+      6761323,
+      3859357063,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/corrective_blendshapes_lod2.npz",
+      383796298,
+      14127486,
+      2594034307,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/corrective_blendshapes_lod6.npz",
+      21420298,
+      887442,
+      2513127713,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/compact_v6_1.model",
+      31179,
+      4946,
+      197979563,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/mhr_model.pt",
+      696110248,
+      26223048,
+      2320269692,
+      false,
+      0,
+      "0o100600",
+      8
+    ],
+    [
+      "assets/corrective_blendshapes_lod5.npz",
+      34956298,
+      1035008,
+      2548618350,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/corrective_blendshapes_lod4.npz",
+      88596298,
+      3369725,
+      1580246214,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/lod0.fbx",
+      30376016,
+      28736303,
+      1878362433,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/lod1.fbx",
+      7884560,
+      7399818,
+      2311888953,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/lod3.fbx",
+      2181136,
+      1649779,
+      2030932133,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/corrective_activation.npz",
+      3313540,
+      227487,
+      2854531524,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/lod2.fbx",
+      4354768,
+      3831502,
+      635330590,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/lod6.fbx",
+      661456,
+      260123,
+      1009150888,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/lod5.fbx",
+      932048,
+      533574,
+      691998580,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/lod4.fbx",
+      1289120,
+      827698,
+      1539844773,
+      false,
+      0,
+      "0o100644",
+      8
+    ],
+    [
+      "assets/LICENSE.txt",
+      11358,
+      3949,
+      2263004340,
+      false,
+      0,
+      "0o100644",
+      8
+    ]
+  ],
+  "inventory_expanded_bytes": 4767087611,
+  "selected_members": [
+    "assets/LICENSE.txt",
+    "assets/mhr_model.pt"
+  ],
+  "selected_license": {
+    "member": "assets/LICENSE.txt",
+    "bytes": 11358,
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  "selected_expanded_byte_cap": 696121606,
+  "interpretation": "exact_published_archive_and_complete_metadata_whitelist_only_two_members_decoded_stream_hash_no_extraction_or_inactive_payload_open",
+  "old_generic_inventory_bounds_changed": false,
+  "old_failure_relabelled": false,
+  "models_loaded": false,
+  "packages_installed": false,
+  "gpu_used": false,
+  "dataset_read": false,
+  "sam_provenance_relabelled": false,
+  "competition_eligibility_verified": false,
+  "training_overlap_verified": false,
+  "adoption": false
+}

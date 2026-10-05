@@ -146,7 +146,7 @@ def test_interrupted_download_only_owned_partial_cleanup(release):
     r=report(release);assert r['error_type']=='TimeoutError' and r['owned_archive_removed']
 
 
-@pytest.mark.parametrize('flag',['--mhr-release-only','--mhr-release-inventory-only'])
+@pytest.mark.parametrize('flag',['--mhr-release-only','--mhr-release-inventory-only','--mhr-release-selected-only'])
 def test_strict_cli_returns_before_secret_hf_torch(release,monkeypatch,flag):
     release['freeze']();monkeypatch.setattr(acq.platform,'system',lambda:'Linux')
     monkeypatch.setenv('WR_ROOT',str(release['root']));monkeypatch.setenv('WR_CODE',str(release['code']));monkeypatch.setenv('WR_CODE_REVISION',release['revision'])
@@ -154,7 +154,7 @@ def test_strict_cli_returns_before_secret_hf_torch(release,monkeypatch,flag):
     monkeypatch.setitem(sys.modules,'mediapipe_cpu_runtime_verify',rt);monkeypatch.setattr(rt,'__file__',str(release['code']/'infra/mediapipe_cpu_runtime_verify.py'))
     calls=[];monkeypatch.setattr(acq,'mhr_release',lambda *a,**kw: calls.append((a,kw)) or dict(stage='fixture',status='pass',elapsed_seconds=1,model_byte_identical=True))
     before=set(sys.modules);acq.main([flag]);assert len(calls)==1
-    assert calls[0][1]==({'inventory_only':True} if flag=='--mhr-release-inventory-only' else {})
+    assert calls[0][1]==({'selected_only':True} if flag=='--mhr-release-selected-only' else {'inventory_only':True} if flag=='--mhr-release-inventory-only' else {})
     assert not ({'torch','huggingface_hub'} & (set(sys.modules)-before)) and not (release['root']/'.secrets').exists()
     for args in (['--mhr-release'],['--mhr-release-only','unknown'],['--mhr-release-only','--mhr-release-only']):
         with pytest.raises(SystemExit):acq.main(args)
@@ -163,7 +163,7 @@ def test_strict_cli_returns_before_secret_hf_torch(release,monkeypatch,flag):
 def test_original_all_asset_body_retained():
     import ast
     tree=ast.parse((ROOT/'infra/acquire_weights.py').read_text());main=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='main')
-    statements=main.body;optin=next(i for i,n in enumerate(statements) if isinstance(n,ast.If) and ast.unparse(n.test)=='args.mhr_release_only or args.mhr_release_inventory_only')
+    statements=main.body;optin=next(i for i,n in enumerate(statements) if isinstance(n,ast.If) and ast.unparse(n.test)=='args.mhr_release_only or args.mhr_release_inventory_only or args.mhr_release_selected_only')
     assert any(isinstance(n,ast.Return) for n in statements[optin].body)
     hf=next(i for i,n in enumerate(statements) if isinstance(n,ast.ImportFrom) and n.module=='huggingface_hub')
     assert optin<hf and any('.secrets/hf_token' in ast.unparse(n) for n in statements[optin+1:hf])
@@ -303,3 +303,151 @@ def test_inventory_central_scalars_without_payload_reads(monkeypatch):
     assert d['rows'][0]['orig_filename']=='LICENSE' and d['rows'][0]['mode_octal']==oct(stat.S_IFREG|0o644)
     assert d['rows'][0]['compression']==zipfile.ZIP_DEFLATED and d['rows'][0]['flags']==0
     assert d['first_v1_rejection']['guard']=='required_members' and d['structurally_safe']
+
+
+@pytest.fixture
+def selected_release(inventory_release,monkeypatch):
+    """Manufactured complete 19-member proof; no publisher data downloaded."""
+    c=inventory_release;selected=json.loads((ROOT/acq.MHR_SELECTED_PROTOCOL).read_text())
+    rows=[(r[0],b'inactive'*12 if i==1 else b'',int(r[6],8)) for i,r in enumerate(selected['inventory_rows'])]
+    rows[0]=('assets/',b'',stat.S_IFDIR|0o755)
+    rows[7]=('assets/mhr_model.pt',c['model'],stat.S_IFREG|0o600)
+    rows[-1]=('assets/LICENSE.txt',c['license'],stat.S_IFREG|0o644)
+    c['archive']=archive_bytes(rows);c['protocol']['archive_limits']['member_bytes']=50
+    for p in [c['code'],*c['code'].rglob('*')]:p.chmod(0o700 if p.is_dir() else 0o644)
+    for name in ('revision','source-sha256'):(c['code'].parent/name).chmod(0o644)
+    c['freeze']();oldcode=c['root']/'jobs'/acq.MHR_FAILED_REVISION/'acquire_weights/code'
+    p=oldcode/acq.MHR_PROTOCOL;p.chmod(0o644);p.write_bytes((c['code']/acq.MHR_PROTOCOL).read_bytes());p.chmod(0o444)
+    old=json.loads((c['old_out']/'report.json').read_bytes())
+    old.update(protocol_identity=acq.MHR_PROTOCOL_PIN,archive=identity(c['archive']),source_before=rt.source(c['root'],oldcode,acq.MHR_FAILED_REVISION,'acquire_weights',acq.MHR_HELPERS))
+    p=c['old_out']/'report.json';p.chmod(0o644);p.write_bytes(json.dumps(old,sort_keys=True).encode());p.chmod(0o444)
+    monkeypatch.setattr(acq,'MHR_FAILED_REPORT',identity(p.read_bytes()))
+    c['old_files']={p.name:p.read_bytes() for p in c['old_out'].iterdir()}
+    prev=selected['previous_inventory'];prev.update(revision='d'*40,source_archive_sha256='f'*64)
+    diagcode=c['root']/'jobs'/prev['revision']/'acquire_weights/code';diagcode.mkdir(parents=True)
+    for name in acq.MHR_HELPERS:
+        p=diagcode/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes((c['code']/name).read_bytes());p.chmod(0o444)
+    for name,value in [('revision',prev['revision']),('source-sha256',prev['source_archive_sha256'])]:
+        p=diagcode.parent/name;p.write_text(value+'\n');p.chmod(0o444)
+    for p in [diagcode,*diagcode.rglob('*')]:
+        if p.is_dir():p.chmod(0o555)
+    with zipfile.ZipFile(io.BytesIO(c['archive'])) as z:inventory=acq._mhr_inventory(z,c['protocol'])
+    selected['inventory_rows']=[[r[k] for k in selected['inventory_columns']] for r in inventory['rows']]
+    selected['inventory_expanded_bytes']=inventory['expanded_bytes']
+    selected['selected_license'].update(identity(c['license']))
+    selected['selected_expanded_byte_cap']=len(c['license'])+len(c['model'])
+    selected['base_protocol']=dict(path=acq.MHR_PROTOCOL,**acq.MHR_PROTOCOL_PIN)
+    failure=acq._mhr_failure(rt,c['root'],c['protocol']);metadata=b'{"mock-only":"frozen diagnostic metadata"}'
+    diag=dict(stage='mhr_official_release_inventory_v1',status='pass',phase='complete',producer_revision=prev['revision'],
+        protocol_identity=acq.MHR_PROTOCOL_PIN,previous_failure=failure,archive=identity(c['archive']),existing_model=identity(c['model']),
+        source_before=rt.source(c['root'],diagcode,prev['revision'],'acquire_weights',acq.MHR_HELPERS),primary_metadata=identity(metadata),
+        inventory_diagnostic=inventory,notice_payloads_read=0,asset_notices=[])
+    diag.update({k:True for k in ('source_rehashed_after','existing_model_rehashed_after','whole_archive_sha_verified',
+        'archive_rehashed_after','original_failure_unchanged','owned_archive_removed')})
+    diag.update({k:False for k in ('asset_LICENSE_verified','model_member_streamed','model_member_extracted')})
+    out=c['root']/prev['namespace'];out.mkdir()
+    for name,raw in [('primary-LICENSE',c['license']),('primary-README.md',c['readme']),('release-metadata.json',metadata),('report.json',json.dumps(diag,sort_keys=True).encode())]:
+        p=out/name;p.write_bytes(raw);p.chmod(0o444)
+    out.chmod(0o555);prev['report']=identity((out/'report.json').read_bytes())
+    raw=(json.dumps(selected,sort_keys=True)+'\n').encode();monkeypatch.setattr(acq,'MHR_SELECTED_PIN',identity(raw))
+    p=c['code']/acq.MHR_SELECTED_PROTOCOL;p.parent.chmod(0o700);p.write_bytes(raw);p.chmod(0o444);p.parent.chmod(0o555)
+    c.update(selected=selected,selected_entries=rows,diag_out=out,diag_files={p.name:p.read_bytes() for p in out.iterdir()},
+        selected_out=c['root']/selected['namespace'])
+    def run():return acq.mhr_release(c['root'],c['code'],c['revision'],rt,fetch=c['fetch'],download=c['download'],selected_only=True)
+    c['selected_run']=run;return c
+
+
+def test_selected_two_only_exact_licence_and_model_with_inactive_oversize(selected_release,monkeypatch):
+    c=selected_release;opened=[];original=zipfile.ZipFile.open
+    def spy(z,name,*args,**kwargs):
+        n=name.filename if hasattr(name,'filename') else name;opened.append(n)
+        assert n in c['selected']['selected_members'];return original(z,name,*args,**kwargs)
+    monkeypatch.setattr(zipfile.ZipFile,'open',spy)
+    r=c['selected_run']()
+    assert opened==['assets/LICENSE.txt','assets/mhr_model.pt']==r['selected_payloads_opened']
+    assert r['status']=='pass' and r['stage']=='mhr_official_release_license_v2' and r['selected_members_decoded']==2
+    assert r['complete_metadata_whitelist_verified'] and r['selected_expanded_bytes']==c['selected']['selected_expanded_byte_cap']
+    assert r['model_byte_identical'] and r['asset_license_matches_primary_exactly'] and r['inactive_payloads_opened']==0
+    assert not r['sam_provenance_relabelled'] and not r['competition_eligibility_verified'] and not r['model_member_extracted']
+    assert r['original_failure_unchanged'] and r['original_inventory_unchanged'] and not r['old_generic_inventory_bounds_changed']
+    assert {p.name:p.read_bytes() for p in c['old_out'].iterdir()}==c['old_files']
+    assert {p.name:p.read_bytes() for p in c['diag_out'].iterdir()}==c['diag_files']
+    assert (c['selected_out']/'asset-notice-0.txt').read_bytes()==c['license']
+    assert c['selected_out'].stat().st_mode&0o777==0o555 and all(p.stat().st_mode&0o777==0o444 for p in c['selected_out'].iterdir())
+    assert not (c['selected_out']/'assets.zip.part').exists()
+
+
+@pytest.mark.parametrize('kind',['traversal','type','flags','compression','row_bytes','missing','duplicate'])
+def test_selected_complete_central_gate_before_any_payload(selected_release,monkeypatch,kind):
+    c=selected_release
+    with zipfile.ZipFile(io.BytesIO(c['archive'])) as z:
+        if kind=='traversal':z.filelist[1].filename=z.filelist[1].orig_filename='../unsafe'
+        elif kind=='type':z.filelist[1].external_attr=(stat.S_IFLNK|0o777)<<16
+        elif kind=='flags':z.filelist[1].flag_bits=1
+        elif kind=='compression':z.filelist[1].compress_type=zipfile.ZIP_LZMA
+        elif kind=='row_bytes':z.filelist[1].file_size+=1
+        elif kind=='missing':z.filelist.pop()
+        elif kind=='duplicate':z.filelist.append(z.filelist[-1])
+        monkeypatch.setattr(z,'open',lambda *_:pytest.fail('Payload read before full central gate'))
+        with pytest.raises(ValueError):acq._mhr_selected_inventory(z,c['selected'],rt)
+
+
+@pytest.mark.parametrize('kind',['license','model','stream_cap','budget','diagnostic_before','diagnostic_after','source_before','overwrite'])
+def test_selected_fail_closed_retains_old_proof_and_cleans_own_partial(selected_release,monkeypatch,kind):
+    c=selected_release
+    if kind in ('license','model','stream_cap'):
+        original=zipfile.ZipFile.open
+        def altered(z,name,*args,**kwargs):
+            n=name.filename if hasattr(name,'filename') else name
+            if n==('assets/LICENSE.txt' if kind=='license' else 'assets/mhr_model.pt'):
+                return io.BytesIO(b'x'*(z.getinfo(n).file_size+(1 if kind=='stream_cap' else 0)))
+            return original(z,name,*args,**kwargs)
+        monkeypatch.setattr(zipfile.ZipFile,'open',altered)
+    elif kind=='budget':
+        c['selected']['selected_expanded_byte_cap']-=1
+        p=c['code']/acq.MHR_SELECTED_PROTOCOL;raw=json.dumps(c['selected']).encode();p.chmod(0o644);p.write_bytes(raw);p.chmod(0o444)
+        monkeypatch.setattr(acq,'MHR_SELECTED_PIN',identity(raw))
+    elif kind.startswith('diagnostic'):
+        def mutate():
+            p=c['diag_out']/'primary-README.md';p.chmod(0o644);p.write_bytes(b'tampered diagnostic')
+        if kind=='diagnostic_before':mutate()
+        else:c['mutation']=mutate
+    elif kind=='source_before':
+        prev=c['selected']['previous_inventory'];p=c['root']/'jobs'/prev['revision']/'acquire_weights/source-sha256'
+        p.chmod(0o644);p.write_bytes(b'wrong source marker\n')
+    elif kind=='overwrite':c['selected_out'].mkdir();(c['selected_out']/'report.json').write_bytes(b'existing untouched')
+    with pytest.raises(RuntimeError):c['selected_run']()
+    if kind in ('budget','diagnostic_before','source_before','overwrite'):assert not c['calls']
+    else:
+        r=json.loads((c['selected_out']/'report.json').read_bytes())
+        assert r['status']=='fail' and r['owned_archive_removed'] and not (c['selected_out']/'assets.zip.part').exists()
+    if kind=='overwrite':assert (c['selected_out']/'report.json').read_bytes()==b'existing untouched'
+    assert {p.name:p.read_bytes() for p in c['old_out'].iterdir()}==c['old_files']
+
+
+def test_selected_mode_strict_before_any_io(monkeypatch):
+    monkeypatch.setattr(acq.platform,'system',lambda:pytest.fail('Malformed CLI performed IO'))
+    for args in (['--mhr-release-selected'],['--mhr-release-selected-only','--mhr-release-selected-only'],
+        ['--mhr-release-selected-only','--mhr-release-only'],['--mhr-release-selected-only','--mhr-release-inventory-only']):
+        with pytest.raises(SystemExit):acq.main(args)
+
+
+def test_selected_diagnostic_forged_whitelist_rejected_before_download(selected_release,monkeypatch):
+    c=selected_release;p=c['diag_out']/'report.json';report=json.loads(p.read_bytes())
+    report['inventory_diagnostic']['rows'][1]['bytes']+=1
+    raw=json.dumps(report,sort_keys=True).encode();p.chmod(0o644);p.write_bytes(raw);p.chmod(0o444)
+    # A tiny independently pinned forged receipt must still fail semantic binding.
+    c['selected']['previous_inventory']['report']=identity(raw)
+    p=c['code']/acq.MHR_SELECTED_PROTOCOL;raw=json.dumps(c['selected']).encode()
+    p.chmod(0o644);p.write_bytes(raw);p.chmod(0o444);monkeypatch.setattr(acq,'MHR_SELECTED_PIN',identity(raw))
+    with pytest.raises(RuntimeError):c['selected_run']()
+    assert not c['calls'] and not c['selected_out'].exists()
+
+
+def test_selected_primary_protocol_pin_and_unchanged_generic_limits():
+    raw=(ROOT/acq.MHR_SELECTED_PROTOCOL).read_bytes();selected=json.loads(raw)
+    base=json.loads((ROOT/acq.MHR_PROTOCOL).read_bytes())
+    assert identity(raw)==acq.MHR_SELECTED_PIN and len(selected['inventory_rows'])==19
+    assert selected['selected_members']==['assets/LICENSE.txt','assets/mhr_model.pt']
+    assert selected['selected_expanded_byte_cap']==696121606
+    assert base['archive_limits']['member_bytes']==1<<30 and base['archive_limits']['expanded_bytes']==2<<30

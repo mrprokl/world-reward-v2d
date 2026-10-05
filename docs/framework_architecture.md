@@ -120,6 +120,8 @@ through one explicit mode: six T24 named-rig recipes, actual head PCA mappings,
 provenance. Standalone native geometric contact eligibility needs no optimizer;
 algebraic attachment does not certify grasp or whole-body nonpenetration.
 Boots and positive-weight fits remain a separate prospective experiment.
+The actual first cohort closes before decoding on native rig bounds; no texture,
+articulation, contact, tracking or quality gate was reached. It is not replayed.
 The next actual tracking seam needs no new model: BootsTAPIR already preserves
 full-T query slots, raw logits and native global XY256. The point objective's
 `diag(256/W,256/H)` maps **full-image** pixels, not native silhouette crop pixels.

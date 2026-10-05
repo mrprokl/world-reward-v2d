@@ -1,5 +1,15 @@
 # Authored point study — prospective component preflight
 
+## Actual closed result (2026-10-05)
+
+Producer `8e7c14dbcc09e93638b19dbab71457ba4f8b1ec4` fails at
+`component_0_decode`: frozen authored controls violate actual native limits.
+The check precedes decoding:0decode calls/frames,0renders,0optimizer/tracker.
+Native12.266240s; host15.979850s. Source/asset posthash and owned cleanup pass.
+The loaded rig metadata and failed receipts remain sealed on Azure; no angle,
+scale, bounds, source, cohort or gate is retuned and this cohort stays closed.
+No future full-render/Boots/A/B scope is authorized by this result.
+
 This is a **new synthetic component study**, not RGB-only HOI reconstruction,
 challenge validation, a grasp certificate, or a rerun of a closed cohort. The
 frozen JSON declares six new T24 scenes (two development, four reserved), 144
