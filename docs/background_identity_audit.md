@@ -326,7 +326,8 @@ is independently frozen/acquired32/32. Unchanged HieraL AMG executes32calls/
 FixedDEV16 bbox-IoU.5 macro recall is **.328394all/.185550human/.437592object**,
 below the prospective.6gate. Original244instances88persons/156objects yield
 79/15/64best-box recoveries. RESERVED references remain unopened; the study
-is **CLOSED**, not a tuning bank. Independent saved-only metric audit pending.
+is **CLOSED**, not a tuning bank. Independent saved-only raw-bank/DEV scalar-IoU
+audit PASS4.294886s confirms this result; RESERVED references hash-only/unmounted.
 
 Decision: reject native default AMG as the sole high-recall actor/object
 proposer. Synthetic geometry is easier than real clutter/partial humans/small

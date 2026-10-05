@@ -1,0 +1,38 @@
+{
+  "schema": "world_reward.owlv2_assets.v1",
+  "publisher_repository": "google/owlv2-base-patch16-ensemble",
+  "publisher_revision": "57beb61adb5abda3de4a9796bc35ae60bc4b9802",
+  "output": "weights/owlv2_objectness_v1",
+  "report": "results/owlv2-objectness-assets-v1.json",
+  "budget_seconds": 600,
+  "retry_count": 0,
+  "parallel_downloads": 1,
+  "maximum_total_bytes": 620000000,
+  "assets": [
+    {"file": "README.md", "bytes": 4838, "sha256": "7c7426bc5ec939a42d1f96fb093031b6263400cceac4129ebb941a0c8c11b9b9", "kind": "primary_model_card",
+     "url": "https://huggingface.co/google/owlv2-base-patch16-ensemble/raw/57beb61adb5abda3de4a9796bc35ae60bc4b9802/README.md"},
+    {"file": "config.json", "bytes": 414, "sha256": "ba9df8c25a4b8461887dd0a93d9252c9cd84697fe8d49a9d8794ce409af9acb2", "kind": "primary_configuration",
+     "url": "https://huggingface.co/google/owlv2-base-patch16-ensemble/raw/57beb61adb5abda3de4a9796bc35ae60bc4b9802/config.json"},
+    {"file": "preprocessor_config.json", "bytes": 425, "sha256": "cf3e396635b797ee1a464e1b2836e98748f8edac19e89aaa2c93b55ac15b0064", "kind": "primary_configuration",
+     "url": "https://huggingface.co/google/owlv2-base-patch16-ensemble/raw/57beb61adb5abda3de4a9796bc35ae60bc4b9802/preprocessor_config.json"},
+    {"file": "model.safetensors", "bytes": 619918824, "sha256": "e1e130b9e404cf91a75ad45644c1da9d7fa5284085eecc864266a6923efb99e7", "kind": "opaque_checkpoint",
+     "url": "https://huggingface.co/google/owlv2-base-patch16-ensemble/resolve/57beb61adb5abda3de4a9796bc35ae60bc4b9802/model.safetensors"}
+  ],
+  "reused_helper_pins": {
+    "infra/mediapipe_cpu_runtime_verify.py": {"bytes": 23559, "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"},
+    "infra/mediapipe_hands_acquire.py": {"bytes": 21381, "sha256": "8293510c02777cd5b844865285736ff1a653631a8803849a9047ee9030196570"},
+    "infra/masa_acquire.py": {"bytes": 17128, "sha256": "2e9e0539c0ddf6d0d9045a377516f4a89424a8b29ebdf04503f1444f2b512238"}
+  },
+  "provenance_limits": {
+    "checkpoint_sha_basis_before_run": "documentary_publisher_LFS_SHA_not_actual_download_verified",
+    "model_card_license": "Apache-2.0",
+    "standalone_model_license_file_verified": false,
+    "license_clearance_verified": false,
+    "training_overlap_verified": false,
+    "challenge_overlap_verified": false,
+    "model_card_v2_training_section_update_pending": true,
+    "models_loaded": false,
+    "datasets_read": false,
+    "gpu_used": false
+  }
+}
