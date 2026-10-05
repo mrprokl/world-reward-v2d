@@ -66,3 +66,19 @@ occlusion/release ; jamais propriété/contact/3D déduits d'un PASS mécanique.
 aux permutations, pas preuve d'ownership ;
 [Torch2.5.1 LBFGS](https://github.com/pytorch/pytorch/blob/v2.5.1/torch/optim/lbfgs.py),
 source18037B/SHAf181e9224a72596f0f9027cfc42c0bf3819fd136828aef0fdc002a4e94495367.
+
+## Référence mécanique implémentée, pas recette apprise
+
+`coherent_pair_marginal` prépare une référence énumérative NumPyFP64 sur
+PairCache authentifié ; aucun FIT, perte/optimiseur, température adoptée ou GPU.
+Les clés géométriques comprennent12 valeurs **brutes masquées**, leurs12
+supports,5 indicateurs et présence de route : désactiver un coefficient via
+une échelle FIT ne fusionne pas deux géométries brutes distinctes. Classes/
+marges ne définissent pas la géométrie. IDs/supports natifs restent complets.
+
+26 contrôles dédiés passent. Audit indépendant en RAM sur4180B fabriqués :
+énumération hiérarchique,17 dérivées FD, dérivée droite alpha0, chemin A/B
+bit-exact, absence HOI, immutabilité et rejet de facteurs forgés PASS. Root274
+contrôles combinés PASS1.93s incluant ce module et parser/census/cache existants.
+Ce résultat qualifie uniquement les mathématiques et contrats : coût full-bank,
+objectif/optimiseurGPU, convergence, ownership et qualité restent à tester.
