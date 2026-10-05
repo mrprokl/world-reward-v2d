@@ -64,3 +64,18 @@ removed. Final driver28413 bytes/SHA
 has no remaining concrete blocking issue from that review. Root368 combined tiny
 tests passed in23.40s, including44 dedicated controls, AST and shell syntax.
 No actual pilot RGB, model, CUDA inference or positive-pair accuracy was tested.
+
+## Actual bank generation, no reference evaluation
+
+Producer e1a01f303f533344a10ef0e4eb216c2eb13c9182 completes all16 images
+in22.796350087s host elapsed: two model loads,16 original calls per frontend,
+94 retained people (2…19/image), all3600 OWL patches/image.17,618,192 bytes of
+16 banks remain Azure. Independent saved-only audit checks all272 array
+headers/raw payload hashes/ZIP CRC, six original Git closures, twelve assets,
+runtime, sources/inputs/outputs before/after and exact CID/name/label absence.
+The historical systemd exit was collected/unavailable; sealed source-bound
+native/host receipts establish execution, not default exit0. See
+`results/audits/vcoco_pilot_endpoint_banks_v1_actual.json`.
+No reference semantics, score fitting, pair accuracy or ownership has been
+evaluated. Proposal capacity is the next inexpensive falsification, before
+additional anatomy/relation inference or any learning.

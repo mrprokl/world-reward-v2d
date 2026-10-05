@@ -1,0 +1,129 @@
+{
+  "Azure_RC_calls": 1,
+  "FIT_performed": false,
+  "GDI_raw_queries_per_image": 900,
+  "GPU_used": false,
+  "HTTP_used": false,
+  "NPZ_header_payload_hash_CRC_verified": true,
+  "NPZ_values_interpreted": false,
+  "NumPy_imported": false,
+  "OWL_raw_patches_per_image": 3600,
+  "RGB_decoded": false,
+  "RGB_transferred": false,
+  "Torch_imported": false,
+  "actual_runtime_versions": {
+    "Pillow": "10.2.0",
+    "numpy": "1.26.3",
+    "protobuf": "7.36.2",
+    "safetensors": "0.6.2",
+    "scipy": "1.16.3",
+    "torch": "2.5.1+cu124",
+    "torchvision": "0.20.1+cu124",
+    "transformers": "4.53.3"
+  },
+  "actual_state": "SEALED_NATIVE_BANKS_PASS",
+  "adopted": false,
+  "all_raw_and_retained_arrays_preserved": true,
+  "array_count": 272,
+  "audit_elapsed_seconds": 5.544838059984613,
+  "audit_status": "pass",
+  "azure_runcommand_terminal": true,
+  "bank_count": 16,
+  "bank_total_bytes": 17618192,
+  "complete_Git_XZ_markers_bytes_modes_before_after": true,
+  "current_archive_xz": {
+    "bytes": 260552,
+    "sha256": "ca6e188c294debcff8432e92e8c14e96621d147d1f4d300e1dd6d57d4b08d145"
+  },
+  "current_source_closure_sha256": "ddefd7f4663b15fee9dd8f6bb14693ea1f0d343e4407100b1152aafbcdc939ec",
+  "decision": "READY_PENDING_SEPARATE_REFERENCE_EVALUATION",
+  "forward_calls": {
+    "box_calls": 16,
+    "image_embed_calls": 16,
+    "objectness_calls": 16,
+    "person_forward_calls": 16
+  },
+  "full_bank_policy_verified_from_frozen_source": true,
+  "host_elapsed_seconds": 22.796350086980965,
+  "host_error_types": {},
+  "host_status": "pass",
+  "image_id": "sha256:fd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252",
+  "model_asset_bytes": 1554274413,
+  "model_asset_count": 12,
+  "model_loads": 2,
+  "models_loaded": false,
+  "native_error_types": {},
+  "native_phase": "complete",
+  "native_rerun": false,
+  "native_status": "pass",
+  "observed_unit_exit": null,
+  "observer_command_identity": {
+    "bytes": 30230,
+    "sha256": "a429008f29376b9f9e2f0fc824583f63db8b39229bf22cfee7cdb3eb6c99e161"
+  },
+  "observer_mechanical_repairs": 0,
+  "observer_source_identity": {
+    "bytes": 17812,
+    "sha256": "eb985b602ae720758d702a2581fdc19473dc10b114f164bc7bc634220221d7e5"
+  },
+  "original_CID_name_labels_absent": true,
+  "original_Git_files": {
+    "acquire": 303,
+    "build": 58,
+    "current": 316,
+    "kernel": 60,
+    "owl": 283,
+    "owl_assets": 273
+  },
+  "output_identities": {
+    ".container.cid": {
+      "bytes": 64,
+      "sha256": "60fc6792a5ee39b4446493e8399901cee63eaf8aa9215aceeeca34e89c6ba671"
+    },
+    "host.json": {
+      "bytes": 86447,
+      "sha256": "2cc2244058da86265a44240a04ea943b374741b1abfd219173487fde8b4d7123"
+    },
+    "native.json": {
+      "bytes": 59764,
+      "sha256": "2de5f967f0f378b4b739489dc754896de9ab787ac034eccb53fa67abf9cfb4bc"
+    },
+    "proof.json": {
+      "bytes": 9264,
+      "sha256": "c1dc7df9f78f15b32589f56dfbe02f53bef6805a877d9eaed86bc4118a250a78"
+    }
+  },
+  "outputs_sealed": true,
+  "ownership_verified": false,
+  "person_counts": {
+    "empty_images": 0,
+    "maximum": 19,
+    "minimum": 2,
+    "total": 94
+  },
+  "private_metadata_hash_only_count": 18,
+  "producer_driver_absent": true,
+  "producer_revision": "e1a01f303f533344a10ef0e4eb216c2eb13c9182",
+  "public_file_count": 17,
+  "quality_verified": false,
+  "reference_semantics_decoded": false,
+  "references_decoded": false,
+  "rootfs_layers": 50,
+  "rootfs_sha256": "2b10f869ca9c09cac4e8604cb620c3167cc1433dd62a49f743526a94244d1363",
+  "saved_only": true,
+  "schema": "world_reward.vcoco_pilot_endpoint_banks_saved_audit.v1",
+  "scope_limitation": "Saved source/receipt/NPZ headers, raw payload SHA+CRC only. Array numerical values and RGB pixels never interpreted; 900/3600 and unfiltered-policy claims source-bound, not new numerical or quality evaluation. References hash-only, collected unit exit unavailable rather than inferred.",
+  "selected_references_hash_only": true,
+  "source_inputs_models_runtime_outputs_rehashed_after": true,
+  "topK_or_OWL_NMS_performed": false,
+  "transport_exit_status": 0,
+  "unit_exit_independently_available": false,
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  }
+}
