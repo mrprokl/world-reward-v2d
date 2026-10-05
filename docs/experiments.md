@@ -10033,3 +10033,14 @@ above:43717B PNG, no reference arrays/videos transferred. The visual explicitly
 shows both correct-support gains and the second-clip wrong-object regression;
 it is not a reconstruction-quality or leaderboard plot. Disposable plot script
 removed; scientific report pins/counts suffice to reproduce this presentation.
+
+New HOI-DETR image-observation seam executes actual supplied model.extract_feat
+and query_head(return_hs=True), not a prediction-only callback or a substitute
+detector. Preserves all1500 last-layer tokens/role logits/boxes, original native
+flatten-top1000/CPU soft-NMS/raw-score policy, exact surviving query IDs and all
+ordered H→direct-object/direct-object→tool-target raw interaction-head logits.
+No demo link thresholds/softmax/nearest target/exception-to-empty.45 tiny tests
+PASS0.09s cover original scales, duplicated query slots, empty native banks,
+full raw finite checks before filtering, mutation/errors and noAMP/TF32. This
+does not qualify real weights/imports/preprocessing/operators or semantic links;
+those actual Azure gates must run separately before use on any video.
