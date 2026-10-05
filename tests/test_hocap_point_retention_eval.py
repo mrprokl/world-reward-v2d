@@ -298,15 +298,19 @@ def test_late_receipt_publication_never_leaves_pass(tmp_path,monkeypatch):
     assert json.loads(path.read_text())['status']=='fail' and path.stat().st_mode&0o777==0o444
 
 
-@pytest.mark.parametrize('native_fail',[False,True])
-def test_mock_real_host_shared_deadline_narrow_private_mount_owned_cleanup(tmp_path,monkeypatch,native_fail):
+@pytest.mark.parametrize('native_fail,audited',[(False,False),(True,False),(False,True)])
+def test_mock_real_host_shared_deadline_narrow_private_mount_owned_cleanup(tmp_path,monkeypatch,native_fail,audited):
     from types import SimpleNamespace
     rt,code,npin,hpin,folder,old=public_proof_fixture(tmp_path,monkeypatch)
     proof=m.authenticate(rt,code,npin,hpin);root=m.ROOT;rev='c'*40
+    audit_pin=dict(bytes=1,sha256='f'*64)
+    if audited:
+        proof['audit']=dict(folder=str(root/m.AUDIT),source_parent=str(root/'jobs'/('d'*40)/'run_hocap_boots_saved_audit'),
+                            report_identity=audit_pin,independent_saved_native_audit=True)
     private=tmp_path/'quarantine/labels.zip';private.parent.mkdir();private.parent.chmod(0o700);private.write_bytes(b'TINY_OPAQUE_PRIVATE');private.chmod(0o400)
     private_pin=rt.identity(private);proof['protocol']['private_evaluation']['archive']={**private_pin,'path':str(private)}
     monkeypatch.setattr(m,'runtime',lambda code:rt);monkeypatch.setattr(m,'source',lambda *args:{'frozen_source':True})
-    monkeypatch.setattr(m,'authenticate',lambda *args:copy.deepcopy(proof));monkeypatch.setattr(m.sys,'platform','linux')
+    monkeypatch.setattr(m,'authenticate',lambda *args,**kw:copy.deepcopy(proof));monkeypatch.setattr(m.sys,'platform','linux')
     monkeypatch.setattr(m.os,'geteuid',lambda:0);monkeypatch.setattr(m.os,'uname',lambda:SimpleNamespace(nodename='world-reward-ncc-h100-02'))
     monkeypatch.setenv('WR_CODE',str(code));monkeypatch.setenv('WR_CODE_REVISION',rev);monkeypatch.setenv('WR_ROOT',str(root))
     calls=[];cid='e'*64
@@ -319,16 +323,23 @@ def test_mock_real_host_shared_deadline_narrow_private_mount_owned_cleanup(tmp_p
         assert not any('src='+str(private.parent)+','in v for v in argv)
         assert any(v.startswith('WR_RETENTION_DEADLINE=')for v in argv)
         assert argv.count('--native')==1 and '--dispatch'not in argv
+        assert ('--prediction-audit-bytes'in argv)==audited
+        if audited:
+            assert argv[argv.index('--prediction-audit-sha256')+1]==audit_pin['sha256']
+            for key in ('folder','source_parent'):
+                p=proof['audit'][key];assert f'type=bind,src={p},dst={p},readonly'in argv
         out=root/'results'/('hocap-point-retention-'+rev);(out/'container.cid').write_bytes(cid.encode())
         if native_fail:return SimpleNamespace(returncode=1,stdout=b'',stderr=b'EXACT MANUFACTURED FAILURE')
         nr=dict(stage='hocap_point_retention_native',status='pass',phase='complete',producer_revision=rev,source_binding={'frozen_source':True},
             prediction_report_identity=npin,prediction_host_identity=hpin,source_prediction_reference_rehashed_after=True,image_id=m.IMAGE,
             gpu_used=False,model_executed=False,quality_3D_verified=False,adoption=False,decision='INCONCLUSIVE',clips=[{},{}],
             private_keys_accessed=sorted(m.LABEL_KEYS),private_archive_identity=private_pin)
+        if audited:nr.update(prediction_audit_identity=audit_pin,prediction_audit_proof=proof['audit'],original_prediction_host_status='fail')
         seal(out/'native.json',nr);return SimpleNamespace(returncode=0,stdout=b'',stderr=b'')
     monkeypatch.setattr(m.subprocess,'run',run)
     argv=['--dispatch','--prediction-report-bytes',str(npin['bytes']),'--prediction-report-sha256',npin['sha256'],
           '--prediction-host-bytes',str(hpin['bytes']),'--prediction-host-sha256',hpin['sha256']]
+    if audited:argv+=['--prediction-audit-bytes',str(audit_pin['bytes']),'--prediction-audit-sha256',audit_pin['sha256']]
     try:
         if native_fail:
             with pytest.raises(ValueError,match='CPU evaluation failed'):m.main(argv)
@@ -338,4 +349,133 @@ def test_mock_real_host_shared_deadline_narrow_private_mount_owned_cleanup(tmp_p
     assert host['native_exit_status']==int(native_fail) and host['owned_cleanup_verified']
     assert host['status']==('fail'if native_fail else'pass') and out.stat().st_mode&0o777==0o555
     assert host['native_stderr_tail']==('EXACT MANUFACTURED FAILURE'if native_fail else None)
+    if audited:assert host['prediction_audit_identity']==audit_pin and host['original_prediction_host_status']=='fail'
+    else:assert 'prediction_audit_identity'not in host
     assert not any(c[:2]==['docker','rm']for c in calls)
+
+
+def saved_audit_fixture(tmp_path,monkeypatch):
+    """Independent tiny byte pins and real whole-code ledgers; no audit executes."""
+    rt,code,_,_,folder,old=public_proof_fixture(tmp_path,monkeypatch)
+    monkeypatch.setattr(m,'ORIGINAL_REV','a'*40);monkeypatch.setattr(m,'ORIGINAL_CID','e'*64)
+    def replace(path,value):path.chmod(0o644);return seal(path,value)
+    folder.chmod(0o755)
+    nr=json.loads((folder/'report.json').read_text())
+    for row in nr['predictions']:row.update(seeds=1,zero_query_seeds=0)
+    npin=replace(folder/'report.json',nr)
+    hr=json.loads((folder/'host.json').read_text());hr.update(status='fail',native_report_identity=npin,
+        owned_cleanup_verified=False,source_public_bank_assets_rehashed_after=False,post_error_type='ValueError')
+    hpin=replace(folder/'host.json',hr)
+    (folder/'native.log').write_bytes(b'TINY ORIGINAL FAILURE');(folder/'native.log').chmod(0o400)
+    (folder/'.container.cid').chmod(0o644);folder.chmod(0o555)
+    original={n.name:rt.identity(n,readonly=n.name!='.container.cid')for n in folder.iterdir()}
+    monkeypatch.setattr(m,'ORIGINAL_FILES',original)
+    prior=json.loads((folder/'proof.json').read_text());revision='d'*40
+    auditcode=m.ROOT/'jobs'/revision/'run_hocap_boots_saved_audit/code';auditcode.mkdir(parents=True)
+    helpers=('infra/hocap_boots_saved_audit.py','infra/run_hocap_boots_saved_audit.sh',
+             'infra/hocap_boots_track.py','infra/robotap_boots_infer.py')
+    for name in helpers:
+        p=auditcode/name;p.parent.mkdir(exist_ok=True);p.write_bytes((REPO/name).read_bytes());p.chmod(0o444)
+    for name in ('revision','source-sha256'):
+        p=auditcode.parent/name;p.write_text((revision if name=='revision'else'f'*64)+'\n');p.chmod(0o444)
+    for p in auditcode.rglob('*'):
+        if p.is_dir():p.chmod(0o555)
+    auditcode.chmod(0o555);auditcode.parent.chmod(0o555)
+    sb=rt.source(m.ROOT,auditcode,revision,'run_hocap_boots_saved_audit',helpers)
+    fields=('st_dev','st_ino','st_mode','st_size','st_mtime_ns','st_ctime_ns','st_nlink','st_uid','st_gid')
+    op=dict(original_files=original,original_source_binding=prior['source_binding'],bank=prior['bank'],runtime=prior['runtime'],
+        original_cid_stat={k:getattr((folder/'.container.cid').lstat(),k)for k in fields},
+        **{k:prior[k]for k in ('protocol_identity','retention_protocol_identity','public_manifest_identity')})
+    common=dict(status='pass',phase='complete',producer_revision=revision,source_binding=sb,image_id=m.IMAGE,
+        historical_producer_revision=m.ORIGINAL_REV,historical_host_status='fail',historical_native_status='pass',
+        original_files=original,originals_rehashed_after=True,models_loaded=0,native_tracker_calls=0,rgb_decodes=0,
+        private_labels_read=False,gpu_used=False,quality_verified=False,association_verified=False,adoption=False,elapsed_seconds=1)
+    saved=dict(common,schema='world_reward.hocap_boots_saved_native_audit.v1',stage='hocap_boots_saved_native_audit',
+        original_proof=op,independent_saved_native_audit=True,opaque_metadata_read=False,ground_truth_used=False,
+        predictions=[{k:r[k]for k in ('clip','frames','queries','seeds','file','bytes','sha256')}for r in nr['predictions']])
+    auditdir=m.ROOT/m.AUDIT;nativepin=seal(auditdir/'native.json',saved)
+    census=dict(original_unit='world-reward-hocap-boots-track-v1.service',original_unit_state=dict(LoadState='loaded',
+        ActiveState='failed',SubState='failed',Result='exit-code',ExecMainStatus='1'),original_cid=m.ORIGINAL_CID,
+        original_cid_absent=True,original_container_name_absent=True,gpu_idle=True)
+    ah=dict(common,schema='world_reward.hocap_boots_saved_audit.v1',stage='hocap_boots_saved_host_audit',native_exit_status=0,
+        owned_cleanup_verified=True,native_report_identity=nativepin,terminal_census_before=census,terminal_census_after=census)
+    auditpin=seal(auditdir/'report.json',ah);(auditdir/'container.cid').write_bytes(b'f'*64)
+    (auditdir/'container.cid').chmod(0o444);auditdir.chmod(0o555)
+    return rt,code,npin,hpin,auditpin,auditdir,auditcode,folder
+
+
+@pytest.mark.parametrize('fault',[None,'audit_byte_pin','audit_native_hash','audit_host_fail','audit_native_false_claim',
+    'old_cid_stat','old_cid_mode','terminal_census','audit_source','extra_audit_sibling','second_prediction'])
+def test_real_saved_audit_explicit_optin_full_provenance_before_private(tmp_path,monkeypatch,fault):
+    rt,code,npin,hpin,apin,auditdir,auditcode,folder=saved_audit_fixture(tmp_path,monkeypatch)
+    before={p.name:p.read_bytes()for p in folder.iterdir()}
+    def change(path,fn):
+        path.chmod(0o644);v=json.loads(path.read_text());fn(v);return seal(path,v)
+    if fault=='audit_byte_pin':apin={**apin,'sha256':'0'*64}
+    elif fault=='audit_native_hash':
+        p=auditdir/'native.json';p.chmod(0o644);p.write_bytes(p.read_bytes()+b' ');p.chmod(0o444)
+    elif fault=='audit_host_fail':apin=change(auditdir/'report.json',lambda v:v.update(status='fail'))
+    elif fault in ('audit_native_false_claim','old_cid_stat'):
+        def corrupt(v):
+            if fault=='audit_native_false_claim':v['private_labels_read']=True
+            else:v['original_proof']['original_cid_stat']['st_ino']+=1
+        newpin=change(auditdir/'native.json',corrupt)
+        apin=change(auditdir/'report.json',lambda v:v.update(native_report_identity=newpin))
+    elif fault=='old_cid_mode':(folder/'.container.cid').chmod(0o400)
+    elif fault=='terminal_census':
+        apin=change(auditdir/'report.json',lambda v:v['terminal_census_after'].update(gpu_idle=False))
+    elif fault=='audit_source':
+        p=auditcode/'infra/robotap_boots_infer.py';p.chmod(0o644);p.write_bytes(p.read_bytes()+b'\n');p.chmod(0o444)
+    elif fault=='extra_audit_sibling':
+        auditdir.chmod(0o755);(auditdir/'unexpected.json').write_bytes(b'{}');auditdir.chmod(0o555)
+    elif fault=='second_prediction':
+        p=folder/'20231027_113202_tracks.npz';p.chmod(0o644);p.write_bytes(b'CHANGED SECOND');p.chmod(0o444)
+    real=rt.canonical;private=[]
+    def canonical(path):
+        if 'quarantine'in Path(path).parts:private.append(path);pytest.fail('Unqualified audit opened private path')
+        return real(path)
+    monkeypatch.setattr(rt,'canonical',canonical)
+    # No opt-in ever permits the historical failed host, even with new files.
+    with pytest.raises(ValueError):m.authenticate(rt,code,npin,hpin)
+    if fault:
+        with pytest.raises(ValueError):m.authenticate(rt,code,npin,hpin,audit_pin=apin)
+    else:
+        got=m.authenticate(rt,code,npin,hpin,audit_pin=apin)
+        assert got['host']['status']=='fail' and got['audit']['independent_saved_native_audit']
+        assert got['audit']['source_parent']==str(auditcode.parent)
+        m.recheck(rt,got['files'])
+        assert {p.name:p.read_bytes()for p in folder.iterdir()}==before
+        assert (folder/'.container.cid').stat().st_mode&0o777==0o644
+    assert not private
+
+
+@pytest.mark.parametrize('option',['--prediction-audit-bytes','--prediction-audit-sha256'])
+def test_half_optional_audit_pin_rejected_before_public_or_private_auth(monkeypatch,option):
+    monkeypatch.setenv('WR_CODE','/unused');monkeypatch.setenv('WR_CODE_REVISION','a'*40)
+    monkeypatch.setattr(m,'runtime',lambda *a:None)
+    monkeypatch.setattr(m,'authenticate',lambda *a,**kw:pytest.fail('Half audit pin reached input authentication'))
+    argv=['--dispatch','--prediction-report-bytes','1','--prediction-report-sha256','a'*64,
+          '--prediction-host-bytes','1','--prediction-host-sha256','b'*64,option,'1'if option.endswith('bytes')else'c'*64]
+    with pytest.raises(ValueError,match='BOTH'):m.main(argv)
+
+
+def test_original_scientific_arrays_reference_metrics_byte_unchanged():
+    # Independent frozen function bytes from ba503307: no scientific predicate,
+    # denominator, label schema or metric changed by this technical opt-in.
+    names=('prediction_arrays','label_arrays','read_label','sample_classes','qualify_clip','evaluate_clip','decision','evaluate')
+    text=(REPO/'infra/hocap_point_retention_eval.py').read_text();tree=ast.parse(text)
+    bodies=[ast.get_source_segment(text,n)for name in names for n in tree.body if isinstance(n,ast.FunctionDef)and n.name==name]
+    assert hashlib.sha256('\n'.join(bodies).encode()).hexdigest()=='492cd6e872c4d70b8c80f908c8eb34d46cbdc697fc97fd76491448ec03254d8b'
+
+
+@pytest.mark.parametrize('parent_mode',[0o555,0o755,0o777])
+def test_real_azure_transport_snapshot_parent_modes(tmp_path,monkeypatch,parent_mode):
+    rt,code,npin,hpin,apin,_,auditcode,_=saved_audit_fixture(tmp_path,monkeypatch)
+    auditcode.parent.chmod(parent_mode)
+    if parent_mode==0o777:
+        with pytest.raises(ValueError,match='complete audit source'):m.authenticate(rt,code,npin,hpin,audit_pin=apin)
+    else:
+        proof=m.authenticate(rt,code,npin,hpin,audit_pin=apin)
+        assert proof['audit']['source_parent']==str(auditcode.parent)
+        assert auditcode.stat().st_mode&0o777==0o555
+        assert all((auditcode.parent/n).stat().st_mode&0o777==0o444 for n in ('revision','source-sha256'))

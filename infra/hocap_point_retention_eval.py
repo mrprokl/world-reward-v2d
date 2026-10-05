@@ -23,6 +23,17 @@ PROTOCOL='configs/hocap_point_retention_protocol_v1.json'
 PROTOCOL_PIN={'bytes':11108,'sha256':'9a7d9650639590a50c4c907b84bee4b6bb09f89209f450bac20ebad4489678a3'}
 IMAGE='sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4'
 PREDICTIONS='validation/hocap_boots_track_v1'; BANK='validation/hocap_amg_bank_v1'
+AUDIT='validation/hocap_boots_saved_audit_v1'
+ORIGINAL_REV='9ab14d6e5dd662d8b50b7fee9b0656bd14afea59'
+ORIGINAL_CID='4b1d37b7965bcf71e690e3028475cb0ea9faaaa70fdb6b1f1c3ffec0bf808a9d'
+ORIGINAL_FILES={
+ 'report.json':dict(bytes=2006,sha256='e8bae07453e0629cf858eeb7fdebc2415554bee3848bddafa1e4ef109e15174d'),
+ 'host.json':dict(bytes=547,sha256='571adb0a21e0d2ca21a27c240a9623a286e82dac94032c25247aeb1b909abf49'),
+ 'proof.json':dict(bytes=11004,sha256='25dd2465595284e49446f67153865681937c0b8cfe2819feb3bea6887c21cb41'),
+ '.container.cid':dict(bytes=64,sha256='42d90b11f2e82003ede9283b5b385f5234ad219a151cf63dd278c923f5975d90'),
+ 'native.log':dict(bytes=94,sha256='6ed498efc79c8673f9d5197a40c91bbc9c006f760f7d5645a6a9b518ed5fa00e'),
+ '20231027_112303_tracks.npz':dict(bytes=29394484,sha256='f8d1b9f5fdb06e8820982a356e81d59c4ecabfa97317ac40d532fd340ba5cdb4'),
+ '20231027_113202_tracks.npz':dict(bytes=30968919,sha256='89302408062f87bd62a52e951e9793a9cabce6d70aec85808442faf16f65a211')}
 HELPERS=('infra/hocap_point_retention_eval.py','infra/run_hocap_point_retention_eval.sh',
          'infra/mediapipe_cpu_runtime_verify.py',PROTOCOL,'configs/robotap_boots_inference_pins.json')
 CATALOG=tuple(f'G{group:02d}_{k}' for group in (1,2,4,5,6,7,9,10,11,15,16,18,19,20,21,22)
@@ -61,22 +72,82 @@ def source(rt,code,revision):
 
 
 def recheck(rt,files):
-    for path,pin in files.items():require(rt.identity(Path(path),max(MAX_PRED,pin['bytes']))==pin,'Frozen source/prediction/reference changed')
+    for path,pin in files.items():
+        writable_cid=Path(path)==ROOT/PREDICTIONS/'.container.cid'
+        require(not writable_cid or pin==ORIGINAL_FILES['.container.cid'] and stat.S_IMODE(Path(path).stat().st_mode)==0o644,
+            'Only exact historical unchanged CID may remain writable')
+        require(rt.identity(Path(path),max(MAX_PRED,pin['bytes']),readonly=not writable_cid)==pin,'Frozen source/prediction/reference changed')
 
 
-def authenticate(rt,code,native_pin,host_pin):
+def audit_evidence(rt,audit_pin,native,host,proof):
+    """Explicit independent saved-only qualification; NEVER relabel HOSTFAIL."""
+    folder=rt.canonical(ROOT/AUDIT)
+    require(stat.S_IMODE(folder.stat().st_mode)==0o555 and {p.name for p in folder.iterdir()}=={'report.json','native.json','container.cid'},'Exact sealed independent saved audit required')
+    require(all(stat.S_IMODE(p.stat().st_mode)==0o444 for p in folder.iterdir())
+        and re.fullmatch(b'[0-9a-f]{64}\n?',(folder/'container.cid').read_bytes()),'Sealed independent audit artifacts/CID required')
+    report=rt.pinned(folder/'report.json',audit_pin,MAX_REPORT);revision=report.get('producer_revision')
+    require(type(revision)is str and re.fullmatch('[0-9a-f]{40}',revision),'Real audit producer revision required')
+    facts(report,dict(schema='world_reward.hocap_boots_saved_audit.v1',stage='hocap_boots_saved_host_audit',status='pass',phase='complete',
+        image_id=IMAGE,historical_producer_revision=ORIGINAL_REV,historical_host_status='fail',historical_native_status='pass',
+        original_files=ORIGINAL_FILES,native_exit_status=0,owned_cleanup_verified=True,originals_rehashed_after=True,
+        private_labels_read=False,gpu_used=False,models_loaded=0,native_tracker_calls=0,rgb_decodes=0,quality_verified=False,association_verified=False,adoption=False))
+    original=ROOT/'jobs'/revision/'run_hocap_boots_saved_audit/code';sb=report['source_binding']
+    require({'infra/hocap_boots_saved_audit.py','infra/run_hocap_boots_saved_audit.sh',
+        'infra/hocap_boots_track.py','infra/robotap_boots_infer.py'}<=set(sb['helpers'])
+        and stat.S_IMODE(original.parent.stat().st_mode)in(0o555,0o755)
+        and {p.name for p in original.parent.iterdir()}=={'code','revision','source-sha256'}
+        and rt.source(ROOT,original,revision,'run_hocap_boots_saved_audit',tuple(sb['helpers']))==sb,
+        'Independent complete audit source/helper/dispatch markers differ; no old code executed')
+    npin=report['native_report_identity'];saved=rt.pinned(folder/'native.json',npin,MAX_REPORT)
+    facts(saved,dict(schema='world_reward.hocap_boots_saved_native_audit.v1',stage='hocap_boots_saved_native_audit',status='pass',phase='complete',
+        producer_revision=revision,source_binding=sb,image_id=IMAGE,historical_producer_revision=ORIGINAL_REV,
+        historical_host_status='fail',historical_native_status='pass',original_files=ORIGINAL_FILES,
+        independent_saved_native_audit=True,originals_rehashed_after=True,models_loaded=0,native_tracker_calls=0,rgb_decodes=0,
+        private_labels_read=False,opaque_metadata_read=False,ground_truth_used=False,gpu_used=False,association_verified=False,quality_verified=False,adoption=False))
+    require(all(type(r.get('elapsed_seconds'))in(int,float) and 0<r['elapsed_seconds']<=120 for r in (report,saved)), 'New saved-only budget differs')
+    expected_census=dict(original_unit='world-reward-hocap-boots-track-v1.service',original_unit_state=dict(LoadState='loaded',
+        ActiveState='failed',SubState='failed',Result='exit-code',ExecMainStatus='1'),original_cid=ORIGINAL_CID,
+        original_cid_absent=True,original_container_name_absent=True,gpu_idle=True)
+    for key in ('terminal_census_before','terminal_census_after'):facts(report[key],expected_census)
+    op=saved['original_proof']
+    require(op['original_files']==ORIGINAL_FILES and op['original_source_binding']==proof['source_binding'] and op['bank']==proof['bank']
+        and op['runtime']==proof['runtime'] and all(op[k]==proof[k]for k in ('protocol_identity','retention_protocol_identity','public_manifest_identity')),
+        'Same original full source/bank/runtime/scientific input proof required')
+    fields=('st_dev','st_ino','st_mode','st_size','st_mtime_ns','st_ctime_ns','st_nlink','st_uid','st_gid')
+    old_cid=ROOT/PREDICTIONS/'.container.cid';current={k:getattr(old_cid.lstat(),k)for k in fields}
+    require(current==op['original_cid_stat'] and stat.S_IMODE(current['st_mode'])==0o644 and old_cid.read_bytes()==ORIGINAL_CID.encode(),
+        'Original CID bytes/permissions/stat must remain unchanged')
+    wanted=[{k:r[k]for k in ('clip','frames','queries','seeds','file','bytes','sha256')}for r in native['predictions']]
+    require(saved['predictions']==wanted and native['producer_revision']==host['producer_revision']==ORIGINAL_REV,
+        'Both complete saved prediction ABI identities must be original')
+    files={str(folder/'report.json'):audit_pin,str(folder/'native.json'):npin,str(folder/'container.cid'):rt.identity(folder/'container.cid',65)}
+    for name,pin in ORIGINAL_FILES.items():
+        path=ROOT/PREDICTIONS/name;require(rt.identity(path,MAX_PRED,readonly=name!='.container.cid')==pin,'Exact seven historical failed files differ')
+        require(stat.S_IMODE(path.stat().st_mode)==(0o644 if name=='.container.cid'else 0o400 if name=='native.log'else 0o444),'Original historical file modes differ')
+        files[str(path)]=pin
+    return dict(report_identity=audit_pin,native_identity=npin,source_binding=sb,source_parent=str(original.parent),
+                folder=str(folder),original_host_status='fail',independent_saved_native_audit=True,files=files)
+
+
+def authenticate(rt,code,native_pin,host_pin,*,audit_pin=None):
     """All public provenance and BOTH complete arrays BEFORE even stat/open of labels."""
     p=rt.pinned(code/PROTOCOL,PROTOCOL_PIN,16384);folder=rt.canonical(ROOT/PREDICTIONS)
-    require(stat.S_IMODE(folder.stat().st_mode)==0o555 and {v.name for v in folder.iterdir()}=={
-        'report.json','host.json','proof.json','.container.cid',*(c['clip']+'_tracks.npz' for c in p['cohort']['clips'])},'Exact sealed two-clip output inventory required')
+    names=set(ORIGINAL_FILES)if audit_pin is not None else {'report.json','host.json','proof.json','.container.cid',*(c['clip']+'_tracks.npz' for c in p['cohort']['clips'])}
+    require(stat.S_IMODE(folder.stat().st_mode)==0o555 and {v.name for v in folder.iterdir()}==names,'Exact sealed two-clip output inventory required')
     native=rt.pinned(folder/'report.json',native_pin,MAX_REPORT);host=rt.pinned(folder/'host.json',host_pin,MAX_REPORT)
     facts(native,dict(schema='world_reward.hocap_boots_tracks.v1',stage='hocap_native_all_seed_full_t_tracks',status='pass',phase='complete',
         image_id=IMAGE,model_loads=1,rgb_decodes=1493,native_calls_attempted=2,native_calls_returned=2,native_calls_completed=2,
         all_original_jpegs_decoded_before_model=True,all_source_public_bank_assets_rehashed_after=True,private_labels_read=False,
         opaque_metadata_read=False,calibration_read=False,ground_truth_used=False,challenge_inputs_used=False,oracle_modes=[],quality_verified=False,adoption=False))
     revision=native.get('producer_revision');require(type(revision)is str and re.fullmatch('[0-9a-f]{40}',revision),'Frozen prediction producer required')
-    facts(host,dict(stage='hocap_boots_host',status='pass',producer_revision=revision,image_id=IMAGE,native_exit_status=0,
-        native_report_identity=native_pin,owned_cleanup_verified=True,source_public_bank_assets_rehashed_after=True,private_labels_read=False,quality_verified=False,adoption=False))
+    if audit_pin is None:
+        facts(host,dict(stage='hocap_boots_host',status='pass',producer_revision=revision,image_id=IMAGE,native_exit_status=0,
+            native_report_identity=native_pin,owned_cleanup_verified=True,source_public_bank_assets_rehashed_after=True,private_labels_read=False,quality_verified=False,adoption=False))
+    else:
+        require(native_pin==ORIGINAL_FILES['report.json'] and host_pin==ORIGINAL_FILES['host.json'],'Independent exact original failed native/host pins required')
+        facts(host,dict(stage='hocap_boots_host',status='fail',producer_revision=ORIGINAL_REV,image_id=IMAGE,native_exit_status=0,
+            native_report_identity=native_pin,owned_cleanup_verified=False,source_public_bank_assets_rehashed_after=False,
+            post_error_type='ValueError',private_labels_read=False,quality_verified=False,adoption=False))
     require(type(native.get('elapsed_seconds'))in(int,float) and 0<native['elapsed_seconds']<=1800,'Original prediction deadline required')
     proof_pin=native['proof_identity'];proof=rt.pinned(folder/'proof.json',proof_pin,MAX_REPORT)
     original=ROOT/'jobs'/revision/'run_hocap_boots_track/code';sb=proof['source_binding']
@@ -125,7 +196,9 @@ def authenticate(rt,code,native_pin,host_pin):
         require(row['clip']==clip['clip'] and row['frames']==clip['frames'] and row['file']==clip['clip']+'_tracks.npz'
             and type(row['queries'])is int and 0<=row['queries']<=4096,'Full original fixed query clip required')
         pin={k:row[k] for k in ('bytes','sha256')};require(rt.identity(folder/row['file'],MAX_PRED)==pin,'Both complete prediction byte seals required');files[str(folder/row['file'])]=pin
-    return dict(protocol=p,native=native,host=host,proof=proof,files=files,original=original,folder=folder,runtime_path=rpath)
+    audit=audit_evidence(rt,audit_pin,native,host,proof)if audit_pin is not None else None
+    if audit is not None:files.update(audit['files'])
+    return dict(protocol=p,native=native,host=host,proof=proof,files=files,original=original,folder=folder,runtime_path=rpath,audit=audit)
 
 
 def prediction_arrays(np,path,row,banks):
@@ -377,24 +450,31 @@ def main(argv=None):
     mode.add_argument('--dispatch',action='store_true');mode.add_argument('--native',action='store_true')
     for name in ('prediction-report','prediction-host'):
         ap.add_argument('--'+name+'-bytes',type=int,required=True);ap.add_argument('--'+name+'-sha256',required=True)
+    ap.add_argument('--prediction-audit-bytes',type=int);ap.add_argument('--prediction-audit-sha256')
     args=ap.parse_args(argv);code=Path(os.environ['WR_CODE']);revision=os.environ['WR_CODE_REVISION'];rt=runtime(code)
+    require((args.prediction_audit_bytes is None)==(args.prediction_audit_sha256 is None),'Optional independent audit requires BOTH byte/SHA pins')
+    audit_pin=None if args.prediction_audit_bytes is None else dict(bytes=args.prediction_audit_bytes,sha256=args.prediction_audit_sha256)
     require(sys.platform=='linux' and os.geteuid()==0 and os.environ.get('WR_ROOT')==str(ROOT),'Owned VM02 Linux CPU required')
     started=time.monotonic();deadline=float(os.environ['WR_RETENTION_DEADLINE'])if args.native else started+BUDGET
     def expired(*_):raise TimeoutError('Inclusive CPU evaluation expired')
     signal.signal(signal.SIGALRM,expired);signal.signal(signal.SIGTERM,expired);signal.alarm(max(1,math.ceil(deadline-started)))
     original=source(rt,code,revision);npin=dict(bytes=args.prediction_report_bytes,sha256=args.prediction_report_sha256)
     hpin=dict(bytes=args.prediction_host_bytes,sha256=args.prediction_host_sha256)
-    proof=authenticate(rt,code,npin,hpin);out=ROOT/'results'/('hocap-point-retention-'+revision)
+    proof=authenticate(rt,code,npin,hpin,audit_pin=audit_pin);out=ROOT/'results'/('hocap-point-retention-'+revision)
     if args.native:
         require(os.environ.get('CUDA_VISIBLE_DEVICES')=='-1' and os.environ.get('WR_IMAGE_ID')==IMAGE
             and {p.name for p in Path('/sys/class/net').iterdir()}=={'lo'} and out.is_dir()
             and {p.name for p in out.iterdir()}=={'container.cid'},'Fresh offline CPU native output required')
-        result=evaluate(rt,code,proof,deadline);recheck(rt,proof['files']);require(source(rt,code,revision)==original,'Source changed after reference evaluation');check(deadline)
+        result=evaluate(rt,code,proof,deadline);recheck(rt,proof['files']);require(source(rt,code,revision)==original,'Source changed after reference evaluation')
+        if audit_pin is not None:
+            require(authenticate(rt,code,npin,hpin,audit_pin=audit_pin)['audit']==proof['audit'],'Original complete saved audit/source changed after evaluation')
+        check(deadline)
         result.update(schema='world_reward.hocap_point_retention_eval.v1',stage='hocap_point_retention_native',status='pass',phase='complete',
             producer_revision=revision,source_binding=original,prediction_report_identity=npin,prediction_host_identity=hpin,
             source_prediction_reference_rehashed_after=True,gpu_used=False,model_executed=False,quality_3D_verified=False,adoption=False,
             input_bindings=proof['files'],image_id=IMAGE,
             budget_seconds=BUDGET,elapsed_seconds=BUDGET-(deadline-time.monotonic()))
+        if audit_pin is not None:result.update(prediction_audit_identity=audit_pin,prediction_audit_proof=proof['audit'],original_prediction_host_status='fail')
         publish(rt,out/'native.json',result,deadline);signal.alarm(0);return result
     require(os.uname().nodename=='world-reward-ncc-h100-02' and not out.exists(),'Fresh exact VM02 namespace required');out.mkdir(mode=0o700)
     owner=(out.stat().st_dev,out.stat().st_ino,out.stat().st_uid);name='world-reward-retention-'+revision[:12];failure=None;removed=False;native_exit=None;stderr_tail=None;private=None;private_pin=None
@@ -406,6 +486,7 @@ def main(argv=None):
             and rt.identity(private,2<<30)==private_pin,'Original host-only quarantine permissions and opaque archive hash differ')
         paths=[code.parent,proof['original'].parent,proof['folder'],ROOT/BANK/'report.json',ROOT/BANK/'host.json',
             ROOT/BANK/'sanitized_input_proof.json',ROOT/BANK/'bank',proof['runtime_path'],Path(proof['protocol']['input']['manifest']['path']),private]
+        if proof['audit']is not None:paths += [Path(proof['audit']['folder']),Path(proof['audit']['source_parent'])]
         require(len(paths)==len(set(paths)) and not any(','in str(p) or '\n'in str(p) for p in paths),'Exact narrow mounts required')
         cmd=['docker','run','--rm','--name',name,'--cidfile',str(out/'container.cid'),'--label','world_reward.retention.owner='+revision,
             '--network','none','--read-only','--user','0:0','--cap-drop','ALL','--cap-add','DAC_READ_SEARCH','--security-opt','no-new-privileges',
@@ -417,6 +498,7 @@ def main(argv=None):
             'PYTHONDONTWRITEBYTECODE=1','OPENBLAS_NUM_THREADS=1','OMP_NUM_THREADS=1','/opt/conda/bin/python','-I','-B',str(code/HELPERS[0]),
             '--native','--prediction-report-bytes',str(npin['bytes']),'--prediction-report-sha256',npin['sha256'],
             '--prediction-host-bytes',str(hpin['bytes']),'--prediction-host-sha256',hpin['sha256']]
+        if audit_pin is not None:cmd+=['--prediction-audit-bytes',str(audit_pin['bytes']),'--prediction-audit-sha256',audit_pin['sha256']]
         r=subprocess.run(cmd,capture_output=True,timeout=max(.1,deadline-time.monotonic()),check=False)
         native_exit=r.returncode;stderr_tail=r.stderr[-4096:].decode('utf-8','replace')if r.returncode else None
         require(r.returncode==0 and len(r.stdout)<=8192 and len(r.stderr)<=32768,'Native semantic evaluator failed')
@@ -424,6 +506,7 @@ def main(argv=None):
         facts(native,dict(stage='hocap_point_retention_native',status='pass',phase='complete',producer_revision=revision,
             source_binding=original,prediction_report_identity=npin,prediction_host_identity=hpin,source_prediction_reference_rehashed_after=True,
             image_id=IMAGE,gpu_used=False,model_executed=False,quality_3D_verified=False,adoption=False))
+        if audit_pin is not None:facts(native,dict(prediction_audit_identity=audit_pin,prediction_audit_proof=proof['audit'],original_prediction_host_status='fail'))
         require(native['decision']in ('INCONCLUSIVE','REJECT','QUALIFIED_SEMANTIC_MASK_POINT_RETENTION') and len(native['clips'])==2
             and (native['private_keys_accessed']==sorted(LABEL_KEYS)or native['decision']=='INCONCLUSIVE'and native['private_keys_accessed']==[]),
             'Complete exact diagnostic decision/reference schema required')
@@ -437,7 +520,7 @@ def main(argv=None):
             require(rt.canonical(out)==out and (out.stat().st_dev,out.stat().st_ino,out.stat().st_uid)==owner,'Owned namespace replaced; no cleanup/publication')
             if (out/'container.cid').exists():cleanup(out,name,revision);removed=True
             require((out.stat().st_dev,out.stat().st_ino,out.stat().st_uid)==owner,'Owned output namespace changed')
-            recheck(rt,proof['files']);require(authenticate(rt,code,npin,hpin)['files']==proof['files'] and source(rt,code,revision)==original,'Host original proof changed')
+            recheck(rt,proof['files']);require(authenticate(rt,code,npin,hpin,audit_pin=audit_pin)['files']==proof['files'] and source(rt,code,revision)==original,'Host original proof changed')
             if (out/'native.json').exists():
                 sealed=rt.strict((out/'native.json').read_bytes());private=Path(proof['protocol']['private_evaluation']['archive']['path'])
                 require(rt.identity(private,2<<30)==sealed['private_archive_identity'],'Host original private archive posthash differs')
@@ -451,6 +534,7 @@ def main(argv=None):
             native_report_identity=rt.identity(out/'native.json',32<<20)if (out/'native.json').exists()else None,
             error_type=type(failure).__name__ if failure else None,error=str(failure)[:400]if failure else None,
             native_stderr_tail=stderr_tail,gpu_used=False,model_executed=False,adoption=False)
+        if audit_pin is not None:report.update(prediction_audit_identity=audit_pin,prediction_audit_proof=proof['audit'],original_prediction_host_status='fail')
         require(rt.canonical(out)==out and (out.stat().st_dev,out.stat().st_ino,out.stat().st_uid)==owner,'Foreign namespace not published')
         if failure:rt.write(out/'report.json',(json.dumps(report,sort_keys=True)+'\n').encode(),0o444)
         else:publish(rt,out/'report.json',report,deadline)
