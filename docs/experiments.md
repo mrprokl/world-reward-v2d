@@ -10896,3 +10896,31 @@ sourcefiles; ACK only, queued behind EP20/22 by original exclusive GPUlock.
 EP16 fullforward uses existing queued stagewrapper with after-gpu-lock,
 unchanged native fullwindow schedule and freshly frozen independently audited
 inputs. No second frontend, per-episode targetprompt or new predictionalgorithm.
+
+
+### 2026-10-05 — Six-frame joint person/HOI evidence protocol (predeclared)
+
+Hypothesis: retaining all automatic persons and all native hand→object pairs
+creates the necessary unselected evidence for resolving background ownership.
+This probe is engineering diagnosis on Track1 RGB, **not independent accuracy**.
+Same six frozen person banks EP9(0,27,55),EP26(0,26,53),14total crops; no additional
+manual prompts, labels, thresholds, per-episode tuning or proposed owner.
+Explicit `hoi_person_bank_probe.v1` sets challenge_inputs_used=true and all
+quality/identity/contact/adoption flags false; old closed external studies untouched.
+Reuse the exact qualified HOI native loader1796fields, original non-EMA forward,
+no AMP/TF32, one model load, six forwards. Empty native pairs are valid outcomes.
+Save all raw person/HOI arrays and every N×2×P tuple with unsupported NaNs.
+Predeclared300s Azure-only private byte replica and1800s inclusive model budget;
+code/source/input rehashes, one existing FD9 GPU lease, exact mounts and owned
+cleanup required. Failure remains immutable; no score or ownership victory claim.
+Source/runtime/acquisition receipts persist; disposable FairScale overlay must
+be recreated on CPU because successful old jobs deleted it. Never infer runtime
+physical availability from a receipt. Only two original videos/sixNPZ/report/
+original code-only producer closure move Azure→Azure; no local media transit.
+
+Current status: protocol/helper/transport tiny tests prepared, **not yet executed**.
+274combined targeted/profile/transport/old-bank tests PASS; source closure
+and numerical regression controls included. Native bootstrap
+and nine original numerical/authentication functions AST/literal unchanged.
+External EgoExo route found, but signed grant and qualifying cohort still missing;
+see background audit. First place/beat CARI4D remain unachieved and unverified.

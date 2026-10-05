@@ -201,3 +201,35 @@ framework component. If this cannot stay bounded and maintainable, defer MASA
 and use already-qualified automatic instance/memory observations rather than
 spend further research on unrelated infrastructure. Ownership remains the
 primary hypothesis and needs an independently labeled legal external cohort.
+
+
+## 2026-10-05 — Legal external multiperson validation route
+
+A bounded primary-source review found a credible **Ego-Exo4D** route. The
+[38-page model agreement](https://ego4d.github.io/pdfs/Ego-Exo4D-Model-License.pdf)
+allows ML development/evaluation for academic, commercial and noncommercial
+purposes and creation/distribution of annotations. It is explicitly a draft,
+**not our signed grant**; an executed agreement and participant identity remain
+required. Prior descriptions of this dataset as research/NC-only were too broad.
+[Official access instructions](https://docs.ego-exo4d-data.org/getting-started/)
+state free access, approximately48h approval and14-day AWS credentials. No form
+submitted or media acquired. Thomas must supply the personal signature if needed.
+
+[Atomic descriptions](https://docs.ego-exo4d-data.org/annotations/atomic_descriptions/)
+distinguish camera wearer C from other people O, including a published two-person
+example take `3c489f86-8896-4c86-8a5a-929999799d36`. This does **not** qualify
+eight two-person/two-object clips or exhaustive hand ownership. Proposed route:
+12 licensed short single-exocamera clips,2FIT/2calibration/8sealed, capture/site/
+participant-disjoint; creator-authorized new external labels blind to outputs,
+including misses/ambiguity/left-right/actor/tool-target. No challenge labels.
+Only explicitly selected [448-resolution takes](https://docs.ego-exo4d-data.org/data/downscaled_takes/)
+on Azure; default14TiB downloader is prohibited by this experiment's narrow scope.
+Do not share raw RGB with third-party annotators without their own applicable grant.
+
+IKEA ASM, Assembly101, EPIC-KITCHENS, RICH, BEHAVE, InterCap and Panoptic did not
+provide an immediately qualified alternative. Their NC conditions are not a
+universal competition ban: the [Creative Commons FAQ](https://creativecommons.org/faq/#does-my-use-violate-the-noncommercial-clause-of-the-licenses)
+depends on purpose/use. Rights and multiperson/ownership coverage remain unresolved.
+EgoExo is not among the declared DWPose COCO-WholeBody/UBody or HOI-DETR
+COCO/Hands23 corpora, but unverified backbone/teacher overlap remains unknown.
+**Gates:** signed grant; actual eligible sealed cohort; overlap audit. No validation PASS.

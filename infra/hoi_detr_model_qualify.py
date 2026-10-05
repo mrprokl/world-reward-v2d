@@ -38,6 +38,10 @@ HELPERS = ('infra/hoi_detr_model_qualify.py', 'infra/run_hoi_detr_model_qualify.
            'infra/hoi_detr_runtime_verify.py', 'infra/hoi_detr_acquire.py',
            'infra/mediapipe_cpu_runtime_verify.py', 'infra/mediapipe_hands_acquire.py',
            'src/world_reward/hoi_detr_observations.py')
+PERSON_PROTOCOL = 'configs/hoi_person_bank_probe_v1.json'
+PERSON_PROTOCOL_PIN = {'bytes': 6123, 'sha256': '0b90d1b9559c97522a066fd074cdd20921c07f2e53a9ee7dec23c2bd6841cf9e'}
+PERSON_HELPER = 'infra/hoi_person_bank_evidence.py'
+PERSON_BANKS = ((9, 0, 2), (9, 27, 3), (9, 55, 3), (26, 0, 2), (26, 26, 2), (26, 53, 2))
 FLAGS = ('quality_verified', 'actor_identity_verified', 'contact_verified', 'training_overlap_verified',
          'license_eligibility_verified', 'ground_truth_used', 'challenge_inputs_used', 'adoption')
 
@@ -66,21 +70,30 @@ def load_helpers(code):
 
 def source(rt, code, revision):
     require(Path(__file__).resolve() == code/HELPERS[0] and {x.name for x in code.parent.iterdir()} == {'code', 'revision', 'source-sha256'}, 'Actual complete model-gate source required')
-    return rt.source(ROOT, code, revision, ENTRY, HELPERS)
+    return rt.source(ROOT, code, revision, ENTRY, HELPERS + (PERSON_PROTOCOL, PERSON_HELPER,
+        'src/world_reward/person_pose_observations.py', 'src/world_reward/interaction_tuple_evidence.py'))
 
 
-def protocol(rt, code, *, external_rgb=False, external_cohort=False, external_cohort128=False):
-    require(sum((external_rgb, external_cohort, external_cohort128)) <= 1, 'Exactly one inference scope required')
+def protocol(rt, code, *, external_rgb=False, external_cohort=False, external_cohort128=False, person_bank=False):
+    require(sum((external_rgb, external_cohort, external_cohort128, person_bank)) <= 1, 'Exactly one inference scope required')
     name, pin = (COHORT128_PROTOCOL, COHORT128_PROTOCOL_PIN) if external_cohort128 else ((COHORT_PROTOCOL, COHORT_PROTOCOL_PIN) if external_cohort else ((IMAGE_PROTOCOL, IMAGE_PROTOCOL_PIN) if external_rgb else (PROTOCOL, PROTOCOL_PIN)))
+    if person_bank: name, pin = PERSON_PROTOCOL, PERSON_PROTOCOL_PIN
     p = rt.pinned(code/name, pin, (64 if external_cohort128 else 16) << 10)
     schema, scope, output = ('world_reward.hoi_detr_external_cohort128.v3', 'fixed128_external_full_native_observations_before_reference_evaluation', 'results/hoi-detr-external-cohort128-v3') if external_cohort128 else (('world_reward.hoi_detr_external_cohort.v1', 'fixed_external_cohort_full_native_observations_before_reference_evaluation', 'results/hoi-detr-external-cohort-v1') if external_cohort else (('world_reward.hoi_detr_image_probe.v1', 'one_external_RGB_native_pair_head_runtime_only', 'results/hoi-detr-image-probe-v1') if external_rgb else (
         'world_reward.hoi_detr_model_qualification.v4', 'one_procedural_RGB_full_native_model_runtime_only', 'results/hoi-detr-model-qualify-v4')
     ))
+    if person_bank:
+        schema, scope, output = 'world_reward.hoi_person_bank_probe.v1', 'six_saved_track1_all_person_banks_native_hoi_evidence_no_selection', 'results/hoi-person-bank-probe-v1'
+        c = p['person_bank_profile']
+        require(c['name'] == 'track1_saved_person_banks_v1' and tuple(map(tuple, c['banks'])) == PERSON_BANKS
+                and c['all_recorded_banks'] is True and c['zero_pair_outputs_are_valid'] is True
+                and all(c[k] is False for k in ('hand_labeled_test', 'selection_performed', 'ownership_verified')),
+                'Exact automatic six-bank diagnostic profile required')
     require(p['schema'] == schema and p['scope'] == scope
             and p['root'] == str(ROOT) and p['output'] == output
             and (p['budget_seconds'], p['cleanup_grace_seconds'], p['outer_seconds']) == (1800, 60, 1860)
             and (p['cpu_cpus'], p['cpu_memory'], p['gpu_cpus'], p['gpu_memory']) == (4, '16g', 4, '64g')
-            and p['amp'] is False and p['tf32'] is False and p['seed'] == 0 and all(p[k] is False for k in FLAGS), 'Frozen one-forward scope required')
+            and p['amp'] is False and p['tf32'] is False and p['seed'] == 0 and all(p[k] is (person_bank if k == 'challenge_inputs_used' else False) for k in FLAGS), 'Frozen one-forward scope required')
     require(p['runtime']['path'] == 'results/hoi-detr-runtime-v4/report.json' and p['runtime']['unresolved_pin_is_fail_before_checkpoint_decode'] is True,
             'Independent native operator qualification required')
     require(len(p['import_wheels']) == 1 and p['import_wheels'][0]['name'] == 'terminaltables'
@@ -89,7 +102,12 @@ def protocol(rt, code, *, external_rgb=False, external_cohort=False, external_co
     return p
 
 
+def evidence_flags(p):
+    return {k: ('person_bank_profile' in p if k == 'challenge_inputs_used' else False) for k in FLAGS}
+
+
 def selected_protocol_pin(p):
+    if 'person_bank_profile' in p: return PERSON_PROTOCOL_PIN
     return COHORT128_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v3' else (COHORT_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_external_cohort.v1' else (IMAGE_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_image_probe.v1' else PROTOCOL_PIN))
 
 
@@ -242,6 +260,56 @@ def authenticate_external_rgb(rt, p):
               c['rights']['path']: c['rights']['identity'], c['acquisition']['path']: c['acquisition']['identity'], c['path']: c['identity']}
     exact(rt, Path(c['path']), c['identity'], 16 << 20)
     return frozen
+
+
+def authenticate_person_banks(rt, p):
+    """Original six automatic banks and Track1 RGB; no masks/calibration/GT."""
+    prior = p['qualified_model']; path = ROOT/prior['path']
+    h = rt.pinned(path, prior['report'], 32 << 10)
+    n = rt.pinned(path.parent/'native.json', prior['native'], 32 << 10)
+    require(h['status'] == n['status'] == 'pass' and h['producer_revision'] == prior['producer_revision']
+            and h['phase'] == 'complete' and h['actual_model_qualified'] is True
+            and h['native_report_identity'] == prior['native'] and n['native_forward_calls'] == 1
+            and n['strict_checkpoint']['keys'] == 1796 and n['strict_checkpoint']['strict'] is True
+            and n['strict_checkpoint']['weights_only'] is True
+            and all(h[k] is True for k in ('source_rehashed_after', 'inputs_rehashed_after', 'image_unchanged', 'owned_containers_removed', 'owned_overlay_removed'))
+            and all(h[k] is False and n[k] is False for k in FLAGS), 'Original independently qualified full model required')
+    old_source(rt, h['source_binding'], ENTRY, HELPERS)
+    c = p['person_bank_profile']; producer = c['producer_revision']
+    require(producer == '5e4255d192a657bec3428806ded272f457804a01'
+            and c['original_video_config'] == 'configs/person_pose_bank_probe_v1.json', 'Exact original person producer required')
+    base = ROOT/('results/person-pose-bank-probe-'+producer); report_path = base/'report.json'
+    report = rt.pinned(report_path, c['report'], 32 << 10)
+    facts = dict(status='pass', stage='automatic_all_person_dwpose_diagnostic', producer_revision=producer,
+                 gpu_used=False, ground_truth_used=False, hand_labeled_test=False, oracle_modes=[],
+                 anatomical_ownership_verified=False, all_recorded_person_banks_retained=True,
+                 source_inputs_assets_rehashed_after=True, native_session_count=1)
+    require(all(type(report.get(k)) is type(v) and report[k] == v for k, v in facts.items())
+            and tuple((b['episode'], b['frame_index'], b['persons']) for b in report['banks']) == PERSON_BANKS,
+            'Actual complete automatic six-bank receipt required')
+    binding = report['source_binding']; old_source(rt, binding, 'run_person_pose_bank_probe', tuple(binding['helpers']))
+    code = ROOT/'jobs'/producer/'run_person_pose_bank_probe'/'code'
+    scope_path = code/c['original_video_config']
+    scope = rt.pinned(scope_path, dict(bytes=2599, sha256='e1ff1c0a37caacd48cb5c705fd972d5fa352864780737e5bc17824d4b2d4c8ab'), 16 << 10)
+    frozen = {str(path): prior['report'], str(path.parent/'native.json'): prior['native'],
+              str(report_path): c['report'], str(scope_path): dict(bytes=2599, sha256='e1ff1c0a37caacd48cb5c705fd972d5fa352864780737e5bc17824d4b2d4c8ab')}
+    for row in scope['episodes']:
+        video = ROOT/row['video']; pin = row['files'][row['video']]
+        require(report['input_pins'][row['video']] == pin, 'Original complete RGB binding differs')
+        exact(rt, video, pin, 32 << 30); frozen[str(video)] = pin
+    for bank in report['banks']:
+        name = f"episode_{bank['episode']:06d}_frame_{bank['frame_index']:06d}.npz"
+        require(bank['prediction_file'] == name and len(bank['person_ids']) == bank['persons'], 'Exact saved automatic person slots required')
+        exact(rt, base/name, bank['prediction'], 1 << 20); frozen[str(base/name)] = bank['prediction']
+    return frozen
+
+
+def person_bank_mounts(p):
+    c = p['person_bank_profile']; base = ROOT/('results/person-pose-bank-probe-'+c['producer_revision'])
+    paths = [base/'report.json']
+    paths += [base/f'episode_{e:06d}_frame_{f:06d}.npz' for e, f, _ in PERSON_BANKS]
+    paths += [ROOT/f'data/track_1/videos/chunk-000/observation.images.exo_camera/episode_{e:06d}.mp4' for e in (9, 26)]
+    return paths
 
 
 MODEL_REQUIREMENTS = frozenset({
@@ -552,7 +620,7 @@ def gpu_model(code, revision, p, proof_pin):
     def prepare(rgb):
         result = transform(dict(img=np.array(rgb[:, :, ::-1], copy=True)))
         require(set(result) == {'img', 'img_metas'}, 'Native image-only preprocessing required'); return result
-    external = 'external_RGB' in p; cohort = 'external_cohort' in p
+    external = 'external_RGB' in p; cohort = 'external_cohort' in p; person_bank = 'person_bank_profile' in p
     if external:
         from PIL import Image
         c = p['external_RGB']; exact(rt, Path(c['path']), c['identity'], 16 << 20)
@@ -560,15 +628,38 @@ def gpu_model(code, revision, p, proof_pin):
             require(image.format == 'JPEG' and not getattr(image, 'is_animated', False) and image.width*image.height <= 16 << 20,
                     'Actual external image with native pairs required')
             rgb = np.asarray(image.convert('RGB'), dtype=np.uint8)
-    elif not cohort:
+    elif not cohort and not person_bank:
         c = p['procedural_RGB']; y, x = np.indices((c['height'], c['width']), dtype=np.int32)
         rgb = np.stack(((x*3+y*5)%256, (x*7+y*11)%256, (x*13+y*17)%256), axis=2).astype(np.uint8)
     operations = NativeHOIOperations(prepare, collate, scatter, bbox_cxcywh_to_xyxy, batched_nms, torch, torch.device('cuda:0'))
     # Load once, execute every fixed acquired image. Semantic empties are outputs,
     # not errors, skipped samples or grounds for replacing the fixed cohort.
-    records = p['external_cohort']['inputs'] if cohort else [c]
+    if person_bank:
+        person_base = ROOT/('results/person-pose-bank-probe-'+p['person_bank_profile']['producer_revision'])
+        bank_report = rt.pinned(person_base/'report.json', p['person_bank_profile']['report'], 32 << 10)
+        require(tuple((b['episode'], b['frame_index'], b['persons']) for b in bank_report['banks']) == PERSON_BANKS, 'All original person banks required')
+        records = bank_report['banks']
+        spec = importlib.util.spec_from_file_location('wr_hoi_person_bank_evidence', code/PERSON_HELPER)
+        bank_helper = importlib.util.module_from_spec(spec); spec.loader.exec_module(bank_helper)
+        import cv2
+    else:
+        records = p['external_cohort']['inputs'] if cohort else [c]
     outputs = []
     for c in records:
+        if person_bank:
+            video_name = f"data/track_1/videos/chunk-000/observation.images.exo_camera/episode_{c['episode']:06d}.mp4"
+            exact(rt, ROOT/video_name, bank_report['input_pins'][video_name], 32 << 30)
+            cap = cv2.VideoCapture(str(ROOT/video_name))
+            try:
+                require(cap.isOpened() and cap.set(cv2.CAP_PROP_POS_FRAMES, c['frame_index']), 'Original frame seek required')
+                ok, bgr = cap.read()
+                require(ok and int(round(cap.get(cv2.CAP_PROP_POS_FRAMES))) == c['frame_index']+1, 'Exact original frame decode required')
+                rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+            finally: cap.release()
+            person_file = person_base/c['prediction_file']; exact(rt, person_file, c['prediction'], 1 << 20)
+            with np.load(person_file, allow_pickle=False) as saved:
+                person = bank_helper.reconstruct_saved_person(c, {k: saved[k] for k in saved.files}, rgb)
+            c = dict(c, original_frame_index=c['frame_index'])
         if cohort:
             from PIL import Image
             exact(rt, Path(c['path']), c['identity'], 16 << 20)
@@ -580,13 +671,18 @@ def gpu_model(code, revision, p, proof_pin):
         if external:
             require(len(result.hand_object_pairs) >= c['minimum_native_hand_object_pairs'], 'Actual external image with native pairs required')
         if external or cohort: exact(rt, Path(c['path']), c['identity'], 16 << 20)
-        file = out/(c['image_id']+'.npz' if cohort else 'observations.npz')
+        file = out/(c['prediction_file'].removesuffix('.npz')+'-hoi.npz' if person_bank else (c['image_id']+'.npz' if cohort else 'observations.npz'))
         arrays = {k: v for k, v in vars(result).items() if isinstance(v, np.ndarray)}
         with file.open('xb') as stream: np.savez_compressed(stream, **arrays); stream.flush(); os.fsync(stream.fileno()); os.fchmod(stream.fileno(), 0o444)
         outputs.append(dict(image_id=c.get('image_id'), file=file.name, original_frame_index=c['original_frame_index'], image_size=result.image_size,
                             observations=rt.identity(file, 32 << 20), retained_role_counts=[int((result.class_ids == i).sum()) for i in range(3)],
                             hand_object_pairs=len(result.hand_object_pairs), object_target_pairs=len(result.object_target_pairs),
                             decoded_rgb_identity=dict(bytes=rgb.nbytes, sha256=hashlib.sha256(rgb.tobytes()).hexdigest())))
+        if person_bank:
+            joined = bank_helper.save_tuple_evidence(out/c['prediction_file'].removesuffix('.npz'), person, result)
+            outputs[-1].update(episode=c['episode'], persons=joined['persons'], tuple_rows=joined['tuple_rows'], joint_evidence=joined['prediction'])
+            exact(rt, person_file, c['prediction'], 1 << 20)
+            exact(rt, ROOT/video_name, bank_report['input_pins'][video_name], 32 << 30)
     exact(rt, DATA/'weights/epoch_5.pth', p['acquisition']['checkpoint'], 6_000_000_000); check_inventory(rt, root/'source', proof['overlay']['source']); check_inventory(rt, root/'site', proof['overlay']['site']); check_inventory(rt, mmcv_root, proof['runtime']['manifest']['artifacts'])
     require(source(rt, code, revision) == proof['source_binding'], 'Current full source changed after actual model')
     # Preserve the original32KiB terminal receipt bound for the larger cohort.
@@ -599,14 +695,14 @@ def gpu_model(code, revision, p, proof_pin):
     value = dict(stage='hoi_detr_full_native_model', status='pass', source_binding=proof['source_binding'], checkpoint_identity=p['acquisition']['checkpoint'], strict_checkpoint=loaded, checkpoint_buffer_schema=buffer_schema,
                  versions=versions, configuration=overrides, actual_full_model=True, native_forward_calls=len(outputs), decoded_rgb_identity=dict(bytes=rgb.nbytes, sha256=hashlib.sha256(rgb.tobytes()).hexdigest()),
                  preprocessing='original_LoadImageFromWebcam_BGR_input_then_native_test_pipeline', decoder_queries=1500, original_frame_index=c['original_frame_index'], native_cpu_softNMS=True,
-                 hand_object_pairs=len(result.hand_object_pairs), object_target_pairs=len(result.object_target_pairs), observations=outputs[0]['observations'] if not cohort else saved_outputs,
-                 original_source_unchanged=True, checkpoint_rehashed_after=True, overlays_rehashed_after=True, elapsed_seconds=time.monotonic()-proof['started_monotonic'], **{k: False for k in FLAGS})
+                 hand_object_pairs=len(result.hand_object_pairs), object_target_pairs=len(result.object_target_pairs), observations=saved_outputs if cohort or person_bank else outputs[0]['observations'],
+                 original_source_unchanged=True, checkpoint_rehashed_after=True, overlays_rehashed_after=True, elapsed_seconds=time.monotonic()-proof['started_monotonic'], **evidence_flags(p))
     if external:
         value.update(scope=p['scope'], external_rgb_identity=c['identity'], actual_native_pair_head_executed=True,
                      original_image_size=result.image_size, retained_role_counts=[int((result.class_ids == i).sum()) for i in range(3)])
-    elif cohort:
+    elif cohort or person_bank:
         for k in ('decoded_rgb_identity', 'original_frame_index', 'hand_object_pairs', 'object_target_pairs'): value.pop(k)
-        value.update(scope=p['scope'], acquired_slots=len(outputs), fixed_cohort_slots=p['external_cohort']['slots'], missing_slots=p['external_cohort']['missing'],
+        value.update(scope=p['scope'], acquired_slots=len(outputs), fixed_cohort_slots=6 if person_bank else p['external_cohort']['slots'], missing_slots=0 if person_bank else p['external_cohort']['missing'],
                      semantic_empty_outputs_preserved=True, native_model_loads=1, reference_geometry_read=False)
     else:
         value['procedural_rgb_identity'] = value.pop('decoded_rgb_identity')
@@ -616,6 +712,8 @@ def gpu_model(code, revision, p, proof_pin):
 def container_plan(code, out, revision, p, proof, phase, deadline):
     name = 'world-reward-hoi-model-'+phase+'-'+revision[:12]; cid = out/(phase+'.cid'); image_id = proof['runtime']['image']['Id']; overlay = out/'.overlay'
     mounts = [(code.parent, code.parent, True), (out, out, False)] if phase == 'overlay' else [(code.parent, code.parent, True), (out, out, False), (overlay, overlay, True), (DATA/'weights/epoch_5.pth', DATA/'weights/epoch_5.pth', True)]
+    if phase == 'model' and 'person_bank_profile' in p:
+        mounts += [(f, f, True) for f in person_bank_mounts(p)]
     if phase == 'model' and 'external_RGB' in p:
         f = Path(p['external_RGB']['path']); mounts.append((f, f, True))
     if phase == 'model' and 'external_cohort' in p:
@@ -629,6 +727,7 @@ def container_plan(code, out, revision, p, proof, phase, deadline):
     args += [image_id, '-i', 'PATH=/opt/conda/bin:/usr/local/cuda/bin:/usr/bin:/bin', 'HOME=/tmp', 'PYTHONDONTWRITEBYTECODE=1', 'WR_ROOT='+str(ROOT), 'WR_CODE='+str(code), 'WR_CODE_REVISION='+revision,
              'WR_IMAGE_ID='+image_id, 'WR_MODEL_DEADLINE='+format(deadline, '.17g'), 'OMP_NUM_THREADS=4', 'OPENBLAS_NUM_THREADS=4', 'CUDA_VISIBLE_DEVICES=0' if phase == 'model' else 'CUDA_VISIBLE_DEVICES=-1',
              '/opt/conda/bin/python', '-I', '-B', str(code/HELPERS[0]), '--'+phase, '--proof-bytes', str(proof['pin']['bytes']), '--proof-sha256', proof['pin']['sha256']]
+    if 'person_bank_profile' in p: args.append('--person-bank')
     if 'external_RGB' in p: args.append('--external-rgb')
     if 'external_cohort' in p: args.append('--external-cohort128' if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v3' else '--external-cohort')
     return name, cid, mounts, args
@@ -676,18 +775,18 @@ def cleanup(runtime, cidfile, name, revision, image_id, deadline):
     require(not runtime.command(['docker', 'ps', '-aq', '--no-trunc', '--filter', 'id='+cid], deadline), 'Own CID survived cleanup'); runtime.absent(name, deadline); cidfile.chmod(0o444)
 
 
-def run(code, revision, *, opener=None, external_rgb=False, external_cohort=False, external_cohort128=False):
+def run(code, revision, *, opener=None, external_rgb=False, external_cohort=False, external_cohort128=False, person_bank=False):
     import fcntl
-    started = time.monotonic(); rt, mp, acq, runtime = load_helpers(code); own = source(rt, code, revision); p = protocol(rt, code, external_rgb=external_rgb, external_cohort=external_cohort, external_cohort128=external_cohort128); deadline = started+p['budget_seconds']
+    started = time.monotonic(); rt, mp, acq, runtime = load_helpers(code); own = source(rt, code, revision); p = protocol(rt, code, external_rgb=external_rgb, external_cohort=external_cohort, external_cohort128=external_cohort128, person_bank=person_bank); deadline = started+p['budget_seconds']
     require(sys.platform == 'linux' and os.geteuid() == 0 and os.uname().nodename == 'world-reward-ncc-h100-02' and os.environ.get('WR_ROOT') == str(ROOT), 'Exact Azure root host required')
     qualified = authenticate_runtime(rt, runtime, p, deadline); acquired, manifest = authenticate_acquisition(rt, acq, p)
-    external_frozen = authenticate_external_cohort(rt, p) if external_cohort or external_cohort128 else (authenticate_external_rgb(rt, p) if external_rgb else {})
+    external_frozen = authenticate_person_banks(rt, p) if person_bank else authenticate_external_cohort(rt, p) if external_cohort or external_cohort128 else (authenticate_external_rgb(rt, p) if external_rgb else {})
     out = rt.canonical(ROOT/p['output']); require(not out.exists() and out.parent.is_dir(), 'Fresh model qualification namespace required'); out.mkdir(mode=0o755); os.chown(out, 1000, 1000)
     s = out.lstat(); own_inode = (s.st_dev, s.st_ino, s.st_uid); overlay = out/'.overlay'; overlay.mkdir(mode=0o755); os.chown(overlay, 1000, 1000); s = overlay.lstat(); overlay_inode = (s.st_dev, s.st_ino, s.st_uid)
     proof = dict(source_binding=own, protocol_identity=selected_protocol_pin(p), runtime=qualified, acquisition=dict(report_identity=acquired['report_identity'], source_manifest_identity=acquired['source_manifest_identity'], source_binding=acquired['source_binding']), started_monotonic=started)
-    report = dict(stage='hoi_detr_external_cohort' if external_cohort or external_cohort128 else ('hoi_detr_image_probe' if external_rgb else 'hoi_detr_model_qualification'), scope=p['scope'], status='fail', phase='preflight', producer_revision=revision, source_binding=own, protocol_identity=selected_protocol_pin(p),
+    report = dict(stage='hoi_person_bank_probe' if person_bank else 'hoi_detr_external_cohort' if external_cohort or external_cohort128 else ('hoi_detr_image_probe' if external_rgb else 'hoi_detr_model_qualification'), scope=p['scope'], status='fail', phase='preflight', producer_revision=revision, source_binding=own, protocol_identity=selected_protocol_pin(p),
                   runtime_report_identity=qualified['report_identity'], acquisition_report_identity=acquired['report_identity'], actual_model_qualified=False, source_rehashed_after=False, inputs_rehashed_after=False,
-                  image_unchanged=False, owned_containers_removed=False, owned_overlay_removed=False, **{k: False for k in FLAGS})
+                  image_unchanged=False, owned_containers_removed=False, owned_overlay_removed=False, **evidence_flags(p))
     containers = []; lock_fd = None; failure = None; owned, dirs = [], set()
     try:
         opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler({}), runtime.NoRedirect())
@@ -725,8 +824,8 @@ def run(code, revision, *, opener=None, external_rgb=False, external_cohort=Fals
             name, cid, mounts, args = container_plan(code, out, revision, p, context, phase, deadline); runtime.absent(name, deadline); containers.append((cid, name, qualified['image']['Id']))
             runtime.command(args, deadline); value = container_inspect(runtime, name, deadline, large_cohort=external_cohort128); validate_container(value, mounts, name, revision, qualified['image']['Id'], phase)
             runtime.command(['docker', 'start', '-a', name], deadline, log=out/(phase+'.log')); cleanup(runtime, cid, name, revision, qualified['image']['Id'], deadline); containers.pop()
-        native = rt.strict((out/'native.json').read_bytes()); require(native['status'] == 'pass' and native['source_binding'] == own and native['actual_full_model'] is True and native['native_forward_calls'] == (p['external_cohort']['acquired'] if external_cohort or external_cohort128 else 1)
-            and all(native[k] is False for k in FLAGS), 'Genuine one-forward model receipt required')
+        native = rt.strict((out/'native.json').read_bytes()); require(native['status'] == 'pass' and native['source_binding'] == own and native['actual_full_model'] is True and native['native_forward_calls'] == (6 if person_bank else (p['external_cohort']['acquired'] if external_cohort or external_cohort128 else 1))
+            and all(native[k] is v for k, v in evidence_flags(p).items()), 'Genuine one-forward model receipt required')
         report.update(status='pass', phase='complete', native_report_identity=rt.identity(out/'native.json', 32 << 10), observations_identity=native['observations'], actual_model_qualified=True)
     except Exception as exc:
         failure = exc; report['error_type'] = type(exc).__name__
@@ -744,7 +843,8 @@ def run(code, revision, *, opener=None, external_rgb=False, external_cohort=Fals
             for path, pin in qualified['frozen'].items(): exact(rt, Path(path), pin, 2 << 20)
             old_source(rt, acquired['source_binding'], acq.JOB, acq.HELPERS)
             old_source(rt, qualified['report']['source_binding'], runtime.ENTRY, runtime.HELPERS)
-            for path, pin in external_frozen.items(): exact(rt, Path(path), pin, 16 << 20)
+            for path, pin in external_frozen.items(): exact(rt, Path(path), pin, 32 << 30 if person_bank else 16 << 20)
+            if person_bank: require(authenticate_person_banks(rt, p) == external_frozen, 'Original person/model source and files changed after probe')
             if (out/'FairScale.LICENSE').exists(): exact(rt, out/'FairScale.LICENSE', row_pin(p['fairscale']['publisher_license']), 64 << 10)
             report['inputs_rehashed_after'] = True; report['source_rehashed_after'] = source(rt, code, revision) == own; report['image_unchanged'] = runtime.image(qualified['image']['Id'], grace) == qualified['image']
             runtime.remove_owned_folder(rt, overlay, overlay_inode, out); report['owned_overlay_removed'] = True
@@ -773,9 +873,9 @@ def run(code, revision, *, opener=None, external_rgb=False, external_cohort=Fals
 
 def main():
     parser = argparse.ArgumentParser(allow_abbrev=False); group = parser.add_mutually_exclusive_group(); group.add_argument('--overlay', action='store_true'); group.add_argument('--model', action='store_true')
-    scopes = parser.add_mutually_exclusive_group(); scopes.add_argument('--external-rgb', action='store_true'); scopes.add_argument('--external-cohort', action='store_true'); scopes.add_argument('--external-cohort128', action='store_true')
+    scopes = parser.add_mutually_exclusive_group(); scopes.add_argument('--external-rgb', action='store_true'); scopes.add_argument('--external-cohort', action='store_true'); scopes.add_argument('--external-cohort128', action='store_true'); scopes.add_argument('--person-bank', action='store_true')
     parser.add_argument('--proof-bytes', type=int); parser.add_argument('--proof-sha256'); args = parser.parse_args()
-    code = Path(os.environ['WR_CODE']); revision = os.environ['WR_CODE_REVISION']; rt, _, acq, _ = load_helpers(code); p = protocol(rt, code, external_rgb=args.external_rgb, external_cohort=args.external_cohort, external_cohort128=args.external_cohort128)
+    code = Path(os.environ['WR_CODE']); revision = os.environ['WR_CODE_REVISION']; rt, _, acq, _ = load_helpers(code); p = protocol(rt, code, external_rgb=args.external_rgb, external_cohort=args.external_cohort, external_cohort128=args.external_cohort128, person_bank=args.person_bank)
     if args.overlay or args.model:
         require(type(args.proof_bytes) is int and args.proof_bytes > 0 and re.fullmatch('[0-9a-f]{64}', args.proof_sha256 or ''), 'Independent native proof pin required')
         phase = 'overlay' if args.overlay else 'model'
@@ -785,10 +885,10 @@ def main():
             name = 'overlay.json' if args.overlay else 'native.json'; out = ROOT/p['output']
             if not (out/name).exists():
                 _, _, _, runtime = load_helpers(code)
-                acq.write_receipt(out/name, dict(stage='hoi_detr_'+phase, status='fail', error_type=type(exc).__name__, requirement=failure_requirement(exc, runtime), phase='native_execution', **{k: False for k in FLAGS}), time.monotonic(), float(os.environ['WR_MODEL_DEADLINE']))
+                acq.write_receipt(out/name, dict(stage='hoi_detr_'+phase, status='fail', error_type=type(exc).__name__, requirement=failure_requirement(exc, runtime), phase='native_execution', **evidence_flags(p)), time.monotonic(), float(os.environ['WR_MODEL_DEADLINE']))
             raise
     else:
-        value = run(code, revision, external_rgb=args.external_rgb, external_cohort=args.external_cohort, external_cohort128=args.external_cohort128); print(json.dumps({k: value[k] for k in ('stage', 'status', 'phase', 'elapsed_seconds')}))
+        value = run(code, revision, external_rgb=args.external_rgb, external_cohort=args.external_cohort, external_cohort128=args.external_cohort128, person_bank=args.person_bank); print(json.dumps({k: value[k] for k in ('stage', 'status', 'phase', 'elapsed_seconds')}))
 
 
 if __name__ == '__main__':
