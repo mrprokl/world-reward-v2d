@@ -1,0 +1,183 @@
+{
+  "FIT_performed": false,
+  "GPU_used": false,
+  "RESERVED_reference_values_read": false,
+  "RGB_decoded": false,
+  "adoption": false,
+  "budget_seconds": 180,
+  "cpu_threads": 4,
+  "development_slots": 8,
+  "helper_pins": {
+    "configs/frontend_asset_archive_pins.json": {
+      "bytes": 1806,
+      "sha256": "b2b39f067c015d20d59cef9f72aa0bea7eae2441c79177031a968bff6e62b747"
+    },
+    "configs/frontend_grounding_source_pins.json": {
+      "bytes": 23140,
+      "sha256": "775de939b18f8833ab478153071f90c387ed270825572def4b7e15cebed4ea8e"
+    },
+    "configs/owlv2_assets_v2.json": {
+      "bytes": 2864,
+      "sha256": "a9e2423ba06301b9b3ca0dece14afeeae25b8f681d58067e894b223770c0be51"
+    },
+    "configs/owlv2_native_qualification_v1.json": {
+      "bytes": 2279,
+      "sha256": "0f4dae48a0078405578372dfd8d094ff8d9ca84e4c762d54848ebc638613ee27"
+    },
+    "configs/rgb_endpoint_bank_v2.json": {
+      "bytes": 2239,
+      "sha256": "1543ff33c77a2ad34dd38dc93e926173c53302c9a4cf7a9f28362334955589cc"
+    },
+    "configs/vcoco_pilot_endpoint_bank_v1.json": {
+      "bytes": 4342,
+      "sha256": "75f1ce62248ad2d4b26de816aec1d87333ba08ef5ccf1a8c686551dc8d311936"
+    },
+    "configs/vcoco_role_pilot_v1.json": {
+      "bytes": 3768,
+      "sha256": "8bfefd77dc0ed4b538ef97864b725056ef83ff5f411ddafc3a0ea94086145c55"
+    },
+    "infra/bridge_frontend_bindings.py": {
+      "bytes": 15790,
+      "sha256": "94a1d1d99abd5c325e43511a6fa08cded20ad55f0bb28aaa0f13101b07951d6f"
+    },
+    "infra/coco_endpoint_evaluate.py": {
+      "bytes": 38477,
+      "sha256": "f1bf582b704b06891efbda4f13d643c214379e92a997b38506e7d33b13085685"
+    },
+    "infra/coco_proposal_prepare.py": {
+      "bytes": 24704,
+      "sha256": "ee9ec3ddd540ec485ef6bbe5812dda5f98760e9633cd3c11fdc49dbde2f66574"
+    },
+    "infra/frontend_sam2_kernel_gate.py": {
+      "bytes": 15441,
+      "sha256": "156bf96f6f875ccd5c58e13a25bc10c52a8cceffeeaceff1ace58e26b1737ed6"
+    },
+    "infra/frontend_selected_assets.py": {
+      "bytes": 10312,
+      "sha256": "28817bc5b6629c4721108c7ccb2f10b6b1ee30ba833c6e3eb85d202336a26c43"
+    },
+    "infra/masa_acquire.py": {
+      "bytes": 17128,
+      "sha256": "2e9e0539c0ddf6d0d9045a377516f4a89424a8b29ebdf04503f1444f2b512238"
+    },
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "infra/mediapipe_hands_acquire.py": {
+      "bytes": 21381,
+      "sha256": "8293510c02777cd5b844865285736ff1a653631a8803849a9047ee9030196570"
+    },
+    "infra/metadata_json_stream.py": {
+      "bytes": 8322,
+      "sha256": "742b10d5f92e3446d17d4953f1d088281f051577653899ddcc7081f61545bf53"
+    },
+    "infra/openimages_joint_pair_acquire.py": {
+      "bytes": 23252,
+      "sha256": "ab0cac6d8a66550b8898a6add435fe92bc2546cbb7536723d4de3b8d8597ad49"
+    },
+    "infra/openimages_joint_pair_gdi.py": {
+      "bytes": 26539,
+      "sha256": "6d5f5976de54b45ca179aed0c8d2ac3d9da2379b56334ec585326884d9887352"
+    },
+    "infra/owlv2_acquire.py": {
+      "bytes": 12032,
+      "sha256": "071a3653b6a6e5b4b08f22c303301e9cb0b6956b3db7787ccc4fafb076bdaa54"
+    },
+    "infra/owlv2_native_qualify.py": {
+      "bytes": 25658,
+      "sha256": "dd2934a1146ad21eaaab8b422486c2e765535f3139032f74dd01e6047476875e"
+    },
+    "infra/rgb_endpoint_bank.py": {
+      "bytes": 34983,
+      "sha256": "7a4641eb7da72cd4610750b19758ee0b7afe0c7ac2865ce8e1f6ddb6715d3081"
+    },
+    "infra/run_owlv2_acquire.sh": {
+      "bytes": 716,
+      "sha256": "a71ddde76e1bf6976525a9f9bf1fa10456aa034b11dd8d2965697abb8dc891f9"
+    },
+    "infra/run_rgb_endpoint_bank.sh": {
+      "bytes": 909,
+      "sha256": "dd8bcfc51a8c3fc991d4ca669dbe0cdf97fcf9613c6b72c56bea906e9bfb218f"
+    },
+    "infra/run_vcoco_pilot_endpoint_bank.sh": {
+      "bytes": 965,
+      "sha256": "93590cbab6eee959f6e9e41a9e52b5e90fbf3e8ee8bca3be8383778f7805736d"
+    },
+    "infra/run_vcoco_role_prepare.sh": {
+      "bytes": 1214,
+      "sha256": "fbf5f3b51366dd9164fb822dd7e9fcc78bb38c4b14a38e28364dc859ee09b04c"
+    },
+    "infra/vcoco_pilot_endpoint_bank.py": {
+      "bytes": 28413,
+      "sha256": "0fa39ee74e8cc8021d13256a4e8fb918389a0be97f701d07f0567fda6595b74d"
+    },
+    "infra/vcoco_role_census.py": {
+      "bytes": 29942,
+      "sha256": "5c785eca755a4d7be16c398a3e2b6e6c74e347e95e1ae3cbbf01adc626c9f09e"
+    },
+    "infra/vcoco_role_prepare.py": {
+      "bytes": 31647,
+      "sha256": "522f585c320d0dea1cb2a5d27603018b7dec693aa62f0bcad60b9208e7488424"
+    },
+    "infra/vcoco_role_stream.py": {
+      "bytes": 10552,
+      "sha256": "e2d213677aa91677f343a337f959e4023961416419a2a3d0f4c3665aca26a70f"
+    },
+    "src/world_reward/__init__.py": {
+      "bytes": 81,
+      "sha256": "1ac8c64041277f0c3cf4d8838b3153210d7076dd86a5121d1e6ef494b64b36a1"
+    },
+    "src/world_reward/owlv2_object_observations.py": {
+      "bytes": 8748,
+      "sha256": "8587489a860b44a74bc0149c67960128b6b12aa1e4d51bc07e0e52103da5b888"
+    },
+    "src/world_reward/prompt_selection.py": {
+      "bytes": 9971,
+      "sha256": "04c9ed2ce9d004920da436d2e15ce0d464275598f122411eac87b47bb8c95ae6"
+    },
+    "src/world_reward/rgb_bank_inputs.py": {
+      "bytes": 4240,
+      "sha256": "f6f00d4c2f51be665112ac697753ae755fb914caeaf6362472ae76c38b7ffa99"
+    },
+    "src/world_reward/vcoco_pair_retrieval.py": {
+      "bytes": 12116,
+      "sha256": "13aa086cd2a7a9ac68d3b1485fd5c5945a0dc33d6180802a0f344e4bc362f026"
+    },
+    "src/world_reward/vcoco_role_reference.py": {
+      "bytes": 11628,
+      "sha256": "6aa4e088d8da9575b58645445db1231dfe3b2f9e710c75a3b2da4af2c6cdc75a"
+    }
+  },
+  "image_id": "sha256:fd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252",
+  "maximum_bank_bytes": 16777216,
+  "maximum_receipt_bytes": 2097152,
+  "maximum_reference_bytes": 4194304,
+  "memory_bytes": 6442450944,
+  "missing_slot_recall": 0.0,
+  "models_loaded": 0,
+  "outer_seconds": 195,
+  "output": "/srv/scenesmith/world-reward/results/vcoco-pilot-pair-capacity-v1",
+  "ownership_verified": false,
+  "pair_gate": 0.7,
+  "primary_iou": 0.5,
+  "producers": {
+    "bank": {
+      "closure_sha256": "ddefd7f4663b15fee9dd8f6bb14693ea1f0d343e4407100b1152aafbcdc939ec",
+      "entries": 321,
+      "files": 316,
+      "revision": "e1a01f303f533344a10ef0e4eb216c2eb13c9182"
+    },
+    "prepare": {
+      "closure_sha256": "098811fa1eac670cfa081b8d5d10dcdc3b405ed4b9cc67356345e8de42b4ae0a",
+      "entries": 308,
+      "files": 303,
+      "revision": "a8da2da838dc4ef513e7819be4d25ece99488207"
+    }
+  },
+  "quality_verified": false,
+  "reserved_slots": 8,
+  "schema": "world_reward.vcoco_pilot_pair_capacity.v1",
+  "selector_evaluated": false,
+  "slots": 16
+}
