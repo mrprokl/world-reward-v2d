@@ -60,6 +60,32 @@ side-aware learner must retain SELF/other-person/OFF and unknown validity, using
 an adequately licensed fresh reference. Multiple indistinguishable simultaneous
 interactions require unresolved task identity, not arbitrary top1 or a hand label.
 
+## Current falsification and reference progress
+
+The96-photo study is closed on insufficient access68/96; no subset, new seed
+or unavailable-photo replacement is allowed. The subsequent original full-bank
+procedural cost probe rejects qualifying its512-step recipe under720s, not the
+geometry hypothesis. A new source-authenticated cache retains exact complete
+route arithmetic and native identities;116 tiny controls and independent
+constructor/mutable-copy audits pass, with no speed or ownership claim.
+A separately frozen paired full3600 control is dispatched, not yet a result.
+
+Fresh Visual Genome metadata acquisition and independent saved-only audit pass:
+135026437B remain Azure, zero RGB/annotation values consulted. New census will
+require licensed photo-ID-linked COCO metadata and exclude all432 historical
+slots before new semantic references. No new selector is learned or adopted yet.
+
+Latent sides with only published positive pair labels motivate permutation-
+invariant MIL, but a flexible attention/graph model does not identify ownership
+by itself. [Ilse et al.,2018](https://proceedings.mlr.press/v80/ilse18a.html)
+provides bag aggregation, not hand-to-body supervision.
+[Cour et al.,2011](https://www.jmlr.org/papers/v12/cour11a.html) assumes exactly
+one correct candidate, unlike multiple/incomplete holds labels.
+[Kiryo et al.,2017](https://arxiv.org/abs/1703.00593) studies positive-unlabeled
+risk; its statistical assumptions/priors are not automatically qualified here.
+Any smoother latent marginal or optimizer change needs a genuinely new recipe,
+authored controls and fresh non-challenge validation, not a closed-score rescue.
+
 ## Methods address different failure classes
 
 | Component | Useful mechanism | What it does not establish |
