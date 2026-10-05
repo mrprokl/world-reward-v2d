@@ -87,7 +87,8 @@ def test_import_exact_replica_published_no_collision_and_blob_deleted(tmp_path,m
         mode=Path(src).stat().st_mode & 0o777
         if Path(src).is_dir():Path(src).chmod(0o755)
         rename(src,dst);Path(dst).chmod(mode)
-    monkeypatch.setattr(m.os,'rename',root_rename)
+    monkeypatch.setattr(m,'rename_noreplace',root_rename)
+    monkeypatch.setattr(m,'_sync_directory',lambda *_:None)
     try:value=m.run('import','b'*40,pin,'a'*40)
     except ValueError:
         pytest.fail((root/'results'/('person-bank-transfer-import-'+'b'*40)/'report.json').read_text())
@@ -113,3 +114,9 @@ def test_final_posthash_error_demotes_prior_success(tmp_path,monkeypatch):
     with pytest.raises(ValueError):m.run('export','a'*40)
     report=json.loads((root/'results'/('person-bank-transfer-export-'+'a'*40)/'report.json').read_text())
     assert report['status']=='fail' and report['error_type']=='ValueError'
+
+
+def test_atomic_publication_has_no_overwrite_fallback():
+    s=(ROOT/'infra/person_bank_transfer.py').read_text()
+    assert 'os.rename(' not in s and s.count('rename_noreplace(stage/name,dst)')==2
+    assert '_sync_directory(dst.parent)' in s

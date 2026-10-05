@@ -19,6 +19,7 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import mediapipe_cpu_runtime_verify as rt
+from atomic_metadata import rename_noreplace, _sync_directory
 from articulated_runtime_transfer import Blob, NoRedirect
 import urllib.request
 
@@ -86,7 +87,7 @@ def run(action, revision, expected=None, export_revision=None):
     rt.require(os.geteuid() == 0 and os.uname().sysname == 'Linux'
         and os.uname().nodename == ('scenesmith-ncc-h100-01' if action == 'export' else 'world-reward-ncc-h100-02'), 'Exact Azure replica host required')
     code = Path(os.environ['WR_CODE'])
-    own = rt.source(ROOT,code,revision,ENTRY,('infra/person_bank_transfer.py','infra/run_person_bank_transfer.sh','infra/articulated_runtime_transfer.py','infra/mediapipe_cpu_runtime_verify.py'))
+    own = rt.source(ROOT,code,revision,ENTRY,('infra/person_bank_transfer.py','infra/run_person_bank_transfer.sh','infra/articulated_runtime_transfer.py','infra/mediapipe_cpu_runtime_verify.py','infra/atomic_metadata.py'))
     out = ROOT/('results/person-bank-transfer-'+action+'-'+revision)
     rt.require(not out.exists(), 'Fresh transfer namespace required'); out.mkdir(mode=0o700)
     archive_path = out/'replica.tar'
@@ -151,10 +152,10 @@ def run(action, revision, expected=None, export_revision=None):
                     if p.is_dir():p.chmod(0o555)
                 folder.chmod(0o555)
             for name in (OLD,BASE):
-                dst=ROOT/name;rt.canonical(dst);dst.parent.mkdir(parents=True,exist_ok=True);os.rename(stage/name,dst)
+                dst=ROOT/name;rt.canonical(dst);dst.parent.mkdir(parents=True,exist_ok=True);rename_noreplace(stage/name,dst);_sync_directory(dst.parent)
             for name in rows:
                 if name.startswith('data/'):
-                    dst=ROOT/name;rt.canonical(dst);dst.parent.mkdir(parents=True,exist_ok=True);os.rename(stage/name,dst)
+                    dst=ROOT/name;rt.canonical(dst);dst.parent.mkdir(parents=True,exist_ok=True);rename_noreplace(stage/name,dst);_sync_directory(dst.parent)
             actual_rows,source=original_files()
             rt.require(actual_rows == rows and source == manifest['original_source_binding'], 'Published full original source/banks/RGB differ')
             with blob.request('DELETE') as response:rt.require(response.status == 202,'Private transfer blob cleanup required')
