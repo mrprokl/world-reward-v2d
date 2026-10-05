@@ -1764,3 +1764,30 @@ task identity. Prioritize anatomical ownership plus explicit interaction links;
 appearance/temporal memory is complementary, not a substitute. Preserve every
 competitor and unknown/no-contact route; no largest/foreground/nearest rule,
 test-specific correction or reopening the closed128-image study.
+
+### October5 — Pi-HOC: coherent instance-pair tokens, not a ready dependency
+
+[Pi-HOC, April14,2026v1](https://arxiv.org/html/2604.12923v1), sections3.2–3.5,
+constructs a token per detected human–object pair, refines pair/image tokens
+jointly with an InteractionFormer, and predicts pair-level contact presence
+before a dense human-contact decoder. This addresses competing instance pairs
+more directly than category-conditioned contact. It supports learning **coherent
+joint representations**, not assembling independent best anatomy/IoU/logit
+features from unrelated hand routes. Paper metrics are author measurements;
+none is our reconstruction result or externally validated World Reward gain.
+
+Do not copy two shortcuts: section3.2 discards non-overlapping detection boxes
+(IoU>0); our complete-bank design retains such candidates and occluded endpoints.
+Downstream supplementaryS.8.4 refers to a ground-truth mask in reconstruction
+losses: it is not a qualified RGB-only Track1 refinement recipe. Contact labels
+derived from fitted geometry are not independently measured physical contact.
+
+Actual public [code repository](https://github.com/SravanChittupalli/Pi-HOC/tree/6d37ec77dc0c18cd7bc9e4609f7064375de2c494),
+cutoff6d37ec77 (2026-04-15), contains only README905B/SHA256
+`2766bcd0091669d71f55a52ea01f1ee77c49e4bb4de3df2c1daed5dffa42d57c`,
+announcing a future release. No code, checkpoint, model licence or training
+implementation is verified. Project/paper CC grants do not license future model
+assets. Fail fast on installation: use this architecture as a research insight,
+not another unavailable stack. MMHOI's individually accessible published
+person–target CSVs warrant a separate metadata gate (see
+`mmhoi_ownership_reference_audit.md`), not direct adoption or a full3D claim.

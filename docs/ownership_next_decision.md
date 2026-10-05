@@ -27,6 +27,14 @@ remain separate states; occlusion is not an observed OFF label.
 |2|[V-COCO 489cc4d](https://github.com/s-gupta/v-coco/tree/489cc4db74f2f10ab4b134f67da3874afbf245ab)|Positive person–object role retrieval|Explicit annotation grant unresolved; no anatomical side/contact/temporal truth. Zero role IDs are missing, not OFF.|
 |3|[DexYCB](https://dex-ycb.github.io/)|Manipulated-object identity and object/hand trajectory with distractors|NC data grant and other asset rights; predominantly one actor, not a bystander benchmark. No24GB download before a useful subset path/eligibility.|
 
+New independent MMHOI audit finds a commercially unrestricted **CC-BY-SA4 data
+grant** and individually accessible archive members with explicit person→object
+action/bodypart matrices. This advances MMHOI to the next **metadata feasibility
+gate**, not a new training/adoption priority by licence alone. The14-part mapping,
+sentinels, coordinates, RGB alignment and full inventory remain unproved. See
+`mmhoi_ownership_reference_audit.md`; whole inspected scenario is excluded before
+any prospective split. No93GB archive or new model stack is justified yet.
+
 Primary sources, hashes, rights and precise schemas were independently audited
 in `background_identity_audit.md`, `vcoco_role_validation_audit.md` and
 `identity_association_protocol.md`. A public code license never clears separate
