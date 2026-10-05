@@ -9887,3 +9887,21 @@ source Git blobs verified, isolated Apache checker and no full Kaolin import.
 Training overlap and complete-stack eligibility remain unknown. New1b722ae
 CPU-only all14 visual overview is bounded240KB, unchanged geometry/camera;
 29 tiny tests PASS0.87s, actual rendering remains to verify independently.
+
+Independent actual Azure checks: TRELLIS21afdfe acquisition PASS127.968806s,
+all6 checkpoint pins/118 retained artifacts, both full Git inventories and source/
+artifact posthash/owned scratch cleanup verified. Report29047B/
+5636d8992f27a1ab7147fd685aa949d50523a28a183ba780e0e0e0d6786cd814.
+No imports/build/model/GPU calls or eligibility/overlap clearance. Subsequent
+primary-source import audit finds an additional noncommercial Gaussian utility
+branch: original all-six factory is not an eligible mesh-only shortcut. Defer
+building it pending a separately audited mesh-only import/constructor boundary.
+
+HO-Cap f5cd5e8 extraction actual PASS34.344311s,1493 original RGB frames:
+702 and791 in the two prospective clips. Manifest358318B/
+58f888bcffd4c3c0e308a0f173e92a9e2e4150de7883af0e3d2d5afd0145d42d;
+report5940B/17b5eebd632d52a08f813de179b12baebace1e20014cf7daca5ec6baf5e648a4.
+Original5 archives/failed source, exact census, public RGB and opaque metadata
+posthash verified. This does not qualify JPEG decoding, timestamp continuity,
+private semantic/instance mapping or an automatic model bank. Those are next,
+with predictor mounts excluding raw metadata and all reference archives.

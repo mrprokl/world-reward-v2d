@@ -88,7 +88,7 @@ def host_proof(root,code,revision):
         rows=[r for r in manifest['files']if r.get('path')==relative]
         rt.require(len(rows)==1,'Exactly one official original RGB video required')
         video=root/'data'/relative;vp={k:rows[0][k]for k in('bytes','sha256')}
-        rt.require(rt.identity(video,10_000_000_000,readonly=False)==vp and report.get('input_sha256')==vp['sha256'],'Original video/export input SHA differs')
+        rt.require(rt.identity(video,10_000_000_000,readonly=False)==vp,'Original official video SHA differs')
         frozen.update({str(video):vp,str(pin_path):pp,str(ipath):ip})
         clips.append(dict(episode_index=e,clip_spec=spec,frame_index=midpoint(spec['total_frames']),video=str(video),export=str(base),export_report_sha256=producer['sha256'],video_sha256=vp['sha256']))
         mounts.extend((video,base))

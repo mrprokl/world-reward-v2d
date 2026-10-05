@@ -1,5 +1,6 @@
 """Tiny frozen-export/render fixtures only, no real videos/models/cloud."""
 import copy
+import ast
 import hashlib
 import importlib.util
 import io
@@ -45,7 +46,7 @@ def setup(m,tmp_path,monkeypatch):
             producer_revision='c'*40,script_sha256='d'*64,frames=5,input_track='track_1',ground_truth_used=False,ground_truth_read=False,
             private_truth_read=False,hand_labeled_test=False,oracle_modes=[],unchanged_refined_predictions_verified=True,
             full_original_native_export_verified=True,original_frame_coverage_verified=True,source_inputs_assets_rehashed=True,source_helpers_rehashed=True,
-            input_pins=identity(ipath.read_bytes()),source_files=inputs['source_files'],output_files=records,original_frame_indices=list(range(5)),input_sha256=vp['sha256'])
+            input_pins=identity(ipath.read_bytes()),source_files=inputs['source_files'],output_files=records,original_frame_indices=list(range(5)))
         (base/'report.json').write_text(json.dumps(report));rp=identity((base/'report.json').read_bytes());records['report.json']=rp
         pins=dict(schema='world-reward-cari-shared-export-pins-v1',clip_spec=spec,export=dict(**rp,producer_revision='c'*40,script_sha256='d'*64),export_files=records)
         (code/m.pin_name(e,'shared_export')).write_text(json.dumps(pins))
@@ -73,6 +74,22 @@ def test_real_current_source_and_all_export_video_proof_tiny(gate,tmp_path,monke
     assert p['source_binding']['helpers'][gate.HELPERS[0]]['bytes']>0
     assert all('/weights/'not in x and '/vendor/'not in x and '/labels/'not in x for x in p['mounts'])
     gate.recheck(gate.runtime(code),p)
+
+
+def test_actual_export_schema_has_no_direct_video_sha_field(gate,tmp_path,monkeypatch):
+    # The real export binds its prepared-input pins/source-files, not a new
+    # top-level video SHA. The independently frozen official video is checked
+    # by overview separately; no genuine producer field is invented.
+    tree=ast.parse((REPO/'infra/cari_full_export.py').read_text())
+    report_keywords={k.arg for node in ast.walk(tree) if isinstance(node,ast.Call)
+        and (isinstance(node.func,ast.Attribute) and isinstance(node.func.value,ast.Name)
+             and node.func.value.id=='report' and node.func.attr=='update') for k in node.keywords}
+    assert {'input_pins','source_files'}<=report_keywords and 'input_sha256'not in report_keywords
+    root,code,rev=setup(gate,tmp_path,monkeypatch)
+    for e in gate.EPISODES:
+        report=json.loads((root/f'outputs/episode_{e:06d}/cari_shared_export_v1/report.json').read_text())
+        assert 'input_sha256'not in report and report['input_pins'] and report['source_files']
+    assert len(gate.host_proof(root,code,rev)['clips'])==14
 
 
 @pytest.mark.parametrize('fault',['export','video','input','manifest','source','sibling','extraexport','missingpin'])
