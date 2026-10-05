@@ -20,9 +20,12 @@ not manual episode reassignment or another downstream fit of the wrong pair.
 - **Actual automatic observation bank:** two external HO-Cap clips retain all
   1493 original RGB frames and all287 native class-agnostic AMG proposals at ten
   fixed anchors, yielding3133 automatic point queries. Execution/source/cleanup
-  checks pass; no private reference values were read. Full-T native tracking and
-  the [frozen semantic-retention test](docs/hocap_point_retention_protocol.md)
-  remain separate from actor choice, contact and reconstruction accuracy.
+  checks pass. Both full-T native tracker outputs are independently authenticated.
+  The [frozen semantic-retention test](docs/hocap_point_retention_protocol.md)
+  is now **closed REJECT**: correct support increases, but wrong-object assignment
+  regresses on one external clip (3.28%→7.74%). Do not tune this cohort or adopt
+  this bare bank as qualified identity evidence. Learned relational observations
+  are the next separate hypothesis; actor/contact/3D accuracy remain unverified.
 
 - **New generic operators:** [surface identity/LOD](docs/surface_lod_protocol.md)
   separates lawful open surfaces from our optional closed-solid backend; no

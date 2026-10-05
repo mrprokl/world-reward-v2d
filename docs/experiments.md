@@ -10008,3 +10008,22 @@ source manifest755745B/8ed68b93269dd216272c702603b56487ff47debaa38b72d891740d417
 No checkpoint decode, upstream import/install/build/inference, runtime approval
 or overlap clearance.273 integrated tiny tests PASS2.79s; whole-stack native
 qualification and external relational evidence remain the next separate gates.
+
+91666b6 frozen semantic-retention evaluation actual lifecycle PASS but scientific
+decision CLOSED REJECT, native17.370164s. Both702/791-frame reference schemas
+qualify with zero errors; only seg_mask/obj_class_inds/obj_class_names accessed
+after complete public/native saved-output authentication. Clip112303 object-query
+future denominator78224: A correct48187(61.6013%),wrong738(.9434%); nativeBoots
+B correct64943(83.0218%),wrong35(.0447%). Clip113202 denominator86549: A
+correct46411(53.6240%),wrong2842(3.2837%); B correct53116(61.3710%),wrong6697
+(7.7378%). Hidden/off-grid/background/HAND observations remain in denominators.
+Second clip violates the predeclared no-wrong-object-regression gate; no pooled
+rescue or tuning this cohort. Static A is a diagnostic, not a valid interaction
+trajectory. Reject adopting this bare all-AMG/Boots bank as a qualified identity
+source; results do not reject the tracker generally or establish material-point,
+contact, physical-instance, full-body or3D accuracy. Retain the frozen baseline
+and investigate substantively new relational evidence on fresh external controls.
+Host5915B/c6b67c9a3070efeebcd56c1c9cf916d9bedc348ff2358dd239cd132a45d4e086;
+native2899095B/6ce2357e98f48ea74518760f6cf5dc85ec2aa3b9a8db66b4dd1b912f016da20a.
+Source/prediction/private archive posthash and owned cleanup verified; original
+prediction HOSTFAIL preserved. Full reference/diagnostic arrays stay on Azure.
