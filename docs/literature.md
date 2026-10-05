@@ -1704,3 +1704,16 @@ conv2d at zero offsets/unit mask and remain finite/repeatable at nonzero offsets
 actual native RoIAlign must match its same-parameter CPU reference. Synchronize
 CUDA before reporting. These data-free gates precede strict original checkpoint
 loading and full-bank embeddings, and prove neither association nor 3D quality.
+
+Separate primary data audit: SA-V explicitly grants CC-BY4 for videos AND
+annotations at SAM2de05a2e0c5c46260ccf7f967ad55fcd390dc524d30
+(README8404B/d0084f4900800e4160a2a65af5db3d5fd027bc60ae831a36ded0b7994fc53292).
+However it provides class-agnostic instance masklets, not person/object classes
+or manipulation ownership. It can test MASA temporal instance correspondence,
+occlusion recovery and identity switches, never which person manipulates which
+object. Val155videos/293masklets and test150/278 use24Hz RGB and6Hz masks;
+retain original frame IDs, fixed global matching and missing denominators.
+Additional download terms remain unread/uncleared; no acquisition here. HICO-DET,
+HAKE and GIO/AVA do not supply a verified primary DATA/image grant in this audit.
+Do not substitute code MIT or third-party CC0 assertions for data permission,
+or describe a tracking-only gain as a demonstrated fix of EP8/9 or CARI4D win.

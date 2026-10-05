@@ -10411,3 +10411,16 @@ The first read-only audit incorrectly expected the underlying ValueError rather
 than its typed SurfaceBudgetError wrapper; corrected metadata assertion only,
 without rerunning or modifying native output. Both original and surface failures
 remain closed. Move numerical coverage order to19, not a domain/threshold reroll.
+
+6540b32 actual MASA public source/opaque R50 acquisition COMPLETE PASS53.367273s
+on VM02,18assets528485634B, no package/model/GPU/dataset execution. Receipt6409B/
+10a5f0c971e26aa8e74a4714efc866b86ca76ae27373a29e2fdd6332ca211f7d.
+Parent independently authenticates actual committed source/config closure, all17
+primary source/notices and complete publisher-LFS checkpoint SHA, all public
+files444/directories555, exact inventory and no owned partial. Only this tiny
+receipt crosses locally; the528MB checkpoint stays opaque on Azure.
+First read-only audit misstated the lease schema; corrected to the unchanged
+actual fresh_namespace_lease.v1 source, without acquisition rerun or mutation.
+No runtime, original strict state loading, H100 operator qualification,
+training-overlap clearance, license eligibility, association gain or adoption.
+Parent216 combined tiny source/surface/frontend/acquisition tests PASS2.69s.
