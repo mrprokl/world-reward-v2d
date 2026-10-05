@@ -101,6 +101,37 @@ authored controls and fresh non-challenge validation, not a closed-score rescue.
 
 ## Methods address different failure classes
 
+### Additional temporal literature check, October5
+
+Primary papers available before the September cutoff support **pair-persistent
+reasoning**, not a largest-person/object rule:
+
+- [HOI-DA, April12,2026](https://arxiv.org/html/2604.10397v1), sections3.3/5:
+  aligned subject/object query slots persist through the observed clip; detection
+  and anticipation share matching. Its reported16.27% present detection mAP is
+  on the corrected DETAnt-HOI VidHOI component, not the original VidHOI protocol
+  or Track1. Slots do not certify physical identity through arbitrary occlusion,
+  anatomical ownership, or the challenge-designated pair. No executable model,
+  checkpoint rights or overlap were qualified here.
+- [SAGE, July4,2026](https://arxiv.org/html/2607.04017v1), tables3/4 and supplement:
+  gaze-conditioned temporal interaction features and uncertainty are relevant
+  evidence. Its38.65% VidHOI detection mAP is explicitly **Oracle mode**; do not
+  compare it to automatic end-to-end detection or import source GT inputs.
+  Gaze is not manipulation/contact; context can attend to a bystander or tool.
+- [4D-QA/GIO, AAAI2025](https://arxiv.org/html/2412.19542v1), sections3.4/4/5.2:
+  selects candidate object tracks conditioned on an actor track and optional
+  interaction semantics. Default results use **GT human tracklets**; SAM boxes
+  prompted by GT objects construct supervision. Neither is a permitted Track1
+  inference input. Thus it addresses object grounding after actor targeting,
+  not our missing automatic initial actor selection.
+
+Decision: retain joint competing identities and full-T missing evidence; consider
+temporal relation observations after a lawful, independently labeled reference
+qualifies them. A semantic/gaze/transformer score is not truth or a reason to
+delete competitors. No new model stack, challenge prompts or prediction changes
+follow from this bounded paper review. Primary HTML was read; no raw-file SHA
+claim is made. Existing closed cohorts remain closed.
+
 | Component | Useful mechanism | What it does not establish |
 |---|---|---|
 | [DAM4SAM, CVPR2025](https://arxiv.org/html/2411.17576v2), [cutoff code](https://github.com/jovanavidenovic/dam4sam/blob/aad389b85c224bd408da8923e8fcb96410cf7e30/dam4sam_tracker.py#L121-L168) | Distractor-aware recent/anchor memory after an initial bbox/mask. | Which initial person/object is task-relevant. SAM2.1 is a separate release, not DAM4SAM. |
