@@ -24,8 +24,10 @@ reduction. Its masked variant and pure FIT-only learner prototype pass numerical
 controls, but no real selector has been fitted or adopted. The fixed-step
 hard-max recipe fails its frozen cost gate. A separate normalized latent
 reference, compact factors/CSR and CPU analytic gradients pass tiny independent
-controls; the Torch device prototype has source-only qualification, no actual
-GPU numerical/cost test yet. The first strict VG/COCO-linked reference census
+controls. The first tiny GPU control closes before Torch/container creation:
+its B47 image was addressed on the wrong Docker-store worker. A new explicit
+VM01 execution profile is being qualified, with unchanged numerical gates;
+no GPU parity/cost or selection gain is claimed. The first strict VG/COCO-linked reference census
 completes but yields0 eligible photos: this path is closed without RGB, relaxed
 joins or retries. Fresh external validation remains necessary.
 MMHOI's complete Azure-only metadata census passes an independent audit; its

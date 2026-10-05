@@ -76,3 +76,16 @@ ordered segment records, actual runtime, four FD-applicable/four unsupported
 cases and saved-CID absence are required. Source review is not native ABI proof.
 The first run targets **VM02**, not VM01, and must use its exact public frozen
 commit with a fresh result namespace. No full-bank recipe or FIT is authorized.
+
+## Actual first attempt: closed image preflight, no numerical execution
+
+Producera48aaec runs on VM02 and stops in `image()` before output creation,
+Torch import or container/fixtures. B47's Docker OCI ID belongs to VM01; VM02
+uses the separately documented classic config ID7ebfff for the same exported
+graph. Do not add an arbitrary image-ID fallback or rebuild/retag. Unit exits1,
+PID0; no proof/native/report/CID exists, zero GPU processes afterward.
+Two observer mistakes (target identity, literal marker newline) remain separate
+INCONCLUSIVE records. Root saved-only bounded diagnostics locate the image
+inspection error, not a mathematical failure or full-source PASS.
+Next: a new explicit **VM01** profile with identical fixture/math/FD/memory/time
+gates and fresh namespace. Existing v1 source/result remain historical and closed.
