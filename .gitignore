@@ -20,3 +20,5 @@ vendor/
 *.h5
 *.glb
 *.zip
+# User-authorised tiny Azure QA previews; never heavy datasets or video.
+work/previews/
