@@ -9696,3 +9696,10 @@ cohort executed or rescued. Protocol8076B/d1a3fd38cfd0496fd22a2a0280ff95cbc684d8
 now explicitly seals this boundary; tiny AST/census regressions prevent interposed
 private scoring. Two completed instances remain live until pair evaluation,
 without extra constructors or optimizer work.
+
+The independent CPU image diagnostic also failed370.701906s before producing
+an archive: docker save returned nonzero. Original archive-verifier attribution
+is therefore unproven; do not deploy a compatibility adapter as a presumed fix.
+No image/graph/layer bytes were inspected or changed. Original model/assets and
+206-file source closure rehashed unchanged. Next inspect actual storage/save
+diagnostics; preserve both failures, no runtime/model qualification replay.
