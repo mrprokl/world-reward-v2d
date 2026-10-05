@@ -57,7 +57,7 @@ def config():
     for e in (9, 26):
         base = f'outputs/episode_{e:06d}/automatic_masks'
         row = dict(episode=e, total_frames=415, automatic_source_sha256='b'*64,
-                   video=f'data/track_1/videos/chunk-000/episode_{e:06d}.mp4',
+                   video=f'data/track_1/videos/chunk-000/observation.images.exo_camera/episode_{e:06d}.mp4',
                    report=base+'/report.json', diagnostic=base+'/seed-diagnostics.json')
         row['files'] = {row[k]: pin.copy() for k in ('video', 'report', 'diagnostic')}
         rows.append(row)
@@ -65,7 +65,7 @@ def config():
                 ('results/input-manifest.json', 'data/track_1/meta/episodes.jsonl')})
 
 
-@pytest.mark.parametrize('change', ['gt', 'absolute', 'extra', 'episode', 'pin_bool', 'pin_invalid', 'video'])
+@pytest.mark.parametrize('change', ['gt', 'absolute', 'extra', 'episode', 'pin_bool', 'pin_invalid', 'video', 'missing_camera_directory'])
 def test_exact_mount_scope_before_model_or_read(change):
     p = config()
     validate_paths(p)
@@ -76,4 +76,22 @@ def test_exact_mount_scope_before_model_or_read(change):
     if change == 'pin_bool': next(iter(p['metadata_files'].values()))['bytes'] = True
     if change == 'pin_invalid': next(iter(p['metadata_files'].values()))['sha256'] = 'bad'
     if change == 'video': p['episodes'][0]['files'].pop(p['episodes'][0]['video'])
+    if change == 'missing_camera_directory':
+        row = p['episodes'][0]
+        old = row['video']
+        row['video'] = old.replace('/observation.images.exo_camera/', '/')
+        row['files'][row['video']] = row['files'].pop(old)
     with pytest.raises(ValueError): validate_paths(p)
+
+
+def test_committed_native_camera_paths_match_original_automatic_producer():
+    import json
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    frozen = json.loads((root/'configs/person_pose_bank_probe_v1.json').read_bytes())
+    validate_paths(frozen)
+    original = (root/'infra/automatic_masks.py').read_text()
+    native_directory = 'track_1/videos/chunk-000/observation.images.exo_camera/'
+    assert native_directory in original
+    assert all(row['video'] == f'data/{native_directory}episode_{row["episode"]:06d}.mp4'
+               for row in frozen['episodes'])

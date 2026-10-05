@@ -114,7 +114,7 @@ def validate_paths(p):
         episode = row['episode']
         rt.require(type(episode) is int and episode in (9, 26), 'Fixed two episode diagnostic required')
         base = f'outputs/episode_{episode:06d}/automatic_masks'
-        expected = dict(video=f'data/track_1/videos/chunk-000/episode_{episode:06d}.mp4',
+        expected = dict(video=f'data/track_1/videos/chunk-000/observation.images.exo_camera/episode_{episode:06d}.mp4',
                         report=base+'/report.json', diagnostic=base+'/seed-diagnostics.json')
         rt.require(all(row[k] == v for k, v in expected.items())
                    and set(row['files']) == set(expected.values())

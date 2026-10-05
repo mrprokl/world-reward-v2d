@@ -138,3 +138,26 @@ A source audit also catches an upstream multi-person SAM3DBody mask pitfall:
 process_one_image blindly reshapes provided masks to[N,H,W,1]. Input[H,W,N]
 would mix people rather than transpose. Our historical N=1 calls are unchanged;
 any future all-person Body call must use explicit person-first mask layout.
+
+### External validation is a separate remaining dependency
+
+A bounded independent audit did not identify a fully qualified public
+person/left-hand/right-hand/object ownership cohort. This is not proof that
+none exists. DexYCB/OakInk2 are useful single-actor controls, not crowd tests;
+SA-V supplies masks, not ownership; scene-graph role annotations do not supply
+the complete tuple or establish their own data grant. COCO-WholeBody's primary
+README license wording and linked CC-BY-NC terms differ: do not silently treat
+it as an unrestricted annotation source. Previously closed OpenImages pilots
+remain closed. None of these metadata checks establishes model-training overlap.
+
+Two routes remain: obtain explicit permission for the relevant existing
+annotations/images, or acquire a genuinely new independently annotated real
+RGB cohort with author rights and participant consent, directly on Azure.
+A proposed small capture is12 clips, separate2 FIT/2 calibration/8 reserved,
+covering stationary targets, bystander manipulation, crossings/occlusion and
+similar objects. It is **not frozen, available, captured or evaluated**. External
+human labels are permitted; challenge labels/prompts are not. New capture after
+checkpoint freeze would provide a temporal independence check, not universal
+generalization. Full-tuple errors must count missed proposals and abstentions;
+sparse annotations cannot certify unannotated temporal identity or3D contact.
+No email has been sent, data acquired or comparison gain claimed.

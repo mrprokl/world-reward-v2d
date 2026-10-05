@@ -10678,3 +10678,20 @@ tiny adapter/transport/build controls PASS0.33s; these do not qualify a real
 compiler, GPU operator, model, ownership selector or competition license.
 This is one bounded technical experiment, not another GPU diagnostic retry;
 all previous native CUDA failures remain closed.
+
+9d8703 all-person CPU diagnostic CLOSED technical preflightFAIL: immutable
+dispatch acknowledged, actual unit ExecMainStatus2, no output directory or
+native inference. Read-only census identifies absent video paths: the native
+Track1 path includes observation.images.exo_camera. No model/data/output was
+changed or producer restarted. Prospective path-only correction aligns config,
+shell whitelist and driver with original automatic_masks; exact video hashes,
+cohort, observations, algorithms and300s budget unchanged. Config2599B/
+e1ff1c0a37caacd48cb5c705fd972d5fa352864780737e5bc17824d4b2d4c8ab.
+Independent focused static review finds no additional guaranteed blocker;
+parent316 related tiny tests PASS1.06s. Actual fresh execution is still needed.
+
+94e7c2f MASA full original SM90 CPU build dispatched once on VM02; actual unit
+PID472644 active, public acquisition visible, no receipt at observation.
+This is not a compiler or GPU model PASS. New external full-person/hand/object
+ownership validation remains unavailable or rights-unqualified; no proxy score
+or challenge QA is substituted for that comparison.

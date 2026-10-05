@@ -28,7 +28,7 @@ assert names=={'results/input-manifest.json','data/track_1/meta/episodes.jsonl'}
 assert [x['episode']for x in p['episodes']]==[9,26]
 for row in p['episodes']:
  e=row['episode'];base=f'outputs/episode_{e:06d}/automatic_masks'
- expected={f'data/track_1/videos/chunk-000/episode_{e:06d}.mp4',base+'/report.json',base+'/seed-diagnostics.json'}
+ expected={f'data/track_1/videos/chunk-000/observation.images.exo_camera/episode_{e:06d}.mp4',base+'/report.json',base+'/seed-diagnostics.json'}
  assert set(row['files'])==expected
  names.update(row['files'])
 for name in sorted(names):
