@@ -76,3 +76,14 @@ borné avec KKT projeté, géométrie gelée. Budget, tolérances, température,
 régularisation et arrêt **non gelés ici** ; à déclarer avant FIT. Nonfinite,
 ligne échouée ou budget épuisé ferme la recette sans restart. Stationnarité,
 PASS mécanique et capacité ne prouvent ni ownership, contact ni qualité 3D.
+
+## Préparation compacte réalisée, qualification minuscule seulement
+
+`coherent_pair_packed` implémente la préparation coefficient-free : trois
+tables brutes/supports/normalisées, composites et CSR, refs natifs complets,
+constructeur uniquement sur PairCache authentifié. Aucun scorer/Torch/FIT.
+16 contrôles dédiés passent ; root162 combinés PASS1.89s. Audit indépendant
+sur5548B fabriqués reconstruit les clés depuis l'evidence originale, pas le
+helper de préparation :18 refs, marges inégales, alias, zéros signés, supports,
+échelles désactivées, absences et rejet de tables forgées PASS. Cela n'établit
+ni débit/mémoire full-bank, ni performance GPU ou précision de sélection.
