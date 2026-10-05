@@ -1595,3 +1595,17 @@ control and named articulation lot would precede rendering/Boots/calibration;
 the failed authored recipe remains closed. Direct generation can avoid SAM PCA,
 but the current learned native optimizer is not thereby checkpoint-free or
 competition-cleared. No new model/decode/job or positive point benefit executed.
+
+### October5 — fresh relational reference boundary
+
+Primary HO-Cap toolkit576c63e and paper sections4.5–4.6 document segmentation,
+handside/keypoints/MANO and object6DoF, not manual H→object or object→target
+relations/contact. Initial object prompts and800 manual keypoint QA samples do
+not supply such ground truth. After the two closed subject5 clips,113535 is
+HPEtest but ODET/OPEtrain/valid; it is not a fresh joint test-only counterpart.
+A surface-distance diagnostic would be a geometric proxy, not validation of
+stationary contact, distractors, ownership or tool relations. Do not repurpose
+the closed cohort or proximity as manual truth. FineBio's signed-access and
+explicit intended-use/commercial grant remain the useful external next step;
+its sparse manual triplets still would not prove full-T release/stationarity.
+Native operator/full-model feasibility proceeds independently of those rights.
