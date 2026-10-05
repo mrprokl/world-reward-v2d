@@ -1,0 +1,898 @@
+{
+  "schema": "world_reward.hoi_detr_external_cohort128.v2",
+  "scope": "fixed128_external_full_native_observations_before_reference_evaluation",
+  "root": "/srv/scenesmith/world-reward",
+  "output": "results/hoi-detr-external-cohort128-v2",
+  "budget_seconds": 1800,
+  "cleanup_grace_seconds": 60,
+  "outer_seconds": 1860,
+  "cpu_cpus": 4,
+  "cpu_memory": "16g",
+  "gpu_cpus": 4,
+  "gpu_memory": "64g",
+  "runtime": {
+    "path": "results/hoi-detr-runtime-v4/report.json",
+    "report": {
+      "bytes": 13248,
+      "sha256": "906bf42aaeaf6612586de1b93c4039a5f969233022f346d64ae84a975debb445"
+    },
+    "unresolved_pin_is_fail_before_checkpoint_decode": true
+  },
+  "acquisition": {
+    "producer_revision": "bee1d8e49c90f8926e6ff0f63347daef3ddfa99e",
+    "report": {
+      "bytes": 4471,
+      "sha256": "b424f6227cefe69a9e112310a226b84cfcd44780f14fa3cf31f71934dad709a3"
+    },
+    "source_manifest": {
+      "bytes": 755745,
+      "sha256": "8ed68b93269dd216272c702603b56487ff47debaa38b72d891740d417f69b0fd"
+    },
+    "source_revision": "1b367292f3833afd64a204bd4d9d84519541d035",
+    "git_root_tree_sha1": "e93a418345712fc6c011bfcc84bdddc90f496a70",
+    "checkpoint": {
+      "bytes": 5855053598,
+      "sha256": "4708fd0ddc5c3d386bad67c31152de58676840b911f6d01219e0092a603277d3"
+    }
+  },
+  "fairscale": {
+    "name": "fairscale",
+    "version": "0.4.13",
+    "license": "BSD-3-Clause",
+    "url": "https://files.pythonhosted.org/packages/c1/08/b3334d7b543ac10dcb129cef4f84723ab696725512f18d69ab3a784b0bf5/fairscale-0.4.13.tar.gz",
+    "file": "fairscale-0.4.13.tar.gz",
+    "bytes": 266261,
+    "sha256": "1b797825c427f5dba92253fd0d8daa574e8bd651a2423497775fab1b30cfb768",
+    "publisher_license": {
+      "url": "https://raw.githubusercontent.com/facebookresearch/fairscale/v0.4.13/LICENSE",
+      "file": "FairScale.LICENSE",
+      "bytes": 1739,
+      "sha256": "0a9b773f521ede2910204567bbe69c4f2a8ee8bede07dde0e667bcc6dfd268a0"
+    },
+    "maximum_expanded_bytes": 4194304,
+    "maximum_members": 1024,
+    "build_cuda_extensions": "0",
+    "offline_no_deps_no_build_isolation": true
+  },
+  "native_config": {
+    "path": "projects/configs/co_dino_vit/co_dino_5scale_vit_large_coco_with_relation_only_all_losses_custom.py",
+    "identity": {
+      "bytes": 19637,
+      "sha256": "018acf8bc176daf671959466726d928486977e5e43cc7bf03b4ce509ba6c00d9"
+    },
+    "original_load_from": "work_dirs/01_inter_full_low_1e4_corrected_auto80_100_h_f_s_w_3/epoch_5.pth",
+    "inference_overrides": {
+      "load_from": null,
+      "model.train_cfg": null
+    },
+    "custom_imports": false,
+    "full_model_components_retained": true
+  },
+  "compatibility_patch": {
+    "path": "projects/models/co_detr.py",
+    "identity": {
+      "bytes": 27476,
+      "sha256": "d63adcaa1e62b9ddf1f835a50ef4023332be28cfcc3039b7e9fdd9847b4f3212"
+    },
+    "remove_exact_sys_path_append": "/lus/lfs1aip2/projects/u6ev/ahmad/Co-DETR",
+    "all_other_AST_unchanged": true
+  },
+  "extra_base_distributions": {
+    "fvcore": "0.1.5.post20221221",
+    "iopath": "0.1.10",
+    "portalocker": "4.4.0",
+    "termcolor": "3.3.0",
+    "yacs": "0.1.8",
+    "tabulate": "0.10.0",
+    "tqdm": "4.66.5",
+    "typing_extensions": "4.16.0",
+    "timm": "1.0.30",
+    "scipy": "1.16.3",
+    "einops": "0.8.2"
+  },
+  "seed": 0,
+  "amp": false,
+  "tf32": false,
+  "quality_verified": false,
+  "actor_identity_verified": false,
+  "contact_verified": false,
+  "training_overlap_verified": false,
+  "license_eligibility_verified": false,
+  "ground_truth_used": false,
+  "challenge_inputs_used": false,
+  "adoption": false,
+  "import_wheels": [
+    {
+      "name": "terminaltables",
+      "version": "3.1.10",
+      "filename": "terminaltables-3.1.10-py2.py3-none-any.whl",
+      "file": "terminaltables-3.1.10-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/c4/fb/ea621e0a19733e01fe4005d46087d383693c0f4a8f824b47d8d4122c87e0/terminaltables-3.1.10-py2.py3-none-any.whl",
+      "bytes": 15155,
+      "sha256": "e4fdc4179c9e4aab5f674d80f09d76fa436b96fdc698a8505e0a36bf0804a874",
+      "publication_date": "2021-12-07",
+      "license": "MIT",
+      "publisher_license": {
+        "url": "https://raw.githubusercontent.com/matthewdeanmartin/terminaltables/v3.1.10/LICENSE",
+        "file": "terminaltables.LICENSE",
+        "bytes": 1065,
+        "sha256": "2e1320fd337db06a3136d0f4101bd62f13249c95c5b581304f35481e979d432a"
+      }
+    }
+  ],
+  "checkpoint_buffers": {
+    "source_path": "mmdet/core/hook/ema.py",
+    "source_identity": {
+      "bytes": 5150,
+      "sha256": "255d0d63865735bd2fe661cc1c4f375c68e7834aee0446e27eaaa861c7106663"
+    },
+    "native_hook": {
+      "type": "ExpMomentumEMAHook",
+      "momentum": 0.0001,
+      "priority": 49
+    },
+    "registration_only": true,
+    "skip_buffers": false,
+    "swap_or_update": false,
+    "forward_uses_original_non_ema_fields": true
+  },
+  "qualified_model": {
+    "path": "results/hoi-detr-model-qualify-v4/report.json",
+    "producer_revision": "b9571478c734c41531204f8c1a974556be6802dc",
+    "report": {
+      "bytes": 2967,
+      "sha256": "65eb67cf953a698e4c5decada37a2c051d3af23e34967610d7a40fca9413c3e5"
+    },
+    "native": {
+      "bytes": 3572,
+      "sha256": "51c30b02ba9127b3a6208e6e4f2ce77469f2e6434188742ed00d72b54bdd3dcb"
+    }
+  },
+  "external_cohort": {
+    "root": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1",
+    "manifest": {
+      "bytes": 127742,
+      "sha256": "58b15ab040f2400bbc1aa67ea32f8c75155eecb79c771d7b4735d5157b9ec793"
+    },
+    "slots": 128,
+    "acquired": 73,
+    "missing": 55,
+    "excluded_QA_image": "2333ac90234d7d50",
+    "zero_pair_outputs_are_valid": true,
+    "reference_geometry_read": false,
+    "no_replacements": true,
+    "metadata_to_GPU": false,
+    "inputs": [
+      {
+        "image_id": "fd8bd7e94c798335",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/fd8bd7e94c798335/rgb.jpg",
+        "identity": {
+          "bytes": 308249,
+          "sha256": "0741214e7003ffef93249a1f26342f6b478926b3f2ef2b9e855e0a39557a840a"
+        },
+        "cohort_slot": 0,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "490950e4c4a2f44b",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/490950e4c4a2f44b/rgb.jpg",
+        "identity": {
+          "bytes": 751941,
+          "sha256": "09eb34e26eefd2d96a14bd85f5ddab3a62dd668a2a3d363cb4821f909f45cdd8"
+        },
+        "cohort_slot": 1,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "16f42a277a86940d",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/16f42a277a86940d/rgb.jpg",
+        "identity": {
+          "bytes": 3883809,
+          "sha256": "7cc546a775434f642d99ac8ad101d12d7dc4540a09fcaa32f1402ac9c3785cd2"
+        },
+        "cohort_slot": 2,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "1a22f99a981ca26f",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/1a22f99a981ca26f/rgb.jpg",
+        "identity": {
+          "bytes": 2520456,
+          "sha256": "819bdf6ae1c2edd162f8f875726e050bd09e7b003a15623d3bda73a770a9768d"
+        },
+        "cohort_slot": 6,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "a49d9ad674495182",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/a49d9ad674495182/rgb.jpg",
+        "identity": {
+          "bytes": 5814159,
+          "sha256": "0836674ef35231c4c4183eb06d664482363c3e3ceceb3ab3899d624bde93c93b"
+        },
+        "cohort_slot": 7,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "48107c4d3526446f",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/48107c4d3526446f/rgb.jpg",
+        "identity": {
+          "bytes": 2385090,
+          "sha256": "8fd673091116d5c954a299f770d1b0b338844dae679a6738faf277f40e5bdce4"
+        },
+        "cohort_slot": 8,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "049aa19c83ab2bef",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/049aa19c83ab2bef/rgb.jpg",
+        "identity": {
+          "bytes": 6872760,
+          "sha256": "f7fcbf337268ca9f37a4480d5a067c2abb6327383ae344536b8560b7a209d2b0"
+        },
+        "cohort_slot": 9,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "49e48849d8174c20",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/49e48849d8174c20/rgb.jpg",
+        "identity": {
+          "bytes": 354610,
+          "sha256": "77a1abae18d5b9d742dd39c697bc8259b5037a5c7e1eb31030ac2b0f99780fec"
+        },
+        "cohort_slot": 10,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "0b9133833978c9ad",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/0b9133833978c9ad/rgb.jpg",
+        "identity": {
+          "bytes": 76863,
+          "sha256": "1af5e1694866a485c59a0bb2b84433e3276caca170b6efc607d094e75b34f6c5"
+        },
+        "cohort_slot": 11,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "aaf10a9872d38951",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/aaf10a9872d38951/rgb.jpg",
+        "identity": {
+          "bytes": 775159,
+          "sha256": "0d6e162e030d0add8c619b7fb5f7c1fe9bcaeddd255934147a590045228e9cbd"
+        },
+        "cohort_slot": 12,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "42db35ac1f6a3294",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/42db35ac1f6a3294/rgb.jpg",
+        "identity": {
+          "bytes": 2670034,
+          "sha256": "0fc7af55576688411051fc262ab85c2f3c178b1efd78445b384cb43e209796aa"
+        },
+        "cohort_slot": 13,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "33b19b3426635251",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/33b19b3426635251/rgb.jpg",
+        "identity": {
+          "bytes": 407293,
+          "sha256": "082486b3101f34134f1cb9c89dbde129b0dff4bfe48061782c1da575e16ef48c"
+        },
+        "cohort_slot": 14,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "7884ab6e62c9fe07",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/7884ab6e62c9fe07/rgb.jpg",
+        "identity": {
+          "bytes": 2865035,
+          "sha256": "58db8cfcbe60c804ce1b1d63f421de8f53998febcdd05e77f2b06861d724dbfa"
+        },
+        "cohort_slot": 15,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "dedc2e505cebc86b",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/dedc2e505cebc86b/rgb.jpg",
+        "identity": {
+          "bytes": 1596788,
+          "sha256": "19cb65fdb6e8733a0244384bf656979dc605ff4f015d8755944a09efc6130e25"
+        },
+        "cohort_slot": 16,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "2ed8a1825ed36fef",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/2ed8a1825ed36fef/rgb.jpg",
+        "identity": {
+          "bytes": 3674493,
+          "sha256": "5938f340665ff126ac14635e545ff955176f4635f74390d4191b2777e20d843f"
+        },
+        "cohort_slot": 17,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "61600b8970f91b6b",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/61600b8970f91b6b/rgb.jpg",
+        "identity": {
+          "bytes": 2672290,
+          "sha256": "be82147db1d9550d44543aa015e63909a1b85329aeed6887ed89c7b83e2ba4bb"
+        },
+        "cohort_slot": 18,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "73cc83643fe3a0a5",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/73cc83643fe3a0a5/rgb.jpg",
+        "identity": {
+          "bytes": 3356294,
+          "sha256": "342d743da14b8b9c07a59ddfd8cae4241f7644629bec0ed175b93a3e5c8c656f"
+        },
+        "cohort_slot": 19,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "153b038de0c4355c",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/153b038de0c4355c/rgb.jpg",
+        "identity": {
+          "bytes": 299179,
+          "sha256": "2944b3d5af22adaf09b2bda565c13919edc1f40d8a852c23ee737e42393e74ba"
+        },
+        "cohort_slot": 21,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "8ccd8c6b7bc674fe",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/8ccd8c6b7bc674fe/rgb.jpg",
+        "identity": {
+          "bytes": 3857939,
+          "sha256": "c94b365439b12eaf62b8e886d65dab99fc8228ac84f9f5d0395a5295ff9b9b53"
+        },
+        "cohort_slot": 22,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "ae9d41ea5ccf5291",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/ae9d41ea5ccf5291/rgb.jpg",
+        "identity": {
+          "bytes": 2427617,
+          "sha256": "572c3606d9d865c2e7fbd5fb8f85da06990715e2f3d1dcfca4befb1287d3f916"
+        },
+        "cohort_slot": 24,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "69dad05aab451f8c",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/69dad05aab451f8c/rgb.jpg",
+        "identity": {
+          "bytes": 6237569,
+          "sha256": "7a8457098a6a26d235bfcdaf3aba40d580783c074d1bbd69850a601a8fcbedae"
+        },
+        "cohort_slot": 27,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "056dae1b6833a57e",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/056dae1b6833a57e/rgb.jpg",
+        "identity": {
+          "bytes": 109337,
+          "sha256": "c1653918117e7cda0aab372504bf45d3fbdef4a1b1f3dc428e1f88fa4256da3c"
+        },
+        "cohort_slot": 28,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "6bf47a5d62845984",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/6bf47a5d62845984/rgb.jpg",
+        "identity": {
+          "bytes": 11187027,
+          "sha256": "49049cd257dfc8832b81eccc1d39a779af7241a929e10e212613044f584430db"
+        },
+        "cohort_slot": 31,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "79b2cf62e0ab10d9",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/79b2cf62e0ab10d9/rgb.jpg",
+        "identity": {
+          "bytes": 829238,
+          "sha256": "71c07f1ae6c00577ec7e726b27db1c810d23ab6b4e58babaa455950d30405bc2"
+        },
+        "cohort_slot": 32,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "b8d8f8acf8ce2fc0",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/b8d8f8acf8ce2fc0/rgb.jpg",
+        "identity": {
+          "bytes": 1554787,
+          "sha256": "a3bdc62b3300e5850d1d082e8b07399cf399d766e9dd09045e3c5ddc56a5e225"
+        },
+        "cohort_slot": 33,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "0a53b25fdd55704b",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/0a53b25fdd55704b/rgb.jpg",
+        "identity": {
+          "bytes": 160567,
+          "sha256": "ff6837484a12d16f37a25e7f17055509583dd26653611b373cc3827f6cd8ef5b"
+        },
+        "cohort_slot": 36,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "d4099a07ebb97df2",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/d4099a07ebb97df2/rgb.jpg",
+        "identity": {
+          "bytes": 45893,
+          "sha256": "9ccf0047676c164fe12af7fda78d35571a849baead75d6218295d65dfc885101"
+        },
+        "cohort_slot": 38,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "17f6e8ddc732f015",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/17f6e8ddc732f015/rgb.jpg",
+        "identity": {
+          "bytes": 2224748,
+          "sha256": "f3dd68e304564f548bf55715de749c8658ca932e5658e26e2102cdeeac5080f7"
+        },
+        "cohort_slot": 39,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "dc58527c9d626af4",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/dc58527c9d626af4/rgb.jpg",
+        "identity": {
+          "bytes": 352079,
+          "sha256": "a568a01fede16e6607e1d1add5e596cd2c5e393d08d86cdbbe664be428efb1ea"
+        },
+        "cohort_slot": 42,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "52435fac7ad9f225",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/52435fac7ad9f225/rgb.jpg",
+        "identity": {
+          "bytes": 3230596,
+          "sha256": "6a9e1bef85c5c316941c7303c09092b1be1444d25224f7bbd171b8d9a60e553e"
+        },
+        "cohort_slot": 43,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "9c1c51aeb0131d55",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/9c1c51aeb0131d55/rgb.jpg",
+        "identity": {
+          "bytes": 5985235,
+          "sha256": "ba805864aa35887c6f3e731b9fa58649670992624eba039340e93f08955bf9d7"
+        },
+        "cohort_slot": 44,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "93a9d4990e82ddd3",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/93a9d4990e82ddd3/rgb.jpg",
+        "identity": {
+          "bytes": 1079959,
+          "sha256": "8854a855f1ffba487f8ed424da7e3e485b0b42d2a7da7faebe7c0cc4e1b65d1e"
+        },
+        "cohort_slot": 45,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "77d4110c0e0b7713",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/77d4110c0e0b7713/rgb.jpg",
+        "identity": {
+          "bytes": 563845,
+          "sha256": "0de0bbbcbcd4fdc22b40616709e5bdc50378e7383bb75fe8bd621e13d15dce9b"
+        },
+        "cohort_slot": 49,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "99a57a8d2e040c4f",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/99a57a8d2e040c4f/rgb.jpg",
+        "identity": {
+          "bytes": 43908,
+          "sha256": "9f46892ad2e450321a9bb83d6056db0fbf572fca1d05087262c19c865c767004"
+        },
+        "cohort_slot": 51,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "007bddc8f1277b76",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/007bddc8f1277b76/rgb.jpg",
+        "identity": {
+          "bytes": 2679139,
+          "sha256": "25323c201e66211d52945c2bb1f11c5b56d1bff26f267e2b0c3dd419d4355ef2"
+        },
+        "cohort_slot": 52,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "492f88481e95a110",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/492f88481e95a110/rgb.jpg",
+        "identity": {
+          "bytes": 732893,
+          "sha256": "6268f1f2e9836c6e55be4c0335c8bb47f36a2a39de7493f5157ddd3147939c80"
+        },
+        "cohort_slot": 53,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "684b5fbfedae9a42",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/684b5fbfedae9a42/rgb.jpg",
+        "identity": {
+          "bytes": 3718812,
+          "sha256": "bd84e15ebc586586889e30b29b0bca2b93272e56aefa25aff512a9eb5e4a84ae"
+        },
+        "cohort_slot": 54,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "ef76312a56e4358b",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/ef76312a56e4358b/rgb.jpg",
+        "identity": {
+          "bytes": 3501817,
+          "sha256": "9671bcda43f8ff8d737fbe2473092724b37bf9784b665c3b0191f1b384e2ccf3"
+        },
+        "cohort_slot": 55,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "6aad3e4fe92487f3",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/6aad3e4fe92487f3/rgb.jpg",
+        "identity": {
+          "bytes": 2936045,
+          "sha256": "aaba2e7ddc25261a2ff683d023d12d1f03b26ebcda408b55a9cd45414b125a13"
+        },
+        "cohort_slot": 58,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "a64360fb184da99b",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/a64360fb184da99b/rgb.jpg",
+        "identity": {
+          "bytes": 2864117,
+          "sha256": "388ce8efebfccd6331a0938a758dcf66309db9a6521c7e224c8c9d67da0c6f8e"
+        },
+        "cohort_slot": 60,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "bfa8dd6b7a851d39",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/bfa8dd6b7a851d39/rgb.jpg",
+        "identity": {
+          "bytes": 4898811,
+          "sha256": "6d20bc1ac33ed67a0d145d8ef935bdbb2199c9e543c66180f1a11075ef6acf68"
+        },
+        "cohort_slot": 62,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "6a8885bbdfdbc5f7",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/6a8885bbdfdbc5f7/rgb.jpg",
+        "identity": {
+          "bytes": 1743890,
+          "sha256": "af58526b9f16affe0a641a18df35d63f851d4a8d9cd6fae34640fe48e930c1cd"
+        },
+        "cohort_slot": 64,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "f89fc1ae2e5f35cf",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/f89fc1ae2e5f35cf/rgb.jpg",
+        "identity": {
+          "bytes": 2752799,
+          "sha256": "7ba57a2047f1bd24055361288edc5c6512f8351aa1619e2de7577a90b964f006"
+        },
+        "cohort_slot": 65,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "594be2b637f3069e",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/594be2b637f3069e/rgb.jpg",
+        "identity": {
+          "bytes": 336685,
+          "sha256": "f46bf2214b47eeac9bb014a2ed2d4777b8adfbc33a176e66beef3e9677f1d220"
+        },
+        "cohort_slot": 66,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "ea5f245e48ca646f",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/ea5f245e48ca646f/rgb.jpg",
+        "identity": {
+          "bytes": 3585938,
+          "sha256": "b87668f6a0a86ff3cbcfdadd5832af456334dd9990e53db3041ef7326d46704f"
+        },
+        "cohort_slot": 67,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "67ed7074e4f21d13",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/67ed7074e4f21d13/rgb.jpg",
+        "identity": {
+          "bytes": 363908,
+          "sha256": "ca2d38aef6539c8d42cc1d00a4c6fdb7f5b838be5a71cede904e6fd483ee131e"
+        },
+        "cohort_slot": 70,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "e1880e7aaf12702b",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/e1880e7aaf12702b/rgb.jpg",
+        "identity": {
+          "bytes": 2191050,
+          "sha256": "44fa88e0dabf58db4797e6e681916a5b3bb219665ab59c303223f3ec6cafb1c0"
+        },
+        "cohort_slot": 71,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "8ade1edb8a94cc3e",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/8ade1edb8a94cc3e/rgb.jpg",
+        "identity": {
+          "bytes": 2589523,
+          "sha256": "014af62f7dfb8ade426d2107641c4a6f3ea146fab6a2ef474f83f094c735d9ee"
+        },
+        "cohort_slot": 72,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "b2d1ba5bb7c0d868",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/b2d1ba5bb7c0d868/rgb.jpg",
+        "identity": {
+          "bytes": 2441462,
+          "sha256": "6bc0c28a356dbdce3444ffdff2d9849b2ea388eb720523149369ac8579072ac0"
+        },
+        "cohort_slot": 73,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "be639435f6ab9486",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/be639435f6ab9486/rgb.jpg",
+        "identity": {
+          "bytes": 5571733,
+          "sha256": "437e81e102140922a725798c2328447cd2b93c0328c900555ef39114e9273587"
+        },
+        "cohort_slot": 74,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "9cbedb210fea8c79",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/9cbedb210fea8c79/rgb.jpg",
+        "identity": {
+          "bytes": 839358,
+          "sha256": "53a3090d4e6c2e5215080301bea9a454708efc3a3d4256edb2f4476a46f34a0a"
+        },
+        "cohort_slot": 80,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "03bb15edb87b7821",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/03bb15edb87b7821/rgb.jpg",
+        "identity": {
+          "bytes": 2814283,
+          "sha256": "f133d813d933a7939a03a6b922ef4003fe1e11293e0d9d13953556cb25b22545"
+        },
+        "cohort_slot": 82,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "7ccacd9ce3caf7dd",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/7ccacd9ce3caf7dd/rgb.jpg",
+        "identity": {
+          "bytes": 613534,
+          "sha256": "6f667547690481e48c88c0ea194913576b24c4e0e39534c71201d94f12c7bc94"
+        },
+        "cohort_slot": 84,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "47fc65ca97e156db",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/47fc65ca97e156db/rgb.jpg",
+        "identity": {
+          "bytes": 478064,
+          "sha256": "54ffec1488080acd1422d55f890eb13e4ba47280a65db36f3df838801ebc38fc"
+        },
+        "cohort_slot": 86,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "7a89223842410530",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/7a89223842410530/rgb.jpg",
+        "identity": {
+          "bytes": 158828,
+          "sha256": "7b7f63338d2655651d6fce5b3ecc62a79187cf47a7d2abd3f840ccb4f6ee1ff6"
+        },
+        "cohort_slot": 87,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "3924992327afd1e2",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/3924992327afd1e2/rgb.jpg",
+        "identity": {
+          "bytes": 1074170,
+          "sha256": "8569641c613052b37720bfed65b4b1a054a21e214ba485ee9d44278c2ebbf514"
+        },
+        "cohort_slot": 88,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "b1ffa667ec71472d",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/b1ffa667ec71472d/rgb.jpg",
+        "identity": {
+          "bytes": 4928529,
+          "sha256": "18209218abc64a662502d3838631533330c229e06bd2d2aad8bf22a7c61cf71d"
+        },
+        "cohort_slot": 91,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "3fbb59a39708db71",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/3fbb59a39708db71/rgb.jpg",
+        "identity": {
+          "bytes": 2775997,
+          "sha256": "982ca700c2a8ed82c4a6d242bad44311b1b38c8aedb7dd0b0695c4b625de12ae"
+        },
+        "cohort_slot": 92,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "6426e22ca40a289a",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/6426e22ca40a289a/rgb.jpg",
+        "identity": {
+          "bytes": 2671842,
+          "sha256": "c850a4a18f8917b351765852bf1a9bb7f3b115e2f28ff05e3451b36f0311ab06"
+        },
+        "cohort_slot": 93,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "de1235313f0bb28b",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/de1235313f0bb28b/rgb.jpg",
+        "identity": {
+          "bytes": 843004,
+          "sha256": "ea2e39f59f3d63c701c8e18f45c6f50e347aa86a45fd6ac07555a067aaa2879e"
+        },
+        "cohort_slot": 96,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "4769dea058ce932f",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/4769dea058ce932f/rgb.jpg",
+        "identity": {
+          "bytes": 558086,
+          "sha256": "d7ceb05b2713728276fd55749e93c8abd9ad121b853f54cada854ccb751a20c3"
+        },
+        "cohort_slot": 97,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "173942aff9b8234c",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/173942aff9b8234c/rgb.jpg",
+        "identity": {
+          "bytes": 588371,
+          "sha256": "2ee296138c21d30d899dca6527049f3196ece7282caa84531fce23bb8c37f324"
+        },
+        "cohort_slot": 99,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "94f3cefc466e6908",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/94f3cefc466e6908/rgb.jpg",
+        "identity": {
+          "bytes": 3045193,
+          "sha256": "288e92cd6e387c18a622814cd73b90863aa12f6ff0b2462132ac3bf6282bacd9"
+        },
+        "cohort_slot": 102,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "e60987eee83e0ed0",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/e60987eee83e0ed0/rgb.jpg",
+        "identity": {
+          "bytes": 5220949,
+          "sha256": "a253151552f66aeb62e781ffd0a1818dbbc551db339dbf56096545d63218c7ed"
+        },
+        "cohort_slot": 103,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "67cac965604e9838",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/67cac965604e9838/rgb.jpg",
+        "identity": {
+          "bytes": 5422972,
+          "sha256": "6aac7c3ee540fc860ca1858344b5dc283dfc59f66a90a7cf44cc62c7a89282bc"
+        },
+        "cohort_slot": 104,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "c3329dbd87577323",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/c3329dbd87577323/rgb.jpg",
+        "identity": {
+          "bytes": 415236,
+          "sha256": "80b104b637beeb424ab6e14ba76af90af31094237a09b2505f7f6c22383f859f"
+        },
+        "cohort_slot": 106,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "06d3086953fe445e",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/06d3086953fe445e/rgb.jpg",
+        "identity": {
+          "bytes": 271114,
+          "sha256": "4bde7603a9ac24a55232387f1b860f3ba9db0468a6bb106f8a5044ef2392fbe4"
+        },
+        "cohort_slot": 107,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "e7776fc137a4af84",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/e7776fc137a4af84/rgb.jpg",
+        "identity": {
+          "bytes": 4360249,
+          "sha256": "908cc94c9a23a189db24a5d38fdada610cc83a4a4090681fb82740e9566798ef"
+        },
+        "cohort_slot": 108,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "02079ab4f3485715",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/02079ab4f3485715/rgb.jpg",
+        "identity": {
+          "bytes": 11036741,
+          "sha256": "9dc50d48d27aa0c323ace4e16b7441f6844d830b425bec7155e498087445af3c"
+        },
+        "cohort_slot": 109,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "6a70c4bda312051f",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/6a70c4bda312051f/rgb.jpg",
+        "identity": {
+          "bytes": 546879,
+          "sha256": "ab92e47df89cc99700358ddb9bfc2729b9ea9e536c0dd3cbf4bc459ca92ebea9"
+        },
+        "cohort_slot": 111,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "e2b26ed230e034bb",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/e2b26ed230e034bb/rgb.jpg",
+        "identity": {
+          "bytes": 246615,
+          "sha256": "134c3e0b483e6c1369d5a691151190f0537151bcb841ce8a546be749f1494bc3"
+        },
+        "cohort_slot": 113,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "f3f74540844d69ae",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/f3f74540844d69ae/rgb.jpg",
+        "identity": {
+          "bytes": 4793680,
+          "sha256": "b1b11fd0be985272d188899db09c48776db92f8e25de9920a7418d87b804d4a4"
+        },
+        "cohort_slot": 114,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "f413a694e79e8313",
+        "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/f413a694e79e8313/rgb.jpg",
+        "identity": {
+          "bytes": 3267675,
+          "sha256": "c219ac04a81d584a569f31eec3be4613826a483e482a95744044f7690a734ca7"
+        },
+        "cohort_slot": 116,
+        "original_frame_index": 0
+      }
+    ]
+  }
+}

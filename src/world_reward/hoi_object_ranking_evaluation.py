@@ -251,11 +251,12 @@ def exact_image_signflip(deltas):
 def exact_image_sign_test(deltas):
     """Distinct one-sided paired binomial sign test; zero ties excluded.
 
-    Eligibility requires at least six nonzero image deltas. Mean retains ALL
-    supplied images including zeros. No silent substitution for sign-flip.
+    Eligibility requires at least six informative images supplied by the caller,
+    including exact-zero deltas. Ties abstain only from the directional binomial
+    vote; they remain in the image mean/count. No substitution for sign-flip.
     """
     a = _deltas(deltas); wins, losses = int((a > 0).sum()), int((a < 0).sum())
     n = wins + losses
-    p = sum(math.comb(n, k) for k in range(wins, n + 1)) / (2 ** n) if n >= 6 else None
+    p = sum(math.comb(n, k) for k in range(wins, n + 1)) / (2 ** n) if len(a) >= 6 else None
     values, den = _dyadic_values(a)
-    return ExactImageTest("exact_binomial_sign", len(a), n, wins, losses, int((a == 0).sum()), sum(values) / (den * len(a)), p, n >= 6)
+    return ExactImageTest("exact_binomial_sign", len(a), len(a), wins, losses, int((a == 0).sum()), sum(values) / (den * len(a)), p, len(a) >= 6)

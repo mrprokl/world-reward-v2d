@@ -264,7 +264,9 @@ def test_distinct_exact_sign_test_big_cohort_zero_ties_and_eligibility():
     assert r.p_one_sided == 2**-128 and r.informative_count == r.image_count == 128
     r = exact_image_sign_test(np.array([1, 1, 1, 1, 1, -1, 0, 0], np.float64))
     assert r.p_one_sided == 7 / 64 and r.zero_count == 2 and r.mean_delta == .5
-    assert exact_image_sign_test(np.array([1, 1, 1, 1, 1, 0], np.float64)).p_one_sided is None
+    assert exact_image_sign_test(np.array([1, 1, 1, 1, 1, 0], np.float64)).p_one_sided == 1/32
+    assert exact_image_sign_test(np.zeros(6, np.float64)).p_one_sided == 1
+    assert exact_image_sign_test(np.zeros(5, np.float64)).p_one_sided is None
     assert r.test != exact_image_signflip(np.ones(6, np.float64)).test
 
 

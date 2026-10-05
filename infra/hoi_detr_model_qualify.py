@@ -32,8 +32,8 @@ IMAGE_PROTOCOL = 'configs/hoi_detr_image_probe_v1.json'
 IMAGE_PROTOCOL_PIN = dict(bytes=6550, sha256='f556b700e4f331b7d92631711aa453e37cbd18d91e5bc0da1738c7e70ce3d9c9')
 COHORT_PROTOCOL = 'configs/hoi_detr_external_cohort_v1.json'
 COHORT_PROTOCOL_PIN = dict(bytes=8752, sha256='7d99a68fccf780e24cff46a2654103bb65f9894577853ce1ad15ddb6319097d4')
-COHORT128_PROTOCOL = 'configs/hoi_detr_external_cohort128_v1.json'
-COHORT128_PROTOCOL_PIN = {'bytes': 33079, 'sha256': '04329e3304d37e9ba23dfccbc29114550c82c1b99fd0433da6b70a5fd004b636'}
+COHORT128_PROTOCOL = 'configs/hoi_detr_external_cohort128_v2.json'
+COHORT128_PROTOCOL_PIN = {'bytes': 33079, 'sha256': 'da9cf0d7fc54b28ec40bc6384b2b108e597c4364df5be0f09c1ae90669d70060'}
 HELPERS = ('infra/hoi_detr_model_qualify.py', 'infra/run_hoi_detr_model_qualify.sh', PROTOCOL,
            'infra/hoi_detr_runtime_verify.py', 'infra/hoi_detr_acquire.py',
            'infra/mediapipe_cpu_runtime_verify.py', 'infra/mediapipe_hands_acquire.py',
@@ -73,7 +73,7 @@ def protocol(rt, code, *, external_rgb=False, external_cohort=False, external_co
     require(sum((external_rgb, external_cohort, external_cohort128)) <= 1, 'Exactly one inference scope required')
     name, pin = (COHORT128_PROTOCOL, COHORT128_PROTOCOL_PIN) if external_cohort128 else ((COHORT_PROTOCOL, COHORT_PROTOCOL_PIN) if external_cohort else ((IMAGE_PROTOCOL, IMAGE_PROTOCOL_PIN) if external_rgb else (PROTOCOL, PROTOCOL_PIN)))
     p = rt.pinned(code/name, pin, (64 if external_cohort128 else 16) << 10)
-    schema, scope, output = ('world_reward.hoi_detr_external_cohort128.v1', 'fixed128_external_full_native_observations_before_reference_evaluation', 'results/hoi-detr-external-cohort128-v1') if external_cohort128 else (('world_reward.hoi_detr_external_cohort.v1', 'fixed_external_cohort_full_native_observations_before_reference_evaluation', 'results/hoi-detr-external-cohort-v1') if external_cohort else (('world_reward.hoi_detr_image_probe.v1', 'one_external_RGB_native_pair_head_runtime_only', 'results/hoi-detr-image-probe-v1') if external_rgb else (
+    schema, scope, output = ('world_reward.hoi_detr_external_cohort128.v2', 'fixed128_external_full_native_observations_before_reference_evaluation', 'results/hoi-detr-external-cohort128-v2') if external_cohort128 else (('world_reward.hoi_detr_external_cohort.v1', 'fixed_external_cohort_full_native_observations_before_reference_evaluation', 'results/hoi-detr-external-cohort-v1') if external_cohort else (('world_reward.hoi_detr_image_probe.v1', 'one_external_RGB_native_pair_head_runtime_only', 'results/hoi-detr-image-probe-v1') if external_rgb else (
         'world_reward.hoi_detr_model_qualification.v4', 'one_procedural_RGB_full_native_model_runtime_only', 'results/hoi-detr-model-qualify-v4')
     ))
     require(p['schema'] == schema and p['scope'] == scope
@@ -90,12 +90,12 @@ def protocol(rt, code, *, external_rgb=False, external_cohort=False, external_co
 
 
 def selected_protocol_pin(p):
-    return COHORT128_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v1' else (COHORT_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_external_cohort.v1' else (IMAGE_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_image_probe.v1' else PROTOCOL_PIN))
+    return COHORT128_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v2' else (COHORT_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_external_cohort.v1' else (IMAGE_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_image_probe.v1' else PROTOCOL_PIN))
 
 
 def authenticate_external_cohort(rt, p):
     """Host-only rights/metadata binding. The GPU receives original JPEGs only."""
-    c = p['external_cohort']; folder = Path(c['root']); large = p['schema'] == 'world_reward.hoi_detr_external_cohort128.v1'
+    c = p['external_cohort']; folder = Path(c['root']); large = p['schema'] == 'world_reward.hoi_detr_external_cohort128.v2'
     require((str(folder) == '/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1'
              and c['slots'] == 128 and 0 < c['acquired'] <= 128 and c['missing'] == 128-c['acquired']) if large else
             (str(folder) == '/srv/world-reward-data/openimages_holds_fresh_acquisition_v1' and (c['slots'], c['acquired'], c['missing']) == (15, 8, 7)),
@@ -521,7 +521,7 @@ def gpu_model(code, revision, p, proof_pin):
     # Complete per-image identities live in a separately pinned concise manifest,
     # not truncated rows or a larger deadline/receipt policy.
     saved_outputs = outputs
-    if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v1':
+    if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v2':
         rt.write(out/'observations_manifest.json', (json.dumps(dict(schema='world_reward.hoi_detr_observations_manifest.v1', observations=outputs), sort_keys=True, allow_nan=False)+'\n').encode(), 0o444)
         saved_outputs = rt.identity(out/'observations_manifest.json', 256 << 10)
     value = dict(stage='hoi_detr_full_native_model', status='pass', source_binding=proof['source_binding'], checkpoint_identity=p['acquisition']['checkpoint'], strict_checkpoint=loaded, checkpoint_buffer_schema=buffer_schema,
@@ -558,7 +558,7 @@ def container_plan(code, out, revision, p, proof, phase, deadline):
              'WR_IMAGE_ID='+image_id, 'WR_MODEL_DEADLINE='+format(deadline, '.17g'), 'OMP_NUM_THREADS=4', 'OPENBLAS_NUM_THREADS=4', 'CUDA_VISIBLE_DEVICES=0' if phase == 'model' else 'CUDA_VISIBLE_DEVICES=-1',
              '/opt/conda/bin/python', '-I', '-B', str(code/HELPERS[0]), '--'+phase, '--proof-bytes', str(proof['pin']['bytes']), '--proof-sha256', proof['pin']['sha256']]
     if 'external_RGB' in p: args.append('--external-rgb')
-    if 'external_cohort' in p: args.append('--external-cohort128' if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v1' else '--external-cohort')
+    if 'external_cohort' in p: args.append('--external-cohort128' if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v2' else '--external-cohort')
     return name, cid, mounts, args
 
 
@@ -570,6 +570,25 @@ def validate_container(value, mounts, name, revision, image_id, phase):
             and not any(m['Type'] == 'volume' for m in value['Mounts']) and not h.get('Devices') and not h.get('Binds') and not h.get('VolumesFrom'), 'Only exact code/overlay/checkpoint/fresh output permitted')
     devices = h.get('DeviceRequests') or []
     require(bool(devices) == (phase == 'model') and (not devices or len(devices) == 1 and devices[0]['Driver'] == 'nvidia' and devices[0]['Count'] == -1 and devices[0]['Capabilities'] == [['gpu']]), 'Only one explicit native GPU request permitted')
+
+
+def container_inspect(runtime, name, deadline, *, large_cohort=False):
+    """Project unused metadata, never drop any mount or sandbox field.
+
+    Docker's complete inspect includes73 JPEGs repeatedly (Args/Mounts/HostConfig)
+    and exceeds the unchanged32KiB control bound. Preserve every field consumed
+    by validate_container; exclude only unused duplicate Args/lifecycle metadata.
+    """
+    if not large_cohort:
+        return json.loads(runtime.command(['docker', 'inspect', name, '--format', '{{json .}}'], deadline))
+    fields = ('Image', 'Name', 'Config', 'HostConfig', 'Mounts')
+    value = {}
+    for field in fields:
+        # Each unchanged field stays below32KiB; the full mount array is read
+        # in one response and every leaf is verified, never trimmed or aliased.
+        value[field] = json.loads(runtime.command(['docker', 'inspect', name, '--format', '{{json .'+field+'}}'], deadline))
+    require(set(value) == set(fields), 'All required owner/sandbox/mount metadata required')
+    return value
 
 
 def cleanup(runtime, cidfile, name, revision, image_id, deadline):
@@ -632,7 +651,7 @@ def run(code, revision, *, opener=None, external_rgb=False, external_cohort=Fals
                 report['phase'] = 'full_native_model'
             rt.write(out/(phase+'_proof.json'), (json.dumps(proof, sort_keys=True)+'\n').encode(), 0o444); context = dict(proof, pin=rt.identity(out/(phase+'_proof.json'), 2 << 20))
             name, cid, mounts, args = container_plan(code, out, revision, p, context, phase, deadline); runtime.absent(name, deadline); containers.append((cid, name, qualified['image']['Id']))
-            runtime.command(args, deadline); value = json.loads(runtime.command(['docker', 'inspect', name, '--format', '{{json .}}'], deadline)); validate_container(value, mounts, name, revision, qualified['image']['Id'], phase)
+            runtime.command(args, deadline); value = container_inspect(runtime, name, deadline, large_cohort=external_cohort128); validate_container(value, mounts, name, revision, qualified['image']['Id'], phase)
             runtime.command(['docker', 'start', '-a', name], deadline, log=out/(phase+'.log')); cleanup(runtime, cid, name, revision, qualified['image']['Id'], deadline); containers.pop()
         native = rt.strict((out/'native.json').read_bytes()); require(native['status'] == 'pass' and native['source_binding'] == own and native['actual_full_model'] is True and native['native_forward_calls'] == (p['external_cohort']['acquired'] if external_cohort or external_cohort128 else 1)
             and all(native[k] is False for k in FLAGS), 'Genuine one-forward model receipt required')

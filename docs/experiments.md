@@ -10258,3 +10258,25 @@ Next scientific cohort must be separately preregistered, larger and disjoint;
 algorithm/rank definitions remain unchanged, not tuned on this diagnostic.
 200 combined tiny tests PASS0.44s; clean diff/source syntax. Existing tiny visual
 receipts remain exact (all14 baseline139752B and external native QA55431B).
+
+Fresh128 study preregistered d870b0e BEFORE RGB inference/reference geometry:
+hash ranks16:144, disjoint old16, unchanged A/B and full-model policy. Creator/
+original MD5 acquisition128fixed slots:73 originals181054837B Azure-only,
+44unavailable+11unknown-rotation remain missing no replacements. Acquisition
+manifest127742B/58b15ab040f2400bbc1aa67ea32f8c75155eecb79c771d7b4735d5157b9ec793.
+
+392832e actual128batch v1 CLOSED HOSTFAIL20.403143s before GPU/model forward,
+zero NPZs. Host2891B/55df582ec17fb2bd1ccbae6f609d9fc9f9891cf6b3892fb1e3667582d42e2494;
+source/input/image/posthash and owned-container/overlay cleanup true; GPUidle.
+Cause: full Docker inspect with73exactJPEGmounts exceeds the unchanged32768B
+control bound. CPU-only never-started metadata diagnostic measures full49258B,
+even combinedrequiredprojection42180B. Read *each complete required field*
+separately: Image74,Name48,Config4076,HostConfig18444,Mounts19493B; all73mounts
+retained, noGPU/noRGB/noforward, exactcreatedCID removed. No control cap increase,
+mount omission, modelmath/native threshold change or oldFAIL relabel. Freshv2
+namespace reuses samecohort before any predictions; schema/pins only new.
+
+Before any reference metrics, independent audit caught statistical implementation
+mismatch: preregistered six *informative* images includes ties, not six nonzero
+deltas. Exactpaired binomial now returns5wins+1tie p1/32, all6ties p1; mean and
+informative denominator include zeros. No metric observations or gate retuning.

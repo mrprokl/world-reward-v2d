@@ -124,3 +124,23 @@ def test_large_scope_complete73_inputs_and_bounded_sidecar(gate):
     _, _, mounts, args = gate.container_plan(Path('/tmp/code'), Path('/tmp/out'), 'a'*40, p, proof, 'model', 1800)
     assert '--external-cohort128' in args and '--external-cohort' not in args
     assert len([m for m in mounts if str(m[0]).startswith(c['root'])]) == 73
+
+
+def test_large_inspect_projection_keeps_all_validation_metadata(gate):
+    source = (REPO/gate.HELPERS[0]).read_text()
+    tree = ast.parse(source); validator = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'validate_container')
+    keys = {n.slice.value for n in ast.walk(validator) if isinstance(n, ast.Subscript) and isinstance(n.value, ast.Name)
+            and n.value.id == 'value' and isinstance(n.slice, ast.Constant)}
+    assert keys == {'Image', 'Name', 'Config', 'HostConfig', 'Mounts'}
+    calls = []
+    def command(args, deadline):
+        calls.append(args)
+        return json.dumps({k: {} for k in keys}) if args[-1] == '{{json .}}' else '{}'
+    runtime = SimpleNamespace(command=command)
+    value = gate.container_inspect(runtime, 'name', 1800, large_cohort=True)
+    assert set(value) == keys
+    assert len(calls) == 5
+    assert set(c[-1] for c in calls) == {'{{json .'+k+'}}' for k in keys}
+    assert '{{json .Args}}' not in [c[-1] for c in calls]
+    gate.container_inspect(runtime, 'name', 1800)
+    assert calls[-1][-1] == '{{json .}}'
