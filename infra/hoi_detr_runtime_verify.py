@@ -24,21 +24,80 @@ import urllib.request
 import zipfile
 
 ROOT = Path('/srv/scenesmith/world-reward')
-DATA = Path('/srv/world-reward-data/hoi_detr_runtime_v1')
+DATA = Path('/srv/world-reward-data/hoi_detr_runtime_v2')
 ENTRY = 'run_hoi_detr_runtime_verify'
 PROTOCOL = 'configs/hoi_detr_runtime_v1.json'
-PROTOCOL_PIN = dict(bytes=7634, sha256='7f116a5f64565496437551717fa531d229eda323eca0d6c518f2335647aa217a')
+PROTOCOL_PIN = dict(bytes=7634, sha256='f3b89aa5aaa50070c36cb9aa1e5802b79da9a7d1ca0b31223d5a86538e24c6fc')
 ACQUIRE_PIN = dict(bytes=29349, sha256='130ca5bb5c4925c0069b5a3181c54848b78cb6c043dc688f29aa1f8bb66c3845')
 HELPERS = ('infra/hoi_detr_runtime_verify.py', 'infra/run_hoi_detr_runtime_verify.sh', PROTOCOL,
            'infra/hoi_detr_acquire.py', 'infra/mediapipe_cpu_runtime_verify.py', 'infra/mediapipe_hands_acquire.py')
 BLOCK = 1 << 20
 SAFE_ENV = dict(PATH='/usr/bin:/bin:/usr/sbin:/sbin', HOME='/nonexistent', LANG='C.UTF-8', DOCKER_HOST='unix://'+str(ROOT/'docker.sock'))
 FLAGS = ('quality_verified', 'hoi_model_inference_qualified', 'model_weights_read', 'rgb_read', 'dataset_instantiated', 'ground_truth_used', 'challenge_inputs_used', 'training_overlap_verified', 'license_eligibility_verified')
+# Only fixed public requirement labels may enter a native failure receipt. Never
+# serialize upstream exception text, paths, traceback or environment values.
+NATIVE_REQUIREMENTS = frozenset((
+    'Original acquisition helper path required',
+    'Pinned readonly acquisition helper required',
+    'Independent acquisition helper differs',
+    'Actual isolated source/markers required',
+    'Canonical immutable/control path required',
+    'Bounded single-link regular artifact required',
+    'Artifact changed while hashing',
+    'Duplicate receipt/config field',
+    'Nonfinite metadata',
+    'Exact independent SHA/byte pin required',
+    'Independent artifact identity differs',
+    'Original immutable source namespace required',
+    'Actual dispatch markers required',
+    'Readonly complete source closure required',
+    'Required immutable source/config closure missing',
+    'Inclusive native runtime deadline',
+    'Unprivileged offline native container required',
+    'Parent source/base proof differs',
+    'Parent owned CID must precede native imports',
+    'Complete source-only acquisition manifest required',
+    'Closed numerical source/dependency inventory required',
+    'Readonly source-only inputs required',
+    'No foreign source/model/RGB artifact permitted',
+    'Original source/dependency posthash differs',
+    'Original full source proof differs',
+    'Original CP311/Torch/NumPy ABI required',
+    'Frozen unchanged base dependencies/headers required',
+    'CPU build must not execute CUDA',
+    'Build copy differs from original source',
+    'Frozen native host compiler differs',
+    'Exact CUDA12.4 compiler required',
+    'Original full native extension build failed; no retry/patch',
+    'Native build modified original numerical/build source',
+    'Exactly one full native MMCV extension required',
+    'No generated build/runtime symlinks',
+    'CPU build never initialized CUDA',
+    'Native compile receipt late/failure',
+    'Original built runtime differs before ops',
+    'Exact added dependency versions required',
+    'Exactly built native MMCV extension required',
+    'No HOI/model/dataset imports in operator gate',
+    'Actual single H100 SM90 required',
+    'Native CUDA MSDeformAttn disagrees with original PyTorch reference',
+    'Native CUDA NMS indices differ',
+    'Original CPU soft-NMS decay/removal/indices differ',
+    'Native CUDA RoIAlign analytic grid differs',
+    'Built runtime changed after native operators',
+    'Source changed after operators',
+    'Native operators late/failure',
+))
 
 
 def require(value, message):
     if not value:
         raise ValueError(message)
+
+
+def native_failure_requirement(error):
+    if type(error) is ValueError and len(error.args) == 1 and type(error.args[0]) is str and error.args[0] in NATIVE_REQUIREMENTS:
+        return error.args[0]
+    return 'redacted_non_allowlisted_error'
 
 
 def helpers(code):
@@ -61,8 +120,8 @@ def source(rt, code, revision):
 
 def protocol(rt, code):
     p = rt.pinned(code/PROTOCOL, PROTOCOL_PIN, 32 << 10)
-    require(p['schema'] == 'world_reward.hoi_detr_runtime.v1' and p['scope'] == 'native_mmcv_operator_qualification_only'
-            and p['root'] == str(ROOT) and p['data_root'] == str(DATA) and p['output'] == 'results/hoi-detr-runtime-v1'
+    require(p['schema'] == 'world_reward.hoi_detr_runtime.v2' and p['scope'] == 'native_mmcv_operator_qualification_only'
+            and p['root'] == str(ROOT) and p['data_root'] == str(DATA) and p['output'] == 'results/hoi-detr-runtime-v2'
             and (p['budget_seconds'], p['cleanup_grace_seconds'], p['outer_seconds']) == (1800, 60, 1860)
             and p['minimum_free_bytes'] == 16 << 30 and all(p[k] is False for k in FLAGS), 'Frozen operator-only scope required')
     s = p['source']
@@ -572,7 +631,7 @@ def main():
         except Exception as exc:
             out = ROOT/p['output']; name = 'compile.json' if args.compile else 'operators.json'
             if not (out/name).exists():
-                failure = dict(stage='hoi_detr_mmcv_native_compile' if args.compile else 'hoi_detr_mmcv_native_operators', status='fail', phase='native_execution', error_type=type(exc).__name__, producer_revision=revision, **{k: False for k in FLAGS})
+                failure = dict(stage='hoi_detr_mmcv_native_compile' if args.compile else 'hoi_detr_mmcv_native_operators', status='fail', phase='native_execution', error_type=type(exc).__name__, requirement=native_failure_requirement(exc), producer_revision=revision, **{k: False for k in FLAGS})
                 _, _, acq = helpers(code); acq.write_receipt(out/name, failure, time.monotonic(), float(os.environ['WR_RUNTIME_DEADLINE']))
             raise
     else:

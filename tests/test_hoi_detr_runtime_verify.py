@@ -11,7 +11,9 @@ from pathlib import Path
 import shutil
 import stat
 import subprocess
+import sys
 import tarfile
+from types import SimpleNamespace
 import zipfile
 
 import pytest
@@ -254,25 +256,25 @@ def test_media_weights_or_unneeded_tests_never_retained(gate, tmp_path, name):
 
 
 def test_actual_vm02_image_absence_contract(gate, monkeypatch):
-    target = 'world-reward/hoi-detr-mmcv-native-v1'
+    target = 'world-reward/hoi-detr-mmcv-native-v2'
     def absent(args, **kwargs):
         assert args == ['docker','image','inspect',target,'--format','{{.Id}}']
-        return subprocess.CompletedProcess(args,1,b'\n',b'Error response from daemon: No such image: world-reward/hoi-detr-mmcv-native-v1:latest\n')
+        return subprocess.CompletedProcess(args,1,b'\n',b'Error response from daemon: No such image: world-reward/hoi-detr-mmcv-native-v2:latest\n')
     monkeypatch.setattr(gate.subprocess,'run',absent)
     gate.absent(target,gate.time.monotonic()+30,image_name=True)
 
 
 @pytest.mark.parametrize('fault',['daemon','permission','rc','present','wrong_name','wrong_tag'])
 def test_absence_never_accepts_ambiguous_daemon_or_foreign_name(gate, monkeypatch, fault):
-    stderr = b'Error response from daemon: No such image: world-reward/hoi-detr-mmcv-native-v1:latest\n'; stdout = b'\n'; rc=1
+    stderr = b'Error response from daemon: No such image: world-reward/hoi-detr-mmcv-native-v2:latest\n'; stdout = b'\n'; rc=1
     if fault == 'daemon': stderr=b'Cannot connect to the Docker daemon\n'
     elif fault == 'permission': stderr=b'permission denied\n'
     elif fault == 'rc': rc=2
     elif fault == 'present': rc=0; stdout=b'sha256:'+b'a'*64+b'\n'; stderr=b''
     elif fault == 'wrong_name': stderr=b'Error response from daemon: No such image: foreign:latest\n'
-    else: stderr=b'Error response from daemon: No such image: world-reward/hoi-detr-mmcv-native-v1:other\n'
+    else: stderr=b'Error response from daemon: No such image: world-reward/hoi-detr-mmcv-native-v2:other\n'
     monkeypatch.setattr(gate.subprocess,'run',lambda args,**kw:subprocess.CompletedProcess(args,rc,stdout,stderr))
-    with pytest.raises(ValueError): gate.absent('world-reward/hoi-detr-mmcv-native-v1',gate.time.monotonic()+30,image_name=True)
+    with pytest.raises(ValueError): gate.absent('world-reward/hoi-detr-mmcv-native-v2',gate.time.monotonic()+30,image_name=True)
 
 
 def test_owned_scratch_cleanup_rejects_replacement_inode(gate,tmp_path):
@@ -347,3 +349,112 @@ def test_create_registered_before_control_and_no_cleanup_after_final_receipt(gat
     assert final.index("out.chmod(0o555)") < final.index("acq.write_receipt(out/'report.json'")
     tail=final[final.index("acq.write_receipt(out/'report.json'"):]
     assert '.unlink()' not in tail and '.chmod(' not in tail
+
+
+def stub_base_versions(gate, monkeypatch, tmp_path, *, changed=None, header=True):
+    """Tiny public metadata seam; never import/install the actual native stack."""
+    import importlib.metadata as metadata
+    import sysconfig
+    p = json.loads((REPO/gate.PROTOCOL).read_bytes())
+    found = dict(p['base_distributions'])
+    if changed:
+        found[changed[0]] = changed[1]
+    include = tmp_path/'include'; include.mkdir()
+    if header:
+        (include/'Python.h').write_bytes(b'/* tiny header availability only */')
+    torch = SimpleNamespace(__version__=p['platform']['torch'], _C=SimpleNamespace(_GLIBCXX_USE_CXX11_ABI=False))
+    numpy = SimpleNamespace(__version__=p['platform']['numpy'])
+    monkeypatch.setitem(sys.modules, 'torch', torch); monkeypatch.setitem(sys.modules, 'numpy', numpy)
+    monkeypatch.setattr(gate.sys, 'version', p['platform']['python']+' manufactured test')
+    monkeypatch.setattr(sysconfig, 'get_config_var', lambda name:p['platform']['SOABI'] if name=='SOABI' else None)
+    monkeypatch.setattr(sysconfig, 'get_path', lambda name:str(include) if name=='include' else None)
+    calls = []
+    def version(name):
+        calls.append(name); return found[name]
+    monkeypatch.setattr(metadata, 'version', version)
+    return p, torch, numpy, calls
+
+
+def test_actual_ef12_metadata_901_without_install_or_downgrade(gate, monkeypatch, tmp_path):
+    p, torch, numpy, calls = stub_base_versions(gate, monkeypatch, tmp_path)
+    actual_torch, actual_numpy, report = gate.versions(p)
+    assert actual_torch is torch and actual_numpy is numpy
+    assert report['base_distributions'] == p['base_distributions'] and report['base_distributions']['importlib-metadata']=='9.0.1'
+    assert calls == list(p['base_distributions'])
+
+
+@pytest.mark.parametrize('changed', [('importlib-metadata','8.5.0'), ('importlib-metadata','9.0.2'), ('Pillow','10.3.0')])
+def test_actual_base_metadata_mismatch_still_rejected(gate, monkeypatch, tmp_path, changed):
+    p, _, _, _ = stub_base_versions(gate, monkeypatch, tmp_path, changed=changed)
+    with pytest.raises(ValueError, match='Frozen unchanged base dependencies/headers required'):
+        gate.versions(p)
+
+
+def test_base_header_presence_still_required(gate, monkeypatch, tmp_path):
+    p, _, _, _ = stub_base_versions(gate, monkeypatch, tmp_path, header=False)
+    with pytest.raises(ValueError, match='Frozen unchanged base dependencies/headers required'):
+        gate.versions(p)
+
+
+def test_technical_v2_namespaces_preserve_original_v1_failure(gate):
+    p = json.loads((REPO/gate.PROTOCOL).read_bytes())
+    assert p['schema']=='world_reward.hoi_detr_runtime.v2'
+    assert gate.DATA==Path('/srv/world-reward-data/hoi_detr_runtime_v2') and p['data_root']==str(gate.DATA)
+    assert p['output']=='results/hoi-detr-runtime-v2' and p['target_image']=='world-reward/hoi-detr-mmcv-native-v2'
+    assert (p['budget_seconds'],p['cleanup_grace_seconds'],p['outer_seconds'])==(1800,60,1860)
+    source = (REPO/gate.HELPERS[0]).read_text()
+    assert '/srv/world-reward-data/hoi_detr_runtime_v1' not in source and 'results/hoi-detr-runtime-v1' not in source
+    assert gate.ENTRY=='run_hoi_detr_runtime_verify' and gate.PROTOCOL=='configs/hoi_detr_runtime_v1.json'
+
+
+@pytest.mark.parametrize('message', [
+    'Frozen unchanged base dependencies/headers required',
+    'Original CP311/Torch/NumPy ABI required',
+    'Original full native extension build failed; no retry/patch',
+    'Native CUDA MSDeformAttn disagrees with original PyTorch reference',
+    'Original CPU soft-NMS decay/removal/indices differ',
+    'Independent artifact identity differs',
+])
+def test_native_failure_reports_only_known_original_requirement(gate, message):
+    assert gate.native_failure_requirement(ValueError(message))==message
+
+
+def test_native_failure_redacts_unknown_type_args_and_string_subclasses(gate):
+    class ValueErrorSubclass(ValueError): pass
+    class StringSubclass(str): pass
+    message='Frozen unchanged base dependencies/headers required'
+    for error in (ValueError('secret=DO_NOT_LOG'), RuntimeError(message), ValueError(message, 'secret'), ValueError(),
+                  ValueErrorSubclass(message), ValueError(StringSubclass(message)), ValueError({'secret':'DO_NOT_LOG'})):
+        assert gate.native_failure_requirement(error)=='redacted_non_allowlisted_error'
+
+
+def test_native_requirement_allowlist_is_literal_and_covers_native_guards(gate):
+    tree=ast.parse((REPO/gate.HELPERS[0]).read_text())
+    assignment=next(n for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name)and t.id=='NATIVE_REQUIREMENTS'for t in n.targets))
+    assert isinstance(assignment.value,ast.Call) and isinstance(assignment.value.func,ast.Name) and assignment.value.func.id=='frozenset'
+    assert set(ast.literal_eval(assignment.value.args[0]))==gate.NATIVE_REQUIREMENTS
+    native_functions={'helpers','source','check','data_proof','native_proof','versions','compile_native','native_ops','operator_cases'}
+    for function in (n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name in native_functions):
+        for call in ast.walk(function):
+            if isinstance(call,ast.Call)and isinstance(call.func,ast.Name)and call.func.id=='require':
+                assert isinstance(call.args[1],ast.Constant) and call.args[1].value in gate.NATIVE_REQUIREMENTS
+
+
+@pytest.mark.parametrize('known', [True,False])
+def test_native_main_failure_receipt_uses_redacted_requirement_only(gate, monkeypatch, tmp_path, known):
+    p=json.loads((REPO/gate.PROTOCOL).read_bytes()); out=tmp_path/p['output'];out.mkdir(parents=True);records=[]
+    message='Frozen unchanged base dependencies/headers required' if known else 'secret=DO_NOT_LOG'
+    def failing_compile(*args): raise ValueError(message)
+    class Acquisition:
+        @staticmethod
+        def write_receipt(path,value,started,deadline): records.append((path,value))
+    monkeypatch.setattr(gate,'ROOT',tmp_path);monkeypatch.setattr(gate,'helpers',lambda code:(None,None,Acquisition))
+    monkeypatch.setattr(gate,'protocol',lambda rt,code:p);monkeypatch.setattr(gate,'compile_native',failing_compile)
+    monkeypatch.setenv('WR_CODE',str(tmp_path/'code'));monkeypatch.setenv('WR_CODE_REVISION','a'*40);monkeypatch.setenv('WR_RUNTIME_DEADLINE','100')
+    monkeypatch.setattr(sys,'argv',['gate','--compile','--proof-bytes','12','--proof-sha256','b'*64])
+    with pytest.raises(ValueError): gate.main()
+    assert len(records)==1 and records[0][0]==out/'compile.json'
+    value=records[0][1]
+    assert value['status']=='fail' and value['error_type']=='ValueError' and all(value[k]is False for k in gate.FLAGS)
+    assert value['requirement']==(message if known else 'redacted_non_allowlisted_error')
+    assert 'DO_NOT_LOG' not in json.dumps(value) and 'traceback' not in value
