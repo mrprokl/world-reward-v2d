@@ -205,7 +205,10 @@ def test_observability_is_ast_neutral_for_native_math_and_runtime(gate):
         def visit_Assign(self,node):
             if (len(node.targets)==1 and isinstance(node.targets[0],ast.Subscript)
                 and isinstance(node.targets[0].value,ast.Name)and node.targets[0].value.id=='progress'
-                and isinstance(node.targets[0].slice,ast.Constant)and node.targets[0].slice.value in ('subgate','operator_subgate')):
+                and isinstance(node.targets[0].slice,ast.Constant)and node.targets[0].slice.value in ('subgate','operator_subgate','operator_step')):
+                if node.targets[0].slice.value=='operator_step':
+                    assert node.value.value in ('initialize','native_forward','conv2d_reference','synchronize','compare')
+                    return None
                 allowed=gate.OPERATOR_SUBGATES if node.targets[0].slice.value=='operator_subgate'else gate.FAILURE_GATES
                 assert isinstance(node.value,ast.Constant)and node.value.value in allowed
                 return None
@@ -261,6 +264,62 @@ def test_native_operator_failure_keeps_fixed_subgate_and_first_operators_gate(ga
     assert report['operator_subgate']==operator_subgate and operator_subgate in gate.OPERATOR_SUBGATES
     assert not report['model_constructed']and not report['weights_decoded']and not report['model_loaded']
     assert report['source_artifacts_rehashed_after']and 'SECRET'not in json.dumps(report)
+
+
+@pytest.mark.parametrize('message,category',[
+ ('CUDA error: no kernel image is available for execution on the device','cuda_no_kernel_image'),
+ ('CUDA error: invalid device function','cuda_invalid_device_function'),
+ ('CUDA error: an illegal memory access was encountered','cuda_illegal_memory_access'),
+ ('CUDA driver version is insufficient for CUDA runtime version','cuda_driver'),
+ ('modulated_deformable_im2col_impl: implementation for device cuda:0 not found','extension_device_unavailable'),
+ ('expected all tensors to be on the same device','tensor_device_mismatch'),
+ ("Input shape and kernel channels won't match",'tensor_shape'),
+ ('GET was unable to find an engine to execute this computation','cudnn_engine_unavailable'),
+ ('cuDNN error: CUDNN_STATUS_NOT_SUPPORTED','cudnn_status'),
+ ('CUDA error: CUBLAS_STATUS_NOT_SUPPORTED','cublas_status'),
+ ('CUDA out of memory','cuda_out_of_memory'),
+ ('SECRET_UNKNOWN_PAYLOAD','unclassified'),
+ ('CUDA error: invalid device function and CUDNN_STATUS_NOT_SUPPORTED','unclassified'),
+ ('CUDA error: invalid device function'+'x'*4097,'unclassified')])
+def test_operator_runtime_error_category_never_publishes_text(gate,message,category):
+    assert gate.operator_error_category(RuntimeError(message))==category
+    assert 'SECRET'not in gate.operator_error_category(RuntimeError(message))
+
+
+def test_operator_category_only_reads_bounded_exact_builtin_args(gate):
+    class Unknown(RuntimeError):
+        @property
+        def args(self):raise AssertionError('Untrusted exception arguments read')
+    for exc in (Unknown(),RuntimeError(),RuntimeError('invalid device function','SECRET'),
+                RuntimeError({'SECRET':'invalid device function'}),ValueError('invalid device function')):
+        assert gate.operator_error_category(exc)=='unclassified'
+
+
+def test_zero_offset_diagnostic_steps_preserve_original_operation_order(gate):
+    raw=(REPO/'infra/masa_native_qualify.py').read_text();tree=ast.parse(raw)
+    fn=next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='operators')
+    markers=sorted((n.lineno,n.value.value)for n in ast.walk(fn)if isinstance(n,ast.Assign)
+      and isinstance(n.targets[0],ast.Subscript)and isinstance(n.targets[0].slice,ast.Constant)
+      and n.targets[0].slice.value=='operator_step')
+    assert [v for _,v in markers]==['initialize','native_forward','conv2d_reference','synchronize','compare']
+
+
+def test_actual_native_failure_records_only_projected_operator_family(gate,tmp_path,monkeypatch):
+    rt,root,code,args,c=setup(gate,tmp_path,monkeypatch);out=tmp_path/'native';out.mkdir()
+    proof=gate.authenticate(rt,code,args);rt.write(out/'proof.json',json.dumps(proof).encode(),0o444)
+    torch=SimpleNamespace(__version__='2.1.2+cu118',cuda=SimpleNamespace(is_available=lambda:True,
+      get_device_capability=lambda:(9,0),get_device_name=lambda:'H100'))
+    monkeypatch.setitem(gate.sys.modules,'torch',torch);monkeypatch.setattr(gate.sys,'prefix',gate.VENV)
+    def operators(torch,policy,progress):
+        progress.update(operator_subgate='dcn_zero_offset',operator_step='native_forward')
+        raise RuntimeError('CUDA error: no kernel image is available for execution on the device SECRET_TOKEN')
+    def model(*a):raise AssertionError('No model after a kernel failure')
+    monkeypatch.setattr(gate,'operators',operators);monkeypatch.setattr(gate,'native_model',model)
+    with pytest.raises(ValueError):gate.run_native(code,args.revision,out,rt.identity(out/'proof.json'),gate.time.monotonic()+600)
+    r=json.loads((out/'native.json').read_bytes())
+    assert r['operator_error_category']=='cuda_no_kernel_image'and r['operator_step']=='native_forward'
+    assert not r['weights_decoded']and not r['model_constructed']and r['source_artifacts_rehashed_after']
+    assert 'SECRET'not in json.dumps(r)and 'no kernel image'not in json.dumps(r)
 
 
 @pytest.mark.parametrize('kind',[ImportError,ModuleNotFoundError,ValueError,TypeError,KeyError,AttributeError,RuntimeError,

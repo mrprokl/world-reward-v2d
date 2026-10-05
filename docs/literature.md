@@ -1717,3 +1717,18 @@ Additional download terms remain unread/uncleared; no acquisition here. HICO-DET
 HAKE and GIO/AVA do not supply a verified primary DATA/image grant in this audit.
 Do not substitute code MIT or third-party CC0 assertions for data permission,
 or describe a tracking-only gain as a demonstrated fix of EP8/9 or CARI4D win.
+
+MMCV2.1 original DCNv2 source audit for the actual pre-checkpoint RuntimeError:
+[Python wrapper](https://github.com/open-mmlab/mmcv/blob/v2.1.0/mmcv/ops/modulated_deform_conv.py)
+accepts our FP32 CUDA input[1,2,9,11]/weight[3,2,3,3]/offset[1,18,9,11]/
+mask[1,9,9,11], groups/deform_groups1. The native
+[device registry](https://github.com/open-mmlab/mmcv/blob/v2.1.0/mmcv/ops/csrc/common/pytorch_device_registry.hpp)
+checks common devices and a registered implementation; its
+[CUDA kernel](https://github.com/open-mmlab/mmcv/blob/v2.1.0/mmcv/ops/csrc/pytorch/cuda/modulated_deform_conv_cuda.cu)
+checks the launch error before native matrix multiplication. Successful CPU
+import does not establish these CUDA paths. Current zero-offset bucket also
+includes PyTorch conv2d/reference synchronization, so neither SM90 mismatch nor
+DCNv2 itself is identified by RuntimeError alone. Project exact bounded builtin
+diagnostics to fixed error-family labels in RAM; never serialize exception text,
+secrets or arbitrary class names. Preserve the original recipe/numerical gates
+and historical FAILs before any separately published technical diagnostic.

@@ -10561,3 +10561,15 @@ cap, so no extraction or architecture claim. Do not build a replacement or
 relax tests without identifying the actual technical cause. Parent144 combined
 tiny tests PASS3.33s; operator AST is unchanged after stripping diagnostic-only
 progress assignments. No tracking, physical ownership or quality gain.
+
+Next MASA technical diagnostic is frozen before invocation: unchanged600s
+contract/image/checkpoint and all original math, but separate zero-offset
+initialize/native-forward/conv2d-reference/sync/compare labels. Exact builtin
+RuntimeError with one exact string argument<=4096 is projected in RAM to fixed
+public CUDA/device/cuDNN/cuBLAS error-family labels; ambiguous/unknown payloads
+become unclassified. No text, hash of exception secrets, arbitrary class or
+argument is published. Parent161 combined tiny tests PASS3.43s, including byte/
+AST-neutral operators and end-to-end model-not-reached/no-secret failure receipt.
+This diagnoses a family, not the true architecture/root cause by itself; both
+historical failures remain closed and no replacement build is authorized by
+their generic RuntimeError alone.

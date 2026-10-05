@@ -40,6 +40,28 @@ def failure(report,gate,exc):
     report.setdefault('failure_class',EXCEPTION_CLASSES.get(type(exc),'other'))
 
 
+def operator_error_category(exc):
+    """Project bounded builtin CUDA diagnostics to labels; never publish text."""
+    if type(exc)is not RuntimeError:return 'unclassified'
+    args=exc.args
+    if type(args)is not tuple or len(args)!=1 or type(args[0])is not str or len(args[0])>4096:
+        return 'unclassified'
+    text=args[0].lower()
+    patterns=(('cuda_no_kernel_image',('no kernel image is available',)),
+      ('cuda_invalid_device_function',('invalid device function',)),
+      ('cuda_illegal_memory_access',('illegal memory access',)),
+      ('cuda_driver',('driver version is insufficient','no nvidia driver','cuda driver initialization failed')),
+      ('extension_device_unavailable',('implementation for device cuda:0 not found','not compiled with gpu support',
+                                       'not compiled with cuda','implementation for device cuda not found')),
+      ('tensor_device_mismatch',('expected all tensors to be on the same device','inconsistent device')),
+      ('tensor_shape',("input shape and kernel shape won't match","input shape and kernel channels won't match")),
+      ('cudnn_engine_unavailable',('unable to find an engine','unable to find a valid cudnn algorithm')),
+      ('cudnn_status',('cudnn_status_',)),('cublas_status',('cublas_status_',)),
+      ('cuda_out_of_memory',('cuda out of memory',)))
+    matches=[label for label,fragments in patterns if any(fragment in text for fragment in fragments)]
+    return matches[0]if len(matches)==1 else 'unclassified'
+
+
 def rt_helper(code):
     p=code/'infra/mediapipe_cpu_runtime_verify.py';s=p.lstat();expected='936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2'
     if (p.resolve()!=p or any(q.is_symlink()for q in(p,*p.parents))or not stat.S_ISREG(s.st_mode)
@@ -170,11 +192,18 @@ def operators(torch,c,progress):
     conv=ModulatedDeformConv2d(2,3,3,padding=1,bias=True).cuda().eval()
     with torch.no_grad():
         progress['operator_subgate']='dcn_zero_offset'
+        progress['operator_step']='initialize'
         conv.weight.copy_((torch.arange(conv.weight.numel(),device='cuda').reshape_as(conv.weight)%7-3)/32)
         conv.bias.copy_(torch.arange(3,device='cuda')/64)
         offset=torch.zeros((1,18,9,11),device='cuda');mask=torch.ones((1,9,9,11),device='cuda')
-        y=conv(x,offset,mask);ref=torch.nn.functional.conv2d(x,conv.weight,conv.bias,padding=1);torch.cuda.synchronize()
+        progress['operator_step']='native_forward'
+        y=conv(x,offset,mask)
+        progress['operator_step']='conv2d_reference'
+        ref=torch.nn.functional.conv2d(x,conv.weight,conv.bias,padding=1)
+        progress['operator_step']='synchronize'
+        torch.cuda.synchronize()
         g=c['operator_gates_before_checkpoint'];tol=g['dcn_zero_offset_mask_one_vs_conv2d']
+        progress['operator_step']='compare'
         if not torch.allclose(y,ref,**tol):raise ValueError('Native DCNv2 zero-offset identity differs')
         progress['operator_subgate']='dcn_nonzero'
         offset.fill_(.125);mask.copy_(.25+torch.arange(mask.numel(),device='cuda').reshape_as(mask)%5/8)
@@ -300,6 +329,7 @@ def run_native(code,revision,out,proof_pin,deadline):
         report.update(status='pass',phase='complete',subgate='complete')
     except BaseException as exc:
         failure(report,report['subgate'],exc);report['error']='bounded_native_contract_failed'
+        if report['subgate']=='operators':report['operator_error_category']=operator_error_category(exc)
     finally:
         signal.setitimer(signal.ITIMER_REAL,0)
         try:
