@@ -9905,3 +9905,29 @@ Original5 archives/failed source, exact census, public RGB and opaque metadata
 posthash verified. This does not qualify JPEG decoding, timestamp continuity,
 private semantic/instance mapping or an automatic model bank. Those are next,
 with predictor mounts excluding raw metadata and all reference archives.
+
+0eaf3e2 corrected visual overview actual PASS26.417090s (native22.875760s):
+all14 saved exports independently pass the native-array ABI census, with original
+middle-frame RGB and unchanged human/object geometry/camera. The first1b722ae
+attempt failed before rendering on an imagined export-receipt field; only that
+nonexistent-field assertion was removed, retaining the actual source/input pins.
+Overview139752B/134911ba9c957cf9c7c315c36718a0193964ecaf0e736ca9df284238d227ed32;
+report46333B/d2410b5a49a2787be93f6e59d2b7b65296582b61b0732a0c60ea10ef5f214378.
+Read-only source posthash and owned cleanup verified; only the bounded JPEG was
+delivered through private Azure storage to the user. QA also shows a background
+pair on episode8, consistent with the diagnosed episode9 association failure.
+No manual relabeling, per-clip fitting or reconstruction-quality claim.
+
+e54cbfe native HO-Cap AMG bank actual PASS23.068374s (native17.472354s):
+all1493 original JPEGs decoded before one model load/10 fixed-anchor AMG calls.
+Both complete clips retained; all native returned hierarchical masks preserved,
+not interpreted as exclusive physical IDs. First clip149 seeds/1616 queries;
+second138 seeds/1517 queries;10 banks13112452B total, zero zero-query seeds.
+Report7495B/710adfbaa52125d489178fcdfc83d4d5bd62af11b45bbfab2e2424207518682d;
+host668B/4ae12b1305a8de5ac777c35f2fbb8c22262757a3266d5b297ae4ed044c9e840b.
+Source/public/model posthash and owned cleanup verified. No private references,
+semantic validation or Boots tracking yet. Frozen40aff44 external retention
+protocol precedes model outputs; next run tracks every query over full native
+trajectories, seals both predictions, then opens only external semantic labels.
+245 integrated tiny tests PASS2.23s; this is execution evidence, not a video gain
+or a verified improvement over CARI4D.
