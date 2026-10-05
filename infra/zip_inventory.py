@@ -14,7 +14,7 @@ def require(value, message):
         raise ValueError(message)
 
 
-def read_directory(get_range, archive_bytes, maximum_bytes, maximum_members):
+def read_directory(get_range, archive_bytes, maximum_bytes, maximum_members, *, expected_layout=None):
     require(type(archive_bytes) is int and archive_bytes >= 98,
             'Bounded original archive length required')
     require(type(maximum_bytes) is int and maximum_bytes > 0
@@ -41,10 +41,12 @@ def read_directory(get_range, archive_bytes, maximum_bytes, maximum_members):
         boundary = where
     require(0 < count <= maximum_members and 46 * count <= length <= maximum_bytes
             and offset >= 0 and offset + length == boundary, 'Central-directory census bounds exceeded')
+    layout = dict(members=count, bytes=length, offset=offset, zip64=zip64,
+                  archive_bytes=archive_bytes, trailer_boundary=boundary)
+    require(expected_layout is None or layout == expected_layout, 'Original diagnostic ZIP64 metadata changed')
     raw = get_range(offset, offset + length - 1)
     require(len(raw) == length, 'Complete central-directory bytes required')
-    return raw, dict(members=count, bytes=length, offset=offset, zip64=zip64,
-                     archive_bytes=archive_bytes, trailer_boundary=boundary)
+    return raw, layout
 
 
 def parse_directory(raw, layout):

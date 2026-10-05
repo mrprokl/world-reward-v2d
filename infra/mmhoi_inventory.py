@@ -19,6 +19,7 @@ ROOT = Path('/srv/scenesmith/world-reward')
 ENTRY = 'run_mmhoi_inventory'
 CONFIG = 'configs/mmhoi_inventory_v1.json'
 CONFIG_V2 = 'configs/mmhoi_inventory_v2.json'
+CONFIG_V3 = 'configs/mmhoi_inventory_v3.json'
 HELPERS = ('infra/mmhoi_inventory.py', 'infra/zip_inventory.py',
            'infra/run_mmhoi_inventory.sh', 'infra/mediapipe_cpu_runtime_verify.py', CONFIG)
 
@@ -127,16 +128,17 @@ def run(config_name=CONFIG):
     rt.require(os.geteuid() == 0 and os.uname().sysname == 'Linux'
                and os.uname().nodename == 'world-reward-ncc-h100-02', 'Exact Azure CPU host only')
     revision, code = os.environ['WR_CODE_REVISION'], Path(os.environ['WR_CODE'])
-    rt.require(config_name in (CONFIG, CONFIG_V2), 'Only frozen explicit inventory versions')
+    rt.require(config_name in (CONFIG, CONFIG_V2, CONFIG_V3), 'Only frozen explicit inventory versions')
     helpers = (*HELPERS, config_name)
     source = rt.source(ROOT, code, revision, ENTRY, helpers)
     cfg = rt.strict((code / config_name).read_bytes())
-    rt.require(cfg['schema'] in ('world_reward.mmhoi_inventory.v1', 'world_reward.mmhoi_inventory.v2') and cfg['entry'] == ENTRY
+    rt.require(cfg['schema'] in ('world_reward.mmhoi_inventory.v1', 'world_reward.mmhoi_inventory.v2',
+                                'world_reward.mmhoi_inventory.v3') and cfg['entry'] == ENTRY
                and cfg['no_member_payload_reads'] is cfg['no_retries'] is cfg['no_directory_container_downloads'] is True,
                'Frozen metadata-only/no-retry scope')
     original_failure = None
-    if config_name == CONFIG_V2:
-        rt.require(cfg['schema'] == 'world_reward.mmhoi_inventory.v2'
+    if config_name in (CONFIG_V2, CONFIG_V3):
+        rt.require(cfg['schema'] == ('world_reward.mmhoi_inventory.v2' if config_name == CONFIG_V2 else 'world_reward.mmhoi_inventory.v3')
                    and cfg['publisher_metadata_required_before_after'] is True
                    and cfg['range_last_modified_policy'] == 'exact_or_absent_with_pinned_metadata_before_after',
                    'Explicit original-metadata-bound transport-v2 policy required')
@@ -147,6 +149,16 @@ def run(config_name=CONFIG):
         rt.require(old['status'] == 'fail' and old['producer_revision'] == cfg['original_failure']['producer_revision']
                    and old['range_bytes'] == 0 and old['member_payload_read'] is False
                    and old['RGB_read'] is False and old['outputs'] == {}, 'Original zero-body failure must remain closed')
+    directory_failure = None
+    if config_name == CONFIG_V3:
+        second = rt.strict((code / CONFIG_V2).read_bytes())
+        directory_failure = Path(second['output']) / 'report.json'
+        directory_pin = {k:cfg['directory_budget_failure'][k] for k in ('bytes','sha256')}
+        old = rt.pinned(directory_failure, directory_pin, 1 << 20)
+        rt.require(old['status'] == 'fail' and old['producer_revision'] == cfg['directory_budget_failure']['producer_revision']
+                   and old['range_bytes'] == 98 and old['member_payload_read'] is False
+                   and old['CSV_values_read'] is False and old['RGB_read'] is False and old['outputs'] == {},
+                   'Original pre-directory budget failure must remain closed')
     output = rt.canonical(cfg['output'])
     rt.require(not output.exists(), 'Exclusive new census namespace required')
     output.mkdir(mode=0o700)
@@ -163,7 +175,8 @@ def run(config_name=CONFIG):
         metadata = acquire_metadata(ranges)
         report['publisher_metadata_identity'] = pin(metadata)
         report['stage'] = 'central_directory'
-        raw, layout = read_directory(ranges.get, cfg['archive_bytes'], cfg['max_central_bytes'], cfg['max_members'])
+        raw, layout = read_directory(ranges.get, cfg['archive_bytes'], cfg['max_central_bytes'], cfg['max_members'],
+            expected_layout=cfg['expected_trailer_layout'] if config_name == CONFIG_V3 else None)
         rows = parse_directory(raw, layout); ranges.check()
         counts, sessions = summarize(rows, cfg)
         # Version/file metadata is independently byte-pinned before AND after
@@ -173,6 +186,9 @@ def run(config_name=CONFIG):
         if original_failure is not None:
             rt.require(rt.identity(original_failure, 1 << 20) == expected, 'Original failure changed during transport-v2')
             report['original_failure_unchanged'] = True
+        if directory_failure is not None:
+            rt.require(rt.identity(directory_failure, 1 << 20) == directory_pin, 'Original directory-budget failure changed')
+            report['directory_budget_failure_unchanged'] = True
         payload = dict(schema=cfg['schema'] + '.members', layout=layout, rows=rows)
         for name, data in (('publisher_file_metadata.json', metadata), ('central_directory.bin', raw),
                            ('members.json', (json.dumps(payload, sort_keys=True, separators=(',', ':')) + '\n').encode()),
@@ -198,5 +214,7 @@ def run(config_name=CONFIG):
 
 
 if __name__ == '__main__':
-    rt.require(sys.argv[1:] in ([], ['--metadata-bound-range-v2']), 'Only explicit transport-v2 mode')
-    run(CONFIG_V2 if sys.argv[1:] else CONFIG)
+    modes = {():CONFIG, ('--metadata-bound-range-v2',):CONFIG_V2,
+             ('--dimensioned-directory-v3',):CONFIG_V3}
+    rt.require(tuple(sys.argv[1:]) in modes, 'Only explicit frozen transport modes')
+    run(modes[tuple(sys.argv[1:])])

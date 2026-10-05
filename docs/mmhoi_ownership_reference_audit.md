@@ -140,3 +140,20 @@ diagnostic reproduces all three original range SHAs and ZIP64 fields:
 inventory is called PASS. Original publisher98trailer bytes and file metadata
 are sufficient to dimension a **new metadata-only** census, not to sample a
 favourable subset or change any scientific ownership population.
+
+Prospective explicit **inventory-v3** uses these exact782,626members and
+153,100,982central bytes, total153,101,080Range bytes including the98B trailer,
+600s inclusive deadline/20s per request/no retry. Original v1/v2 receipt pins are
+required unchanged before/after; a separate namespace prevents overwriting the
+failed gates. Asset identity, exclusions and no-label/no-RGB scope are unchanged.
+No directory budget is enlarged in response to a quality result. This is a new
+dimensioned metadata gate only; actual completion/audit remains required.
+
+Primary [paper v1 §3.3/4.4](https://arxiv.org/html/2510.07828v1) confirms trained
+annotators label framewise actions and involved body parts, all person×object
+pairs; neither is defined as binary physical contact. README lines98–111 name
+camera0–3 and bbox/action members but do not specify coordinate order, anatomical
+indices or sentinels. Published temporal chunks share scenarios and must not be
+mistaken for subject/session-disjoint validation. A positive person–object action
+study is distinct from hand-side/contact evaluation. Supplement PDF still unread;
+no numerical mapping or OFF label is inferred from an ambiguous sentinel.

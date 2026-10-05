@@ -43,6 +43,17 @@ def test_budget_failure_before_central_body_read():
     assert reads == [(len(raw) - 22, len(raw) - 1)]
 
 
+def test_changed_pinned_layout_rejected_before_central_body_read():
+    raw = archive(); reads = []
+    _, expected = read_directory(lambda a,b:raw[a:b+1], len(raw), 4096, 10)
+    expected['members'] += 1
+    def get(a, b):
+        reads.append((a,b)); return raw[a:b+1]
+    with pytest.raises(ValueError, match='diagnostic ZIP64 metadata changed'):
+        read_directory(get, len(raw), 4096, 10, expected_layout=expected)
+    assert reads == [(len(raw)-22,len(raw)-1)]
+
+
 def test_comment_rejected_without_tail_scan_or_member_read():
     raw = bytearray(archive()); raw[-2:] = b'\x01\x00'
     with pytest.raises(ValueError, match='comment-free'):
@@ -63,6 +74,23 @@ def test_zip64_trailer_with_sparse_virtual_archive():
               (where,where+55):record, (offset,offset+len(central)-1):central}
     raw, layout = read_directory(lambda a,b:wanted[(a,b)], end+22, 4096, 10)
     assert layout['zip64'] is True and parse_directory(raw,layout)[0]['name'] == 'x'
+
+
+@pytest.mark.parametrize('missing', [False, True])
+def test_member_zip64_sizes_offset_disk_decode_without_payload(missing):
+    values = struct.pack('<3QI', 1 << 33, 101, 1 << 34, 0)
+    extra = struct.pack('<HH', 1, len(values)) + values
+    if missing:
+        extra = b''
+    raw = struct.pack('<4s6H3I5H2I', b'PK\x01\x02', 45,45,0,8,0,0,0,
+                      4294967295,4294967295,1,len(extra),0,65535,0,0,4294967295) + b'x' + extra
+    layout = dict(bytes=len(raw), members=1, offset=(1 << 34) + 1024)
+    if missing:
+        with pytest.raises(ValueError, match='Required ZIP64 extra field missing'):
+            parse_directory(raw, layout)
+    else:
+        row, = parse_directory(raw, layout)
+        assert (row['bytes'], row['compressed_bytes'], row['local_header_offset']) == (1 << 33, 101, 1 << 34)
 
 
 @pytest.mark.parametrize('filename', ['../x', '/x', 'a//b', 'a\\b', 'a/./b', 'a\x00b'])
@@ -157,3 +185,18 @@ def test_v2_identity_policy_cannot_silently_inherit_v1_namespace_or_config():
               'max_central_bytes','max_members','max_request_bytes','max_total_range_bytes','budget_seconds',
               'exclude_schema_read_scenario','no_member_payload_reads','no_retries'):
         assert first[k] == second[k]
+
+
+def test_v3_complete_directory_is_exactly_dimensioned_by_actual_trailer():
+    second = json.loads(Path('configs/mmhoi_inventory_v2.json').read_bytes())
+    third = json.loads(Path('configs/mmhoi_inventory_v3.json').read_bytes())
+    layout = third['expected_trailer_layout']
+    assert layout['bytes'] == third['max_central_bytes'] == 153100982
+    assert layout['members'] == third['max_members'] == 782626
+    assert third['max_total_range_bytes'] == layout['bytes'] + 98
+    assert layout['offset'] + layout['bytes'] == layout['trailer_boundary']
+    assert third['output'] != second['output'] and third['budget_seconds'] == 600
+    for key in ('metadata_pin','publisher_md5','version_id','file_id','bucket_id',
+                'archive_bytes','max_request_bytes','range_last_modified_policy',
+                'exclude_schema_read_scenario','no_member_payload_reads','no_retries'):
+        assert third[key] == second[key]
