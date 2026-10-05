@@ -25,10 +25,10 @@ import mediapipe_hands_acquire as mp
 import masa_acquire as acq
 
 ROOT=Path('/srv/scenesmith/world-reward')
-BASE='weights/owlv2_objectness_v1'
-REPORT='results/owlv2-objectness-assets-v1.json'
+BASE='weights/owlv2_objectness_v2'
+REPORT='results/owlv2-objectness-assets-v2.json'
 ENTRY='run_owlv2_acquire'
-CONFIG='configs/owlv2_assets_v1.json'
+CONFIG='configs/owlv2_assets_v2.json'
 REVISION='57beb61adb5abda3de4a9796bc35ae60bc4b9802'
 REPO='google/owlv2-base-patch16-ensemble'
 BUDGET=600
@@ -39,7 +39,8 @@ ASSETS=(('README.md',4838,'7c7426bc5ec939a42d1f96fb093031b6263400cceac4129ebb941
         ('preprocessor_config.json',425,'cf3e396635b797ee1a464e1b2836e98748f8edac19e89aaa2c93b55ac15b0064','primary_configuration'),
         ('model.safetensors',619918824,'e1e130b9e404cf91a75ad45644c1da9d7fa5284085eecc864266a6923efb99e7','opaque_checkpoint'))
 HOSTS=frozenset(('huggingface.co','cdn-lfs.huggingface.co','cdn-lfs.hf.co',
-                 'cdn-lfs-us-1.hf.co','cdn-lfs-eu-1.hf.co','cas-bridge.xethub.hf.co'))
+                 'cdn-lfs-us-1.hf.co','cdn-lfs-eu-1.hf.co','cas-bridge.xethub.hf.co',
+                 'us.aws.cdn.hf.co'))
 
 
 def encode(value):return (json.dumps(value,sort_keys=True,allow_nan=False)+'\n').encode()

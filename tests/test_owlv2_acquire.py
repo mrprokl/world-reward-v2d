@@ -59,8 +59,15 @@ def test_original_streamer_and_publication_are_reused_and_configs_pinned():
 
 
 @pytest.mark.parametrize('url',['https://huggingface.co/a','https://cdn-lfs-us-1.hf.co/a?Expires=123&Signature=opaque',
-    'https://cas-bridge.xethub.hf.co/a?X-Amz-Credential=publisher_delivery&X-Amz-Signature=opaque'])
+    'https://cas-bridge.xethub.hf.co/a?X-Amz-Credential=publisher_delivery&X-Amz-Signature=opaque',
+    'https://us.aws.cdn.hf.co/a?Expires=123&Signature=opaque'])
 def test_exact_approved_https_cdn_signed_delivery_only(url):assert p.endpoint(url)==url
+
+
+def test_observed_publisher_cdn_intersects_unchanged_upstream_endpoint():
+    url='https://us.aws.cdn.hf.co/a?Expires=123&Signature=opaque'
+    assert p.endpoint(url)==p.acq.endpoint(url)==url
+    assert len(p.HOSTS)==7
 
 
 @pytest.mark.parametrize('url',['http://huggingface.co/a','https://evil.hf.co/a','https://hf.co.evil/a',
