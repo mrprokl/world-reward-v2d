@@ -24,10 +24,10 @@ import urllib.request
 import zipfile
 
 ROOT = Path('/srv/scenesmith/world-reward')
-DATA = Path('/srv/world-reward-data/hoi_detr_runtime_v2')
+DATA = Path('/srv/world-reward-data/hoi_detr_runtime_v3')
 ENTRY = 'run_hoi_detr_runtime_verify'
 PROTOCOL = 'configs/hoi_detr_runtime_v1.json'
-PROTOCOL_PIN = dict(bytes=7634, sha256='f3b89aa5aaa50070c36cb9aa1e5802b79da9a7d1ca0b31223d5a86538e24c6fc')
+PROTOCOL_PIN = dict(bytes=7634, sha256='b6636cfc2ac56929489a577cdd7daefff768d8beaff00c8be5a6fe8fabb13d67')
 ACQUIRE_PIN = dict(bytes=29349, sha256='130ca5bb5c4925c0069b5a3181c54848b78cb6c043dc688f29aa1f8bb66c3845')
 HELPERS = ('infra/hoi_detr_runtime_verify.py', 'infra/run_hoi_detr_runtime_verify.sh', PROTOCOL,
            'infra/hoi_detr_acquire.py', 'infra/mediapipe_cpu_runtime_verify.py', 'infra/mediapipe_hands_acquire.py')
@@ -120,8 +120,8 @@ def source(rt, code, revision):
 
 def protocol(rt, code):
     p = rt.pinned(code/PROTOCOL, PROTOCOL_PIN, 32 << 10)
-    require(p['schema'] == 'world_reward.hoi_detr_runtime.v2' and p['scope'] == 'native_mmcv_operator_qualification_only'
-            and p['root'] == str(ROOT) and p['data_root'] == str(DATA) and p['output'] == 'results/hoi-detr-runtime-v2'
+    require(p['schema'] == 'world_reward.hoi_detr_runtime.v3' and p['scope'] == 'native_mmcv_operator_qualification_only'
+            and p['root'] == str(ROOT) and p['data_root'] == str(DATA) and p['output'] == 'results/hoi-detr-runtime-v3'
             and (p['budget_seconds'], p['cleanup_grace_seconds'], p['outer_seconds']) == (1800, 60, 1860)
             and p['minimum_free_bytes'] == 16 << 30 and all(p[k] is False for k in FLAGS), 'Frozen operator-only scope required')
     s = p['source']
@@ -270,9 +270,13 @@ def command(args, deadline, *, log=None):
         r = subprocess.run(args, env=SAFE_ENV, capture_output=True, timeout=min(15, max(.01, deadline-time.monotonic())), check=False)
         require(r.returncode == 0 and len(r.stdout) <= 32768 and len(r.stderr) <= 32768, 'Bounded native lifecycle control failed')
         return r.stdout.decode().rstrip('\n')
+    # BuildKit treats a local full image ID in FROM as a registry tag. The
+    # measured classic builder resolves that exact existing ID without aliases
+    # or remote pulls; this changes image packaging only, never native math.
+    build_env = dict(SAFE_ENV, DOCKER_BUILDKIT='0') if args[:2] == ['docker', 'build'] else SAFE_ENV
     with log.open('xb') as stream:
         os.fchmod(stream.fileno(), 0o400)
-        r = subprocess.run(args, env=SAFE_ENV, stdout=stream, stderr=subprocess.STDOUT, timeout=max(.01, deadline-time.monotonic()), check=False)
+        r = subprocess.run(args, env=build_env, stdout=stream, stderr=subprocess.STDOUT, timeout=max(.01, deadline-time.monotonic()), check=False)
     require(log.stat().st_size <= 16 << 20 and r.returncode == 0, 'Native build/operator process failed')
 
 
@@ -539,7 +543,7 @@ def run(code, revision, *, opener=None):
         context, runtime = make_context(rt, out, compiled, deadline, owned_folders)
         rt.write(out/'runtime_manifest.json', (json.dumps(runtime, sort_keys=True)+'\n').encode(), 0o444); runtime_pin = rt.identity(out/'runtime_manifest.json', 2 << 20)
         dockerfile = ('FROM '+base['Id']+'\nCOPY runtime /opt/world-reward-hoi-mmcv\n').encode(); rt.write(context/'Dockerfile', dockerfile, 0o444)
-        command(['docker', 'build', '--network', 'none', '--label', 'world-reward.job='+ENTRY, '--label', 'world-reward.revision='+revision, '--label', 'world-reward.source='+own['closure_sha256'], '--label', 'world-reward.protocol='+PROTOCOL_PIN['sha256'], '--tag', p['target_image'], '--file', str(context/'Dockerfile'), str(context)], deadline, log=out/'image.log')
+        command(['docker', 'build', '--pull=false', '--network', 'none', '--label', 'world-reward.job='+ENTRY, '--label', 'world-reward.revision='+revision, '--label', 'world-reward.source='+own['closure_sha256'], '--label', 'world-reward.protocol='+PROTOCOL_PIN['sha256'], '--tag', p['target_image'], '--file', str(context/'Dockerfile'), str(context)], deadline, log=out/'image.log')
         child = image(p['target_image'], deadline)
         require(child['Id'] != base['Id'] and child['RootFS']['Layers'][:p['base_layers']] == base['RootFS']['Layers'] and len(child['RootFS']['Layers']) > p['base_layers']
                 and child['Labels'].get('world-reward.job') == ENTRY and child['Labels'].get('world-reward.revision') == revision and child['Labels'].get('world-reward.source') == own['closure_sha256'], 'New owned child must preserve all original base layers')

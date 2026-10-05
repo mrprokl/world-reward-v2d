@@ -10083,3 +10083,20 @@ context/source unpack) remain AST-identical to a68d9ef; no native math/backend
 change. Failure reports allow only fixed literal requirement labels, never
 upstream exception contents or environment.219 combined tiny tests PASS1.84s,
 syntax/diff checks PASS; actual native outcome must be read independently.
+
+7217b70 v2 full original MMCV compile actual PASS64.195558s/129objects,
+unchanged numerical source, CUDA not initialized. Extension13834312B/
+e0437758c5f1c4675113c4565107902c30070a75ee5482b3f9c62aa8f22dc446;
+compile2511B/2a33102adf49b96daa8f11702b11757ef408c765f256efb6594b9bed34c6e803.
+Overall remains CLOSED HOSTFAIL72.658893s: BuildKit misinterprets FROM local
+sha256:imageID as docker.io/library/sha256:tag and attempts remote metadata.
+Host7446B/9f2e8787a422a47ad614137716ec4a5fe21568d5c1d848fe04a7e221b8997b80.
+Original source/input/base posthash and owned-container/scratch cleanup pass.
+No native GPU operators or full-model qualification yet; failed image/logs retained.
+
+Independent CPU-only packaging control with DOCKER_BUILDKIT=0 resolves the same
+full existing ef12 image ID, returns that exact ID, and verifies unchanged
+base/rootfs. No COPY/install/tag/GPU/models or extra image layer. Fresh v3
+therefore changes packaging only: explicit classic local builder and --pull=false,
+new namespace, nine native functions AST-identical to v2. Same source/operators/
+32CPU/128GiB/1800s; no package/source/numerical repair or old-result relabel.
