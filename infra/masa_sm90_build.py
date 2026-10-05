@@ -28,7 +28,7 @@ import zipfile
 ROOT = Path('/srv/scenesmith/world-reward')
 ENTRY = 'run_masa_sm90_build'
 CONFIG = 'configs/masa_sm90_build_v1.json'
-CONFIG_PIN = dict(bytes=20643, sha256='ea645f2a70b3c9e9e22fe9714ee005456b4d34d4294cc7f47eaf390c73ae25ad')
+CONFIG_PIN = dict(bytes=20926, sha256='fdc0134a5037bf446f8f7c755c4252749b4ffba492dda93a43932d14674f252b')
 BUDGET, COMPILE_BUDGET, GRACE = 2400, 1800, 30
 BASE = 'sha256:5b4cda06057d53e3e1fdd5408e5b14aa2b702318df2b50252558d098300a5ec6'
 VENV = '/opt/world-reward-masa'
@@ -353,7 +353,7 @@ class LimitedReader:
 
 
 def deb_members(path):
-    """Only canonical three-member Debian archives; no GNU/BSD name indirection."""
+    """Three Debian members plus optional final bounded publisher signature."""
     members = []
     with path.open('rb') as f:
         require(f.read(8) == b'!<arch>\n')
@@ -371,10 +371,17 @@ def deb_members(path):
             f.seek(size, os.SEEK_CUR)
             if size % 2:
                 require(f.read(1) == b'\n')
-        require(f.tell() == path.stat().st_size and len(members) == 3)
+        require(f.tell() == path.stat().st_size and len(members) in (3, 4))
         require(members[0]['name'] == 'debian-binary' and members[0]['bytes'] == 4
                 and members[1]['name'] in ('control.tar.xz', 'control.tar.gz')
                 and members[2]['name'] in ('data.tar.xz', 'data.tar.gz'))
+        if len(members) == 4:
+            signature = members[3]
+            require(signature['name'] == '_gpgbuilder' and 0 < signature['bytes'] <= 4096)
+            f.seek(signature['offset'])
+            raw = f.read(signature['bytes'])
+            require(len(raw) == signature['bytes'])
+            signature['sha256'] = hashlib.sha256(raw).hexdigest()
         f.seek(members[0]['offset'])
         require(f.read(4) == b'2.0\n')
     return members
@@ -428,6 +435,7 @@ def deb_headers(path, destination, c):
     require(header_count > 0 and notice_count > 0)
     return dict(ar_members=members, data_members=len(rows), data_expanded_bytes=expanded,
                 selected_header_and_notice_bytes=selected, headers=header_count, notices=notice_count,
+                signature_verification_claimed=False, signature_executed_or_extracted=False,
                 data_inventory_sha256=hashlib.sha256(json.dumps(rows, sort_keys=True).encode()).hexdigest(),
                 selected_inventory=inventory(destination), shared_or_static_libraries_installed=False)
 

@@ -333,7 +333,7 @@
     "adoption": false,
     "known_missing_Torch_CUDA_headers_observed_before_any_SM90_build": true
   },
-  "recipe_revision": "prospective_headers_complete_after_actual_missing_Torch_CUDAContext_header_census_before_any_build",
+  "recipe_revision": "technical_signed_DEB_container_format_after_closed_94e7c2f_no_algorithm_ABI_operator_or_budget_change",
   "header_package_metadata": {
     "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/Packages.gz",
     "whole_current_Packages_gz_pin": null,
@@ -408,8 +408,16 @@
     "shared_static_libraries_scripts_and_control_payload_installed": false,
     "dpkg_or_apt_invoked": false,
     "archive_inventory_recorded_on_Azure": true,
-    "archive_members_observed": false,
+    "archive_members_observed": true,
     "symlink_hardlink_or_device_in_selected_files_allowed": false,
-    "selected_include_binary_library_names_allowed": false
+    "selected_include_binary_library_names_allowed": false,
+    "debian_ar_optional_final_signature": {
+      "name": "_gpgbuilder",
+      "minimum_bytes": 1,
+      "maximum_bytes": 4096,
+      "inventory_offset_size_and_sha256": true,
+      "executed_or_extracted": false,
+      "cryptographic_signature_verification_claimed": false
+    }
   }
 }

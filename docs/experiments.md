@@ -10695,3 +10695,20 @@ PID472644 active, public acquisition visible, no receipt at observation.
 This is not a compiler or GPU model PASS. New external full-person/hand/object
 ownership validation remains unavailable or rights-unqualified; no proxy score
 or challenge QA is substituted for that comparison.
+
+94e7c2f original full MMCV SM90 CPU build CLOSED technicalFAIL99.661931s at
+toolkit_inventory, before compiler/model/GPU. Receipt14415B/
+4257e289ce23b692f67b43a76c28860b987f1fb82ee1213928ce634e264ad255;
+source/prior runtime/assets/image posthash, owned cleanup and seal flags true.
+One independent read-only Azure archive audit24.912s identifies the exact
+cause: all three publisher-hashed DEBs include a fourth final _gpgbuilder
+member (1271/1272B), while the reader allowed only three. CUDA component
+inventories and selected headers/notices match original paths and limits.
+Fresh prospective transport-format support permits only this optional final
+1..4096B member, records its SHA/offset/size and never executes/extracts it or
+claims signature verification. All complete DEB hashes, original source,
+algorithms, ABI and deadlines remain unchanged; no old failure rewrite.
+Config20926B/fdc0134a5037bf446f8f7c755c4252749b4ffba492dda93a43932d14674f252b;
+parent72 build/transport/person-bank tests PASS0.33s. Native compile remains
+unverified. This addresses a demonstrated file-format defect, not a numerical
+gate relaxation or another data/parameter experiment.

@@ -459,7 +459,8 @@ def test_compile_diagnostic_fixed_steps_and_log_identity_no_raw(gate, tmp_path):
     assert 'private' not in json.dumps(result).replace('private_compiler_output_identity', '')
 
 
-def make_deb(path, *, extra=False, unsafe=None, root_entry=False, trailing_slash=True):
+def make_deb(path, *, extra=False, unsafe=None, root_entry=False, trailing_slash=True,
+             signature=None, signature_position=None, signature_name='_gpgbuilder', duplicate_signature=False):
     data = io.BytesIO()
     with tarfile.open(fileobj=data, mode='w:gz') as t:
         if root_entry:
@@ -479,6 +480,11 @@ def make_deb(path, *, extra=False, unsafe=None, root_entry=False, trailing_slash
     with tarfile.open(fileobj=control, mode='w:gz') as t:
         pass
     members = [('debian-binary', b'2.0\n'), ('control.tar.gz', control.getvalue()), ('data.tar.gz', data.getvalue())]
+    if signature is not None:
+        item = (signature_name, signature)
+        members.insert(len(members) if signature_position is None else signature_position, item)
+        if duplicate_signature:
+            members.append(item)
     if extra:
         members.append(('malicious', b'bad'))
     raw = bytearray(b'!<arch>\n')
@@ -517,6 +523,33 @@ def test_actual_nvidia_deb_short_ar_names_without_slash(gate, tmp_path):
     report = gate.deb_headers(p, tmp_path / 'out', c)
     assert [r['name'] for r in report['ar_members']] == ['debian-binary', 'control.tar.gz', 'data.tar.gz']
     assert report['headers'] == 1
+
+
+@pytest.mark.parametrize('slash', [False, True])
+def test_actual_nvidia_final_signature_metadata_only(gate, tmp_path, slash):
+    c = json.loads((REPO / gate.CONFIG).read_bytes())
+    p = tmp_path / 'library.deb'
+    body = b'Publisher opaque signature\n'
+    make_deb(p, signature=body, trailing_slash=slash, root_entry=True)
+    report = gate.deb_headers(p, tmp_path / 'out', c)
+    signature = report['ar_members'][-1]
+    assert signature['name'] == '_gpgbuilder' and signature['bytes'] == len(body)
+    assert signature['sha256'] == hashlib.sha256(body).hexdigest()
+    assert report['signature_verification_claimed'] is report['signature_executed_or_extracted'] is False
+    assert report['headers'] == report['notices'] == 1
+    assert not list((tmp_path / 'out').rglob('_gpgbuilder'))
+
+
+@pytest.mark.parametrize('fault', ['empty', 'oversize', 'unknown', 'duplicate', 'not_last'])
+def test_signature_constraints_fail_before_any_extraction(gate, tmp_path, fault):
+    c = json.loads((REPO / gate.CONFIG).read_bytes())
+    p = tmp_path / 'library.deb'
+    make_deb(p, signature=b'' if fault == 'empty' else b'x' * 4097 if fault == 'oversize' else b'tiny',
+             signature_name='unknown' if fault == 'unknown' else '_gpgbuilder',
+             duplicate_signature=fault == 'duplicate', signature_position=1 if fault == 'not_last' else None)
+    with pytest.raises(ValueError):
+        gate.deb_headers(p, tmp_path / 'out', c)
+    assert not (tmp_path / 'out').exists()
 
 
 @pytest.mark.parametrize('fault', ['extra_ar', 'unsafe_tar', 'oversize_selected', 'missing_hash_record'])
