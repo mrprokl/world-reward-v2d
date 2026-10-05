@@ -1,0 +1,249 @@
+{
+  "schema": "world_reward.hoi_detr_runtime.v1",
+  "scope": "native_mmcv_operator_qualification_only",
+  "root": "/srv/scenesmith/world-reward",
+  "data_root": "/srv/world-reward-data/hoi_detr_runtime_v1",
+  "output": "results/hoi-detr-runtime-v1",
+  "base_image_id": "sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4",
+  "target_image": "world-reward/hoi-detr-mmcv-native-v1",
+  "base_layers": 47,
+  "base_ordered_rootfs_sha256": "0f1bf78024834b90e5841b8de8893fba8eec4176bf36c071516d0c1205d84fdc",
+  "publication_cutoff": "2026-09-30",
+  "budget_seconds": 1800,
+  "cleanup_grace_seconds": 60,
+  "outer_seconds": 1860,
+  "minimum_free_bytes": 17179869184,
+  "maximum_report_bytes": 2097152,
+  "maximum_build_log_bytes": 16777216,
+  "cpu_memory": "128g",
+  "gpu_memory": "16g",
+  "maximum_jobs": 32,
+  "platform": {
+    "python": "3.11.10",
+    "SOABI": "cpython-311-x86_64-linux-gnu",
+    "torch": "2.5.1+cu124",
+    "numpy": "1.26.3",
+    "cuda": "12.4",
+    "gpu_capability": [
+      9,
+      0
+    ]
+  },
+  "base_distributions": {
+    "Pillow": "10.2.0",
+    "PyYAML": "6.0.2",
+    "packaging": "24.1",
+    "opencv-python": "4.11.0.86",
+    "ninja": "1.11.1.1",
+    "setuptools": "72.1.0",
+    "wheel": "0.44.0",
+    "platformdirs": "4.3.6",
+    "importlib-metadata": "8.5.0",
+    "zipp": "3.20.2"
+  },
+  "compiler": {
+    "gcc": "11.4.0",
+    "g++": "11.4.0",
+    "nvcc": "12.4.131",
+    "gcc_path": "/usr/bin/gcc",
+    "gxx_path": "/usr/bin/g++",
+    "nvcc_path": "/usr/local/cuda/bin/nvcc",
+    "ninja_path": "/opt/conda/bin/ninja",
+    "cuda_home": "/usr/local/cuda",
+    "torch_cuda_arch_list": "9.0"
+  },
+  "source": {
+    "repository": "open-mmlab/mmcv",
+    "revision": "4c01b026f0afa5a91a5f54aea313788da1e40f95",
+    "commit_date": "2023-12-27T02:44:06Z",
+    "git_root_tree_sha1": "e5a9980219f78ae70ec004c18d7be58773925870",
+    "url": "https://codeload.github.com/open-mmlab/mmcv/tar.gz/4c01b026f0afa5a91a5f54aea313788da1e40f95",
+    "archive_prefix": "mmcv-4c01b026f0afa5a91a5f54aea313788da1e40f95",
+    "blob_count": 1026,
+    "expanded_bytes": 14700206,
+    "maximum_archive_bytes": 67108864,
+    "maximum_expanded_bytes": 67108864,
+    "maximum_member_bytes": 16777216,
+    "maximum_retained_file_bytes": 500000,
+    "maximum_blobs": 2048,
+    "maximum_tar_entries": 4096,
+    "symlinks": {
+      "docs/zh_cn/mmcv-logo.png": {
+        "target": "../docs/mmcv-logo.png",
+        "bytes": 21,
+        "git_blob_sha1": "7dcca035f61762b204842bfe5a12aa990c97e8eb"
+      }
+    },
+    "required_source_pins": {
+      "LICENSE": {
+        "bytes": 11413,
+        "sha256": "866d999d3ca92d2c5dc9b0afc941c5fac6529e2d180fc638274f91f7fce161d7"
+      },
+      "setup.py": {
+        "bytes": 25054,
+        "sha256": "72e752ce57550482d562d4ad96c1932e1ac24fe1aca04164be262e8140b01dcd"
+      },
+      "mmcv/ops/multi_scale_deform_attn.py": {
+        "bytes": 16566,
+        "sha256": "c3d1469a8a40df0e27dbea8809f66863d9d57243ecaa6b2d597afc9e095b9f83"
+      },
+      "mmcv/ops/nms.py": {
+        "bytes": 21238,
+        "sha256": "fc136ea4f1fefad092de5683f3b56ce1323a4bf7fd117a39c8d746f53b3b07c6"
+      },
+      "mmcv/ops/roi_align.py": {
+        "bytes": 8733,
+        "sha256": "26ddded2455ea2a50414bd9ccc6b1b604ea4777e257951bdc4176e019d7ebec5"
+      },
+      "mmcv/ops/csrc/pytorch/cuda/ms_deform_attn_cuda.cu": {
+        "bytes": 18325,
+        "sha256": "5cb973adf1326bbe9852a0d60b389abcc22d1a601a45f4fbe78835a431179729"
+      },
+      "mmcv/ops/csrc/common/cuda/ms_deform_attn_cuda_kernel.cuh": {
+        "bytes": 33575,
+        "sha256": "4ca3b6d22e90ad9d11ebddff8c9f0ea76af9582fdc99066ac87847ea77e2f90a"
+      }
+    },
+    "retention": "all original mmcv numerical Python/C++/CUDA/header/build text, requirements/setup/build config, all licenses/notices anywhere; no symlinks/media/data/weights"
+  },
+  "wheels": [
+    {
+      "name": "addict",
+      "version": "2.4.0",
+      "filename": "addict-2.4.0-py3-none-any.whl",
+      "bytes": 3832,
+      "sha256": "249bb56bbfd3cdc2a004ea0ff4c2b6ddc84d53bc2194761636eb314d5cfa5dfc",
+      "url": "https://files.pythonhosted.org/packages/6a/00/b08f23b7d7e1e14ce01419a467b583edbb93c6cdb8654e54a9cc579cd61f/addict-2.4.0-py3-none-any.whl",
+      "date": "2020-11-21",
+      "license": "MIT",
+      "publisher_license": {
+        "url": "https://raw.githubusercontent.com/mewwts/addict/v2.4.0/LICENSE",
+        "bytes": 1085,
+        "sha256": "ca488d33c512d0b226142090af90e89ae266a901a293f89fd642dfec931e22c1"
+      }
+    },
+    {
+      "name": "yapf",
+      "version": "0.40.1",
+      "filename": "yapf-0.40.1-py3-none-any.whl",
+      "bytes": 250316,
+      "sha256": "b8bfc1f280949153e795181768ca14ef43d7312629a06c43e7abd279323af313",
+      "url": "https://files.pythonhosted.org/packages/23/75/c374517c09e31bf22d3b3f156d73e0f38d08e29b2afdd607cef5f1e10aa9/yapf-0.40.1-py3-none-any.whl",
+      "date": "2023-06-20",
+      "license": "Apache-2.0",
+      "publisher_license": {
+        "url": "https://raw.githubusercontent.com/google/yapf/v0.40.1/LICENSE",
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      }
+    },
+    {
+      "name": "tomli",
+      "version": "2.0.1",
+      "filename": "tomli-2.0.1-py3-none-any.whl",
+      "bytes": 12757,
+      "sha256": "939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc",
+      "url": "https://files.pythonhosted.org/packages/97/75/10a9ebee3fd790d20926a90a2547f0bf78f371b2f13aa822c759680ca7b9/tomli-2.0.1-py3-none-any.whl",
+      "date": "2022-02-08",
+      "license": "MIT",
+      "publisher_license": {
+        "url": "https://raw.githubusercontent.com/hukkin/tomli/2.0.1/LICENSE",
+        "bytes": 1072,
+        "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
+      }
+    }
+  ],
+  "build": {
+    "MMCV_WITH_OPS": "1",
+    "FORCE_CUDA": "1",
+    "MMCV_WITH_TRT": "0",
+    "MMCV_WITH_ORT": "0",
+    "MAX_JOBS": "32",
+    "native_numerical_source_modified": false,
+    "extension": "mmcv._ext",
+    "cpp_standard": "native_setup_cxx17"
+  },
+  "operators": {
+    "seed": 3,
+    "dtype": "float32",
+    "MSDeformAttn": {
+      "device": "cuda",
+      "batch": 1,
+      "heads": 8,
+      "head_dimension": 32,
+      "queries": 3,
+      "levels": 5,
+      "points": 4,
+      "spatial_shapes": [
+        [
+          3,
+          2
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "im2col_step": 64,
+      "rtol": 1e-05,
+      "atol": 1e-07
+    },
+    "NMS": {
+      "device": "cuda",
+      "iou_threshold": 0.5,
+      "offset": 0,
+      "expected_indices": [
+        0,
+        2
+      ]
+    },
+    "softNMS": {
+      "device": "cpu",
+      "native_cpu_only": true,
+      "iou_threshold": 0.5,
+      "offset": 0,
+      "method": "linear",
+      "min_score": 0.001,
+      "expected_indices": [
+        0,
+        2
+      ]
+    },
+    "RoIAlign": {
+      "device": "cuda",
+      "output_size": 2,
+      "spatial_scale": 1.0,
+      "sampling_ratio": 0,
+      "pool_mode": "avg",
+      "aligned": true,
+      "atol": 1e-06
+    },
+    "amp": false,
+    "tf32": false,
+    "checkpoint_used": false,
+    "rgb_used": false
+  },
+  "quality_verified": false,
+  "hoi_model_inference_qualified": false,
+  "model_weights_read": false,
+  "rgb_read": false,
+  "dataset_instantiated": false,
+  "ground_truth_used": false,
+  "challenge_inputs_used": false,
+  "training_overlap_verified": false,
+  "license_eligibility_verified": false,
+  "build_cpus": 32,
+  "gpu_cpus": 4
+}
