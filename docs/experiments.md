@@ -9810,3 +9810,37 @@ audit generic automatic entity-to-mask/contact association and introduce a
 prospective all-clip consistency gate, not a manual EP9 reassignment. EP26 looks
 more coherent in these three views but contact, geometry and temporal accuracy
 remain unverified. No verified CARI4D superiority or leaderboard result.
+
+Independent actual EP9 lineage census identifies the first semantic break at
+automatic initialization, not Body indexing: seed0 chooses actor1 background
+bbox[1099.786,474.607,1200.071,666.038] and object bbox in the background desk
+region. Full Body conditioned mask boxes agree at0/207/414; raw Body-v-mask IoU
+0.752650/0.790239/0.635926. Thus downstream self-consistency alone cannot expose
+the wrong semantic pair. All16 sparse seed observations were used; foreground
+track uncertainty was retained as contamination, while global top-confidence
+object affinity selected the stable background actor. No manual target/label
+replacement or episode-specific parameter change. A new procedural negative
+independently reproduces this global-top-object vulnerability. Next architecture
+must retain exhaustive joint person/object candidates and competing temporal
+routes; co-motion/nearest distance are not certified contact or target truth.
+
+Actual49072 conditional point study CLOSED technicalFAIL: first24-frame native
+decode/reconstitution complete, then original LBS `int64` requirement rejects
+actual Momentum `uint32[18439,8]` IDs0..114. Zero renders, trackers or fits.
+Native report5747B/faec8cb45e3f125e43935e12359e86e5f5639d47443dadc5abb4cd48fd410385;
+host4635B/5a1fac3f3bdfa12bdb96f813991f66730562cdd9fb31e1611ed955f9c8fdbacd.
+Owned container absent, GPU idle. Saved metadata independently CPU-inspected:
+faces int64[36874,3], LBS weights float32[18439,8]. Minimal a1414f4 accepts only
+source-native uint32 and existing int64 identifiers, unchanged bytes/no cast;
+all original validity, named wrist mass and face tie rules remain. Scientific
+8076B/d1a3fd protocol, meshes and all six scenes unchanged. Root156 tiny tests
+PASS0.55s; this ABI fix is not a successful scientific experiment or fit gain.
+
+HO-Cap primary dataset CC-BY4 grant and exact five public Box endpoints HEAD
+verified. Prospective df9a689 acquisition onVM02:5,080,226,520B entirely Azure,
+two fixed subject5 clips/camera, original RGB only for predictors; labels/poses/
+CAD/calibration stay opaque400 in700 quarantine. Raw sequence metadata private,
+only scalar num_frames public. All41 acquisition tiny tests PASS; real source/
+download/layout/decoder/reference continuity remain to qualify independently.
+No full-body/contact/active-target truth is claimed. It can validate persistent
+object/hand pose, not invent semantic target labels from nearest private wrists.
