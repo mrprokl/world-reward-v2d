@@ -1,0 +1,118 @@
+{
+  "schema": "world_reward.vcoco_pilot_endpoint_bank.v1",
+  "image_id": "sha256:fd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252",
+  "output": "/srv/scenesmith/world-reward/results/vcoco-pilot-endpoint-banks-v1",
+  "input_directory": "/srv/world-reward-data/vcoco_role_pilot_v1/inputs",
+  "maximum_images": 16,
+  "maximum_input_bytes": 268435456,
+  "maximum_image_bytes": 16777216,
+  "maximum_decoded_pixels": 16777216,
+  "maximum_bank_bytes": 16777216,
+  "maximum_output_bytes": 268435456,
+  "budget_seconds": 600,
+  "native_cleanup_seconds": 20,
+  "outer_seconds": 615,
+  "cpu_threads": 4,
+  "maximum_host_memory_bytes": 8589934592,
+  "maximum_container_memory_bytes": 8589934592,
+  "model_loads": 2,
+  "person_query": "person.",
+  "confidence": 0.3,
+  "text_threshold": 0.25,
+  "nms_iou": 0.7,
+  "owl_patches": 3600,
+  "ground_truth_used": false,
+  "ownership_verified": false,
+  "quality_verified": false,
+  "adoption": false,
+  "original_recipe": {
+    "bytes": 2239,
+    "sha256": "1543ff33c77a2ad34dd38dc93e926173c53302c9a4cf7a9f28362334955589cc"
+  },
+  "reused_helper_pins": {
+    "configs/frontend_asset_archive_pins.json": {
+      "bytes": 1806,
+      "sha256": "b2b39f067c015d20d59cef9f72aa0bea7eae2441c79177031a968bff6e62b747"
+    },
+    "configs/frontend_grounding_source_pins.json": {
+      "bytes": 23140,
+      "sha256": "775de939b18f8833ab478153071f90c387ed270825572def4b7e15cebed4ea8e"
+    },
+    "configs/owlv2_assets_v2.json": {
+      "bytes": 2864,
+      "sha256": "a9e2423ba06301b9b3ca0dece14afeeae25b8f681d58067e894b223770c0be51"
+    },
+    "configs/owlv2_native_qualification_v1.json": {
+      "bytes": 2279,
+      "sha256": "0f4dae48a0078405578372dfd8d094ff8d9ca84e4c762d54848ebc638613ee27"
+    },
+    "configs/rgb_endpoint_bank_v2.json": {
+      "bytes": 2239,
+      "sha256": "1543ff33c77a2ad34dd38dc93e926173c53302c9a4cf7a9f28362334955589cc"
+    },
+    "infra/bridge_frontend_bindings.py": {
+      "bytes": 15790,
+      "sha256": "94a1d1d99abd5c325e43511a6fa08cded20ad55f0bb28aaa0f13101b07951d6f"
+    },
+    "infra/frontend_sam2_kernel_gate.py": {
+      "bytes": 15441,
+      "sha256": "156bf96f6f875ccd5c58e13a25bc10c52a8cceffeeaceff1ace58e26b1737ed6"
+    },
+    "infra/frontend_selected_assets.py": {
+      "bytes": 10312,
+      "sha256": "28817bc5b6629c4721108c7ccb2f10b6b1ee30ba833c6e3eb85d202336a26c43"
+    },
+    "infra/masa_acquire.py": {
+      "bytes": 17128,
+      "sha256": "2e9e0539c0ddf6d0d9045a377516f4a89424a8b29ebdf04503f1444f2b512238"
+    },
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "infra/mediapipe_hands_acquire.py": {
+      "bytes": 21381,
+      "sha256": "8293510c02777cd5b844865285736ff1a653631a8803849a9047ee9030196570"
+    },
+    "infra/openimages_joint_pair_gdi.py": {
+      "bytes": 26539,
+      "sha256": "6d5f5976de54b45ca179aed0c8d2ac3d9da2379b56334ec585326884d9887352"
+    },
+    "infra/owlv2_acquire.py": {
+      "bytes": 12032,
+      "sha256": "071a3653b6a6e5b4b08f22c303301e9cb0b6956b3db7787ccc4fafb076bdaa54"
+    },
+    "infra/owlv2_native_qualify.py": {
+      "bytes": 25658,
+      "sha256": "dd2934a1146ad21eaaab8b422486c2e765535f3139032f74dd01e6047476875e"
+    },
+    "infra/rgb_endpoint_bank.py": {
+      "bytes": 34983,
+      "sha256": "7a4641eb7da72cd4610750b19758ee0b7afe0c7ac2865ce8e1f6ddb6715d3081"
+    },
+    "infra/run_owlv2_acquire.sh": {
+      "bytes": 716,
+      "sha256": "a71ddde76e1bf6976525a9f9bf1fa10456aa034b11dd8d2965697abb8dc891f9"
+    },
+    "infra/run_rgb_endpoint_bank.sh": {
+      "bytes": 909,
+      "sha256": "dd8bcfc51a8c3fc991d4ca669dbe0cdf97fcf9613c6b72c56bea906e9bfb218f"
+    },
+    "src/world_reward/__init__.py": {
+      "bytes": 81,
+      "sha256": "1ac8c64041277f0c3cf4d8838b3153210d7076dd86a5121d1e6ef494b64b36a1"
+    },
+    "src/world_reward/owlv2_object_observations.py": {
+      "bytes": 8748,
+      "sha256": "8587489a860b44a74bc0149c67960128b6b12aa1e4d51bc07e0e52103da5b888"
+    },
+    "src/world_reward/prompt_selection.py": {
+      "bytes": 9971,
+      "sha256": "04c9ed2ce9d004920da436d2e15ce0d464275598f122411eac87b47bb8c95ae6"
+    },
+    "src/world_reward/rgb_bank_inputs.py": {
+      "bytes": 4240,
+      "sha256": "f6f00d4c2f51be665112ac697753ae755fb914caeaf6362472ae76c38b7ffa99"
+    }
+  }
+}
