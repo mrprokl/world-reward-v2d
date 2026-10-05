@@ -1,0 +1,44 @@
+{
+  "schema": "world_reward.rgb_region_bank.v1",
+  "sam2_source_revision": "2b90b9f5ceec907a1c18123530e92e794ad901a4",
+  "sam2_checkpoint_revision": "665f8e2ad61cf5f53d65644ff27c8ee525124610",
+  "image_id": "sha256:fd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252",
+  "checkpoint": {
+    "relative_path": "sam2/sam2.1_hiera_large.pt",
+    "bytes": 898083611,
+    "sha256": "2647878d5dfa5098f2f8649825738a9345572bae2d4350a2468587ece47dd318"
+  },
+  "installed_config": {
+    "path": "configs/sam2.1/sam2.1_hiera_l.yaml",
+    "bytes": 3798,
+    "sha256": "1dbd6cb6dfebeaf588c7006ee222c6efbfa9049a7ad472a3cdfb2f5d919e8107"
+  },
+  "build_apply_postprocessing": true,
+  "amg": {
+    "points_per_side": 32,
+    "points_per_batch": 64,
+    "pred_iou_thresh": 0.8,
+    "stability_score_thresh": 0.95,
+    "stability_score_offset": 1.0,
+    "mask_threshold": 0.0,
+    "box_nms_thresh": 0.7,
+    "crop_n_layers": 0,
+    "crop_nms_thresh": 0.7,
+    "crop_overlap_ratio": 0.3413333333333333,
+    "crop_n_points_downscale_factor": 1,
+    "min_mask_region_area": 0,
+    "output_mode": "binary_mask",
+    "use_m2m": false,
+    "multimask_output": true
+  },
+  "packed_mask_bitorder": "little",
+  "budget_seconds": 1200,
+  "maximum_images": 64,
+  "maximum_pixels": 16777216,
+  "maximum_rgb_bytes": 16777216,
+  "maximum_masks": 3072,
+  "maximum_bank_bytes": 1073741824,
+  "all_native_returned_masks": true,
+  "quality_verified": false,
+  "adoption": false
+}
