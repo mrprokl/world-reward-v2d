@@ -1,0 +1,41 @@
+{
+  "schema": "world_reward.hoi_observation_preview.v1",
+  "root": "/srv/scenesmith/world-reward",
+  "output": "results/hoi-observation-preview-v1",
+  "image_id": "sha256:5fa124a3c7c92c0482b6be0d1477f43da2d246d550411170e01a8f9d4fb8523a",
+  "source_producer_revision": "54437d8f450cfef46340a74838c2e4dfa5dc1cb5",
+  "input": "/srv/world-reward-data/openimages_holds_rgb_v2/rgb.jpg",
+  "input_pin": {
+    "bytes": 1208691,
+    "sha256": "07eb3b6cac2c4c5f898c212fd9d136c0766b0f9d66157efae75141384ab5d181"
+  },
+  "observations": "/srv/scenesmith/world-reward/results/hoi-detr-image-probe-v1/observations.npz",
+  "observations_pin": {
+    "bytes": 1464521,
+    "sha256": "a1a10d0509e627bff6e54e7aee90ad564ade6b2bfb2a2a9f379ea39597552131"
+  },
+  "native": "/srv/scenesmith/world-reward/results/hoi-detr-image-probe-v1/native.json",
+  "native_pin": {
+    "bytes": 3868,
+    "sha256": "a1457b4d8b1f30fcf61517dc3030d7729531fce53d3e55ca2c68b60c5236d092"
+  },
+  "host_report": "/srv/scenesmith/world-reward/results/hoi-detr-image-probe-v1/report.json",
+  "host_pin": {
+    "bytes": 3019,
+    "sha256": "874806c2b996a7b038279a449ccfd10f18286c3d56d83427f8ea8d6382a0ee2a"
+  },
+  "image_size": [
+    1800,
+    2062
+  ],
+  "maximum_width": 640,
+  "maximum_height": 560,
+  "maximum_preview_bytes": 95000,
+  "quality": 70,
+  "budget_seconds": 120,
+  "attribution": "Andrea Sartorati / Flickr / CC BY 2.0",
+  "source_url": "https://www.flickr.com/photos/tomjoad/2327806535",
+  "reference_geometry_used": false,
+  "manual_annotations": false,
+  "all_native_proposals_and_pairs": true
+}
