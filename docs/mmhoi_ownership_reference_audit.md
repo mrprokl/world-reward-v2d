@@ -131,3 +131,12 @@ original publisher version/file metadata **before and after all ranges**. It
 does not invent CAS or whole-archive authenticity. Separate output/config/source,
 original failed receipt remains immutable and verified before/after.24tiny
 transport controls PASS0.06s; actual v2 inventory/audit still required.
+
+Actual94c6f96 transport-v2 **CLOSED metadata-budgetFAIL0.866485s**:98trailer
+bytes read,0central-directory/member/CSV/RGB bytes. Separate exact trailer-only
+diagnostic reproduces all three original range SHAs and ZIP64 fields:
+782,626members,153,100,982central bytes at93,529,665,643. This exceeds the frozen
+128MiB gate, so original failure remains; no same-namespace rerun or partial
+inventory is called PASS. Original publisher98trailer bytes and file metadata
+are sufficient to dimension a **new metadata-only** census, not to sample a
+favourable subset or change any scientific ownership population.

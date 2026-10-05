@@ -1,0 +1,31 @@
+{
+  "CSV_values_read": false,
+  "RGB_read": false,
+  "adopted": false,
+  "decision": "CLOSED_PREDECLARED_CENTRAL_DIRECTORY_BUDGET",
+  "elapsed_seconds": 0.8664854700036813,
+  "independent_complete_audit": false,
+  "member_payload_read": false,
+  "outputs": {},
+  "producer_revision": "94c6f9625af986f38d50f4f5c704cc0cb2baeba7",
+  "quality_verified": false,
+  "range_bytes": 98,
+  "receipt": {
+    "bytes": 2962,
+    "sha256": "a16d48fa1e315dc09131debd0cb6495de2d5db8a48bd8dc8e28bf856cae4b19b"
+  },
+  "schema": "world_reward.mmhoi_inventory_observed.v2",
+  "stage": "central_directory",
+  "status": "fail",
+  "trailer_diagnostic": {
+    "archive_bytes": 93682766723,
+    "central_bytes": 153100982,
+    "central_directory_read": false,
+    "central_offset": 93529665643,
+    "members": 782626,
+    "original_failure_unchanged": true,
+    "trailer_boundary": 93682766625,
+    "zip64": true
+  },
+  "unit_exit_status": 1
+}
