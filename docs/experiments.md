@@ -10745,3 +10745,16 @@ MASA signed-DEB CPU v2 actual native log reaches toolchain_probe, sm90_probe
 and full_original_build: transitive ATen/Python11 and native SM90 test compiled,
 full original package compilation still running. This is progress, not final
 wheel/CPU-child/GPU-operator/model or ownership qualification.
+
+e91798b full original MMCV SM90 CPU producer reports COMPLETE PASS258.091262s,
+receipt28309B/1262228737c5346ee354d67e6556bd37b8135d168bb8933916f7731587008723.
+Actual final native step source_posthash; source/prior runtime/assets/image
+rechecks, owned cleanup and seal flags true. Independent final artifact/image
+audit is pending. Important scope gap: the prospective config lists optional
+cuobjdump architecture inspection, but the driver acquired that tool without
+executing it. Thus no independent embedded-SM90 architecture gate is complete,
+despite the real compiler flags/tiny probe/full build and CPU import receipt.
+Do not promote this to GPU operator/model qualification; the next fresh native
+qualifier must authenticate this new child separately from its unchanged
+original author-runtime parent, complete the architecture gate, then run the
+original DCNv2/ROIAlign/model controls without loosening numerical tolerances.
