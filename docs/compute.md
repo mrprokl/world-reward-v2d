@@ -49,6 +49,14 @@ closed external retention test (~180KiB total); actual source/middle frames,
 meshes and both positive/negative outcomes are shown. This is visual QA, not
 manual test labeling or a leaderboard-quality certificate. Full media stay Azure.
 
+A separate55,431B external HOI-DETR preview now shows every native proposal
+(two hands/one direct object) and both raw ordered link logits, without selected
+links, softmax or GT overlay. Actual original-model source/checkpoint/runtime/
+JPEG/proposal pins and creator CC-BY2 attribution are authenticated. The
+CPU-only preview does not qualify correct attribution or contact; no original
+1.2MB image or1.46MB evidence archive crossed the laptop connection. Temporary
+private Azure preview blob removed after exact byte-pin verification locally.
+
 Fourteen complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
 verified CARI4D superiority exists. Other episodes are not presumed ready.

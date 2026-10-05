@@ -10220,3 +10220,14 @@ correct attribution, contact/calibration/temporal identity/3D or CARI4D improvem
 331 combined tests PASS2.01s. Ten native math/load/overlay/auth/cleanup functions
 remain AST-identical to the procedural qualified producer. No closed cohort
 reuse, parameter retune, challenge/private geometry or backend adoption.
+
+a81ec8c actual CPU-only tiny frozen-observation QA PASS; no GPU/models/reference
+geometry. All three native proposals and both raw H→O logits displayed, no link
+filter/softmax/top1 or semantic labels added. Report1995B/
+7354caf70fa85565f69e83a3c3995a8bde71d728a0888a2b94546accea6724be;
+JPEG55431B/b12886532fb7c31d6ebf334e98e69cf7b6b37687e25386214c6441c61fb3b0ed.
+Exact original input/prediction source hashes rechecked. Only this tiny QA image
+crossed to ignored local previews; creator attribution retained. Temporary
+private transfer blob removed, no media/checkpoint publication. Visual QA is
+not manual test labeling or independently measured relationship accuracy.
+Final336 combined tiny tests PASS2.05s; source/syntax/diff checks PASS.
