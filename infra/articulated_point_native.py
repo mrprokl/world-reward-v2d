@@ -387,11 +387,14 @@ def _fit(rt, code, out, c, layer, optimizer, spec, r, persist, check):
         seal_check(); r['phase'] = f'reserved_{i}_evidence'; persist()
         p, evidence = _evidence(rt, c, path, mr, tracks_path, tr, i)
         seal_check(); source = _source(rt, base, full, torch, path, mr, i)
-        seal_check(); truth = _truth(rt, path, mr, i)
         before = full.fingerprint(source); extension = op.native_point_optimizer_class(optimizer, evidence, config)
         order = ('A_original', 'B_point') if j % 2 == 0 else ('B_point', 'A_original')
         row = dict(scene_index=i, scene_id=mr['scene_ids'][i], order=list(order), results={}, status='fail'); r['reserved_results'].append(row)
         previous_initial = None
+        # Keep the two finished native states for diagnostics only AFTER both
+        # results are frozen. Metric-only MHR/loss calls must not intervene
+        # between A and B on the shared CUDA decoder lifecycle.
+        pending_evaluation = []
         for arm in order:
             seal_check(); _reset(np, torch); r['phase'] = f'{i}_{arm}_constructor'; r['constructor_attempts'] += 1; persist()
             cls = optimizer.MHRParityPostOptimizer if arm == 'A_original' else extension
@@ -414,22 +417,37 @@ def _fit(rt, code, out, c, layer, optimizer, spec, r, persist, check):
             if full.fingerprint(source) != before: raise ValueError('Native fit changed frozen initial inputs')
             step = instance.optimizer.state[instance.object_translation].get('step')
             if step is None or int(step.detach().cpu()) != 301: raise ValueError('Actual full301 native Adam updates required')
-            check(); metrics, fitted249 = _metrics(np, torch, layer, source, result, truth, evidence, optimizer, instance)
-            _save(base, out/f'scene_{i:02d}_{arm}_controls.npz', dict(reconstituted_controls=fitted249))
-            base.retain(out/f'scene_{i:02d}_{arm}_result.pth', lambda stream: torch.save(result, stream))
-            saved = torch.load(out/f'scene_{i:02d}_{arm}_result.pth', map_location='cpu', weights_only=False)
+            result_path = out/f'scene_{i:02d}_{arm}_result.pth'
+            base.retain(result_path, lambda stream: torch.save(result, stream))
+            result_pin = rt.identity(result_path, 512 << 20)
+            saved = torch.load(result_path, map_location='cpu', weights_only=False)
             if full.fingerprint(saved) != full.fingerprint(result): raise ValueError('Complete native saved result reload differs')
-            row['results'][arm] = dict(metrics=metrics, initial_state_sha256=initial_hash,
+            row['results'][arm] = dict(initial_state_sha256=initial_hash,
                 result_sha256=full.fingerprint(result), native_history=result['postopt']['history'], actual_updates=301,
-                actual_native_loss_calls=calls['loss'])
+                actual_native_loss_calls=calls['loss'], frozen_result_identity=result_pin)
+            pending_evaluation.append((arm, instance, saved, result_path, result_pin))
             r['actual_native_updates'] += 301; persist(); del instance, result; gc.collect(); torch.cuda.empty_cache()
+        seal_check(); r['phase'] = f'reserved_{i}_frozen_pair_evaluation'; persist()
+        if len(pending_evaluation) != 2 or set(row['results']) != {'A_original', 'B_point'}:
+            raise ValueError('Both complete arm results must be frozen before reserved truth or metric calls')
+        truth = _truth(rt, path, mr, i)
+        for arm, instance, saved, result_path, result_pin in pending_evaluation:
+            check(); rt.require(rt.identity(result_path, 512 << 20) == result_pin, 'Frozen result changed before evaluation')
+            metrics, fitted249 = _metrics(np, torch, layer, source, saved, truth, evidence, optimizer, instance)
+            _save(base, out/f'scene_{i:02d}_{arm}_controls.npz', dict(reconstituted_controls=fitted249))
+            rt.require(rt.identity(result_path, 512 << 20) == result_pin
+                and full.fingerprint(saved) == row['results'][arm]['result_sha256'], 'Metrics changed frozen result')
+            row['results'][arm]['metrics'] = metrics
+        pending_evaluation.clear(); del instance, saved, truth; gc.collect(); torch.cuda.empty_cache()
+        row['both_results_frozen_before_private_evaluation'] = True
         row['same_supplied_initial_bundle_sha256'] = before
         row['constructed_initial_bit_equal_descriptive'] = row['results']['A_original']['initial_state_sha256'] == row['results']['B_point']['initial_state_sha256']
         row['status'] = 'pass'; persist()
     seal_check(); authenticate_manufacture(rt, c); _previous(rt, c, 'tracks', 'articulated_point_tracks_native_v1')
     for directory, previous in ((path, mr), (tracks_path, tr)):
         for name, pin in previous['outputs'].items(): rt.require(rt.identity(directory/name, 512 << 20) == pin, 'Sealed previous payload changed during fitting')
-    r.update(descriptive_four_pairs_only=True, statistical_population_gain_verified=False, calibrated_before_reserved_reads=True)
+    r.update(descriptive_four_pairs_only=True, statistical_population_gain_verified=False, calibrated_before_reserved_reads=True,
+        both_results_frozen_before_private_evaluation=True)
 
 
 def native(rt, code, out, c):

@@ -24,7 +24,7 @@ import joint_point_authored_qualify as base
 ROOT = base.ROOT
 ENTRY = 'run_articulated_point_study'
 PROTOCOL = 'configs/articulated_point_study_protocol_v1.json'
-PROTOCOL_PIN = dict(bytes=7942, sha256='1f3c26ebf95d89611cc94e31a0f18d1b3ab0331966058bd9049db3fae4813982')
+PROTOCOL_PIN = dict(bytes=8076, sha256='d1a3fd38cfd0496fd22a2a0280ff95cbc684d866eb345beb525bbbece921db0c')
 BOOT_IMAGE = 'sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4'
 STAGES = ('manufacture', 'tracks', 'fit')
 IMAGES = dict(manufacture=base.IMAGE, tracks=BOOT_IMAGE, fit=base.IMAGE)
@@ -123,10 +123,11 @@ def validate_stage(rt, value, stage, proof):
     else:
         required.update(constructor_attempts=10, constructor_returns=10, optimizer_run_attempts=8,
             optimizer_run_returns=8, actual_native_updates=2408, descriptive_four_pairs_only=True,
-            calibrated_before_reserved_reads=True, statistical_population_gain_verified=False,
+            calibrated_before_reserved_reads=True, both_results_frozen_before_private_evaluation=True, statistical_population_gain_verified=False,
             positive_weight_executed=True)
         rt.require(len(value['reserved_results']) == 4
-            and all(row['status'] == 'pass' and set(row['results']) == {'A_original', 'B_point'}
+            and all(row['status'] == 'pass' and row.get('both_results_frozen_before_private_evaluation') is True
+                and set(row['results']) == {'A_original', 'B_point'}
                 for row in value['reserved_results']), 'Every reserved pair must be complete')
     rt.require(all(type(value.get(k)) is type(v) and value[k] == v for k, v in required.items()),
         'Complete typed actual-stage proof required')

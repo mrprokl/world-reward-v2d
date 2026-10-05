@@ -39,7 +39,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 23 | 552 | Full original initializers actual PASS17:56:49UTC. Unchanged31ff94d first default fullpose rejects all eight topology-budget candidates; empty reserved directory only, no trajectory/repair. |
 | 24 | — | Automatic actor ambiguity rejected before frontends; no manual selection. |
 | 25 | 365 | Original exact query SIGSEGV(-11), zeroQEM preserved. Fresh balanced query under84fad21 returns categorical `Exact component self-intersection` before QEM; runtime/source/cleanup checked. No mesh repair, trajectory or accuracy gain. Closed source, not a parameter-rescue target. |
-| 26 | 399 | Full original initializers pass, no object trajectory yet. |
+| 26 | 399 | Faithful surface proposal2068V/4096F/14components and unchanged full399 pose PASS. Original native CPU preparation PASS with distinct saved-only attestation; original hostFAIL preserved. Shared preparation PASS18.237121s and native forward PASS108.459410s independently frozen. Unchanged301-update refinement dispatched, not yet verified. |
 | 27 | 440 | Full original initializers pass, no object trajectory yet. |
 | 28 | 366 | Full original initializers pass18:04:45UTC, no object trajectory yet. |
 | 29 | 419 | Actual fixed-all16 initializers PASS. First default pose-only under unchanged31ff94d rejects all eight fixed topology-budget candidates before output/trajectory; no repair or parameter rescue. |

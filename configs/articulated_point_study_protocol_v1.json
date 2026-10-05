@@ -176,6 +176,7 @@
     "final_control_limits": "all actual post-PCA249 violations reported, no projection/rejection because unchanged native optimizer uses soft limits",
     "fits": 8,
     "interpretation": "descriptive4paired conditional syntheticcases, not poweredstatistics/endtoendwin/adoption",
+    "evaluation_seal": "freeze both complete arm results before reserved truth read or metric-only shared decoder/native loss calls",
     "metrics": [
       "fullT_object_translation_3D_error_without_alignment",
       "fullT_human_PVE_and_MPJPE_without_alignment",

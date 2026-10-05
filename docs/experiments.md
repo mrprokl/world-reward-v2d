@@ -9673,3 +9673,26 @@ and CoCoNet305404924B/14124fe9cf738d5ef72fcb969942db9081afed952fa707c0e34ee2fcd7
 retain actual b8d70a1 producer and script13aaf4d0ee3c287fca54e2c2e9d5fcde8f6680a701a97d05d38847b9cfcb8e65.
 This qualifies the full-video baseline forward path, not reconstruction accuracy.
 Next unchanged native full-video refinement consumes these frozen artifacts.
+
+Unchanged EP26 refinement dispatched from d15be58, 233-file closure/archive
+df05ad45542f340373d832c45a1c0ea503d8e36751c603e65e743227c9283fe3;
+ACK daf7130ac8ca6516ebd0990adeb9d9eb89d5c78683e4819ef34d139c21138dc2.
+Dispatch/live phase is not completion or accuracy. One bounded full-video job,
+no baseline preprocessing/model-forward replay.
+
+Actual narrow Boots export095066a closed FAIL393.441718s at image_save,
+ValueError before upload; scratch removed. All model/data/GPU execution false,
+source206files/eec6d5ef3b5f97ee51c42ca7ad0db9adccfb3408631ceb811c590576e5253d4c.
+The classical-only archive guard may reject modern hybrid OCI metadata; cause
+is not established by the generic error. One CPU-only representation diagnostic
+will inspect the saved graph/config/layer codecs, not rerun runtime qualification
+or the scientific cohort. No imported image, study execution or quality PASS.
+
+Pre-execution independent study review found metric-only shared-MHR/native-loss
+calls between the two reserved fits. Corrected universally: save/hash/reload
+both complete native results immediately after fitting, then read reserved truth
+and evaluate the frozen pair. Same8 fits/2408 updates/weights/budgets; no scientific
+cohort executed or rescued. Protocol8076B/d1a3fd38cfd0496fd22a2a0280ff95cbc684d866eb345beb525bbbece921db0c
+now explicitly seals this boundary; tiny AST/census regressions prevent interposed
+private scoring. Two completed instances remain live until pair evaluation,
+without extra constructors or optimizer work.

@@ -56,6 +56,26 @@ def test_scientific_policy_hash_ignores_only_stage_seals():
     assert n.policy_sha256(c) != before
 
 
+def test_reserved_metrics_are_deferred_until_both_native_results_are_frozen():
+    tree = ast.parse((ROOT/'infra/articulated_point_native.py').read_text())
+    fit = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == '_fit')
+    reserved = next(node for node in fit.body if isinstance(node, ast.For)
+        and isinstance(node.target, ast.Tuple) and isinstance(node.target.elts[0], ast.Name)
+        and node.target.elts[0].id == 'j')
+    arm_loop = next(node for node in reserved.body if isinstance(node, ast.For)
+        and isinstance(node.target, ast.Name) and node.target.id == 'arm')
+    metric_calls = [node for node in ast.walk(arm_loop) if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name) and node.func.id in ('_metrics', '_truth')]
+    assert metric_calls == []
+    append = [node for node in ast.walk(arm_loop) if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute) and node.func.attr == 'append'
+        and isinstance(node.func.value, ast.Name) and node.func.value.id == 'pending_evaluation']
+    assert len(append) == 1
+    calls = [node for node in ast.walk(reserved) if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name) and node.func.id in ('_metrics', '_truth')]
+    assert len(calls) == 2 and all(node.lineno > arm_loop.end_lineno for node in calls)
+
+
 def valid(stage):
     proof = {'source_binding': {'fixture': 'unchanged'}}
     r = dict(stage='articulated_point_'+stage+'_native_v1', status='pass', phase='complete',
@@ -73,8 +93,9 @@ def valid(stage):
     else:
         r.update(constructor_attempts=10, constructor_returns=10, optimizer_run_attempts=8,
             optimizer_run_returns=8, actual_native_updates=2408, descriptive_four_pairs_only=True,
-            calibrated_before_reserved_reads=True, statistical_population_gain_verified=False,
-            positive_weight_executed=True, reserved_results=[dict(status='pass', results={'A_original': {}, 'B_point': {}})]*4)
+            calibrated_before_reserved_reads=True, both_results_frozen_before_private_evaluation=True, statistical_population_gain_verified=False,
+            positive_weight_executed=True, reserved_results=[dict(status='pass', both_results_frozen_before_private_evaluation=True,
+                results={'A_original': {}, 'B_point': {}})]*4)
     return r, proof
 
 
@@ -83,6 +104,10 @@ def test_complete_stage_census(stage):
     r, p = valid(stage); s.validate_stage(rt, r, stage, p)
     for key in ('frames', 'challenge_inputs_used', 'source_inputs_assets_rehashed_after', 'status'):
         bad = copy.deepcopy(r); bad[key] = 'wrong'
+        with pytest.raises(ValueError): s.validate_stage(rt, bad, stage, p)
+    if stage == 'fit':
+        bad = copy.deepcopy(r)
+        bad['reserved_results'][0]['both_results_frozen_before_private_evaluation'] = False
         with pytest.raises(ValueError): s.validate_stage(rt, bad, stage, p)
 
 
