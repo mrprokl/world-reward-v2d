@@ -9752,3 +9752,43 @@ hashes and terminal config remain mandatory; use the observed exact empty schema
 not optional arbitrary fields. Whole layer/config/archive criteria unchanged.
 USTAR correction is separately pre-execution code qualification, not the cause
 of this earlier failure. No model/runtime/scientific cohort rerun.
+
+Actual226c781 Azure byte export PASS828.010402s, independently checked saved
+source211files/59b359f00150957450c026bcfe863f0119f3eb03a9e31db489d5eae496f3d307,
+all9 original assets unchanged and private blob length confirmed. Full archive
+26,572,001,280B/6ebc35f909c342708a3722931269457571f1174bab18a0326c57fc2e3f4bc5ee;
+saved report6994B/40e6ef9ee9d08e16b19939d470c8453245e4a0931c8fc4960c1d13df54cb7dbe.
+Original ef12config,47ordered layers, platform5b4272 and independently pinned
+47compatibility blobs all authenticate; no Docker save/build/model/GPU repeated.
+Exact same frozen226c781 importer onVM01 PASS679.727137s. Independent source,
+all9assets, full47-layer graph and Docker census match; actual imported Docker
+identity is platform5b4272, not the qualified ancestry configef12. Saved receipt
+7487B/864f7b2c0526afdacd7bb51de929c7549ec78e908efe1be18f67b88f4029b5d8;
+owned import scratch removed. Byte replication only: no new model/GPU/data
+execution or scientific improvement. Frozen replica pins and a minimal consumer
+adapter authenticate actual identity without retag/rebuild or numerical changes.
+
+Independent readiness census findsEP27/440 andEP28/366 original initializers
+complete and every pose/input target absent, GPU idle. FreshEP27 first default
+fullpose runs original31ff94d published237-file closure under the existing
+cooperative lock and7230s child bound; no frontend replay, geometry repair or
+per-episode parameter change. CPU runtime import can overlap it; ACK alone is
+not fullpose completion. Root186 native/study regressionsPASS1.47s, fixtures
+removed. HO-Cap public HPE/OPE split arrays independently confirm both proposed
+subject5 clips absent from train/valid; decimation/full-T/provenance still require
+actual Azure preflight, no new dataset acquired.
+
+EP27 original first fullpose CLOSED FAIL: source boundary/nonmanifold edges,
+zero object trajectory; unit exit1 and empty reserved output remain. EP28 first
+unchanged default fullpose similarly CLOSED FAIL: all8 fixed whole/component
+topology-budget candidates rejected on boundary/nonmanifold or orientation/Euler.
+No repair, component deletion, frontend replay or episode-specific rescue.
+
+User explicitly requests lightweight visual QA. New353af50 read-only CPU operator
+uses original frozen baseline exports, fixed first/middle/last original frames,
+unchanged camera/geometry and perspective-correct joint depth overlay. Automatic
+aspect-preserving object detail is presentation only. Maximum240KB JPEG/episode,
+Azure rendering; only these bounded previews may reach the laptop. Private
+dedicated Blob container has VM01 contributor/local reader scopes, no account
+keys or public access. Eight procedural tests PASS; real preview dispatch is not
+yet a render PASS or held-out accuracy claim.

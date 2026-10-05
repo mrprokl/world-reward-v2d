@@ -40,8 +40,8 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 24 | — | Automatic actor ambiguity rejected before frontends; no manual selection. |
 | 25 | 365 | Original exact query SIGSEGV(-11), zeroQEM preserved. Fresh balanced query under84fad21 returns categorical `Exact component self-intersection` before QEM; runtime/source/cleanup checked. No mesh repair, trajectory or accuracy gain. Closed source, not a parameter-rescue target. |
 | 26 | 399 | Faithful surface proposal2068V/4096F/14components and unchanged full399 pose PASS. Original native CPU preparation PASS with distinct saved-only attestation; original hostFAIL preserved. Shared preparation PASS18.237121s, native forward PASS108.459410s,301-update refinement PASS220.401099s, direct export PASS31.564454s and official packing PASS13.395114s; full-chain source/fidelity and saved pack census verified. No accuracy claim. |
-| 27 | 440 | Full original initializers pass, no object trajectory yet. |
-| 28 | 366 | Full original initializers pass18:04:45UTC, no object trajectory yet. |
+| 27 | 440 | Full original initializers pass. First unchanged default fullpose rejects source boundary/nonmanifold edges before tracking; empty reserved output, no repair or trajectory. |
+| 28 | 366 | Full original initializers pass. First unchanged default fullpose rejects all eight fixed whole/component topology-budget candidates before tracking; empty reserved output, no repair or trajectory. |
 | 29 | 419 | Actual fixed-all16 initializers PASS. First default pose-only under unchanged31ff94d rejects all eight fixed topology-budget candidates before output/trajectory; no repair or parameter rescue. |
 
 Fourteen complete packed episodes are engineering/fidelity evidence only. Scratch
