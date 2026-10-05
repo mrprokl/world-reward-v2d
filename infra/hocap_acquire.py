@@ -21,10 +21,10 @@ import urllib.request
 import zipfile
 
 ROOT = Path('/srv/scenesmith/world-reward')
-DESTINATION = Path('/srv/world-reward-data/hocap_v1')
+DESTINATION = Path('/srv/world-reward-data/hocap_v2')
 ENTRY = 'run_hocap_acquire'
 PROTOCOL = 'configs/hocap_acquisition_protocol_v1.json'
-PROTOCOL_PIN = dict(bytes=3150, sha256='ba3b1e4081a21ca0f3e35436fcbb144ba590aefaddf2e50477d65573ab5314c6')
+PROTOCOL_PIN = dict(bytes=3150, sha256='2773671430d4a838179cd5121246c38f93a19a3265a21e5fac31b9b0187d58de')
 HELPERS = ('infra/hocap_acquire.py', 'infra/run_hocap_acquire.sh',
            'infra/mediapipe_cpu_runtime_verify.py', PROTOCOL)
 BLOCK = 1 << 20
@@ -76,7 +76,7 @@ def check(deadline):
 def public_url(url):
     p = urllib.parse.urlsplit(url); host = p.hostname or ''
     require(p.scheme == 'https' and p.port in (None, 443) and not p.username and not p.password and not p.fragment
-        and (host == 'utdallas.box.com' or host == 'boxcloud.com' or host.endswith('.boxcloud.com')
+        and (host in ('utdallas.box.com', 'utdallas.app.box.com') or host == 'boxcloud.com' or host.endswith('.boxcloud.com')
              or host in ('irvlutd.github.io', 'raw.githubusercontent.com')), 'Only public publisher HTTPS destinations allowed')
     return url
 

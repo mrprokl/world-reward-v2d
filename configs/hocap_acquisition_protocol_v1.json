@@ -1,6 +1,6 @@
 {
   "schema": "world_reward.hocap_acquisition_protocol.v1",
-  "output": "/srv/world-reward-data/hocap_v1",
+  "output": "/srv/world-reward-data/hocap_v2",
   "subject": "subject_5",
   "camera": "105322251564",
   "clips": ["20231027_112303", "20231027_113202"],

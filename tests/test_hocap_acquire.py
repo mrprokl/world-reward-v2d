@@ -210,6 +210,13 @@ def test_no_credentials_or_nonpublisher_destinations(hocap, url):
     assert hocap.public_url('https://dl.public.boxcloud.com/path?opaque=not-logged')
 
 
+def test_exact_observed_publisher_redirect_not_all_box_accounts(hocap):
+    assert hocap.public_url('https://utdallas.app.box.com/index.php?public')
+    for url in ('https://another.app.box.com/x','https://utdallas.app.box.com.evil/x',
+            'http://utdallas.app.box.com/x','https://u:p@utdallas.app.box.com/x'):
+        with pytest.raises(ValueError): hocap.public_url(url)
+
+
 def test_existing_output_and_foreign_partial_are_never_replaced(hocap, tmp_path, monkeypatch):
     _, sources, _ = manufacture(hocap, tmp_path, monkeypatch); target = tmp_path/'existing'; target.mkdir(); original = target/'mine'; original.write_bytes(b'preserve')
     with pytest.raises(ValueError): hocap.acquire(None, tmp_path, 'b'*40, target, opener=Opener(sources))
