@@ -11082,3 +11082,24 @@ The next real COCO cohort protocol is frozen at4657c8b;32metadata-selected slots
 excluded. Actor/author/pretraining independence remains unverified. Actual
 metadata-only census dispatched on Azure, native result pending; no RGB/model
 or recall inferred from dispatch. All heavy bytes remain remote.
+
+Actual COCO censusPASS9.166876s:215eligible after240photo exclusions,32frozen;
+independent original fullGit268files/source modes and39input/output hashes plus
+exact metadata/references replayPASS1.350705s. Original annotation ZIP252907541B
+SHA113a836d…268, val member19987840B SHAe8c7f790…b6f. Subsequent acquisition
+PASS3.920901s **32/32original RGB**,16/16each split, no duplicates or unavailable
+slots; independent whole provenance/32JPEG/public-private auditPASS1.562605s.
+Native unchanged SAM2 bank dispatched; no real recall/ownership claim yet.
+
+EP16fullnative refinementPASS360frames/301updates203.547612s and EP17forward
+PASS419frames/5windows110.874111s, independently saved-only audited together in
+29.485129s with separate CPU Python producer namespaces. FullGit277/280files,
+206/199original model/input/output bindings rehashed,15public leaves each;
+finite FP32/proper poses/native faces, no new optimizer/model/GPU. Original
+wrappers lack retained CID receipts; verify current exact-driver absence without
+inventing a historical CID proof. Both qualified for downstream integrity only.
+EP19shared preparation dispatched after audited443inputs; no nativePASS yet.
+EP17refinement initial transport unacknowledged, independent target check shows
+no publishedsource/unit/output. A fresh identical dispatch is allowed only after
+that proof of non-execution, not a silent retry or restart. Result pending.
+Root coverage contracts568PASS/2platform skips63.09s; crowd contracts170PASS.41s.

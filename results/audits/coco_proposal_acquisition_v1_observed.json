@@ -1,0 +1,29 @@
+{
+  "adoption": false,
+  "counts": {
+    "acquired": 32,
+    "acquired_DEV": 16,
+    "acquired_RESERVED": 16,
+    "missing": 0,
+    "slots": 32
+  },
+  "decision": "READY_PENDING_SEPARATE_NATIVE_BANK",
+  "independent_audit": "results/audits/coco_proposal_acquisition_v1_actual.json",
+  "independent_final_acquisition_audit_pending": false,
+  "native_elapsed_seconds": 3.920900511002401,
+  "outputs_sealed": true,
+  "ownership_verified": false,
+  "producer_revision": "4657c8b45f733a1043c5a8af2f5b9d6ac027196a",
+  "public_inputs": {
+    "bytes": 6523,
+    "sha256": "d546a18b3b193801a2e35e8cab7a57912bf630fafd3e8e9343d4412c85db9351"
+  },
+  "quality_verified": false,
+  "report": {
+    "bytes": 37509,
+    "sha256": "6f3346be5a0ccb065084226ad6cdaa2423dd0d460427d43823b9635f57141ae6"
+  },
+  "schema": "world_reward.coco_proposal_acquisition_observed.v1",
+  "source_and_inputs_rehashed_after": true,
+  "status": "pass"
+}

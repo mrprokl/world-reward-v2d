@@ -259,3 +259,9 @@ including57COCO preparation tests; no real RGB/model or measured real recall yet
 COCO publisher-reported individual-image CC-BY2 and annotation CC-BY4 are kept;
 creator/author identity and pretraining overlap remain unverified. The whole
 252.9MB annotation acquisition, selected originals and inference stay on Azure.
+
+Actual census and independent exact metadata replay nowPASS;215eligible/32frozen.
+Actual subsequent acquisition and independent full-source/original-JPEG audit
+have32/32acquired, including16DEV+16reserved, zero missing/duplicate slots. The
+unchanged SAM2 producer is dispatched; no real-proposal metric exists yet. This
+opens the fixed capacity experiment, not automatic actor/object selection.

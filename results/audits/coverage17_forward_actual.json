@@ -31,6 +31,7 @@
     "cuda_initialized": false,
     "faces_native_unchanged": true,
     "fixed_inputs_byte_preserved": false,
+    "fixed_inputs_byte_preserved_scope": "not_applicable_to_forward; the boolean is a refinement-only check, not a failed integrity check",
     "frames": 419,
     "model_or_solver_calls": 0,
     "original_JSON_and_public_producer_chain": true,

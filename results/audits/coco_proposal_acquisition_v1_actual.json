@@ -1,0 +1,35 @@
+{
+  "RGB_values_decoded": false,
+  "acquisition_report": {
+    "bytes": 37509,
+    "sha256": "6f3346be5a0ccb065084226ad6cdaa2423dd0d460427d43823b9635f57141ae6"
+  },
+  "adoption": false,
+  "all_original_manifest_mappings_verified": true,
+  "archive_and_private_reference_hashes_before_after": true,
+  "counts": {
+    "acquired": 32,
+    "acquired_DEV": 16,
+    "acquired_RESERVED": 16,
+    "missing": 0,
+    "slots": 32
+  },
+  "elapsed_seconds": 1.5626050949795172,
+  "gpu_used": false,
+  "metadata_replay_exact": true,
+  "models_loaded": false,
+  "native_acquisition_elapsed_seconds": 3.920900511002401,
+  "ownership_verified": false,
+  "producer_revision": "4657c8b45f733a1043c5a8af2f5b9d6ac027196a",
+  "public32_originalJPEG_hashes_before_after": true,
+  "public_inputs": {
+    "bytes": 6523,
+    "sha256": "d546a18b3b193801a2e35e8cab7a57912bf630fafd3e8e9343d4412c85db9351"
+  },
+  "quality_verified": false,
+  "schema": "world_reward.coco_proposal_acquisition_actual.v1",
+  "source_archive_sha256": "a4e4e35d699ba593847a7223f98f9b77ae5be3abfae0c1739f0ca2b1ee6d840f",
+  "source_files": 268,
+  "source_fullGit_bytes_modes_markers_before_after": true,
+  "status": "pass"
+}
