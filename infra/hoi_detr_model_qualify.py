@@ -27,7 +27,7 @@ ROOT = Path('/srv/scenesmith/world-reward')
 DATA = Path('/srv/world-reward-data/hoi_detr_v1')
 ENTRY = 'run_hoi_detr_model_qualify'
 PROTOCOL = 'configs/hoi_detr_model_qualify_v1.json'
-PROTOCOL_PIN = dict(bytes=4546, sha256='6ad5f2ff37956e7cad4e0a1c26b0c5b92437cbb3337f30819485dfc73f6301df')
+PROTOCOL_PIN = dict(bytes=5005, sha256='8d6184588be0d4be5d8feec600b74b6e7806e953cc3b81c7c87c3e7579e937ac')
 HELPERS = ('infra/hoi_detr_model_qualify.py', 'infra/run_hoi_detr_model_qualify.sh', PROTOCOL,
            'infra/hoi_detr_runtime_verify.py', 'infra/hoi_detr_acquire.py',
            'infra/mediapipe_cpu_runtime_verify.py', 'infra/mediapipe_hands_acquire.py',
@@ -65,8 +65,8 @@ def source(rt, code, revision):
 
 def protocol(rt, code):
     p = rt.pinned(code/PROTOCOL, PROTOCOL_PIN, 16 << 10)
-    require(p['schema'] == 'world_reward.hoi_detr_model_qualification.v3' and p['scope'] == 'one_procedural_RGB_full_native_model_runtime_only'
-            and p['root'] == str(ROOT) and p['output'] == 'results/hoi-detr-model-qualify-v3'
+    require(p['schema'] == 'world_reward.hoi_detr_model_qualification.v4' and p['scope'] == 'one_procedural_RGB_full_native_model_runtime_only'
+            and p['root'] == str(ROOT) and p['output'] == 'results/hoi-detr-model-qualify-v4'
             and (p['budget_seconds'], p['cleanup_grace_seconds'], p['outer_seconds']) == (1800, 60, 1860)
             and (p['cpu_cpus'], p['cpu_memory'], p['gpu_cpus'], p['gpu_memory']) == (4, '16g', 4, '64g')
             and p['amp'] is False and p['tf32'] is False and p['seed'] == 0 and all(p[k] is False for k in FLAGS), 'Frozen one-forward scope required')
@@ -94,6 +94,10 @@ MODEL_REQUIREMENTS = frozenset({
     'Full original active model configuration required',
     'Original safe state_dict checkpoint required',
     'Strict all model state keys/shapes/dtypes required',
+    'Original EMA checkpoint schema policy required',
+    'Unambiguous native EMA buffer names required',
+    'Registration must not resume or skip native buffers',
+    'Exact complete native EMA backup schema required',
     'No state remapping/partial checkpoint load allowed',
     'Exactly qualified full native MMCV extension required',
     'No author train API/foreign absolute source imports',
@@ -255,6 +259,31 @@ def configuration_policy(cfg, c):
     return dict(original_load_from=c['original_load_from'], inference_overrides=c['inference_overrides'], downloads=False)
 
 
+def register_original_checkpoint_buffers(model, cfg, hook_class, c):
+    """Original native schema registration, no EMA update/swap or weight choice.
+
+    Author checkpoint includes backups of every original state tensor. Register
+    these with the authenticated original hook, then strict-load ALL fields.
+    This preserves original inference's non-EMA fields; no checkpoint key drop.
+    """
+    from types import SimpleNamespace
+    require(list(cfg.custom_hooks) == [c['native_hook']] and c['registration_only'] is True
+            and c['skip_buffers'] is False and c['swap_or_update'] is False
+            and c['forward_uses_original_non_ema_fields'] is True, 'Original EMA checkpoint schema policy required')
+    before = dict(model.state_dict()); names = {key: 'ema_'+key.replace('.', '_') for key in before}
+    require(len(set(names.values())) == len(names) and not (set(names.values()) & set(before)), 'Unambiguous native EMA buffer names required')
+    hook = hook_class(momentum=c['native_hook']['momentum'])
+    require(hook.skip_buffers is False and hook.checkpoint is None, 'Registration must not resume or skip native buffers')
+    hook.before_run(SimpleNamespace(model=model))
+    after = model.state_dict()
+    require(set(after) == set(before) | set(names.values()) and hook.param_ema_buffer == names
+            and all(after[key].shape == before[key].shape and after[key].dtype == before[key].dtype
+                    and after[names[key]].shape == before[key].shape and after[names[key]].dtype == before[key].dtype for key in before),
+            'Exact complete native EMA backup schema required')
+    return dict(original_state_keys=len(before), registered_backup_keys=len(names), full_state_keys=len(after),
+                native_registration_only=True, forward_uses_original_non_ema_fields=True, ema_swapped=False, checkpoint_keys_discarded=0)
+
+
 def strict_checkpoint(model, checkpoint, torch):
     require(type(checkpoint) is dict and type(checkpoint.get('state_dict')) in (dict, __import__('collections').OrderedDict), 'Original safe state_dict checkpoint required')
     actual = checkpoint['state_dict']; expected = model.state_dict()
@@ -342,6 +371,9 @@ def gpu_model(code, revision, p, proof_pin):
     cfg = Config.fromfile(str(root/'source'/p['native_config']['path']), import_custom_modules=False)
     overrides = configuration_policy(cfg._cfg_dict, p['native_config'])
     model = build_detector(cfg.model, test_cfg=cfg.get('test_cfg')); runtime.check(deadline)
+    from mmdet.core.hook.ema import ExpMomentumEMAHook
+    exact(rt, root/'source'/p['checkpoint_buffers']['source_path'], p['checkpoint_buffers']['source_identity'], 64 << 10)
+    buffer_schema = register_original_checkpoint_buffers(model, cfg, ExpMomentumEMAHook, p['checkpoint_buffers'])
     checkpoint = torch.load(DATA/'weights/epoch_5.pth', map_location='cpu', weights_only=True)
     loaded = strict_checkpoint(model, checkpoint, torch); del checkpoint
     model.to(device='cuda', dtype=torch.float32).eval(); runtime.check(deadline)
@@ -359,7 +391,7 @@ def gpu_model(code, revision, p, proof_pin):
     with (out/'observations.npz').open('xb') as stream: np.savez_compressed(stream, **arrays); stream.flush(); os.fsync(stream.fileno()); os.fchmod(stream.fileno(), 0o444)
     exact(rt, DATA/'weights/epoch_5.pth', p['acquisition']['checkpoint'], 6_000_000_000); check_inventory(rt, root/'source', proof['overlay']['source']); check_inventory(rt, root/'site', proof['overlay']['site']); check_inventory(rt, mmcv_root, proof['runtime']['manifest']['artifacts'])
     require(source(rt, code, revision) == proof['source_binding'], 'Current full source changed after actual model')
-    value = dict(stage='hoi_detr_full_native_model', status='pass', source_binding=proof['source_binding'], checkpoint_identity=p['acquisition']['checkpoint'], strict_checkpoint=loaded,
+    value = dict(stage='hoi_detr_full_native_model', status='pass', source_binding=proof['source_binding'], checkpoint_identity=p['acquisition']['checkpoint'], strict_checkpoint=loaded, checkpoint_buffer_schema=buffer_schema,
                  versions=versions, configuration=overrides, actual_full_model=True, native_forward_calls=1, procedural_rgb_identity=dict(bytes=rgb.nbytes, sha256=hashlib.sha256(rgb.tobytes()).hexdigest()),
                  preprocessing='original_LoadImageFromWebcam_BGR_input_then_native_test_pipeline', decoder_queries=1500, original_frame_index=c['original_frame_index'], native_cpu_softNMS=True,
                  hand_object_pairs=len(result.hand_object_pairs), object_target_pairs=len(result.object_target_pairs), observations=rt.identity(out/'observations.npz', 32 << 20),

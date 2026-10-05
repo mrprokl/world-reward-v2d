@@ -1,8 +1,8 @@
 {
-  "schema": "world_reward.hoi_detr_model_qualification.v3",
+  "schema": "world_reward.hoi_detr_model_qualification.v4",
   "scope": "one_procedural_RGB_full_native_model_runtime_only",
   "root": "/srv/scenesmith/world-reward",
-  "output": "results/hoi-detr-model-qualify-v3",
+  "output": "results/hoi-detr-model-qualify-v4",
   "budget_seconds": 1800,
   "cleanup_grace_seconds": 60,
   "outer_seconds": 1860,
@@ -125,5 +125,21 @@
         "sha256": "2e1320fd337db06a3136d0f4101bd62f13249c95c5b581304f35481e979d432a"
       }
     }
-  ]
+  ],
+  "checkpoint_buffers": {
+    "source_path": "mmdet/core/hook/ema.py",
+    "source_identity": {
+      "bytes": 5150,
+      "sha256": "255d0d63865735bd2fe661cc1c4f375c68e7834aee0446e27eaaa861c7106663"
+    },
+    "native_hook": {
+      "type": "ExpMomentumEMAHook",
+      "momentum": 0.0001,
+      "priority": 49
+    },
+    "registration_only": true,
+    "skip_buffers": false,
+    "swap_or_update": false,
+    "forward_uses_original_non_ema_fields": true
+  }
 }

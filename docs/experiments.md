@@ -10177,3 +10177,15 @@ native414B/67ee0ed7315e05ea4e73d79176f81472da146046e6b247490035a14405ad72d0.
 Full input/source/image posthash and owned containers/overlay cleanup pass,
 GPU idle. Next action is a CPU-only exact checkpoint schema diagnostic, not
 loosening strictness or adopting a partially matched model.
+
+Independent CPU safe checkpoint schema diagnosis:898 expected/1796 authorstate
+keys, zero missing/shape/dtype mismatches;898 extras are EMA backups. Original
+source-pinned custom ExpMomentumEMAHook(skip_buffers=False) registers every
+state tensor as ema_<dot-to-underscore>; its source5150B/
+255d0d63865735bd2fe661cc1c4f375c68e7834aee0446e27eaaa861c7106663
+explains the exact doubled schema. No prefix issue or partial checkpoint.
+Fresh v4 registers the authenticated native backup schema before strict load
+of ALL1796fields, with no swap/update/resume/key deletion. Forward keeps original
+non-EMA fields as the author's image-only init_detector route. Algorithm/model
+math unchanged; no benchmark-driven weight selection. CPU diagnostic did not
+load values into a model or execute GPU/inference; old strict rejection retained.

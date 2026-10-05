@@ -350,3 +350,41 @@ def test_all_native_imports_are_qualified_cpu_before_gpu_lease(gate):
     assert 'full_import_closure_qualified=True' in cpu
     assert 'model = build_detector' not in cpu and 'torch.load' not in cpu
     assert 'import_custom_modules=False' in cpu
+
+
+class NativeEMAStub:
+    def __init__(self,momentum):self.skip_buffers=False;self.checkpoint=None;self.momentum=momentum
+    def before_run(self,runner):
+        self.param_ema_buffer={k:'ema_'+k.replace('.','_')for k in list(runner.model.expected)}
+        for key,name in self.param_ema_buffer.items():runner.model.expected[name]=Tensor()
+
+
+def test_complete_original_ema_backup_schema_registered_no_key_drop(gate,p):
+    model=Model();original=model.expected['native.weight']
+    result=gate.register_original_checkpoint_buffers(model,SimpleNamespace(custom_hooks=[p['checkpoint_buffers']['native_hook']]),NativeEMAStub,p['checkpoint_buffers'])
+    assert set(model.state_dict())=={'native.weight','ema_native_weight'}
+    assert model.expected['native.weight'] is original and not model.calls
+    assert result['original_state_keys']==result['registered_backup_keys']==1 and result['full_state_keys']==2
+    assert result['checkpoint_keys_discarded']==0 and not result['ema_swapped']
+    state={k:Tensor()for k in model.expected}
+    gate.strict_checkpoint(model,{'state_dict':state},fake_torch())
+    assert model.calls==[(state,True)]
+
+
+@pytest.mark.parametrize('fault',['collision','hook','swap','registration','skip','resume'])
+def test_native_ema_registration_rejects_ambiguous_or_changed_schema(gate,p,fault):
+    model=Model();c=copy.deepcopy(p['checkpoint_buffers']);cfg=SimpleNamespace(custom_hooks=[c['native_hook']])
+    hook=NativeEMAStub
+    if fault=='collision':model.expected['native_weight']=Tensor()
+    elif fault=='hook':cfg.custom_hooks=[dict(type='OtherHook')]
+    elif fault=='swap':c['swap_or_update']=True
+    elif fault=='registration':c['registration_only']=False
+    else:
+        class Bad(NativeEMAStub):
+            def __init__(self,momentum):
+                super().__init__(momentum)
+                if fault=='skip':self.skip_buffers=True
+                else:self.checkpoint='foreign'
+        hook=Bad
+    with pytest.raises(ValueError):gate.register_original_checkpoint_buffers(model,cfg,hook,c)
+    assert not model.calls
