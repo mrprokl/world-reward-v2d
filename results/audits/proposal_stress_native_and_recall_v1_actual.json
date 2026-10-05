@@ -1,0 +1,101 @@
+{
+  "VM02_handed_back": true,
+  "accuracy_verified": false,
+  "adoption": false,
+  "bank_report": {
+    "bytes": 12974,
+    "sha256": "e24271c3504a56ea31b4cbe7184477713ff72fc7d3d434b2cb99f29bb6365bdf"
+  },
+  "completed_gates": [
+    "complete exact Git-reconstructed source file sets/bytes and archive markers for bank/evaluation/manufacture/build/kernel",
+    "all exact native/host/evaluation/public manifest independently pinned reports",
+    "native model load1/calls32/decodes32/sourcepost/cleanup flags",
+    "native public-only helper whitelist and original host source_binding",
+    "original frontend build/kernel/selectedcheckpoint proof and live image identity",
+    "all32 original RGB hashes and all32 saved prediction NPZ full hashes before private truth",
+    "original native CID and evaluator/container names absent"
+  ],
+  "elapsed_seconds": 2.4246638769982383,
+  "error_type": "ValueError",
+  "evaluation_report": {
+    "bytes": 12167,
+    "sha256": "65b75b9a8766c0bc66e13a69ecce35673c63770b89802573981c749df0d54146"
+  },
+  "external_optional_audit_completed": false,
+  "failed_gate": "CPU_installed_SAM2_source_only",
+  "host_report": {
+    "bytes": 2245,
+    "sha256": "94f9b5c7d20459c7b6254ce677c41aa357f3266f54029a1df96e13d1b871984a"
+  },
+  "independent_metric_recompute_completed": false,
+  "matching_tiny_tests": {
+    "elapsed_seconds": 0.1,
+    "passed": 32
+  },
+  "message": "CPU_saved_probe_failed",
+  "native_producer_status": "pass_as_recorded_and_preflight_authenticated",
+  "new_GPU_calls": 0,
+  "new_model_calls": 0,
+  "observer_attempts": [
+    {
+      "cause": "observer erroneously required readonly historical build marker; actual original revision0644, nlink1,41bytes; original helper accepts readonlyFalse",
+      "failed_gate": "original_source_git",
+      "no_models_or_GPU": true,
+      "status": "partial_audit"
+    },
+    {
+      "cause": "owned CPU probe exited nonzero; observer did not capture private stderr, cause unknown",
+      "failed_gate": "CPU_installed_SAM2_source_only",
+      "no_models_or_GPU": true,
+      "status": "partial_audit"
+    }
+  ],
+  "original_producers_modified": false,
+  "ownership_verified": false,
+  "post_rechecks_completed": false,
+  "private_reference_values_read": false,
+  "schema": "world_reward.proposal_stress_native_and_recall_actual.v1",
+  "source_bindings": {
+    "bank": {
+      "archive_sha256": "3e5454716e23904ec7a54480347bffdc83f288b97dc18d6cb3a3ecb9707f864a",
+      "closure_sha256": "710dbd407167d7d1d836a5565efa6671a1bfeb80fae921c36669551942be1cc2",
+      "entries": 276,
+      "entry": "run_rgb_region_bank",
+      "files": 271,
+      "revision": "15a6bde56308f9f598cd6c39fbb78334fec4261c"
+    },
+    "build": {
+      "archive_sha256": "0c8d2aa16b0b5f1c15e877640b993e8ed27b1bd1911dbae2ab2609052b3a67d3",
+      "closure_sha256": "9daa3f643580bf0fb9de20fafeea7690fa7455c228910182fc1f163b3ca1ee3a",
+      "entries": 63,
+      "entry": "run_frontend_grounding_build",
+      "files": 58,
+      "revision": "d1fcb8ad158cf4ad4b1f7fe2bba7ea533ae565cc"
+    },
+    "evaluation": {
+      "archive_sha256": "5884de4519d8abaec10dfd2e911d99fdeac98c61fa1298471e406d6a8f236a69",
+      "closure_sha256": "86e473c540a3c1841e3702487788637af41e1da7ae8390d4feb52896c36583ce",
+      "entries": 267,
+      "entry": "run_proposal_stress_evaluate",
+      "files": 262,
+      "revision": "dd232ffbeec4726e5fb60034b16f318b68f32596"
+    },
+    "kernel": {
+      "archive_sha256": "6fbde5e601cdc082a2e2b74a79355394964be4bd2375f3e4c372368f5fbe9a44",
+      "closure_sha256": "7fcf83a5bb14809dc15a00818fcf2d4634e29ae69dbd0c11f006e82c8c524802",
+      "entries": 65,
+      "entry": "run_frontend_sam2_kernel_gate",
+      "files": 60,
+      "revision": "168a809369a294c1ab65154a585b83014c98d976"
+    },
+    "manufacture": {
+      "archive_sha256": "b48f75c29fa159c1c372c1dbd89b85c75c0e3de00a3a919a41156d275f96384e",
+      "closure_sha256": "2bbb4f4698357a40639a3b0c9c7e0a3c940e6b9cc1cfdb04ff634052ba847b1b",
+      "entries": 264,
+      "entry": "run_proposal_stress_render",
+      "files": 259,
+      "revision": "d7e1f8d61ae91611cc36da41e3cef6e49e039e04"
+    }
+  },
+  "status": "partial_audit"
+}

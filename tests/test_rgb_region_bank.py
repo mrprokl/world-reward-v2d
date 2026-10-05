@@ -45,6 +45,9 @@ def test_defaults_do_not_follow_cohort_or_semantic_query():
     assert 'infra/proposal_stress_render.py' not in d.NATIVE_FILES
     assert 'configs/proposal_stress_v1.json' not in d.NATIVE_FILES
     assert not any('openimages_joint_pair' in str(x) for x in d.INPUTS)
+    assert len(d.INPUTS) == len(d.OUTPUTS) == 3
+    assert str(d.INPUTS[2]) == '/srv/world-reward-data/coco_proposal_v1/inputs'
+    assert d.OUTPUTS[2] == 'coco-proposal-regions-v1'
 
 
 def test_dispatch_markers_alongside_individual_source_files(tmp_path):

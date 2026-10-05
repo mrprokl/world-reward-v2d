@@ -1,0 +1,47 @@
+{
+  "schema": "world_reward.coco_proposal_prepare.v1",
+  "output": "/srv/world-reward-data/coco_proposal_v1",
+  "slots": 32,
+  "dev": 16,
+  "reserved": 16,
+  "workers": 6,
+  "overall": 300,
+  "request_timeout": 15,
+  "max_image_bytes": 16777216,
+  "max_decoded_pixels": 16777216,
+  "min_acquired_dev": 12,
+  "retry_count": 0,
+  "no_replacements": true,
+  "hash_namespace": "world_reward.coco_proposal_v1/",
+  "archive_url": "https://s3.amazonaws.com/images.cocodataset.org/annotations/annotations_trainval2017.zip",
+  "archive_bytes": 252907541,
+  "archive_md5": "f4bbac642086de4f52a3fdda2de5fa2c",
+  "member": "annotations/instances_val2017.json",
+  "annotation_cache": null,
+  "historical": [
+    {"path": "/srv/world-reward-data/openimages_holds_census_v1/census_v2.json", "readonly": false,
+     "pin": {"bytes": 10130, "sha256": "b4333ea57bb408b0eafdbc5eee51d2b3ee3e6e963ef9ec269178bbd45480ff4a"}},
+    {"path": "/srv/world-reward-data/openimages_holds_census_fresh128_v1/census.json", "readonly": false,
+     "pin": {"bytes": 76839, "sha256": "bf576b143bf8304981eb8dddfa64726945262d79c24cff07601f14e20a4fd452"}},
+    {"path": "/srv/scenesmith/world-reward/results/openimages-joint-pair-selection-v1/cohort.json", "readonly": true,
+     "pin": {"bytes": 31043, "sha256": "441bdc57e101cb4e8291ca6bbebc554ca397619e2a892469d9e410a16359a456"}},
+    {"path": "/srv/scenesmith/world-reward/results/proposal-external-census-v1/cohort.json", "readonly": true,
+     "pin": {"bytes": 18076, "sha256": "4db28db7b8c9beb0ce58e574e8f012f05c86ef7447ff056a269d4b04cd74ed33"}}
+  ],
+  "reused_helper_pins": {
+    "infra/mediapipe_cpu_runtime_verify.py": {"bytes": 23559, "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"},
+    "infra/openimages_joint_pair_acquire.py": {"bytes": 23252, "sha256": "ab0cac6d8a66550b8898a6add435fe92bc2546cbb7536723d4de3b8d8597ad49"}
+  },
+  "primary_terms": {
+    "source_revision": "aaa6a5a0cc24bf1350247169cc512edd7ddf28b9",
+    "terms_url": "https://raw.githubusercontent.com/cocodataset/cocodataset.github.io/aaa6a5a0cc24bf1350247169cc512edd7ddf28b9/dataset/termsofuse.htm",
+    "terms_identity": {"bytes": 2370, "sha256": "bd019f88ee44c29b2f19c5b99888cf5bc2e7c16f57b6e52af8ed3a60462e8bdd"},
+    "annotation_license": "CC-BY-4.0",
+    "image_license_id": 4,
+    "image_license_url": "http://creativecommons.org/licenses/by/2.0/",
+    "creator_identity": "UNKNOWN",
+    "grant_authority": "publisher_recorded_individual_image_license_not_independent_creator_authentication",
+    "raw_redistribution": false,
+    "pretraining_overlap": "COCO_trained_models_overlap_by_design_SAM2_and_web_exact_overlap_unknown"
+  }
+}

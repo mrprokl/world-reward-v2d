@@ -1,0 +1,144 @@
+{
+  "CPU_saved_inventory_attempt2": {
+    "CPU_observer_removed": true,
+    "arrays_decoded": false,
+    "frames": 443,
+    "model_imports": false,
+    "observer_elapsed_seconds": 8.21609024296049,
+    "public_files": 15,
+    "status": "pass"
+  },
+  "VM01_slot": "free",
+  "adoption": false,
+  "all_source_and_input_output_posthash": true,
+  "audit_read_only": true,
+  "episode": 19,
+  "final_observer_new_CPU_runs": 0,
+  "frames": 443,
+  "gpu_used": false,
+  "host_elapsed_seconds": 3563.3378729779506,
+  "host_report": {
+    "bytes": 698,
+    "sha256": "1419d97c89a58bc81dac67611eb411d21440b02e61ab47be2dcd108dbcc4f260"
+  },
+  "models_loaded": false,
+  "native_elapsed_seconds": 3551.5836753679905,
+  "native_report": {
+    "bytes": 17532,
+    "sha256": "22f900d6f03602c6cfaa1910830e6bd61b696f976165118b9fe6f79fa81184b5"
+  },
+  "observer_attempts": [
+    {
+      "attempt": 1,
+      "reason": "Observer incorrectly demanded executable Git source files444; corrected to original tar mode&555, producer untouched.",
+      "status": "inconclusive"
+    },
+    {
+      "attempt": 2,
+      "final_transport": "inconclusive_over3500_base64chars",
+      "source_and_CPU_public_inventory": "pass"
+    }
+  ],
+  "observer_elapsed_seconds": 6.120127129950561,
+  "original_controls_555_444_sealed": true,
+  "original_input_count": 1356,
+  "original_native_container_absence": true,
+  "other_CPU_prepare_headers": {
+    "20": {
+      "frames": 549,
+      "producer_revision": "e2b6019f502e18694a221aa6b1818804ef3d6d83",
+      "report": {
+        "bytes": 17536,
+        "sha256": "4a3d16300e9dfc5a3ac95ce7c73dc8d2a97b40b411734a45cff5b9062a8a045b"
+      },
+      "status": "pass"
+    },
+    "22": {
+      "frames": 533,
+      "producer_revision": "e2b6019f502e18694a221aa6b1818804ef3d6d83",
+      "report": {
+        "bytes": 17526,
+        "sha256": "4fec315b9f0a9cf0fde1b072ca5d7d23015c74261d3a54337d986756999aa7ee"
+      },
+      "status": "pass"
+    }
+  },
+  "output_pins": {
+    "depth_h5": {
+      "bytes": 451482628,
+      "sha256": "2ee2f81c1b989f86763cc8b2e1d5c36323e6236950bea2c32e75c35012a71c0e"
+    },
+    "mhr_init": {
+      "bytes": 1978075,
+      "sha256": "eed0968885b44706387862748cbdb78a81c904c23a9441812043e2c265093314"
+    },
+    "object_metric.glb": {
+      "bytes": 74296,
+      "sha256": "0935643f0d4e2f6b78aefc672605d66d742a2186a9284a8a1040abb71516b7e8"
+    },
+    "object_poses": {
+      "bytes": 33038,
+      "sha256": "39c8c45e62dab8433c723a4253e87b473681f3e8b051229a416ec5d4a9e590a9"
+    },
+    "wild_export": {
+      "bytes": 2810,
+      "sha256": "ca946b2603908c883da0fe19cde64d8ae50d750f19dd1ac532cb21b20350e08e"
+    }
+  },
+  "producer_revision": "447f25d738e50635bf5d0c3932e40dc6a76ab906",
+  "proof": {
+    "bytes": 249227,
+    "sha256": "4032329adfd4adc15af955814f6e9a316072fff0d140e715771dcb4a8f9ba083"
+  },
+  "public_files": 15,
+  "quality_verified": false,
+  "schema": "world_reward.coverage_prepare_saved_audit.v1",
+  "script_sha256": "9d6e9028653ca43f1eb184cb0ed85102279289dd97840c7f89cb8c69a40a79e8",
+  "source_archive_sha256": "e16a464567cafd5af990c505469742944e49b8374584409befaa92e4d7f2ec9c",
+  "source_binding": {
+    "closure_sha256": "c55fa0f67c397b34b30c61cc7c9c4c13d690aa5cd54fa6df5f1b8d70f9b658d9",
+    "entries": 350,
+    "markers": {
+      "revision": {
+        "bytes": 41,
+        "sha256": "44c1064ba19a75f9d83ce1b4c66c5eaa4662a2b0a53de641ec2e54045d780a3f"
+      },
+      "source-sha256": {
+        "bytes": 65,
+        "sha256": "df9fe5da739c939cfb3f2f11f6dbd144115cf61cedcd818247bc015d0619b079"
+      }
+    },
+    "producer_revision": "447f25d738e50635bf5d0c3932e40dc6a76ab906"
+  },
+  "source_files": 345,
+  "source_independent_Git_verified": true,
+  "source_modes_exact_original_tar_and_555": true,
+  "status": "pass",
+  "unit_states": {
+    "world-reward-coverage-cari-inputs-19.service": {
+      "ActiveState": "inactive",
+      "MainPID": "0",
+      "SubState": "dead"
+    },
+    "world-reward-coverage-cari-inputs-20.service": {
+      "ActiveState": "inactive",
+      "MainPID": "0",
+      "SubState": "dead"
+    },
+    "world-reward-coverage-cari-inputs-22.service": {
+      "ActiveState": "inactive",
+      "MainPID": "0",
+      "SubState": "dead"
+    },
+    "world-reward-coverage-cari-shared-forward-17.service": {
+      "ActiveState": "inactive",
+      "MainPID": "0",
+      "SubState": "dead"
+    },
+    "world-reward-coverage-cari-shared-refined-16.service": {
+      "ActiveState": "inactive",
+      "MainPID": "0",
+      "SubState": "dead"
+    }
+  }
+}

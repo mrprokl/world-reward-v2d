@@ -31,7 +31,9 @@ NATIVE_FILES = ('infra/rgb_region_bank.py', 'infra/hocap_amg_bank.py',
     CONFIG, binding.CONFIG, binding.selected.PINS)
 HELPERS = (*NATIVE_FILES, 'infra/run_rgb_region_bank.sh')
 INPUTS = (ROOT/'validation/proposal_stress_v1/inputs',
-          Path('/srv/world-reward-data/proposal_external_rgb_v1/inputs'))
+          Path('/srv/world-reward-data/proposal_external_rgb_v1/inputs'),
+          Path('/srv/world-reward-data/coco_proposal_v1/inputs'))
+OUTPUTS = ('proposal-stress-regions-v2', 'proposal-external-regions-v1', 'coco-proposal-regions-v1')
 
 
 def write(path, value):
@@ -302,8 +304,8 @@ def main():
     a = parser.parse_args(); code = Path(os.environ['WR_CODE']); revision = os.environ['WR_CODE_REVISION']
     rt.require(sys.platform == 'linux' and os.geteuid() == 0 and os.environ['WR_ROOT'] == str(ROOT)
         and re.fullmatch('[0-9a-f]{40}',revision) and code == ROOT/'jobs'/revision/ENTRY/'code', 'Actual immutable source namespace required')
-    rt.require(a.inputs in INPUTS and a.output == ROOT/'results'/('proposal-stress-regions-v2' if a.inputs == INPUTS[0]
-        else 'proposal-external-regions-v1'), 'Only prospectively frozen fresh validation namespaces allowed')
+    rt.require(a.inputs in INPUTS and a.output == ROOT/'results'/OUTPUTS[INPUTS.index(a.inputs)],
+        'Only prospectively frozen fresh validation namespaces allowed')
     p = configuration(code); pin = dict(bytes=a.manifest_bytes,sha256=a.manifest_sha256)
     def expired(*_): raise TimeoutError('Inclusive region bank bound exceeded')
     signal.signal(signal.SIGTERM,expired); signal.signal(signal.SIGALRM,expired); signal.alarm(p['budget_seconds']+60)
