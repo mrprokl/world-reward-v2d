@@ -1,0 +1,28 @@
+{
+  "actual_state": "UNOBSERVED",
+  "audit_failure_stage": "azure_transport_wrong_resource_group_and_vm_name_no_scalar_record",
+  "actual_native_result_observed": false,
+  "incorrect_resource_group": "SCENESMITH-H100",
+  "incorrect_vm_name": "scenesmith-ncc-h100-02",
+  "expected_resource_group": "WORLD-REWARD-RESEARCH",
+  "expected_vm_name": "world-reward-ncc-h100-02",
+  "native_reexecuted": false,
+  "independent_audit_passed": false,
+  "native_failure_inferred": false,
+  "observer_sha256": "09ff71f6b37923aa2906fc17291133975bcd1eb6eee51b4503c16ae8124f1209",
+  "observer_target_error": {
+    "documented_vm02_name": "world-reward-ncc-h100-02",
+    "documented_vm02_resource_group": "WORLD-REWARD-RESEARCH",
+    "remote_execution_observed": false,
+    "source": "docs/compute.md:118",
+    "stderr_body_retained": false,
+    "submitted_resource_group": "SCENESMITH-H100",
+    "submitted_vm_name": "scenesmith-ncc-h100-02"
+  },
+  "producer_revision": "a48aaec27772ffd0cb1a0e9e9660d2da84560186",
+  "schema": "world_reward.coherent_pair_gpu_probe_independent_actual.v1",
+  "status": "inconclusive",
+  "transport_cli_exit": 3,
+  "transport_stderr_bytes": 446,
+  "transport_stdout_bytes": 0
+}
