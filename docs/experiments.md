@@ -10057,3 +10057,22 @@ no surviving GPU apps or owned containers. No native compatibility/quality claim
 203 combined tiny tests PASS1.70s had qualified code contracts only; an
 independent read-only CPU assertion diagnostic will identify the real boundary
 failure before any fresh technical repair. Preserve this failed namespace/unit.
+
+Independent read-only ef12 CPU diagnostic authenticates old source/proof/inputs
+and finds native_proof PASS, exact versions() dependency/header assertion FAIL.
+All old artifacts unchanged; no compiler/model/RGB/GPU calls. Follow-up census
+under both root and UID1000 finds one importlib_metadata9.0.1 distribution,
+not the erroneously frozen8.5.0. Ten other base versions and Python.h match.
+Publisher9.0.1 is Apache2/Python>=3.10, released2026-08-28; correcting the
+prospective pin requires no package installation/downgrade or base mutation.
+A fresh v2 namespace preserves the original failed job and all numerical/native
+source, operator controls,32CPU/128GiB/1800s gate. Native build remains unqualified.
+
+Whole-model dependency census on exact ef12 confirms FairScale is the only
+missing active dependency; fvcore0.1.5.post20221221/iopath0.1.10/portalocker4.4.0/
+termcolor3.3.0/yacs0.1.8/tabulate0.10.0/tqdm4.66.5/typing_extensions4.16.0 and
+timm1.0.30/scipy1.16.3/einops0.8.2 are already installed. Preserve them. FairScale
+0.4.13 publisher sdist266261B/1b797825c427f5dba92253fd0d8daa574e8bd651a2423497775fab1b30cfb768,
+BSD3-style notice1739B/0a9b773f521ede2910204567bbe69c4f2a8ee8bede07dde0e667bcc6dfd268a0.
+Offline pure-Python construction with BUILD_CUDA_EXTENSIONS=0 is prospective;
+no install/strict checkpoint load/full-model inference is claimed.
