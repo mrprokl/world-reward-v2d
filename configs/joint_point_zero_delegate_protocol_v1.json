@@ -1,0 +1,36 @@
+{
+  "schema": "world_reward.joint_point_zero_delegate_protocol.v1",
+  "status": "prospective_not_executed",
+  "control": "zero_delegate",
+  "base_protocol": {"path": "configs/joint_point_authored_runtime_protocol_v1.json", "bytes": 8529, "sha256": "559c41d113f85083dd1cfb60346cb7f56cad656e050542f7d5094ddee03f668a"},
+  "upstream_revision": "7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80",
+  "optimizer_source": {"path": "learning/training/mhr_opt_refineout.py", "bytes": 92824, "sha256": "84e0e818a3bc0935bb30b75fcd82fd7c5e3730ed812864594cd759697ddb406b"},
+  "runtime_image_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "inheritance": "all_bound_base_sources_models_acquisition_native_decoder_renderer_crop_contact_penetration_optimizer_settings_and_budgets_except_explicit_changes_below",
+  "cohort": {"controls": 1, "frames": 3, "frame_indices": [0, 1, 2], "frame_names": ["000000", "000001", "000002"], "image_size": [480, 640], "K": [[800, 0, 320], [0, 800, 240], [0, 0, 1]], "seed": 0, "previous_raw_arrays_reused": false},
+  "human_translation": {"linear_x_m": 0.01875, "quadratic_x_m": 0.00625, "z_m": 4, "operation": "float64_original_t_arange_then_single_float32_cast"},
+  "object": {
+    "vertices_float32_m": [[-0.046875, -0.03125, -0.0234375], [0.0703125, -0.0234375, -0.015625], [-0.015625, 0.078125, -0.015625], [0.015625, 0.015625, 0.0859375]],
+    "faces_int64_outward": [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]],
+    "placement": "same_primary_named_left_hand_frame0_vertex_mean_plus_[0,0,-0.045]_then_new_human_x_increment",
+    "rotation": "identity_all3", "scale": 1, "repair_or_reposition": false
+  },
+  "optimizer": {"constructor_kind": "one_real_weight_zero_point_subclass", "arms": ["Z_point_zero_delegate"], "constructors": 1, "point_optimizer_factory_calls": 1, "point_weight": 0, "residual_scale_256_px": 1, "calibration_reference": "runtime-only-zero-delegation-not-calibration", "probe_steps": [0, 181], "updates": 301, "runs": 1, "warmup_or_layer_reset_added": false},
+  "query_binding": "same32_mask_quantiles_before_only_constructor_from_source_initial_native_F32_pose_mesh_then_exact_instance_R0_t0_check_no_refill_no_tracker",
+  "observer": {
+    "mechanism": "single_scoped_sys.setprofile_dispatch_exact_native_loss_subclass_loss_point_reprojection_loss_code_objects",
+    "ordered_steps": "[0,181]+list(range(301))",
+    "expected_pairs": 303,
+    "required": "native_direct_parent_is_subclass_same_self_indices_step_include_diagnostics;subclass_return_total_is_native_total_and_metrics_is_native_metrics",
+    "point_reprojection_calls": 0,
+    "tuple_identity_required": false,
+    "frames_or_graphs_retained": false,
+    "tensor_hash_copy_CPU_GPU_or_arithmetic_in_observer": false,
+    "existing_profiler_replaced": false
+  },
+  "retention_Azure_only": ["full_authored_arrays_and_source", "point_evidence.npz", "one_initial_snapshot", "two_full_loss_gradient_probes", "one_full_native_result_including_point_metadata", "scalar_delegation_and_kernel_census"],
+  "budgets_seconds": {"manufacture": 180, "fit": 1200, "inclusive": 1380, "outer": 1440, "owned_cleanup_grace": 30},
+  "failure_policy": "one_new_control_STOP_no_replay_reset_refill_rerender_sweep_tolerance_or_closed_parity_rescue",
+  "interpretation": "PASS_only_qualifies_return_object_delegation_without_added_loss_arithmetic_on_this_control_NOT_A_B_bit_parity_stochastic_lifecycle_determinism_or_quality",
+  "claims": {"executed": false, "bit_parity_qualified": false, "stochastic_lifecycle_qualified": false, "tracker_executed": false, "positive_weight_executed": false, "reconstruction_accuracy_verified": false, "adoption": false, "training_overlap_verified": false, "competition_license_eligibility_verified": false}
+}

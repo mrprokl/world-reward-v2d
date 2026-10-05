@@ -1,4 +1,4 @@
-"""Authored actual-MHR A/B pair or explicit fresh native A/A repeat control.
+"""Authored actual-MHR A/B, fresh A/A, or single zero-delegation control.
 
 Reuse native constructors/losses and the existing paired sequencing operator.
 No challenge records, inherited predictions, GT, renderer retries or calibration.
@@ -26,6 +26,8 @@ PROTOCOL='configs/joint_point_authored_runtime_protocol_v1.json'
 PROTOCOL_PIN={'bytes':8529,'sha256':'559c41d113f85083dd1cfb60346cb7f56cad656e050542f7d5094ddee03f668a'}
 REPEAT_PROTOCOL='configs/joint_point_native_repeat_protocol_v1.json'
 REPEAT_PIN={'bytes':3591,'sha256':'db82e8b8d51058920e02301f20887d84d52e1b25d6c5488596ebd6e51c23706e'}
+DELEGATE_PROTOCOL='configs/joint_point_zero_delegate_protocol_v1.json'
+DELEGATE_PIN={'bytes':3759,'sha256':'b9d9590b9bafdd8568ee0730a69b57a3def041041522fbe15be191a56ab1d6ed'}
 ARCHIVE_PINS='configs/frontend_asset_archive_pins.json'
 IMAGE='sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7'
 BODY='weights/cari4d/sam3d_body/checkpoints/sam-3d-body-dinov3'
@@ -47,11 +49,12 @@ def runtime(code):
 def profile(mode=None):
     if mode is None:return PROTOCOL_PIN,'joint-point-authored-qualify-',('A_original','B_point_weight_zero')
     if mode=='native_repeat':return REPEAT_PIN,'joint-point-native-repeat-',('A_native_first','A_native_second')
+    if mode=='zero_delegate':return DELEGATE_PIN,'joint-point-zero-delegate-',('Z_point_zero_delegate',)
     raise ValueError('Explicit known native control required')
 
 
 def helpers(mode=None):
-    profile(mode);return HELPERS if mode is None else (*HELPERS,REPEAT_PROTOCOL)
+    profile(mode);return HELPERS if mode is None else (*HELPERS,DELEGATE_PROTOCOL if mode=='zero_delegate' else REPEAT_PROTOCOL)
 
 
 def output_path(root,revision,mode=None):
@@ -62,12 +65,13 @@ def output_path(root,revision,mode=None):
 def protocol(rt,code,mode=None):
     profile(mode);c=rt.pinned(code/PROTOCOL,PROTOCOL_PIN,16<<10)
     if mode is None:return c
-    selected=rt.pinned(code/REPEAT_PROTOCOL,REPEAT_PIN,16<<10)
+    selected=rt.pinned(code/(DELEGATE_PROTOCOL if mode=='zero_delegate' else REPEAT_PROTOCOL),profile(mode)[0],16<<10)
     rt.require(selected['control']==mode and selected['base_protocol']==dict(path=PROTOCOL,**PROTOCOL_PIN)
         and selected['upstream_revision']==c['upstream_revision'] and selected['runtime_image_id']==c['runtime_image_id']
         and selected['optimizer_source']==dict(path='learning/training/mhr_opt_refineout.py',**c['primary_sources']['learning/training/mhr_opt_refineout.py']), 'Exact inherited native contracts required')
     c['control']=mode;c['human']['x_coefficients']=selected['human_translation']
     c['object']['vertices_float32_m']=selected['object']['vertices_float32_m'];c['optimizer']['arms']=selected['optimizer']['arms']
+    if mode=='zero_delegate':c['point_attachment']['reference']=selected['optimizer']['calibration_reference']
     return c
 
 
@@ -82,15 +86,61 @@ def write(path,raw,mode=0o444):
         os.fchmod(stream.fileno(),mode);stream.write(raw);stream.flush();os.fsync(stream.fileno())
 
 
-def observed_call(callback,functions):
+class LossDelegationObserver:
+    """Transient return-object identity proof; never retains Python frames."""
+    def __init__(self,native_loss,subclass_loss,point_loss):
+        self.native,self.subclass,self.point=(f.__code__ for f in (native_loss,subclass_loss,point_loss))
+        if len({self.native,self.subclass,self.point})!=3:raise ValueError('Distinct exact loss code objects required')
+        self.steps=[];self.point_calls=0;self.active=None;self.returned=None;self.native_frame=None
+
+    def clear(self):self.active=None;self.returned=None;self.native_frame=None
+
+    @staticmethod
+    def binding(frame):
+        fields=frame.f_locals;value=(id(fields['self']),id(fields['indices']),fields['step'],fields['include_diagnostics'])
+        if type(value[2]) is not int or type(value[3]) is not bool:raise ValueError('Typed native loss arguments required')
+        return value
+
+    def __call__(self,frame,event,value):
+        code=frame.f_code
+        if event=='call' and code is self.point:self.point_calls+=1;raise ValueError('Zero delegation called point arithmetic')
+        if code not in (self.native,self.subclass) or event not in ('call','return'):return
+        if event=='call':
+            binding=self.binding(frame)
+            if code is self.subclass:
+                expected=[0,181]+list(range(301))
+                if self.active is not None or len(self.steps)>=303 or binding[2]!=expected[len(self.steps)]:raise ValueError('Exact ordered delegation steps required')
+                self.active=(id(frame),binding)
+            elif self.active is None or frame.f_back.f_code is not self.subclass or id(frame.f_back)!=self.active[0] or binding!=self.active[1]:
+                raise ValueError('Direct same-instance native delegation required')
+            elif self.returned is not None or self.native_frame is not None:raise ValueError('Only one native loss per delegation')
+            else:self.native_frame=id(frame)
+        elif code is self.native:
+            if self.active is None or id(frame)!=self.native_frame or id(frame.f_back)!=self.active[0] or frame.f_back.f_code is not self.subclass or self.binding(frame)!=self.active[1] or self.binding(frame.f_back)!=self.active[1] or type(value) is not tuple or len(value)!=2:raise ValueError('Actual native loss return required')
+            self.returned=value;self.native_frame=None
+        else:
+            try:
+                if self.active is None or id(frame)!=self.active[0] or self.binding(frame)!=self.active[1] or self.native_frame is not None or self.returned is None or type(value) is not tuple or len(value)!=2 or value[0] is not self.returned[0] or value[1] is not self.returned[1]:raise ValueError('Native total/metrics objects changed')
+                self.steps.append(self.active[1][2])
+            finally:self.clear()
+
+    def report(self):
+        return dict(pairs=len(self.steps),ordered_steps=self.steps.copy(),point_reprojection_calls=self.point_calls,
+                    total_object_identity_verified=len(self.steps)==303,metrics_object_identity_verified=len(self.steps)==303,frames_retained=False)
+
+
+def observed_call(callback,functions,delegate=None):
     """Observe delegated real Python entrypoints; no monkeypatch or substitute."""
     if sys.getprofile() is not None:raise ValueError('Unmodified native profiler state required')
     codes={f.__code__:name for name,f in functions.items()};counts={name:0 for name in functions}
     def profile(frame,event,arg):
         if event=='call' and frame.f_code in codes:counts[codes[frame.f_code]]+=1
+        if delegate is not None:delegate(frame,event,arg)
     sys.setprofile(profile)
     try:return callback(),counts
-    finally:sys.setprofile(None)
+    finally:
+        sys.setprofile(None)
+        if delegate is not None:delegate.clear()
 
 
 def cleanup(rt,name,revision,path):
@@ -127,7 +177,7 @@ def parameters(np,c,body_converter,hand_converter,dims):
     if dims!=PARAMETER_DIMS:raise ValueError('Exact primary MHR parameter ABI required')
     values={k:np.zeros((3,n),np.float32) for k,n in dims.items()};index=np.arange(3)
     values['mhr_global_rot6d'][:]=c['human']['root_rot6d_interleaved'];values['mhr_trans'][:,0]=(.01*index+.005*index**2).astype(np.float32);values['mhr_trans'][:,2]=4
-    if c.get('control')=='native_repeat':
+    if c.get('control') in ('native_repeat','zero_delegate'):
         coefficients=c['human']['x_coefficients'];values['mhr_trans'][:,0]=(coefficients['linear_x_m']*index+coefficients['quadratic_x_m']*index**2).astype(np.float32)
     values['mhr_body_pose_cont'][:]=body_converter(np.zeros((3,133),np.float32))
     hand=hand_converter(np.zeros((3,27),np.float32));values['mhr_hand'][:]=np.concatenate((hand,hand),axis=1)
@@ -250,23 +300,43 @@ def paired_native(np,torch,layer,optimizer,source,vertices,faces,depth,c,out,rep
     import Utils
     from kaolin.ops.mesh import check_sign
     from kaolin.metrics.trianglemesh import point_to_mesh_distance
-    repeat=c.get('control')=='native_repeat';arms=profile(c.get('control'))[2]
+    repeat=c.get('control')=='native_repeat';single=c.get('control')=='zero_delegate';arms=profile(c.get('control'))[2]
     config=None if repeat else op.PointObjectiveConfig(1.,0.,c['point_attachment']['reference']);cfg=optimizer.MHRParityPostOptConfig(
         penetration_collision_proxy_path=str(ROOT/'weights/cari4d/refinement/mhr_collision_proxy_4000v.npz'),
         hand_surface_spec_path=str(ROOT/'weights/cari4d/refinement/mhr_hand_surface_spec.npz'),report_every=100,checkpoint_path=None)
-    fingerprint=full.fingerprint(source);extension=None;retained={p.name:runtime(Path(os.environ['WR_CODE'])).identity(p) for p in out.iterdir() if p.name!='report.json'}
+    fingerprint=full.fingerprint(source);extension=None;delegate=None;retained={p.name:runtime(Path(os.environ['WR_CODE'])).identity(p) for p in out.iterdir() if p.name!='report.json'}
     functions=dict(contact=optimizer.MHRParityPostOptimizer._contact_loss,render=Utils.nvdiff_color_depth_render,
         penetration=optimizer.object_inside_human_penetration_loss,kaolin_sign=check_sign,kaolin_distance=point_to_mesh_distance)
     report.update(config=asdict(cfg),point_config=None if repeat else asdict(config),raw_source_sha256=fingerprint,raw_artifacts=retained)
     if repeat:report.update(control='native_repeat',constructor_kind='original_both',arm_names=list(arms),point_optimizer_factory_calls=0,point_evidence_bound=False)
+    if single:
+        from world_reward.fixed_shape_point_pose import PointTrackEvidence
+        from world_reward.joint_point_evidence import bind_joint_point_evidence
+        pose=source['pr']['pose_abs']
+        if pose.dtype!=np.float32 or pose.shape!=(3,4,4) or not pose.flags.c_contiguous:raise ValueError('Exact native F32 initial pose required before constructor')
+        r0,t0=pose[0,:3,:3].copy(),pose[0,:3,3].copy()
+        try:selected=canonical_mask_quantile_queries(vertices,faces,r0,t0,np.asarray(c['cohort']['K'],np.float64),source['observations']['object_mask'][0],np.isfinite(depth[0])&(depth[0]>0),image_width=640,image_height=480);q=selected.queries
+        except MaskQueryError as error:report['query_diagnostics']=error.diagnostics.scalar_report();raise
+        report['query_diagnostics']=selected.diagnostics.scalar_report();n=len(q.face_indices);timeline=np.arange(3,dtype=np.int64);xy=q.query_points[:,[2,1]]*np.array([256/640,256/480])
+        tracks=PointTrackEvidence(timeline,timeline,np.arange(n,dtype=np.int64),q.query_points,np.broadcast_to(xy,(3,n,2)).copy(),np.zeros((3,n),bool))
+        evidence=bind_joint_point_evidence(q,tracks,native_vertices=vertices,native_faces=faces,K=np.asarray(c['cohort']['K'],np.float64),image_size=(480,640),frame_index=timeline,source_frame_ids=timeline,native_frame_names=tuple(source['frames']),source_references=(c['point_attachment']['reference'],'NUMERICALCONTROL_NOTTRACKER'))
+        extension=op.native_point_optimizer_class(optimizer,evidence,config);delegate=LossDelegationObserver(optimizer.MHRParityPostOptimizer.loss,extension.loss,op.point_reprojection_loss)
+        retain(out/'point_evidence.npz',lambda stream:np.savez(stream,**{k:getattr(evidence,k) for k in evidence.__dataclass_fields__ if isinstance(getattr(evidence,k),np.ndarray)}))
+        retained['point_evidence.npz']=runtime(Path(os.environ['WR_CODE'])).identity(out/'point_evidence.npz')
+        report.update(control='zero_delegate',constructor_kind='one_real_weight_zero_point_subclass',arm_names=list(arms),point_optimizer_factory_calls=1,point_evidence_bound=True,point_evidence_sha256=evidence.evidence_sha256,bit_parity_qualified=False,stochastic_lifecycle_qualified=False)
     def reset():random.seed(0);np.random.seed(0);torch.manual_seed(0);torch.cuda.manual_seed_all(0)
     def construct(arm):
         nonlocal extension
         check()
         if full.fingerprint(source)!=fingerprint:raise ValueError('Authored source changed')
-        instance=optimizer.MHRParityPostOptimizer(source,vertices,faces,cfg,mhr_layer=layer) if repeat or arm==arms[0] else extension(source,vertices,faces,cfg,mhr_layer=layer)
+        instance=optimizer.MHRParityPostOptimizer(source,vertices,faces,cfg,mhr_layer=layer) if not single and (repeat or arm==arms[0]) else extension(source,vertices,faces,cfg,mhr_layer=layer)
         if not bool((instance.contact_mask[:,0]>0).all()):raise ValueError('Effective authored left contact absent')
-        if arm==arms[0]:
+        if single:
+            r,t,_,_=instance._object_state(torch.arange(3,device='cuda'),include_surface=False)
+            actual_r,actual_t=r[0].detach().cpu().numpy(),t[0].detach().cpu().numpy()
+            if actual_r.dtype!=r0.dtype or actual_t.dtype!=t0.dtype or actual_r.tobytes()!=r0.tobytes() or actual_t.tobytes()!=t0.tobytes():raise ValueError('Preconstructor query pose differs from actual native initial state')
+            report['query_pose_verified_after_constructor']=True
+        elif arm==arms[0]:
             indices=torch.arange(3,device='cuda');r,t,_,_=instance._object_state(indices,include_surface=False)
             try:selected=canonical_mask_quantile_queries(vertices,faces,r[0].detach().cpu().numpy(),t[0].detach().cpu().numpy(),np.asarray(c['cohort']['K'],np.float64),source['observations']['object_mask'][0],np.isfinite(depth[0])&(depth[0]>0),image_width=640,image_height=480);q=selected.queries
             except MaskQueryError as error:report['query_diagnostics']=error.diagnostics.scalar_report();raise
@@ -286,28 +356,43 @@ def paired_native(np,torch,layer,optimizer,source,vertices,faces,depth,c,out,rep
         state={k:v for k,v in vars(instance).items() if torch.is_tensor(v) or isinstance(v,np.ndarray)};state['params_fixed']=instance.params_fixed
         retain(out/f"{report['phase']}_initial.pth",lambda stream:torch.save(dict(state=state,optimizer=instance.optimizer.state_dict(),scheduler=instance.scheduler.state_dict()),stream))
         record=dict(state_sha256=full.fingerprint(state),optimizer_sha256=full.fingerprint(instance.optimizer.state_dict()),scheduler_sha256=full.fingerprint(instance.scheduler.state_dict()))
-        if repeat:precomparison_record(report,record,persist)
+        if repeat or single:precomparison_record(report,record,persist)
         return record
     def probe(instance,step):
         check();indices=torch.arange(3,device='cuda');instance.optimizer.zero_grad(set_to_none=True)
-        (total,metrics),counts=observed_call(lambda:instance.loss(indices,step,include_diagnostics=True),functions);total.backward();torch.cuda.synchronize()
+        (total,metrics),counts=observed_call(lambda:instance.loss(indices,step,include_diagnostics=True),functions,delegate);total.backward();torch.cuda.synchronize()
         gradients=[p.grad for g in instance.optimizer.param_groups for p in g['params']]
         if not torch.isfinite(total) or any(g is not None and not torch.isfinite(g).all() for g in gradients):raise ValueError('Nonfinite real native probe')
         if not counts['contact'] or not counts['render'] or step==181 and any(not n for n in counts.values()):raise ValueError('Real contact/render/Kaolin path not executed')
         retain(out/f"{report['phase']}.pth",lambda stream:torch.save(dict(total=total,metrics=metrics,gradients=gradients),stream))
         record=dict(step=step,loss_sha256=full.fingerprint(total),metrics_sha256=full.fingerprint(metrics),gradients=full.fingerprint(gradients),native_calls=counts)
-        if repeat:precomparison_record(report,record,persist)
+        if repeat or single:precomparison_record(report,record,persist)
         instance.optimizer.zero_grad(set_to_none=True);return record
     def validate(result,arm):
         retain(out/(arm+'_result.pth'),lambda stream:torch.save(result,stream))
         if full.fingerprint(torch.load(out/(arm+'_result.pth'),map_location='cpu',weights_only=False))!=full.fingerprint(result):raise ValueError('Full native saved result reload differs')
-        if not repeat and arm=='B_point_weight_zero':
+        if not repeat and not single and arm=='B_point_weight_zero':
             extra=result['postopt'].pop('point_objective')
             if extra['config']!=asdict(config) or any(extra['after_initializer_support']):raise ValueError('Zero weight evidence changed')
+        if single and result['postopt']['point_objective']!=dict(config=asdict(config),evidence_sha256=evidence.evidence_sha256,
+            mesh_sha256=evidence.mesh_sha256,after_initializer_support=evidence.support_counts().tolist(),native_source_sha256=op.NATIVE_SOURCE_SHA256,
+            object_rotation_fixed=True,track_equal=True,support_is_confidence=False,calibration_reference_authenticated=False,calibrated_probabilities=False,quality_verified=False,adoption=False):raise ValueError('Full zero-delegate point metadata differs')
         metadata=full.validate_result(source,result,3);check()
         if full.fingerprint(source)!=fingerprint:raise ValueError('Raw source changed')
         return dict(result_sha256=full.fingerprint(result),metadata_sha256=full.fingerprint(metadata))
-    pair.paired_execution(construct,probe,lambda instance:instance.run(),reset,lambda:(gc.collect(),torch.cuda.empty_cache()),initial,validate,report,persist,arm_names=arms)
+    if single:
+        arm=arms[0];reset();report['phase']=arm+'_constructor';report['constructor_attempts']+=1;persist();instance=construct(arm);report['constructor_returns']+=1
+        observed=dict(initial_state=initial(instance),probes=[])
+        try:
+            for step in (0,181):
+                report['phase']=arm+f'_loss_gradient_{step}';report['probe_attempts']+=1;persist();observed['probes'].append(probe(instance,step));report['probe_returns']+=1
+            report['phase']=arm+'_301_updates';report['run_attempts']+=1;persist();result,counts=observed_call(lambda:instance.run(),functions,delegate);report['run_returns']+=1
+            checked=validate(result,arm);report[arm]=dict(initial=observed,result=checked,native_calls=counts)
+            if delegate.steps!=[0,181]+list(range(301)) or delegate.point_calls:raise ValueError('Complete303 ordered zero-loss delegations required')
+            report.update(semantic_delegation_verified=True,actual_native_updates_total=301,actual_native_updates_per_arm=301)
+        finally:report['loss_delegation']=delegate.report();delegate.clear();persist()
+        del instance,result;gc.collect();torch.cuda.empty_cache()
+    else:pair.paired_execution(construct,probe,lambda instance:instance.run(),reset,lambda:(gc.collect(),torch.cuda.empty_cache()),initial,validate,report,persist,arm_names=arms)
     rt=runtime(Path(os.environ['WR_CODE']));rt.require(all(rt.identity(out/n)==pin for n,pin in retained.items()),'Frozen raw control changed during pair')
     rt.require(full.fingerprint(torch.load(out/'authored_source.pth',map_location='cpu',weights_only=False))==fingerprint,'Saved raw control reload differs')
 
@@ -351,7 +436,8 @@ def host(rt,root,code,revision,mode=None):
     pin,_,arms=profile(mode);proof=prerequisites(rt,root,code,revision,mode);proof['host_start_monotonic']=start
     if mode is not None:proof['control']=mode
     out=output_path(root,revision,mode);rt.canonical(out);rt.require(not out.exists(),'Fresh control only')
-    name=('world-reward-joint-point-native-repeat-' if mode else 'world-reward-joint-point-authored-')+revision;rt.require(not control(['docker','ps','-aq','--filter','name=^/'+name+'$']).strip(),'Owned name occupied')
+    label='zero-delegate' if mode=='zero_delegate' else 'native-repeat' if mode else 'authored'
+    name='world-reward-joint-point-'+label+'-'+revision;rt.require(not control(['docker','ps','-aq','--filter','name=^/'+name+'$']).strip(),'Owned name occupied')
     projection=rt.strict(control(['docker','image','inspect',IMAGE,'--format','{"Id":{{json .Id}},"Architecture":{{json .Architecture}},"Os":{{json .Os}},"RootFS":{{json .RootFS}}}']))
     rt.require(projection['Id']==IMAGE and projection['Architecture']=='amd64' and projection['Os']=='linux' and projection['RootFS']['Type']=='layers','Actual native image required')
     out.mkdir(mode=0o755);out.chmod(0o755);pred=out/'native';pred.mkdir(mode=0o700);os.chown(pred,1000,1000)
@@ -359,7 +445,7 @@ def host(rt,root,code,revision,mode=None):
     lock=rt.canonical(root/'jobs/.world-reward-h100.lock');s=lock.lstat();rt.require(stat.S_ISREG(s.st_mode) and s.st_nlink==1,'Existing cooperative lock required')
     fd=os.open(lock,os.O_RDONLY|os.O_NOFOLLOW);os.dup2(fd,9)
     if fd!=9:os.close(fd)
-    report=dict(stage='joint_point_native_repeat_host_seal_v1' if mode else 'joint_point_authored_host_seal_v1',status='fail',producer_revision=revision,source_binding=proof['source_binding'],protocol_identity=pin,
+    report=dict(stage='joint_point_zero_delegate_host_seal_v1' if mode=='zero_delegate' else 'joint_point_native_repeat_host_seal_v1' if mode else 'joint_point_authored_host_seal_v1',status='fail',producer_revision=revision,source_binding=proof['source_binding'],protocol_identity=pin,
         image=projection,runtime_qualified=False,quality_verified=False,adoption=False,challenge_inputs_used=False,gt_used=False)
     if mode is not None:report['control']=mode
     cid=out/'.container.cid';failure=None
@@ -382,7 +468,7 @@ def host(rt,root,code,revision,mode=None):
             os.fchmod(log.fileno(),0o444);result=subprocess.run(args,stdout=log,stderr=log,timeout=max(.001,1380-(time.monotonic()-start)))
         rt.require(result.returncode==0,'Actual native pair failed')
         native_report=rt.strict((pred/'report.json').read_bytes());validate_native(rt,native_report,proof,mode)
-        expected={'authored_object.obj','authored_raw.npz','authored_source.pth','quantile_diagnostic.npz' if mode else 'point_evidence.npz','report.json'}|{arm+s for arm in arms for s in ('_constructor_initial.pth','_loss_gradient_0.pth','_loss_gradient_181.pth','_result.pth')}
+        expected={'authored_object.obj','authored_raw.npz','authored_source.pth','quantile_diagnostic.npz' if mode=='native_repeat' else 'point_evidence.npz','report.json'}|{arm+s for arm in arms for s in ('_constructor_initial.pth','_loss_gradient_0.pth','_loss_gradient_181.pth','_result.pth')}
         rt.require({p.name for p in pred.iterdir()}==expected and pred.stat().st_mode&0o777==0o555,'Exact complete retained native control required')
         report['native_report_identity']=rt.identity(pred/'report.json');report['outputs']={p.name:rt.identity(p,1_000_000_000) for p in pred.iterdir()}
     except BaseException as error:failure=error;report['error_type']=type(error).__name__
@@ -407,8 +493,17 @@ def validate_native(rt,r,proof,mode=None):
     required=dict(status='pass',phase='complete',frames=3,constructor_attempts=2,constructor_returns=2,probe_attempts=4,probe_returns=4,run_attempts=2,run_returns=2,
         actual_native_updates_total=602,actual_native_updates_per_arm=301,exact_full_result_history_parity=True,exact_initial_state_loss_gradient_parity=True,
         manufactured_not_inferred=True,tracker_executed=False,positive_weight_executed=False,quality_verified=False,adoption=False,ground_truth_used=False,challenge_inputs_used=False,source_inputs_assets_rehashed_after=True)
+    if mode=='zero_delegate':
+        for k in ('exact_full_result_history_parity','exact_initial_state_loss_gradient_parity'):required.pop(k);rt.require(k not in r,'Delegation is not independent bit parity')
+        required.update(constructor_attempts=1,constructor_returns=1,probe_attempts=2,probe_returns=2,run_attempts=1,run_returns=1,actual_native_updates_total=301,
+            bit_parity_qualified=False,stochastic_lifecycle_qualified=False,semantic_delegation_verified=True,point_optimizer_factory_calls=1,point_evidence_bound=True,query_pose_verified_after_constructor=True)
+        rt.require(r.get('control')==mode and r.get('constructor_kind')=='one_real_weight_zero_point_subclass' and r.get('arm_names')==list(arms)
+            and r.get('point_config')==dict(residual_scale_256_px=1.,weight=0.,calibration_reference='runtime-only-zero-delegation-not-calibration'),'One native zero-delegate subclass required')
+        d=r['loss_delegation'];rt.require(type(d['pairs']) is int and d['pairs']==303 and type(d['point_reprojection_calls']) is int and d['point_reprojection_calls']==0
+            and type(d['ordered_steps']) is list and all(type(s) is int for s in d['ordered_steps']) and d['ordered_steps']==[0,181]+list(range(301))
+            and d['total_object_identity_verified'] is True and d['metrics_object_identity_verified'] is True and d['frames_retained'] is False,'Complete semantic delegation required')
     rt.require(all(type(r.get(k)) is type(v) and r[k]==v for k,v in required.items()) and r['source_binding']==proof['source_binding'] and r['protocol_identity']==pin and proof.get('control')==mode,'Complete actual authored pair proof required')
-    if mode is not None:
+    if mode=='native_repeat':
         rt.require(r.get('control')==mode and r.get('constructor_kind')=='original_both' and r.get('arm_names')==list(arms)
             and type(r.get('point_optimizer_factory_calls')) is int and r['point_optimizer_factory_calls']==0 and r.get('point_evidence_bound') is False and r.get('point_config') is None,'Original-only native repeat proof required')
     for arm in arms:
@@ -420,7 +515,7 @@ def validate_native(rt,r,proof,mode=None):
 
 
 def arguments(argv=None):
-    parser=argparse.ArgumentParser(allow_abbrev=False);parser.add_argument('--native',nargs=2);parser.add_argument('--control',action='append',choices=['native_repeat']);args=parser.parse_args(argv)
+    parser=argparse.ArgumentParser(allow_abbrev=False);parser.add_argument('--native',nargs=2);parser.add_argument('--control',action='append',choices=['native_repeat','zero_delegate']);args=parser.parse_args(argv)
     if args.control and len(args.control)!=1:parser.error('Control selected exactly once')
     args.control=args.control[0] if args.control else None;return args
 
@@ -432,7 +527,7 @@ def main(argv=None):
     proof=rt.pinned(Path('/opt/authored-proof.json'),dict(bytes=int(args.native[0]),sha256=args.native[1]),4<<20)
     rt.require(proof.get('control')==args.control,'Host/native control selection differs')
     out=output_path(root,revision,args.control)/'native'
-    report=dict(stage='joint_point_native_repeat_v1' if args.control else 'joint_point_authored_native_pair_v1',status='fail',phase='preflight',source_binding=proof['source_binding'],protocol_identity=pin,
+    report=dict(stage='joint_point_zero_delegate_v1' if args.control=='zero_delegate' else 'joint_point_native_repeat_v1' if args.control else 'joint_point_authored_native_pair_v1',status='fail',phase='preflight',source_binding=proof['source_binding'],protocol_identity=pin,
         frames=3,constructor_attempts=0,constructor_returns=0,probe_attempts=0,probe_returns=0,run_attempts=0,run_returns=0,
         manufactured_not_inferred=True,tracker_executed=False,positive_weight_executed=False,quality_verified=False,adoption=False,ground_truth_used=False,challenge_inputs_used=False)
     if args.control is not None:report['control']=args.control

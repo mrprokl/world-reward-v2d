@@ -9,6 +9,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tarfile
+import weakref
 from types import SimpleNamespace
 
 import numpy as np
@@ -219,6 +220,7 @@ def test_runtime_sourceclosure_and_shell_syntax():
     paths=azure_job.runtime_bundle_paths(files,'infra/run_joint_point_authored_qualify.sh')
     assert set(q.HELPERS)<=set(paths)
     assert q.REPEAT_PROTOCOL in paths
+    assert q.DELEGATE_PROTOCOL in paths
     subprocess.run(['bash','-n',str(ROOT/'infra/run_joint_point_authored_qualify.sh')],check=True)
 
 
@@ -397,3 +399,256 @@ def test_native_cli_host_control_mismatch_before_torch_or_output(tmp_path,monkey
     monkeypatch.setattr(q,'native',lambda *a,**k:pytest.fail('No native calls on control mismatch'))
     with pytest.raises(ValueError,match='selection differs'):q.main(['--native','16','a'*64,'--control','native_repeat'])
     assert list(tmp_path.iterdir())==[]
+
+
+def test_zero_delegate_frozen_distinct_scene_and_route():
+    raw=(ROOT/q.DELEGATE_PROTOCOL).read_bytes();selected=json.loads(raw)
+    assert q.DELEGATE_PIN==dict(bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
+    gate=SimpleNamespace(pinned=lambda p,pin,cap:rt.strict(p.read_bytes()),require=rt.require)
+    c=q.protocol(gate,ROOT,'zero_delegate');base=configuration()
+    values=q.parameters(np,c,lambda a:np.zeros((3,260),np.float32),lambda a:np.zeros((3,54),np.float32),PARAMETER_DIMS)
+    assert np.array_equal(values['mhr_trans'][:,0],(.01875*np.arange(3)+.00625*np.arange(3)**2).astype(np.float32))
+    v=np.asarray(c['object']['vertices_float32_m'],np.float32);f=np.asarray(c['object']['faces_int64_outward'],np.int64)
+    assert np.array_equal(v*128,[[-6,-4,-3],[9,-3,-2],[-2,10,-2],[2,2,11]])
+    assert all(np.dot(np.cross(v[b]-v[a],v[d]-v[a]),v[a]-v.mean(0))>0 for a,b,d in f)
+    assert np.array_equal(f,base['object']['faces_int64_outward'])
+    assert c['optimizer']['arms']==['Z_point_zero_delegate'] and selected['optimizer']['constructors']==1
+    assert q.helpers('zero_delegate')==(*q.HELPERS,q.DELEGATE_PROTOCOL)
+    assert q.REPEAT_PROTOCOL not in q.helpers('zero_delegate') and q.arguments(['--control','zero_delegate']).control=='zero_delegate'
+    assert len({q.output_path(Path('/tmp'), 'a'*40,mode) for mode in (None,'native_repeat','zero_delegate')})==3
+
+
+@pytest.mark.parametrize('argv',[
+    ['--control','zero_delegate','--control','zero_delegate'],['--control','native_repeat','--control','zero_delegate']])
+def test_delegate_duplicate_or_combined_control_rejected(argv):
+    with pytest.raises(SystemExit):q.arguments(argv)
+
+
+class NativeLossFixture:
+    def loss(self,indices,step,*,include_diagnostics=True):return object(),{'native':object()}
+
+
+class DelegateLossFixture(NativeLossFixture):
+    def loss(self,indices,step,*,include_diagnostics=True):
+        total,metrics=super().loss(indices,step,include_diagnostics=include_diagnostics)
+        return total,metrics  # A fresh tuple must not require tuple identity.
+
+
+def point_loss_fixture():return object()
+
+
+def observer(cls=DelegateLossFixture):return q.LossDelegationObserver(NativeLossFixture.loss,cls.loss,point_loss_fixture)
+
+
+def test_delegate_exact303_pairs_one_profile_and_no_retained_returns():
+    instance=DelegateLossFixture();indices=object();audit=observer()
+    def run():
+        for step in [0,181]+list(range(301)):instance.loss(indices,step,include_diagnostics=bool(step%2))
+    _,counts=q.observed_call(run,{'native':NativeLossFixture.loss},audit)
+    assert counts=={'native':303} and audit.report()==dict(pairs=303,ordered_steps=[0,181]+list(range(301)),
+        point_reprojection_calls=0,total_object_identity_verified=True,metrics_object_identity_verified=True,frames_retained=False)
+    assert audit.active is audit.returned is audit.native_frame is None and sys.getprofile() is None
+
+
+def test_delegate_return_graphs_released_after_immediate_pair():
+    class Graph:pass
+    refs=[]
+    class Native:
+        def loss(self,indices,step,*,include_diagnostics=True):
+            total=Graph();refs.append(weakref.ref(total));return total,{}
+    class Delegated(Native):
+        def loss(self,indices,step,*,include_diagnostics=True):return super().loss(indices,step,include_diagnostics=include_diagnostics)
+    audit=q.LossDelegationObserver(Native.loss,Delegated.loss,point_loss_fixture)
+    def call_and_release():Delegated().loss(object(),0)
+    q.observed_call(call_and_release,{},audit)
+    assert len(refs)==1 and refs[0]() is None and audit.returned is audit.active is None
+
+
+@pytest.mark.parametrize('kind',['total','metrics','indices','self','step','diagnostics','duplicate','nested','helper','point','exception','rebind'])
+def test_delegate_object_binding_call_count_and_exception_forgeries_fail(kind):
+    def intermediary(instance,indices,step,include_diagnostics):
+        return NativeLossFixture.loss(instance,indices,step,include_diagnostics=include_diagnostics)
+    class Bad(NativeLossFixture):
+        def loss(self,indices,step,*,include_diagnostics=True):
+            if kind=='nested':return self.loss(indices,step,include_diagnostics=include_diagnostics)
+            if kind=='point':point_loss_fixture()
+            if kind=='exception':raise RuntimeError('fixture failure')
+            if kind=='helper':return intermediary(self,indices,step,include_diagnostics)
+    # Bind the exact native function; no dynamic substitute of the source function.
+    if kind=='self':
+        def wrong_self_loss(self,indices,step,*,include_diagnostics=True):
+            return NativeLossFixture.loss(NativeLossFixture(),indices,step,include_diagnostics=include_diagnostics)
+        Bad.loss=wrong_self_loss
+    elif kind not in ('nested','point','exception','helper'):
+        # The native signature cannot take an extra positional self argument.
+        def bad_loss(self,indices,step,*,include_diagnostics=True):
+            total,metrics=super(Bad,self).loss(object() if kind=='indices' else indices,step+1 if kind=='step' else step,
+                include_diagnostics=not include_diagnostics if kind=='diagnostics' else include_diagnostics)
+            if kind=='duplicate':super(Bad,self).loss(indices,step,include_diagnostics=include_diagnostics)
+            if kind=='rebind':indices=object()
+            return (object() if kind=='total' else total,dict(metrics) if kind=='metrics' else metrics)
+        Bad.loss=bad_loss
+    audit=observer(Bad)
+    with pytest.raises((ValueError,RuntimeError)):
+        q.observed_call(lambda:Bad().loss(object(),0),{},audit)
+    assert audit.steps==[] and audit.active is audit.returned is audit.native_frame is None
+    assert audit.report()['total_object_identity_verified'] is False and sys.getprofile() is None
+
+
+@pytest.mark.parametrize('step,diagnostics',[(True,True),(0,1),(1,True)])
+def test_delegate_typed_step_diagnostics_and_first_order_required(step,diagnostics):
+    audit=observer()
+    with pytest.raises(ValueError):q.observed_call(lambda:DelegateLossFixture().loss(object(),step,include_diagnostics=diagnostics),{},audit)
+    assert audit.steps==[] and sys.getprofile() is None
+
+
+def test_delegate_native_inflight_and_return_parent_are_exact():
+    audit=observer();instance=object();indices=object();fields=dict(self=instance,indices=indices,step=0,include_diagnostics=True)
+    subclass=SimpleNamespace(f_code=audit.subclass,f_locals=fields);native=SimpleNamespace(f_code=audit.native,f_locals=fields,f_back=subclass)
+    audit(subclass,'call',None);audit(native,'call',None)
+    with pytest.raises(ValueError,match='one native'):audit(native,'call',None)
+    native.f_back=SimpleNamespace(f_code=audit.subclass,f_locals=fields)
+    with pytest.raises(ValueError,match='native loss return'):audit(native,'return',(object(),{}))
+    audit.clear();assert audit.native_frame is audit.returned is audit.active is None
+
+
+def delegate_native_report():
+    r,proof=native_report();proof['control']='zero_delegate';r['protocol_identity']=q.DELEGATE_PIN
+    for k in ('exact_full_result_history_parity','exact_initial_state_loss_gradient_parity'):r.pop(k)
+    r['Z_point_zero_delegate']=r.pop('A_original');r.pop('B_point_weight_zero')
+    r.update(control='zero_delegate',constructor_kind='one_real_weight_zero_point_subclass',arm_names=['Z_point_zero_delegate'],
+        constructor_attempts=1,constructor_returns=1,probe_attempts=2,probe_returns=2,run_attempts=1,run_returns=1,actual_native_updates_total=301,
+        bit_parity_qualified=False,stochastic_lifecycle_qualified=False,semantic_delegation_verified=True,point_optimizer_factory_calls=1,
+        point_evidence_bound=True,query_pose_verified_after_constructor=True,point_config=dict(residual_scale_256_px=1.,weight=0.,calibration_reference='runtime-only-zero-delegation-not-calibration'),
+        loss_delegation=dict(pairs=303,ordered_steps=[0,181]+list(range(301)),point_reprojection_calls=0,total_object_identity_verified=True,metrics_object_identity_verified=True,frames_retained=False))
+    return r,proof
+
+
+def test_delegate_scope_is_one301_not_pair_bit_parity():
+    r,proof=delegate_native_report();q.validate_native(rt,r,proof,'zero_delegate')
+    for mode in (None,'native_repeat'):
+        with pytest.raises(ValueError):q.validate_native(rt,r,proof,mode)
+
+
+@pytest.mark.parametrize('key,value',[('constructor_returns',2),('run_returns',2),('actual_native_updates_total',602),
+    ('semantic_delegation_verified',False),('bit_parity_qualified',True),('exact_initial_state_loss_gradient_parity',True),('point_optimizer_factory_calls',True)])
+def test_delegate_wrong_claims_or_counts_rejected(key,value):
+    r,proof=delegate_native_report();r[key]=value
+    with pytest.raises(ValueError):q.validate_native(rt,r,proof,'zero_delegate')
+
+
+@pytest.mark.parametrize('key,value',[('pairs',302),('point_reprojection_calls',1),('frames_retained',True),
+    ('ordered_steps',[False,181]+list(range(301))),('ordered_steps',[181,0]+list(range(301))),('total_object_identity_verified',False)])
+def test_delegate_incomplete_malformed_observation_rejected(key,value):
+    r,proof=delegate_native_report();r['loss_delegation'][key]=value
+    with pytest.raises(ValueError):q.validate_native(rt,r,proof,'zero_delegate')
+
+
+def test_delegate_cli_proof_mismatch_before_output_or_models(tmp_path,monkeypatch):
+    monkeypatch.setenv('WR_ROOT',str(tmp_path));monkeypatch.setenv('WR_CODE',str(ROOT));monkeypatch.setenv('WR_CODE_REVISION','a'*40)
+    monkeypatch.setattr(q,'runtime',lambda code:SimpleNamespace(pinned=lambda *a,**k:{'control':'native_repeat'},require=rt.require))
+    monkeypatch.setattr(q,'native',lambda *a,**k:pytest.fail('Mismatched control cannot run'))
+    with pytest.raises(ValueError):q.main(['--native','16','a'*64,'--control','zero_delegate'])
+    assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize('fault',[None,'pose','metadata'])
+def test_single_native_orchestration_query_before_one_constructor_full_retention(tmp_path,monkeypatch,fault):
+    """Procedural callbacks exercise caller order; not a real native qualification."""
+    from dataclasses import dataclass,asdict
+    import cari_full_refine as full
+    from world_reward import joint_point_objective as op
+    from world_reward.point_surface_queries import SurfaceQueries
+    import world_reward.point_surface_queries as selectors
+    gate=SimpleNamespace(pinned=lambda p,pin,cap:rt.strict(p.read_bytes()),require=rt.require)
+    c=q.protocol(gate,ROOT,'zero_delegate');v=np.asarray(c['object']['vertices_float32_m'],np.float32)
+    f=np.asarray(c['object']['faces_int64_outward'],np.int64);pose=np.tile(np.eye(4,dtype=np.float32),(3,1,1));pose[:,2,3]=4
+    source=dict(frames=['000000','000001','000002'],pr=dict(pose_abs=pose),observations=dict(object_mask=np.ones((3,4,4),bool)))
+    events=[];saved={};persisted=[]
+    @dataclass
+    class Config:
+        penetration_collision_proxy_path:str
+        hand_surface_spec_path:str
+        report_every:int
+        checkpoint_path:object
+    class Tensor:
+        def __init__(self,array):self.array=np.asarray(array)
+        def __getitem__(self,i):return Tensor(self.array[i])
+        def detach(self):return self
+        def cpu(self):return self
+        def numpy(self):return self.array
+        def backward(self):events.append('backward')
+    def render():pass
+    def penetration():pass
+    def sign():pass
+    def distance():pass
+    class Native:
+        def __init__(self,*args,**kwargs):
+            events.append(('constructor',type(self).__name__));self.contact_mask=np.ones((3,2));self.params_fixed={}
+            self.optimizer=SimpleNamespace(state_dict=lambda:{'optimizer':0},zero_grad=lambda **k:None,param_groups=[])
+            self.scheduler=SimpleNamespace(state_dict=lambda:{'scheduler':0})
+        def _contact_loss(self):pass
+        def _object_state(self,*args,**kwargs):
+            r=pose[:,:3,:3].copy();t=pose[:,:3,3].copy()
+            if fault=='pose':t[0,0]=1
+            return Tensor(r),Tensor(t),None,None
+        def loss(self,indices,step,*,include_diagnostics=True):
+            self._contact_loss();render()
+            if step>=181:penetration();sign();distance()
+            return Tensor(np.float32(1)),{'loss_total':1.}
+        def run(self):
+            events.append('run301');indices=np.arange(3)
+            for step in range(301):self.loss(indices,step,include_diagnostics=True)
+            return {**copy.deepcopy(source),'postopt':{'full_native_result':True}}
+    def factory(native,evidence,config):
+        events.append('point_factory');assert evidence.native_visible.shape==(3,8) and not evidence.native_visible.any()
+        class PointZero(Native):
+            def loss(self,indices,step,*,include_diagnostics=True):
+                total,metrics=super().loss(indices,step,include_diagnostics=include_diagnostics);return total,metrics
+            def run(self):
+                result=super().run();result['postopt']['point_objective']=dict(config=asdict(config),evidence_sha256=evidence.evidence_sha256,
+                    mesh_sha256=evidence.mesh_sha256,after_initializer_support=evidence.support_counts().tolist(),native_source_sha256=op.NATIVE_SOURCE_SHA256,
+                    object_rotation_fixed=True,track_equal=True,support_is_confidence=False,calibration_reference_authenticated=False,calibrated_probabilities=False,quality_verified=False,adoption=False)
+                if fault=='metadata':result['postopt']['point_objective']['quality_verified']=True
+                return result
+        return PointZero
+    def select(*args,**kwargs):
+        events.append('query');assert not any(isinstance(e,tuple) and e[0]=='constructor' for e in events)
+        assert args[2].dtype==args[3].dtype==np.float32 and np.array_equal(args[3],pose[0,:3,3])
+        grid=np.column_stack((np.zeros(8,np.int64),np.arange(8)));bary=np.column_stack((np.linspace(.1,.4,8),np.full(8,.2),np.linspace(.7,.4,8)))
+        ids=np.zeros(8,np.int64);points=np.sum(v.astype(np.float64)[f[ids]]*bary[:,:,None],axis=1)
+        arrays=[points,np.column_stack((np.zeros(8),grid+.5)),grid,ids,np.ones(8),bary]
+        for a in arrays:a.flags.writeable=False
+        return SimpleNamespace(queries=SurfaceQueries(*arrays),diagnostics=SimpleNamespace(scalar_report=lambda:{'selected':8}))
+    def save(value,stream):
+        saved[str(stream.name)]=copy.deepcopy(value);stream.write(full.fingerprint(value).encode())
+    def validate(raw,result,count):
+        events.append('validate_full');assert count==3 and result['postopt']['point_objective']['quality_verified'] is False
+        assert result['postopt']['full_native_result'] is True;return {'full':'metadata'}
+    monkeypatch.setitem(sys.modules,'Utils',SimpleNamespace(nvdiff_color_depth_render=render))
+    monkeypatch.setitem(sys.modules,'kaolin.ops.mesh',SimpleNamespace(check_sign=sign))
+    monkeypatch.setitem(sys.modules,'kaolin.metrics.trianglemesh',SimpleNamespace(point_to_mesh_distance=distance))
+    monkeypatch.setenv('WR_CODE',str(ROOT));monkeypatch.setattr(op,'native_point_optimizer_class',factory)
+    monkeypatch.setattr(selectors,'canonical_mask_quantile_queries',select);monkeypatch.setattr(full,'validate_result',validate)
+    monkeypatch.setattr(pair,'paired_execution',lambda *a,**k:pytest.fail('No paired602 execution in single control'))
+    monkeypatch.setattr(q,'runtime',lambda code:SimpleNamespace(identity=rt.identity,require=rt.require))
+    cuda=SimpleNamespace(manual_seed_all=lambda n:None,synchronize=lambda:None,empty_cache=lambda:None)
+    torch=SimpleNamespace(manual_seed=lambda n:None,cuda=cuda,arange=lambda n,**k:np.arange(n),is_tensor=lambda a:isinstance(a,Tensor),
+        isfinite=lambda a:np.isfinite(a.array),save=save,load=lambda path,**k:copy.deepcopy(source if path.name=='authored_source.pth' else saved[str(path)]))
+    optimizer=SimpleNamespace(MHRParityPostOptConfig=Config,MHRParityPostOptimizer=Native,object_inside_human_penetration_loss=penetration)
+    report={k:0 for k in ('constructor_attempts','constructor_returns','probe_attempts','probe_returns','run_attempts','run_returns')}
+    if fault:
+        with pytest.raises(ValueError):q.paired_native(np,torch,object(),optimizer,source,v,f,np.ones((3,4,4)),c,tmp_path,report,lambda:persisted.append(copy.deepcopy(report)),lambda:None)
+    else:q.paired_native(np,torch,object(),optimizer,source,v,f,np.ones((3,4,4)),c,tmp_path,report,lambda:persisted.append(copy.deepcopy(report)),lambda:None)
+    assert events[:3]==['query','point_factory',('constructor','PointZero')] and sum(isinstance(e,tuple) and e[0]=='constructor' for e in events)==1
+    if fault=='pose':
+        assert 'run301' not in events and report['constructor_returns']==0;return
+    assert events.count('run301')==1 and report['constructor_returns']==report['run_returns']==1
+    assert report['loss_delegation']['pairs']==303 and report['loss_delegation']['point_reprojection_calls']==0
+    if fault=='metadata':assert 'semantic_delegation_verified' not in report;return
+    assert report['semantic_delegation_verified'] is True and report['actual_native_updates_total']==301
+    assert len(report['retained_precomparison'])==3 and all(report['retained_precomparison'][k] for k in report['retained_precomparison'])
+    assert len(list(tmp_path.iterdir()))==5  # Evidence +oneinitial +twoprobes +fullresult, raw files are manufactured separately.
+    stored=saved[str(tmp_path/'Z_point_zero_delegate_result.pth')]
+    assert stored['postopt']['point_objective']['evidence_sha256']==report['point_evidence_sha256']
+    assert 'point_objective' in stored['postopt'] and events[-1]=='validate_full'

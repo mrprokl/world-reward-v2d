@@ -9255,3 +9255,15 @@ Initialonlyreference_foot_vertices138/2304 differsmax4.47034836e-8m; probe0
 5fields/1817fields differ. No subclass causality or universal nondeterminism
 inferred; previous cold/strict MHR R68–R70/D80 already show scope-limited
 repeatability. Do not add repeated bitwise runs or change closed gates.
+
+New single-instance zero-weight delegation protocol is frozen: one fresh T3
+scene, one real point subclass constructor, probes0/181 and one301-update run.
+Exact live-code profiling requires303 native→subclass calls returning the same
+total and metrics objects, zero point arithmetic; full point metadata remains.
+This is semantic delegation, not a replacement PASS for either closed exact
+parity failure, stochastic repeatability, tracking or reconstruction quality.
+Root final230PASS10SKIP1.57s; combined integration407PASS10SKIP23.77s. Both
+test runs are local procedural controls, not native runtime evidence. A separate
+MHR official-release asset-license acquisition is dispatched on Azure CPU from
+4ed17ad;199source closure/archived74c1263…ed54b. Its ACK is not completion;
+no model load, duplicate model, SAM provenance relabel or eligibility claim.
