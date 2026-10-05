@@ -275,3 +275,44 @@ routes. Reuse solver mathematics, not the private YCB label/weighting contract.
 Explicit no-contact labels are necessary to train OFF; positive-only observations
 must never be relabeled as exhaustive negatives. No component is adopted until
 actual external retrieval/ownership and full-T reconstruction checks support it.
+
+## Proposal generation priority after the closed joint census
+
+The new frozen64-slot joint study closed before labels: fixed GDI `object.`
+has only1FITimage with both automatic endpoints, below12usableFIT. Do not
+rescue that cohort. Segmentation, objectness, ownership and task identity are
+different contracts; a high-quality background mask is still a distractor.
+
+1. Reuse **SAM2.1 native AutomaticMaskGenerator**, already executable on the
+qualified HieraL runtime. Original source18461B SHA
+66df266dbe14412305ae3398f0ec1bb21b303a93216b102d767e6c4ee5d4c3d7,
+https://github.com/facebookresearch/sam2/blob/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/automatic_mask_generator.py .
+Keep author defaults32×32/.8/.95/NMS.7/no crops, every original returned mask
+and bbox. These are regions/parts/background, not certified physical objects.
+Apache2 covers code/checkpoints; SA1B/SAV/internal overlap remains unknown.
+Reuse mechanics only, not the closed rejected HO-Cap validation.
+2. **OWLv2 native image-only objectness**, not a generic text prompt: original
+image_embedder→objectness_predictor+box_predictor. Primary paper
+https://arxiv.org/abs/2306.09683 ; Transformers4.53.3 source78926B SHA
+98e94770ce96e7b6b09be14596fad0600aac7a60e47b5fda846464547ae4d05e.
+Official google/owlv2-base-patch16-ensemble@57beb61adb5abda3de4a9796bc35ae60bc4b9802
+safeweights619918824B SHAe1e130b9e404cf91a75ad45644c1da9d7fa5284085eecc864266a6923efb99e7,
+Apache2. New acquisition/runtime not performed. Preserve complete patches;
+predeclare recall@K views, no proximity-to-hand pruning. Official training
+includes OpenImages/COCO/web, so a freshOIcohort is not pretrained-disjoint.
+3. **SAM3 PCS separate instances + global external vocabulary** is later: code
+https://github.com/facebookresearch/sam3/tree/2345a4ad109ac29c569da749c91d84f10dc08c40 ,
+customSAMlicense permits use/research subject to conditions, not Apache/OSI.
+Training includes OpenImages. WordNet vocabulary extraction can be globally
+frozen independent of all dataset labels, but broad queries are expensive
+and incomplete. SAM3D qualification does not qualify SAM3 PCS. Never union
+concept instances or manually supply episode-specific target prompts.
+
+Prospective gates before any next RGB: authenticate source/defaults/runtime,
+freeze a genuinely new procedural multi-person/multi-object distractor DEV and
+disjoint reserved stress recipe, all candidates/no truncation, bounded cost,
+then object/joint-proposal recall at IoU.5 after banks freeze. Procedural engine
+labels are external, not challengeGT. Synthetic success would only qualify
+proposal mechanics; real owned/consented external captures or an executed
+EgoExo grant are still needed for ownership/temporal/real-transfer claims.
+No next manufacture, model execution, adoption or leaderboard gain claimed.
