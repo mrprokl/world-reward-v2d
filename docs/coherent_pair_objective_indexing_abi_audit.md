@@ -49,3 +49,15 @@ regression proves `manifest`, `measure`, `solve`, `scipy_evidence`,
 runtime/profile layer is added.304 combined tiny controls pass in1.75s, including
 52 objective tests and explicit ABI/failure-source controls. No native objective,
 SciPy, optimization, FIT or quality result follows before actual execution.
+
+Actual producer8db0500a09589dd288ecd8494f00ad33f61983ec completes both
+full-bank objective/CPU-GPU repeat-bit comparisons and all72 prescribed FD
+calls, then fails at `scipy_native_inventory` with `ValueError` after86.108390s
+host elapsed. No solver ran and no SciPy inventory was qualified. Thus the
+complete control remains **FAIL**, while the recorded objective/FD subcontrols
+passed on the same1,843,200-route bank. Source312files/317entries, original
+failure lineage, image, sealed receipts and cleanup passed saved-only audit;
+see `results/audits/coherent_pair_gpu_objective_probe_v2_actual.json`.
+The receipt lacks the failing inventory condition; a separate bounded,
+metadata-only diagnostic is needed before any runtime repair, not an objective
+rerun or relaxed numerical/scientific gate. No FIT/adoption/quality claim.
