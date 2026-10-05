@@ -1,0 +1,28 @@
+{
+  "schema": "world_reward.openimages_joint_pair_dwpose.v1",
+  "gdi": {
+    "producer_revision": "038f65aa9405cebb1adcbb0eaa50f0cb5fbb034b",
+    "report": {
+      "bytes": 67368,
+      "sha256": "576057693bec11cea8a35e1c16f7f45488218bcf74a6a9aaa069530106fed82f"
+    },
+    "native_report": {
+      "bytes": 76598,
+      "sha256": "b520c10085cd70023c5db1f5f8d639671be5377fed2b3d907f718b23896c5d9e"
+    }
+  },
+  "asset_acquisition_revision": "37a6d39045db215626b8a0268c1357019835af59",
+  "asset_acquisition_report": {
+    "bytes": 11455,
+    "sha256": "3967342c41fb81e16f8d3d08c705a6f39bf7ab4d650fdd90bb5e344ca7ec19cd"
+  },
+  "image_id": "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3",
+  "output": "results/openimages-joint-pair-dwpose-v1",
+  "acquired_images": 50,
+  "missing_images": 14,
+  "budget_seconds": 600,
+  "ground_truth_used": false,
+  "quality_verified": false,
+  "anatomical_ownership_verified": false,
+  "adoption": false
+}
