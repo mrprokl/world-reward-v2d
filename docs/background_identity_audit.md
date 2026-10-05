@@ -171,3 +171,18 @@ checkpoint freeze would provide a temporal independence check, not universal
 generalization. Full-tuple errors must count missed proposals and abstentions;
 sparse annotations cannot certify unannotated temporal identity or3D contact.
 No email has been sent, data acquired or comparison gain claimed.
+
+### Prospective complete tuple evidence bridge
+
+The pure interaction_tuple_evidence bridge now enumerates every person ×
+left/right side × native HOI hand/object pair, including duplicate proposals.
+It retains source slots/IDs, raw joint coordinates/scores, both relation logits
+and separate native-valid/in-grid diagnostics. Fifteen named geometric/raw
+features are evidence, not a learned selector or calibrated probabilities.
+Missing native joints give unsupported/NaN distance features; finite off-grid
+coordinates remain explicit diagnostics. All inputs stay unchanged. Parent148
+combined tiny observation/bridge/display tests PASS0.21s; no real joint-bank
+execution, anatomical correctness or external accuracy comparison follows.
+A separate bounded Azure CPU preview will display all six already frozen banks,
+not choose a target or infer labels from human QA. Colors are frame-local slots,
+not stable temporal IDs.

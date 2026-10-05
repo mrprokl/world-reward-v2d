@@ -10750,9 +10750,12 @@ e91798b full original MMCV SM90 CPU producer reports COMPLETE PASS258.091262s,
 receipt28309B/1262228737c5346ee354d67e6556bd37b8135d168bb8933916f7731587008723.
 Actual final native step source_posthash; source/prior runtime/assets/image
 rechecks, owned cleanup and seal flags true. Independent final artifact/image
-audit is pending. Important scope gap: the prospective config lists optional
-cuobjdump architecture inspection, but the driver acquired that tool without
-executing it. Thus no independent embedded-SM90 architecture gate is complete,
+audit completed in one read-only Azure call4.737s: original source, all52
+prior wheels,14 new assets, compiled wheel/extension, image filiation, seals,
+posthash and actual owned-container absence verified. The authenticated
+producer logs show all51 non-MMCV distributions unchanged; no new CPU probe
+was run during this audit. Important scope gap: cuobjdump is only an optional
+config asset; it was neither acquired nor executed. Thus no independent embedded-SM90 architecture gate is complete,
 despite the real compiler flags/tiny probe/full build and CPU import receipt.
 Do not promote this to GPU operator/model qualification; the next fresh native
 qualifier must authenticate this new child separately from its unchanged
@@ -10780,3 +10783,11 @@ supplemental original-source file pins still need collection before a downstream
 config; observer requested a later config absent in original603272 closure.
 That collector failure does not revoke the independently verified producer,
 invent missing pins or permit a scientific rerun. Coverage is not target accuracy.
+
+MASA independently audited CPU child sha256:
+4e316aecf19fa5590deb2eb814149bb98ea5dc757529280d2f19ae5782554413;
+wheel5738756B/ded2ebca3dea6d43d6c1a453d3cec7b75a984eb7a5765438c43b33e68855925b;
+extension25850576B/f95180d08e064f0f8397cec1a574519c1800f7d0b0f368a0742cad8d4ef85fb0.
+Original5b4 author runtime remains unchanged. Fresh explicit child
+authentication and actual embedded-architecture/native qualification remain
+required; appearance correspondence cannot establish manipulation ownership.

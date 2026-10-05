@@ -1,0 +1,19 @@
+{
+  "schema": "world_reward.person_pose_bank_preview.v1",
+  "producer_revision": "5e4255d192a657bec3428806ded272f457804a01",
+  "report": {
+    "bytes": 24928,
+    "sha256": "0d8227caf7d35df87547c3a7cd92cb89686d08372f22adc8ee3fd8b940aadac6"
+  },
+  "image_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "budget_seconds": 90,
+  "viewport_hw": [240, 320],
+  "maximum_preview_bytes": 180000,
+  "jpeg_quality": 68,
+  "all_recorded_banks": true,
+  "manual_selection": false,
+  "model_execution": false,
+  "quality_evaluation": false,
+  "tracking_identity_verified": false,
+  "ownership_verified": false
+}
