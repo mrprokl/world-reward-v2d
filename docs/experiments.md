@@ -10454,3 +10454,15 @@ the tiny pins previously displayed, not a geometry rerun. Original topology
 failure remains unchanged; no component deletion/scale repair/accuracy claim.
 EP16 actual GPU progress confirms200/360 native frames; EP17 wrapper waits the
 cooperative lock with no duplicate GPU process. Neither trajectory PASS inferred.
+
+05b5e50 actual MASA author-runtime build CLOSED technicalFAIL0.258582s during
+preflight, zero acquired wheels, no CPU container/build/model/GPU. Receipt1917B/
+51f44784ce60c2a0ca68b3832ebf690d78a7674fd22673ea8ada907ee61dc8b1.
+Independent actual source/config/base and empty namespace/owned cleanup audit
+PASS: Docker returns exact `Error response from daemon: No such image: <tag>`
+for the fresh missing owned tag; original strict absence parser accepted only
+two other CLI variants. Failure remains immutable. New source accepts this
+exact-name/return1/empty-stdout variant and exact missing-container daemon form,
+while still rejecting daemon outages, foreign tags/IDs and extra diagnostics.
+No numeric/source/model/dependency/budget gate changed; fresh revision-scoped
+runtime attempt requires separate publication/dispatch, never restart old FAIL.

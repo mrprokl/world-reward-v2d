@@ -147,6 +147,32 @@ def test_actual_config_validator_and_exact_filenames(gate,tmp_path,monkeypatch):
     assert all(gate.endpoint(r['url'])==r['url']for r in c['wheels'])
 
 
+@pytest.mark.parametrize('prefix',['Error: No such image: ', 'error: no such image: ',
+                                 'Error response from daemon: No such image: '])
+def test_exact_native_image_absence_variants(gate,monkeypatch,prefix):
+    target='world-reward/masa-author-runtime:'+'a'*40
+    class RT:
+        @staticmethod
+        def require(value,message):
+            if not value:raise ValueError(message)
+    monkeypatch.setattr(gate,'command',lambda *a,**kw:subprocess.CompletedProcess(
+        [],1,b'',(prefix+target+'\n').encode()))
+    assert gate.image(RT,target,123,absent=True) is None
+
+
+@pytest.mark.parametrize('error',['permission denied', 'daemon unavailable',
+    'Error response from daemon: No such image: unrelated',
+    'Error response from daemon: No such image: target\npermission denied'])
+def test_image_daemon_error_is_not_absence(gate,monkeypatch,error):
+    class RT:
+        @staticmethod
+        def require(value,message):
+            if not value:raise ValueError(message)
+    monkeypatch.setattr(gate,'command',lambda *a,**kw:subprocess.CompletedProcess(
+        [],1,b'',error.encode()))
+    with pytest.raises(ValueError):gate.image(RT,'target',123,absent=True)
+
+
 def test_mock_actual_host_success_isolated_offline_no_base_mutation(gate,tmp_path,monkeypatch):
     root,code,rev,c,opener=setup(gate,tmp_path,monkeypatch);docker=Docker(gate,c,rev);monkeypatch.setattr(gate,'command',docker)
     report=gate.run(code,rev,opener=opener)
@@ -251,7 +277,8 @@ def test_late_receipt_publication_demotes_same_inode(gate,tmp_path,monkeypatch):
 
 @pytest.mark.parametrize('stderr,stdout,rc',[
  ('error: no such container: '+('c'*64)+'\n',b'\n',1),
- ('Error: No such object: '+('c'*64)+'\n',b'[]\n',1)])
+ ('Error: No such object: '+('c'*64)+'\n',b'[]\n',1),
+ ('Error response from daemon: No such container: '+('c'*64)+'\n',b'',1)])
 def test_owned_missing_container_exact_cli_variants(gate,tmp_path,monkeypatch,stderr,stdout,rc):
     class RT:
         require=staticmethod(lambda v,m:None if v else(_ for _ in()).throw(ValueError(m)))

@@ -163,8 +163,10 @@ def command(args,deadline,*,log=None):
 def image(rt,name,deadline,*,absent=False,owner=None):
     r=command(['docker','image','inspect',name,'--format','{{json .}}'],deadline)
     if absent:
-        rt.require(r.returncode==1 and r.stdout.strip()in(b'',b'[]')and r.stderr.strip()in(
-            ('Error: No such image: '+name).encode(),('error: no such image: '+name).encode()), 'Fresh owned image tag must be absent')
+        rt.require(r.returncode==1 and r.stdout.strip()in(b'',b'[]')and r.stderr.strip()in(tuple(
+            (prefix+name).encode()for prefix in('Error: No such image: ',
+                'error: no such image: ','Error response from daemon: No such image: '))),
+            'Fresh owned image tag must be absent')
         return None
     rt.require(r.returncode==0,'Actual immutable image required');c=rt.strict(r.stdout)
     rt.require(c['Architecture']=='amd64' and c['Os']=='linux' and re.fullmatch('sha256:[0-9a-f]{64}',c['Id'])
@@ -235,7 +237,8 @@ def cleanup_container(rt,cid,name,label,deadline):
     if r.returncode==1:
         rt.require(r.stdout.strip()in(b'',b'[]')and r.stderr.strip()in(tuple(
           (prefix+value).encode()for prefix in('Error: No such object: ','error: no such object: ',
-                                             'Error: No such container: ','error: no such container: '))),'Exact absent owned container required')
+                                             'Error: No such container: ','error: no such container: ',
+                                             'Error response from daemon: No such container: '))),'Exact absent owned container required')
     else:
         rt.require(r.returncode==0,'Owned container inspect failed');c=rt.strict(r.stdout)
         rt.require(c['Id']==value and c['Name']=='/'+name and(c['Config'].get('Labels')or{}).get('world_reward_masa_runtime_owner')==label,
@@ -244,7 +247,8 @@ def cleanup_container(rt,cid,name,label,deadline):
         r=command(['docker','inspect','--type','container','--format','{{json .}}',value],deadline)
         rt.require(r.returncode==1 and r.stdout.strip()in(b'',b'[]')and r.stderr.strip()in(tuple(
           (prefix+value).encode()for prefix in('Error: No such object: ','error: no such object: ',
-                                             'Error: No such container: ','error: no such container: '))),'Owned container survives cleanup')
+                                             'Error: No such container: ','error: no such container: ',
+                                             'Error response from daemon: No such container: '))),'Owned container survives cleanup')
     rt.require(rt.identity(cid,100,readonly=False)==pin,'Owned CID changed');cid.chmod(0o444)
 
 
