@@ -1,0 +1,92 @@
+{
+  "actual_dataset_values_read": false,
+  "adoption": false,
+  "audit_elapsed_seconds": 0.11489458399591967,
+  "cases": [
+    {
+      "bytes": 67108864,
+      "case": "dense_excluded",
+      "decoded_rows": 0,
+      "excluded_rows": 262143,
+      "rows": 262143,
+      "seconds": 34.28154628694756,
+      "seconds_per_byte": 5.108348471961552e-07,
+      "sha256": "f09a8584a91b93b64a109eaa178fb7a50dd518cb860d1fab547dd28f4a3dfe1e",
+      "stride_bytes": 256
+    },
+    {
+      "bytes": 67108864,
+      "case": "mixed",
+      "decoded_rows": 1023,
+      "excluded_rows": 15360,
+      "rows": 16383,
+      "seconds": 2.3860223650117405,
+      "seconds_per_byte": 3.5554503873165555e-08,
+      "sha256": "1142a5264ede068cf1e8f065fb28a320bfc16f1ddbd027f923ce9256c4de88c3",
+      "stride_bytes": 4096
+    },
+    {
+      "bytes": 67108864,
+      "case": "long_consulted",
+      "decoded_rows": 1023,
+      "excluded_rows": 0,
+      "rows": 1023,
+      "seconds": 0.4991545910015702,
+      "seconds_per_byte": 7.437983021163497e-09,
+      "sha256": "1b8a9b970ce7deb42238ef9845afe9b29655f4dcea0bc6dcaca6986e228f0cd3",
+      "stride_bytes": 65536
+    }
+  ],
+  "cost_gate_passed": false,
+  "decision": "CLOSED_PARSER_COST_INSUFFICIENT",
+  "generator_rerun": false,
+  "gpu_used": false,
+  "host_elapsed_seconds": 37.77246245800052,
+  "limitation": "Saved generated-byte hashes/counts and negative controls are producer claims authenticated by original source/receipt, not independently regenerated. Cost projection is not a runtime guarantee or quality result.",
+  "models_loaded": false,
+  "negative_controls": {
+    "controls_after_timed_cases": true,
+    "invalid_json_rejected": 6,
+    "invalid_zip_rejected": 2
+  },
+  "observer_remote_scaffolds_created": false,
+  "observer_sha256": "b5089f24d949368b1d9fa917cce81f271bba4710f63707405614e465b9b213b9",
+  "original_driver_absent": true,
+  "outputs_before_after": true,
+  "outputs_sealed": true,
+  "parser_rerun": false,
+  "peak_resident_bytes": 23138304,
+  "producer_revision": "b8d8a02f2ee337b0098579dfa816d171ba0711b6",
+  "producer_status": "fail",
+  "projected_seconds": 697.6067469293372,
+  "quality_verified": false,
+  "report": {
+    "bytes": 3822,
+    "sha256": "0f2c2b9646ad8cf97ecd10cfb3e1f2f89938adab89a282f94a0784d123a4c1cc"
+  },
+  "rgb_read": false,
+  "saved_only": true,
+  "schema": "world_reward.metadata_json_cost_probe_actual_audit.v1",
+  "source_archive_xz_bytes": 208576,
+  "source_archive_xz_sha256": "ed307044a7ae3fbe77a6ecab334f5a2c3097582db4a0f8a6e52ac2d4949fce1a",
+  "source_before_after": true,
+  "source_closure_sha256": "a5ecf194a83130a618873f60ba73f4f2ad03aab42b1aaca4035a92695f748a42",
+  "source_entries": 298,
+  "source_files": 293,
+  "source_modes_identity": {
+    "bytes": 17566,
+    "sha256": "63c66c676438171d65c7d5007a73d49da8ceff1c51de28ade30ef266946d40d4"
+  },
+  "status": "pass",
+  "transport_cli_exit": 0,
+  "unit": "world-reward-world-reward-metadata-json-cost-v1.service",
+  "unit_state": {
+    "ActiveState": "failed",
+    "ExecMainStatus": "1",
+    "LoadState": "loaded",
+    "MainPID": "0",
+    "Result": "exit-code",
+    "SubState": "failed"
+  },
+  "unit_wait_seconds": 0.005246200016699731
+}

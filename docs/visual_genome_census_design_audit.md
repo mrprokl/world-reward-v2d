@@ -68,7 +68,7 @@ only; no exhaustive negatives/anatomy/contact/OFF/task/temporal truth.
 Incremental stdlib top-level JSON array reader, each raw row≤16MiB, duplicate-key/
 nonfinite rejection, UTF-8/bracket/string-safe skipping of excluded semantics.
 Eligible image index+one row at a time; no1GiB `json.load` or expanded-file dump.
-Complete stream/CRC/source/input byte+mode postchecks,600s/16GiB. Predeclare
+Complete stream/CRC/source/input byte+mode postchecks,1200s/16GiB. Predeclare
 ≥96 distinct eligible photo IDs: **capacity lower bound**, not author guarantee
 or selected cohort. Insufficient closes before RGB. All rejection denominators;
 sealed counts+private metadata-only ID/rights ledger. No public references,
@@ -90,8 +90,15 @@ in actual default callers; generic nonpositive/noninteger limits now reject
 before reading the source. Excluded semantic values, ID field order, native
 conflicts, source-receipt ABI and late-publication demotion are tested.
 
-No real annotation row has been consulted. Before the first census, qualify
-the native CPU parser with separate authored streams: parsing all expanded
-metadata may exceed600s despite small compressed inputs. This pre-gate does
-not relax a failed actual census or select a cohort. Capacity/rights/quality
-remain unverified until their respective actual stages.
+No real annotation row has been consulted. Native authored parser cost control
+now closes its600s gate:697.606746929s projected including120s reserve. Actual
+37.772462458s covers three64MiB streams; the projection is not a bound. Keep
+that control closed, never rerun it.
+
+Prospective census **v2**, before the first semantic row: unchanged parser,
+scientific eligibility,96 threshold, exclusions432 and source/rights contracts;
+1200s inclusive/1215s outer, fresh output `visual_genome_ownership_census_v2`.
+This supersedes the unexecuted600s v1 design, not a failed real census or
+historical cohort. The measured697.61s projection fits the new budget without
+altering data or algorithm; actual timeout remains fail-closed. Capacity/rights/
+quality remain unverified until their respective actual stages.
