@@ -1,0 +1,88 @@
+{
+  "adoption": false,
+  "archives": {
+    "calibration.zip": {
+      "bytes": 10538,
+      "expanded_bytes": 11936,
+      "maximum_member_bytes": 3100,
+      "members": 23,
+      "sha256": "91924c0b132cfa2086882faf60b93b25df58ef2c8ecb0d9502def279d699304c"
+    },
+    "labels.zip": {
+      "bytes": 1572838245,
+      "expanded_bytes": 1985734475,
+      "maximum_member_bytes": 4664,
+      "members": 583768,
+      "sha256": "8dc68344d05f75f45bc1e68f95b8093353785f8ec123344135c50e36ed17425c"
+    },
+    "models.zip": {
+      "bytes": 54906991,
+      "expanded_bytes": 135102932,
+      "maximum_member_bytes": 2394953,
+      "members": 385,
+      "sha256": "ff2149d5e3fbc62fe2ca0eea28b2dbba4f2a650312d0094b0ac8e3dba4b7071e"
+    },
+    "poses.zip": {
+      "bytes": 24712636,
+      "expanded_bytes": 39997888,
+      "maximum_member_bytes": 1002584,
+      "members": 265,
+      "sha256": "11c56cf1566c0769723c8f0126344d17ea1e29436fc5b9663a0e2b6f48296f69"
+    },
+    "subject_5.zip": {
+      "bytes": 3427758110,
+      "expanded_bytes": 3618915185,
+      "maximum_member_bytes": 167486,
+      "members": 39933,
+      "sha256": "fd463fe22d36b32c8fe0b611b31644f4ba87136d5cc9e5c482aa599d9274b477"
+    }
+  },
+  "budget_seconds": 600,
+  "calibration_values_parsed": false,
+  "camera": "105322251564",
+  "cleanup_grace_seconds": 60,
+  "clips": [
+    "20231027_112303",
+    "20231027_113202"
+  ],
+  "image_decoder_qualified": false,
+  "label_values_parsed": false,
+  "maximum_zip_members": 583768,
+  "minimum_free_bytes": 2147483648,
+  "model_loaded": false,
+  "network_used": false,
+  "original": "/srv/world-reward-data/hocap_v2",
+  "original_protocol": {
+    "bytes": 3150,
+    "sha256": "2773671430d4a838179cd5121246c38f93a19a3265a21e5fac31b9b0187d58de"
+  },
+  "output": "/srv/world-reward-data/hocap_extract_v1",
+  "primary_sources": {
+    "hocap_recordings.yaml": {
+      "bytes": 1123,
+      "sha256": "e4f3677adaefc805036bcb6413eaa208b38256f839b2afb9836eb90ee839b25f"
+    },
+    "publisher.html": {
+      "bytes": 29538,
+      "sha256": "dc77ec8bbe2fa9820f9b70be7d505761a6dc8c9b792d827a8b3dc681816b1c78"
+    },
+    "sequence_loader.py": {
+      "bytes": 13139,
+      "sha256": "9359085817f285173dce73a0ec8eb42725268f9d815b1de2cc0cef883dad8e07"
+    },
+    "toolkit-README.md": {
+      "bytes": 12538,
+      "sha256": "482fea353dedb53beff4791ac6ad278f6e69dc900e9bea01e80b0a53e5da0bc2"
+    }
+  },
+  "producer_revision": "e561740e2764f8cbabc891109a802b48d7de5b30",
+  "reference_continuity_qualified": false,
+  "report": {
+    "bytes": 3224,
+    "sha256": "4252b1a131bf36ec4257be0c43d334d562f4685ca974bd14f9ac5e33c10bb86e"
+  },
+  "schema": "world_reward.hocap_extraction_protocol.v1",
+  "source_closure_sha256": "77e27d637b7f54cae0128959418deab73321d41ea33201572d37da127ce89179",
+  "source_owner_uid": 1000,
+  "subject": "subject_5"
+}
