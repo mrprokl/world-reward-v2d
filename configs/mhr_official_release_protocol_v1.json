@@ -1,0 +1,55 @@
+{
+  "schema": "world_reward.mhr_official_release_protocol.v1",
+  "namespace": "results/mhr-official-release-license-v1",
+  "budget_seconds": 300,
+  "release": {
+    "url": "https://api.github.com/repos/facebookresearch/MHR/releases/tags/v1.0.1",
+    "tag": "v1.0.1",
+    "published_at": "2025-11-19T19:21:12Z",
+    "body": "Added LICENSE to assets",
+    "maximum_metadata_bytes": 65536
+  },
+  "archive": {
+    "url": "https://github.com/facebookresearch/MHR/releases/download/v1.0.1/assets.zip",
+    "file": "assets.zip",
+    "bytes": 198943157,
+    "sha256": "e4f4f205cd87c0fa106577ba1de4fc763e4eb197c924461d2ef7e6944e9d6b94"
+  },
+  "model": {
+    "member": "assets/mhr_model.pt",
+    "existing_path": "weights/mhr/mhr_model.pt",
+    "bytes": 696110248,
+    "sha256": "352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc",
+    "accepted_uids": [
+      0,
+      1000
+    ]
+  },
+  "primary_texts": {
+    "LICENSE": {
+      "url": "https://raw.githubusercontent.com/facebookresearch/MHR/4998cec385b1aaa07abdefba71bfba2f83c7db32/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "README.md": {
+      "url": "https://raw.githubusercontent.com/facebookresearch/MHR/4998cec385b1aaa07abdefba71bfba2f83c7db32/README.md",
+      "bytes": 7753,
+      "sha256": "b907f4ff885cbb1ee6e51fe150dfcc2d15704838a9047430a2196216afe58712"
+    }
+  },
+  "archive_limits": {
+    "members": 1024,
+    "expanded_bytes": 2147483648,
+    "member_bytes": 1073741824,
+    "notice_bytes": 65536,
+    "total_notice_bytes": 262144
+  },
+  "purpose": "independent_release_identity_and_asset_notices_for_standalone_authored_truth_only",
+  "sam_provenance_relabelled": false,
+  "models_loaded": false,
+  "packages_installed": false,
+  "gpu_used": false,
+  "dataset_read": false,
+  "competition_eligibility_verified": false,
+  "training_overlap_verified": false
+}

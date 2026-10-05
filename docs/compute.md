@@ -1,4 +1,4 @@
-# Azure runtime — operational snapshot, 2026-10-04
+# Azure runtime — operational snapshot, 2026-10-05
 
 This is a compact operational summary, **not a live monitor**. A dispatch ACK
 proves launch acceptance, never completion or quality. Detailed immutable
@@ -23,7 +23,7 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 0 | 790 | Full native refinement and direct export PASS42.687162s, whole source chain/four outputs pinned. Official packing PASS16.896468s/all790 frames, scratch removed; old conversion failure separate. |
 | 4 | 747 | Tracking stops at18 empty automatic object masks; full trajectory unavailable. |
 | 7 | — | Empty automatic fixed anchor; closed without reroll. |
-| 9 | 415 | Historical failures preserved. Whole-solid geometry/full415pose PASS. Fresh f5e6030 native input preparation PASS3219.182s; independent224-source/39-input-ledger audit and actual saved F32/native-loaded mesh roundtrip6.260959e-7m PASS under unchanged1e-5m bound. Shared preparation c80ee35 PASS18.766984s and independently frozen after full415 ABI/source/asset checks; forward/refine/export still pending. No HOI quality claim. |
+| 9 | 415 | Historical failures preserved. Whole-solid geometry/full415pose/input/shared preparation → native forward →301-update refinement →direct export →official packing PASS, independently audited. No HOI quality claim. |
 | 10 | — | Automatic actor identity support FAIL5/16; no substitution by the better-covered bystander. |
 | 11 | — | Actor identity feasibility FAIL2/15 valid observations, fragmented tracks; no SAM2 or later frontends. |
 | 12 | 405 | Full native refinement and direct export PASS31.726037s, whole source chain/four outputs pinned. Official packing PASS13.521699s/all405, scratch removed. |
@@ -44,9 +44,16 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 28 | 366 | Full original initializers pass18:04:45UTC, no object trajectory yet. |
 | 29 | 419 | Actual fixed-all16 initializers PASS. First default pose-only under unchanged31ff94d rejects all eight fixed topology-budget candidates before output/trajectory; no repair or parameter rescue. |
 
-Twelve complete packed episodes are engineering/fidelity evidence only. Scratch
+Thirteen complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
 verified CARI4D superiority exists. Other episodes are not presumed ready.
+
+New real-MHR A/B and separate original-only A/A controls are CLOSED FAIL at exact
+initial/probe parity, each first301updates/second0. Both manufactured32 valid
+attaches and executed real native contact/render/penetration paths; no tracker
+or positive point-weight fit. Saved-array CPU diagnostics and full source/assets
+posthash/owned container absence are verified. See their explicit failure pins;
+do not restart these scenes or infer an extension defect from their differences.
 
 VM02 YCBv2 acquisition and three native MoGe2 initial calls PASS; automatic
 object identity then FAILS on ambiguous detections: two detector calls, zero

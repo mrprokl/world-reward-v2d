@@ -1,6 +1,6 @@
 # Prospective native A/A numerical repeat control
 
-**2026-10-05 — not executed.** This is one distinct authored control of the
+**2026-10-05 — executed, CLOSED FAIL (`e2b084a…`).** This is one distinct authored control of the
 original native MHR optimizer, not a replay, learned inference or HOI accuracy
 experiment. Both constructors are original `MHRParityPostOptimizer`; no point
 subclass or point-optimizer factory runs.
@@ -78,3 +78,17 @@ extension comparison needs separately frozen new support. Shared-layer warm
 state, CUDA reduction order and backend nondeterminism remain hypotheses until
 independently discriminated; no PyTorch3D result is evidence about nvdiffrast.
 Model license eligibility and training/challenge overlap remain unverified.
+
+## Actual outcome, not a revised protocol
+
+Native29.837638s/host33.907104s;32 valid queries, two constructors/four probes,
+first301 updates and second0. Exact initial/probe0/probe181 differ despite zero
+point factory calls. The six precomparison records and12full artifacts remain
+sealed on Azure. CPU-only saved-array audit finds constructor differences only
+in `reference_foot_vertices`:138/2304 values, maximum4.47034836e-8m. No decoder,
+loss or optimizer was rerun for this audit. Complete receipts and source pins
+are in `configs/joint_point_native_repeat_failure_pins.json`.
+
+This control stays FAIL. It demonstrates that this original sequential lifecycle
+does not satisfy our exact repeat gate, not an extension defect or a universal
+nondeterminism/JIT cause. Further identical bitwise runs are not the priority.

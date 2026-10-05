@@ -121,6 +121,20 @@ Boots outputs directly through `joint_point_evidence`, and preserve occluded
 slots without interpolation. The repeated zero-support numerical control is
 not that tracker. TAPNext++ has no qualified runtime adapter and stays deferred.
 
+The next scientific slice, after actual zero-weight delegation qualification,
+is a **controlled component study**, not another frontend stack: new textured
+authored articulated scenes, real Boots observations, native versus point-guided
+joint fitting. Fixed geometry/K/R/scale/body/renderer masks and exact t0 are
+declared synthetic oracle controls; perturb only future translations so t0
+attachments remain physically matched. Private truth calibrates two DEV scenes
+once, then four reserved scenes remain untouched until predictions freeze.
+One predeclared gradient-balance weight and measured pixel-noise scale are
+heuristics, not calibrated likelihoods. Report fullT3D/human/contact/acceleration
+against truth and every failure; eight reserved fits are descriptive, not a
+powered statistical comparison or proof of real-video superiority. This study
+is proposed only: acquisition/rights/render feasibility and tracker support
+remain prerequisites. Do not pass its oracle controls into challenge inference.
+
 ### Première migration réalisée
 
 `world_reward.shared_scene` ajoute des adaptateurs explicites
