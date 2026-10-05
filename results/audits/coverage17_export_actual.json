@@ -1,0 +1,91 @@
+{
+  "GPU_used": false,
+  "VM01_handed_back": true,
+  "adopted": false,
+  "all_829_sources_inputs_artifacts_before_after": true,
+  "artifact_pins": {
+    "native_parameters.npz": {
+      "bytes": 1547853,
+      "sha256": "d5efada0a7aa3abceb2220265433a0a19f42e8b086b80df95d6a4104d3307d32"
+    },
+    "object_aligned.glb": {
+      "bytes": 74764,
+      "sha256": "4854af3ec649e64a5df35031971b92dff362a314d79459cd182316ab65bfd77f"
+    },
+    "report.json": {
+      "bytes": 20873,
+      "sha256": "9bde90fa79136f960c0f397a141fa9a267338cb149db4ce1d7c85932259a7723"
+    },
+    "target.npy": {
+      "bytes": 92711420,
+      "sha256": "61c39a2aa96a039d5b985eea0c2d5da9a439ae9abcaa1c75e2be15dc096bc19f"
+    },
+    "trajectory.npz": {
+      "bytes": 276126,
+      "sha256": "e8c9a89b22a6ec66228853fc5860039ac2ecd2d95f44b113b506ba91566e6532"
+    }
+  },
+  "episode": 17,
+  "exact_original_Git_XZ6_source_markers_modes_before_after": {
+    "run_cari_shared_stage_queued": {
+      "XZ6_archive_sha256": "52ff4b200bbc9909b2caf82e932492e012a559eba60d627c04ebc1c23a63aa70",
+      "files": 289
+    },
+    "run_official_track1_pack_gate": {
+      "XZ6_archive_sha256": "64c85146546565ca0d351a92987e81cb41ccc31310adb988c08427d1ed376e5e",
+      "files": 295
+    }
+  },
+  "frames": 419,
+  "historical_systemd_unit_exit": "not_inferred_from_collected_unit",
+  "native_elapsed_seconds": 31.722442189988215,
+  "native_execution_receipt_authenticated": true,
+  "new_inference_calls": 0,
+  "new_pack_calls": 0,
+  "numerical_observation": {
+    "all_npz_npy_finite_FP32_exact_shapes": true,
+    "frames": 419,
+    "native_direct_max_mm": 0.0028832880550498543,
+    "native_replay_max_mm": 0.0009721223372399861,
+    "reference_max_mean_mm": 0.0008450927701867257,
+    "trajectory_shared_identity_rigid_positive_depth": true,
+    "validated_original_native_export_report": true
+  },
+  "observer_repairs": [
+    {
+      "elapsed_seconds": 1.806529163965024,
+      "error_type": "FileNotFoundError",
+      "failed_gate": "artifact_input_pins",
+      "last_artifact": "/srv/scenesmith/world-reward/weights/cari4d/sam3d_body/model.ckpt",
+      "status": "partial_audit"
+    },
+    {
+      "child_error": {
+        "exit": 1,
+        "sanitized_tail": "  File \"<string>\", line 54, in <module> |   File \"<string>\", line 15, in req | ValueError: unchanged_shared_head",
+        "slug": "17-19",
+        "stderr_sha256": "aa688d84e4189872ac7a961eb1b1afab7f1d3627ad2c44edf205ce1c910c9184"
+      },
+      "elapsed_seconds": 12.002408854023088,
+      "error_type": "ValueError",
+      "failed_gate": "saved_native_CPU",
+      "last_artifact": "/srv/scenesmith/world-reward/results/official-pack-image-build.json",
+      "status": "partial_audit"
+    }
+  ],
+  "original_native_process_absent": true,
+  "original_runtime_images_before_after": true,
+  "owned_CPU_containers_absent": true,
+  "producer_revision": "a1fa03bafb909760f0d49803d9e81c4ee2b59139",
+  "quality_verified": false,
+  "receipt": {
+    "bytes": 20873,
+    "sha256": "9bde90fa79136f960c0f397a141fa9a267338cb149db4ce1d7c85932259a7723"
+  },
+  "sample_prediction_columns_read": false,
+  "saved_CPU_audit_elapsed_seconds": 19.94940321496688,
+  "schema": "world_reward.coverage17_export_saved_audit.v1",
+  "source_input_artifact_files": 829,
+  "status": "pass",
+  "submission_eligibility_verified": false
+}

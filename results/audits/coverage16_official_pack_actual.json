@@ -1,0 +1,74 @@
+{
+  "GPU_used": false,
+  "VM01_handed_back": true,
+  "adopted": false,
+  "all_829_sources_inputs_artifacts_before_after": true,
+  "episode": 16,
+  "exact_original_Git_XZ6_source_markers_modes_before_after": {
+    "run_cari_shared_stage_queued": {
+      "XZ6_archive_sha256": "52ff4b200bbc9909b2caf82e932492e012a559eba60d627c04ebc1c23a63aa70",
+      "files": 289
+    },
+    "run_official_track1_pack_gate": {
+      "XZ6_archive_sha256": "64c85146546565ca0d351a92987e81cb41ccc31310adb988c08427d1ed376e5e",
+      "files": 295
+    }
+  },
+  "frames": 360,
+  "historical_systemd_unit_exit": "not_inferred_from_collected_unit",
+  "native_elapsed_seconds": 13.18618520500604,
+  "native_execution_receipt_authenticated": true,
+  "new_inference_calls": 0,
+  "new_pack_calls": 0,
+  "numerical_observation": {
+    "actual_original_row_id_digest_verified": true,
+    "all_engineering_pack_receipt_fields": true,
+    "frames": 360,
+    "new_pack_calls": 0,
+    "official_source_and_runtime_authenticated": true,
+    "row_id_only_arrow_projection": true,
+    "sample_prediction_columns_read": false,
+    "scratch_absent": true,
+    "selected_rows": 20231,
+    "selected_scored_frames": 240
+  },
+  "observer_repairs": [
+    {
+      "elapsed_seconds": 1.806529163965024,
+      "error_type": "FileNotFoundError",
+      "failed_gate": "artifact_input_pins",
+      "last_artifact": "/srv/scenesmith/world-reward/weights/cari4d/sam3d_body/model.ckpt",
+      "status": "partial_audit"
+    },
+    {
+      "child_error": {
+        "exit": 1,
+        "sanitized_tail": "  File \"<string>\", line 54, in <module> |   File \"<string>\", line 15, in req | ValueError: unchanged_shared_head",
+        "slug": "17-19",
+        "stderr_sha256": "aa688d84e4189872ac7a961eb1b1afab7f1d3627ad2c44edf205ce1c910c9184"
+      },
+      "elapsed_seconds": 12.002408854023088,
+      "error_type": "ValueError",
+      "failed_gate": "saved_native_CPU",
+      "last_artifact": "/srv/scenesmith/world-reward/results/official-pack-image-build.json",
+      "status": "partial_audit"
+    }
+  ],
+  "original_native_process_absent": true,
+  "original_runtime_images_before_after": true,
+  "original_scratch_Parquet_not_retained": true,
+  "owned_CPU_containers_absent": true,
+  "producer_revision": "a1fa03bafb909760f0d49803d9e81c4ee2b59139",
+  "qualification": "Saved pack receipt/source/row-ID firewall audited; no packer replay or benchmark score recomputation.",
+  "quality_verified": false,
+  "receipt": {
+    "bytes": 9988,
+    "sha256": "812172e4732682e49d3d8e3fd63eb6f84ce02436bf6504104405ad9d22bb6bc1"
+  },
+  "sample_prediction_columns_read": false,
+  "saved_CPU_audit_elapsed_seconds": 19.94940321496688,
+  "schema": "world_reward.coverage16_official_pack_saved_audit.v1",
+  "source_input_artifact_files": 829,
+  "status": "pass",
+  "submission_eligibility_verified": false
+}
