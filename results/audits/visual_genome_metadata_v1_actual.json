@@ -1,0 +1,95 @@
+{
+  "adoption": false,
+  "annotation_values_consulted": false,
+  "artifact_identities": {
+    "image_data.json.zip": {
+      "bytes": 1780854,
+      "sha256": "b87a94918cb2ff4d952cf1dfeca0b9cf6cd6fd204c2f8704645653be1163681a"
+    },
+    "objects.json.zip": {
+      "bytes": 55323929,
+      "sha256": "efa456069aedb420b7dabf54f4608c89c78a00de550f1433066e9b6f84fb629c"
+    },
+    "publisher_about.html": {
+      "bytes": 8984,
+      "sha256": "29ec54c0554a4e12c4f695afd7f6bbe7a77db411090ee3031268950ea38a3a7b"
+    },
+    "publisher_api.html": {
+      "bytes": 8197,
+      "sha256": "43a80892dbc5f5ca6215ad75f7bf3d57c510ddd7444d2d9025165f52e80f7774"
+    },
+    "relationships.json.zip": {
+      "bytes": 77904473,
+      "sha256": "e648867b8087e4aeb10019a959f914e2580909f1c3e50a21b25de8741679182f"
+    }
+  },
+  "artifacts_before_after": true,
+  "audit_elapsed_seconds": 0.34706349804764614,
+  "central_directory_catalog": [
+    {
+      "compressed_member_bytes": 1780674,
+      "compression": 8,
+      "crc32": "d76e1675",
+      "expanded_bytes": 17612822,
+      "expanded_sha256_producer": "93d0053d7e8f451497646fa513e8fb9b1a889df6e757010b88e51e2e21803487",
+      "file": "image_data.json.zip",
+      "member": "image_data.json"
+    },
+    {
+      "compressed_member_bytes": 55323755,
+      "compression": 8,
+      "crc32": "1a17521a",
+      "expanded_bytes": 349437266,
+      "expanded_sha256_producer": "94238b6187c0ea1f97acc1fdaec106bd3dee12bb0f81b23dc8b07e9173514985",
+      "file": "objects.json.zip",
+      "member": "objects.json"
+    },
+    {
+      "compressed_member_bytes": 77904287,
+      "compression": 8,
+      "crc32": "3d187495",
+      "expanded_bytes": 743673397,
+      "expanded_sha256_producer": "9a7d5f396bd9f1d150e6977c2896ca4feb6024068c6e4c51d571d385f5ab4e64",
+      "file": "relationships.json.zip",
+      "member": "relationships.json"
+    }
+  ],
+  "gpu_used": false,
+  "historical_references_read": false,
+  "host_elapsed_seconds": 28.40558633801993,
+  "independent_decompression_executed": false,
+  "models_loaded": false,
+  "observer_sha256": "f0d46f59c07e3cd3039ecba952a1607d20333adc2877108410d31d6c103a00af",
+  "original_driver_absent": true,
+  "outputs_sealed": true,
+  "producer_crc_stream_proof_recorded": true,
+  "producer_rerun": false,
+  "producer_revision": "caf8e6309636d46986f70b1be58c31f00e9dd145",
+  "public_bytes_received": 135026437,
+  "publisher_archive_sha256_verified": false,
+  "quality_verified": false,
+  "report": {
+    "bytes": 4623,
+    "sha256": "b1c5d6a9e2212ca90751edd568f104e7f4d388d09604a36b7290b0fe82925717"
+  },
+  "rgb_read": false,
+  "saved_only": true,
+  "schema": "world_reward.visual_genome_metadata_saved_audit.v1",
+  "source_archive_xz_sha256": "6c3cfda3555da8deebc3b16252095bf8a04d48fd3fa859c1a127b7e5f6bba708",
+  "source_before_after": true,
+  "source_closure_sha256": "9c8a00d4f086c545e956093431c2d437b86e3d21fa198da781d23bc181aff1bc",
+  "source_entries": 293,
+  "source_files": 288,
+  "status": "pass",
+  "training_overlap_verified": false,
+  "transport_cli_exit": 0,
+  "underlying_image_rights_verified": false,
+  "unit": "world-reward-visual-genome-metadata-v1.service",
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  }
+}

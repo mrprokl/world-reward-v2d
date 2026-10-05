@@ -47,3 +47,22 @@ publisher metadata grant, not certification of underlying photographs. A
 separate metadata census must exclude all432 historical slots and authenticate
 creator/photo/known-MD5 identities before any fresh selection or RGB requests.
 See `ownership_reference_next_audit.md` for primary text hashes and rights limits.
+
+## Actual frozen acquisition and independent saved-only audit
+
+Producer `caf8e6309636d46986f70b1be58c31f00e9dd145` completed PASS28.405586338s,
+135026437B received on Azure. Report4623B SHA256
+`b1c5d6a9e2212ca90751edd568f104e7f4d388d09604a36b7290b0fe82925717`.
+Exact one-member names qualify; expanded17,612,822/349,437,266/743,673,397B
+CRC-checked streams stay unparsed and are not written as expanded files.
+
+Independent saved-only audit PASS0.347063498s authenticates full original
+Git288files/293entries, XZ and modes/owners before/after, all five saved artifacts
+and sealed output, ZIP central-directory identities and terminal unit exit0.
+It **does not repeat decompression**: stream CRC/SHA is the producer's proof;
+independent catalog and original compressed hashes bind it to the frozen bytes.
+Audit3287B SHA256
+`b54d27473fd2a214200ae58d3df8dbf3f40570b26f7123778ffd067c7e6f1dd9`
+in `results/audits/visual_genome_metadata_v1_actual.json`. No RGB, annotation
+values, old references, model or GPU was read. Metadata acquisition only is
+qualified; census, photo rights, overlap and predictive quality remain separate.
