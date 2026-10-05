@@ -10343,3 +10343,24 @@ ownership, training overlap, 3D quality, CARI4D victory or adoption verified.
 Decision: do not integrate this component on weak descriptive uplift; prioritize
 completing the native Track1 reconstruction/export and an informative independent
 validation source before another relation-comparison experiment.
+
+603272b actual first native-coverage surface proposal EP16 COMPLETE PASS
+163.916619s, full360-frame original source, one unchanged QSlim call,
+2052vertices/4096faces/two components. Original closed-solid topology-budget
+FAIL remains unchanged; this is the separately preregistered surface domain.
+Host840528B/bd54a705cd92af7ee151c7f7298a93d8d7fd3859d441c453dc28013c709820a8;
+native747244B/1fececc0ad7972f47a35432131216759ddfaafe3b619b299b9f164637687c810.
+Independent actual complete producer closure, original inputs/qualification,
+native receipt and all four output hashes/posthash/owned scratch cleanup PASS.
+No numerical operator changed from qualified EP26; no geometry repair,
+rescaling, target reroll or quality claim. A first read-only pin recipe tried
+an unused consumer helper absent from the producer closure; corrected by
+binding current consumer source separately, not changing or rerunning geometry.
+Actual fifteen-artifact/sixteen-current-helper pins5971B/
+7e7c70300f5dc7effb7743ae61b5ad04e925e6e215635daa1556fed248344561
+freeze the sole positive original transform scale0.559777021408081 once.
+Only this tiny metadata crosses locally; all geometry/mapping stay Azure.
+Next is unchanged full360-frame surface pose execution; no pose, CARI chain,
+packing, accuracy, all30 coverage or leaderboard result inferred yet.
+281 targeted tiny tests PASS36.20s, one Azure-only geometry dependency skipped;
+exact current sixteen-helper hashes and clean diff verified locally.
