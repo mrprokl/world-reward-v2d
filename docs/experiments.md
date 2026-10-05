@@ -10145,3 +10145,13 @@ from the relative-string order used by comparison (firstdiff15 fairscale package
 versus fairscale-0.4.13.dist-info). Fresh v2 canonicalizes ALLinventory rows by
 relative-string order without dropping/rewriting files or loosening byte/mode
 checks. Model/preprocessing/load/budget unchanged; original failure stays closed.
+
+da74110 whole-model v2 actual CLOSED FAIL24.414834s after CPUoverlay PASS
+and exact complete derived source/runtime/checkpoint hash qualification. Native
+GPUcontainer reaches model imports then ModuleNotFoundError; no strictcheckpoint
+decode or model forward verified. Host2809B/
+f7893d24c5c78a815a127de3079af8f7c2a8e1081aafeba139411f0857acbe9b;
+native403B/259939a55d4c23dfb14877bcf6ab12924fd3fb45712d4bf4032bc4e902893b00.
+Owned container/overlay cleanup and source/input/image posthash pass, GPU idle.
+Native source notice/import closure requires a bounded CPU-only missing-module
+diagnostic before the next repair; full-model/relationship/quality unqualified.
