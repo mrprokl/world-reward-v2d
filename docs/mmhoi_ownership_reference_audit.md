@@ -115,3 +115,19 @@ may pass; CSV meanings, frame map, cohort, RGB and ownership remain unqualified.
 20tiny authored tests PASS0.35s including ZIP64 sparse offsets, unsafe names,
 budget rejection and zero body reads on invalid HTTP headers. Independent source
 audit confirms the exact763B metadata ABI/firewall; no actual Azure result yet.
+
+Original7fa90fd attempt **CLOSED technicalFAIL0.424977s**, receipt2440B/SHA
+`b56bf71490d2ec3521467e0bd7499a3a6157cd3ad7f61dc63c39744651e85d08`:
+the server returned206 and correct22B range but **omitted Last-Modified**.
+The frozen strict firewall rejected before reading its body:0archive bytes,
+0member/CSV/RGB reads,0outputs, unit exit1. This is not a failed scientific
+ownership hypothesis and is not silently retried.
+
+Separate header-only Azure diagnostic0.265103s confirms exact206/Content-Range/
+Content-Length, Accept-Ranges bytes, no ETag/date. No body read; original failure
+byte pin unchanged. Fresh explicit transport-v2 keeps every census/scope/budget
+unchanged, accepts an **absent** date (never a conflicting date), and pins the
+original publisher version/file metadata **before and after all ranges**. It
+does not invent CAS or whole-archive authenticity. Separate output/config/source,
+original failed receipt remains immutable and verified before/after.24tiny
+transport controls PASS0.06s; actual v2 inventory/audit still required.

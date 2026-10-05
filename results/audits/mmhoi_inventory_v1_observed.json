@@ -1,0 +1,29 @@
+{
+  "CSV_values_read": false,
+  "RGB_read": false,
+  "adopted": false,
+  "decision": "CLOSED_METADATA_GATE_NO_RGB_OR_MODEL",
+  "elapsed_seconds": 0.4249769780144561,
+  "error_type": "ValueError",
+  "independent_complete_audit": false,
+  "member_payload_read": false,
+  "outputs": {},
+  "producer_revision": "7fa90fdac28de961795a1c8b13796c86caf11cc3",
+  "quality_verified": false,
+  "range_bytes": 0,
+  "receipt": {
+    "bytes": 2440,
+    "sha256": "b56bf71490d2ec3521467e0bd7499a3a6157cd3ad7f61dc63c39744651e85d08"
+  },
+  "rejected_headers": {
+    "body_read": false,
+    "header_sha256": "de779cb2133a66f86fe6c47ba54c78840a10c71dcdb0fedf902d0b036c1332ef",
+    "requested_bytes": 22,
+    "status": 206
+  },
+  "schema": "world_reward.mmhoi_inventory_observed.v1",
+  "source_closure_sha256": "0739227b8ed81848f6c542b3d14c93bfa788cd064c7af48fb3181048a45ea540",
+  "stage": "central_directory",
+  "status": "fail",
+  "unit_exit_status": 1
+}

@@ -1,0 +1,19 @@
+{
+  "Accept_Ranges": "bytes",
+  "Content_Length": 22,
+  "Content_Range": "bytes 93682766701-93682766722/93682766723",
+  "ETag": null,
+  "Last_Modified": null,
+  "URL_exact": true,
+  "body_read": false,
+  "elapsed_seconds": 0.2651025390077848,
+  "new_archive_body_bytes": 0,
+  "original_receipt": {
+    "bytes": 2440,
+    "sha256": "b56bf71490d2ec3521467e0bd7499a3a6157cd3ad7f61dc63c39744651e85d08"
+  },
+  "original_report_unchanged": true,
+  "quality_verified": false,
+  "schema": "world_reward.mmhoi_inventory_header_diagnostic.v1",
+  "status": 206
+}

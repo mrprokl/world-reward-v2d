@@ -1,0 +1,35 @@
+{
+  "schema": "world_reward.mmhoi_inventory.v2",
+  "entry": "run_mmhoi_inventory",
+  "output": "/srv/world-reward-data/mmhoi_inventory_v2",
+  "metadata_url": "https://zenodo.org/api/records/17711786/files/MMHOI_release.zip",
+  "archive_url": "https://zenodo.org/api/records/17711786/files/MMHOI_release.zip/content",
+  "metadata_pin": {
+    "bytes": 763,
+    "sha256": "1e7204a4196f11461755d6f30b8e6b97e00742a4d6e2f135794a090c6414031c"
+  },
+  "archive_bytes": 93682766723,
+  "publisher_md5": "3f461a6e4962e772f8acd0b718d0da8c",
+  "version_id": "f74a5b6d-72a3-4fc6-b7d5-f0b35126696b",
+  "file_id": "d359ea34-9233-4302-8308-f94aff1748ee",
+  "bucket_id": "fcb5c16d-d1d3-4900-ad0d-854bef1453a2",
+  "last_modified": "Mon, 01 Dec 2025 19:50:24 GMT",
+  "max_central_bytes": 134217728,
+  "max_members": 1000000,
+  "max_request_bytes": 8388608,
+  "max_total_range_bytes": 134217826,
+  "request_timeout_seconds": 20,
+  "budget_seconds": 180,
+  "no_retries": true,
+  "no_member_payload_reads": true,
+  "no_directory_container_downloads": true,
+  "exclude_schema_read_scenario": "MMHOI/sequences/20240412_personA_personB/20240412_C_5K3__30skip/",
+  "reference_scope": "metadata_names_lengths_only_no_CSV_RGB_calibration_mesh_body_or_predictions",
+  "range_last_modified_policy": "exact_or_absent_with_pinned_metadata_before_after",
+  "publisher_metadata_required_before_after": true,
+  "original_failure": {
+    "producer_revision": "7fa90fdac28de961795a1c8b13796c86caf11cc3",
+    "bytes": 2440,
+    "sha256": "b56bf71490d2ec3521467e0bd7499a3a6157cd3ad7f61dc63c39744651e85d08"
+  }
+}

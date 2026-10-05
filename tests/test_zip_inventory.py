@@ -121,3 +121,39 @@ def test_exact206_range_is_bounded_and_pinned():
     req, _ = ranges.opener.calls[0]
     assert req.get_header('Range') == f'bytes={cfg["archive_bytes"]-22}-{cfg["archive_bytes"]-1}'
     assert req.get_header('If-unmodified-since') == cfg['last_modified']
+
+
+def test_original_v1_rejects_absent_date_without_body_reads():
+    cfg = config(); ranges = Ranges(cfg, float('inf'))
+    response = Response(cfg, cfg['archive_bytes']-22, cfg['archive_bytes']-1,
+                        modifications={'Last-Modified':None})
+    ranges.opener = Opener(response)
+    with pytest.raises(ValueError, match='firewall'):
+        ranges.get(cfg['archive_bytes']-22, cfg['archive_bytes']-1)
+    assert response.reads == []
+
+
+@pytest.mark.parametrize('date,accepted', [(None,True), ('different',False)])
+def test_transport_v2_allows_only_exact_or_missing_date_not_wrong(date,accepted):
+    cfg = json.loads(Path('configs/mmhoi_inventory_v2.json').read_bytes())
+    ranges = Ranges(cfg, float('inf'))
+    response = Response(cfg, cfg['archive_bytes']-22, cfg['archive_bytes']-1,
+                        modifications={'Last-Modified':date})
+    ranges.opener = Opener(response)
+    if accepted:
+        assert ranges.get(cfg['archive_bytes']-22, cfg['archive_bytes']-1) == b'x'*22
+        assert ranges.proofs[0]['publisher_last_modified_present'] is False
+    else:
+        with pytest.raises(ValueError, match='firewall'):
+            ranges.get(cfg['archive_bytes']-22, cfg['archive_bytes']-1)
+        assert response.reads == []
+
+
+def test_v2_identity_policy_cannot_silently_inherit_v1_namespace_or_config():
+    first, second = config(), json.loads(Path('configs/mmhoi_inventory_v2.json').read_bytes())
+    assert first['output'] != second['output'] and first['schema'] != second['schema']
+    assert second['publisher_metadata_required_before_after'] is True
+    for k in ('metadata_pin','archive_bytes','publisher_md5','version_id','file_id','bucket_id',
+              'max_central_bytes','max_members','max_request_bytes','max_total_range_bytes','budget_seconds',
+              'exclude_schema_read_scenario','no_member_payload_reads','no_retries'):
+        assert first[k] == second[k]

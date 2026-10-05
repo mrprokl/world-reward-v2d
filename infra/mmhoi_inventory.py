@@ -18,6 +18,7 @@ from zip_inventory import read_directory, parse_directory
 ROOT = Path('/srv/scenesmith/world-reward')
 ENTRY = 'run_mmhoi_inventory'
 CONFIG = 'configs/mmhoi_inventory_v1.json'
+CONFIG_V2 = 'configs/mmhoi_inventory_v2.json'
 HELPERS = ('infra/mmhoi_inventory.py', 'infra/zip_inventory.py',
            'infra/run_mmhoi_inventory.sh', 'infra/mediapipe_cpu_runtime_verify.py', CONFIG)
 
@@ -59,7 +60,9 @@ class Ranges:
                 if not (response.status == 206 and response.geturl() == cfg['archive_url']
                         and h.get('Content-Range') == wanted_range and h.get('Content-Length') == str(n)
                         and h.get('Content-Encoding', 'identity').lower() == 'identity'
-                        and h.get('Last-Modified') == cfg['last_modified']):
+                        and (h.get('Last-Modified') == cfg['last_modified']
+                             or (cfg.get('range_last_modified_policy') == 'exact_or_absent_with_pinned_metadata_before_after'
+                                 and h.get('Last-Modified') is None))):
                     self.rejected_headers = dict(status=response.status, requested_bytes=n,
                         header_sha256=hashlib.sha256(json.dumps({k:h.get(k) for k in
                             ('Content-Range','Content-Length','Content-Encoding','Last-Modified')}, sort_keys=True).encode()).hexdigest(),
@@ -68,7 +71,8 @@ class Ranges:
                 raw = response.read(n + 1)
                 self.bytes += len(raw)
                 rt.require(len(raw) == n, 'Exact original range body required')
-            self.proofs.append(dict(start=first, end=last, **pin(raw)))
+            self.proofs.append(dict(start=first, end=last, **pin(raw),
+                                   publisher_last_modified_present=h.get('Last-Modified') is not None))
             parts.append(raw)
         self.check()
         return b''.join(parts)
@@ -118,22 +122,37 @@ def summarize(rows, cfg):
                 schema_read_excluded_scenario_files=excluded_count), sessions
 
 
-def run():
+def run(config_name=CONFIG):
     started = time.monotonic()
     rt.require(os.geteuid() == 0 and os.uname().sysname == 'Linux'
                and os.uname().nodename == 'world-reward-ncc-h100-02', 'Exact Azure CPU host only')
     revision, code = os.environ['WR_CODE_REVISION'], Path(os.environ['WR_CODE'])
-    source = rt.source(ROOT, code, revision, ENTRY, HELPERS)
-    cfg = rt.strict((code / CONFIG).read_bytes())
-    rt.require(cfg['schema'] == 'world_reward.mmhoi_inventory.v1' and cfg['entry'] == ENTRY
+    rt.require(config_name in (CONFIG, CONFIG_V2), 'Only frozen explicit inventory versions')
+    helpers = (*HELPERS, config_name)
+    source = rt.source(ROOT, code, revision, ENTRY, helpers)
+    cfg = rt.strict((code / config_name).read_bytes())
+    rt.require(cfg['schema'] in ('world_reward.mmhoi_inventory.v1', 'world_reward.mmhoi_inventory.v2') and cfg['entry'] == ENTRY
                and cfg['no_member_payload_reads'] is cfg['no_retries'] is cfg['no_directory_container_downloads'] is True,
                'Frozen metadata-only/no-retry scope')
+    original_failure = None
+    if config_name == CONFIG_V2:
+        rt.require(cfg['schema'] == 'world_reward.mmhoi_inventory.v2'
+                   and cfg['publisher_metadata_required_before_after'] is True
+                   and cfg['range_last_modified_policy'] == 'exact_or_absent_with_pinned_metadata_before_after',
+                   'Explicit original-metadata-bound transport-v2 policy required')
+        first = rt.strict((code / CONFIG).read_bytes())
+        original_failure = Path(first['output']) / 'report.json'
+        expected = {k:cfg['original_failure'][k] for k in ('bytes','sha256')}
+        old = rt.pinned(original_failure, expected, 1 << 20)
+        rt.require(old['status'] == 'fail' and old['producer_revision'] == cfg['original_failure']['producer_revision']
+                   and old['range_bytes'] == 0 and old['member_payload_read'] is False
+                   and old['RGB_read'] is False and old['outputs'] == {}, 'Original zero-body failure must remain closed')
     output = rt.canonical(cfg['output'])
     rt.require(not output.exists(), 'Exclusive new census namespace required')
     output.mkdir(mode=0o700)
     ranges = Ranges(cfg, started + cfg['budget_seconds'])
     report = dict(schema=cfg['schema'], producer_revision=revision, source_binding=source,
-        status='fail', stage='source_metadata', configuration_identity=source['helpers'][CONFIG],
+        status='fail', stage='source_metadata', configuration_identity=source['helpers'][config_name],
         scope=cfg['reference_scope'], archive_bytes=cfg['archive_bytes'], publisher_md5=cfg['publisher_md5'],
         version_id=cfg['version_id'], file_id=cfg['file_id'], budget_seconds=cfg['budget_seconds'],
         whole_archive_SHA_verified=False, member_CRC_verified=False, member_payload_read=False,
@@ -147,13 +166,20 @@ def run():
         raw, layout = read_directory(ranges.get, cfg['archive_bytes'], cfg['max_central_bytes'], cfg['max_members'])
         rows = parse_directory(raw, layout); ranges.check()
         counts, sessions = summarize(rows, cfg)
+        # Version/file metadata is independently byte-pinned before AND after
+        # ranges. This is not a CAS ETag or whole-archive authenticity proof.
+        rt.require(acquire_metadata(ranges) == metadata, 'Publisher file/version metadata changed after ranges')
+        report['publisher_metadata_pinned_before_after'] = True
+        if original_failure is not None:
+            rt.require(rt.identity(original_failure, 1 << 20) == expected, 'Original failure changed during transport-v2')
+            report['original_failure_unchanged'] = True
         payload = dict(schema=cfg['schema'] + '.members', layout=layout, rows=rows)
         for name, data in (('publisher_file_metadata.json', metadata), ('central_directory.bin', raw),
                            ('members.json', (json.dumps(payload, sort_keys=True, separators=(',', ':')) + '\n').encode()),
                            ('sessions.json', (json.dumps(sessions, sort_keys=True, separators=(',', ':')) + '\n').encode())):
             ranges.check(); rt.write(output / name, data, 0o444)
             report['outputs'][name] = pin(data)
-        rt.require(rt.source(ROOT, code, revision, ENTRY, HELPERS) == source, 'Original complete source changed')
+        rt.require(rt.source(ROOT, code, revision, ENTRY, helpers) == source, 'Original complete source changed')
         for name, expected in report['outputs'].items():
             rt.require(rt.identity(output / name, 512 << 20) == expected, 'Saved original census bytes changed')
         ranges.check()
@@ -172,4 +198,5 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    rt.require(sys.argv[1:] in ([], ['--metadata-bound-range-v2']), 'Only explicit transport-v2 mode')
+    run(CONFIG_V2 if sys.argv[1:] else CONFIG)
