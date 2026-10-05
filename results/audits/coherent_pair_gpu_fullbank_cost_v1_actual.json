@@ -1,0 +1,182 @@
+{
+  "actual_state": "SEALED_FULLBANK_CONTROL_PASS",
+  "adoption": false,
+  "audit_elapsed_seconds": 1.1558579809498042,
+  "azure_runcommand_terminal": true,
+  "bridge_rows": 230400,
+  "candidate_rows": 28800,
+  "cid_absent": true,
+  "complete_geometry_count": 1570402,
+  "container_name_absent": true,
+  "counts": [
+    4,
+    3600,
+    64
+  ],
+  "decision": "FULLBANK_SCORE_GRADIENT_CONTROL_PASS_PENDING_OBJECTIVE",
+  "descriptive_projection": [
+    {
+      "evaluations": 1,
+      "projected_seconds": 11.959613100043498
+    },
+    {
+      "evaluations": 100,
+      "projected_seconds": 23.99685183056863
+    },
+    {
+      "evaluations": 1000,
+      "projected_seconds": 133.42629483534256
+    }
+  ],
+  "fit_executed": false,
+  "fixture_prepare_seconds": 0.2268566710408777,
+  "fixtures_rerun": false,
+  "full_fit_cost_qualified": false,
+  "gpu_used": false,
+  "host_elapsed_seconds": 84.7929510519607,
+  "image_before_after": true,
+  "image_rootfs_sha256": "5ae610524943c42f72e2fa1ac06a9dbe8fa14bf2d572efd8a57cded6ead3503d",
+  "limitation": "Saved metadata/source integrity only; no numerical replay. Collected unit exit unavailable, never inferred from default fields. Technical cost control is not FIT/objective/ownership/quality qualification.",
+  "max_rss_bytes": 1336098816,
+  "models_loaded": false,
+  "native_metadata_validation": true,
+  "observed_unit_exit": null,
+  "observer_command_identity": {
+    "bytes": 29314,
+    "sha256": "d6ba5f33255f6612a6950771085cd7fedb9cc99ec5ee04244e4b1f2945c3f76e"
+  },
+  "observer_mechanical_repairs": 0,
+  "observer_numeric_execution": false,
+  "observer_source_identity": {
+    "bytes": 10344,
+    "sha256": "309332df6cd34fd96f17f0c0f001207df4699e41d4d2992e0b10d0f4a3745e01"
+  },
+  "optimizer_executed": false,
+  "output_identities": {
+    "container.cid": {
+      "bytes": 64,
+      "sha256": "2efa42854f1f0f35c93966ffce22049678d0b1230513ea2f0697cc0ea0bd0bdf"
+    },
+    "native.json": {
+      "bytes": 11011,
+      "sha256": "ef6f9ff654347e351e5f83d92048938761822eb6428829b68be31d40f0aa2074"
+    },
+    "proof.json": {
+      "bytes": 10321,
+      "sha256": "5ae8e18e0a21a21312038a2b46e51da0880f7edc483acb3be4b3882168a18547"
+    },
+    "report.json": {
+      "bytes": 11048,
+      "sha256": "461388f5fc79855f18df47f607951156ff987f6e22396549ce0b635d366721f9"
+    }
+  },
+  "outputs_before_after": true,
+  "outputs_sealed": true,
+  "owner_label_containers_absent": true,
+  "packed_prepare_seconds": 10.586265846970491,
+  "peak_torch_allocated": 554070528,
+  "peak_torch_reserved": 643825664,
+  "producer_driver_absent": true,
+  "producer_revision": "504539cd25eb7a0630e79966e89bb542d5feb88d",
+  "quality_verified": false,
+  "references_read": false,
+  "rgb_read": false,
+  "route_references": 1843200,
+  "rows": [
+    {
+      "all_cpu_packed_arrays_passed": true,
+      "alpha": 0.0,
+      "alpha_vjp_shape": [
+        4,
+        3600
+      ],
+      "cpu_packed_seconds": 6.1817159109632485,
+      "geometry_vjp_shape": [
+        4,
+        3600,
+        17
+      ],
+      "gpu_seconds": 0.12158827000530437,
+      "group_shape": [
+        4,
+        3600
+      ],
+      "native_shape": [
+        4,
+        2,
+        3600
+      ],
+      "native_supported": 28800,
+      "repeat_bits_exact": true,
+      "repeat_gpu_seconds": 0.007276476011611521,
+      "supported_pairs": 14400
+    },
+    {
+      "all_cpu_packed_arrays_passed": true,
+      "alpha": 0.3125,
+      "alpha_vjp_shape": [
+        4,
+        3600
+      ],
+      "cpu_packed_seconds": 60.56345200602664,
+      "geometry_vjp_shape": [
+        4,
+        3600,
+        17
+      ],
+      "gpu_seconds": 0.017148579994682223,
+      "group_shape": [
+        4,
+        3600
+      ],
+      "native_shape": [
+        4,
+        2,
+        3600
+      ],
+      "native_supported": 28800,
+      "repeat_bits_exact": true,
+      "repeat_gpu_seconds": 0.01431964902440086,
+      "supported_pairs": 14400
+    }
+  ],
+  "runtime": {
+    "capability": [
+      9,
+      0
+    ],
+    "cublas_workspace_config": ":4096:8",
+    "cuda": "12.4",
+    "deterministic_algorithms": true,
+    "gpu_name": "NVIDIA H100 NVL",
+    "gpu_total_bytes": 99456909312,
+    "numpy": "1.26.3",
+    "python": "3.11.10",
+    "tf32": false,
+    "torch": "2.5.1+cu124"
+  },
+  "saved_only": true,
+  "schema": "world_reward.coherent_pair_gpu_fullbank_cost_saved_audit.v1",
+  "source_archive_xz": {
+    "bytes": 248028,
+    "sha256": "c8d026188977743bdaa8bc4fb6ec163c4da82865a8e2255e348dd080efa911d2"
+  },
+  "source_before_after": true,
+  "source_closure_sha256": "6951381662d652ca87878275b20be3c0bf4f3155a69178c21d06634458650e07",
+  "source_entries": 312,
+  "source_files": 307,
+  "status": "pass",
+  "tiny_before_after": true,
+  "tuple_rows": 512,
+  "unit": "world-reward-coherent-pair-gpu-fullbank-cost-v1.service",
+  "unit_exit_independently_available": false,
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  },
+  "upload_seconds": 1.0249023120268248
+}

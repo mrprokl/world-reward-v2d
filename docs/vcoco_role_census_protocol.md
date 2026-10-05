@@ -52,7 +52,41 @@ temporal identity, Track1 target accuracy, CARI4D victory or submission eligibil
 V-COCO/COCO model pretraining overlap and repo-wide MIT scope ambiguity remain
 disclosed; underlying photo CC-BY2 is distinct from role annotation permissions.
 
+## Actual v1 capacity — 2026-10-06
+
+Producer `3f445f2d9ee4b2e9849ff15f5dd2cd31cbed964c` completed the frozen
+metadata-only census in844.247900672 s, peak RSS203493376 bytes. Sealed PASS
+report20320 bytes/SHA256
+`79142e6a49d11e3570ff28a41cb09b86056769052823e30a6b25b29712a37975`.
+
+| Official split | Rights-eligible images | Eligible distinct photos | ≥2 positive agents (diagnostic) | Localized positive pairs |
+| --- | ---: | ---: | ---: | ---: |
+| VAL |465|199|97|683|
+| TEST |837|362|149|1188|
+
+The predefined ≥8/8 capacity gate passed. Missing positive role IDs remain
+UNKNOWN (VAL440/TEST734); unscorable positive roles28/67 were not negatives.
+All432 historical photo/known-byte identities and325 known authors were excluded
+before fresh annotation semantics. No eligible list/cohort, RGB, model or FIT was
+produced; original train-role capacity was **not measured**.
+
+One independent saved-only audit authenticated300 Git files/305 entries,
+23 pinned inputs, three historical source closures, all18 opaque acquisition
+assets, original instance/role complete-stream evidence and pre/post hashes,
+states and seals. It did not parse annotation/role values or rerun CRC/census.
+The exact native driver was absent. The systemd unit was already collected:
+exit status remains unavailable; default success/0 is not proof. Qualification
+rests on the source-bound sealed receipt, with this explicit limitation.
+See `results/audits/vcoco_role_census_v1_actual.json`.
+
+Next decisions must be prospective: ≥8/8 supports a minimal **unfitted** fresh
+8DEV/8reserved pair-retrieval check after a separate frozen selection/acquisition.
+It does not authorize a96-record FIT/CAL/reserved recipe: original TRAIN capacity
+and a32/16/48 partition would need their own predeclared census and freeze.
+Photo availability, creator rights/identity, pretrained overlap, pair retrieval,
+anatomical ownership and Track1 quality remain unqualified.
+
 Source qualification before execution: root301 combined tiny controls PASS0.42s,
 including28 census controls; independent source/poison/publication audit READY.
-No real metadata values entered those tests. Actual runtime/capacity is pending
-one immutable Azure-only attempt; a launch ACK is not a completed census.
+No real metadata values entered those tests. The one actual immutable attempt
+and its saved-only audit are recorded above; an ACK alone never proved capacity.

@@ -1,0 +1,133 @@
+{
+  "GPU_used": false,
+  "HTTP_used": false,
+  "RGB_read": false,
+  "VM02_released": true,
+  "adopted": false,
+  "audit_status": "pass",
+  "azure_cli_exit": 0,
+  "azure_resource_group": "WORLD-REWARD-RESEARCH",
+  "azure_vm": "world-reward-ncc-h100-02",
+  "capacity_gate_passed": true,
+  "catalog_counts": {
+    "catalog_images": 123287,
+    "crowd_instances": 115,
+    "duplicate_fresh_photo_images_rejected": 0,
+    "historical_photo_images": 99,
+    "invalid_or_nonpositive_geometry_instances": 0,
+    "publisher_rights_unknown_images": 102960
+  },
+  "census_reexecuted": false,
+  "decision": "CAPACITY_METADATA_ONLY_NO_RGB",
+  "eligibility_inventory_identity": {
+    "bytes": 36117,
+    "sha256": "7c374f0ff34d340983d93a117e51a4fcf09d4d4425e4d56392a327d84dd6c733"
+  },
+  "eligibility_inventory_rows": 561,
+  "expanded_instance_members": {
+    "train2014": {
+      "bytes": 332556225,
+      "sha256": "777ef504abfeba349930485bb32ecd5b6529129a3e010f7852e1437cb049b732"
+    },
+    "val2014": {
+      "bytes": 160682675,
+      "sha256": "e1b4d1bc54906827b1a029981b1c77f2088bd4462569b7615db7929070c3ab47"
+    }
+  },
+  "frozen_input_count": 23,
+  "historical_known_authors": 325,
+  "historical_known_md5": 432,
+  "historical_slots": 432,
+  "historical_source_closures_verified": 3,
+  "models_loaded": false,
+  "native_driver_absent": true,
+  "native_elapsed_seconds": 844.2479006720241,
+  "native_stage": "complete",
+  "native_status": "pass",
+  "observer_elapsed_seconds": 774.579415064014,
+  "observer_files_written": false,
+  "opaque_acquired_asset_count": 18,
+  "output_seal_verified": true,
+  "peak_rss_bytes": 203493376,
+  "producer_revision": "3f445f2d9ee4b2e9849ff15f5dd2cd31cbed964c",
+  "producer_stream_evidence_authenticated_not_reexecuted": true,
+  "quality_verified": false,
+  "report": {
+    "bytes": 20320,
+    "sha256": "79142e6a49d11e3570ff28a41cb09b86056769052823e30a6b25b29712a37975"
+  },
+  "roles_or_annotations_parsed": false,
+  "saved_only_runcommands": 1,
+  "schema": "world_reward.vcoco_role_census_saved_audit.v1",
+  "semantic_data_consulted": false,
+  "source": {
+    "closure_sha256": "7b7891c92772c199a66d66d156d994bedb275707065324ce73add4cd3f6faefa",
+    "config_identity": {
+      "bytes": 23243,
+      "sha256": "d994ce033a4268e8dd572299e6e183ab18118352006b2a78ce4a20ba269958d2"
+    },
+    "entries": 305,
+    "files": 300,
+    "modes_verified": true,
+    "xz_bytes": 229844,
+    "xz_sha256": "0af4bd1a440cfddfd819ee79d20f58d135faec71664b70810d9b957e9a5a6361"
+  },
+  "source_and_inputs_rehashed_after": true,
+  "splits": {
+    "test": {
+      "distinct_eligible_photos": 362,
+      "eligible_images": 362,
+      "eligible_images_two_positive_agents": 149,
+      "localized_positive_pairs": 1188,
+      "missing_positive_role_ids": 734,
+      "positive_action_rows": 3618,
+      "projected_rows": 33514,
+      "projection": {
+        "action_count": 26,
+        "excluded_semantic_values_decoded": false,
+        "passes": 2,
+        "selected_row_count": 33514,
+        "source_identity": {
+          "bytes": 6193877,
+          "sha256": "71de9842b5c102b2f972e35362787e7ba00c29dcabc32eedac65c0ec13361a23"
+        },
+        "source_row_count": 201968
+      },
+      "rights_eligible_images": 837,
+      "unscorable_positive_roles": 67
+    },
+    "val": {
+      "distinct_eligible_photos": 199,
+      "eligible_images": 199,
+      "eligible_images_two_positive_agents": 97,
+      "localized_positive_pairs": 683,
+      "missing_positive_role_ids": 440,
+      "positive_action_rows": 2133,
+      "projected_rows": 18824,
+      "projection": {
+        "action_count": 26,
+        "excluded_semantic_values_decoded": false,
+        "passes": 2,
+        "selected_row_count": 18824,
+        "source_identity": {
+          "bytes": 3590505,
+          "sha256": "2025bf42ce985a079ad88fd052aba47d85f1531c5b04a95804427c8bcb75eedd"
+        },
+        "source_row_count": 116974
+      },
+      "rights_eligible_images": 465,
+      "unscorable_positive_roles": 28
+    }
+  },
+  "unit": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  },
+  "unit_default_exit_not_success_proof": true,
+  "unit_exit_verified": false,
+  "unit_limitation": "collected_or_missing_unit_exit_unavailable"
+}

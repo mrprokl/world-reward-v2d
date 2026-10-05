@@ -406,9 +406,14 @@ MASA source c5472b9c7615f35abdf1188cb1a0c5408fe50d66 is Apache2; independent
 R50 publisher card25ed372c47f2c46cf36fd446d1b657b656bc7ea9 declares Apache2.
 Declared training SA1B500k, overlap unknown. Acquisition/runtime are prospective,
 not submission clearance or an interaction-quality certificate.
-V-COCO roles at489cc4db74f2f10ab4b134f67da3874afbf245ab remain deferred:
-MIT software/documentation grant is not verified explicit DATA permission for
-those added role annotations. Original COCO/Flickr image rights are separate.
+October6 V-COCO delta: the original README says this repository hosts data and
+code, with a root MIT grant and no data exclusion. The documented repo-wide
+interpretation is accepted for private metadata research; annotation-specific
+legal certainty is not claimed. Original role/COCO2014 byte acquisition and
+the crowded-role census are independently qualified, without RGB or FIT.
+Original COCO/Flickr individual photo grants, attribution/creator identity,
+checkpoint overlap and deployment/submission eligibility remain separate.
+See `vcoco_reference_feasibility.md` and `vcoco_role_census_protocol.md`.
 
 ## Experimental general solid certificate (October4, not adoption)
 

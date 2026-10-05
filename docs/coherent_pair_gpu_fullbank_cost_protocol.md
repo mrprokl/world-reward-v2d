@@ -76,3 +76,39 @@ Before freezing, failure-path snapshots, full-bank publication decisions and
 alpha0 buffer-alias checks on both repetitions were corrected. Local checks:
 52 dedicated tests, 227 combined tests, Python AST and shell syntax passed.
 These manufactured/source checks do not constitute an actual Azure result.
+
+## Actual v1 result — independent saved-only audit
+
+Frozen producer `504539cd25eb7a0630e79966e89bb542d5feb88d` completed the
+full-bank control: host **84.792951s**, all **1,843,200 route references**,
+1,570,402 complete geometries,28,800 native score rows and14,400 group rows.
+Both fixed alpha rows passed all CPU packed FP64 score/VJP comparisons at the
+frozen1e-12 tolerance, exact IDs/support/provenance and bit-identical repeats.
+
+| alpha | GPU first / repeat (s) | CPU packed reference (s) |
+|---|---:|---:|
+|0|0.121588 /0.007276|6.181716|
+|.3125|0.017149 /0.014320|60.563452|
+
+Fixture creation0.226857s, packed preparation10.586266s, upload1.024902s.
+Peak Torch allocated/reserved554,070,528 /643,825,664 bytes; RSS1,336,098,816
+bytes. The frozen descriptive projection for1000 score calls is133.426295s;
+it remains neither a bound nor full-FIT/objective/optimizer qualification.
+
+One independent CPU/stdlib saved-only observer verified all307 original Git
+files/312 entries, exact XZ248028 bytes/SHA
+`c8d026188977743bdaa8bc4fb6ec163c4da82865a8e2255e348dd080efa911d2`,
+source/modes/markers, old tiny proof, B47 image and all four output pins before
+and after. CID/name/owner-label containers and producer process were absent.
+Systemd had collected the unit: its historical exit was **independently
+unavailable**, not inferred from default success/zero fields. No Torch, GPU,
+fixtures, references, RGB or numeric execution was repeated by the observer.
+
+Audit `results/audits/coherent_pair_gpu_fullbank_cost_v1_actual.json`:
+5051 bytes/SHA`5dd77c922d1139dc70daca2bd6e941dc283f5b462481a8ac118015d9513cc9c3`.
+Native receipt11011 bytes/SHA
+`ef6f9ff654347e351e5f83d92048938761822eb6428829b68be31d40f0aa2074`;
+host receipt11048 bytes/SHA
+`461388f5fc79855f18df47f607951156ff987f6e22396549ce0b635d366721f9`.
+Decision remains `FULLBANK_SCORE_GRADIENT_CONTROL_PASS_PENDING_OBJECTIVE`:
+no FIT, ownership accuracy, physical reconstruction, adoption or CARI4D victory.

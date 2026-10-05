@@ -28,9 +28,13 @@ controls. The first tiny GPU control closes before Torch/container creation:
 its B47 image was addressed on the wrong Docker-store worker. A new explicit
 VM01 execution profile now passes sealed tiny GPU arithmetic checks in7.24s
 (8fixtures/20controls/288FD calls), independently audited with unchanged gates.
-No full-bank cost or selection gain is claimed. Fresh V-COCO/COCO2014 metadata
-also passes an independent opaque-byte acquisition audit; exclusion-safe role
-reference primitives pass tiny controls, with no census/RGB/FIT/accuracy yet.
+The new full-bank score/VJP control also passes: all1,843,200 procedural routes,
+28,800 native rows and14,400 grouped rows agree with CPU FP64; host84.79s,
+peak GPU reservation644MB. This is measured arithmetic cost, not an objective,
+optimizer, FIT or selection-quality result. Fresh V-COCO/COCO2014 metadata and
+its exclusion-safe role census pass independent audits:199 eligible VAL photos
+and362 TEST, after432 historical photo exclusions. Next is a separately frozen
+8DEV/8reserved unfitted pilot; no RGB, learned selector or accuracy result yet.
 The first strict VG/COCO-linked reference census
 completes but yields0 eligible photos: this path is closed without RGB, relaxed
 joins or retries. Fresh external validation remains necessary.
