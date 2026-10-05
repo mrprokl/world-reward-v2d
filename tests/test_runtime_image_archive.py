@@ -298,3 +298,86 @@ def test_classic_containing_only_structural_parent_directories(archive, tmp_path
 def test_parser_rejects_hidden_extension_before_processing(archive):
     m = archive._ImageTarInfo('malicious'); m.type = tarfile.XHDTYPE; m.size = 2<<30
     with pytest.raises(ValueError, match='Unsupported'): m._proc_member(None)
+
+
+def legacy_fixture(archive, count=47):
+    """Separate manufactured census pins, not evidence about a real Docker save."""
+    rows, _ = fixture(archive, count=count, hybrid=True)
+    r = json.loads(rows['manifest.json'])[0]; config = json.loads(rows[r['Config']])
+    config.update(created='2026-01-02T03:04:05Z', container_config=archive._EMPTY_CONTAINER,
+        config={'Cmd': ['unchanged-pinned-command']}, author='manufactured source')
+    new = encoded(config); del rows[r['Config']]; rows[blob_name(new)] = new
+    platform_change(rows, lambda p: p.update(config=dict(mediaType=archive._CONFIG[0], digest=digest(new), size=len(new))))
+    manifest(rows, lambda r: r.update(Config=blob_name(new)))
+    pins = {}; previous = None
+    for i in range(count):
+        fields = dict(created='1970-01-01T00:00:00Z', container_config=archive._EMPTY_CONTAINER, os='linux')
+        if i == count-1: fields = {k: config[k] for k in archive._V1_FIELDS if k in config}
+        identifier = hashlib.sha256(f'manufactured-legacy-id-{i}'.encode()).hexdigest()
+        node = dict(fields, id=identifier)
+        if previous: node['parent'] = previous
+        data = encoded(node); name = blob_name(data); rows[name] = data
+        pins[name] = dict(bytes=len(data), sha256=hashlib.sha256(data).hexdigest()); previous = identifier
+    rootfs = config['rootfs']['diff_ids']
+    return rows, (digest(new), hashlib.sha256(encoded(rootfs)).hexdigest(), count), pins
+
+
+def legacy_change(rows, pins, index, change):
+    name = list(pins)[index]; node = json.loads(rows.pop(name)); change(node); pins.pop(name)
+    data = encoded(node); name = blob_name(data); rows[name] = data
+    pins[name] = dict(bytes=len(data), sha256=hashlib.sha256(data).hexdigest())
+
+
+def test_pinned_full_47_moby_compatibility_chain_metadata_is_not_derived_identity(archive, tmp_path):
+    rows, pins, metadata = legacy_fixture(archive); path = save(tmp_path, rows); before = path.read_bytes()
+    with pytest.raises(ValueError, match='Unreferenced'): archive.authenticate(path, *pins)
+    result = archive.authenticate(path, *pins, expected_legacy_metadata=metadata)
+    assert result['pinned_legacy_metadata_verified'] is True and result['legacy_ids_derived'] is False
+    assert result['legacy_metadata_count'] == 47 and result['config_id'] == pins[0]
+    assert result['legacy_metadata_manifest_sha256'] == hashlib.sha256(json.dumps(metadata, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+    assert path.read_bytes() == before and result['docker_loaded'] is False
+    assert len(list(metadata.values())[1]['sha256']) == 64
+
+
+@pytest.mark.parametrize('fault', ['missing', 'count', 'wrong_bytes', 'wrong_sha', 'nonblob', 'overlap', 'extra_pin_field', 'bool_bytes'])
+def test_independent_metadata_full_pin_contract_cannot_be_forged(archive, tmp_path, fault):
+    rows, pins, metadata = legacy_fixture(archive, count=3); name = next(iter(metadata))
+    if fault == 'missing': del rows[name]
+    elif fault == 'count': metadata.pop(name)
+    elif fault == 'wrong_bytes': metadata[name]['bytes'] += 1
+    elif fault == 'wrong_sha': metadata[name]['sha256'] = 'a'*64
+    elif fault == 'nonblob': metadata['../foreign'] = metadata.pop(name)
+    elif fault == 'overlap':
+        name = json.loads(rows['manifest.json'])[0]['Config']; metadata.pop(next(iter(metadata)))
+        metadata[name] = dict(bytes=len(rows[name]), sha256=hashlib.sha256(rows[name]).hexdigest())
+    elif fault == 'extra_pin_field': metadata[name]['arbitrary'] = True
+    elif fault == 'bool_bytes': metadata[name]['bytes'] = True
+    with pytest.raises(ValueError): archive.authenticate(save(tmp_path, rows), *pins, expected_legacy_metadata=metadata)
+
+
+@pytest.mark.parametrize('fault', ['command', 'bool_number', 'extra_os', 'foreign_parent', 'cycle', 'branch', 'duplicate_id', 'terminal', 'root_parent', 'unbound_extra'])
+def test_even_separately_pinned_legacy_json_has_strict_source_chain_schema(archive, tmp_path, fault):
+    rows, pins, metadata = legacy_fixture(archive, count=3)
+    records = [json.loads(rows[p]) for p in metadata]
+    if fault == 'command': legacy_change(rows, metadata, 0, lambda r: r['container_config'].update(Cmd=['foreign-execution']))
+    elif fault == 'bool_number': legacy_change(rows, metadata, 0, lambda r: r['container_config'].update(AttachStdin=0))
+    elif fault == 'extra_os': legacy_change(rows, metadata, 0, lambda r: r.update(rootfs={}))
+    elif fault == 'foreign_parent': legacy_change(rows, metadata, 1, lambda r: r.update(parent='a'*64))
+    elif fault == 'cycle': legacy_change(rows, metadata, 0, lambda r: r.update(parent=records[-1]['id']))
+    elif fault == 'branch': legacy_change(rows, metadata, 2, lambda r: r.update(parent=records[0]['id']))
+    elif fault == 'duplicate_id': legacy_change(rows, metadata, 1, lambda r: r.update(id=records[0]['id']))
+    elif fault == 'terminal': legacy_change(rows, metadata, 2, lambda r: r.update(architecture='arm64'))
+    elif fault == 'root_parent': legacy_change(rows, metadata, 0, lambda r: r.update(parent=''))
+    elif fault == 'unbound_extra': rows[blob_name(b'not bound')] = b'not bound'
+    with pytest.raises(ValueError): archive.authenticate(save(tmp_path, rows), *pins, expected_legacy_metadata=metadata)
+
+
+def test_compatibility_pin_bytes_bound_precedes_json_use(archive, tmp_path, monkeypatch):
+    rows, pins, metadata = legacy_fixture(archive, count=1); path = save(tmp_path, rows)
+    name = next(iter(metadata)); rows[name] = rows[name][:-1]+b'x'; path = save(tmp_path, rows)
+    parsed = archive._json
+    def no_corrupt_parse(raw):
+        assert not raw.endswith(b'x')
+        return parsed(raw)
+    monkeypatch.setattr(archive, '_json', no_corrupt_parse)
+    with pytest.raises(ValueError, match='bytes differ'): archive.authenticate(path, *pins, expected_legacy_metadata=metadata)

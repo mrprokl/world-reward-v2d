@@ -9715,3 +9715,17 @@ replaymax.000533953mm, reference maxpoint.002213092mm; unchangedfidelitygates.
 Five exact original export leaves are frozen in episode26shared_export_pins;
 no arrays/models/GPU replay in audit. Packing/quality/submission unverified.
 Root520 relevant tiny/regressiontestsPASS3.07s; no scientificaccuracy claim.
+
+Actual CPU data-disk save diagnostic PASS246.070297s: unchanged Boots image
+26353005568B/6a4bba2fe3bc562579f4cc86e8e76ff02e1e1b815b505ddde3ae802aa1b160e2
+stays on owned Azure1TB disk. Docker29.5.3 exports hybrid OCI, four-key classic
+manifest/46partial LayerSources/47raw layers/47compatibility JSON blobs,100members,
+zeroPAX. Config remains exactef12; platform5b4272fc81d6f8d86ca3419ea5df5f546947997f269d9ae514cc4761be4dec40.
+The old classical guard genuinely rejects its extra key; old root-volume saves
+failed before any archive, separate failures. Independently census all47metadata
+SHA/bytecount, dummychain/finalpinnedV1fields; no unsupported CreateIDderivation
+claimed. Extend source-only parser with these explicit independent pins, not
+foreignmember acceptance. Transfer reuses saved bytes rather than save27GB again;
+actual full47layer authentication/import/conditional study still unexecuted.
+EP26 official packing nativePASS13.395114s/all399, scratchremoved; independent
+saved pack audit still required. No score, upload or accuracy qualification.

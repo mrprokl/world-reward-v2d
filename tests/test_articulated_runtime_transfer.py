@@ -194,5 +194,23 @@ def test_source_no_model_or_dataset_execution_secret_args_or_broad_cleanup(trans
     assert "os.environ.pop('WR_BOOTSTRAP_BLOB_URL'" in source
     assert "signal.alarm(BUDGET)" in source and 'BUDGET = 7200' in source
     assert 'inspect_image()' in source and "'layers': 47" in source
-    assert "docker', 'image', 'save'" in source and "docker', 'image', 'load'" in source
+    assert "docker', 'image', 'save'" not in source and "docker', 'image', 'load'" in source
+    assert 'saved_archive_reused=True, docker_save_repeated=False' in source
     assert "os.fchmod(stream.fileno(), 0o400)" in source
+
+
+def test_original_saved_archive_census_is_independently_frozen(transfer):
+    root = Path(__file__).parents[1]
+    p = transfer.archive_pins(root)
+    assert p['qualified_config_id'] == transfer.IMAGE
+    assert p['image_archive']['bytes'] == 26353005568
+    assert len(p['legacy_metadata']) == 47 and p['legacy_ids_derived'] is False
+    assert hashlib.sha256(json.dumps(p['legacy_metadata'], sort_keys=True,
+        separators=(',', ':')).encode()).hexdigest() == p['legacy_metadata_manifest_sha256']
+
+
+def test_runtime_identity_cannot_use_unproved_image_alias(transfer):
+    with pytest.raises(ValueError): transfer.inspect_image('sha256:'+'a'*64)
+    wrong = dict(config_id='sha256:'+'b'*64, ordered_rootfs_sha256=transfer.LAYERS_SHA,
+        platform_manifest_id='sha256:'+'a'*64, index_ids=[])
+    with pytest.raises(ValueError): transfer.inspect_image('sha256:'+'a'*64, graph=wrong)

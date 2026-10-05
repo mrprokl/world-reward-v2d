@@ -34,6 +34,14 @@ _GZIP = ('application/vnd.oci.image.layer.v1.tar+gzip',
          'application/vnd.docker.image.rootfs.diff.tar.gzip')
 _STABLE = ('st_dev', 'st_ino', 'st_size', 'st_mode', 'st_nlink',
            'st_uid', 'st_gid', 'st_mtime_ns', 'st_ctime_ns')
+_EMPTY_CONTAINER = dict(Hostname='', Domainname='', User='', AttachStdin=False,
+    AttachStdout=False, AttachStderr=False, Tty=False, OpenStdin=False,
+    StdinOnce=False, Env=None, Cmd=None, Image='', Volumes=None, WorkingDir='',
+    Entrypoint=None, OnBuild=None, Labels=None)
+# Moby v28.0.0 image/image.go V1Image, lines 32-81. ID/parent are
+# compatibility-chain fields; rootfs/history belong to Image, not V1Image.
+_V1_FIELDS = ('comment', 'created', 'container', 'container_config',
+    'docker_version', 'author', 'config', 'architecture', 'variant', 'os', 'Size')
 
 
 class _ImageTarInfo(tarfile.TarInfo):
@@ -89,13 +97,62 @@ def _descriptor(value, media):
 def _snapshot(value): return tuple(getattr(value, field) for field in _STABLE)
 
 
-def authenticate(path, expected_config_id, expected_ordered_rootfs_sha256, expected_layer_count=47):
+def _exact_json(left, right):
+    return json.dumps(left, sort_keys=True, separators=(',', ':'), allow_nan=False) == json.dumps(right, sort_keys=True, separators=(',', ':'), allow_nan=False)
+
+
+def _legacy_metadata(pins, count, config, used, raw):
+    """Authenticate separately pinned Moby compatibility JSON; never derive IDs.
+
+    These SHA pins must come from an independently authenticated save census,
+    not be computed by the caller from the same untrusted candidate archive.
+    The matching terminal V1 config is inert metadata, not another image alias.
+    """
+    _require(type(pins) is dict and len(pins) == count, 'Complete separately pinned legacy census required')
+    records = {}; terminal_fields = {k: config[k] for k in _V1_FIELDS if k in config}
+    terminal_fields.setdefault('created', None); terminal_fields.setdefault('container_config', _EMPTY_CONTAINER)
+    dummy = dict(created='1970-01-01T00:00:00Z', container_config=_EMPTY_CONTAINER, os='linux')
+    for name, pin in pins.items():
+        _name(name)
+        _require(re.fullmatch('blobs/sha256/[0-9a-f]{64}', name) and name not in used
+            and type(pin) is dict and set(pin) == {'bytes', 'sha256'}
+            and type(pin['bytes']) is int and 0 < pin['bytes'] <= MAX_JSON
+            and type(pin['sha256']) is str and pin['sha256'] == name.rsplit('/', 1)[1], 'Exact independent legacy blob pin required')
+        data = raw(name); _require(len(data) == pin['bytes'] and hashlib.sha256(data).hexdigest() == pin['sha256'], 'Pinned legacy metadata bytes differ')
+        node = _json(data)
+        _require(type(node) is dict and type(node.get('id')) is str and re.fullmatch('[0-9a-f]{64}', node['id'])
+            and ('parent' not in node or type(node['parent']) is str and re.fullmatch('[0-9a-f]{64}', node['parent']))
+            and node['id'] not in records, 'Unique bounded legacy ID/parent required')
+        fields = {k: v for k, v in node.items() if k not in ('id', 'parent')}
+        _require(_exact_json(fields, dummy) or _exact_json(fields, terminal_fields), 'Legacy metadata differs from dummy/pinned V1 config')
+        records[node['id']] = (node.get('parent'), fields)
+    children = {}; roots = []
+    for key, (parent, _) in records.items():
+        if parent is None: roots.append(key)
+        else:
+            _require(parent in records and parent not in children, 'Legacy parent is foreign or branches')
+            children[parent] = key
+    _require(len(roots) == 1, 'One legacy chain root required')
+    current = roots[0]; visited = set()
+    for i in range(count):
+        _require(current not in visited, 'Legacy parent cycle'); visited.add(current)
+        _require(_exact_json(records[current][1], terminal_fields if i == count-1 else dummy), 'Legacy terminal/source config position differs')
+        if i < count-1:
+            _require(current in children, 'Incomplete legacy parent chain'); current = children[current]
+        else: _require(current not in children, 'Legacy terminal has a child')
+    _require(len(visited) == count, 'Disconnected legacy metadata refused')
+    return hashlib.sha256(json.dumps(pins, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+
+
+def authenticate(path, expected_config_id, expected_ordered_rootfs_sha256, expected_layer_count=47, *, expected_legacy_metadata=None):
     """Return authenticated IDs/rootfs; no Docker, network, layer unpack or alias.
 
     Compressed blob hashes bind OCI descriptors; their bounded uncompressed byte
     hashes independently bind config diff_ids. The containing TAR is checked
     for stable inode/content metadata, NOT claimed publisher-SHA authenticated.
     Caller provides the wall-clock deadline and independently pins archive bytes.
+    Optional compatibility metadata needs a separate trusted full census; its
+    V1 IDs are checked as a chain, NOT claimed source-derived or Docker IDs.
     """
     _sha(expected_config_id)
     _require(type(expected_ordered_rootfs_sha256) is str and re.fullmatch('[0-9a-f]{64}', expected_ordered_rootfs_sha256)
@@ -240,6 +297,10 @@ def authenticate(path, expected_config_id, expected_ordered_rootfs_sha256, expec
                         and info.get('id') == PurePosixPath(parent).name
                         and info.get('parent', '') in ('', previous), 'Classic layer metadata parent/ID differs')
             if 'repositories' in table: _require(_json(raw('repositories', 65536)) == {}, 'No repository tags may be imported')
+            metadata_sha = None
+            if expected_legacy_metadata is not None:
+                _require(hybrid, 'Pinned compatibility blobs require authenticated hybrid graph')
+                metadata_sha = _legacy_metadata(expected_legacy_metadata, expected_layer_count, config, used, raw)
             _require(all(name in used or m.isdir() and any(p.startswith(name+'/') for p in used)
                 for name, m in table.items()), 'Unreferenced image graph/member refused')
             receipt = dict(schema='world_reward.runtime_image_archive.v1', representation='hybrid_oci' if hybrid else 'classic',
@@ -247,6 +308,9 @@ def authenticate(path, expected_config_id, expected_ordered_rootfs_sha256, expec
                 ordered_rootfs_sha256=rootfs_sha, rootfs_diff_ids=diff_ids, layer_count=expected_layer_count,
                 unique_layer_blobs=len(verified), uncompressed_layer_bytes=expanded_total,
                 compressed_layers=sum(codec in _GZIP for codec in codecs), archive_bytes=before.st_size,
+                legacy_metadata_count=expected_layer_count if metadata_sha else 0,
+                legacy_metadata_manifest_sha256=metadata_sha,
+                pinned_legacy_metadata_verified=metadata_sha is not None, legacy_ids_derived=False,
                 archive_whole_sha_verified=False, layers_extracted=False, docker_loaded=False)
         _require(_snapshot(os.fstat(source.fileno())) == _snapshot(before) == _snapshot(p.lstat()), 'Archive changed during authentication')
     return receipt

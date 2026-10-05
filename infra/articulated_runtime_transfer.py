@@ -24,6 +24,9 @@ import time
 import urllib.parse
 import urllib.request
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import runtime_image_archive
+
 ROOT = Path('/srv/scenesmith/world-reward')
 IMAGE = 'sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4'
 LAYERS_SHA = '0f1bf78024834b90e5841b8de8893fba8eec4176bf36c071516d0c1205d84fdc'
@@ -37,6 +40,17 @@ MAX_IMAGE = 32*1024**3
 MAX_ARCHIVE = 33*1024**3
 BUDGET = 7200
 SCHEMA = 'world_reward.articulated_runtime_replica.v1'
+IMAGE_ARCHIVE_PINS = 'configs/articulated_runtime_image_archive_pins.json'
+IMAGE_ARCHIVE_PINS_PIN = {'bytes': 10144, 'sha256': '6e99f900c1e7653cb9e1823d88c41511617afa265f356a6cb52e61090edc2203'}
+
+
+def archive_pins(code):
+    require(identity(code/IMAGE_ARCHIVE_PINS) == IMAGE_ARCHIVE_PINS_PIN, 'Independently frozen saved-image census required')
+    value = strict_json((code/IMAGE_ARCHIVE_PINS).read_bytes())
+    require(value['schema'] == 'world_reward.articulated_runtime_image_archive_pins.v1'
+        and value['qualified_config_id'] == IMAGE and value['ordered_rootfs_sha256'] == LAYERS_SHA
+        and value['legacy_ids_derived'] is False, 'Original config/rootfs and explicit legacy pin provenance required')
+    return value
 
 
 def require(condition, message):
@@ -104,20 +118,35 @@ def source_proof(code, revision):
     return {'files': count, 'sha256': digest.hexdigest()}
 
 
-def inspect_image():
-    result = subprocess.run(['docker', 'image', 'inspect', IMAGE], capture_output=True, timeout=30, check=False)
+def inspect_image(identifier=IMAGE, *, graph=None):
+    permitted = {IMAGE}
+    if graph is not None:
+        require(graph['config_id'] == IMAGE and graph['ordered_rootfs_sha256'] == LAYERS_SHA,
+            'Authenticated graph required before runtime identity resolution')
+        permitted |= {graph['platform_manifest_id'], *graph['index_ids']}
+    require(identifier in permitted and re.fullmatch('sha256:[0-9a-f]{64}', identifier), 'Only authenticated image identity allowed')
+    result = subprocess.run(['docker', 'image', 'inspect', identifier], capture_output=True, timeout=30, check=False)
     require(result.returncode == 0 and len(result.stdout) <= 1024**2, 'Original exact image inspection failed')
     rows = strict_json(result.stdout); require(type(rows) is list and len(rows) == 1, 'One exact Docker image required')
     image = rows[0]; layers = image['RootFS']['Layers']
-    require(image['Id'] == IMAGE and image['Architecture'] == 'amd64' and image['Os'] == 'linux'
+    require(image['Id'] in permitted and image['Architecture'] == 'amd64' and image['Os'] == 'linux'
             and len(layers) == 47 and all(re.fullmatch('sha256:[0-9a-f]{64}', p) for p in layers)
             and hashlib.sha256(json.dumps(layers, separators=(',', ':')).encode()).hexdigest() == LAYERS_SHA,
             'Exact qualified 47-layer image required')
-    return {'image_id': IMAGE, 'layers': 47, 'ordered_rootfs_sha256': LAYERS_SHA, 'size': image['Size']}
+    return {'image_id': image['Id'], 'qualified_config_id': IMAGE, 'layers': 47, 'ordered_rootfs_sha256': LAYERS_SHA, 'size': image['Size']}
 
 
-def verify_image_archive(path):
+def verify_image_archive(path, pins=None):
     """Validate Docker's byte archive before load; never decode layer payloads."""
+    if pins is not None:
+        require(identity(path) == pins['image_archive'], 'Exact independently frozen saved archive required')
+        graph = runtime_image_archive.authenticate(path, IMAGE, LAYERS_SHA,
+            expected_legacy_metadata=pins['legacy_metadata'])
+        require(graph['platform_manifest_id'] == pins['platform_manifest_id']
+            and graph['legacy_metadata_manifest_sha256'] == pins['legacy_metadata_manifest_sha256'],
+            'Actual original image graph/metadata census differs')
+        require(identity(path) == pins['image_archive'], 'Saved archive changed during graph authentication')
+        return graph
     with tarfile.open(path, 'r:') as archive:
         members = archive.getmembers(); names = [m.name for m in members]
         require(len(members) <= 200 and len(set(names)) == len(names)
@@ -337,7 +366,7 @@ def main(argv=None):
     require(platform.system() == 'Linux' and os.geteuid() == 0 and os.environ.get('WR_ROOT') == str(ROOT)
             and Path(__file__) == code/'infra/articulated_runtime_transfer.py', 'Azure-only root stdlib transfer entry required')
     verify_azure_peer(args.command)
-    proof = source_proof(code, revision); files = asset_pins(code)
+    proof = source_proof(code, revision); files = asset_pins(code); saved_pins = archive_pins(code)
     export_revision = revision if args.command == 'export' else args.export_revision
     require(type(export_revision) is str and re.fullmatch('[0-9a-f]{40}', export_revision), 'Exact original export revision required')
     managed = os.environ.pop('WR_BOOTSTRAP_MANAGED_IDENTITY', '') == '1'
@@ -360,11 +389,12 @@ def main(argv=None):
         if args.command == 'export':
             image = inspect_image(); original = {p: identity(ROOT/p) for p in files}
             require(original == files, 'All original nine asset bytes required')
-            require(shutil.disk_usage(out).free >= image['size']+sum(v['bytes'] for v in files.values())+2*1024**3, 'Bounded export disk capacity insufficient')
-            image_path = scratch/'image.tar'; report['phase'] = 'image_save'
-            result = subprocess.run(['docker', 'image', 'save', '--output', str(image_path), IMAGE], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=BUDGET-(time.monotonic()-started))
-            require(result.returncode == 0, 'Exact image byte save failed'); image_pin = identity(image_path)
-            verify_image_archive(image_path)
+            require(subprocess.check_output(['findmnt', '--noheadings', '--output', 'UUID', '--target',
+                '/srv/world-reward-data'], text=True, timeout=10).strip() == saved_pins['data_disk_uuid'],
+                'Original owned data disk required')
+            image_path = canonical(saved_pins['saved_path']); report['phase'] = 'saved_image_authentication'
+            image_pin = identity(image_path); graph = verify_image_archive(image_path, saved_pins)
+            report.update(image_graph=graph, saved_archive_reused=True, docker_save_repeated=False)
             writer = BlockWriter(blob); report['phase'] = 'upload'
             manifest = pack(writer, ROOT, files, image_path, image_pin, revision, proof)
             report['archive'] = writer.finish(); report['image'] = manifest['image']
@@ -377,9 +407,19 @@ def main(argv=None):
             require(shutil.disk_usage(out).free >= 3*expected['bytes']+2*1024**3, 'Bounded import disk capacity insufficient')
             archive_path = scratch/'archive.tar'; report['phase'] = 'download'; download(blob, archive_path, expected)
             manifest, extracted = unpack(archive_path, scratch, files, export_revision); report['phase'] = 'image_load'
-            verify_image_archive(extracted['image.tar'])
+            graph = verify_image_archive(extracted['image.tar'], saved_pins)
             result = subprocess.run(['docker', 'image', 'load', '--input', str(extracted['image.tar'])], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=BUDGET-(time.monotonic()-started))
-            require(result.returncode == 0, 'Original image byte load failed'); inspect_image()
+            require(result.returncode == 0, 'Original image byte load failed')
+            candidates = (IMAGE, graph['platform_manifest_id'], *graph['index_ids'])
+            actual = []
+            for candidate in dict.fromkeys(candidates):
+                if candidate is None: continue
+                try: actual.append(inspect_image(candidate, graph=graph))
+                except ValueError: continue
+            require(actual and len({row['image_id'] for row in actual}) == 1,
+                'Exactly one authenticated imported config/platform image required')
+            report.update(image_graph=graph, imported_runtime=actual[0], image_rebuilt=False,
+                image_retagged=False, original_runtime_receipt_replayed=False)
             report['assets'] = install(extracted, ROOT, files); report['archive'] = expected; report['image'] = manifest['image']
             report['original_export_source_proof'] = manifest['source_proof']
         require(proof == source_proof(code, revision) and time.monotonic()-started <= BUDGET, 'Source changed or transfer deadline exhausted')
