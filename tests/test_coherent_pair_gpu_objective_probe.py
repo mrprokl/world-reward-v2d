@@ -32,8 +32,8 @@ class Runtime:
     def canonical(path):
         path=Path(path);assert not any(p.is_symlink() for p in (path,*path.parents));return path.resolve()
     @staticmethod
-    def identity(path,limit,**_):
-        data=Path(path).read_bytes();assert 0<len(data)<=limit
+    def identity(path,limit,**kwargs):
+        data=Path(path).read_bytes();assert (0 if kwargs.get('empty') else 1)<=len(data)<=limit
         return dict(bytes=len(data),sha256=hashlib.sha256(data).hexdigest())
     @staticmethod
     def write(path,raw,mode):
@@ -132,13 +132,15 @@ def test_frozen_helpers_manifest_and_shell():
     assert q.manifest()['solver_options']==dict(maxiter=20,maxfun=100,maxls=20,maxcor=10,ftol=1e-12,gtol=1e-6)
     assert len(q.leaves(ROOT))==len(q.HELPERS)+2 and len(set(q.leaves(ROOT)))==len(q.leaves(ROOT))
     assert subprocess.run(['bash','-n',str(ROOT/q.HELPERS[1])],capture_output=True).returncode==0
+    audit=(ROOT/q.METADATA_AUDIT['reference']).read_bytes()
+    assert dict(bytes=len(audit),sha256=hashlib.sha256(audit).hexdigest())==q.METADATA_AUDIT['identity']
 
 
 def test_technical_resumption_preserves_frozen_scientific_functions():
     old=subprocess.run(['git','show',q.FAILED_REV+':infra/coherent_pair_gpu_objective_probe.py'],
         cwd=ROOT,capture_output=True,check=True).stdout
     original=ast.parse(old);current=ast.parse((ROOT/q.HELPERS[0]).read_bytes())
-    for name in ('manifest','scipy_evidence','solve','measure','validate_native','publish'):
+    for name in ('manifest','solve','measure','validate_native','publish'):
         before=next(n for n in original.body if isinstance(n,ast.FunctionDef) and n.name==name)
         after=next(n for n in current.body if isinstance(n,ast.FunctionDef) and n.name==name)
         assert ast.dump(before)==ast.dump(after),name
@@ -146,7 +148,10 @@ def test_technical_resumption_preserves_frozen_scientific_functions():
         cwd=ROOT,capture_output=True,check=True).stdout
     assert (len(frozen_objective),hashlib.sha256(frozen_objective).hexdigest())==(
         13853,'b00568420e4ccf4a50d3afcb2bc488fe5848686e136bc73bb8ed243d8580fe1e')
-    assert q.RESULT=='results/coherent-pair-gpu-objective-probe-v2'
+    assert q.RESULT=='results/coherent-pair-gpu-objective-probe-v3'
+    v2=subprocess.run(['git','show',q.METADATA_FAILED_REV+':infra/coherent_pair_gpu_objective_probe.py'],
+        cwd=ROOT,capture_output=True,check=True).stdout
+    assert (len(v2),hashlib.sha256(v2).hexdigest())==(34836,'c91a11a660f1660b8643d3387084badeaad942bcbc67f1326c953aca4508abaa')
 
 
 @pytest.mark.parametrize('tamper',[None,'phase','status','source','fd','removed','manifest','xz'])
@@ -194,6 +199,78 @@ def test_bad_native_scipy_contract_rejected(monkeypatch,tmp_path,bad):
     if bad=='missing':d.files=[]
     monkeypatch.setattr(q.importlib.metadata,'distribution',lambda _:d)
     with pytest.raises((ValueError,AssertionError,FileNotFoundError)):q.scipy_evidence(Runtime)
+
+
+def test_actual_record_function_accepts_general_explicit_empty_claims(monkeypatch,tmp_path):
+    d=distribution(tmp_path);record=d.locate_file('scipy-1.16.3.dist-info/RECORD')
+    rows=list(csv.reader(record.read_text().splitlines()));names=('scipy-1.16.3.dist-info/REQUESTED','scipy/empty.py')
+    claim='sha256='+base64.urlsafe_b64encode(hashlib.sha256(b'').digest()).decode().rstrip('=')
+    for name in names:d.locate_file(name).write_bytes(b'');rows.insert(-1,[name,claim,'0'])
+    with record.open('w') as f:csv.writer(f).writerows(rows)
+    d.files=[Path(r[0]) for r in rows];monkeypatch.setattr(q.importlib.metadata,'distribution',lambda _:d)
+    value=q.scipy_evidence(real_rt)
+    assert value['claimed_empty_files']==2 and value['populated_record_claims_verified']
+    assert value['empty_file_policy']=='explicit_original_record_sha256_empty_and_exact_size0_only'
+    assert q.scipy_evidence(real_rt)==value
+
+
+@pytest.mark.parametrize('bad',['blank','wrong_hash','wrong_size','zero_padded_size','nonempty_file','symlink','hardlink','escape','empty_cache'])
+def test_real_record_empty_claim_cannot_waive_file_safety(monkeypatch,tmp_path,bad):
+    d=distribution(tmp_path);record=d.locate_file('scipy-1.16.3.dist-info/RECORD')
+    name='scipy-1.16.3.dist-info/REQUESTED';path=d.locate_file(name);path.write_bytes(b'')
+    claim='sha256='+base64.urlsafe_b64encode(hashlib.sha256(b'').digest()).decode().rstrip('=')
+    row=[name,claim,'0'];rows=list(csv.reader(record.read_text().splitlines()))
+    if bad=='blank':row[1:]=['','']
+    elif bad=='wrong_hash':row[1]='sha256='+'A'*43
+    elif bad=='wrong_size':row[2]='1'
+    elif bad=='zero_padded_size':row[2]='00'
+    elif bad=='nonempty_file':path.write_bytes(b'x')
+    elif bad=='symlink':
+        target=path.with_name('target');path.rename(target);path.symlink_to(target)
+    elif bad=='hardlink':os.link(path,path.with_name('hardlink'))
+    elif bad=='escape':
+        outside=tmp_path/'escape';outside.write_bytes(b'');row[0]='../escape'
+    elif bad=='empty_cache':
+        row=['scipy/__pycache__/empty.pyc','',''];d.locate_file(row[0]).write_bytes(b'')
+    rows.insert(-1,row)
+    with record.open('w') as f:csv.writer(f).writerows(rows)
+    d.files=[Path(r[0]) for r in rows];monkeypatch.setattr(q.importlib.metadata,'distribution',lambda _:d)
+    with pytest.raises(ValueError):q.scipy_evidence(real_rt)
+
+
+@pytest.mark.parametrize('tamper',[None,'phase','status','source','fd','controls','solvers','removed','manifest','xz'])
+def test_v2_metadata_failure_live_authentication_no_solver_claim(monkeypatch,tmp_path,tamper):
+    monkeypatch.setattr(q,'ROOT',tmp_path)
+    code=tmp_path/'jobs'/q.METADATA_FAILED_REV/q.ENTRY/'code';code.mkdir(parents=True)
+    marker=b'6eb181f08240eaebcf851fe70425095043250a4d5a813477dd0dece83d21df37\n'
+    (code.parent/'source-sha256').write_bytes(b'0'*64+b'\n' if tamper=='xz' else marker)
+    binding=dict(entries=317,closure_sha256=q.METADATA_FAILED_CLOSURE)
+    proof=dict(source_binding=binding,manifest=q.manifest())
+    native=dict(proof,status='fail',phase='scipy_native_inventory',error_type='ValueError',fd_calls=72,
+        controls=[{},{}],decision='CLOSED_OBJECTIVE_CONTROL')
+    host=dict(proof,status='fail',native_exit_code=1,source_rehashed_after=True,owned_container_removed=True,decision='CLOSED_OBJECTIVE_CONTROL')
+    if tamper=='phase':native['phase']='complete'
+    if tamper=='status':native['status']='pass'
+    if tamper=='source':native['source_binding']={}
+    if tamper=='fd':native['fd_calls']=0
+    if tamper=='controls':native['controls']=[]
+    if tamper=='solvers':native['solvers']=[{}]
+    if tamper=='removed':host['owned_container_removed']=False
+    if tamper=='manifest':native['manifest']={}
+    receipts={'proof.json':proof,'native.json':native,'report.json':host};opened=[]
+    def pinned(path,pin,maximum):
+        opened.append(path);assert pin==q.METADATA_FAILED_PINS[path.name] and maximum==1<<20
+        return receipts[path.name]
+    rt=SimpleNamespace(require=Runtime.require,source=lambda *_:binding,pinned=pinned)
+    if tamper is not None:
+        with pytest.raises(ValueError):q.metadata_resumption(rt)
+    else:
+        result=q.metadata_resumption(rt)
+        assert result['previous_status']=='fail' and result['previous_failure_not_converted_to_pass']
+        assert result['receipts']==q.METADATA_FAILED_PINS and len(opened)==3
+        audit=result['independent_saved_audit_declaration']
+        assert audit['declaration_only'] and not audit['host_or_child_live_read'] and not audit['solver_qualification']
+        assert audit['identity']==dict(bytes=4601,sha256='581aa1e6f80ac3e1acfb6a57fac22abadf83e18ee3370994c9747013eb2d6629')
 
 
 def test_short_solver_fixed_options_exact_two_arms_and_geometry_freeze():
@@ -271,6 +348,7 @@ def receipt():
             cublas_workspace_config=':4096:8',gpu_name='NVIDIA H100 NVL',gpu_total_bytes=99456909312,python='3.11.10'),
         peak_torch_allocated=1024,peak_torch_reserved=2048,max_rss_bytes=4096)
     value['technical_resumption']=dict(producer_revision=q.FAILED_REV,previous_status='fail')
+    value['metadata_resumption']=dict(producer_revision=q.METADATA_FAILED_REV,previous_status='fail')
     evidence=dict(version='1.16.3',first_native_record_census=True,populated_record_claims_verified=True,
         caches_image_anchored_not_record_certified=True,entries=20,license_files={'LICENSE':dict(bytes=20,sha256=digest)})
     value.update(scipy_before=evidence,scipy_after=dict(evidence))
@@ -302,18 +380,19 @@ def test_tampered_native_receipt_rejected(path,replacement):
     with pytest.raises(ValueError):q.validate_native(Runtime,value,binding,'1'*40,qualification)
 
 
-@pytest.mark.parametrize('failure',[None,'native_exit','cleanup','postsource'])
+@pytest.mark.parametrize('failure',[None,'native_exit','cleanup','postsource','metadata_declaration'])
 def test_mock_real_host_owned_cid_narrow_mounts_and_fail_demotion(monkeypatch,tmp_path,failure):
     monkeypatch.setattr(q,'ROOT',tmp_path);(tmp_path/'results').mkdir();value,binding,qualification=receipt()
     prior=dict(source_binding=binding,manifest=q.manifest(),image={'Id':q.IMAGE},fullbank_qualification=qualification,
-        technical_resumption=value['technical_resumption']);proofs=[];commands=[]
+        technical_resumption=value['technical_resumption'],metadata_resumption=value['metadata_resumption']);proofs=[];commands=[]
     def proof(*_):
         proofs.append(1);return dict(prior,image={}) if failure=='postsource' and len(proofs)>1 else prior
     def run(argv,**_):
         commands.append(argv);out=tmp_path/q.RESULT
         assert out.stat().st_mode&0o777==0o755
         (out/'container.cid').write_bytes(b'a'*64)
-        Runtime.write(out/'native.json',(json.dumps(value)+'\n').encode(),0o400)
+        saved=dict(value,metadata_resumption={}) if failure=='metadata_declaration' else value
+        Runtime.write(out/'native.json',(json.dumps(saved)+'\n').encode(),0o400)
         return SimpleNamespace(returncode=1 if failure=='native_exit' else 0,stdout=b'',stderr=b'')
     generic=SimpleNamespace(control=lambda *_:b'',cleanup=lambda *_:failure!='cleanup',error_family=g.error_family)
     monkeypatch.setattr(q,'helpers',lambda *_:(full,generic,Runtime,None));monkeypatch.setattr(q,'proof',proof)
@@ -332,7 +411,8 @@ def test_mock_real_host_owned_cid_narrow_mounts_and_fail_demotion(monkeypatch,tm
     assert (tmp_path/q.RESULT/'report.json').stat().st_mode&0o777==0o400
     assert (tmp_path/q.RESULT).stat().st_mode&0o777==0o500
     mounts=[commands[0][i+1] for i,x in enumerate(commands[0]) if x=='--mount']
-    assert len(mounts)==len(q.leaves(ROOT))+1 and not any('/results/coherent-pair-gpu-fullbank-cost-v1' in p for p in mounts)
+    assert len(mounts)==len(q.leaves(ROOT))+1 and not any(old in p for p in mounts for old in
+        ('/results/coherent-pair-gpu-fullbank-cost-v1','/results/coherent-pair-gpu-objective-probe-v1','/results/coherent-pair-gpu-objective-probe-v2','results/audits/'))
     if failure:assert report['decision']=='CLOSED_OBJECTIVE_CONTROL'
 
 

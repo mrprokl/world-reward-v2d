@@ -20,7 +20,7 @@ import time
 
 ROOT=Path('/srv/scenesmith/world-reward')
 ENTRY='run_coherent_pair_gpu_objective_probe'
-RESULT='results/coherent-pair-gpu-objective-probe-v2'
+RESULT='results/coherent-pair-gpu-objective-probe-v3'
 SCHEMA='world_reward.coherent_pair_gpu_objective_probe.v1'
 IMAGE='sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7'
 BUDGET,MEMORY=1200,6*1024**3
@@ -39,6 +39,20 @@ FAILED_PINS={
  'proof.json':dict(bytes=11121,sha256='f93cdc4db34a4a220e7424aa489007f076a7b99eb66ca0f0bc06f5b357180b92'),
  'native.json':dict(bytes=9351,sha256='ce79dae97060d8044cb9065470088bfa53fe9271d390d6e5523f9338d984fcf6'),
  'report.json':dict(bytes=11725,sha256='2b6de394c25e0ed93167a540fc7a7be21b806555349f81ec8c613108695dcdd5')}
+METADATA_FAILED_REV='8db0500a09589dd288ecd8494f00ad33f61983ec'
+METADATA_FAILED_CLOSURE='cfb613f47e946704d1dbec0d93552bee63ec802bc378fd1811b209c50f2128ac'
+METADATA_FAILED_PINS={
+ 'proof.json':dict(bytes=15057,sha256='662824ad5edbbfd967ecff70d9ac2b31a0722b44c856ef3609fd43029e53c73b'),
+ 'native.json':dict(bytes=14463,sha256='217666a8bd5b168389d6d16657a3acd48d6685007edbf74e934f036d5f52af95'),
+ 'report.json':dict(bytes=15663,sha256='04de0a2f833f408d9ec40d881f206dddae0f30278ba06d58dd729bfcb6faaeb3')}
+METADATA_AUDIT=dict(
+ reference='results/audits/coherent_pair_scipy_native_inventory_v3_actual.json',
+ identity=dict(bytes=4601,sha256='581aa1e6f80ac3e1acfb6a57fac22abadf83e18ee3370994c9747013eb2d6629'),
+ declaration_only=True,host_or_child_live_read=False,solver_qualification=False,image_id=IMAGE,
+ rootfs_sha256='5ae610524943c42f72e2fa1ac06a9dbe8fa14bf2d572efd8a57cded6ead3503d',
+ record=dict(bytes=196853,sha256='c34263ef30380bff9837a2311899667249d27ea73c6a6f226209e762582f38a5'),
+ observed_version='1.16.3',examined_rows=2381,claimed_empty_files=41,unclaimed_nonempty_pyc_files=961,
+ requested_empty_hash_size_verified=True,all_populated_claims_verified=True)
 HELPERS=('infra/coherent_pair_gpu_objective_probe.py','infra/run_coherent_pair_gpu_objective_probe.sh',
  'infra/coherent_pair_gpu_fullbank_cost.py','infra/run_coherent_pair_gpu_fullbank_cost.sh',
  'infra/coherent_pair_gpu_probe.py','infra/coherent_pair_cost_probe.py','infra/mediapipe_cpu_runtime_verify.py',
@@ -100,13 +114,35 @@ def technical_resumption(rt):
         previous_failure_not_converted_to_pass=True)
 
 
+def metadata_resumption(rt):
+    """Live host authentication of V2 FAIL; saved diagnostic summary is declarative."""
+    old=ROOT/'jobs'/METADATA_FAILED_REV/ENTRY/'code';out=ROOT/'results/coherent-pair-gpu-objective-probe-v2'
+    binding=rt.source(ROOT,old,METADATA_FAILED_REV,ENTRY,HELPERS)
+    rt.require(binding['entries']==317 and binding['closure_sha256']==METADATA_FAILED_CLOSURE
+        and (old.parent/'source-sha256').read_bytes()==b'6eb181f08240eaebcf851fe70425095043250a4d5a813477dd0dece83d21df37\n',
+        'Immutable V2 failed producer source required')
+    proof,native,host=(rt.pinned(out/n,METADATA_FAILED_PINS[n],1<<20) for n in ('proof.json','native.json','report.json'))
+    rt.require(proof['source_binding']==native['source_binding']==host['source_binding']==binding
+        and proof['manifest']==native['manifest']==host['manifest']==manifest()
+        and native['status']==host['status']=='fail' and native['phase']=='scipy_native_inventory'
+        and native['error_type']=='ValueError' and native['fd_calls']==72 and len(native['controls'])==2
+        and native.get('solvers',[])==[] and host['native_exit_code']==1 and host['source_rehashed_after'] is True
+        and host['owned_container_removed'] is True and host['decision']==native['decision']=='CLOSED_OBJECTIVE_CONTROL',
+        'Original V2 metadata failure required, not a solver qualification')
+    return dict(producer_revision=METADATA_FAILED_REV,receipts=METADATA_FAILED_PINS,source_binding=binding,
+        host_only_authentication=True,previous_status='fail',previous_phase='scipy_native_inventory',
+        previous_failure_not_converted_to_pass=True,scientific_recipe_unchanged=True,
+        correction='accept_zero_bytes_only_with_explicit_record_sha256_empty_and_size0',
+        independent_saved_audit_declaration=METADATA_AUDIT)
+
+
 def proof(full,g,rt,code,rev):
     source=rt.source(ROOT,code,rev,ENTRY,HELPERS)
     frozen=dict(full.REUSED);frozen.update({HELPERS[2]:FULLBANK_PIN,'src/world_reward/coherent_pair_marginal_objective.py':OBJECTIVE_PIN})
     rt.require(all(source['helpers'][n]==dict(bytes=b,sha256=s) for n,(b,s) in frozen.items()),'Frozen math/objective/runtime source required')
     rt.require({p.name for p in code.parent.iterdir()}=={'code','revision','source-sha256'},'Exact current code namespace required')
     return dict(source_binding=source,manifest=manifest(),image=g.image(),fullbank_qualification=prior_evidence(full,rt),
-        technical_resumption=technical_resumption(rt))
+        technical_resumption=technical_resumption(rt),metadata_resumption=metadata_resumption(rt))
 
 
 def leaves(code):return [*(code/n for n in HELPERS),code.parent/'revision',code.parent/'source-sha256']
@@ -119,10 +155,11 @@ def scipy_evidence(rt):
     rt.require(len(records)==1,'One original SciPy RECORD required');record=rt.canonical(d.locate_file(records[0]))
     root=record.parent.parent;rp=rt.identity(record,2<<20,readonly=False);rows=list(csv.reader(io.StringIO(record.read_text())));ledger={}
     rt.require(0<len(rows)<=20000,'Bounded native distribution census required')
+    empty_claim='sha256='+base64.urlsafe_b64encode(hashlib.sha256(b'').digest()).decode().rstrip('=')
     for row in rows:
         rt.require(len(row)==3 and row[0] and row[0] not in ledger,'Unique native RECORD row required')
         path=rt.canonical(d.locate_file(row[0]));rt.require(path.is_relative_to(root),'Contained native distribution file required')
-        pin=rt.identity(path,200<<20,readonly=False)
+        pin=rt.identity(path,200<<20,readonly=False,empty=row[1:]==[empty_claim,'0'])
         if path==record:rt.require(row[1:]==['',''],'RECORD self-reference required')
         elif row[1:]==['','']:
             rt.require(path.parent.name=='__pycache__' and path.suffix=='.pyc','Only image-anchored native bytecode caches may omit RECORD claims')
@@ -137,7 +174,9 @@ def scipy_evidence(rt):
     return dict(version=d.version,record=rp,entries=len(ledger),license_files={n:ledger[n] for n in notices},
         source_fingerprint=hashlib.sha256(json.dumps(ledger,sort_keys=True).encode()).hexdigest(),first_native_record_census=True,
         populated_record_claims_verified=True,unclaimed_cache_files=sum(r[1:]==['',''] and not r[0].endswith('/RECORD') for r in rows),
-        caches_image_anchored_not_record_certified=True)
+        caches_image_anchored_not_record_certified=True,
+        claimed_empty_files=sum(p['bytes']==0 for p in ledger.values()),
+        empty_file_policy='explicit_original_record_sha256_empty_and_exact_size0_only')
 
 
 def solve(np,evaluate,minimize,theta,check,report):
@@ -267,6 +306,12 @@ def native(code,rev,out,pin,deadline):
         and prior['technical_resumption']['receipts']==FAILED_PINS
         and prior['technical_resumption']['previous_failure_not_converted_to_pass'] is True,
         'Explicit immutable closed-failure resumption declarations required')
+    resumed=prior['metadata_resumption']
+    rt.require(resumed['producer_revision']==METADATA_FAILED_REV and resumed['receipts']==METADATA_FAILED_PINS
+        and resumed['previous_status']=='fail' and resumed['previous_phase']=='scipy_native_inventory'
+        and resumed['previous_failure_not_converted_to_pass'] is True and resumed['host_only_authentication'] is True
+        and resumed['independent_saved_audit_declaration']==METADATA_AUDIT,
+        'Explicit host-authenticated V2 failure and declarative metadata evidence required')
     def check():
         if time.monotonic()>=deadline:raise TimeoutError('Inclusive objective1200s budget')
     def cancelled(*_):raise TimeoutError('Objective control cancelled')
@@ -276,6 +321,7 @@ def native(code,rev,out,pin,deadline):
         source_binding=prior['source_binding'],manifest=manifest(),image_id=IMAGE,fullbank_qualification=prior['fullbank_qualification'],
         real_fit_executed=False,models_loaded=False,rgb_read=False,references_read=False,challenge_inputs_used=False,quality_verified=False,
         adoption=False,global_optimum_claimed=False,technical_resumption=prior['technical_resumption'],
+        metadata_resumption=prior['metadata_resumption'],
         decision='CLOSED_OBJECTIVE_CONTROL');snapshots=[];t=None
     try:
         check();sys.path.insert(0,str(code/'src'));import numpy as np;import torch as t
@@ -378,7 +424,7 @@ def host(code,rev):
     cid=out/'container.cid';name='world-reward-objective-'+rev[:12];owned=False;removed=False
     report=dict(schema=SCHEMA,stage='coherent_pair_gpu_objective_host',status='fail',producer_revision=rev,source_binding=before['source_binding'],
         manifest=manifest(),image=before['image'],fullbank_qualification=before['fullbank_qualification'],
-        technical_resumption=before['technical_resumption'],decision='CLOSED_OBJECTIVE_CONTROL')
+        technical_resumption=before['technical_resumption'],metadata_resumption=before['metadata_resumption'],decision='CLOSED_OBJECTIVE_CONTROL')
     try:
         rt.require(not g.control(['docker','ps','-aq','--no-trunc','--filter','name=^/'+name+'$']).strip(),'Owned name exists');owned=True
         argv=['docker','run','--rm','--cidfile',str(cid),'--name',name,'--label','world_reward.tiny_gpu.owner='+rev,'--gpus','all',
@@ -394,6 +440,7 @@ def host(code,rev):
         removed=g.cleanup(rt,cid,name,rev);value=rt.strict((out/'native.json').read_bytes());rt.require(r.returncode==0,'Objective native process failed')
         validate_native(rt,value,before['source_binding'],rev,before['fullbank_qualification'])
         rt.require(value['technical_resumption']==before['technical_resumption'],'Native technical-resumption provenance differs')
+        rt.require(value['metadata_resumption']==before['metadata_resumption'],'Native metadata-resumption provenance differs')
         report.update(status='pass',decision=DECISION,native_report_identity=rt.identity(out/'native.json',1<<20))
     except BaseException as exc:report.update(status='fail',error_type=g.error_family(exc))
     finally:

@@ -46,8 +46,8 @@ No global optimum or scalability to32 real FIT images is claimed.
 
 VM01 scenesmith-ncc-h100-01, exact B47 image
 `sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7`.
-New entry `run_coherent_pair_gpu_objective_probe`, fresh
-`/srv/scenesmith/world-reward/results/coherent-pair-gpu-objective-probe-v1`.
+Maintained entry `run_coherent_pair_gpu_objective_probe`, now fresh
+`/srv/scenesmith/world-reward/results/coherent-pair-gpu-objective-probe-v3`.
 FD9/nonblocking idleGPU, private Docker socket,4CPU/6GiB host and device allocator,
 UID1000, offline/rootfsRO, env-i, CUBLAS before Torch, FP64/no AMP/TF32, strict
 determinism, native NumPy1.26.3 and host maxRSS≤6GiB.1200s includes all checks/cleanup/publication;1215s outer only failure
@@ -61,9 +61,12 @@ not old receipts or source mounts. Existing helper functions are used without
 global/profile mutation or calling historical host/native/measure runs.
 
 SciPy is first inspected natively, before optimizer import: exact1.16.3, contained
-regular non-symlink files, all populated installed RECORD size/SHA claims checked,
+regular single-link non-symlink files, all populated installed RECORD size/SHA claims checked,
 original BSD notice retained. Blank claims allowed only RECORD self-reference
-and `__pycache__/*.pyc` regular caches. Those cache bytes are newly fingerprinted
+and nonempty `__pycache__/*.pyc` regular caches. Zero bytes are accepted only
+when the original populated RECORD claims both SHA256(empty) and exact size `0`;
+the actual file hash/size must still match. No filename exception is used.
+Those cache bytes are newly fingerprinted
 against the immutable image, **not RECORD-certified source**; Python-B disables
 writes but may read image caches. Full inventory rehashed after execution.
 Missing/version/path/notice/hash failure closes without installation/fallback.
@@ -100,3 +103,43 @@ before/after; owned CID/name/label and producer process are absent. The failed
 unit's exit1 was actually available, not inferred from systemd defaults. See
 `results/audits/coherent_pair_gpu_objective_probe_v1_actual.json`.
 No native replay, parameter change, FIT, adoption or quality result follows.
+
+## V2 closed failure and general metadata-only repair
+
+Producer8db0500a09589dd288ecd8494f00ad33f61983ec reached
+`scipy_native_inventory`: both full-bank objective/CPU-GPU/repeat controls and
+all72 FD calls passed, but the original positive-size file gate failed before
+SciPy optimizer import. Host elapsed86.108389684s, native exit1/ValueError;
+no solver ran. V1 and V2 receipts and frozen Git sources remain unchanged FAIL.
+
+The distinct metadata-only V3 diagnostic inspected the same immutable B47 without
+Torch/SciPy numerical imports, GPU, fixtures or optimizer. All2381 RECORD rows
+were checked and rehashed: version1.16.3, RECORD196853 bytes/SHA
+`c34263ef30380bff9837a2311899667249d27ea73c6a6f226209e762582f38a5`.
+`REQUESTED` is an actual zero-byte regular0644 single-link file, with original
+hash SHA256(empty) and size0 claims. There are41 honest claimed-empty files,
+961 nonempty image-cache files with blank claims, and a retained BSD notice.
+The strict explicit-empty policy passes this metadata diagnostic only, not the
+closed objective/solver control. These observed counts are not new run gates.
+
+V3 changes only this general installed-file ABI and technical provenance, not
+measure/solve/manifest, scorer/objective bytes, FD tolerances, stationarity,
+population, solver limits or resources. The host authenticates V2's complete
+312-file/317-entry source and three sealed FAIL receipts before/after, separately
+from the retained V1 failure and qualified tiny/full-bank priors. The child gets
+the same byte-bound declarations in its current proof; no old receipt/source is
+mounted or chmodded. Both historical failures remain failures.
+
+Independent diagnostic JSON `results/audits/coherent_pair_scipy_native_inventory_v3_actual.json`
+is4601 bytes/SHA`581aa1e6f80ac3e1acfb6a57fac22abadf83e18ee3370994c9747013eb2d6629`.
+Its source-pinned summary is explicitly an `independent_saved_audit_declaration`,
+not host/child live reading of the absent local JSON or certification of SciPy.
+The new native attempt must freshly verify the complete live inventory before
+optimizer import and after execution. Missing/path/alias/link/size/hash/license
+failures still close it, with no install, fallback or scientific gate change.
+
+V3 source qualification before execution: root436 tiny controls PASS21.78s,
+independent71 objective controls PASS. AST of manifest/measure/solve/
+validate_native/publish equals8db0500. Driver38953 bytes/SHA256
+`7049240f015220afb12c0f3718577dbf8250e5ae9a9903e07bbcd4c0fcec74e5`.
+No concrete blocker found; actual native qualification still required.
