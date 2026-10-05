@@ -1,0 +1,415 @@
+{
+  "schema": "world_reward.masa_sm90_build.v1",
+  "purpose": "prospective_internal_research_full_original_MMCV_2_1_SM90_build_not_model_or_submission_qualification",
+  "publication_cutoff": "2026-09-30",
+  "prior_runtime": {
+    "producer_revision": "c5e979b188a5e465b8291236ba7330110ca98c74",
+    "image_id": "sha256:5b4cda06057d53e3e1fdd5408e5b14aa2b702318df2b50252558d098300a5ec6",
+    "report_relative_to_remote_root": "results/masa-runtime-build-c5e979b188a5e465b8291236ba7330110ca98c74/report.json",
+    "report": {
+      "bytes": 47017,
+      "sha256": "ac797a6c9c9fe3fe07e813aaad1425b6605c8eca16a36a8a3aed38b8bf928063"
+    },
+    "actual_image_revision_report_identity_required_on_cli": true,
+    "python": "3.11",
+    "venv": "/opt/world-reward-masa",
+    "torch": "2.1.2+cu118",
+    "torch_cuda": "11.8",
+    "original_runtime_wheel_count": 52,
+    "existing_image_or_parent_venv_mutation": false,
+    "only_existing_distribution_replaced_in_new_child": "mmcv",
+    "additional_build_tool_artifact": "ninja==1.11.1.1_wheel_binary_build_only",
+    "ninja_installed_into_author_runtime": false,
+    "all_other_original_runtime_distributions_and_files_unchanged": true
+  },
+  "source": {
+    "repository": "https://github.com/open-mmlab/mmcv",
+    "release_tag": "v2.1.0",
+    "commit": "57c4e25e06e2d4f8a9357c84bcd24089a284dc88",
+    "commit_date": "2023-10-11",
+    "root_tree": "4db7bd85dc95a1a8c3f7ff6e9d3382eb582be462",
+    "scope": "entire_original_git_tree_including_all_native_ops_no_selected_source_subset",
+    "blob_count_including_symlink": 837,
+    "regular_file_count": 836,
+    "expanded_blob_bytes_including_symlink_content": 13561826,
+    "archive_url": "https://codeload.github.com/open-mmlab/mmcv/tar.gz/57c4e25e06e2d4f8a9357c84bcd24089a284dc88",
+    "archive_publisher_sha256": null,
+    "archive_sha256_policy": "measure_after_acquisition_do_not_claim_publisher_SHA256_authenticate_all_expanded_git_blobs_and_root_tree",
+    "recursive_tree_metadata": {
+      "url": "https://api.github.com/repos/open-mmlab/mmcv/git/trees/4db7bd85dc95a1a8c3f7ff6e9d3382eb582be462?recursive=1",
+      "bytes": 220989,
+      "sha256": "9272646a960b0a2194a9811f33ac0c5449ec5dcc4ac4142997a4f67adc2d6274",
+      "hash_basis": "independently_measured_primary_recursive_Git_tree_JSON_exact_root_tree_HTTP_URL",
+      "reconstruct_complete_Git_root_tree_from_all_authenticated_blob_paths_and_modes": true
+    },
+    "symlink_policy": {
+      "count": 1,
+      "mode": "120000",
+      "file": "docs/zh_cn/mmcv-logo.png",
+      "content_bytes": 21,
+      "git_blob": "7dcca035f61762b204842bfe5a12aa990c97e8eb",
+      "target": "../docs/mmcv-logo.png",
+      "authenticated_git_path_required": true,
+      "resolved_target_must_stay_in_source_root": true,
+      "hardlinks_or_unlisted_links_allowed": false
+    },
+    "required_file_pins": [
+      {
+        "file": "setup.py",
+        "bytes": 21203,
+        "sha256": "c3fdf3cd5e94f435a63d5ca25b2ceb037f4dd6d778c6fd04d0ae7b06b13df6c0"
+      },
+      {
+        "file": "LICENSE",
+        "bytes": 11413,
+        "sha256": "866d999d3ca92d2c5dc9b0afc941c5fac6529e2d180fc638274f91f7fce161d7"
+      },
+      {
+        "file": "LICENSES.md",
+        "bytes": 1592,
+        "sha256": "82ffd201d50f24c58af6c271b0cdc581c5f832e9bf6cf4a66bc137461c99eaa2"
+      },
+      {
+        "file": "mmcv/ops/csrc/pytorch/cuda/fused_bias_leakyrelu_cuda.cu",
+        "bytes": 3027,
+        "sha256": "aaebd7dd001f87ec40c1c9501475e30c102e2e3ae7566cdd93c8d9f2a99f0b5b"
+      }
+    ],
+    "source_editing": false,
+    "op_deletion_or_build_glob_override": false,
+    "original_setup_and_Torch_BuildExtension": true,
+    "source_post_build_hash_required": true,
+    "generated_build_products_are_not_original_source_edits": true
+  },
+  "publisher_metadata": [
+    {
+      "file": "redistrib_11.8.0.json",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/redistrib_11.8.0.json",
+      "bytes": 51765,
+      "sha256": "941a950a4ab3b95311c50df7b3c8bca973e0cdda76fc2f4b456d2d5e4dac0281",
+      "release_date": "2022-10-03",
+      "hash_basis": "independently_measured_publisher_manifest"
+    },
+    {
+      "file": "ninja-1.11.1.1-pypi.json",
+      "url": "https://pypi.org/pypi/ninja/1.11.1.1/json",
+      "bytes": 18888,
+      "sha256": "bd88f58383cdf9f4f203fe1dd74ab56897ad635a9eebfe6601cd2af03f9c5a29",
+      "hash_basis": "independently_measured_publisher_release_metadata"
+    }
+  ],
+  "assets": [
+    {
+      "component": "cuda_nvcc",
+      "version": "11.8.89",
+      "platform": "linux-x86_64",
+      "file": "cuda_nvcc-linux-x86_64-11.8.89-archive.tar.xz",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvcc/linux-x86_64/cuda_nvcc-linux-x86_64-11.8.89-archive.tar.xz",
+      "bytes": 43230952,
+      "sha256": "7ee8450dbcc16e9fe5d2a7b567d6dec220c5894a94ac6640459e06231e3b39a5",
+      "hash_basis": "publisher_NVIDIA_redistrib_11_8_0_SHA256",
+      "publisher_license": "CUDA Toolkit"
+    },
+    {
+      "component": "cuda_cudart",
+      "version": "11.8.89",
+      "platform": "linux-x86_64",
+      "file": "cuda_cudart-linux-x86_64-11.8.89-archive.tar.xz",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cudart/linux-x86_64/cuda_cudart-linux-x86_64-11.8.89-archive.tar.xz",
+      "bytes": 913876,
+      "sha256": "56129e0c42df03ecb50a7bb23fc3285fa39af1a818f8826b183cf793529098bb",
+      "hash_basis": "publisher_NVIDIA_redistrib_11_8_0_SHA256",
+      "publisher_license": "CUDA Toolkit"
+    },
+    {
+      "component": "cuda_cccl",
+      "version": "11.8.89",
+      "platform": "linux-x86_64",
+      "file": "cuda_cccl-linux-x86_64-11.8.89-archive.tar.xz",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cccl/linux-x86_64/cuda_cccl-linux-x86_64-11.8.89-archive.tar.xz",
+      "bytes": 1006416,
+      "sha256": "99d77d9e4c75d5e4663e473577f1871e65bca4ea0b9023f544a3556f0c1776c7",
+      "hash_basis": "publisher_NVIDIA_redistrib_11_8_0_SHA256",
+      "publisher_license": "CUDA Toolkit"
+    },
+    {
+      "component": "ninja",
+      "version": "1.11.1.1",
+      "file": "ninja-1.11.1.1-py2.py3-none-manylinux1_x86_64.manylinux_2_5_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/6d/92/8d7aebd4430ab5ff65df2bfee6d5745f95c004284db2d8ca76dcbfd9de47/ninja-1.11.1.1-py2.py3-none-manylinux1_x86_64.manylinux_2_5_x86_64.whl",
+      "bytes": 307194,
+      "sha256": "84502ec98f02a037a169c4b0d5d86075eaf6afc55e1879003d6cab51ced2ea4b",
+      "hash_basis": "publisher_PyPI_SHA256",
+      "publication_date": "2023-10-09",
+      "publisher_license": "Apache 2.0"
+    }
+  ],
+  "optional_assets": [
+    {
+      "component": "cuda_cuobjdump",
+      "version": "11.8.86",
+      "platform": "linux-x86_64",
+      "file": "cuda_cuobjdump-linux-x86_64-11.8.86-archive.tar.xz",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cuobjdump/linux-x86_64/cuda_cuobjdump-linux-x86_64-11.8.86-archive.tar.xz",
+      "bytes": 162092,
+      "sha256": "28218273db8ffeb3ae4b31bfb4e4d90f0ae3373454c7970703c063dfd0377ba7",
+      "hash_basis": "publisher_NVIDIA_redistrib_11_8_0_SHA256",
+      "publisher_license": "CUDA Toolkit",
+      "purpose": "inspect_new_source_built_extension_SM90_architecture_only",
+      "must_not_run_model_or_GPU": true
+    }
+  ],
+  "limits": {
+    "root_budget_seconds_including_acquisition_build_and_publication": 2400,
+    "cpu_compile_budget_seconds_within_root_budget": 1800,
+    "publication_grace_seconds": 30,
+    "cpus": 32,
+    "memory_bytes": 137438953472,
+    "minimum_free_bytes": 21474836480,
+    "maximum_download_bytes": 500000000,
+    "maximum_source_expanded_bytes": 16000000,
+    "maximum_toolkit_expanded_bytes": 536870912,
+    "network_attempts_per_asset": 1,
+    "acquisition_stays_on_Azure": true,
+    "local_heavy_data_transfer": false,
+    "maximum_DEB_data_expanded_bytes_per_package": 1500000000,
+    "maximum_DEB_selected_header_and_notice_bytes_total": 32000000
+  },
+  "compiler": {
+    "architecture": "x86_64_linux",
+    "gcc": {
+      "path": "/usr/bin/gcc",
+      "version": "11.4.0"
+    },
+    "gxx": {
+      "path": "/usr/bin/g++",
+      "version": "11.4.0"
+    },
+    "python_header": "/opt/conda/include/python3.11/Python.h",
+    "cuda_home": "/opt/world-reward-cuda-11.8",
+    "nvcc_version": "11.8.89",
+    "toolkit_release": "11.8",
+    "torch_cuda_arch_list": "9.0",
+    "expected_arch_flag": "-gencode=arch=compute_90,code=sm_90",
+    "ptx_fallback_requested": false,
+    "environment": {
+      "CUDA_HOME": "/opt/world-reward-cuda-11.8",
+      "CC": "/usr/bin/gcc",
+      "CXX": "/usr/bin/g++",
+      "MAX_JOBS": "32",
+      "FORCE_CUDA": "1",
+      "MMCV_WITH_OPS": "1",
+      "TORCH_CUDA_ARCH_LIST": "9.0",
+      "LD_LIBRARY_PATH": ""
+    },
+    "explicit_child_venv_ninja_and_CUDA11_8_bins_before_system_PATH": true,
+    "cuda_12_4_compiler_headers_or_libraries_allowed": false,
+    "compiler_ABI_checks_disabled": false,
+    "allow_unsupported_compiler": false,
+    "fast_math_or_numeric_flags_added": false,
+    "pip_no_index": true,
+    "pip_no_deps": true,
+    "pip_no_build_isolation": true,
+    "build_full_original_package": true,
+    "before_full_original_build": "tiny_NVCC_SM90_object_including_ATen_cuda_CUDAContext_h_and_Python_h_with_original_Torch_include_paths_GCC11_4_Python11_include_and_original_Torch_CXX11_ABI"
+  },
+  "toolkit_inventory": {
+    "actual_archive_members_observed": false,
+    "before_compile_required": [
+      "bin/nvcc",
+      "bin/ptxas",
+      "bin/nvlink",
+      "nvvm/libdevice/libdevice.10.bc",
+      "nvvm/lib64/libnvvm.so",
+      "include/cuda.h",
+      "include/cuda_runtime.h",
+      "include/cuda_runtime_api.h",
+      "include/crt/host_config.h",
+      "include/thrust",
+      "include/cub",
+      "include/cublas_v2.h",
+      "include/cublas_api.h",
+      "include/cublasLt.h",
+      "include/cusparse.h",
+      "include/cusolverDn.h",
+      "include/cusolver_common.h"
+    ],
+    "cudart_link_library_required": "native_archive_lib_or_lib64/libcudart.so_resolving_inside_toolkit",
+    "preserve_native_component_layout": true,
+    "merge_collision_policy": "only_identical_file_bytes_or_fail",
+    "archive_link_targets_must_resolve_inside_authenticated_component_root": true,
+    "hardlinks_devices_absolute_paths_or_setuid_files_allowed": false,
+    "CUDA_driver_stubs_must_not_be_added_to_runtime_loader_path": true,
+    "missing_component_policy": "fail_before_compile_no_implicit_download_or_CUDA12_substitution",
+    "record_actual_member_manifest_and_preserved_notices_on_Azure": true
+  },
+  "license": {
+    "scope": "internal_noncommercial_research_and_evaluation_only",
+    "commercial_or_public_compiler_distribution_authorized": false,
+    "license_eligibility_verified": false,
+    "cuda_eula": {
+      "url": "https://docs.nvidia.com/cuda/archive/11.8.0/eula/index.html",
+      "bytes": 133919,
+      "sha256": "e60f3475e5447c373d0ecdd960c0195b049052434f93c132b09699a2fc416227",
+      "hash_basis": "independently_measured_primary_EULA_11_8",
+      "install_and_use_grant": "section_1_1_1",
+      "compiler_is_not_asserted_distributable": true,
+      "retain_embedded_component_notices": true,
+      "CCCL_Thrust_Apache_2_and_Boost_1_notices_required": true
+    },
+    "mmcv": {
+      "default_license": "Apache-2.0",
+      "special_op_licenses": "NVIDIA_licenses_per_original_LICENSES_md_not_all_Apache",
+      "full_source_special_ops_still_compiled": true,
+      "special_ops_used_by_MASA_claimed": false,
+      "retain_original_LICENSE_LICENSES_and_source_attributions": true,
+      "research_only_stylegan2_notice": {
+        "url": "https://nvlabs.github.io/stylegan2/license.html",
+        "bytes": 5882,
+        "sha256": "678f5386a1560fea3c75c7f32b36622ba196f91e435b5f21a68f7d9cde5fe837",
+        "hash_basis": "independently_measured_primary_license_referenced_by_original_fused_bias_source",
+        "use_limitation": "section_3_3_research_or_evaluation_purposes_only"
+      }
+    },
+    "ninja": {
+      "publisher_declared_license": "Apache-2.0",
+      "preserve_embedded_LICENSE_and_metadata_before_install": true,
+      "actual_wheel_notices_observed": false
+    },
+    "header_packages": {
+      "publisher_license": "CUDA_Toolkit_11_8_EULA",
+      "research_and_evaluation_only": true,
+      "retain_per_package_copyright_and_license_notice_bytes": true,
+      "commercial_redistribution_eligibility_verified": false
+    }
+  },
+  "fail_fast_gates_in_order": [
+    "authenticate_frozen_prior_runtime_image_revision_and_report",
+    "validate_root_deadline_lease_disk_and_new_child_only",
+    "acquire_and_authenticate_publisher_metadata_and_full_asset_bytes",
+    "authenticate_complete_MMCV_git_tree_all_blobs_modes_and_required_SHA256",
+    "validate_safe_archive_inventory_and_preserve_license_notices",
+    "validate_explicit_CUDA11_8_toolkit_GCC11_4_Python3_11_and_pinned_ninja",
+    "offline_tiny_NVCC_SM90_object_compile_without_GPU",
+    "compile_full_unmodified_MMCV_2_1_original_setup_with_32_CPU_limit",
+    "authenticate_source_post_build_and_generated_wheel",
+    "install_new_MMCV_wheel_only_in_unique_child_and_offline_pip_check",
+    "validate_CPU_import_versions_and_all_other_51_original_runtime_distributions",
+    "inspect_new_extension_architecture_if_pinned_cuobjdump_was_acquired",
+    "seal_receipt_and_new_image_identity_before_deadline",
+    "clean_owned_disposable_build_products_and_lease"
+  ],
+  "publication": {
+    "new_unique_image_tag_only": true,
+    "prior_runtime_tag_or_image_removed": false,
+    "atomic_final_receipt_with_source_and_wheel_hashes": true,
+    "record_only_fixed_gates_safe_exception_class_versions_hashes_resource_and_elapsed_results": true,
+    "raw_errors_environment_secrets_or_unbounded_build_output_in_receipt": false,
+    "no_PASS_after_root_deadline": true
+  },
+  "next_separate_qualification": {
+    "unchanged_original_native_qualifier_required": true,
+    "config_file": "configs/masa_native_qualification_v1.json",
+    "config": {
+      "bytes": 3645,
+      "sha256": "ad5e4a3cb78926512ab655a65ca3285c105f5542f68895ec014ddeaca5f31d2c"
+    },
+    "actual_new_child_image_and_build_report_pinned_before_invocation": true,
+    "build_CPU_PASS_is_not_native_operator_or_model_PASS": true
+  },
+  "claims": {
+    "prospective_only": true,
+    "toolkit_acquired": false,
+    "source_acquired": false,
+    "compiler_qualified": false,
+    "compiled_wheel_qualified": false,
+    "GPU_used": false,
+    "checkpoint_or_model_loaded": false,
+    "private_or_challenge_data_used": false,
+    "training_or_inference_run": false,
+    "tracking_quality_or_ownership_verified": false,
+    "training_overlap_verified": false,
+    "submission_qualified": false,
+    "adoption": false,
+    "known_missing_Torch_CUDA_headers_observed_before_any_SM90_build": true
+  },
+  "recipe_revision": "prospective_headers_complete_after_actual_missing_Torch_CUDAContext_header_census_before_any_build",
+  "header_package_metadata": {
+    "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/Packages.gz",
+    "whole_current_Packages_gz_pin": null,
+    "basis": "three_exact_publisher_stanzas_captured_before_acquisition_frozen_in_this_config_not_latest_package_resolution",
+    "records": [
+      {
+        "package": "libcublas-dev-11-8",
+        "bytes": 731,
+        "sha256": "104984cc408626e3bf0d8766f3762533f93e18f1e5d4a9e490ddaaa1d1e23528",
+        "publisher_stanza": "Package: libcublas-dev-11-8\nVersion: 11.11.3.6-1\nArchitecture: amd64\nPriority: optional\nSection: multiverse/devel\nSource: libcublas\nMaintainer: cudatools <cudatools@nvidia.com>\nInstalled-Size: 1062146\nProvides: libcublas.so.11-dev (= 11.11.3.6)\nDepends: libcublas-11-8 (>= 11.11.3.6)\nFilename: ./libcublas-dev-11-8_11.11.3.6-1_amd64.deb\nSize: 269143880\nMD5sum: 3a1616ff50babbfa2493599a8a88024a\nSHA1: dd2c16315cba4fd67d2bd5ba01a514cbfb4f6176\nSHA256: 84616862f8d45a9042bd6ea584440e2b6a6f5615c267ad2d25ab63f2a51d2428\nSHA512: 0ec9f3e81beca6280fac094d79c9434c3f60db9011ddb90c5409e5c4e00e8ec6078528ac6bf2a2c1a0330c14cfd125e1554c2757c084335f5be979613eea4fcf\nDescription: CUBLAS native dev links, headers\n CUBLAS native dev links, headers\n"
+      },
+      {
+        "package": "libcusolver-dev-11-8",
+        "bytes": 749,
+        "sha256": "be55b1b306452c8c117f94dba714fe84dcaaf76b56e3c3239d67ca824ea434ab",
+        "publisher_stanza": "Package: libcusolver-dev-11-8\nVersion: 11.4.1.48-1\nArchitecture: amd64\nPriority: optional\nSection: multiverse/devel\nSource: libcusolver\nMaintainer: cudatools <cudatools@nvidia.com>\nInstalled-Size: 345583\nProvides: libcusolver.so.11-dev (= 11.4.1.48)\nDepends: libcusolver-11-8 (>= 11.4.1.48)\nFilename: ./libcusolver-dev-11-8_11.4.1.48-1_amd64.deb\nSize: 35689776\nMD5sum: 10333f75be65f4f1ea0fc14be3cae613\nSHA1: 4811fd0b14093edd31ea978a506f362fc4f3e051\nSHA256: 96933fb6d9bde2024ff1c2aa66d80858dbc828da918a975ee8afa827001f2a80\nSHA512: 1ecf6af93840d534079fb5abadfb18831eb9eb905ce366ab47eb1432f9e0dfa665c0641f218212b24596143a096467faeb938f908aa123ff4deb12396ecc6e90\nDescription: CUDA solver native dev links, headers\n CUDA solver native dev links, headers\n"
+      },
+      {
+        "package": "libcusparse-dev-11-8",
+        "bytes": 744,
+        "sha256": "9a5a7ee3ec64030995963055763510b9800141e62cdb19064ba4b38acbc7869f",
+        "publisher_stanza": "Package: libcusparse-dev-11-8\nVersion: 11.7.5.86-1\nArchitecture: amd64\nPriority: optional\nSection: multiverse/devel\nSource: libcusparse\nMaintainer: cudatools <cudatools@nvidia.com>\nInstalled-Size: 315937\nProvides: libcusparse.so.11-dev (= 11.7.5.86)\nDepends: libcusparse-11-8 (>= 11.7.5.86)\nFilename: ./libcusparse-dev-11-8_11.7.5.86-1_amd64.deb\nSize: 116198960\nMD5sum: c49bc517bcd7fa09c67c8b6285142f14\nSHA1: 3c30d5bad969548b9da0189f7617dfefd48f434b\nSHA256: 3a61b6d3094cda2842cea5af6317531f39ec588b5d11c6a5d880def6f5f2e08d\nSHA512: 2242668984cb0ece32ca029a73f20b2a1eb3a3e17269b20a2dd760f5a6d7c3e43f1ee0524f6dddbbfd9e40b615f1760bdabfc55c62dfa564c4123c10926a7a11\nDescription: CUSPARSE native dev links, headers\n CUSPARSE native dev links, headers\n"
+      }
+    ]
+  },
+  "header_assets": [
+    {
+      "package": "libcublas-dev-11-8",
+      "version": "11.11.3.6-1",
+      "file": "libcublas-dev-11-8_11.11.3.6-1_amd64.deb",
+      "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/libcublas-dev-11-8_11.11.3.6-1_amd64.deb",
+      "bytes": 269143880,
+      "sha256": "84616862f8d45a9042bd6ea584440e2b6a6f5615c267ad2d25ab63f2a51d2428",
+      "hash_basis": "publisher_NVIDIA_Ubuntu2204_Packages_SHA256_frozen_stanza",
+      "kind": "DEB_header_and_notice_extraction_only",
+      "runtime_dependency_installation": false
+    },
+    {
+      "package": "libcusolver-dev-11-8",
+      "version": "11.4.1.48-1",
+      "file": "libcusolver-dev-11-8_11.4.1.48-1_amd64.deb",
+      "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/libcusolver-dev-11-8_11.4.1.48-1_amd64.deb",
+      "bytes": 35689776,
+      "sha256": "96933fb6d9bde2024ff1c2aa66d80858dbc828da918a975ee8afa827001f2a80",
+      "hash_basis": "publisher_NVIDIA_Ubuntu2204_Packages_SHA256_frozen_stanza",
+      "kind": "DEB_header_and_notice_extraction_only",
+      "runtime_dependency_installation": false
+    },
+    {
+      "package": "libcusparse-dev-11-8",
+      "version": "11.7.5.86-1",
+      "file": "libcusparse-dev-11-8_11.7.5.86-1_amd64.deb",
+      "url": "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/libcusparse-dev-11-8_11.7.5.86-1_amd64.deb",
+      "bytes": 116198960,
+      "sha256": "3a61b6d3094cda2842cea5af6317531f39ec588b5d11c6a5d880def6f5f2e08d",
+      "hash_basis": "publisher_NVIDIA_Ubuntu2204_Packages_SHA256_frozen_stanza",
+      "kind": "DEB_header_and_notice_extraction_only",
+      "runtime_dependency_installation": false
+    }
+  ],
+  "header_extraction": {
+    "debian_ar_members": [
+      "debian-binary",
+      "control.tar.xz_or_gz",
+      "data.tar.xz_or_gz"
+    ],
+    "debian_binary_bytes": "2.0\n",
+    "entire_archive_SHA256_before_selective_extraction": true,
+    "include_prefix": "usr/local/cuda-11.8/targets/x86_64-linux/include/",
+    "preserve_entire_header_directory": true,
+    "preserve_copyright_and_license_files_under": "usr/share/doc/",
+    "shared_static_libraries_scripts_and_control_payload_installed": false,
+    "dpkg_or_apt_invoked": false,
+    "archive_inventory_recorded_on_Azure": true,
+    "archive_members_observed": false,
+    "symlink_hardlink_or_device_in_selected_files_allowed": false,
+    "selected_include_binary_library_names_allowed": false
+  }
+}

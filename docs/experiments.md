@@ -10662,3 +10662,19 @@ Do not dispatch a known incomplete compiler recipe; independently pinned
 NVIDIA11.8 developer packages must supply include-only paths and notices in
 a new prospective acquisition budget. No CUDA12 header/ABI substitution, kernel
 rewrite or original operator gate relaxation. GPU model still unqualified.
+
+Prospective MASA SM90 CPU build now freezes the complete original MMCV2.1
+Git tree (837 blobs), author Torch2.1.2/cu118 ABI, NVIDIA11.8.89 compiler,
+three publisher-hashed developer DEBs (421032616B, include/notices only) and
+standalone Ninja build binary. Config20643B/
+ea645f2a70b3c9e9e22fe9714ee005456b4d34d4294cc7f47eaf390c73ae25ad.
+The acquisition ceiling is500MB on Azure, inclusive build deadline2400s and
+native compilation1800s; all operators remain in original setup. CPU-only,
+no checkpoint/data read, no existing image/venv mutation. A fresh child may
+replace only MMCV, with the other51 distribution file digests unchanged.
+Independent bounded actual publisher reads catch real AR names without slash,
+TAR root '.', and exact CUDA11.8 include prefix before execution. Parent106
+tiny adapter/transport/build controls PASS0.33s; these do not qualify a real
+compiler, GPU operator, model, ownership selector or competition license.
+This is one bounded technical experiment, not another GPU diagnostic retry;
+all previous native CUDA failures remain closed.
