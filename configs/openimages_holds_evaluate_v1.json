@@ -1,0 +1,63 @@
+{
+  "schema": "world_reward.openimages_holds_evaluate.v1",
+  "output": "results/openimages-holds-evaluate-v1",
+  "budget_seconds": 600,
+  "child_seconds": 300,
+  "cleanup_grace_seconds": 60,
+  "image_id": "sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4",
+  "predictions": {
+    "folder": "results/hoi-detr-external-cohort128-v3",
+    "producer_revision": "1dc58f7f4653813e08c24a06860f0e8babd66dec",
+    "host": {
+      "bytes": 3045,
+      "sha256": "8172195c631d0576de2a215652f0c0d6d70f73942af78633c2b60782ab017740"
+    },
+    "native": {
+      "bytes": 3624,
+      "sha256": "f07b74597e0be296b3ebbd052bb35c6f777408b4158a0540b51a98760f3ff96b"
+    },
+    "observations_manifest": {
+      "bytes": 27073,
+      "sha256": "6ff65286338b84e2acf50139108ebe75d851d7dff8d7aae6f0c56ffd65bd08b3"
+    }
+  },
+  "acquisition_manifest": {
+    "path": "/srv/world-reward-data/openimages_holds_fresh128_input_qualification_v1/manifest.json",
+    "identity": {
+      "bytes": 135808,
+      "sha256": "6f8c289cde355e173a10243c22ab6a038740f5d88159244a5d9262dd917a1646"
+    }
+  },
+  "references": [
+    {
+      "file": "boxes.csv",
+      "url": "https://storage.googleapis.com/openimages/v5/test-annotations-bbox.csv",
+      "maximum_bytes": 268435456
+    },
+    {
+      "file": "relations.csv",
+      "url": "https://storage.googleapis.com/openimages/v6/oidv6-test-annotations-vrd.csv",
+      "maximum_bytes": 16777216,
+      "identity": {
+        "bytes": 9308608,
+        "sha256": "418a1e22a6da1fd2fdcffb53cb92fdc796cc41d7ca0c3311cfd298f1639c9ef6"
+      }
+    },
+    {
+      "file": "triplets.csv",
+      "url": "https://storage.googleapis.com/openimages/v6/oidv6-relationship-triplets.csv",
+      "maximum_bytes": 65536,
+      "identity": {
+        "bytes": 37869,
+        "sha256": "c53e939aef2b72512026ab2d944b9356481c08e647a4086f00b17237d558d38e"
+      }
+    }
+  ],
+  "original_acquisition_manifest": {
+    "path": "/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1/manifest.json",
+    "identity": {
+      "bytes": 127742,
+      "sha256": "58b15ab040f2400bbc1aa67ea32f8c75155eecb79c771d7b4735d5157b9ec793"
+    }
+  }
+}

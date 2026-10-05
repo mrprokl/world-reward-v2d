@@ -10301,3 +10301,22 @@ Reproduction: infra/openimages_fresh128_input_qualify.py, Azure original
 RO files only, Pillow headers not decoded pixels, no network/GPU/model.
 Freshv3 full61 forwards uses unchanged model/native ranking/statistical gates;
 both old technicalFAILs are preserved, not silently resumed/relabelled.
+
+1dc58f7 actual fresh128 v3 full61-image native batch COMPLETE PASS67.789133s:
+one strict1796-key weights_only model load,61 original-image forwards and328
+native H→O pairs. All128slots retained,67missing; empty native roles remain
+valid outputs. Host3045B/
+8172195c631d0576de2a215652f0c0d6d70f73942af78633c2b60782ab017740;
+native3624B/f07b74597e0be296b3ebbd052bb35c6f777408b4158a0540b51a98760f3ff96b;
+complete61-output sidecar27073B/
+6ff65286338b84e2acf50139108ebe75d851d7dff8d7aae6f0c56ffd65bd08b3.
+Source/input/image posthash and owned-container/overlay cleanup pass, GPU idle.
+No private reference geometry or scientific quality/adoption yet. Freeze CPU
+evaluator before any reference fetch: config2146B/
+61ec7c1cb6c7f2c0375dfc584cc5dd07da066069abdc88058e9cb62c3d10066d,
+bind original+qualified128metadata and every complete predicted slot exactly.
+Offline4CPU/4GiB child,600s total/300s child/60s cleanup. Parent/source/NPZ
+RO, no RGB/model/GPU; official external references only after all prediction
+pins authenticate. Exact-case vocabulary/IoU binding/all-slot safety/sign-test
+remain preregistered. 339combined tiny tests PASS0.44s; independent read-only
+audit verifies child mounts/runtime/full source dependency closure.
