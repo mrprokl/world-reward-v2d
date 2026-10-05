@@ -27,7 +27,7 @@ ROOT = Path('/srv/scenesmith/world-reward')
 DATA = Path('/srv/world-reward-data/hoi_detr_v1')
 ENTRY = 'run_hoi_detr_model_qualify'
 PROTOCOL = 'configs/hoi_detr_model_qualify_v1.json'
-PROTOCOL_PIN = dict(bytes=3701, sha256='a8bfea4ac4a0e97b516244ca1c420cc4991fc8b37ddbdb108e7bae7fcb2d5436')
+PROTOCOL_PIN = dict(bytes=4546, sha256='6ad5f2ff37956e7cad4e0a1c26b0c5b92437cbb3337f30819485dfc73f6301df')
 HELPERS = ('infra/hoi_detr_model_qualify.py', 'infra/run_hoi_detr_model_qualify.sh', PROTOCOL,
            'infra/hoi_detr_runtime_verify.py', 'infra/hoi_detr_acquire.py',
            'infra/mediapipe_cpu_runtime_verify.py', 'infra/mediapipe_hands_acquire.py',
@@ -65,19 +65,23 @@ def source(rt, code, revision):
 
 def protocol(rt, code):
     p = rt.pinned(code/PROTOCOL, PROTOCOL_PIN, 16 << 10)
-    require(p['schema'] == 'world_reward.hoi_detr_model_qualification.v2' and p['scope'] == 'one_procedural_RGB_full_native_model_runtime_only'
-            and p['root'] == str(ROOT) and p['output'] == 'results/hoi-detr-model-qualify-v2'
+    require(p['schema'] == 'world_reward.hoi_detr_model_qualification.v3' and p['scope'] == 'one_procedural_RGB_full_native_model_runtime_only'
+            and p['root'] == str(ROOT) and p['output'] == 'results/hoi-detr-model-qualify-v3'
             and (p['budget_seconds'], p['cleanup_grace_seconds'], p['outer_seconds']) == (1800, 60, 1860)
             and (p['cpu_cpus'], p['cpu_memory'], p['gpu_cpus'], p['gpu_memory']) == (4, '16g', 4, '64g')
             and p['amp'] is False and p['tf32'] is False and p['seed'] == 0 and all(p[k] is False for k in FLAGS), 'Frozen one-forward scope required')
     require(p['runtime']['path'] == 'results/hoi-detr-runtime-v4/report.json' and p['runtime']['unresolved_pin_is_fail_before_checkpoint_decode'] is True,
             'Independent native operator qualification required')
+    require(len(p['import_wheels']) == 1 and p['import_wheels'][0]['name'] == 'terminaltables'
+            and p['import_wheels'][0]['version'] == '3.1.10' and p['import_wheels'][0]['bytes'] == 15155
+            and p['import_wheels'][0]['publication_date'] <= '2026-09-30', 'Minimal pre-cutoff import wheel required')
     return p
 
 
 MODEL_REQUIREMENTS = frozenset({
     'Actual independently pinned MMCV PASS is not yet available',
     'Readonly full overlay inventory changed',
+    'CPU original import/config closure required',
     'Complete original native operator PASS required',
     'Offline original FairScale wheel build failed',
     'Offline wheel install/source preservation failed',
@@ -285,12 +289,29 @@ def cpu_overlay(code, revision, p, proof_pin):
         runtime.check(deadline); result = subprocess.run(args, env=env, timeout=max(.01, deadline-time.monotonic()), check=False); require(result.returncode == 0, 'Offline original FairScale wheel build failed')
     wheel = list(wheels.glob('*.whl')); require(len(wheel) == 1 and wheel[0].name == 'fairscale-0.4.13-py3-none-any.whl', 'One pure original FairScale wheel required')
     notices = runtime.wheel_notice(wheel[0], p['fairscale'], (root/'FairScale.LICENSE').read_bytes())
-    result = subprocess.run([sys.executable, '-I', '-B', '-m', 'pip', '--isolated', 'install', '--no-index', '--no-deps', '--no-cache-dir', '--no-compile', '--target', str(site), str(wheel[0])], env=env, timeout=max(.01, deadline-time.monotonic()), check=False)
+    extra_wheels = []
+    for row in p['import_wheels']:
+        exact(rt, root/row['file'], row_pin(row), 1 << 20); exact(rt, root/row['publisher_license']['file'], row_pin(row['publisher_license']), 64 << 10)
+        notices[row['name']] = runtime.wheel_notice(root/row['file'], row, (root/row['publisher_license']['file']).read_bytes())
+        extra_wheels.append(str(root/row['file']))
+    result = subprocess.run([sys.executable, '-I', '-B', '-m', 'pip', '--isolated', 'install', '--no-index', '--no-deps', '--no-cache-dir', '--no-compile', '--target', str(site), str(wheel[0]), *extra_wheels], env=env, timeout=max(.01, deadline-time.monotonic()), check=False)
     require(result.returncode == 0 and all(rt.identity(source_dir/r['file'], 16 << 20, empty=r['bytes'] == 0) == row_pin(r) for r in before), 'Offline wheel install/source preservation failed')
     require(not any(f.suffix in ('.so', '.pyd', '.dll') for f in site.rglob('*')) and not torch.cuda.is_initialized(), 'FairScale CPU-only pure overlay required')
     seal_tree(site); seal_tree(wheels)
+    # Qualify the full import/config closure on CPU BEFORE acquiring the GPU.
+    # Original source/registries are used; no model, datasets or weights built.
+    mmcv_root = Path('/opt/world-reward-hoi-mmcv')
+    sys.path[:0] = [str(site), str(mmcv_root/'site'), str(mmcv_root/'source'), str(root/'source')]
+    import importlib
+    for name in ('fairscale.nn.checkpoint', 'mmdet.models.builder', 'projects.models', 'mmdet.datasets.pipelines'):
+        importlib.import_module(name)
+    from mmcv import Config
+    cfg = Config.fromfile(str(root/'source'/p['native_config']['path']), import_custom_modules=False)
+    configuration_policy(cfg._cfg_dict, p['native_config'])
+    require(not torch.cuda.is_initialized() and not any(n == 'mmdet.apis' or n.startswith('mmdet.apis.') for n in sys.modules)
+            and not any(x.startswith(('/gpfs', '/lus')) for x in sys.path), 'CPU original import/config closure required')
     rt.write(out/'overlay_site.json', (json.dumps(dict(artifacts=inventory(rt, site)), sort_keys=True)+'\n').encode(), 0o444)
-    value = dict(stage='hoi_detr_fairscale_overlay', status='pass', source_binding=proof['source_binding'], versions=versions, site_manifest_identity=rt.identity(out/'overlay_site.json', 256 << 10), wheel=rt.identity(wheel[0], 16 << 20), notices=notices, cuda_initialized=False, base_installed=False)
+    value = dict(stage='hoi_detr_fairscale_overlay', status='pass', source_binding=proof['source_binding'], versions=versions, site_manifest_identity=rt.identity(out/'overlay_site.json', 256 << 10), wheel=rt.identity(wheel[0], 16 << 20), notices=notices, cuda_initialized=False, base_installed=False, full_import_closure_qualified=True)
     acq.write_receipt(out/'overlay.json', value, proof['started_monotonic'], deadline)
     require(value['status'] == 'pass', 'CPU overlay receipt late/failure')
 
@@ -304,7 +325,7 @@ def gpu_model(code, revision, p, proof_pin):
     sys.path[:0] = [str(root/'site'), str(mmcv_root/'site'), str(mmcv_root/'source'), str(root/'source'), str(code/'src')]
     torch, np, versions = runtime.versions(proof['runtime']['configuration'])
     import importlib.metadata as metadata
-    require({n: metadata.version(n) for n in p['extra_base_distributions']} == p['extra_base_distributions'] and metadata.version('fairscale') == '0.4.13', 'Unchanged original model import dependencies required')
+    require({n: metadata.version(n) for n in p['extra_base_distributions']} == p['extra_base_distributions'] and metadata.version('fairscale') == '0.4.13' and all(metadata.version(r['name']) == r['version'] for r in p['import_wheels']), 'Unchanged original model import dependencies required')
     require(torch.cuda.is_available() and torch.cuda.device_count() == 1 and torch.cuda.get_device_capability() == (9, 0), 'Actual one H100 required')
     torch.manual_seed(p['seed']); torch.cuda.manual_seed_all(p['seed']); torch.backends.cuda.matmul.allow_tf32 = False; torch.backends.cudnn.allow_tf32 = False
     from mmcv import Config
@@ -402,21 +423,26 @@ def run(code, revision, *, opener=None):
         exact(rt, overlay/'FairScale.LICENSE', row_pin(p['fairscale']['publisher_license']), 64 << 10)
         rt.write(out/'FairScale.LICENSE', (overlay/'FairScale.LICENSE').read_bytes(), 0o444)
         report['fairscale_license_identity'] = rt.identity(out/'FairScale.LICENSE', 64 << 10)
-        report['phase'] = 'offline_cpu_overlay'
+        for row in p['import_wheels']:
+            for value in (row['publisher_license'], row): runtime.fetch(mp, acq, overlay, value, deadline, owned, dirs, opener)
+            rt.write(out/row['publisher_license']['file'], (overlay/row['publisher_license']['file']).read_bytes(), 0o444)
+        patch = derive_source(rt, acq, manifest, overlay/'source', p)
+        report['phase'] = 'offline_cpu_overlay' 
         for phase in ('overlay', 'model'):
             if phase == 'model':
-                compiled = rt.strict((out/'overlay.json').read_bytes()); require(compiled['status'] == 'pass' and compiled['source_binding'] == own and compiled['cuda_initialized'] is False and compiled['base_installed'] is False, 'Real pure CPU overlay PASS required')
+                compiled = rt.strict((out/'overlay.json').read_bytes()); require(compiled['status'] == 'pass' and compiled['source_binding'] == own and compiled['cuda_initialized'] is False and compiled['base_installed'] is False and compiled['full_import_closure_qualified'] is True, 'Real pure CPU overlay PASS required')
                 site_manifest = rt.pinned(out/'overlay_site.json', compiled['site_manifest_identity'], 256 << 10); check_inventory(rt, overlay/'site', site_manifest['artifacts'])
                 # Dispose original sdist/build copies before the inference mount;
                 # no unverified build debris shares the executable RO overlay.
-                for f in (overlay/'FairScale.LICENSE', overlay/p['fairscale']['file']):
-                    exact(rt, f, row_pin(p['fairscale']['publisher_license'] if f.name == 'FairScale.LICENSE' else p['fairscale']), 1 << 20); f.unlink()
+                disposable = [p['fairscale']['publisher_license'], p['fairscale'], *[r for w in p['import_wheels'] for r in (w['publisher_license'], w)]]
+                for row in disposable:
+                    f=overlay/row['file']; exact(rt, f, row_pin(row), 1 << 20); f.unlink()
                 for folder in (overlay/'fairscale', overlay/'build', overlay/'wheels'):
                     for f in sorted(folder.rglob('*'), reverse=True):
                         require(not f.is_symlink(), 'Own build debris links rejected')
                         if f.is_dir(): f.chmod(0o700)
                     folder.chmod(0o700); shutil.rmtree(folder)
-                patch = derive_source(rt, acq, manifest, overlay/'source', p); seal_tree(overlay); proof['overlay'] = dict(source=inventory(rt, overlay/'source'), site=site_manifest['artifacts'], patch=patch)
+                seal_tree(overlay); proof['overlay'] = dict(source=inventory(rt, overlay/'source'), site=site_manifest['artifacts'], patch=patch)
                 raw = (json.dumps(proof['overlay'], sort_keys=True)+'\n').encode(); rt.write(out/'overlay_manifest.json', raw, 0o444); report['overlay_manifest_identity'] = rt.identity(out/'overlay_manifest.json', 2 << 20)
                 lock = rt.canonical(ROOT/'jobs/.world-reward-h100.lock'); s = lock.lstat(); require(stat.S_ISREG(s.st_mode) and s.st_nlink == 1, 'Existing cooperative GPU lock required')
                 lock_fd = os.open(lock, os.O_RDONLY|os.O_NOFOLLOW); require((os.fstat(lock_fd).st_dev, os.fstat(lock_fd).st_ino) == (s.st_dev, s.st_ino), 'Exact readonly GPU lock inode required'); fcntl.flock(lock_fd, fcntl.LOCK_EX|fcntl.LOCK_NB)

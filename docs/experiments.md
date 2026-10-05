@@ -10155,3 +10155,15 @@ native403B/259939a55d4c23dfb14877bcf6ab12924fd3fb45712d4bf4032bc4e902893b00.
 Owned container/overlay cleanup and source/input/image posthash pass, GPU idle.
 Native source notice/import closure requires a bounded CPU-only missing-module
 diagnostic before the next repair; full-model/relationship/quality unqualified.
+
+Independent CPU-only import diagnostics with authenticated original FairScale
+source identify terminaltables as the real missing native dependency, imported
+by mmdet/core/evaluation/mean_ap.py. Adding its original pure wheel permits the
+complete mmdet/models/projects/pipelines+Config closure on CPU; no model/GPU/
+checkpoint/dataset instantiated. Terminaltables3.1.10 (2021-12-07) MIT wheel
+15155B/e4fdc4179c9e4aab5f674d80f09d76fa436b96fdc698a8505e0a36bf0804a874;
+original publisher/embedded LICENSE1065B/2e1320fd337db06a3136d0f4101bd62f13249c95c5b581304f35481e979d432a.
+Fresh whole-model v3 adds only that pinned offline overlay and now gates all
+native imports/config on CPU before the GPU lease. Existing numerical source,
+checkpoint, model/config/preprocessing and1800s budget unchanged; oldv2FAIL
+preserved. Temporary diagnostic source downloads removed on Azure.

@@ -333,3 +333,20 @@ def test_inventory_package_and_distinfo_have_one_complete_canonical_order(gate,r
     with pytest.raises(ValueError):gate.check_inventory(rt,root,rows[:-1])
     root.chmod(0o755);p=root/'fairscale/z.py';p.chmod(0o644);p.write_bytes(b'Changed');p.chmod(0o444)
     with pytest.raises(ValueError):gate.check_inventory(rt,root,rows)
+
+
+def test_missing_terminaltables_has_pinned_pure_overlay_not_base_install(p):
+    w=p['import_wheels'][0]
+    assert w['name']=='terminaltables' and w['version']=='3.1.10' and w['bytes']==15155
+    assert w['publication_date']<'2026-09-30' and w['license']=='MIT'
+    assert w['publisher_license']['bytes']==1065
+    assert w['sha256']=='e4fdc4179c9e4aab5f674d80f09d76fa436b96fdc698a8505e0a36bf0804a874'
+
+
+def test_all_native_imports_are_qualified_cpu_before_gpu_lease(gate):
+    source=(REPO/gate.HELPERS[0]).read_text()
+    cpu=source[source.index('def cpu_overlay('):source.index('def gpu_model(')]
+    assert "for name in ('fairscale.nn.checkpoint', 'mmdet.models.builder', 'projects.models', 'mmdet.datasets.pipelines')" in cpu
+    assert 'full_import_closure_qualified=True' in cpu
+    assert 'model = build_detector' not in cpu and 'torch.load' not in cpu
+    assert 'import_custom_modules=False' in cpu
