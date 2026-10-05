@@ -66,3 +66,44 @@ Multiple-positive linear loss is not guaranteed convex; numerical termination an
 fixed fit recipe must be checked. Without any matched positive, a FIT record has
 no defined positive-set loss and cannot be repaired with GT proposals. Preserve
 such records as explicit support failures in evaluation. No OFF training here.
+
+## Frozen scorer comparison — before new inference
+
+Use exactly the same automatic retained P/object proposals in every arm. Queries
+`person.`/`object.` are fixed across records, native GroundingDINO .3/.25 and
+classwise NMS .3/.7 unchanged. No SAM masks are necessary for this component.
+DWPose133 processes ALL retained P crops, no full-image fallback when P=0;
+HOI-DETR supplies all original H→O routes separately. None receives reference
+boxes, creator metadata, split, positive counts or selected task labels. Source,
+preprocessing, checkpoint and precision are pinned before native execution.
+
+Primary is image-balanced joint annotated-holds-pair top-choice retrieval on all
+32TEST slots, matching BOTH automatic endpoints only after scores freeze.
+Exact duplicate P/O coordinate tuples count once; their upstream pooled score
+must be identical. Exact top ties receive fraction of unique top tuples matching
+a known positive. Unknown winner, empty proposal bank, abstention, inaccessible
+RGB or unscorable reference contributes0, not an asserted false relation. Report
+proposal/localization support and resolved/unresolved positives separately.
+Class-agnostic endpoint matching considers all original reference boxes, including
+hierarchy/group overlap; ambiguous matches are explicit misses, not relabeled.
+
+A: geometric automatic P→O ranking, lexicographic outside-object-center distance
+and then center-center distance, normalized by original person-box diagonal.
+This mirrors the old automatic actor affinity but scores ALL P×O competitors,
+without first restricting to the top-scored object. It is not an anatomical
+owner classifier. B: a small grouped linear learned scorer over immutable base
+and optional HOI/anatomy features with numerical-availability indicators; its
+exact pooling/features/fit recipe must be committed before FIT inputs open.
+Do not change the baseline after seeing its outcomes. No TEST tuning, per-image
+thresholds, reference crops, missing-positive GT proposal injection or human
+challenge labels. Fulltuple/LEFT/RIGHT/OFF remain outside this experiment.
+
+After B is frozen on24FIT and8DECISION, open32TEST once. Require >=6 acquired
+TEST images with at least one jointly localized annotated positive, strict
+positive mean paired B−A across ALL32slots, and a one-sided exact paired sign
+test p<=.05 on nonzero image deltas. Ties stay in the mean/denominator but carry
+no directional vote. Insufficient support=>INCONCLUSIVE_CLOSED; non-superiority
+or mean regression=>REJECT. No widening/resampling/test switching on a closed
+cohort. A positive outcome is promising only for observed static relation
+retrieval and still needs explicit ownership/task/temporal3D non-regression
+before any Track1 adoption.

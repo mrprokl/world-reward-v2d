@@ -11053,3 +11053,9 @@ accessibility: this variant can remain a selected failed-rights slot; creator
 requests still require strict original `/photos/` HTTPS and no redirects.
 No alias request/fallback or substitution introduced.65focusedtestsPASS.
 Both preflightfailures occurred before sample freeze or any original-image read.
+
+Latest targeted contracts301PASS6.28s with unique owned basetemp. Scorer comparison
+A automatic fullP×Ogeometry vs futureB learned anatomy/HOI is preregistered before
+new inference; same proposal bank, all32TEST slots, no reference-assisted hand
+assignment, explicitpositive-only limits. Actual64RGB acquisition e2b6019 and
+new20CPUprepare e2b6019 dispatch-only pending; no final native success inferred.
