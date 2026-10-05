@@ -1,0 +1,92 @@
+{
+  "archive_bytes": 151911114,
+  "azure_audit": {
+    "bytes": 39107,
+    "elapsed_seconds": 6.777012639970053,
+    "path": "/srv/scenesmith/world-reward/results/audits/mmhoi_supplement_schema_pypdf_20261005T194740.json",
+    "range_bytes": 8709466,
+    "sha256": "cc2ac1222255cda3c96116da3e97405be45a2a9db40411f985d3d73bde62d227",
+    "status": "pass"
+  },
+  "closed_previous_preflight": {
+    "bytes": 537,
+    "path": "/srv/scenesmith/world-reward/results/audits/mmhoi_supplement_schema_20261005T191617.json",
+    "reason": "Existing PDF text tool required",
+    "sha256": "b705f6d06a6bfaa17f842945e87748f0eea7f787ac1693f4075d8bd41b3796ab",
+    "status": "fail",
+    "upstream_probe_exception_not_identified": true
+  },
+  "findings": [
+    {
+      "claim": "Each human-object action annotation independently verified by at least two annotators.",
+      "source": "Supplement section1 Action Annotation"
+    },
+    {
+      "claim": "Figure3 caption refers to choosing the action verb number; this is not a body-part CSV index dictionary.",
+      "source": "Supplement Figure3"
+    },
+    {
+      "claim": "Figure2(e) illustrates14 predefined body parts; no verified numerical index-to-name dictionary recovered from textual content. Drawing arrangement is not interpreted as CSV numbering.",
+      "source": "Supplement Figure2"
+    },
+    {
+      "claim": "Examples contain both no-interaction/bat/none and move-together/stool/none. Therefore none cannot generally be treated as no action. This does not establish final CSV sentinel grammar.",
+      "source": "Supplement qualitative GT Action and Interactive Body Part text"
+    },
+    {
+      "claim": "Contact-body-part evaluation measures whole interaction-set geometric misalignment against GT meshes. It does not define final CSV none/-/YES semantics.",
+      "source": "Supplement evaluation paragraph"
+    },
+    {
+      "claim": "No literal XYXY, XYWH, bbox or YES in extracted text. Bounding-box mentions concern L-SAM/CAD method, not CSV coordinate order.",
+      "source": "Supplement literal text checks"
+    },
+    {
+      "claim": "Publisher README documents RGB prefixes0-3 and bbox_0-3.csv as bounding boxes plus3D coordinates, but not coordinate order or action.csv camera association.",
+      "source": "MMHOI archive README lines98-111"
+    }
+  ],
+  "pdf": {
+    "bytes": 10218910,
+    "compressed_bytes": 8643843,
+    "member": "00485_supp/00485_supp.pdf",
+    "pages": 7,
+    "sha256": "2a3a2d3480cfcb3b9e40509fd13ec3e032a983a4047c62e4e6c6bb1551f2ffef"
+  },
+  "policy": {
+    "dataset_annotations_read": false,
+    "gpu_used": false,
+    "models_loaded": false,
+    "numeric_body_mapping_inferred_from_drawing": false,
+    "old_failure_unchanged": true,
+    "owned_scratch_removed": true,
+    "pdf_transferred_local": false,
+    "video_downloaded": false
+  },
+  "proposed_scope_without_dictionary": "Person-object action-positive supervision only after separately validating parser/endpoints; no hand-side, physical-contact or ambiguous-cell negative claims.",
+  "reader": {
+    "global_install": false,
+    "license": "BSD-3-Clause",
+    "license_bytes": 1605,
+    "license_sha256": "a97ac230e5f33ef10a5367a850eb01f91f1a0b064e34742c7794d2294557f524",
+    "name": "pypdf",
+    "version": "3.17.4",
+    "wheel_bytes": 278159,
+    "wheel_files_record_verified": 48,
+    "wheel_sha256": "6aa0f61b33779b64486de3f42835d3668badd48dac4a536aeb87da187a5eacd2"
+  },
+  "readme": {
+    "bytes": 6876,
+    "sha256": "30db4e21175441b0a0cdd76d5391b7ff8004ede5851aee7caf5b38bbaee278a5"
+  },
+  "schema": "world_reward.mmhoi_primary_schema_findings.v1",
+  "source_url": "https://openaccess.thecvf.com/content/WACV2026/supplemental/Kogashi_MMHOI_Modeling_Complex_WACV_2026_supplemental.zip",
+  "status": "primary_supplement_read_complete_schema_unresolved",
+  "unresolved": [
+    "14 numerical body-part IDs with anatomical names and person-relative sides",
+    "none vs dash vs YES semantics for each matrix-cell type",
+    "action.csv person/object box coordinate order, units and view",
+    "camera0 original-frame and action-row synchronization",
+    "whether absent cells/no-interaction rows define exhaustive negatives"
+  ]
+}

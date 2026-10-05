@@ -157,3 +157,49 @@ indices or sentinels. Published temporal chunks share scenarios and must not be
 mistaken for subject/session-disjoint validation. A positive person–object action
 study is distinct from hand-side/contact evaluation. Supplement PDF still unread;
 no numerical mapping or OFF label is inferred from an ambiguous sentinel.
+
+## Actual complete metadata census and primary supplement
+
+Inventory-v3 **PASS71.959755s**, producer605362944d57ac9bf919c81941263029797c064f,
+receipt7666B/SHA4c07b50119758c460b36794b8295ffbae2e2de8f751aaf82758c4eb78b05711b.
+Independent saved-only audit **PASS30.556423s** authenticates283Gitfiles/XZ6,
+288source entries, all five output pins before/after, all782,626 independently
+parsed central rows and22exact range proofs. Central153,100,982B and total
+153,101,080Range bytes stay on Azure; no member payload/CSV/RGB/calibration/mesh
+or model read. v1/v2 failures unchanged. Audit2983B/SHA
+e6e7e0b9b19c973ca77c354305f96772f16cd15c9ef078f2b8b6f556e4bdcdf4.
+
+Names alone expose150scenario/session paths,8,070camera0 JPEGs,8,071action and
+bbox0 CSVs,6,796final CSVs.6,793path groups co-occur (6,615outside the excluded
+schema-read scenario). Only7,920camera0 filename indices equal their containing
+folder. These mismatches falsify naïve index equality as a universal frame map;
+coexistence and folder counts do not certify synchronization or valid references.
+No cohort is selected and no learner fit/adoption is qualified by this census.
+
+The [actual CVF supplement PDF](https://openaccess.thecvf.com/content/WACV2026/supplemental/Kogashi_MMHOI_Modeling_Complex_WACV_2026_supplemental.zip)
+was separately read **on Azure only**:7pages,10,218,910B/SHA
+2a3a2d3480cfcb3b9e40509fd13ec3e032a983a4047c62e4e6c6bb1551f2ffef,
+6.777013s;8,709,466Range bytes, no video. Disposable BSD3pypdf3.17.4 wheel
+278,159B was publisher-SHA/RECORD verified, no global install, scratch removed.
+The earlier missing-tool preflight remains closed. Concise primary findings are
+in `results/audits/mmhoi_primary_schema_findings_20261005.json`.
+
+Actions for each human–object pair are checked by at least two annotators.
+Figure3 numbers **verbs**, not body indices. Figure2(e) illustrates14parts but
+does not establish the numeric CSV dictionary. Qualitative examples include
+both no-interaction/bat/none and move-together/stool/none; `none` does not mean
+absence of action, nor establish the matrix sentinel grammar. No literal XYXY,
+XYWH, bbox or YES was recovered in its text. Anatomical mapping, sentinels,
+coordinate order/view and reference synchronization remain unresolved. Stop
+anatomical/contact fitting; do not pretend a missing schema is solved by GPU.
+
+A subsequent SHA-bound **filename-only** projection finds no Python/code/schema
+dictionary in the archive (one already-read README, two TXT, one INI, shortcuts
+and an empty ZIP). Do not execute shortcuts/nested archives. One TXT's descriptive
+filename itself contains an annotator's scene-specific contact note. Therefore
+also exclude the whole scenario
+`MMHOI/sequences/20240418_personB_personC_noC1andC2_all_30_skip_start-end/20240418__C_10__30skip/`
+from any prospective FIT/CAL/RESERVED population. This new read-history exclusion
+does not modify the closed metadata inventory or invent a label from that note.
+No member contents were read; PERSON parameter JSONs are not a schema substitute
+and must not be supplied as Track1 predictor inputs.

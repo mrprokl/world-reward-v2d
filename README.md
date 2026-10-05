@@ -17,6 +17,15 @@ mask/mesh agreement cannot certify semantic identity. Prioritize a genuinely
 automatic multi-instance observation bank and external persistent-ID validation,
 not manual episode reassignment or another downstream fit of the wrong pair.
 
+**Current research:** CARI4D's concept-mask union and 4DAnyone's largest summed
+track-area selection do not resolve ownership. The new coherent-route core
+preserves every person/side/object and combines one native relation before
+reduction;199 tiny controls pass, but no selector has been fitted or adopted.
+MMHOI's complete Azure-only metadata census passes an independent audit; its
+supplement still does not qualify anatomical indices, sentinels or RGB alignment.
+See [next ownership decision](docs/ownership_next_decision.md). No manual labels
+or episode-specific rescue are used.
+
 - **Actual automatic observation bank:** two external HO-Cap clips retain all
   1493 original RGB frames and all287 native class-agnostic AMG proposals at ten
   fixed anchors, yielding3133 automatic point queries. Execution/source/cleanup
@@ -63,8 +72,8 @@ not manual episode reassignment or another downstream fit of the wrong pair.
   forward,301-update refinement and directexport pass independent source/full-
   bundle audits; original official packing also passes its independent audit.
 - **Engineering:** all30 original videos pass byte/metadata readiness. Episodes
-  **0,1,2,3,5,6,8,9,12,13,14,15,21,26** pass full native shared preparation, forward,301-update
-  refinement, direct export and original official packing. These are fourteen
+  **0,1,2,3,5,6,8,9,12,13,14,15,16,17,19,21,26** pass full native shared preparation, forward,301-update
+  refinement, direct export and original official packing. These are seventeen
   complete engineering checks, not held-out accuracy; scratch Parquets deleted.
   EP0's legacy conversion failure stays separate. EP4 missing masks, EP7 empty
   anchor, EP9's original topology-budget failure and EP10/EP11 actor identity failures remain closed.
@@ -82,10 +91,10 @@ not manual episode reassignment or another downstream fit of the wrong pair.
   independently audited chain; its earlier host preparation failure stays separate.
 - **Coverage continuation:** the existing qualified open-surface route passes
   independently audited CPU proposals for EP16,17,19,20; EP18's nonmanifold
-  source remains CLOSED FAIL. EP16's full360-frame fixed-shape pose passes in
-  2443.18s; its separate CPU input assembly and remaining native chain are not
-  yet certified. EP17 pose is live; EP19/20 are independently pinned consumers.
-  Original topology failures remain separate. Complete coverage remains14/30,
+  source remains CLOSED FAIL. EP16,17,19 now pass the complete independently
+  audited native chain and official packing; EP20's proposal does not qualify
+  its remaining chain. Original topology failures remain separate. Complete
+  engineering coverage is17/30,
   not an accuracy result. Lightweight QA openly shows EP8/9 wrong background
   identity; engineering packing success does not resolve that scientific defect.
 - **Temporal research:** MASA's isolated author-runtime build passes independent
