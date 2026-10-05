@@ -9951,3 +9951,13 @@ and actual cleanup before private evaluation; no GPU rerun or label access.
 ba50330 implements the frozen evaluator,193 combined tiny tests PASS1.14s.
 Its original host-PASS gate still blocks this failed lifecycle; no semantic
 scores, external quality qualification or CARI4D superiority are inferred.
+
+d97f1e7 saved-only CPU audit v1 CLOSED preflight FAIL before creating any
+output or container: it assumed a0555 source-envelope parent, whereas the
+authenticated Azure publisher uses0755 (code directories0555, markers0444).
+Independent readonly source diagnostic identifies that exact assertion;47B
+terminal log and FAILED unit remain unchanged. Minimal compatibility accepts
+only0555/0755 envelopes with the same exact three entries and full readonly
+code/marker authentication.71 tiny saved-audit/tracker tests PASS0.68s, including
+real transport modes and0777 rejection. No original artifact chmod, GPU rerun,
+private-reference access, scientific-policy change or audit success inferred.

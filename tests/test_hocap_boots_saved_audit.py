@@ -84,6 +84,20 @@ def test_byte_pins_original_cid_and_protocol_are_exact():
     assert m.BUDGET==120 and m.GRACE==60
 
 
+@pytest.mark.parametrize('mode,accepted',[(0o555,True),(0o755,True),(0o777,False),(0o700,False)])
+def test_actual_transport_source_envelope_not_assumed_readonly(tmp_path,mode,accepted):
+    folder=tmp_path/'snapshot';folder.mkdir()
+    (folder/'code').mkdir(mode=0o555)
+    artifact(folder/'revision',b'a'*40+b'\n')
+    artifact(folder/'source-sha256',b'b'*64+b'\n')
+    folder.chmod(mode)
+    try:
+        if accepted:m.snapshot_parent(folder)
+        else:
+            with pytest.raises(ValueError,match='published source-only'):m.snapshot_parent(folder)
+    finally:folder.chmod(0o755)
+
+
 @pytest.mark.parametrize('stdout,stderr,rc,accepted',[
     (b'\n',b'error: no such object: CID\n',1,True),
     (b'',b'Error: No such container: CID\n',1,True),

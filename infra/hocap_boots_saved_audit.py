@@ -51,8 +51,11 @@ def source(code,revision):
 
 def snapshot_parent(path):
     rt.canonical(path)
-    require(stat.S_IMODE(path.stat().st_mode)==0o555 and {n.name for n in path.iterdir()}=={'code','revision','source-sha256'},
-            'Exact readonly source-only snapshot parent required')
+    # azure_job publishes the source-only envelope as0755. The code tree and
+    # both dispatch markers remain independently readonly/authenticated below.
+    require(stat.S_IMODE(path.stat().st_mode) in (0o555,0o755)
+            and {n.name for n in path.iterdir()}=={'code','revision','source-sha256'},
+            'Exact published source-only snapshot parent required')
 
 
 def saved_inputs(code,deadline):
