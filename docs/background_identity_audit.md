@@ -186,3 +186,18 @@ execution, anatomical correctness or external accuracy comparison follows.
 A separate bounded Azure CPU preview will display all six already frozen banks,
 not choose a target or infer labels from human QA. Colors are frame-local slots,
 not stable temporal IDs.
+
+### Fail-fast boundary for appearance tooling
+
+The full original SM90 extension now passes actual embedded-architecture and
+DCNv2/RoIAlign controls; the separately frozen model run fails secure checkpoint
+decoding. Static inspection finds training/NumPy/MMEngine objects in its pickle,
+not a verified weights-only model. Do not weaken loading security or treat this
+as ownership progress. A state-only publisher artifact is preferable. Any
+original-weight extraction would require a new explicit, restricted symbolic
+protocol, byte-identical storage/alias/stride and benign module-version metadata
+preservation plus malicious fixtures. A general pickle VM is not a priority
+framework component. If this cannot stay bounded and maintainable, defer MASA
+and use already-qualified automatic instance/memory observations rather than
+spend further research on unrelated infrastructure. Ownership remains the
+primary hypothesis and needs an independently labeled legal external cohort.
