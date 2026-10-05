@@ -9349,3 +9349,12 @@ realGLB POSITIONF32 promotion/nativeTrimesh operandorder, reportcanonicalcounts
 (including orphan=v0), fullT and pre-reservation report ancestry; corrected
 before any nativecontrol. Agentprofile918PASS2SKIP, finalpreparemount184PASS;
 these overlap unitcoverage and are not added as independent scientificevidence.
+
+Actual surfaceconsumerb780ebf hostpreflightFAIL before namespace/container/
+geometry/model/GPU. Original pinned oldHOSTFAIL7112B has native_report=null:
+historicalsealfailedCIDmodebeforeparsingnativeJSON, but separate native_identity
+is retained. Consumer had incorrectlyrequiredembedded18039Bnativeequal. Original
+bytes/status/sourceproof unchanged, independentreadonlyproofconfirms allsource
+keys exact. Log1591B SHAe4f7186fa1afb10cd09931ff324b7d5d7cef9a6ad6c0b5ab90dc4ed9b057f3ea.
+Technical-only correction authenticates actualnull+native_identity+separatepins;
+freshrevision/unit required, no numericalgates/recipe/sourcequalificationchange.

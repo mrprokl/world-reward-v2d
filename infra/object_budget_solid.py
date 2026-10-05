@@ -502,7 +502,10 @@ def surface_qualification(code, rt, q):
     native = rt.pinned(out/'native.json', pins['native'], 2<<20)
     host = rt.pinned(out/'report.json', pins['historical_host_report'], 2<<20)
     q.validate_native(native, old['native'], rev)
-    require(host['status'] == 'fail' and host['native_report'] == native and host['source_proof'] == old,
+    # Historical CID-mode cleanup failed before seal() read the native JSON.
+    # Authenticate its separate native_identity; do not invent an embedded PASS.
+    require(host['status'] == 'fail' and host['native_report'] is None
+        and host['native_identity'] == pins['native'] and host['source_proof'] == old,
         'Original outer failure must remain failed and unchanged')
     audit = rt.pinned(ROOT/pins['independent_audit_path'], pins['independent_audit_report'], 16<<10)
     q.equal(audit, dict(stage='world_reward.surface_qslim_independent_receipt_audit.v1', status='pass', producer_revision=rev,

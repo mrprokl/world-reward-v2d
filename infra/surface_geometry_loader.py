@@ -173,7 +173,8 @@ def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha
         and qualification['build']['source_cpp'] == b['source_cpp'] and qualification['phase1']['native'] == first['native'] == before[names['phase1_native']],
         'Independent existing qualification lineages differ')
     oldhost,oldnative,audit=records['qualification_host'],records['qualification_native'],records['qualification_audit']
-    require(oldhost['status'] == 'fail' and oldhost['native_report'] == oldnative and oldnative['status'] == 'pass'
+    require(oldhost['status'] == 'fail' and oldhost['native_report'] is None
+        and oldhost['native_identity'] == before[names['qualification_native']] and oldnative['status'] == 'pass'
         and oldnative['phase'] == 'complete' and oldnative['producer_revision'] == q['producer_revision']
         and oldhost['source_proof'] == qualification['original_source_proof']
         and oldnative['source_proof']==qualification['original_source_proof']['native'], 'Original HOSTFAIL may not be relabelled')

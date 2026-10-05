@@ -217,7 +217,7 @@ def receipt_fixture(tmp_path,monkeypatch):
     oldproof={'native':{'source_binding':qs}}
     oldnative=dict(status='pass',phase='complete',producer_revision=qrev,source_proof=oldproof['native'])
     oldpin=seal('qualification_native',oldnative)
-    oldhost=dict(status='fail',native_report=oldnative,source_proof=oldproof)
+    oldhost=dict(status='fail',native_report=None,native_identity=oldpin,source_proof=oldproof)
     oldhostpin=seal('qualification_host',oldhost)
     audit=dict(stage='world_reward.surface_qslim_independent_receipt_audit.v1',status='pass',producer_revision=qrev,
         original_host_status='fail',original_native_status='pass',original_host_receipt_unchanged=True,
@@ -269,6 +269,9 @@ def test_full_manufactured_receipt_authentication_and_three_complete_snapshots(t
     root,code,pins,e,s,osh,ash,names=receipt_fixture(tmp_path,monkeypatch)
     host,native,ledger,returned=loader.verify_pinned_artifacts(root,pins,e,'d'*64,osh,ash,s)
     assert returned==names and host['native']==native
+    oldhost=loader.strict_json((root/names['qualification_host']).read_bytes())
+    assert oldhost['status']=='fail' and oldhost['native_report'] is None
+    assert oldhost['native_identity']==pins['files'][names['qualification_native']]
     assert len([p for p in ledger if p.name=='source-sha256'])==3
 
 

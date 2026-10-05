@@ -23,7 +23,8 @@ inferred automatically; no hand-labeling of challenge records.
   The [surface consumer seam](docs/surface_consumer_protocol.md) now connects
   the same CPU proposal, inert geometry reader, ICP/Viterbi and shared-stage
   profile without changing pose weights. Its fresh96-frame native operator
-  control is frozen but not yet executed; tiny tests are not native qualification.
+  control stops in historical-receipt preflight before any native geometry;
+  its technical reader fix preserves the old failure and all numerical gates.
   EP21 real native point qualification stops before optimization (<8 queries);
   no replay, positive-weight fit or accuracy gain. EP09 full415 preparation,
   forward,301-update refinement and directexport pass independent source/full-

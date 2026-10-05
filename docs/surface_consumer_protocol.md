@@ -39,3 +39,14 @@ geometry removed on Azure. Whole failure closes the control without tuning its
 recipe or numerical gates. Only after an actual PASS may a distinct untouched
 episode exercise the representation; that remains engineering, not a verified
 gain over CARI4D or authorization to revisit old failed cohorts.
+
+## First actual preflight
+
+Producer `b780ebf737ef386fd223a92b19dfeef768012303` fails before reserving an
+output or running a container: it incorrectly requires the original failed
+host to embed its native report. That old sealing path stopped at CID mode
+before parsing native JSON, leaving `native_report=null`, with the separate
+native byte identity intact. Read-only diagnosis proves all source-proof keys
+and original receipt pins unchanged. The technical reader correction checks
+the actual null, separate native identity/pins and independent audit; no
+qualification failure is relabeled, nor any recipe or geometry criterion changed.
