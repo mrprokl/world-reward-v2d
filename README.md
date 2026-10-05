@@ -10,6 +10,13 @@ inferred automatically; no hand-labeling of challenge records.
 
 **No final Parquet, submission or verified CARI4D improvement yet.**
 
+**Visual QA changes the priority:** EP9 selects a background person/object at
+automatic initialization. Its complete engineering PASS is not a correct
+interaction. A read-only census of all14 exports/42 fixed views is complete;
+mask/mesh agreement cannot certify semantic identity. Prioritize a genuinely
+automatic multi-instance observation bank and external persistent-ID validation,
+not manual episode reassignment or another downstream fit of the wrong pair.
+
 - **New generic operators:** [surface identity/LOD](docs/surface_lod_protocol.md)
   separates lawful open surfaces from our optional closed-solid backend; no
   historical failure is relabeled. Under-budget identity and

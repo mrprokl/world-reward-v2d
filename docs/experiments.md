@@ -9844,3 +9844,46 @@ only scalar num_frames public. All41 acquisition tiny tests PASS; real source/
 download/layout/decoder/reference continuity remain to qualify independently.
 No full-body/contact/active-target truth is claimed. It can validate persistent
 object/hand pose, not invent semantic target labels from nearest private wrists.
+
+Actual a70e4e6 read-only diagnostic PASS109.636s: all14 committed exports,
+42 first/middle/last views,266 authenticated source files. Report175281B/
+408b768cd4645360d764adce482606e90f7912a1e600c78bd67bf8d75855b92f.
+Raw human-v-automatic-mask IoU range0.637830–0.920223; visible object-v-mask
+0.046154–0.928571. These are320x240 video-only self-consistency diagnostics,
+not 3D accuracy, semantic labels, calibrated gates or CARI4D superiority.
+
+Actual a1414f4 whole conditional study CLOSED FAIL16.489s: source-native LBS
+ABI passes, one native decode/two renders, then fixed automatic query gate
+rejects fewer than8 attachments. Native receipt6271B/
+5eabe691f5390226d5a142c19e36abb16c11c42574371fa19648ec28b62acec7.
+Zero trackers/calibration/fits/reserved metrics; query-support diagnostic scalars
+were not retained, so the exact visibility/raycast cause remains unknown.
+DEFER this conditional distribution: no refill, lower gate, scene reroll or
+inference that the point loss failed. Real automatic observation coverage first.
+
+HO-Cap v1 CLOSED network FAIL before ZIP bytes: exact publisher redirect needs
+utdallas.app.box.com. Fresh e561740 v2 downloads all5 archives entirely onAzure,
+then CLOSED inventory FAIL270.647s: labels.zip has583768 entries, beyond the
+prospective250000 cap. Saved report3224B/
+4252b1a131bf36ec4257be0c43d334d562f4685ca974bd14f9ac5e33c10bb86e;
+all5 archives independently rehashed, zero reference values/models decoded.
+New f5cd5e8 saved-only extraction authenticates that FAIL and full archive/source
+pins, freezes exact per-archive central-directory counts, retains every selected
+RGB frame and quarantines raw metadata. No download retry or old FAIL relabel.
+JPEG decoding and private-reference semantics remain separate qualifications.
+
+New d83de68 same-bank point/mask primitive retains full native visibility,
+off-image denominators, mixed seed times and zero-query hypotheses; all global
+optimal matching alternatives/nulls remain explicit.159 integrated tiny tests
+PASS0.30s. These are not video gains. Initial-mask IoU baseline is not temporal
+tracking; hierarchical AMG proposals are not mutually exclusive physical IDs.
+Next native bank keeps all returned class-agnostic AMG masks at five fixed
+anchors, before persistent-point tracking and separately frozen evaluation.
+
+21afdfe pinned TRELLIS acquisition is a separate source/model-only Azure job:
+six publisher-LFS-hashed checkpoints3,006,922,800B, MIT declarations first,
+source Git blobs verified, isolated Apache checker and no full Kaolin import.
+26 tiny tests PASS0.77s; dispatch ACK is not acquisition/runtime/inference PASS.
+Training overlap and complete-stack eligibility remain unknown. New1b722ae
+CPU-only all14 visual overview is bounded240KB, unchanged geometry/camera;
+29 tiny tests PASS0.87s, actual rendering remains to verify independently.
