@@ -1,0 +1,28 @@
+{
+  "schema": "world_reward.openimages_joint_pair_acquire.v1",
+  "census": {
+    "path": "results/openimages-joint-pair-census-v1/report.json",
+    "bytes": 842858,
+    "sha256": "106fbe042343f5ce3462c89245c2e02eaf4dfaabad145782cc4b06caf4df30d7",
+    "producer_revision": "bf47f065c6e076d9a73e5084fe02d9b91cb45d9c"
+  },
+  "output": "/srv/world-reward-data/openimages_joint_pair_acquisition_v1",
+  "selection_namespace": "results/openimages-joint-pair-selection-v1",
+  "hash_namespace": "world_reward.oi_joint_pair_v1/",
+  "slots": 64,
+  "dev": 32,
+  "test": 32,
+  "workers": 4,
+  "request_timeout": 15,
+  "overall": 300,
+  "max_image_bytes": 16777216,
+  "max_creator_page_bytes": 2097152,
+  "max_total_image_bytes": 1073741824,
+  "max_decoded_pixels": 16777216,
+  "no_replacements": true,
+  "challenge_inputs_used": false,
+  "training_overlap_verified": false,
+  "challenge_overlap_verified": false,
+  "quality_verified": false,
+  "adoption": false
+}
