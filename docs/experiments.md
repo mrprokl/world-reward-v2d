@@ -9535,3 +9535,21 @@ Same compatibility fix for future CPUprepare wrapper; runningc1c101a snapshot
 is immutable and never hotpatched. Nativegeometry/algorithm/gates unchanged.
 Root273PASS28.35s includes both exactnewlineabsence cases and daemon/foreign/
 timeout/whitespace negatives. No original failure overwritten or promoted.
+
+Actual corrected8da3e48 direct-MHR PASS native4.710909s/host377B
+461262240942fbb6bea5ce28a630f8ffa6b1438e8ad2285b0822cb1efbf99e7c;
+native7596B/4ae57b7791e9ddffdf3cb3701c4c069074ea2a2813c8c6d216a7e2c036bd287f.
+Independent saved-only fullsource/release/model/CID audit PASS:218entries,
+closurea9105cade38e1c21bd4fd6d35a2ce8d3bdc7ef3a7911805efa7a7dba914e95e9;
+all four sealed metadata files unchanged, no new model/decode/GPU replay.
+Nine original poses, named bilateral elbow/index controls, actual material motion,
+constant scales. No grasp, gradients, optimizer or reconstruction qualification.
+
+Next fail-fast question is representability, not another rendered cohort:
+does SAM affine scale decoder mu68+p28*C28x68 admit the direct zero68 reference?
+Fresh pure affine-span gate uses exact IEEE dyadic rationals modulo one fixed
+prime2147483647; rank_modA=28 and rank_modAug=29 proves exact rational
+nonmembership, every other outcome INCONCLUSIVE (never membershipPASS).
+No rounded subtraction, fit, threshold, prime sweep, source/head/model load.
+Root28tinyPASS0.06s incl subnormals/Fraction crosschecks/singularmodprime/alias;
+authentic stored metadata CPU-only diagnostic required before bridge decision.
