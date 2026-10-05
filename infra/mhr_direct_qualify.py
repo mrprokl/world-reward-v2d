@@ -170,7 +170,7 @@ def inspect_container(cid, name, revision, *, run=subprocess.run):
         return True
     errors=tuple((p+cid).encode()for p in('Error: No such object: ','error: no such object: ',
         'Error: No such container: ','Error response from daemon: No such container: '))
-    if r.returncode==1 and r.stdout in(b'',b'[]\n') and r.stderr.strip(b'\r\n')in errors:return False
+    if r.returncode==1 and r.stdout in(b'',b'\n',b'[]\n') and r.stderr.strip(b'\r\n')in errors:return False
     raise ValueError('Docker error is not owned container absence')
 
 

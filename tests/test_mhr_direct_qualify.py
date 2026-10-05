@@ -95,7 +95,8 @@ def test_oversize_report_cannot_be_a_pass(tmp_path):
     assert (tmp_path/'native.json').read_bytes()==b''
 
 
-@pytest.mark.parametrize('stdout,stderr',[(b'',b'Error: No such object: '),(b'[]\n',b'\nerror: no such object: ')])
+@pytest.mark.parametrize('stdout,stderr',[(b'',b'Error: No such object: '),(b'\n',b'error: no such object: '),
+    (b'[]\n',b'\nerror: no such object: ')])
 def test_docker_exact_absence_separate_streams(stdout,stderr):
     cid='a'*64
     def run(*args,**kwargs):

@@ -224,6 +224,7 @@ case "$SCENARIO" in
  malformed) echo '{}';exit 0;;
  absent) echo "Error: No such object: $2" >&2;exit 1;;
  absent_split) printf '[]\\n';printf '\\nerror: no such object: %s\\n' "$2" >&2;exit 1;;
+ absent_format_newline) printf '\\n';printf 'error: no such object: %s\\n' "$2" >&2;exit 1;;
  absent_context) printf '[]\\n';printf '\\nDaemon unavailable\\nerror: no such object: %s\\n' "$2" >&2;exit 1;;
  absent_stdout) echo "Error: No such object: $2";exit 1;;
  absent_space) printf ' Error: No such object: %s\\n' "$2" >&2;exit 1;;
@@ -246,7 +247,7 @@ echo "$2 /$NAME $IMAGE $REV"
     return dict(call=call, cidfile=cidfile)
 
 
-@pytest.mark.parametrize('scenario', ['absent', 'absent_split', 'live'])
+@pytest.mark.parametrize('scenario', ['absent', 'absent_split', 'absent_format_newline', 'live'])
 def test_cleanup_exact_absence_or_owned_removal(cleanup_case, scenario):
     result, calls = cleanup_case['call'](scenario)
     assert result.returncode == 0, result.stderr

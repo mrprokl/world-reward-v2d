@@ -9521,3 +9521,17 @@ precedes hostPASS; same exclusiveFD demotes late/failed sealing. Root58PASS0.23s
 Actual JIT ABI is independently backed by earlier named54control/native geometry
 receipts and primaryMomentum quaternionxyzw/cm documentation. Those observations
 do not transfer SAM licensing, validate gradients/contact, or qualify futurefits.
+
+Actual94b3997 direct-MHR native component PASS4.712022s/one9batch, but HOSTFAIL
+on exact Dockerabsence parsing. Native7596B/d89b4ba9fc2cb0f367ddafcc8802de37264a32b66e926a129e9a0aa1755640e8;
+host449B/fef999589e3c2b8071c025ae991d6e3fd68340bb16251942464aa7f2b39b2df2;
+source218entries/65b7132d6c3d5d5815ef07c0970fe1fc721756532e1a5ee61bf4660b1d000340.
+Saved-only diagnostic rehashes allsource/release/model/sealedreceipts, no decode;
+actualformatted Docker rc1/stdout single LF/stderr exact no-such-object CID.
+Unformatted rc1/stdout[]/exact no-such-container confirms originalCID absent.
+Retain originalHOSTFAIL. Accept only that additional exact newline stdout form
+with unchanged exactstderr/rc/name/image/label checks; daemon/errors stay rejected.
+Same compatibility fix for future CPUprepare wrapper; runningc1c101a snapshot
+is immutable and never hotpatched. Nativegeometry/algorithm/gates unchanged.
+Root273PASS28.35s includes both exactnewlineabsence cases and daemon/foreign/
+timeout/whitespace negatives. No original failure overwritten or promoted.

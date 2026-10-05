@@ -162,7 +162,7 @@ if result.returncode==0:
 absent=tuple((prefix+cid).encode()for prefix in('Error: No such object: ','error: no such object: ','Error: No such container: ','Error response from daemon: No such container: '))
 # Docker may emit an empty JSON list on stdout and leading empty stderr lines.
 # Strip line separators only, never whitespace or daemon/error context.
-sys.exit(1 if result.returncode==1 and result.stdout in(b'',b'[]\n')and result.stderr.strip(b'\r\n')in absent else 2)
+sys.exit(1 if result.returncode==1 and result.stdout in(b'',b'\n',b'[]\n')and result.stderr.strip(b'\r\n')in absent else 2)
 PYSURFACEINSPECT
  }
  surface_cleanup() {
