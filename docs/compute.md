@@ -44,6 +44,11 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 28 | 366 | Full original initializers pass. First unchanged default fullpose rejects all eight fixed whole/component topology-budget candidates before tracking; empty reserved output, no repair or trajectory. |
 | 29 | 419 | Actual fixed-all16 initializers PASS. First default pose-only under unchanged31ff94d rejects all eight fixed topology-budget candidates before output/trajectory; no repair or parameter rescue. |
 
+Tiny user-facing previews are available for14 frozen reconstructions and the
+closed external retention test (~180KiB total); actual source/middle frames,
+meshes and both positive/negative outcomes are shown. This is visual QA, not
+manual test labeling or a leaderboard-quality certificate. Full media stay Azure.
+
 Fourteen complete packed episodes are engineering/fidelity evidence only. Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
 verified CARI4D superiority exists. Other episodes are not presumed ready.
