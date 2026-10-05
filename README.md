@@ -6,7 +6,7 @@ Track2/3 assets, challenge multiview, hidden meshes/trajectories, source camera
 calibration or sequence-matched FORM-HOI. All masks/identity/geometry must be
 inferred automatically; no hand-labeling of challenge records.
 
-## Status — 2026-10-05
+## Status — 2026-10-06
 
 **No final Parquet, submission or verified CARI4D improvement yet.**
 
@@ -26,8 +26,12 @@ hard-max recipe fails its frozen cost gate. A separate normalized latent
 reference, compact factors/CSR and CPU analytic gradients pass tiny independent
 controls. The first tiny GPU control closes before Torch/container creation:
 its B47 image was addressed on the wrong Docker-store worker. A new explicit
-VM01 execution profile is being qualified, with unchanged numerical gates;
-no GPU parity/cost or selection gain is claimed. The first strict VG/COCO-linked reference census
+VM01 execution profile now passes sealed tiny GPU arithmetic checks in7.24s
+(8fixtures/20controls/288FD calls), independently audited with unchanged gates.
+No full-bank cost or selection gain is claimed. Fresh V-COCO/COCO2014 metadata
+also passes an independent opaque-byte acquisition audit; exclusion-safe role
+reference primitives pass tiny controls, with no census/RGB/FIT/accuracy yet.
+The first strict VG/COCO-linked reference census
 completes but yields0 eligible photos: this path is closed without RGB, relaxed
 joins or retries. Fresh external validation remains necessary.
 MMHOI's complete Azure-only metadata census passes an independent audit; its

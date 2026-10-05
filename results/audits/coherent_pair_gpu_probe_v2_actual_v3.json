@@ -1,0 +1,111 @@
+{
+  "actual_state": "SEALED_TINY_GPU_PASS",
+  "adoption": false,
+  "audit_elapsed_seconds": 0.4804312150226906,
+  "cid": "2f07cc137b2aece7105658f926fef20ee25bd6e41bbabae77c69c06d3687705b",
+  "cid_absent": true,
+  "container_name_absent": true,
+  "decision": "TINY_GPU_ARITHMETIC_PASS_NOT_FULLBANK_QUALIFICATION",
+  "fd_calls": 288,
+  "fit_executed": false,
+  "fixture_records": 8,
+  "fixtures_completed": 8,
+  "fixtures_rerun": false,
+  "fullbank_verified": false,
+  "gpu_used": false,
+  "host_elapsed_seconds": 7.240327704988886,
+  "image_before_after": true,
+  "image_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "image_rootfs_sha256": "5ae610524943c42f72e2fa1ac06a9dbe8fa14bf2d572efd8a57cded6ead3503d",
+  "limitation": "Authenticated original tiny numeric claims via saved receipts only; no arithmetic replay. Collected unit exit unavailable when LoadState not-found; no success inferred from default systemd fields. No full-bank cost/learning/quality qualification.",
+  "models_loaded": false,
+  "native_errors": {},
+  "native_exit_code": 0,
+  "native_identity": {
+    "bytes": 16807,
+    "sha256": "d95d66d1e4a5b0d3ab38028c9c25bd40f5ea4df749e12da23329ca337b23f6ab"
+  },
+  "native_phase": "complete",
+  "native_status": "pass",
+  "observer_numeric_execution": false,
+  "observer_sha256": "baa300085547dce50a6ca392ba0ecbbc01cfe768f86d8b8f0a797ddb1b50a90c",
+  "original_native_metadata_validation": true,
+  "output_identities": {
+    "container.cid": {
+      "bytes": 64,
+      "sha256": "691b0ed3f77e10b3e680db61a406d058dafed67c027a70887e0e3d8b9f9cac22"
+    },
+    "native.json": {
+      "bytes": 16807,
+      "sha256": "d95d66d1e4a5b0d3ab38028c9c25bd40f5ea4df749e12da23329ca337b23f6ab"
+    },
+    "proof.json": {
+      "bytes": 7622,
+      "sha256": "dc1be997eabb0407483af794561115db147172a1dfa0f8bc6df7b9bb12b6af5a"
+    },
+    "report.json": {
+      "bytes": 8330,
+      "sha256": "e24940c7fbd27a969fdb221694b07e7e2ef6d5a3e5f4701e09724185be49420c"
+    }
+  },
+  "output_present": true,
+  "outputs_before_after": true,
+  "outputs_sealed": true,
+  "owner_label_containers_absent": true,
+  "peak_torch_allocated": 33723392,
+  "peak_torch_reserved": 35651584,
+  "prior_collected_unit_observer": "results/audits/coherent_pair_gpu_probe_v2_actual.json",
+  "producer_driver_absent": true,
+  "producer_revision": "d3506722efb77d034ee329d04609c621188d6c0b",
+  "quality_verified": false,
+  "references_read": false,
+  "report_errors": {},
+  "report_identity": {
+    "bytes": 8330,
+    "sha256": "e24940c7fbd27a969fdb221694b07e7e2ef6d5a3e5f4701e09724185be49420c"
+  },
+  "report_phase": null,
+  "report_status": "pass",
+  "rgb_read": false,
+  "runtime": {
+    "capability": [
+      9,
+      0
+    ],
+    "cublas_workspace_config": ":4096:8",
+    "cuda": "12.4",
+    "deterministic_algorithms": true,
+    "gpu_name": "NVIDIA H100 NVL",
+    "gpu_total_bytes": 99456909312,
+    "numpy": "1.26.3",
+    "python": "3.11.10",
+    "tf32": false,
+    "torch": "2.5.1+cu124"
+  },
+  "saved_only": true,
+  "schema": "world_reward.coherent_pair_gpu_probe_v2_saved_audit.v3",
+  "segment_controls": 20,
+  "snapshots_post_verified": true,
+  "source_archive_xz_bytes": 237376,
+  "source_archive_xz_sha256": "0a4e527857af45d4017cd70410c9a262d7590fd5a4656116d4067870bb581b02",
+  "source_before_after": true,
+  "source_closure_sha256": "3b48823bc5a0788f8af49fe3bf7d94d920a0ec573e7379d6743042c6be76ef63",
+  "source_entries": 307,
+  "source_files": 302,
+  "status": "pass",
+  "transport_cli_exit": 0,
+  "transport_target": {
+    "resource_group": "SCENESMITH-H100",
+    "vm_name": "scenesmith-ncc-h100-01"
+  },
+  "unit": "world-reward-coherent-pair-gpu-probe-v2.service",
+  "unit_exit_independently_available": false,
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  }
+}

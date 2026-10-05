@@ -1,0 +1,35 @@
+{
+  "adoption": false,
+  "audit_elapsed_seconds": 0.00527155603049323,
+  "audit_error_family": "ValueError",
+  "audit_failure_stage": "terminal_observation",
+  "audit_gate": "terminal_unit",
+  "fit_executed": false,
+  "fixtures_rerun": false,
+  "fullbank_verified": false,
+  "gpu_used": false,
+  "models_loaded": false,
+  "observer_numeric_execution": false,
+  "observer_sha256": "7f9b0d48e2fe44bf3b29b256ece2ff0c122a2efd24b462be8c8d166a0a49fd53",
+  "producer_revision": "d3506722efb77d034ee329d04609c621188d6c0b",
+  "quality_verified": false,
+  "references_read": false,
+  "rgb_read": false,
+  "saved_only": true,
+  "schema": "world_reward.coherent_pair_gpu_probe_v2_actual_audit.v1",
+  "status": "inconclusive",
+  "transport_cli_exit": 0,
+  "transport_target": {
+    "resource_group": "SCENESMITH-H100",
+    "vm_name": "scenesmith-ncc-h100-01"
+  },
+  "unit": "world-reward-coherent-pair-gpu-probe-v2.service",
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  }
+}

@@ -40,9 +40,22 @@ publication demotes late PASS and seals failure receipts. No retry or numerical
 relaxation. PASS means tiny arithmetic only, not full-bank speed or accuracy.
 
 This is a **technical preflight correction**, not a rerun of an executed
-numerical evaluation: V1 never reached arithmetic. V2 remains prospective
-until source freeze and one actual native run produce auditable receipts.
+numerical evaluation: V1 never reached arithmetic. Its frozen source and failure
+remain separate from the v2 result below.
 
 Source qualification, October6: root171 combined tiny tests PASS1.24s;
 independent AST/lifecycle review READY with unchanged v1 mathematical functions
 and wrapper. No local Torch or native GPU evaluation entered these checks.
+
+Actual producer `d3506722efb77d034ee329d04609c621188d6c0b`: sealed host/native
+PASS, 7.240327705 s, H100 NVL / SM90 / Torch2.5.1+cu124. Eight fixtures,
+20 segment controls and288 FD calls complete; peak Torch allocated33723392 B,
+reserved35651584 B. Independent saved-only audit authenticates original302 Git
+files/307 entries, source/image/manifest/snapshots/output before-after evidence,
+exact owned CID/name/label absence and native driver absence, without replay.
+The successful systemd unit was already collected: its independent exit status
+is unavailable; default0/success fields are not proof. Qualification relies on
+source-bound sealed native/host receipts and native-exit0 evidence. The first
+unit-not-found observer remains INCONCLUSIVE, not native failure. See
+`results/audits/coherent_pair_gpu_probe_v2_actual_v3.json`. Tiny arithmetic only;
+full-bank cost, objective/optimizer, ownership and accuracy remain unqualified.
