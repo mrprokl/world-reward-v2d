@@ -9430,3 +9430,20 @@ evidence and FAIL-only reporting grace. No prediction recipe/threshold retuning,
 deadline relaxation, dense PASS or accuracy gain is assumed.
 Root integration369PASS2SKIP18.21s; shell syntax and diff checks PASS. Tests
 overlap existing coverage and are not independent reconstruction evidence.
+
+Actual8ba1656 EP26 surfaceproposalPASS361.585685snative/364.154325shost.
+Original347478V/694916F/14components →2068V/4096F/14components; one native
+preflight/QEM,345410 committed contractions, one unchanged official budget.
+Phase evidence: QEM81.437194s; candidate/JSONdecode1.298699s; mapping/fullfinal
+verification250.463791s; metric/packing/output/inputposthash2.123611s. Complete
+source topology and oriented birth/quotient/F64-F32 checks passed without repair,
+component deletion, shrink, threshold or pose changes. Native1559692B
+b184d2487e5dc57c9edf8adb45ba02d8dc8d3ebfb611f28bebb66c5f61003ab1;
+host1659998B28437e723efce812e2356e26c0a04ea418f875750af7c7629137e4f4cdafcf34.
+Independent saved-only auditPASS exact8files0444/namespace0555, complete303-entry
+sourceclosure230bdad0993130c14a1f97765cf8a7514ed15d5f53561f8059ed7fd36675ae87,
+all original inputs/runtime/qualification prepost and exactCIDabsence. No replay,
+model/GPU calls or historicalfailure relabel; disposable source/QEM files removed.
+Azure-only retained candidate6.3MB/mapping53.1MB are reproducibility artifacts,
+not local data or a measured CARI4D improvement. Freeze15artifact leaves and16
+current consumer helpers before the same full399-frame ICP/Viterbi handoff.
