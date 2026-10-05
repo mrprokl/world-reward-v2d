@@ -1,0 +1,90 @@
+{
+  "adoption": false,
+  "audit_read_only": true,
+  "completed_audit_gates": {
+    "all_1284_original_inputs_current_hash_match": true,
+    "five_native_output_paths_exist": true,
+    "four_native_report_output_hashes_match": true,
+    "host_and_native_PASS_fields": true,
+    "original_host_native_proof_receipt_pins": true,
+    "owned_CID_and_native_PIDs_absent": true,
+    "root_control_555_444_seals": true,
+    "three_historical_source_closures": true
+  },
+  "episode": 17,
+  "frames": 419,
+  "gpu_used": false,
+  "historical_unit_exit": "unknown_collected_exit",
+  "host_elapsed_seconds": 3206.1595152940135,
+  "host_report": {
+    "bytes": 698,
+    "sha256": "c585133403974d3d031b3699d07a5941be5cde2cf9919640e34f1de6422ef9bb"
+  },
+  "input_report_sha256": {
+    "adapter": "d0f4cf17ef49376439fdd5efec41310aec934e9e6183249f29f526be2f648590",
+    "alignment": "4e351aafaeffddfe02bbf11154428cc210811810750ead6bb8ba08ca61bcce05",
+    "body": "996ec4b20300d44d01526d059346a6ebcd70306185108328fe2216c61d436de0",
+    "depth": "788d866e328af806e41c25dd93fdea12cdb9c4e450c676fc417c38e83ac91e1c",
+    "object": "1de44ccd252549ccaf6ac369373de6737c3c476e071ae88a1fdd7d1518f81670"
+  },
+  "models_loaded": false,
+  "native_elapsed_seconds": 3194.2714814789942,
+  "native_report": {
+    "bytes": 17526,
+    "sha256": "deb1f99a5cb20091f34ce037f8a386aeb5e963ef03cfd40dcf02dfdbaad7fe49"
+  },
+  "next_step": "Root current immutable native-input inventory should hash its exact 15 downstream public leaves; do not rerun preparation or chmod original artifacts.",
+  "observer_stop": {
+    "error_type": "FileNotFoundError",
+    "final_1284_second_rehash_completed": false,
+    "gate": "native_surface_geometry_validation_files_host_paths",
+    "qualification": "Five requested output paths all exist. Exception occurred in the additional native surface ledger scan; exact missing ledger path was not captured. Not a native producer failure."
+  },
+  "output_modes": "0o644_original_unchanged",
+  "output_pins": {
+    "depth_h5": {
+      "bytes": 434724428,
+      "native_sha_matches": true,
+      "path": "outputs/episode_000017/cari_inputs/aligned_depth.h5",
+      "sha256": "e5d21953386e8ce371957a71b0dd4b757dfa8a309ca5d1c9811b7bb76ed7a858"
+    },
+    "mhr_init": {
+      "bytes": 1871011,
+      "native_sha_matches": true,
+      "path": "outputs/episode_000017/body_full/cari_adapter/canonical_initializer.pkl",
+      "sha256": "a3dd2d28558e46a2ca4c518aaaf7555dd8a9fb8ad1e820afc6539a0ef55589d6"
+    },
+    "object_metric.glb": {
+      "bytes": 74440,
+      "native_sha_matches": null,
+      "path": "outputs/episode_000017/cari_inputs/object_metric.glb",
+      "sha256": "bd020e7a66efd390b8c0a6d21c8c12926c2ba54f17f8993d74d21edd8c3d7e9e"
+    },
+    "object_poses": {
+      "bytes": 31294,
+      "native_sha_matches": true,
+      "path": "outputs/episode_000017/cari_inputs/own_object_poses.pkl",
+      "sha256": "173e619110ec39e112458ac24d0974a3837ddde9369508310b9d1288305ab6fc"
+    },
+    "wild_export": {
+      "bytes": 2808,
+      "native_sha_matches": true,
+      "path": "outputs/episode_000017/cari_inputs/export/episode_000017/wild_export.json",
+      "sha256": "9981310cfa51f956c7e51e9fab1fab3f7885b6fa31cd6a38e8cbe012eeb4daab"
+    }
+  },
+  "producer_revision": "ea3de92a337648e4d1b6c8f50a157a7868cbeba4",
+  "producer_status": "saved_host_and_native_PASS",
+  "proof": {
+    "bytes": 236147,
+    "sha256": "4f6239432f95408ea85c4f34f1a922f370cc4bb60bfbab324ef742340549620e"
+  },
+  "quality_verified": false,
+  "schema": "world_reward.coverage17_prepare_saved_audit.v1",
+  "source_archive_sha256": "8cc5e6c77cada6e02e2b71584d8e785c173dde11b5241cc9c3fa3c79727c48e6",
+  "source_closure_sha256": "b07a664c06d70c0cbcfa7e2eb6cd4ec04bc83af4a469a4136d8ebe36c0f71054",
+  "source_entries": 347,
+  "source_files": 342,
+  "source_independent_Git_verified": true,
+  "status": "partial_audit"
+}
