@@ -2,6 +2,25 @@
 
 Primary papers, project pages, GitHub source/README and Hugging Face metadata were inspected on 2026-10-02. No Track2/3 assets, FORM-HOI GT, or challenge multiview data were accessed. Paper benchmark numbers are not challenge numbers. This is a targeted, not exhaustive, SOTA survey.
 
+
+## October5 independent orientation audit: no new release acquisition
+
+The cutoff API reconfirms 4DAnyone9cc2aa23 (Sep23) and originalCARI4D71fa7cbe
+(Aug17), with CARIv3 Apr19. Human-centric generated context is not observed
+metric HOI. CARIv3 limitations on180-degree orientation failures motivate
+keeping multiple fullT orientation hypotheses until coupled refinement, rather
+than committing R before the point objective. This concretizes an existing
+priority, not a novel discovery or validatedmethod. Isolate fixed-R versus
+branch-R under samefrozenobservations/points/globalweights/mesh/K/root/hands,
+using a separate reserved rotated/occluded component cohort. Report object
+and object-to-wrist3D, human/PEN/true-dynamics and fullcoverage; image loss alone
+cannot certify orientation. The current translation-only conditional study
+first tests the point term; no branch-R implementation or quality adoption yet.
+Primary sources: https://arxiv.org/html/2512.11988v3 ;
+https://github.com/NVlabs/CARI4D/tree/71fa7cbe46081467edadd11ab534b0c14aa9d913 ;
+https://github.com/ant-research/4DAnyone/tree/9cc2aa230fe5d364da2c5634ec3dabadadcb0d60 .
+No model/media/data acquisition for this independent literature audit.
+
 ## October 4 follow-up: occlusion-aware point association
 
 The [primary TAPNet release](https://github.com/google-deepmind/tapnet/tree/730cda1c730877cfedbe01bf87fb1cadb78a565d)

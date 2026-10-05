@@ -9662,3 +9662,14 @@ Azure managed identities rather than staged SAS: exporter container-only Blob
 Contributor; importer same-container Reader. Tokens stay in RAM and never
 appear in shell/log/source. Root235tinychecks include no-secret failure gates;
 actualimage save/import and scientific runs still require their own receipts.
+
+EP26 full399 shared forward b8d70a1 native PASS108.459410s, one model attempt
+and return, unchanged96-frame windows [0,96,192,288,303]. Independent saved-only
+CPU audit PASS237 original source entries, closure
+59977868e187cf8328242039dec9c1e417beb6c13ec331780b05ee7d881dc950;
+all original inputs unchanged, no arrays decoded, model/GPU/forward rerun.
+Frozen native report65905B/f78b8b74a247d4c4e935112d087b529c473a5b0b37f3a5d4797467273352d67e
+and CoCoNet305404924B/14124fe9cf738d5ef72fcb969942db9081afed952fa707c0e34ee2fcd79e3746
+retain actual b8d70a1 producer and script13aaf4d0ee3c287fca54e2c2e9d5fcde8f6680a701a97d05d38847b9cfcb8e65.
+This qualifies the full-video baseline forward path, not reconstruction accuracy.
+Next unchanged native full-video refinement consumes these frozen artifacts.
