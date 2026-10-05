@@ -122,3 +122,34 @@ output. One cooperating RunCommand/GPU owner per VM. A dispatch ACK is not a
 result; frozen receipts and actual terminal/independent checks establish stages.
 Clean owned disposable fixture/download noise without deleting useful failures,
 source manifests, results, user work or original datasets.
+
+## Measured stage status
+
+The frozen preparation/scorer producer is
+`78daabd4a4521fecf4fde8df0f4c6f4f3ef65fc6`. Parent regression checks:
+491 tiny tests PASS25.95s; these check code/contracts, not prediction quality.
+Actual Azure selection PASS5.030704424s, terminal inactive/dead,
+Result=success/ExecMainStatus=0/MainPID=0. Additional96 historical COCO original
+MD5 exclusions leave139 eligible photos and132 independent lower-bound slots.
+The new fixed SHA order freezes96 slots32/16/48. Selection report16328B/SHA
+`50ce281d7dce7c6b409cf5dfb4d6f0f1a39beb7edc065b5e3b007ef7cd24342c`;
+cohort47482B/SHA
+`3e557abbfe909c110dfdd81cbc00827431a24c2ab88e3614b48e13ed35acef3e`.
+No HTTP, models, GPU or historical reference values/files were used. Independent
+saved-only validation PASS3.806669157s reproduces the scalar annotation binding,
+139/132 counts, complete SHA96 rank, five Git/XZ sources and12 inputs/modes
+before/after. Its first observer failed mechanically before new geometry; that
+1398B partial is preserved, with one corrected observer attempt explicitly
+recorded. The producer/cohort was not rerun or changed. Individual rights and
+original acquisition remain subsequent gates.
+
+The separate pure learner prototype at
+`e318fd9` has23 dedicated numerical tests and255 parent combined checks
+PASS1.98s. It learns17 geometry/support coefficients for A, freezes them, then
+learns only B's nonnegative relational coefficient. All scoring delegates to
+the same masked core; complete-route ties are averaged without alias mass or
+logit-dependent A derivatives. Manufactured optimization uses512 updates per
+arm and513 evaluations per arm by carrying the evaluated gradient. This is
+**not a frozen real-study optimizer recipe**: full3600-object/native-K cost has
+not passed a bounded qualification. No FIT/CAL/RESERVED labels or real images
+were consumed by this prototype, and no trained selector has been adopted.
