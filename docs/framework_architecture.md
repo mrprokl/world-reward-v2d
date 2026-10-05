@@ -508,3 +508,27 @@ Do not tune that cohort, pool away its regression or use its descriptive shift
 contrast as a new acceptance gate. Dependence-aware association remains a
 research hypothesis requiring a substantively new model, fresh validation and
 actual paired wrong-ID/3D/coverage evidence before integration.
+
+## Crowd proposal boundary, October5
+
+Native RGB-only region generation now has a reusable source/runtime-authenticated
+SAM2.1 producer. Inference mounts only helper files, dispatch markers, original
+model proofs and public RGB; no scene recipe, reference, split or broad checkout.
+It preserves the full native region bank, including duplicates and zero banks.
+Regions are not physical objects or owners. The fixed visible-proposal evaluator
+is separate and opens references only after all native bank hashes freeze.
+
+The new authored crowd stress executes32RGB/oneMHR80-pose manufacturing forward
+and32SAM2AMG calls. Observed visible mask recall at IoU.5 is76/80humans and
+121/128objects, not an interaction-selector or real-transfer result. The first
+region authentication failure is retained; the corrected fresh output changes
+only two missing dispatch-marker mounts, never a method parameter or reference.
+The new study/photo/author-disjoint realOI32 acquisition has0RGB and is closed
+before labels/inference. Keep these limitations explicit; do not merge masks,
+choose the largest/closest foreground instance, or call proposal recall victory.
+
+Next scientific dependency is real proposal support and full joint target
+retrieval/ownership. Reuse person-attached observations and complete candidate
+evidence; a foreground/background heuristic cannot be the selection gate. Full
+episode16 native refinement and queued17 forward advance the legitimate full-T
+baseline independently of this research, without adopting an unvalidated pair.
