@@ -9367,3 +9367,14 @@ fullsource/runtime/historicalFAIL lineage/fourfiles0555-0444/exactCIDabsence;
 no geometryreplay. Scratchremoved; nochallenge/model/GPU/HDF5/HOIaccuracy/adoption.
 Unitcollectednot-found is notcompletionproof; actual immutablecomplete receipts
 and nativeproof establish this scoped result. Originalb780ebfFAIL retained.
+
+First actual EP26 surfaceproposal922f359 stops at originalsourceauthority in
+1.559079snative/2.826986shost, before compilation/QEM/officialbudget/pose.
+OriginalpredictedGLB13,552,144B SHA796c78324557aee8eb5056c9435a72bafbb9324369b667d510337398c3edd7bb
+is legitimate0644; unmodifiedauthorityrequiresimmutablefile. Fulloriginalinput/
+source/qualificationrecheckPASS, allbytes/modesunchanged, ownedcleanupPASS.
+Native91258B/b7a6cbdd…368e2a,host183900B/11774c65…b418e, originalFAILretained.
+Technicalcopy-onlycorrection makesbyteidenticalowned0444GLBonAzure, original
+preposthash/modeunchanged, nogeometrytransform/repair/thresholdchange; native
+authorityunchanged. Copygoesonlyinexistingowneddisposablescratch.100PASS2SKIP
+0.66s tinyintegration; freshrevision/unitreplay required, notscientificretuning.

@@ -572,6 +572,19 @@ def surface_raw_source(path, rt, official, np, trimesh):
         geometry_repaired=False)
 
 
+def surface_readonly_source(original, work, rt):
+    """Byte-identical Azure-only authority copy; never chmod historical inputs."""
+    pin=rt.identity(original,256<<20,readonly=False)
+    path=work/'original_source.glb'
+    with original.open('rb') as source,path.open('xb') as target:
+        os.fchmod(target.fileno(),0o444)
+        shutil.copyfileobj(source,target,1<<20)
+        target.flush();os.fsync(target.fileno())
+    require(rt.identity(path,256<<20)==pin and rt.identity(original,256<<20,readonly=False)==pin,
+        'Original source or exact readonly authority copy changed')
+    return path,pin
+
+
 def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, authored=None):
     import numpy as np
     import trimesh
@@ -585,7 +598,11 @@ def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, 
     if authored is None:
         inputs, sources, scale = endpoint.prerequisites(ROOT, episode)
         report.update(source_hashes=sources, original_grounded_scale=scale, input_sha256=inputs['video_sha256'], phase='raw_source')
-        v, f, report['source_geometry'] = surface_raw_source(ROOT/f'outputs/episode_{episode:06d}/object_grounded/object.glb', rt, official, np, trimesh)
+        original=ROOT/f'outputs/episode_{episode:06d}/object_grounded/object.glb'
+        authority_path,original_pin=surface_readonly_source(original,work,rt)
+        v, f, report['source_geometry'] = surface_raw_source(authority_path, rt, official, np, trimesh)
+        report['source_geometry'].update(original_path=str(original),authority_copy_path=str(authority_path),
+            original_source_rehashed=True,authority_copy_byte_exact=True,original_source_mode_changed=False)
     else:
         source_glb, scale = authored
         v, f, report['source_geometry'] = surface_raw_source(source_glb, rt, official, np, trimesh)
@@ -644,7 +661,10 @@ def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, 
             require(set(stored.files) == set(arrays) and all(stored[n].dtype == a.dtype and np.array_equal(stored[n], a)
                 for n,a in arrays.items()), 'Saved full arrays changed')
     build.write_json(work/SURFACE_OUTPUTS[3], proposal.mapping); compiler['mapping_identity'] = rt.identity(work/SURFACE_OUTPUTS[3])
-    if authored is None: require(endpoint.prerequisites(ROOT, episode)[1:] == (sources, scale), 'Source ancestry changed')
+    if authored is None:
+        require(endpoint.prerequisites(ROOT, episode)[1:] == (sources, scale)
+            and rt.identity(original,256<<20,readonly=False)==original_pin
+            and rt.identity(authority_path,256<<20)==original_pin, 'Source ancestry or original authority copy changed')
     require(surface_trimesh_sources(rt,trimesh)==installed, 'Installed raw/native geometry source changed')
     left(); report.update(frame_poses_changed=False, metric_scale_baked_once=scale, object_scale=1.)
 
@@ -799,7 +819,8 @@ def surface_cleanup(name, revision, cid, rt):
 
 def surface_remove_work(work, owner, rt, *, control=False):
     require(rt.canonical(work)==work and (work.lstat().st_dev,work.lstat().st_ino)==(owner.st_dev,owner.st_ino), 'Scratch owner changed')
-    allowed={*SURFACE_OUTPUTS,'native.json','input.obj','candidate.obj','native_mapping.json',*(('authored_source.glb','authored_aligned.glb')if control else ())}
+    allowed={*SURFACE_OUTPUTS,'native.json','input.obj','candidate.obj','native_mapping.json',
+        *(('authored_source.glb','authored_aligned.glb')if control else ('original_source.glb',))}
     require(all(p.name in allowed and not p.is_symlink() and stat.S_ISREG(p.lstat().st_mode) and p.lstat().st_nlink==1
         and p.lstat().st_uid==owner.st_uid for p in work.iterdir()), 'Unknown scratch refused')
     shutil.rmtree(work)

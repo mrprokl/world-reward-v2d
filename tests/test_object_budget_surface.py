@@ -49,10 +49,12 @@ def test_same_graph_identity_preserves_orphan_canonical_payload(gate,monkeypatch
     native_root=tmp_path/'vendor';native_root.mkdir()
     official=SimpleNamespace(check_runtime_packages=lambda _:None)
     def raw(path,*_):
-        if path.name=='object.glb':return v,f,{'source_identity':{'sha256':'1'*64,'bytes':1}}
+        if path.name in ('object.glb','original_source.glb'):return v,f,{'source_identity':{'sha256':'1'*64,'bytes':1}}
         mesh=trimesh.load(path,force='mesh',process=False)
         return mesh.vertices.astype(np.float32),mesh.faces.astype(np.int64),{'source_identity':rt.identity(path)}
     monkeypatch.setattr(gate,'surface_raw_source',raw)
+    source_original=tmp_path/'outputs/episode_000002/object_grounded/object.glb'
+    source_original.parent.mkdir(parents=True);source_original.write_bytes(b'opaque predicted source')
     monkeypatch.setattr(gate,'surface_trimesh_sources',lambda *_:gate.SURFACE_TRIMESH_SOURCES)
     # Original helper ABI spy pads a reordered/welded copy, not the retained payload.
     kit=tmp_path/'vendor/v2d_submission_kit/v2dlb';kit.mkdir(parents=True)
@@ -201,3 +203,15 @@ def test_control_full96_saved_poses_survive_npz_handles(gate,monkeypatch,tmp_pat
     assert report['control']['negative_controls_rejected']==config['negative_controls']
     assert type(seen[0])is np.ndarray and seen[0].dtype==np.float32 and seen[0].shape==(96,4,4)
     assert len(report['control_source_array_sha256'])==7 and report['control']['QEM_calls']==0
+
+
+def test_original_source_readonly_copy_never_changes_historical_mode(gate,tmp_path):
+    import mediapipe_cpu_runtime_verify as rt
+    original=tmp_path/'original.glb';original.write_bytes(b'opaque bytes, no mesh interpretation')
+    original.chmod(0o644);before=original.stat()
+    work=tmp_path/'work';work.mkdir()
+    copied,pin=gate.surface_readonly_source(original,work,rt)
+    assert copied.name=='original_source.glb' and copied.read_bytes()==original.read_bytes()
+    assert copied.stat().st_mode&0o777==0o444 and original.stat()==before
+    assert pin==rt.identity(original,readonly=False)
+    with pytest.raises(FileExistsError):gate.surface_readonly_source(original,work,rt)
