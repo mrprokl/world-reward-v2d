@@ -1,0 +1,106 @@
+{
+  "Azure_RC_calls": 1,
+  "FIT_performed": false,
+  "GPU_used": false,
+  "HTTP_used": false,
+  "RGB_bytes_hashed": true,
+  "RGB_decoded": false,
+  "actual_state": "SEALED_ACQUIRE_PASS",
+  "adopted": false,
+  "all16_mapping_and_attribution_verified": true,
+  "all_input_and_asset_bytes_modes_before_after": true,
+  "all_original_SHA_and_MD5_verified": true,
+  "all_output_bytes_modes_before_after": true,
+  "audit_elapsed_seconds": 2.6139649630058557,
+  "audit_status": "pass",
+  "availability_gate_passed": true,
+  "azure_runcommand_terminal": true,
+  "census_input_count": 23,
+  "census_rerun": false,
+  "counts": {
+    "acquired": 16,
+    "acquired_DEV": 8,
+    "acquired_RESERVED": 8,
+    "missing": 0,
+    "slots": 16
+  },
+  "current_archive_xz": {
+    "bytes": 235804,
+    "sha256": "bf2a89a90781d306253cb27558c2c2d2fac127b442e44984a067d6a03f8acea4"
+  },
+  "current_source_closure_sha256": "098811fa1eac670cfa081b8d5d10dcdc3b405ed4b9cc67356345e8de42b4ae0a",
+  "decision": "READY_PENDING_SEPARATE_RGB_BANK",
+  "frozen_input_and_asset_entries": 41,
+  "full_source_and_markers_before_after": true,
+  "geometry_references_decoded": false,
+  "header_qualification_only": true,
+  "missing_reason_counts": {},
+  "models_loaded": false,
+  "native_elapsed_seconds": 4.3323049760074355,
+  "native_status": "pass",
+  "observed_unit_exit": null,
+  "observer_command_identity": {
+    "bytes": 35442,
+    "sha256": "4e1c9b8d27af44ea16d51196ec19eb2147fd5e7a9ab721bade16855ae95ee495"
+  },
+  "observer_mechanical_repairs": 0,
+  "observer_source_identity": {
+    "bytes": 15574,
+    "sha256": "565bcf35a35662ce70420f043d99e59b80f89913ff2c0cd06fd3e42616aede12"
+  },
+  "optional_runtime": {
+    "available": true,
+    "image_id": "sha256:fd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252",
+    "platform": "linux/amd64",
+    "rootfs_layers": 50,
+    "rootfs_sha256": "2b10f869ca9c09cac4e8604cb620c3167cc1433dd62a49f743526a94244d1363"
+  },
+  "original_Git_files": {
+    "census": 300,
+    "coco": 268,
+    "current": 303,
+    "metadata": 292,
+    "ownership": 296
+  },
+  "original_grant_authority": "publisher_recorded_CC_BY_2_creator_UNKNOWN",
+  "parent_root_private": true,
+  "predictions_read": false,
+  "producer_driver_absent": true,
+  "producer_revision": "a8da2da838dc4ef513e7819be4d25ece99488207",
+  "public_file_count": 17,
+  "public_jpeg_bytes": 2935197,
+  "public_manifest_identity": {
+    "bytes": 3293,
+    "sha256": "b938a7d22737f4399fc14cc0683863e920efaecef5ec544f115180119e4f1680"
+  },
+  "public_outputs_sealed": true,
+  "reference_values_hash_only": true,
+  "report_identity": {
+    "bytes": 58443,
+    "sha256": "264b9e3eec7a1cde816606886391f795e4dd9f63074216e291f2ac70b85e6177"
+  },
+  "role_values_decoded": false,
+  "saved_only": true,
+  "schema": "world_reward.vcoco_role_pilot_acquire_saved_audit.v1",
+  "scope_limitation": "One saved-only acquisition integrity audit. JPEG bytes hash/MD5 and original marker headers only, no image pixels decoded/transferred, HTTP, model, GPU, references semantics, selection rerun or fitting. Availability is not proposal/role accuracy or eligibility. Collected unit exit independently unavailable, not inferred.",
+  "selected18metadata_bytes_modes_before_after": true,
+  "selected_cohort_identity": {
+    "bytes": 12849,
+    "sha256": "2b5048e6816abcbf45dffe7d1c42f5aa9fc22adfd411c8703a5c6f917661970c"
+  },
+  "selected_report_identity": {
+    "bytes": 41759,
+    "sha256": "d2908db8bc0488bcec7836e938b49fea942214ab729afaffde7296f00baab3d6"
+  },
+  "selection_rerun": false,
+  "submission_eligibility_verified": false,
+  "unit_exit_independently_available": false,
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  }
+}

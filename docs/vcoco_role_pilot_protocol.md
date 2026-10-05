@@ -97,3 +97,14 @@ historical exit; PASS is the sealed, source-bound selection receipt, not the
 unit's default exit0. See `results/audits/vcoco_role_pilot_select_v1_actual.json`.
 References remain private/hash-only to the observer. This permits only the
 separately frozen original-JPEG acquisition, not inference or quality claims.
+
+Separate acquisition completes in4.332304976s: all16 original JPEGs acquired,
+8DEV/8RESERVED,2,935,197 bytes remain on Azure. Independent saved-only audit
+checks original byte SHA/MD5, marker headers and all16 ledger slots, source and
+private attribution boundaries before/after; no pixels/references decoded by
+the observer. The sealed public manifest is3293B/SHA
+`b938a7d22737f4399fc14cc0683863e920efaecef5ec544f115180119e4f1680`.
+Actual fd268 frontend image is available on VM02;50 layers have rootfs SHA
+`2b10f869ca9c09cac4e8604cb620c3167cc1433dd62a49f743526a94244d1363`.
+See `results/audits/vcoco_role_pilot_acquire_v1_actual.json`. Availability and
+header checks permit the already frozen bank caller, not retrieval quality.

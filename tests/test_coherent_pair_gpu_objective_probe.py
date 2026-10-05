@@ -49,6 +49,7 @@ class Tensor:
     def shape(self):return self.array.shape
     @property
     def dtype(self):return self.array.dtype
+    def reshape(self,*shape):return Tensor(self.array.reshape(*shape),self.device)
     def cpu(self):return self
     def detach(self):return self
     def numpy(self):return self.array
@@ -131,6 +132,51 @@ def test_frozen_helpers_manifest_and_shell():
     assert q.manifest()['solver_options']==dict(maxiter=20,maxfun=100,maxls=20,maxcor=10,ftol=1e-12,gtol=1e-6)
     assert len(q.leaves(ROOT))==len(q.HELPERS)+2 and len(set(q.leaves(ROOT)))==len(q.leaves(ROOT))
     assert subprocess.run(['bash','-n',str(ROOT/q.HELPERS[1])],capture_output=True).returncode==0
+
+
+def test_technical_resumption_preserves_frozen_scientific_functions():
+    old=subprocess.run(['git','show',q.FAILED_REV+':infra/coherent_pair_gpu_objective_probe.py'],
+        cwd=ROOT,capture_output=True,check=True).stdout
+    original=ast.parse(old);current=ast.parse((ROOT/q.HELPERS[0]).read_bytes())
+    for name in ('manifest','scipy_evidence','solve','measure','validate_native','publish'):
+        before=next(n for n in original.body if isinstance(n,ast.FunctionDef) and n.name==name)
+        after=next(n for n in current.body if isinstance(n,ast.FunctionDef) and n.name==name)
+        assert ast.dump(before)==ast.dump(after),name
+    frozen_objective=subprocess.run(['git','show',q.FAILED_REV+':src/world_reward/coherent_pair_marginal_objective.py'],
+        cwd=ROOT,capture_output=True,check=True).stdout
+    assert (len(frozen_objective),hashlib.sha256(frozen_objective).hexdigest())==(
+        13853,'b00568420e4ccf4a50d3afcb2bc488fe5848686e136bc73bb8ed243d8580fe1e')
+    assert q.RESULT=='results/coherent-pair-gpu-objective-probe-v2'
+
+
+@pytest.mark.parametrize('tamper',[None,'phase','status','source','fd','removed','manifest','xz'])
+def test_closed_failure_authenticated_without_relabeling(monkeypatch,tmp_path,tamper):
+    monkeypatch.setattr(q,'ROOT',tmp_path)
+    code=tmp_path/'jobs'/q.FAILED_REV/q.ENTRY/'code';code.mkdir(parents=True)
+    marker=b'82b790318f5ecd4ccb0f7a528dd8fe1686c83de3152a9fd4aaf29bc7a1524f63\n'
+    (code.parent/'source-sha256').write_bytes(b'0'*64+b'\n' if tamper=='xz' else marker)
+    binding=dict(entries=316,closure_sha256=q.FAILED_CLOSURE)
+    proof=dict(source_binding=binding,manifest=q.manifest())
+    native=dict(proof,status='fail',phase='objective_oracle',error_type='OtherError',fd_calls=0,controls=[],decision='CLOSED_OBJECTIVE_CONTROL')
+    host=dict(proof,status='fail',native_exit_code=1,source_rehashed_after=True,owned_container_removed=True,decision='CLOSED_OBJECTIVE_CONTROL')
+    if tamper=='phase':native['phase']='complete'
+    if tamper=='status':native['status']='pass'
+    if tamper=='source':native['source_binding']={}
+    if tamper=='fd':native['fd_calls']=1
+    if tamper=='removed':host['owned_container_removed']=False
+    if tamper=='manifest':native['manifest']={}
+    receipts={'proof.json':proof,'native.json':native,'report.json':host};opened=[]
+    def pinned(path,pin,maximum):
+        opened.append(path);assert pin==q.FAILED_PINS[path.name] and maximum==1<<20
+        return receipts[path.name]
+    rt=SimpleNamespace(require=Runtime.require,source=lambda *_:binding,pinned=pinned)
+    if tamper is None:
+        result=q.technical_resumption(rt)
+        assert result['previous_status']=='fail' and result['previous_failure_not_converted_to_pass']
+        assert result['scientific_recipe_unchanged'] and result['receipts']==q.FAILED_PINS
+        assert len(opened)==3
+    else:
+        with pytest.raises(ValueError):q.technical_resumption(rt)
 
 
 def test_native_record_populated_claims_and_image_caches(monkeypatch,tmp_path):
@@ -224,6 +270,7 @@ def receipt():
         runtime=dict(numpy='1.26.3',torch='2.5.1+cu124',cuda='12.4',capability=[9,0],tf32=False,deterministic_algorithms=True,
             cublas_workspace_config=':4096:8',gpu_name='NVIDIA H100 NVL',gpu_total_bytes=99456909312,python='3.11.10'),
         peak_torch_allocated=1024,peak_torch_reserved=2048,max_rss_bytes=4096)
+    value['technical_resumption']=dict(producer_revision=q.FAILED_REV,previous_status='fail')
     evidence=dict(version='1.16.3',first_native_record_census=True,populated_record_claims_verified=True,
         caches_image_anchored_not_record_certified=True,entries=20,license_files={'LICENSE':dict(bytes=20,sha256=digest)})
     value.update(scipy_before=evidence,scipy_after=dict(evidence))
@@ -258,7 +305,8 @@ def test_tampered_native_receipt_rejected(path,replacement):
 @pytest.mark.parametrize('failure',[None,'native_exit','cleanup','postsource'])
 def test_mock_real_host_owned_cid_narrow_mounts_and_fail_demotion(monkeypatch,tmp_path,failure):
     monkeypatch.setattr(q,'ROOT',tmp_path);(tmp_path/'results').mkdir();value,binding,qualification=receipt()
-    prior=dict(source_binding=binding,manifest=q.manifest(),image={'Id':q.IMAGE},fullbank_qualification=qualification);proofs=[];commands=[]
+    prior=dict(source_binding=binding,manifest=q.manifest(),image={'Id':q.IMAGE},fullbank_qualification=qualification,
+        technical_resumption=value['technical_resumption']);proofs=[];commands=[]
     def proof(*_):
         proofs.append(1);return dict(prior,image={}) if failure=='postsource' and len(proofs)>1 else prior
     def run(argv,**_):

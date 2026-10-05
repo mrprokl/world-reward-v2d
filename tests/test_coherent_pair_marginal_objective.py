@@ -209,6 +209,7 @@ class Tensor:
     def shape(self):return self.array.shape
     @property
     def dtype(self):return self.array.dtype
+    def reshape(self,*shape):return Tensor(self.array.reshape(*shape),self.device)
     def __getitem__(self,key):
         if isinstance(key,tuple):key=tuple(k.array if type(k) is Tensor else k for k in key)
         elif type(key) is Tensor:key=key.array
@@ -244,6 +245,39 @@ def fake_torch():
 def device_scores(s):
     fields={name:(Tensor(value.copy()) if type(value) is np.ndarray else value) for name,value in vars(s).items()}
     return TorchMarginalPairScores(**fields,device='cuda:0')
+
+
+def test_primary_torch_multidimensional_mask_none_requires_selection_first(monkeypatch):
+    # PyTorch v2.5.1 primary source, no Torch import/kernel execution:
+    # TensorIndexing.h L312-319/L460-463 records one tensor index then inserts
+    # None at dimension1; IndexingUtils.h L30-35 subsequently expands a bool
+    # mask and requires all its dimensions to match that intermediate tensor.
+    # Source SHA256s: 44d5c6cebb19a4bd620391c64fa2e83009b15beb10a046d455fa787854258056
+    # and 2e85c9ea26e416dda38405b25c78af172d60cbb4a3d88aded224f8eeeeb68fe4.
+    original=Tensor.__getitem__;rejected=[]
+    def primary_index(self,key):
+        if (isinstance(key,tuple) and len(key)==2 and type(key[0]) is Tensor
+                and key[1] is None and key[0].array.dtype==np.bool_):
+            mask=key[0].array;shape=list(self.array.shape);shape.insert(1,1)
+            if tuple(shape[:mask.ndim])!=mask.shape:
+                rejected.append((self.array.shape,mask.shape,tuple(shape)))
+                raise IndexError('Primary multidimensional mask/None shape mismatch')
+        return original(self,key)
+    monkeypatch.setattr(Tensor,'__getitem__',primary_index)
+    monkeypatch.setitem(sys.modules,'torch',fake_torch())
+    for alpha in (0.,.3125):
+        s=scores(alpha=alpha);device=device_scores(s)
+        with pytest.raises(IndexError):
+            device.alpha_derivatives_b[device.supported,None]
+        for arm in ('A','B'):
+            actual=objective.marginal_objective_torch((device,),(positive(),),THETA,
+                alpha=alpha,regularization=.125,arm=arm)
+            expected=objective.marginal_objective((s,),(positive(),),THETA,
+                alpha=alpha,regularization=.125,arm=arm)
+            np.testing.assert_allclose(actual.loss.array,expected.loss,rtol=1e-14,atol=1e-14)
+            np.testing.assert_allclose(actual.gradient.array,expected.gradient,rtol=1e-13,atol=1e-13)
+            assert actual.gradient.shape==(17 if arm=='A' else 1,)
+    assert rejected==[((2,3),(2,3),(2,1,3))]*2
 
 
 @pytest.mark.parametrize('arm',['A','B'])

@@ -185,7 +185,7 @@ def marginal_objective_torch(scores, positive_masks, theta, *, alpha=0., regular
             if not bool(pos.any()):losses.append(t.full((),float('nan'),dtype=t.float64,device=device));continue
             if bool(pos.all()):losses.append(t.zeros((),dtype=t.float64,device=device));continue
             x=getattr(score,'scores_'+arm.lower())[support]
-            d=score.geometry_derivatives_a[support] if arm=='A' else score.alpha_derivatives_b[support,None]
+            d=score.geometry_derivatives_a[support] if arm=='A' else score.alpha_derivatives_b[support].reshape(-1,1)
             d=d-d[0]
             _require(bool(t.isfinite(d).all()), 'Centered device derivative overflow')
             def lse(values):

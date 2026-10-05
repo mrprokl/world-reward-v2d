@@ -20,7 +20,7 @@ import time
 
 ROOT=Path('/srv/scenesmith/world-reward')
 ENTRY='run_coherent_pair_gpu_objective_probe'
-RESULT='results/coherent-pair-gpu-objective-probe-v1'
+RESULT='results/coherent-pair-gpu-objective-probe-v2'
 SCHEMA='world_reward.coherent_pair_gpu_objective_probe.v1'
 IMAGE='sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7'
 BUDGET,MEMORY=1200,6*1024**3
@@ -32,7 +32,13 @@ PRIOR_PINS={
  'native.json':dict(bytes=11011,sha256='ef6f9ff654347e351e5f83d92048938761822eb6428829b68be31d40f0aa2074'),
  'report.json':dict(bytes=11048,sha256='461388f5fc79855f18df47f607951156ff987f6e22396549ce0b635d366721f9')}
 FULLBANK_PIN=(30617,'2a4abd0e871646de32ee00ea847f2663b159f1e497279e538a21d5e8d4521220')
-OBJECTIVE_PIN=(13853,'b00568420e4ccf4a50d3afcb2bc488fe5848686e136bc73bb8ed243d8580fe1e')
+OBJECTIVE_PIN=(13862,'2542534221708a9a3146aa5ff25306b3957a0a101bdb98a181bac05ab10855c1')
+FAILED_REV='7281db2a3f7c7298a0d2a22e6ad7e7036fbe4e18'
+FAILED_CLOSURE='b31a3d3b97215c33b3f2db5d34b15ae0aded11774409bd328159e0a2059fa6a0'
+FAILED_PINS={
+ 'proof.json':dict(bytes=11121,sha256='f93cdc4db34a4a220e7424aa489007f076a7b99eb66ca0f0bc06f5b357180b92'),
+ 'native.json':dict(bytes=9351,sha256='ce79dae97060d8044cb9065470088bfa53fe9271d390d6e5523f9338d984fcf6'),
+ 'report.json':dict(bytes=11725,sha256='2b6de394c25e0ed93167a540fc7a7be21b806555349f81ec8c613108695dcdd5')}
 HELPERS=('infra/coherent_pair_gpu_objective_probe.py','infra/run_coherent_pair_gpu_objective_probe.sh',
  'infra/coherent_pair_gpu_fullbank_cost.py','infra/run_coherent_pair_gpu_fullbank_cost.sh',
  'infra/coherent_pair_gpu_probe.py','infra/coherent_pair_cost_probe.py','infra/mediapipe_cpu_runtime_verify.py',
@@ -73,12 +79,34 @@ def prior_evidence(full,rt):
     return dict(producer_revision=PRIOR_REV,receipts=PRIOR_PINS,source_binding=binding,host_only_authentication=True)
 
 
+def technical_resumption(rt):
+    """Host-only failed-source authentication, never a prior numerical PASS."""
+    old=ROOT/'jobs'/FAILED_REV/ENTRY/'code';out=ROOT/'results/coherent-pair-gpu-objective-probe-v1'
+    binding=rt.source(ROOT,old,FAILED_REV,ENTRY,HELPERS)
+    rt.require(binding['entries']==316 and binding['closure_sha256']==FAILED_CLOSURE
+        and (old.parent/'source-sha256').read_bytes()==b'82b790318f5ecd4ccb0f7a528dd8fe1686c83de3152a9fd4aaf29bc7a1524f63\n',
+        'Immutable failed producer source required')
+    proof,native,host=(rt.pinned(out/n,FAILED_PINS[n],1<<20) for n in ('proof.json','native.json','report.json'))
+    rt.require(proof['source_binding']==native['source_binding']==host['source_binding']==binding
+        and proof['manifest']==native['manifest']==host['manifest']==manifest()
+        and native['status']==host['status']=='fail' and native['phase']=='objective_oracle'
+        and native['error_type']=='OtherError' and native['fd_calls']==0 and native['controls']==[]
+        and host['native_exit_code']==1 and host['source_rehashed_after'] is True
+        and host['owned_container_removed'] is True and host['decision']==native['decision']=='CLOSED_OBJECTIVE_CONTROL',
+        'Original closed failure required, not a prior qualification')
+    return dict(producer_revision=FAILED_REV,receipts=FAILED_PINS,source_binding=binding,
+        host_only_authentication=True,previous_status='fail',previous_phase='objective_oracle',
+        correction='scalar_gradient_boolean_selection_before_reshape',scientific_recipe_unchanged=True,
+        previous_failure_not_converted_to_pass=True)
+
+
 def proof(full,g,rt,code,rev):
     source=rt.source(ROOT,code,rev,ENTRY,HELPERS)
     frozen=dict(full.REUSED);frozen.update({HELPERS[2]:FULLBANK_PIN,'src/world_reward/coherent_pair_marginal_objective.py':OBJECTIVE_PIN})
     rt.require(all(source['helpers'][n]==dict(bytes=b,sha256=s) for n,(b,s) in frozen.items()),'Frozen math/objective/runtime source required')
     rt.require({p.name for p in code.parent.iterdir()}=={'code','revision','source-sha256'},'Exact current code namespace required')
-    return dict(source_binding=source,manifest=manifest(),image=g.image(),fullbank_qualification=prior_evidence(full,rt))
+    return dict(source_binding=source,manifest=manifest(),image=g.image(),fullbank_qualification=prior_evidence(full,rt),
+        technical_resumption=technical_resumption(rt))
 
 
 def leaves(code):return [*(code/n for n in HELPERS),code.parent/'revision',code.parent/'source-sha256']
@@ -235,6 +263,10 @@ def native(code,rev,out,pin,deadline):
         and all(before[str(code.parent/n)]==v for n,v in prior['source_binding']['markers'].items())
         and prior['fullbank_qualification']['producer_revision']==PRIOR_REV and prior['fullbank_qualification']['receipts']==PRIOR_PINS,
         'Exact current source and sealed prior declarations required')
+    rt.require(prior['technical_resumption']['producer_revision']==FAILED_REV
+        and prior['technical_resumption']['receipts']==FAILED_PINS
+        and prior['technical_resumption']['previous_failure_not_converted_to_pass'] is True,
+        'Explicit immutable closed-failure resumption declarations required')
     def check():
         if time.monotonic()>=deadline:raise TimeoutError('Inclusive objective1200s budget')
     def cancelled(*_):raise TimeoutError('Objective control cancelled')
@@ -243,7 +275,8 @@ def native(code,rev,out,pin,deadline):
     report=dict(schema=SCHEMA,stage='coherent_pair_gpu_objective_native',status='fail',phase='imports',producer_revision=rev,
         source_binding=prior['source_binding'],manifest=manifest(),image_id=IMAGE,fullbank_qualification=prior['fullbank_qualification'],
         real_fit_executed=False,models_loaded=False,rgb_read=False,references_read=False,challenge_inputs_used=False,quality_verified=False,
-        adoption=False,global_optimum_claimed=False,decision='CLOSED_OBJECTIVE_CONTROL');snapshots=[];t=None
+        adoption=False,global_optimum_claimed=False,technical_resumption=prior['technical_resumption'],
+        decision='CLOSED_OBJECTIVE_CONTROL');snapshots=[];t=None
     try:
         check();sys.path.insert(0,str(code/'src'));import numpy as np;import torch as t
         rt.require(np.__version__=='1.26.3' and t.__version__=='2.5.1+cu124' and t.version.cuda=='12.4' and t.cuda.is_available() and t.cuda.device_count()==1
@@ -344,7 +377,8 @@ def host(code,rev):
     inode=(out.stat().st_dev,out.stat().st_ino);rt.write(out/'proof.json',(json.dumps(before,sort_keys=True)+'\n').encode(),0o444);pin=rt.identity(out/'proof.json',1<<20)
     cid=out/'container.cid';name='world-reward-objective-'+rev[:12];owned=False;removed=False
     report=dict(schema=SCHEMA,stage='coherent_pair_gpu_objective_host',status='fail',producer_revision=rev,source_binding=before['source_binding'],
-        manifest=manifest(),image=before['image'],fullbank_qualification=before['fullbank_qualification'],decision='CLOSED_OBJECTIVE_CONTROL')
+        manifest=manifest(),image=before['image'],fullbank_qualification=before['fullbank_qualification'],
+        technical_resumption=before['technical_resumption'],decision='CLOSED_OBJECTIVE_CONTROL')
     try:
         rt.require(not g.control(['docker','ps','-aq','--no-trunc','--filter','name=^/'+name+'$']).strip(),'Owned name exists');owned=True
         argv=['docker','run','--rm','--cidfile',str(cid),'--name',name,'--label','world_reward.tiny_gpu.owner='+rev,'--gpus','all',
@@ -358,7 +392,9 @@ def host(code,rev):
         report.update(native_exit_code=r.returncode,diagnostics={k:dict(bytes=len(v),sha256=hashlib.sha256(v).hexdigest()) for k,v in (('stdout',r.stdout),('stderr',r.stderr))})
         rt.require(len(r.stdout)<=32768 and len(r.stderr)<=32768,'Bounded native diagnostics required')
         removed=g.cleanup(rt,cid,name,rev);value=rt.strict((out/'native.json').read_bytes());rt.require(r.returncode==0,'Objective native process failed')
-        validate_native(rt,value,before['source_binding'],rev,before['fullbank_qualification']);report.update(status='pass',decision=DECISION,native_report_identity=rt.identity(out/'native.json',1<<20))
+        validate_native(rt,value,before['source_binding'],rev,before['fullbank_qualification'])
+        rt.require(value['technical_resumption']==before['technical_resumption'],'Native technical-resumption provenance differs')
+        report.update(status='pass',decision=DECISION,native_report_identity=rt.identity(out/'native.json',1<<20))
     except BaseException as exc:report.update(status='fail',error_type=g.error_family(exc))
     finally:
         signal.setitimer(signal.ITIMER_REAL,0)
