@@ -65,3 +65,33 @@ video validation must include bystanders, stationary targets, occlusion and
 release, followed by full-T shared-frame body/object/relative3D non-regression.
 DexYCB covers only an object–hand subproblem. No selector adoption or leaderboard
 win follows from endpoint recall, an authored fixture or a clean overlay.
+
+## Minimal learner seam, not another transport framework
+
+Preserve the historical closed positive-only `joint_pair_scorer` unchanged: it
+pools sides and independently pools best route features, so cannot stand in for
+coherent anatomical tuples or OFF supervision. Reuse the complete observation
+contracts, not its feature pooling/24-slot research recipe.
+
+The prospective side-aware core takes every person×side×target, where targets
+are all original OBJECT proposals, SELF, every other PERSON proposal, and OFF.
+This is `2P×(O+P+1)` rows. UNKNOWN is unscorable reference validity or abstention,
+not a fabricated target bbox. Separate state scores from conditional instance
+ranking: adding duplicate objects must not increase OBJECT evidence by mere
+cardinality. Preserve native slots and ambiguous aliases, not invented physical
+IDs. Exact geometry alone cannot establish two proposals as one physical object.
+
+Each coherent native HOI route combines its own hand/person geometry, direct
+target geometry and logit **before** reducing across competing routes. A/B share
+the same geometric routes/reduction; only B adds relational logits. Do not form
+an impossible route from three different minima/maxima. Process OWL3600 without
+topK deletion; blockwise route reduction bounds memory without changing the
+candidate population. FIT-only feature standardization and availability flags
+remain separate from anatomical visibility or calibrated contact probability.
+
+Fresh manufactured falsifications in `test_background_selection_controls.py`
+demonstrate that the old gate accepts a stable high-confidence background pair
+and changes owner when only object confidence changes. Complete evidence keeps
+both persons, both sides and both objects; missing anatomy never becomes OFF.
+214 relevant tiny tests PASS0.79s. These are algorithm/API controls, not dataset
+validation, proof of correct ownership, or a change to any challenge prediction.
