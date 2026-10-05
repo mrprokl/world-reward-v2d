@@ -29,3 +29,11 @@ transfer; new OI photo/author exclusion does not establish unseen pretraining.
 Initial local verification:79 tiny public-contract/native-callback tests PASS.
 These contain generated toy RGB/masks only: no actual native inference, proposal
 quality, actor/object identity or leaderboard gain is claimed by this note.
+
+The first stress-region dispatch failed at authentication before RGB decoding,
+model loading or AMG calls: individual source mounts omitted the current
+dispatch-marker siblings needed by the unchanged selected-asset helper. Keep
+the original FAIL artifacts. The corrected adapter mounts those two tiny
+markers explicitly, not the broad source directory; a fresh v2 output is used.
+This is a preflight transport correction, not a quality-based cohort rescue,
+parameter change, prediction reuse or scientific result.

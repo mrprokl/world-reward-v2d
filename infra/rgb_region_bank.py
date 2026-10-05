@@ -84,6 +84,14 @@ def public_inputs(directory, pin, p, count):
     return value
 
 
+def dispatch_markers(code, revision):
+    """Original byte markers are needed by the unchanged selected-asset helper."""
+    rt.require((code.parent/'revision').read_bytes() == (revision+'\n').encode()
+        and re.fullmatch(b'[0-9a-f]{64}\n',(code.parent/'source-sha256').read_bytes()),
+        'Actual dispatch markers required alongside individual source mounts')
+    return tuple(code.parent/n for n in ('revision','source-sha256'))
+
+
 def decode(directory, row):
     import numpy as np
     from PIL import Image
@@ -173,6 +181,8 @@ def native(code, revision, p, directory, out, count, pin, proof_pin):
         rt.require(mounted == set(NATIVE_FILES) == set(safe['native_files']), 'Only whitelisted helpers; no renderer/recipe/configs')
         for name,wanted in safe['native_files'].items():
             rt.require(rt.identity(code/name,2_000_000) == wanted, 'Mounted original helper changed')
+        for path in dispatch_markers(code,revision):
+            rt.require(rt.identity(path,100) == safe['source']['markers'][path.name], 'Original source markers changed')
         before = public_inputs(directory,pin,p,count); model = mechanics.frontend_proof(code,p)
         rt.require(mechanics.json_digest(model) == safe['frontend_sha256'], 'Qualified original model proof differs')
         import torch
@@ -230,7 +240,7 @@ def dispatch(code, revision, p, directory, out, count, pin):
         fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB)
         rt.require(not cmdout(['nvidia-smi','--query-compute-apps=pid','--format=csv,noheader,nounits']), 'Other GPU compute present')
         out.mkdir(mode=0o700); created = True; proof_pin = write(out/'proof.json',safe)
-        mounts = [code/n for n in NATIVE_FILES]+list(binding.control_paths())+[directory,
+        mounts = [code/n for n in NATIVE_FILES]+list(dispatch_markers(code,revision))+list(binding.control_paths())+[directory,
             binding.DEST/'weights'/p['checkpoint']['relative_path']]
         cmd = ['docker','run','--rm','--name',name,'--cidfile',str(out/'.container.cid'),
             '--label','world-reward.job='+ENTRY,'--label','world-reward.revision='+revision,
@@ -292,7 +302,7 @@ def main():
     a = parser.parse_args(); code = Path(os.environ['WR_CODE']); revision = os.environ['WR_CODE_REVISION']
     rt.require(sys.platform == 'linux' and os.geteuid() == 0 and os.environ['WR_ROOT'] == str(ROOT)
         and re.fullmatch('[0-9a-f]{40}',revision) and code == ROOT/'jobs'/revision/ENTRY/'code', 'Actual immutable source namespace required')
-    rt.require(a.inputs in INPUTS and a.output == ROOT/'results'/('proposal-stress-regions-v1' if a.inputs == INPUTS[0]
+    rt.require(a.inputs in INPUTS and a.output == ROOT/'results'/('proposal-stress-regions-v2' if a.inputs == INPUTS[0]
         else 'proposal-external-regions-v1'), 'Only prospectively frozen fresh validation namespaces allowed')
     p = configuration(code); pin = dict(bytes=a.manifest_bytes,sha256=a.manifest_sha256)
     def expired(*_): raise TimeoutError('Inclusive region bank bound exceeded')

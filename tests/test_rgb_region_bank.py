@@ -47,6 +47,13 @@ def test_defaults_do_not_follow_cohort_or_semantic_query():
     assert not any('openimages_joint_pair' in str(x) for x in d.INPUTS)
 
 
+def test_dispatch_markers_alongside_individual_source_files(tmp_path):
+    job=tmp_path/'job';code=job/'code';code.mkdir(parents=True);revision='a'*40
+    seal(job/'revision',(revision+'\n').encode());seal(job/'source-sha256',('b'*64+'\n').encode())
+    assert d.dispatch_markers(code,revision)==(job/'revision',job/'source-sha256')
+    with pytest.raises(ValueError):d.dispatch_markers(code,'c'*40)
+
+
 def test_exact_public_rgb_pin_and_native_decode(tmp_path):
     directory,pin,p,value = fixture(tmp_path)
     assert d.public_inputs(directory,pin,p,1) == value
