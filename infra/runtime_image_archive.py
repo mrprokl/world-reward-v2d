@@ -37,7 +37,7 @@ _STABLE = ('st_dev', 'st_ino', 'st_size', 'st_mode', 'st_nlink',
 _EMPTY_CONTAINER = dict(Hostname='', Domainname='', User='', AttachStdin=False,
     AttachStdout=False, AttachStderr=False, Tty=False, OpenStdin=False,
     StdinOnce=False, Env=None, Cmd=None, Image='', Volumes=None, WorkingDir='',
-    Entrypoint=None, OnBuild=None, Labels=None)
+    Entrypoint=None, Labels=None)
 # Moby v28.0.0 image/image.go V1Image, lines 32-81. ID/parent are
 # compatibility-chain fields; rootfs/history belong to Image, not V1Image.
 _V1_FIELDS = ('comment', 'created', 'container', 'container_config',

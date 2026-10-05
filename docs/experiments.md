@@ -9743,3 +9743,12 @@ known. Tiny header control proves originalUSTAR ValueError and GNUbase256 exact
 upload; preserve its interruption/failure. New transport uses same bounded short
 allowlisted names and exact image bytes, only supportedbase256 header. No model,
 image build/save or scientific cohort replay.
+
+Actual ff24598 export already closedFAIL50.105053s before the stop request,
+at saved_image_authentication; no upload/interruption. Saved-only exact guard
+diagnosis identifies strict dummy-schema mismatch: modern Docker29.5.3 omits
+OnBuild rather than serializing null. The actual47 independently pinned metadata
+hashes and terminal config remain mandatory; use the observed exact empty schema,
+not optional arbitrary fields. Whole layer/config/archive criteria unchanged.
+USTAR correction is separately pre-execution code qualification, not the cause
+of this earlier failure. No model/runtime/scientific cohort rerun.
