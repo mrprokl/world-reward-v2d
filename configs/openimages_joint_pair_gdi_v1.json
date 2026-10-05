@@ -1,0 +1,20 @@
+{
+  "schema": "world_reward.openimages_joint_pair_gdi.v1",
+  "acquisition_revision": "e2b6019f502e18694a221aa6b1818804ef3d6d83",
+  "cohort": {"bytes": 31043, "sha256": "441bdc57e101cb4e8291ca6bbebc554ca397619e2a892469d9e410a16359a456"},
+  "manifest": {"bytes": 76232, "sha256": "57135ee4853afaff9d5820f11128fc2c8da9c42b2cb14b40597909c9f0f0eeb4"},
+  "image_id": "sha256:fd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252",
+  "output": "results/openimages-joint-pair-gdi-v1",
+  "slots": 64,
+  "acquired": 50,
+  "missing": 14,
+  "budget_seconds": 600,
+  "person_query": "person.",
+  "object_query": "object.",
+  "confidence": 0.3,
+  "text_threshold": 0.25,
+  "nms_iou": 0.7,
+  "challenge_inputs_used": false,
+  "quality_verified": false,
+  "adoption": false
+}
