@@ -1,0 +1,49 @@
+{
+  "DEV": {
+    "acquired_slots": 16,
+    "all_instances": 244,
+    "fixed_gate": 0.6,
+    "human_instances": 88,
+    "macro_all_bbox_recall_at_half": 0.3283938283938284,
+    "macro_human_bbox_recall_at_half": 0.1855502136752137,
+    "macro_object_bbox_recall_at_half": 0.43759157509157504,
+    "missing_slots": 0,
+    "native_boxes": 560,
+    "object_instances": 156,
+    "recovered_all_instances_at_half": 79,
+    "recovered_human_instances_at_half": 15,
+    "recovered_object_instances_at_half": 64,
+    "slots": 16
+  },
+  "adoption": false,
+  "all_native": {
+    "amg_calls": 32,
+    "bank_bytes": 37233689,
+    "elapsed_seconds": 23.81992286298191,
+    "host_report": {
+      "bytes": 2245,
+      "sha256": "b2cc5600d6a06937417029a2096f88f385200029805267700a9a4f81550702fd"
+    },
+    "masks": 1024,
+    "model_loads": 1,
+    "native_report": {
+      "bytes": 12996,
+      "sha256": "587c774818fc4c19c8a64839a646facf369fd7da28b0a4ac1aaef43c7620edfd"
+    },
+    "original_RGB_decodes": 32
+  },
+  "decision": "CLOSED_DEVELOPMENT_RECALL_FAILURE_RESERVED_UNOPENED",
+  "independent_metric_audit_pending": true,
+  "ownership_verified": false,
+  "producer_revision": "4657c8b45f733a1043c5a8af2f5b9d6ac027196a",
+  "quality_verified": false,
+  "report": {
+    "bytes": 4458,
+    "sha256": "99e48917c3a93fb26da18a66944303a69c64d79443086e2f9f2478fc3de16ae5"
+  },
+  "reserved_references_opened": false,
+  "retry_or_tuning_allowed": false,
+  "schema": "world_reward.coco_proposal_dev_recall_observed.v1",
+  "source_predictions_references_rehashed_after": true,
+  "status": "pass"
+}

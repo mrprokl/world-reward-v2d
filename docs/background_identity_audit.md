@@ -316,3 +316,25 @@ labels are external, not challengeGT. Synthetic success would only qualify
 proposal mechanics; real owned/consented external captures or an executed
 EgoExo grant are still needed for ownership/temporal/real-transfer claims.
 No next manufacture, model execution, adoption or leaderboard gain claimed.
+
+### Actual real transfer fail-fast, October5
+
+The new synthetic native-AMG proposal-capacity result is not enough. Fresh
+CC-BY2 COCO cohort32,215metadata-eligible after all240closed photo exclusions,
+is independently frozen/acquired32/32. Unchanged HieraL AMG executes32calls/
+1024complete native regions in23.819923s; all banks precede references.
+FixedDEV16 bbox-IoU.5 macro recall is **.328394all/.185550human/.437592object**,
+below the prospective.6gate. Original244instances88persons/156objects yield
+79/15/64best-box recoveries. RESERVED references remain unopened; the study
+is **CLOSED**, not a tuning bank. Independent saved-only metric audit pending.
+
+Decision: reject native default AMG as the sole high-recall actor/object
+proposer. Synthetic geometry is easier than real clutter/partial humans/small
+objects, and regions remain parts/background. Keep the reusable region module
+but do not adopt it as a physical-object or ownership solution. A substantively
+new observation system should combine an explicit complete multi-person bank,
+an objectness-capable complete object bank and automatic relational evidence;
+not merely increase AMG thresholds/crops until this closed cohort passes.
+Validate each endpoint first on genuinely fresh licensed external records,
+then annotated joint pairs and full-T reconstruction. Neither successful RGB
+acquisition nor1024masks establishes foreground target selection.

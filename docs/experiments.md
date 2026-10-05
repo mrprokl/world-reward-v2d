@@ -11103,3 +11103,13 @@ EP17refinement initial transport unacknowledged, independent target check shows
 no publishedsource/unit/output. A fresh identical dispatch is allowed only after
 that proof of non-execution, not a silent retry or restart. Result pending.
 Root coverage contracts568PASS/2platform skips63.09s; crowd contracts170PASS.41s.
+
+Actual unchanged SAM2COCO runPASS32RGB/32AMG/1load,1024native regions37,233,689B,
+23.819923s. Scientific fixedDEV gate FAIL: macro bboxRecall@.5=.3283938284all,
+.1855502137human/.4375915751object;16fully acquired slots,244instances88P/156O,
+79recovered15P/64O. Report4458B SHA99e48917…ae5, decision
+CLOSED_DEVELOPMENT_RECALL_FAILURE_RESERVED_UNOPENED. RESERVED reference files
+hashed only, not opened. No replacement, threshold/crop tuning, rescue or
+reserved score. Independent saved-only audit delegated. Reject AMG-only endpoint
+proposal strategy; preserve source/results and pursue substantively new person+
+objectness+relational evidence on a fresh protocol. No CARI4D gain claimed.
