@@ -10167,3 +10167,13 @@ Fresh whole-model v3 adds only that pinned offline overlay and now gates all
 native imports/config on CPU before the GPU lease. Existing numerical source,
 checkpoint, model/config/preprocessing and1800s budget unchanged; oldv2FAIL
 preserved. Temporary diagnostic source downloads removed on Azure.
+
+11feff5 whole-model v3 actual CLOSED FAIL37.911238s: full original import/config
+closure CPU PASS; original full detector constructor and safe weights_only
+checkpoint decode reached, then strict key/shape/dtype validation rejected it.
+No partial load, inference, remapping or dtype conversion. Host2811B/
+18d0b4d4ff7057952cc18b2537b1273759d79e5205f5df70c33153fbab64f4b8;
+native414B/67ee0ed7315e05ea4e73d79176f81472da146046e6b247490035a14405ad72d0.
+Full input/source/image posthash and owned containers/overlay cleanup pass,
+GPU idle. Next action is a CPU-only exact checkpoint schema diagnostic, not
+loosening strictness or adopting a partially matched model.
