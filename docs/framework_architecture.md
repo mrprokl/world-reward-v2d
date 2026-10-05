@@ -100,8 +100,11 @@ unqualified. Full-HOI calibration/held-out rights remain unresolved; see the
 October5 targeted licence audit. No positive weight or backend adoption yet.
 
 The bounded [fresh real-MHR caller](joint_point_authored_runtime_protocol.md)
-is now implemented and dispatched separately from its protocol. It reuses the
-same operators; no execution/accuracy/adoption is implied by its tiny tests.
+now fails exact A/B parity after real manufacture/contact/render/Kaolin probes:
+32 valid attaches, A301 updates, B stopped before optimization. A CPU-only saved-
+state audit localizes initial reference-foot and forward/gradient discrepancies;
+baseline bit self-reproducibility is unknown, not an established subclass defect.
+The original failure stays closed; no tolerance or accuracy/adoption follows.
 The next actual tracking seam needs no new model: BootsTAPIR already preserves
 full-T query slots, raw logits and native global XY256. The point objective's
 `diag(256/W,256/H)` maps **full-image** pixels, not native silhouette crop pixels.

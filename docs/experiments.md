@@ -9214,3 +9214,23 @@ FullinstalledBody/native/transitiveacquisition/model proof beforedecode; unknown
 FAIL ratherthan firstseenpin. DispatchACKonly/231sourcefiles
 archive3885c95ff62c18f82bb8ac5cfdd278584f1e4bc141e55d36d976f78fb70ce91f.
 Rootcombinedsurface+joint311PASS10skip2.65s; still noactualpaired outcome.
+
+Fresh authored1b1ac13 CLOSEDFAIL: native29.907874s/host33.989916s, fullT3
+manufacture14.838088s actualMHR18439V3frames/render/crop;32/32distinctunambiguous
+maskquantilequeries.2constructors4probesreturned, originalA301updates1run,
+BstopsBEFORErun at exactinitial/loss/gradient comparison;602notachieved.
+Actualcontact+render calls bothprobes;181penetration+Kaolincheck_sign/distance.
+Host6172B981b4db4bec8f8a4e1ff6a12396a426ce462f06950aa41960c5e1d9122ce4eb0,
+native6623Bdc2745e86b79ddf0e5542f6f05434113d3c600e15c5770ef958a35ec875e258f.
+Source/assets posthash/exactownCIDabsencePASS;12nativefullartifactssealedAzure.
+CPUonlysavedstate/probe/Aresult/fullrawsourceauditPASS1.186073s,noMHRdecode,
+loss,optimizer/GPUcalls;6941Bcc5e2201a2394263c9ce5ade78e26d302aed3de3ff4a9535ca5a8947a5ec28f6.
+Initialonlyreference_foot_vertices146/2304F32values differmax4.76837158e-7m;
+otherstate/opt/schedulerexact. Probe0gradsmax2.38418579e-6translation/
+1.37090683e-6body+forwardmetrics/contactdifferences;181translation1.65462494e-4/
+body1.26123428e-4, penetration+total2.38418579e-7. No causal attribution to
+subclass/atomics; bothforward+backwarddiffer. FirstCPUcontroller usedwrongnested
+initialstatekey, stoppedafterreadonlycomparisons; ownCID-onlyscratchremoved,
+correctedsame12savedfilesaudit,no scientificrerun. Compactreportreadneeded
+becauseAzuretruncatedover4KB. OriginalFAILretained,nogaterelaxation/adoption.
+Nextquestion is freshoriginalA/Aselfreproducibility, notrerunthisscene/weightfit.

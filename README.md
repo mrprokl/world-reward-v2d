@@ -65,7 +65,8 @@ inferred automatically; no hand-labeling of challenge records.
   manufactured state pass; real-body/contact execution and independent HOI
   validation remain required. No challenge-tuned loss weights or measured gain.
   A [fresh three-frame real-MHR runtime pair](docs/joint_point_authored_runtime_protocol.md)
-  is now preregistered; manufacture/render/602-update execution remain unverified.
+  passes manufacture/32 attaches/real-kernel execution but **fails exact parity**:
+  A301 updates, B0; full602-update qualification remains unachieved.
   [Balanced exact sums](docs/balanced_solid_sum.md) pass15 fresh native controls
   on the authenticated existing CPU runtime; four fresh QEM/query composition
   controls also pass, with the original QEM unchanged and query proofs separate.

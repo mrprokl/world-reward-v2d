@@ -2,9 +2,9 @@
 
 **Prospective only, 2026-10-05.** The companion
 `configs/joint_point_authored_runtime_protocol_v1.json` freezes one new three-frame
-control. Its bounded caller is implemented and tiny-tested; no manufacture,
-model execution, optimization, runtime qualification or accuracy measurement
-has been observed. EP21's original insufficient-query failure
+control. Its bounded caller has executed and **failed exact A/B parity**;
+runtime qualification and accuracy improvement remain unproven.
+EP21's original insufficient-query failure
 stays closed; neither its inputs nor any earlier authored control is reused.
 This is a small new caller of existing operators, not another inference pipeline.
 
@@ -15,7 +15,27 @@ kernel entrypoints are observed by a scoped profiler, not monkeypatched.
 Root279 tests pass with10 Torch-dependent skips; these are caller/control tests,
 not real GPU evidence. Complete installed Body/native source and independently
 pinned model bytes remain runtime prerequisites. One fresh Azure dispatch is
-requested at `1b1ac133ea59aeef732a6552b9a86dbb173494c1`; ACK/completion are separate.
+executed at `1b1ac133ea59aeef732a6552b9a86dbb173494c1`; its failure is frozen in
+`configs/joint_point_authored_failure_pins.json`.
+
+Actual manufacture14.838s/fullT3 succeeded;32/32 mask-quantile attaches were
+distinct, supported and unambiguous. Two constructors and all four probes
+returned with actual contact/render and step181 Kaolin sign/distance calls.
+A completed301 updates; exact initial/loss/gradient comparison then stopped B
+**before its optimization**. Native29.908s/host33.990s, source posthash and owned
+container cleanup verified. Twelve complete native artifacts remain on Azure.
+The602-update pair and full-result parity were **not achieved**.
+
+A CPU-only audit of retained states/probes/result, without decode/loss/optimizer
+replay, localized the initial difference to146/2304 `reference_foot_vertices`
+F32 entries (max4.768e-7m); other initial values/optimizer/scheduler were exact.
+Forward diagnostics/contact also differ; step181 total and penetration differ
+by2.384e-7. Gradient maxima differ up to1.655e-4. This is not proof that the
+point subclass caused the differences, nor that backward atomics explain all
+of them. Seed/TF32 settings do not establish baseline bit reproducibility.
+The exact gate stays unchanged; no tolerance, repetition or rescue of this
+scene. A separate fresh **original-vs-original** control can test native
+self-reproducibility before attributing this failure to the extension.
 
 ## Exact source and model prerequisites
 

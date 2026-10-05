@@ -1,0 +1,41 @@
+{
+  "schema": "world_reward.joint_point_authored_failure_pins.v1",
+  "producer_revision": "1b1ac133ea59aeef732a6552b9a86dbb173494c1",
+  "host_report": {
+    "bytes": 6172,
+    "sha256": "981b4db4bec8f8a4e1ff6a12396a426ce462f06950aa41960c5e1d9122ce4eb0"
+  },
+  "native_report": {
+    "bytes": 6623,
+    "sha256": "dc2745e86b79ddf0e5542f6f05434113d3c600e15c5770ef958a35ec875e258f"
+  },
+  "cpu_diagnostic": {
+    "path": "results/joint-point-authored-parity-diagnostic-v2/report.json",
+    "bytes": 6941,
+    "sha256": "cc5e2201a2394263c9ce5ade78e26d302aed3de3ff4a9535ca5a8947a5ec28f6"
+  },
+  "source_files": 231,
+  "source_archive_sha256": "3885c95ff62c18f82bb8ac5cfdd278584f1e4bc141e55d36d976f78fb70ce91f",
+  "status": "fail",
+  "phase": "B_point_weight_zero_loss_gradient_181",
+  "frames": 3,
+  "manufacture_seconds": 14.838088111020625,
+  "native_elapsed_seconds": 29.90787374699721,
+  "host_elapsed_seconds": 33.9899161469948,
+  "constructor_returns": 2,
+  "probe_returns": 4,
+  "run_returns": 1,
+  "original_A_updates": 301,
+  "original_B_updates": 0,
+  "qualified_queries": 32,
+  "retained_native_files": 12,
+  "source_assets_rehashed_after": true,
+  "owned_container_absence_verified": true,
+  "exact_initial_state_parity": false,
+  "exact_loss_gradient_parity": false,
+  "runtime_qualified": false,
+  "tracker_executed": false,
+  "positive_weight_executed": false,
+  "quality_verified": false,
+  "adoption": false
+}
