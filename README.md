@@ -10,12 +10,19 @@ inferred automatically; no hand-labeling of challenge records.
 
 **No final Parquet, submission or verified CARI4D improvement yet.**
 
-**Visual QA changes the priority:** EP9 selects a background person/object at
+**Visual QA changes the priority:** EP8/EP9 select a background person/object at
 automatic initialization. Its complete engineering PASS is not a correct
 interaction. A read-only census of all14 exports/42 fixed views is complete;
 mask/mesh agreement cannot certify semantic identity. Prioritize a genuinely
 automatic multi-instance observation bank and external persistent-ID validation,
 not manual episode reassignment or another downstream fit of the wrong pair.
+
+- **Actual automatic observation bank:** two external HO-Cap clips retain all
+  1493 original RGB frames and all287 native class-agnostic AMG proposals at ten
+  fixed anchors, yielding3133 automatic point queries. Execution/source/cleanup
+  checks pass; no private reference values were read. Full-T native tracking and
+  the [frozen semantic-retention test](docs/hocap_point_retention_protocol.md)
+  remain separate from actor choice, contact and reconstruction accuracy.
 
 - **New generic operators:** [surface identity/LOD](docs/surface_lod_protocol.md)
   separates lawful open surfaces from our optional closed-solid backend; no
