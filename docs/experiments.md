@@ -10231,3 +10231,30 @@ crossed to ignored local previews; creator attribution retained. Temporary
 private transfer blob removed, no media/checkpoint publication. Visual QA is
 not manual test labeling or independently measured relationship accuracy.
 Final336 combined tiny tests PASS2.05s; source/syntax/diff checks PASS.
+
+919271c fresh external15-slot cohort actual full native batch COMPLETE
+PASS48.919351s. Independently verified creator grants/original MD5 allowed eight
+original JPEGs15,110,779B, all Azure-only; five access/grant failures and two
+unknown-orientation slots stay missing without replacements. Metadata and
+references never mounted into GPU. One strict1796-key weights_only full original
+model load, eight native forwards, 156 original H→O pair logits. No AMP/TF32,
+EMA swapping, native detector retuning or required-pair filtering. Original
+provenance/numerical/cleanup helper functions remain AST unchanged. Protocol and
+strong geometry-vs-native-margin score definitions frozen before fresh inference.
+Host6498B/a14ef5900e4659be6cdb89c28b243ddc0ae7d7dfa5e9057de53834c424640c98;
+native7074B/71658f2aff1430c8232b6cf4da401c116788732698d89ed766ec1e9bfbc5d26f.
+Independent root reauthentication of full current/historical source, original
+5.855GB checkpoint, exact runtime/image, all eight JPEG/grant/output pins and
+read-only sealing/owned-container-overlay cleanup PASS; GPU idle after run.
+
+Fail-fast scientific support: native role1 counts[4,5,1,4,5,1,2,1] mean at most
+five of the eight acquired images can contain two differently ranked objects.
+The predeclared six-informative-image gate is already unattainable even before
+private reference geometry. Therefore this fixed cohort is **INCONCLUSIVE** for
+scientific adoption; do not relax the gate, replace images or spend evaluator
+effort pretending it can establish superiority. Native availability/execution
+is demonstrated; attribution/hand ownership/contact/3D/CARI4D superiority is not.
+Next scientific cohort must be separately preregistered, larger and disjoint;
+algorithm/rank definitions remain unchanged, not tuned on this diagnostic.
+200 combined tiny tests PASS0.44s; clean diff/source syntax. Existing tiny visual
+receipts remain exact (all14 baseline139752B and external native QA55431B).
