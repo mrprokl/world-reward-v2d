@@ -205,8 +205,12 @@ PYSURFACECID
  BEFORE="$(surface_host before)"
  REMAINING=$((7200-(SECONDS-SURFACE_START)));(( REMAINING>0 )) || exit 1
  CREATED=1
+ # Bound future CPU preparation inside Docker's own cgroup. The systemd parent
+ # does not cap daemon-created containers; existing immutable jobs are unchanged.
  timeout --signal=TERM --kill-after=1s "${REMAINING}s" docker run --rm --name "$NAME" --cidfile "$CID_FILE" --label "world_reward.cari_prepare.owner=$REV" --network none \
+  --cpus 4 --memory 64g --pids-limit 256 \
   --user "$(id -u scenesmith):$(id -g scenesmith)" --env WR_ROOT="$ROOT" --env WR_CODE_REVISION="$REV" --env PYTHONPATH="$CODE/src" --env PYTHONDONTWRITEBYTECODE=1 \
+  --env OMP_NUM_THREADS=4 --env OPENBLAS_NUM_THREADS=4 --env MKL_NUM_THREADS=4 \
   --mount "type=bind,src=$CODE,dst=$CODE,readonly" --mount "type=bind,src=$ROOT/vendor,dst=$ROOT/vendor,readonly" \
   --mount "type=bind,src=$ROOT/data,dst=$ROOT/data,readonly" --mount "type=bind,src=$ROOT/results,dst=$ROOT/results,readonly" \
   --mount "type=bind,src=$ROOT/outputs,dst=$ROOT/outputs" "${HISTORICAL_MOUNTS[@]}" "$IMAGE" python "$CODE/infra/cari_prepare.py" "$@"

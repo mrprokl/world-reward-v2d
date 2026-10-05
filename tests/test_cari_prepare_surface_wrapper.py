@@ -296,5 +296,7 @@ def test_surface_only_budget_image_no_gpu_and_legacy_tail_unchanged():
     assert '--gpus' not in branch and 'flock' not in branch and 'fd/9' not in branch
     assert '"$IMAGE" python "$CODE/infra/cari_prepare.py" "$@"' in branch
     assert 'mkdir "$OUT"' not in branch
+    assert '--cpus 4 --memory 64g --pids-limit 256' in branch
+    assert '--env OMP_NUM_THREADS=4 --env OPENBLAS_NUM_THREADS=4 --env MKL_NUM_THREADS=4' in branch
     assert 'EXISTING="$(timeout 5s docker ps' in branch and ')" || exit 1' in branch
     subprocess.run(['bash', '-n', str(SCRIPT)], check=True)

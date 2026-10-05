@@ -204,3 +204,11 @@ The optional `azure_job --github-source` mode now passes an exact-byte remote so
 fetches the exact public source closure, verifies every file and original TAR/XZ
 hash, then uses the same atomic publisher. One90s bounded phase; no redirects,
 credentials, retry or fallback. It is not a scientific/runtime qualification.
+
+October5: future surface-only CARI CPU preparation now explicitly caps the
+Docker-created container at4CPUs/64GiB/256PIDs and BLAS/OpenMP4threads. Parent
+systemd cgroups do not govern Docker-daemon children. The original EP17 job at
+ea3de92 continues unchanged with its original uncapped execution; do not restart
+it or claim historical resource isolation. Any concurrent CPU continuation must
+first read actual Docker/cgroup usage and available host memory. This affects
+future engineering resource budgets, not reconstruction parameters.
