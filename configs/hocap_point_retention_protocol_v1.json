@@ -1,0 +1,272 @@
+{
+  "attribution": {
+    "changes": "selected single-camera RGB and prospective automatic-mask/point diagnostic; original reference files unchanged",
+    "dataset": "HO-Cap; IRVLUTD; CVPR2024",
+    "license": "CC-BY-4.0",
+    "source": "https://irvlutd.github.io/HOCap/"
+  },
+  "automatic_bank": {
+    "GT_seed_selection": false,
+    "all_native_returned_masks": true,
+    "class_agnostic": true,
+    "native_filters_unchanged": true,
+    "parts_hierarchy_overlap_background_retained": true,
+    "protocol": {
+      "bytes": 2172,
+      "path": "configs/hocap_amg_protocol_v1.json",
+      "sha256": "5f63a6c82e3594cda799a4e167c296be2471b8c75bb2090b2c3401d1301de1d3"
+    },
+    "query_refill": false,
+    "query_rule": "fixed 4x4 native XYWH bbox grid, floor/clamp/unique row-major pixels inside original mask; (anchor,y+.5,x+.5)",
+    "resource_overrun": "STOP whole bank, no truncation",
+    "text_queries": [],
+    "zero_query_seeds_retained": true
+  },
+  "budgets_seconds": {
+    "AMG_native": 900,
+    "Boots_full_two_clips_native": 1800,
+    "host_cleanup_each": 60,
+    "private_evaluation_native": 300
+  },
+  "cohort": {
+    "anchor_rule": "floor(k*(T-1)/4), k=0..4",
+    "camera": "105322251564",
+    "clips": [
+      {
+        "anchors": [
+          0,
+          175,
+          350,
+          525,
+          701
+        ],
+        "clip": "20231027_112303",
+        "frames": 702
+      },
+      {
+        "anchors": [
+          0,
+          197,
+          395,
+          592,
+          790
+        ],
+        "clip": "20231027_113202",
+        "frames": 791
+      }
+    ],
+    "frame_index": "int64 arange(T); source_frame_id unchanged",
+    "full_frames": 1493,
+    "replacement_allowed": false,
+    "subject": "subject_5"
+  },
+  "dataset": {
+    "challenge_overlap_verified": false,
+    "fit_or_calibration": false,
+    "license": "CC-BY-4.0",
+    "name": "HO-Cap",
+    "official_HPE_OPE_test_only": true,
+    "toolkit_license": "GPL-3.0",
+    "toolkit_revision": "576c63ebf3b84dfec8744ba0f021234213bf0dab",
+    "training_overlap_verified": false
+  },
+  "decision": {
+    "CARI4D_victory": false,
+    "actor_object_association_verified": false,
+    "adoption": false,
+    "contact_verified": false,
+    "coverage_minima_descriptive_only": true,
+    "malformed_or_unknown_label": "INCONCLUSIVE whole job",
+    "material_correspondence_verified": false,
+    "metric_3D_verified": false,
+    "nonregression": "B wrong-object-class fraction <=A separately on EACH clip, SAME possible denominator",
+    "otherwise": "REJECT; retain all clips/queries/predictions/diagnostics; no repeat/filter/prompt/model/threshold changes",
+    "physical_identity_verified": false,
+    "pooled_only_PASS_forbidden": true,
+    "primary": "QUALIFIED_SEMANTIC_MASK_POINT_RETENTION only if B correct-supported fraction strictly>A separately on EACH clip",
+    "unsupported_reference": "zero object-referenced possible slots on either clip => INCONCLUSIVE"
+  },
+  "input": {
+    "all_original_JPEGs_decode_validate_before_model": true,
+    "directory": "/srv/world-reward-data/hocap_extract_v1/inputs",
+    "extraction": {
+      "bytes": 5940,
+      "path": "/srv/world-reward-data/hocap_extract_v1/report.json",
+      "producer_revision": "f5cd5e8a5003d092be51ff4dc885c65dfee42ecf",
+      "sha256": "17b5eebd632d52a08f813de179b12baebace1e20014cf7daca5ec6baf5e648a4"
+    },
+    "manifest": {
+      "bytes": 358318,
+      "path": "/srv/world-reward-data/hocap_extract_v1/inputs/manifest.json",
+      "sha256": "58f888bcffd4c3c0e308a0f173e92a9e2e4150de7883af0e3d2d5afd0145d42d"
+    },
+    "timestamps_verified": false
+  },
+  "metrics": {
+    "A": "static original anchor XY diagnostic with all-true nominal support; not an admissible reconstructed trajectory",
+    "B": "unchanged full-T Boots original-image XY and native_visible",
+    "coverage_floor": "none; full natural occlusion is valid, missing remains penalized in primary denominator",
+    "dependence": "seeds/hierarchy/anchors/queries correlated, not independent objects or trials",
+    "evaluation_frames": "strict t>query_anchor only; prebirth and forced anchor remain stored but excluded",
+    "per_frame": [
+      "all-seed/object-seed possible counts",
+      "correct_supported_A_B",
+      "native_visible_finite_inbounds_B",
+      "wrong_object_class_A_B",
+      "background_HAND_A_B",
+      "hidden_outgrid_B",
+      "reference_class_absent",
+      "native_visible_fraction",
+      "coverage_minimum_and_gap_runs"
+    ],
+    "possible_per_object_query": "T-1-anchor, including native-hidden/out-of-frame/wrong-class/reference-class-absent frames",
+    "primary_correct_supported": "native_visible AND finite AND in-original-image AND semantic SEG at floor predicted XY equals fixed object reference",
+    "primary_weighting": "per clip micro counts over ALL object-referenced query-future-frame slots; no query/seed/frame selection",
+    "secondary_weighting": "equal eligible seed/anchor macro plus every raw per-query count; Q0/NO_FUTURE reported separately",
+    "unknown_GT": "INCONCLUSIVE whole experiment, never silently shrink denominator",
+    "wrong_object_class": "supported finite in-bounds point lies in a different object class; background/HAND/missing counted separately"
+  },
+  "primary_sources": {
+    "class_catalog": {
+      "bytes": 4016,
+      "sha256": "cddb4f8484223216880eeb9d675fdd3072c19888e81cc47150505c9c8b42ef9e",
+      "url": "https://raw.githubusercontent.com/IRVLUTD/HO-Cap/576c63ebf3b84dfec8744ba0f021234213bf0dab/config/hocap_info.yaml"
+    },
+    "dataset_factory": {
+      "bytes": 20701,
+      "mapping_lines": [
+        [
+          204,
+          218
+        ],
+        [
+          277,
+          294
+        ],
+        [
+          419,
+          440
+        ]
+      ],
+      "sha256": "720c634ccc433843543e877746416936396da3c80135bbdd87af00102139d473",
+      "url": "https://raw.githubusercontent.com/IRVLUTD/HO-Cap/576c63ebf3b84dfec8744ba0f021234213bf0dab/hocap_toolkit/factory/dataset_factory.py"
+    },
+    "label_viewer": {
+      "bytes": 2977,
+      "lines": [
+        28,
+        59
+      ],
+      "sha256": "41663cfdb412f11bc86ea0af043fb0034cac84d514e986daaa7089d3d26d7c98",
+      "url": "https://raw.githubusercontent.com/IRVLUTD/HO-Cap/576c63ebf3b84dfec8744ba0f021234213bf0dab/examples/image_label_viewer.py"
+    },
+    "publisher": {
+      "bytes": 29538,
+      "sha256": "dc77ec8bbe2fa9820f9b70be7d505761a6dc8c9b792d827a8b3dc681816b1c78",
+      "url": "https://irvlutd.github.io/HOCap/"
+    },
+    "sam2_AMG": {
+      "bytes": 18461,
+      "constructor_lines": [
+        37,
+        150
+      ],
+      "sha256": "66df266dbe14412305ae3398f0ec1bb21b303a93216b102d767e6c4ee5d4c3d7",
+      "url": "https://raw.githubusercontent.com/facebookresearch/sam2/2b90b9f5ceec907a1c18123530e92e794ad901a4/sam2/automatic_mask_generator.py"
+    },
+    "sequence_loader": {
+      "bytes": 13139,
+      "lines": [
+        246,
+        261
+      ],
+      "sha256": "9359085817f285173dce73a0ec8eb42725268f9d815b1de2cc0cef883dad8e07",
+      "url": "https://raw.githubusercontent.com/IRVLUTD/HO-Cap/576c63ebf3b84dfec8744ba0f021234213bf0dab/hocap_toolkit/loaders/sequence_loader.py"
+    }
+  },
+  "private_evaluation": {
+    "allow_pickle": false,
+    "archive": {
+      "bytes": 1572838245,
+      "path": "/srv/world-reward-data/hocap_v2/quarantine/labels.zip",
+      "sha256": "8dc68344d05f75f45bc1e68f95b8093353785f8ec123344135c50e36ed17425c"
+    },
+    "class_catalog": "0-based original object_classes; HAND in native name is evaluator-only hand label",
+    "class_index_dtype": "native non-boolean NumPy signed/unsigned integer",
+    "class_name_dtype": "native fixed-width Unicode/bytes; strict textual catalog match, no objects/pickle",
+    "duplicate_same_class_objects": "physical identity cannot be resolved; no Hungarian or instance-ID claim",
+    "keys_accessed": [
+      "seg_mask",
+      "obj_class_inds",
+      "obj_class_names"
+    ],
+    "keys_forbidden": [
+      "cam_K",
+      "obj_poses",
+      "hand_joints_2d",
+      "hand_joints_3d"
+    ],
+    "label_members": 1493,
+    "mapping": "0 is background; enumerate sorted unique positive SEG values, kth maps to obj_class_inds[k],obj_class_names[k]; never SEG==class_index+1",
+    "mapping_checks": [
+      "exact row cardinalities",
+      "nonnegative SEG",
+      "catalog index/name correspondence",
+      "unique semantic rows within each label",
+      "same class index/name identity across all selected frames",
+      "full source-frame continuity"
+    ],
+    "mapping_failure": "INCONCLUSIVE whole experiment, preserve missing/unknown/malformed counts; no predicted background substitute",
+    "member_rule": "subject_5/<frozen_clip>/105322251564/label_<source_frame_id:06d>.npz",
+    "other_archives_or_raw_metadata_opened": false,
+    "seg_dtype": "native non-boolean NumPy signed/unsigned integer; 2D original H,W; no cast/resize/relabel"
+  },
+  "readiness": {
+    "AMG_completed": false,
+    "Boots_completed": false,
+    "frozen_runtime_and_prediction_receipt_pins_required_before_evaluation": true,
+    "new_driver_implemented": false,
+    "private_label_schema_qualified": false
+  },
+  "schema": "world_reward.hocap_point_retention_protocol.v1",
+  "scope": "semantic_mask_point_persistence_not_physical_identity_contact_or_3D",
+  "seed_reference": {
+    "Q0": "NO_QUERIES count retained, no score1 or zero-error success",
+    "initial_background_and_HAND": "contamination diagnostics, never accepted actors or targets",
+    "last_anchor": "NO_FUTURE; retain slots and raw predictions, no artificial perfect score",
+    "mixed_overlapping_masks": "retain all queries/variants, report purity/class histogram/overlap; never choose best seed or variants",
+    "reference": "fixed semantic (class_index,class_name) for all later frames",
+    "selection": "every original query pixel at its frozen anchor, floor continuous original XY without rounding/fitting; evaluator-only SEG lookup"
+  },
+  "status": "prospectively_frozen_before_AMG_and_tracking",
+  "tracking": {
+    "AMP": false,
+    "FP32": true,
+    "TF32": false,
+    "after_two_clip_prediction_seals_before_any_private_label_read": true,
+    "all_query_IDs_births_and_prebirth_outputs_retained": true,
+    "checkpoint": {
+      "bytes": 218886140,
+      "file": "bootstapir_checkpoint_v2.pt",
+      "license": "Apache-2.0",
+      "repo": "google/tapnet",
+      "revision": "5d3fb48e76c5422841e38501514121e251beabb7",
+      "sha256": "8493c7a69e02c85b9382fbb3c7b8b539b36bc08ede744b9e99feb739a0129f4b"
+    },
+    "full_T_all_queries_per_clip": true,
+    "is_training": false,
+    "model_loads": 1,
+    "native_calls": 2,
+    "native_preprocessing": "utils.bilinear align_corners=False; RGB /255*2-1; convert_grid_coordinates tyx then native XY256->original multiply-then-divide",
+    "native_revision": "730cda1c730877cfedbe01bf87fb1cadb78a565d",
+    "native_visible_rule": "(1-sigmoid(occlusion))*(1-sigmoid(expected_dist))>0.5",
+    "pyramid_level": 1,
+    "query_chunk_size": 32,
+    "resolution": [
+      256,
+      256
+    ],
+    "seed": 0,
+    "visibility_is_confidence_or_GT": false
+  }
+}
