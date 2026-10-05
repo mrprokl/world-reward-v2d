@@ -427,7 +427,7 @@ def run(code, revision, *, opener=None):
             for value in (row['publisher_license'], row): runtime.fetch(mp, acq, overlay, value, deadline, owned, dirs, opener)
             rt.write(out/row['publisher_license']['file'], (overlay/row['publisher_license']['file']).read_bytes(), 0o444)
         patch = derive_source(rt, acq, manifest, overlay/'source', p)
-        report['phase'] = 'offline_cpu_overlay' 
+        report['phase'] = 'offline_cpu_overlay'
         for phase in ('overlay', 'model'):
             if phase == 'model':
                 compiled = rt.strict((out/'overlay.json').read_bytes()); require(compiled['status'] == 'pass' and compiled['source_binding'] == own and compiled['cuda_initialized'] is False and compiled['base_installed'] is False and compiled['full_import_closure_qualified'] is True, 'Real pure CPU overlay PASS required')
