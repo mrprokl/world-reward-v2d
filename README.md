@@ -23,10 +23,11 @@ preserves every person/side/object and combines one native relation before
 reduction;199 tiny controls pass, but no selector has been fitted or adopted.
 MMHOI's complete Azure-only metadata census passes an independent audit; its
 supplement still does not qualify anatomical indices, sentinels or RGB alignment.
-The fresh OpenImages metadata gate stops on unsupported publisher identity
-formats before geometry; its independently verified failure stays immutable.
-Any explicit corrected metadata gate still requires96 independent slots, not
-replacement records or a relaxed scientific threshold.
+The explicit corrected OpenImages metadata gate finds132 independent source
+slots above the unchanged96 gate; unsupported identities are excluded, not
+repaired, and the old failure stays immutable. Independent rederivation passes.
+Remaining COCO byte-alias exclusions precede any selection. No cohort has been
+acquired or selected, and no accuracy follows.
 See [next ownership decision](docs/ownership_next_decision.md). No manual labels
 or episode-specific rescue are used.
 

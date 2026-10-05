@@ -193,6 +193,51 @@ Explicit v2 implementation controls:255 parent tiny tests PASS1.19s, including
 unchanged96 threshold, original-failure posthash changes closing FAIL and no
 per-record flags. This is an implementation check, not the actual census result.
 
+Actual v2 producer8d7b438d0ec2d27868756e20721fb70f15e5d147 **PASS3.369368s**,
+exit0/inactive-dead, report8286B/SHA
+dbcdd0e99b93805746317d6f626b110f500d2f2fc9162a7aa20ba870e87049ad.
+After all336 historical slots/229 known authors and unsupported identities are
+excluded:139 geometry-qualified photos,132 independent author/photo/MD5/URL
+slots, exceeding the unchanged96 capacity gate. All5 invalid new identities
+are rejected without repair;45 positive pairs are unscorable. These are
+metadata counts, not accuracy or96 individually licensed/acquired records.
+No RGB/network/model/GPU or selection was performed. Independent saved-only
+rederivation **PASS3.472462s**, one attempt/no repair, authenticates291Gitfiles,
+XZ6/closure, original289-file failed producer, all ten inputs/modes before/after.
+Its independent scalar IoU/binding/greedy census reproduces every count and
+inventory22230B/SHA62e9e0879b7b06b70136bd90e9880f761ae0b7923ad33e8a15beabec8bc1092f.
+Audit2464B/SHAe8c0ed21df1eae91acc89993dc5a32f63d649c84547f4caa25e3caabbefce35d;
+later collected unit has unknown exit at audit time, while the root's earlier
+terminal observer saw exit0. No new launch follows from unit collection. Freeze
+a separate new study, including remaining COCO byte exclusions, before acquisition.
+
+A bounded primary-only fallback audit identifies original OpenImages **TRAIN**
+relations356,502,404B, boxes2,258,447,590B and boxable metadata638,407,721B
+([publisher V6](https://storage.googleapis.com/openimages/web/download_v6.html)),
+HEAD200 only. The current cached source is **TEST**, not validation. TRAIN
+would be a distinct source partition, not permission to reopen a failed TEST
+cohort; admissible capacity/individual rights remain unknown. Its3.253GB is
+**not downloaded or needed now** because v2 clears metadata capacity. OWLv2's
+OpenImages pretraining remains known at dataset level/unknown by exact photo;
+neither a fresh source partition nor author disjointness makes this an unseen
+pretraining benchmark or a Track1 validation score.
+
+Before any future selection, also authenticate original **acquisition ledgers**
+for COCO32+64, not just their cohort metadata. They contain original-byte MD5:
+`/srv/world-reward-data/coco_proposal_v1/eval_private/manifest.json`,37509B/SHA
+6f3346be5a0ccb065084226ad6cdaa2423dd0d460427d43823b9635f57141ae6,
+producer4657c8b45f733a1043c5a8af2f5b9d6ac027196a; and
+`/srv/world-reward-data/coco_endpoint_v2/eval_private/manifest.json`,72806B/SHA
+53de338a0c23409e12afa2a24b39538ff9873d40fc18c2d142b512790bf5ae10,
+producer7b557290140dc97c839590c31155fbaf50e442a8. Read acquisition metadata
+only, never their RGB/predictions/reference values. Verify every32+64 slot,
+schemas/acquire phase/source/cohort/seals; union canonical `original_md5` only
+from acquired records, retaining unavailable slots if any. The prior audits
+reported96 acquired/zero missing. Applying these byte exclusions can reduce
+139/132: require96 again **before** selecting a new cohort; otherwise close.
+COCO creator identities still remain UNKNOWN; byte/photographic disjointness
+does not prove subject, event, author or unseen-pretraining independence.
+
 ### Minimal A/B proposal — conditional, not a frozen experiment
 
 Independent audit proposes96 fresh slots (FIT32/CAL16/RESERVED48) **only if**
@@ -220,3 +265,31 @@ assumed**.75 directional-win probability. This arithmetic is not actual power:
 ties, access/matching failures and endpoint misses can make the study inadequate.
 Uninformative support closes INCONCLUSIVE, never resampling or threshold rescue.
 Claim scope remains annotated-holds person+object retrieval only.
+
+One additional implementation gate precedes freezing that learner: the current
+raw-linear core requires every active feature to be numerically supported. A
+single unavailable hand root can therefore invalidate a score; zeroing only
+features globally absent on FIT does not solve partial anatomy. Do not silently
+impute it or train weights that change candidate support. An explicit small
+availability-aware opt-in may use masked standardized values plus availability
+indicators, while retaining raw NaNs and a fixed, arm-shared structural support
+rule. An all-missing route is not a meaningful bias-only owner. This design and
+its missingness tests are **not implemented or frozen** yet; old raw-linear
+behavior and closed scorers remain unchanged.
+
+Hard route/side/alias maxima also make the proposed objective nonsmooth. A tiny
+gradient from one arbitrary tie subgradient is not a valid convergence proof.
+Optimizer/termination must be defined and falsified on manufactured controls
+before FIT references, not rescued with tolerances after a scientific failure.
+
+The independent design audit suggests a minimal opt-in masked value design
+`z=m*x/FIT_scale` plus learned numerical-availability indicators, with geometry
+anchors fixed independently of coefficients. Raw arrays/NaNs stay untouched;
+no anchor means unsupported, while missing HOI leaves the base in both arms.
+A shared narrow geometric learner plus B's sole relational coefficient avoids
+an extra model stack. A single fixed-budget deterministic subgradient schedule,
+ties averaged over distinct branch vectors and best-FIT-loss iterate is a
+candidate optimization procedure, **not an adopted recipe or convergence
+certificate**. Validate gradients away from ties, directional derivatives at
+ties, alpha0 parity, missing observations and full-bank/block/alias invariance
+on tiny authored tests before fixing its iteration count/step/L2/support rules.
