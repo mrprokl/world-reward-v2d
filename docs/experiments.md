@@ -9267,3 +9267,17 @@ test runs are local procedural controls, not native runtime evidence. A separate
 MHR official-release asset-license acquisition is dispatched on Azure CPU from
 4ed17ad;199source closure/archived74c1263…ed54b. Its ACK is not completion;
 no model load, duplicate model, SAM provenance relabel or eligibility claim.
+
+Actual zero-delegate69882f3 semanticPASS:host36.516234s/native32.492233s,
+manufacture14.781992s,32unambiguousdistinctquantiles,1constructor/2probes/
+1run301updates,303observednative/subclassidentitypairs,zero pointarithmetic.
+Runcontact301/render301/penetration120/sign120/distance120.9fullartifacts
+retainedincludingpointmetadata; host7613B7a575d7b…b1b70/native10073B7e7f4244…b8ea6.
+CPU-onlysaved-fileauditPASS1.185352s/998B61c17a77…9d69a,fullsource/result/
+initAdamScheduler/twofiniteprobes/all9hashes/sourceassets/ownedabsence verified.
+No decode/loss/optimizer rerun; no independentbitparity/positiveweight/quality.
+MHRrelease4ed17ad acquisitionFAIL4.239365s phaseinventory afterwholeZIP SHA
+exact; originalmodel/sourceposthash/ownedZIPcleanupPASS,4primarytextfiles
+sealed.2270Ba6f68fac…5c2e31; noassetnotice/modelmemberinterpretation reached.
+Cause unverified; boundedcentralinventory diagnostic planned onAzure, no
+v1gaterelaxation or relabelledPASS. BothoriginalparityFAILs remainclosed.

@@ -1,0 +1,36 @@
+{
+  "schema": "world_reward.mhr_official_release_failure_pins.v1",
+  "producer_revision": "4ed17ad0846b3acbf020fe29e1f58cd272c4ebc4",
+  "source_files": 199,
+  "source_archive_sha256": "d74c1263edefa0e531f2d71394c4e8c62f19b7434fe3d8defc285fea582ed54b",
+  "report_path": "results/mhr-official-release-license-v1/report.json",
+  "report": {
+    "bytes": 2270,
+    "sha256": "a6f68fac3a81a2cba27bed853e907aeb66ab596bf1c6deb46d194aec3f5c2e31"
+  },
+  "status": "fail",
+  "phase": "inventory",
+  "error_type": "ValueError",
+  "elapsed_seconds": 4.239365115005057,
+  "archive": {
+    "bytes": 198943157,
+    "sha256": "e4f4f205cd87c0fa106577ba1de4fc763e4eb197c924461d2ef7e6944e9d6b94"
+  },
+  "primary_metadata": {
+    "bytes": 3438,
+    "sha256": "2af0d9d4ec8b2ebed6f66cf38df4fef069c0ec132ac2b0407323a012b53cc1fe"
+  },
+  "retained_text_files": 4,
+  "whole_archive_sha_verified": true,
+  "existing_model_rehashed_after": true,
+  "source_rehashed_after": true,
+  "owned_archive_removed": true,
+  "asset_license_verified": false,
+  "model_member_stream_hashed": false,
+  "models_loaded": false,
+  "gpu_used": false,
+  "sam_provenance_relabelled": false,
+  "competition_eligibility_verified": false,
+  "training_overlap_verified": false,
+  "cause_verified": false
+}

@@ -69,6 +69,10 @@ inferred automatically; no hand-labeling of challenge records.
   A301 updates, B0; full602-update qualification remains unachieved.
   A distinct two-original-optimizer A/A also **fails exact repeat parity**;
   this does not identify an extension defect. Both controls remain closed.
+  A new [single-instance zero-weight delegation](docs/joint_point_zero_delegate_protocol.md)
+  passes on H100:301updates/303exact native return-object pairs, real contact/
+  renderer/penetration execution, full9-artifact saved-file audit. This verifies
+  semantic delegation only, not independent bit parity, tracking or HOI gain.
   [Balanced exact sums](docs/balanced_solid_sum.md) pass15 fresh native controls
   on the authenticated existing CPU runtime; four fresh QEM/query composition
   controls also pass, with the original QEM unchanged and query proofs separate.

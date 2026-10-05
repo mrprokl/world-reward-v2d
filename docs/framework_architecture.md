@@ -89,15 +89,14 @@ observations through `joint_point_evidence`. The legacy `fixed_shape_point_pose`
 selector must not be implicitly substituted, and the failed EP21 cohort stays
 closed. No per-video rescue or point-weight choice is justified by availability.
 
-Before a positive-weight experiment, a fresh preregistered native-bundle control
-must exercise real MHR/contact/render kernels and the original versus weight0
-subclass pair: identical seeds/config, loss/gradient probes0/181, all301 updates,
-byte-exact state/history/result. Supplied manufactured bundles qualify runtime,
-not inferred RGB geometry or held-out HOI accuracy. A subsequent real tracker
-control remains separate; previous authored/analytic cohorts are not fresh
-validation. Do not manufacture more wrappers while this underlying seam is
-unqualified. Full-HOI calibration/held-out rights remain unresolved; see the
-October5 targeted licence audit. No positive weight or backend adoption yet.
+The original preregistered exact A/B gate required actual MHR/contact/render
+kernels, probes0/181 and two301-update runs with exact state/history/result.
+It failed and remains closed; the original-only A/A also fails. Neither is
+relabelled by a new semantic proof. Manufactured controls qualify runtime,
+not inferred RGB geometry or held-out HOI accuracy. Real tracker observations,
+external calibration and quality comparison remain separate prerequisites.
+Full-HOI held-out rights remain unresolved; see the October5 licence audit.
+No positive weight or backend adoption yet.
 
 The bounded [fresh real-MHR caller](joint_point_authored_runtime_protocol.md)
 now fails exact A/B parity after real manufacture/contact/render/Kaolin probes:
@@ -109,8 +108,10 @@ The fresh original-only A/A also fails at initial/probe parity (first301,
 second0). Saved-array CPU analysis finds only reference-foot constructor
 differences, with no point factory involved. This closes bitwise qualification,
 not the point hypothesis or an established JIT/kernel mechanism. A separately
-preregistered same-invocation delegation check can test the zero-weight branch
-without pretending independent stochastic optimizer trajectories are identical.
+preregistered same-invocation delegation check now passes on H100:301updates,
+303exact native total/metrics object pairs, no point arithmetic, real native
+kernels and full saved-file audit. This verifies the zero-weight branch without
+pretending independent stochastic optimizer trajectories are identical.
 The next actual tracking seam needs no new model: BootsTAPIR already preserves
 full-T query slots, raw logits and native global XY256. The point objective's
 `diag(256/W,256/H)` maps **full-image** pixels, not native silhouette crop pixels.

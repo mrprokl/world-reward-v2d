@@ -1,0 +1,57 @@
+{
+  "schema": "world_reward.joint_point_zero_delegate_qualification_pins.v1",
+  "producer_revision": "69882f37ed469f5a7d4acbbf160a0fa339824f2b",
+  "source_files": 236,
+  "source_archive_sha256": "a4a4c08239a123210ecb7fe89517d6d306c2b7829dfe14e22c073398736cdee9",
+  "host_report": {
+    "bytes": 7613,
+    "sha256": "7a575d7bae5f118d7647293e155dfc482228f6801965a962b460bdc85f5b1b70"
+  },
+  "native_report": {
+    "bytes": 10073,
+    "sha256": "7e7f4244d422e481ac6ba1c4afbbfc4a031651c15abce7d988bf4c02a9ab8ea6"
+  },
+  "saved_cpu_audit": {
+    "path": "results/joint-point-zero-delegate-saved-audit-v1/report.json",
+    "bytes": 998,
+    "sha256": "61c17a771910c92f6a01d24d9f83022fb2d808f8fc9f8bfbf41bff3f47b9d69a",
+    "elapsed_seconds": 1.1853517910058144,
+    "native_decode_loss_optimizer_calls": 0,
+    "GPU_used": false
+  },
+  "status": "pass",
+  "control": "zero_delegate",
+  "frames": 3,
+  "constructor_returns": 1,
+  "probe_returns": 2,
+  "run_returns": 1,
+  "actual_native_updates": 301,
+  "semantic_delegation_pairs": 303,
+  "point_reprojection_calls": 0,
+  "point_optimizer_factory_calls": 1,
+  "qualified_queries": 32,
+  "retained_native_files": 9,
+  "manufacture_seconds": 14.781992420001188,
+  "native_elapsed_seconds": 32.49223324900959,
+  "host_elapsed_seconds": 36.516234012990026,
+  "native_run_calls": {
+    "contact": 301,
+    "render": 301,
+    "penetration": 120,
+    "kaolin_sign": 120,
+    "kaolin_distance": 120
+  },
+  "source_assets_rehashed_after": true,
+  "original_receipts_all9_files_unchanged": true,
+  "owned_container_absence_verified": true,
+  "full_result_with_point_metadata_validated": true,
+  "semantic_delegation_qualified": true,
+  "bit_parity_qualified": false,
+  "stochastic_lifecycle_qualified": false,
+  "tracker_executed": false,
+  "positive_weight_executed": false,
+  "quality_verified": false,
+  "adoption": false,
+  "training_overlap_verified": false,
+  "competition_eligibility_verified": false
+}

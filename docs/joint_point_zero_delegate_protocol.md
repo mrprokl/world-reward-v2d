@@ -1,6 +1,6 @@
 # Prospective zero-weight native delegation control
 
-**2026-10-05 — not executed.** One new authored T3 control, not a replay of
+**2026-10-05 — executed, semantic PASS (`69882f3…`).** One new authored T3 control, not a replay of
 either closed A/B or A/A parity failure. A/A `e2b084a` returned one301-update
 run, then stopped at exact initial/probe mismatch in the second arm. Its failure
 and all raw arrays remain unchanged. No tolerance, warmup, reset or cause
@@ -58,3 +58,19 @@ real kernel, delegate mismatch or deadline failure stops without retries.
 PASS qualifies only this single control's zero-weight return delegation. It
 does not qualify A/B bit parity, stochastic lifecycle determinism, calibrated
 positive weights, tracking/HOI accuracy, legal eligibility or adoption.
+
+## Actual bounded outcome
+
+Host36.516234s/native32.492233s, manufacture14.781992s; one constructor,
+two probes,301 updates,303 observed return-object identity pairs and zero
+point-loss calls. All32 quantiles have distinct unambiguous surface witnesses;
+the sole instance's initial query pose is exact. The actual run calls contact
+and renderer301 times each, penetration/sign/distance120 times each.
+
+All9full native artifacts, including untouched point metadata, remain sealed
+on Azure. A separate CPU-only saved-file audit passes1.185352s: full source,
+result, initial state/Adam/scheduler, two finite probes and all original hashes
+validate without importing native MHR/render/collision or invoking any optimizer.
+Source/model posthashes and both exact owned-container absences are verified.
+Full receipt pins are in `configs/joint_point_zero_delegate_qualification_pins.json`.
+The old A/B and A/A FAILs stay unchanged; no bit-repeatability or accuracy claim.
