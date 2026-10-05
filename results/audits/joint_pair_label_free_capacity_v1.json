@@ -1,0 +1,35 @@
+{
+  "adopted": false,
+  "counts": {
+    "DECISION": {
+      "acquired": 6,
+      "joint_nonempty": 2,
+      "object_nonempty": 2,
+      "person_nonempty": 6,
+      "slots": 8
+    },
+    "FIT": {
+      "acquired": 21,
+      "joint_nonempty": 1,
+      "object_nonempty": 1,
+      "person_nonempty": 21,
+      "slots": 24
+    },
+    "TEST": {
+      "acquired": 23,
+      "joint_nonempty": 7,
+      "object_nonempty": 7,
+      "person_nonempty": 23,
+      "slots": 32
+    }
+  },
+  "dwpose_inference_performed": false,
+  "fit_labels_read": false,
+  "minimum_usable_fit_predeclared": 12,
+  "reason": "Missing object proposals upper bound usable FIT support; no reference matching or replacement",
+  "reference_boxes_read": false,
+  "reference_relations_read": false,
+  "schema": "world_reward.joint_pair_label_free_capacity_gate.v1",
+  "status": "inconclusive_closed",
+  "test_labels_read": false
+}

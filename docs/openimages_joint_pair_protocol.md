@@ -144,3 +144,28 @@ those original masked/tail positions; NaN/+inf and active-token-inf still fail.
 No model math, query, threshold, original sample, evaluation or FIT input changes.
 37manufactured adapter tests PASS. A nativev2 result must confirm this convention
 on actual inputs; the old receipt alone did not record its mask.
+
+## CLOSED: label-free proposal-capacity gate
+
+Corrected native GDIv2 actually PASS50images/100forwards/one model load in
+30.967954s; all original padding masks/logits retained. Producer
+038f65aa9405cebb1adcbb0eaa50f0cb5fbb034b, host67368B SHA
+576057693bec11cea8a35e1c16f7f45488218bcf74a6a9aaa069530106fed82f,
+native76598B SHAb520c10085cd70023c5db1f5f8d639671be5377fed2b3d907f718b23896c5d9e.
+Independent source/runtime/acquisition and all50saved-bank hash audit PASS.
+224person proposals but only15object proposals, not localization accuracy.
+
+Before any FIT/TEST relation/box labels or DWPose/HOI/learned fit, check the
+necessary upper bound on usable FIT: only1of24 frozen FIT slots has both
+nonempty automatic P/O banks (21RGB acquired), below the already fixed12usable
+author requirement. DECISION2joint-nonempty/8slots; TEST7/32slots,23acquired.
+These are label-free proposal-presence counts, not held-out performance.
+Decision **INCONCLUSIVE_CLOSED**: no fit, no reference evaluation, no native
+DWPose/HOI spending, no threshold/query changes or replacement on this cohort.
+The committed CPU DWPose implementation was prepared but NOT dispatched.
+
+The nonspecific `object.` query is not a universal objectness mechanism.
+Next research must qualify a principled high-recall automatic proposal generator
+on a separately declared independent DEV protocol, not salvage this closed
+comparison or choose target labels from challenge annotations. Static joint
+retrieval, anatomical ownership and temporal identity remain unverified.
