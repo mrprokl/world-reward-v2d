@@ -371,6 +371,29 @@ covers software/documentation, not an independent grant of its processed OMOMO
 captures/scans. Motion generation is not a verified monocular reconstruction
 benchmark. Neither route unlocks lawful real full-HOI validation today.
 
+### October5 — newly identified hands–object validation route
+
+[HO-Cap's dataset grant](https://irvlutd.github.io/HOCap/) is explicitly
+CC-BY-4.0, distinct from its GPL toolkit. Public
+[HPE/OPE splits@576c63e](https://github.com/IRVLUTD/HO-Cap/tree/576c63ebf3b84dfec8744ba0f021234213bf0dab/config)
+identify subject_5 clips20231027_112303 and20231027_113202 as test-only in both
+tasks; subject5's third clip is not OPE-heldout. Camera105322251564 is a possible
+single-view input. Original subject archive3,427,758,110B plus labels, poses,
+models and calibration totals about5.08GB; no acquisition performed. Decimated
+benchmark indices are not full trajectories: qualify original inventory/frame
+counts and isolate every annotation/mesh/calibration from prediction first.
+The [primary paper](https://arxiv.org/html/2406.06843v1) describes coupled RGB-D
+fits with MediaPipe triangulation/interpolation/MANO, not independent mocap.
+Actual distributed-joint provenance, separate model rights and training overlap
+remain unverified. This permits investigating a conditional hand/object 3D
+diagnostic, not full-body validation, acceleration/contact truth or V2D clearance.
+
+MMHOI's publisher DATA grant is CC-BY-SA4, but its93.68GB archive, sampled
+benchmark frames and manually refined SMPL-X reference do not yet establish a
+small continuous full-T independent holdout. OakInk2's CC-BY-SA4 dataset has
+upper-body/hands-object coverage and separate body-model rights; lower-body
+parameters are documented unused. Both remain deferred, with no acquisition.
+
 ## Experimental general solid certificate (October4, not adoption)
 
 The independently written certified_solid_query.cpp glue is Apache-2.0.
