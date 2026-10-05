@@ -89,8 +89,9 @@ not manual episode reassignment or another downstream fit of the wrong pair.
   not an accuracy result. Lightweight QA openly shows EP8/9 wrong background
   identity; engineering packing success does not resolve that scientific defect.
 - **Temporal research:** MASA's isolated author-runtime build passes independent
-  source/52-wheel/CPU-import/image/cleanup checks. The separately frozen native
-  H100 operator/strict-checkpoint/full-bank contract still needs actual outcome.
+  source/52-wheel/CPU-import/image/cleanup checks. The separate native H100
+  contract stops on an operator RuntimeError before checkpoint/model work;
+  that technical FAIL is retained, not described as successful inference.
   Appearance persistence is not physical ownership or a validated HOI gain.
 - **Geometry compiler:** exact F32/weld predicate controls pass, but the frozen
   real-collapse comparison **fails** on the thin cavity: both original and new

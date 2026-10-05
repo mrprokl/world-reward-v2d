@@ -28,6 +28,8 @@ ENV=dict(PATH='/usr/bin:/bin',HOME='/nonexistent',LANG='C.UTF-8',DOCKER_HOST='un
 FAILURE_GATES=frozenset(('bootstrap','runtime_import','operators','registry','config','model_construct','weights_decode',
  'strict_state','model_device','preprocess','encoder','embedding','native_posthash','native_deadline','gpu_lock',
  'gpu_idle','container_absence','container_dispatch','native_receipt','host_cleanup','host_posthash','output_seal','host_deadline'))
+OPERATOR_SUBGATES=frozenset(('imports','dcn_construct','dcn_zero_offset','dcn_nonzero','roi_construct',
+                           'roi_cuda','roi_cpu','roi_compare','complete'))
 EXCEPTION_CLASSES={cls:cls.__name__ for cls in (ImportError,ModuleNotFoundError,ValueError,TypeError,KeyError,AttributeError,
  RuntimeError,OSError,FileNotFoundError,PermissionError,TimeoutError,MemoryError,AssertionError,subprocess.TimeoutExpired)}
 
@@ -158,26 +160,37 @@ def strict_state(torch,payload,expected):
                       prefix_rewrite=False,ema_selection=False,strict=True)
 
 
-def operators(torch,c):
+def operators(torch,c,progress):
+    progress['operator_subgate']='imports'
     from mmcv.ops import ModulatedDeformConv2d,RoIAlign
+    progress['operator_subgate']='dcn_construct'
     torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False
     torch.backends.cudnn.benchmark=False
     x=(torch.arange(2*9*11,dtype=torch.float32,device='cuda').reshape(1,2,9,11)%17-8)/16
     conv=ModulatedDeformConv2d(2,3,3,padding=1,bias=True).cuda().eval()
     with torch.no_grad():
+        progress['operator_subgate']='dcn_zero_offset'
         conv.weight.copy_((torch.arange(conv.weight.numel(),device='cuda').reshape_as(conv.weight)%7-3)/32)
         conv.bias.copy_(torch.arange(3,device='cuda')/64)
         offset=torch.zeros((1,18,9,11),device='cuda');mask=torch.ones((1,9,9,11),device='cuda')
         y=conv(x,offset,mask);ref=torch.nn.functional.conv2d(x,conv.weight,conv.bias,padding=1);torch.cuda.synchronize()
         g=c['operator_gates_before_checkpoint'];tol=g['dcn_zero_offset_mask_one_vs_conv2d']
         if not torch.allclose(y,ref,**tol):raise ValueError('Native DCNv2 zero-offset identity differs')
+        progress['operator_subgate']='dcn_nonzero'
         offset.fill_(.125);mask.copy_(.25+torch.arange(mask.numel(),device='cuda').reshape_as(mask)%5/8)
         non=conv(x,offset,mask);repeat=conv(x,offset,mask);torch.cuda.synchronize()
         if not torch.isfinite(non).all()or not torch.equal(non,repeat)or torch.equal(non,y):raise ValueError('Native nontrivial DCNv2 unsupported')
+        progress['operator_subgate']='roi_construct'
         roi=RoIAlign(output_size=7,sampling_ratio=0)
         boxes=torch.tensor([[0,1.125,2.25,8.5,7.75],[0,0,0,4,5]],dtype=torch.float32)
-        gpu=roi(x,boxes.cuda());cpu=roi(x.cpu(),boxes);torch.cuda.synchronize()
+        progress['operator_subgate']='roi_cuda'
+        gpu=roi(x,boxes.cuda())
+        progress['operator_subgate']='roi_cpu'
+        cpu=roi(x.cpu(),boxes)
+        progress['operator_subgate']='roi_compare'
+        torch.cuda.synchronize()
         if not torch.isfinite(gpu).all()or not torch.allclose(gpu.cpu(),cpu,**g['roi_align_cuda_vs_cpu']):raise ValueError('Native RoIAlign CPU/CUDA differs')
+    progress['operator_subgate']='complete'
     return dict(dcn_zero_offset_max_abs=float((y-ref).abs().max().cpu()),dcn_nontrivial_repeat_exact=True,
       roi_cuda_cpu_max_abs=float((gpu.cpu()-cpu).abs().max()),roi_defaults=dict(output_size=list(roi.output_size),sampling_ratio=roi.sampling_ratio,
       spatial_scale=roi.spatial_scale,aligned=roi.aligned,pool_mode=roi.pool_mode,use_torchvision=roi.use_torchvision),gpu_synchronized=True,checkpoint_read=False)
@@ -282,7 +295,7 @@ def run_native(code,revision,out,proof_pin,deadline):
                    and 'H100'in torch.cuda.get_device_name()and sys.prefix==VENV,'Actual author H100 runtime required')
         report['gpu_used']=True
         report['subgate']='operators'
-        report['operators']=operators(torch,c);report['phase']='strict_checkpoint_model'
+        report['operators']=operators(torch,c,report);report['phase']='strict_checkpoint_model'
         report['model']=native_model(torch,c,deadline,report)
         report.update(status='pass',phase='complete',subgate='complete')
     except BaseException as exc:

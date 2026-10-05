@@ -172,7 +172,7 @@ def test_operator_gate_is_ordered_before_checkpoint_and_uses_original_defaults(g
     tree=ast.parse((REPO/'infra/masa_native_qualify.py').read_bytes())
     native=next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='run_native')
     segment=ast.get_source_segment((REPO/'infra/masa_native_qualify.py').read_text(),native)
-    assert segment.index('operators(torch,c)')<segment.index('native_model(torch,c,deadline,report)')
+    assert segment.index('operators(torch,c,report)')<segment.index('native_model(torch,c,deadline,report)')
     op=ast.get_source_segment((REPO/'infra/masa_native_qualify.py').read_text(),next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='operators'))
     assert 'RoIAlign(output_size=7,sampling_ratio=0)'in op
     constructor=next(n for n in ast.walk(tree)if isinstance(n,ast.Call)and isinstance(n.func,ast.Name)and n.func.id=='RoIAlign')
@@ -205,14 +205,62 @@ def test_observability_is_ast_neutral_for_native_math_and_runtime(gate):
         def visit_Assign(self,node):
             if (len(node.targets)==1 and isinstance(node.targets[0],ast.Subscript)
                 and isinstance(node.targets[0].value,ast.Name)and node.targets[0].value.id=='progress'
-                and isinstance(node.targets[0].slice,ast.Constant)and node.targets[0].slice.value=='subgate'):
-                assert isinstance(node.value,ast.Constant)and node.value.value in gate.FAILURE_GATES
+                and isinstance(node.targets[0].slice,ast.Constant)and node.targets[0].slice.value in ('subgate','operator_subgate')):
+                allowed=gate.OPERATOR_SUBGATES if node.targets[0].slice.value=='operator_subgate'else gate.FAILURE_GATES
+                assert isinstance(node.value,ast.Constant)and node.value.value in allowed
                 return None
             return node
     for fn in tree.body:
         if isinstance(fn,ast.FunctionDef)and fn.name in pins:
             actual=RemoveDiagnostics().visit(copy.deepcopy(fn))
+            if fn.name=='operators':
+                assert actual.args.args[-1].arg=='progress'
+                actual.args.args.pop()
             assert hashlib.sha256(ast.dump(actual,include_attributes=False).encode()).hexdigest()==pins[fn.name]
+
+
+def test_fixed_operator_subgates_precede_unchanged_native_calls(gate):
+    raw=(REPO/'infra/masa_native_qualify.py').read_text();tree=ast.parse(raw)
+    fn=next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='operators')
+    markers=sorted((n.lineno,n.value.value)for n in ast.walk(fn)if isinstance(n,ast.Assign)
+        and isinstance(n.targets[0],ast.Subscript)and isinstance(n.targets[0].slice,ast.Constant)
+        and n.targets[0].slice.value=='operator_subgate')
+    assert [label for _,label in markers]==['imports','dcn_construct','dcn_zero_offset','dcn_nonzero',
+                                           'roi_construct','roi_cuda','roi_cpu','roi_compare','complete']
+    checks={'ModulatedDeformConv2d(2,3,3,padding=1,bias=True)':'dcn_construct',
+            'RoIAlign(output_size=7,sampling_ratio=0)':'roi_construct',
+            'roi(x,boxes.cuda())':'roi_cuda','roi(x.cpu(),boxes)':'roi_cpu',
+            "torch.allclose(gpu.cpu(),cpu,**g['roi_align_cuda_vs_cpu'])":'roi_compare'}
+    calls=[n for n in ast.walk(fn)if isinstance(n,ast.Call)]
+    for expression,label in checks.items():
+        call=next(n for n in calls if ast.get_source_segment(raw,n)==expression)
+        assert [value for line,value in markers if line<call.lineno][-1]==label
+    conv_calls=sorted((n for n in calls if ast.get_source_segment(raw,n)=='conv(x,offset,mask)'),key=lambda n:n.lineno)
+    assert len(conv_calls)==3
+    assert [[value for line,value in markers if line<call.lineno][-1]for call in conv_calls]==[
+        'dcn_zero_offset','dcn_nonzero','dcn_nonzero']
+
+
+@pytest.mark.parametrize('operator_subgate',sorted(('imports','dcn_construct','dcn_zero_offset','dcn_nonzero',
+                                                 'roi_construct','roi_cuda','roi_cpu','roi_compare')))
+def test_native_operator_failure_keeps_fixed_subgate_and_first_operators_gate(gate,tmp_path,monkeypatch,operator_subgate):
+    rt,root,code,args,c=setup(gate,tmp_path,monkeypatch);out=tmp_path/'native';out.mkdir()
+    proof=gate.authenticate(rt,code,args);rt.write(out/'proof.json',json.dumps(proof).encode(),0o444)
+    torch=SimpleNamespace(__version__='2.1.2+cu118',cuda=SimpleNamespace(is_available=lambda:True,
+      get_device_capability=lambda:(9,0),get_device_name=lambda:'H100'))
+    monkeypatch.setitem(gate.sys.modules,'torch',torch);monkeypatch.setattr(gate.sys,'prefix',gate.VENV)
+    def operators(torch,policy,progress):
+        progress['operator_subgate']=operator_subgate
+        raise RuntimeError('SECRET_CUDA_DIAGNOSTIC_PAYLOAD')
+    def model(*a):raise AssertionError('Model must not run after operator failure')
+    monkeypatch.setattr(gate,'operators',operators);monkeypatch.setattr(gate,'native_model',model)
+    with pytest.raises(ValueError,match='Native contract failed'):
+        gate.run_native(code,args.revision,out,rt.identity(out/'proof.json'),gate.time.monotonic()+600)
+    report=json.loads((out/'native.json').read_bytes())
+    assert report['failure_gate']=='operators'and report['failure_class']=='RuntimeError'
+    assert report['operator_subgate']==operator_subgate and operator_subgate in gate.OPERATOR_SUBGATES
+    assert not report['model_constructed']and not report['weights_decoded']and not report['model_loaded']
+    assert report['source_artifacts_rehashed_after']and 'SECRET'not in json.dumps(report)
 
 
 @pytest.mark.parametrize('kind',[ImportError,ModuleNotFoundError,ValueError,TypeError,KeyError,AttributeError,RuntimeError,
