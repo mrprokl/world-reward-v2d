@@ -320,22 +320,18 @@ def test_bundle_routing_converter_only(fake_shell, mode):
 def test_explicit_geometry_profile_routes_its_own_pose_report(fake_shell,profile,episode):
     env,run,report,log,_=fake_shell
     if profile=='surface':
-        # Numerical/source authentication is tested separately below; no old snapshot is executed.
-        spy=Path(env['PATH'].split(os.pathsep)[0])/'python3'
-        spy.write_text('#!/usr/bin/env bash\ncat >/dev/null\n'+''.join('printf "%s\\n" '+repr(str(Path(env['WR_ROOT'])/'jobs'/('b'*40)/entry))+'\n' for entry in ('run_object_budget_solid','run_surface_qslim_qualify','run_surface_identity_qualify')))
-        spy.chmod(0o755)
+        # Surface production now requires its exact Linux/source namespace.
+        # Dedicated surface host/shell spies test that branch; this legacy fake
+        # workspace must not turn a malformed context into an apparent PASS.
+        report('prepare',episode,stage='object_pose_full_surface')
+        result=run('prepare','--episode',str(episode),'--mesh-source','surface')
+        assert result.returncode==2 and not log.exists()
+        return
     report('prepare',episode,stage='object_pose_full_'+profile)
     result=run('prepare','--episode',str(episode),'--mesh-source',profile)
     assert result.returncode==0,result.stderr
     assert docker_arguments(log)[-4:]==['--episode',str(episode),'--mesh-source',profile]
-    if profile=='surface':
-        args=docker_arguments(log)
-        for entry in ('run_object_budget_solid','run_surface_qslim_qualify','run_surface_identity_qualify'):
-            parent=Path(env['WR_ROOT'])/'jobs'/('b'*40)/entry
-            assert f'type=bind,src={parent},dst={parent},readonly' in args
-        assert f'type=bind,src={env["WR_ROOT"]}/jobs,dst={env["WR_ROOT"]}/jobs,readonly' not in args
-    else:
-        assert not any('/jobs/' in arg for arg in docker_arguments(log))
+    assert not any('/jobs/' in arg for arg in docker_arguments(log))
     assert not Path(env['FAKE_CTL_LOG']).exists()
 
 

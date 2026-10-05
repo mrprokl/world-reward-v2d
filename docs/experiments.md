@@ -9471,3 +9471,20 @@ Expanded integration880PASS1SKIP48.13s with uniquely owned test temporary root;
 simultaneous default pytest fixtures had collided with disposable-directory
 cleanup, not a source regression. Retain no failed fixture noise. Wrapper diff
 is exactly one role-cap line; historical solid bytes and all15artifact pins exact.
+
+Actual full-surface pose consumer4e7d946 dispatched on AzureH100, source312files/
+317entries, archive63f909dd3ef4399f2e145721a9c8518a262492210b9ff4a347e50f36210cef72.
+Preflight proof239113B/1ec82f63b53690cf424b8b9f77aa9f40ec81b2a367e5ed417c599b1921ee0198;
+observed200/399frames at1087.894261s. These are progress, not completion/accuracy.
+Existing full399body adapter is reused; no upstream model/reconstruction rerun.
+
+Prospective CPU native surface preparation stays in run_cari_prepare.sh, with
+unchanged Python estimator/default/solid tail and the original15surface pins.
+Inclusive7200s budget, immutable full source/input pre/post ledger, three
+hash-only historical parents, actualB47 image byID, CPU/noGPU, exact owned CID
+absence, failure-preserving exit and exclusive sealed receipt. Reporting grace
+cannot publish PASS after compute budget. Native output is never precreated.
+Independent wrapper/native ABI audit READY; root595PASS1SKIP54.07s on tiny
+manufactured tests in a unique owned directory (no local media/array/model).
+Deployment remains gated by full native pose PASS plus saved-output audit;
+no preparation PASS, positive point benefit or CARI4D victory claimed.

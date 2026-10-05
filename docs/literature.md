@@ -1466,3 +1466,20 @@ from all automatic frontends/initialization; model/renderer rights, physically
 credible interactions and domain gap must be explicit. Existing manufactured
 initialization/renderer masks are runtime controls, not that study. No new study,
 weights, calibrated gates, held-out benefit or CARI4D victory is claimed.
+
+### October5 — checkpoint-free articulation seam, still prospective
+
+Independent primary audit favors direct named native controls into the selected
+MHR JIT, not a fabricated SAMHead/PCA bridge. Official
+[MHR forward@4998cec](https://github.com/facebookresearch/MHR/blob/4998cec385b1aaa07abdefba71bfba2f83c7db32/mhr/mhr.py)
+declares identity/model/expression inputs; generic Python pads117 internal
+coordinates, whereas the actually retained MHRDemo exposes249. Authenticate its
+own executable schemas/forward before translating that source into an ABI claim.
+[Momentum parameter limits@c54b9de](https://github.com/facebookresearch/momentum/blob/c54b9def6df15b7b807e6c3010f09bd7c3988ecb/pymomentum/torch/parameter_limits.py)
+treats limits as soft penalties; genuine [0,0] entries are not unbounded sentinels
+or a licence to ignore a declared experiment gate. Native local scale is log2
+joint scale, not a global metres multiplier. A fresh metadata/schema/support
+control and named articulation lot would precede rendering/Boots/calibration;
+the failed authored recipe remains closed. Direct generation can avoid SAM PCA,
+but the current learned native optimizer is not thereby checkpoint-free or
+competition-cleared. No new model/decode/job or positive point benefit executed.
