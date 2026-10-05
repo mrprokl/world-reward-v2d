@@ -9204,3 +9204,13 @@ neutral decoded body and asymmetric tetra, actualrender/nativecrop, mask-only
 180manufacture+1200pair/1380inclusive. This is numerical runtime qualification,
 not predictedRGB, tracker, positiveweight calibration or held-out HOI evidence.
 Caller under implementation; no manufacture/model/run observed yet.
+
+Fresh authored nativecaller1b1ac13 nowimplemented, root279tinytestsPASS10skip
+1.71s; independentprimaryABIaudit found no definiteblocker, no nativeclaim.
+BothnativecropandfullimageXY256 pointprojection stay distinct; no K substitution.
+301+301originalloop retainsfullT3/rawpr_initial/twoinitial/fourprobe/tworesult
+files onAzure, scopedprofiler observes unchanged actualkernelcalls0/181.
+FullinstalledBody/native/transitiveacquisition/model proof beforedecode; unknowns
+FAIL ratherthan firstseenpin. DispatchACKonly/231sourcefiles
+archive3885c95ff62c18f82bb8ac5cfdd278584f1e4bc141e55d36d976f78fb70ce91f.
+Rootcombinedsurface+joint311PASS10skip2.65s; still noactualpaired outcome.

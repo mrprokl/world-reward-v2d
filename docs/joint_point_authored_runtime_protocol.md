@@ -2,10 +2,20 @@
 
 **Prospective only, 2026-10-05.** The companion
 `configs/joint_point_authored_runtime_protocol_v1.json` freezes one new three-frame
-control. No manufacture, model execution, optimization, runtime qualification or
-accuracy measurement has occurred. EP21's original insufficient-query failure
+control. Its bounded caller is implemented and tiny-tested; no manufacture,
+model execution, optimization, runtime qualification or accuracy measurement
+has been observed. EP21's original insufficient-query failure
 stays closed; neither its inputs nor any earlier authored control is reused.
 This is a small new caller of existing operators, not another inference pipeline.
+
+Implementation: `infra/joint_point_authored_qualify.py` calls the original
+decoder/render/crop and existing paired sequencing, retaining `pr_initial`
+before execution to preserve the unchanged native result ABI. Actual Python
+kernel entrypoints are observed by a scoped profiler, not monkeypatched.
+Root279 tests pass with10 Torch-dependent skips; these are caller/control tests,
+not real GPU evidence. Complete installed Body/native source and independently
+pinned model bytes remain runtime prerequisites. One fresh Azure dispatch is
+requested at `1b1ac133ea59aeef732a6552b9a86dbb173494c1`; ACK/completion are separate.
 
 ## Exact source and model prerequisites
 

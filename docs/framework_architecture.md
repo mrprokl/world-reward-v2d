@@ -99,6 +99,19 @@ validation. Do not manufacture more wrappers while this underlying seam is
 unqualified. Full-HOI calibration/held-out rights remain unresolved; see the
 October5 targeted licence audit. No positive weight or backend adoption yet.
 
+The bounded [fresh real-MHR caller](joint_point_authored_runtime_protocol.md)
+is now implemented and dispatched separately from its protocol. It reuses the
+same operators; no execution/accuracy/adoption is implied by its tiny tests.
+The next actual tracking seam needs no new model: BootsTAPIR already preserves
+full-T query slots, raw logits and native global XY256. The point objective's
+`diag(256/W,256/H)` maps **full-image** pixels, not native silhouette crop pixels.
+Keep Kfull for points; `postopt_K_rois` stays exclusively the independently
+computed crop projection. Never substitute crop K or add a second half-pixel.
+Freeze actual native face/barycentric attachments before future RGB, pass full-T
+Boots outputs directly through `joint_point_evidence`, and preserve occluded
+slots without interpolation. The repeated zero-support numerical control is
+not that tracker. TAPNext++ has no qualified runtime adapter and stays deferred.
+
 ### Première migration réalisée
 
 `world_reward.shared_scene` ajoute des adaptateurs explicites
