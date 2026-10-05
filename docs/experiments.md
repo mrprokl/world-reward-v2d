@@ -9729,3 +9729,17 @@ foreignmember acceptance. Transfer reuses saved bytes rather than save27GB again
 actual full47layer authentication/import/conditional study still unexecuted.
 EP26 official packing nativePASS13.395114s/all399, scratchremoved; independent
 saved pack audit still required. No score, upload or accuracy qualification.
+
+EP26 saved pack census independently rehashes241sourcefiles/closure
+c77e40f35de1fc2898456f2f34a2ed2d215df394beac170180eab70427ee2cef;
+native10228B/dd5a735a07fd4df72ff39ae72c1a70647e1b35f526c5df9d0a03a7dc94b6d591.
+Exactlyone remainingreport, scratch removed, original399frames/geometry retained,
+official source/prediction arrays nativeposthashesPASS, commit230ecdb accessible.
+Fourteen full packed episodes now, not final30 or leaderboardimprovement.
+
+Source review caught USTAR's8GiB size-field ceiling after saved26GB image was
+known. Tiny header control proves originalUSTAR ValueError and GNUbase256 exact
+26353005568B with noPAX/longname. Stop the owned pending export before redundant
+upload; preserve its interruption/failure. New transport uses same bounded short
+allowlisted names and exact image bytes, only supportedbase256 header. No model,
+image build/save or scientific cohort replay.

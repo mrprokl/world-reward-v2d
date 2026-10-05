@@ -209,6 +209,16 @@ def test_original_saved_archive_census_is_independently_frozen(transfer):
         separators=(',', ':')).encode()).hexdigest() == p['legacy_metadata_manifest_sha256']
 
 
+def test_large_sealed_image_header_needs_base256_not_pax_or_ustar(transfer):
+    member = tarfile.TarInfo('image.tar'); member.size = 26353005568
+    with pytest.raises(ValueError): member.tobuf(format=tarfile.USTAR_FORMAT)
+    raw = member.tobuf(format=tarfile.GNU_FORMAT)
+    parsed = tarfile.TarInfo.frombuf(raw, 'utf-8', 'strict')
+    assert len(raw) == 512 and parsed.size == member.size and parsed.isreg()
+    assert not parsed.pax_headers and parsed.name == 'image.tar'
+    assert "format=tarfile.GNU_FORMAT" in Path(transfer.__file__).read_text()
+
+
 def test_runtime_identity_cannot_use_unproved_image_alias(transfer):
     with pytest.raises(ValueError): transfer.inspect_image('sha256:'+'a'*64)
     wrong = dict(config_id='sha256:'+'b'*64, ordered_rootfs_sha256=transfer.LAYERS_SHA,

@@ -264,7 +264,9 @@ def pack(writer, root, files, image_path, image_pin, revision, proof):
         'assets': files, 'replica_only': True, 'qualification_or_model_execution': False}
     raw = json.dumps(manifest, sort_keys=True, separators=(',', ':')).encode()
     require(len(raw) <= 16384, 'Bounded first manifest required')
-    with tarfile.open(fileobj=writer, mode='w|', format=tarfile.USTAR_FORMAT) as archive:
+    # GNU base-256 size fields represent the sealed26GB image. Names are all
+    # short allowlisted paths, so no GNU longname or PAX extension is emitted.
+    with tarfile.open(fileobj=writer, mode='w|', format=tarfile.GNU_FORMAT) as archive:
         info = tarfile.TarInfo('manifest.json'); info.size = len(raw); info.mode = 0o444; archive.addfile(info, io.BytesIO(raw))
         for name, path, pin in [(p, root/p, v) for p, v in sorted(files.items())]+[('image.tar', image_path, image_pin)]:
             require(identity(path) == pin, 'Original transfer artifact differs')
