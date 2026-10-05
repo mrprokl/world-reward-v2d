@@ -9602,3 +9602,11 @@ Limited source-only scale-reference primitive proposes each distinctone-sparse
 equality coefficient once viaF64ratio→F32, others0, neverQP/search/clamp. CPU
 boundsdiagnostic retains failures and explicitly cannot qualify CUDAexpansion;
 realhipdepth scalarF32case +2^-37 fails literalzero, no neighbor/epsilonrescue.
+
+EP26full399native inputpins now frozen as v3surface: exactly15originalsource
+leaves, originalc1producer/script9d6e9028653ca43f1eb184cb0ed85102279289dd97840c7f89cb8c69a40a79e8.
+Second saved-only attestation rechecks allnativearrays/source/inputs unchanged;
+existing report-only surfaceconsumer validates these15pins beforepublication.
+No arrays/media/checkpoints transferred locally, no nativeprep rerun. Native
+depth449580724B and RGB355130064B stay onAzure; preparation itself remains
+originalHOSTFAIL with distinct authenticnativePASS attestation, neverrelabeled.
