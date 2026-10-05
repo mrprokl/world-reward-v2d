@@ -1,0 +1,115 @@
+{
+  "schema": "world_reward.coco_endpoint_prepare.v2",
+  "output": "/srv/world-reward-data/coco_endpoint_v2",
+  "slots": 64,
+  "dev": 32,
+  "reserved": 32,
+  "workers": 6,
+  "overall": 300,
+  "request_timeout": 15,
+  "max_image_bytes": 16777216,
+  "max_decoded_pixels": 16777216,
+  "max_total_image_bytes": 1073741824,
+  "min_acquired_dev": 24,
+  "retry_count": 0,
+  "no_replacements": true,
+  "hash_namespace": "world_reward.coco_endpoint_v2/",
+  "archive_url": "https://s3.amazonaws.com/images.cocodataset.org/annotations/annotations_trainval2017.zip",
+  "archive_bytes": 252907541,
+  "archive_md5": "f4bbac642086de4f52a3fdda2de5fa2c",
+  "member": "annotations/instances_val2017.json",
+  "annotation_cache": {
+    "producer_revision": "4657c8b45f733a1043c5a8af2f5b9d6ac027196a",
+    "report": {
+      "path": "/srv/world-reward-data/coco_proposal_v1/metadata/report.json",
+      "pin": {
+        "bytes": 3562,
+        "sha256": "c8dcee4e4f78b56a5ba8b9f644f94507715a9c46f6c05d0a305f8ce977f58786"
+      }
+    },
+    "archive_path": "/srv/world-reward-data/coco_proposal_v1/metadata/annotations_trainval2017.zip",
+    "archive_pin": {
+      "bytes": 252907541,
+      "sha256": "113a836d90195ee1f884e704da6304dfaaecff1f023f49b6ca93c4aaae470268"
+    }
+  },
+  "historical": [
+    {
+      "path": "/srv/world-reward-data/openimages_holds_census_v1/census_v2.json",
+      "readonly": false,
+      "pin": {
+        "bytes": 10130,
+        "sha256": "b4333ea57bb408b0eafdbc5eee51d2b3ee3e6e963ef9ec269178bbd45480ff4a"
+      }
+    },
+    {
+      "path": "/srv/world-reward-data/openimages_holds_census_fresh128_v1/census.json",
+      "readonly": false,
+      "pin": {
+        "bytes": 76839,
+        "sha256": "bf576b143bf8304981eb8dddfa64726945262d79c24cff07601f14e20a4fd452"
+      }
+    },
+    {
+      "path": "/srv/scenesmith/world-reward/results/openimages-joint-pair-selection-v1/cohort.json",
+      "readonly": true,
+      "pin": {
+        "bytes": 31043,
+        "sha256": "441bdc57e101cb4e8291ca6bbebc554ca397619e2a892469d9e410a16359a456"
+      }
+    },
+    {
+      "path": "/srv/scenesmith/world-reward/results/proposal-external-census-v1/cohort.json",
+      "readonly": true,
+      "pin": {
+        "bytes": 18076,
+        "sha256": "4db28db7b8c9beb0ce58e574e8f012f05c86ef7447ff056a269d4b04cd74ed33"
+      }
+    }
+  ],
+  "closed_coco_cohort": {
+    "path": "/srv/world-reward-data/coco_proposal_v1/metadata/cohort.json",
+    "pin": {
+      "bytes": 24029,
+      "sha256": "c78f2e100cd0c724f3b8873a3256299a7074c473ecb93c960dec509941994e67"
+    }
+  },
+  "reused_helper_pins": {
+    "infra/coco_proposal_prepare.py": {
+      "bytes": 24704,
+      "sha256": "ee9ec3ddd540ec485ef6bbe5812dda5f98760e9633cd3c11fdc49dbde2f66574"
+    },
+    "infra/run_coco_proposal_prepare.sh": {
+      "bytes": 780,
+      "sha256": "4de0f57eb778386811b22571b5695446e7dbc30145b8615bdb3585bfd56376c3"
+    },
+    "configs/coco_proposal_v1.json": {
+      "bytes": 2663,
+      "sha256": "982675264ba9009468c1c3e40569c3f68f8b3f188d30487759a2bde77dd0e811"
+    },
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "infra/openimages_joint_pair_acquire.py": {
+      "bytes": 23252,
+      "sha256": "ab0cac6d8a66550b8898a6add435fe92bc2546cbb7536723d4de3b8d8597ad49"
+    }
+  },
+  "primary_terms": {
+    "source_revision": "aaa6a5a0cc24bf1350247169cc512edd7ddf28b9",
+    "terms_url": "https://raw.githubusercontent.com/cocodataset/cocodataset.github.io/aaa6a5a0cc24bf1350247169cc512edd7ddf28b9/dataset/termsofuse.htm",
+    "terms_identity": {
+      "bytes": 2370,
+      "sha256": "bd019f88ee44c29b2f19c5b99888cf5bc2e7c16f57b6e52af8ed3a60462e8bdd"
+    },
+    "annotation_license": "CC-BY-4.0",
+    "image_license_id": 4,
+    "image_license_url": "http://creativecommons.org/licenses/by/2.0/",
+    "creator_identity": "UNKNOWN",
+    "grant_authority": "publisher_recorded_individual_image_license_not_independent_creator_authentication",
+    "raw_redistribution": false,
+    "pretraining_overlap": "COCO_DWPose_possible_OWL_web_pretraining_exact_photo_overlap_unknown"
+  },
+  "purpose": "person_specific_GDI_and_image_only_OWL_endpoint_recall_not_ownership"
+}
