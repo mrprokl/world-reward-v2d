@@ -10280,3 +10280,24 @@ Before any reference metrics, independent audit caught statistical implementatio
 mismatch: preregistered six *informative* images includes ties, not six nonzero
 deltas. Exactpaired binomial now returns5wins+1tie p1/32, all6ties p1; mean and
 informative denominator include zeros. No metric observations or gate retuning.
+
+6f78aef actual128batch v2 CLOSED HOSTFAIL43.880896s. Five partial native
+observations are unusable for scientific evaluation. Host2891B/
+47a3aa2223a3528e85a02afd2524d14a4868b85ffeecd0a968a45f4f1bf594b9;
+native394B/4246e5455e6fbd29f65e19b7044910eff4513dfaa25d417325173c0767e1fea5.
+All source/input/image posthash and owned-container/overlay cleanup pass;
+GPU idle. Cause: original JPEG exceeds the already preregistered16Mi-pixel
+input-area ceiling. No partial-model predictions are scored or adopted.
+
+General CPU-only original JPEG header qualification of all73 downloaded
+originals, before any reference geometry:12 fail the unchanged area ceiling,
+61 qualify. Same128 slots and original RGB bytes, no replacement, thumbnail,
+limit increase or quality-driven selection. Original44unavailable and
+11unknown-rotation plus12header-unscorable remain67 explicit misses.
+Qualification manifest135808B/
+6f8c289cde355e173a10243c22ab6a038740f5d88159244a5d9262dd917a1646,
+bound to original acquisition127742B/58b15ab040f2400bbc1aa67ea32f8c75155eecb79c771d7b4735d5157b9ec793.
+Reproduction: infra/openimages_fresh128_input_qualify.py, Azure original
+RO files only, Pillow headers not decoded pixels, no network/GPU/model.
+Freshv3 full61 forwards uses unchanged model/native ranking/statistical gates;
+both old technicalFAILs are preserved, not silently resumed/relabelled.

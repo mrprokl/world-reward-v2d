@@ -106,13 +106,13 @@ def test_batch_load_once_empty_outputs_valid_and_scope_flag_propagates(gate):
     assert 'external_cohort=args.external_cohort' in ast.unparse(main)
 
 
-def test_large_scope_complete73_inputs_and_bounded_sidecar(gate):
+def test_large_scope_complete_qualified_inputs_and_bounded_sidecar(gate):
     raw = (REPO/gate.COHORT128_PROTOCOL).read_bytes(); p = json.loads(raw)
     assert gate.COHORT128_PROTOCOL_PIN == dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
     c = p['external_cohort']
-    assert (c['slots'], c['acquired'], c['missing']) == (128, 73, 55)
-    assert len(c['inputs']) == len({r['image_id'] for r in c['inputs']}) == 73
-    assert len({r['cohort_slot'] for r in c['inputs']}) == 73
+    assert (c['slots'], c['acquired'], c['missing']) == (128, 61, 67)
+    assert len(c['inputs']) == len({r['image_id'] for r in c['inputs']}) == 61
+    assert len({r['cohort_slot'] for r in c['inputs']}) == 61
     assert all(0 <= r['cohort_slot'] < 128 and r['original_frame_index'] == 0 for r in c['inputs'])
     assert gate.selected_protocol_pin(p) == gate.COHORT128_PROTOCOL_PIN
     original = json.loads((REPO/gate.COHORT_PROTOCOL).read_bytes())
@@ -123,7 +123,7 @@ def test_large_scope_complete73_inputs_and_bounded_sidecar(gate):
     proof = dict(runtime=dict(image=dict(Id='sha256:'+'f'*64)), pin=dict(bytes=1, sha256='a'*64))
     _, _, mounts, args = gate.container_plan(Path('/tmp/code'), Path('/tmp/out'), 'a'*40, p, proof, 'model', 1800)
     assert '--external-cohort128' in args and '--external-cohort' not in args
-    assert len([m for m in mounts if str(m[0]).startswith(c['root'])]) == 73
+    assert len([m for m in mounts if str(m[0]).startswith(c['root'])]) == 61
 
 
 def test_large_inspect_projection_keeps_all_validation_metadata(gate):
@@ -144,3 +144,127 @@ def test_large_inspect_projection_keeps_all_validation_metadata(gate):
     assert '{{json .Args}}' not in [c[-1] for c in calls]
     gate.container_inspect(runtime, 'name', 1800)
     assert calls[-1][-1] == '{{json .}}'
+
+
+def qualified_fixture(gate):
+    """Manufactured full128 metadata only: 73 acquired ->61 +12 header misses."""
+    p = json.loads((REPO/gate.COHORT128_PROTOCOL).read_bytes())
+    values, images = fixture(gate, p); c = p['external_cohort']
+    parent = values[c['root']+'/manifest.json']
+    parent.update(schema='manufactured_parent.v1', source_proof={'verified': True, 'bytes': 1})
+    acquired = next(r for r in parent['records'] if r['status'] == 'acquired')
+    missing = [r for r in parent['records'] if r['status'] != 'acquired']
+    for slot, row in enumerate(missing):
+        row['image_id'] = f'{0xFFFFFFFF00000000+slot:016x}'
+        row['reason'] = 'original_access_failure'
+    for row in missing[:12]:
+        iid = row['image_id']; row.clear(); row.update(copy.deepcopy(acquired)); row['image_id'] = iid
+        row['reason'] = 'original_acquisition_note'
+    qualified = copy.deepcopy(parent)
+    qualified.update(schema='world_reward.openimages_fresh128_input_qualification.v1',
+        parent_acquisition_pin=c['manifest'], original_RGB_root=c['root'], header_only_CPU=True)
+    censored = {r['image_id'] for r in missing[:12]}
+    for row in qualified['records']:
+        if row['status'] != 'acquired': continue
+        width = 4097 if row['image_id'] in censored else 4096
+        row['original_JPEG_header'] = dict(format='JPEG', width=width, height=4096, pixels=width*4096)
+        if row['image_id'] in censored:
+            row.update(status='unscorable_header', reason='predeclared_original_JPEG_16Mi_pixel_limit_no_replacement')
+    values[c['qualified_manifest']['path']] = qualified
+    return p, values, images, parent, qualified
+
+
+def test_qualified_full128_header_only_preserves_inputs_and_config(gate, monkeypatch):
+    p, values, images, parent, qualified = qualified_fixture(gate)
+    snapshots = copy.deepcopy((p, parent, qualified)); c = p['external_cohort']; calls = []
+    counts = gate.validate_external_cohort_qualification(parent, qualified, c['manifest'], c['root'])
+    assert counts == dict(parent_acquired=73, qualified_acquired=61, header_unscorable=12, original_missing=55)
+    monkeypatch.setattr(gate, 'exact', lambda rt, path, pin, limit: calls.append(str(path)) if images[str(path)] == pin else pytest.fail('Wrong exact RGB pin'))
+    monkeypatch.setattr(gate, 'old_source', lambda *args: calls.append('old_source'))
+    frozen = gate.authenticate_external_cohort(SimpleNamespace(pinned=lambda path, *args: values[str(path)]), p)
+    assert len(frozen) == 126 and calls == [r['path'] for r in c['inputs']]+['old_source']
+    assert (p, parent, qualified) == snapshots
+
+
+@pytest.mark.parametrize('fault', [
+    'parent_pin', 'root', 'schema', 'cpu', 'reference', 'top_extra', 'top_mutation',
+    'reorder', 'duplicate', 'replace', 'parent_header', 'missing_header', 'header_extra',
+    'width_bool', 'height_float', 'pixels_bool', 'pixels_mismatch', 'width_zero', 'height_negative',
+    'format_int', 'animation_int', 'acquired_too_large', 'acquired_not_jpeg', 'acquired_animated',
+    'false_censor', 'bad_reason', 'parent_pin_field', 'parent_metadata', 'parent_bool_as_int',
+    'record_extra', 'missing_mutated', 'missing_header_added', 'missing_promoted', 'source_reason_changed',
+])
+def test_qualified_header_record_tampering_rejected_before_rgb(gate, monkeypatch, fault):
+    p, values, _, parent, qualified = qualified_fixture(gate); c = p['external_cohort']
+    acquired = next(r for r in qualified['records'] if r['status'] == 'acquired')
+    censored = next(r for r in qualified['records'] if r['status'] == 'unscorable_header')
+    missing = next(r for r in qualified['records'] if r['status'] == 'unavailable')
+    header = acquired['original_JPEG_header']
+    if fault == 'parent_pin': qualified['parent_acquisition_pin'] = {'bytes': 1, 'sha256': '0'*64}
+    if fault == 'root': qualified['original_RGB_root'] += '_other'
+    if fault == 'schema': qualified['schema'] = 'model_selected.v1'
+    if fault == 'cpu': qualified['header_only_CPU'] = 1
+    if fault == 'reference': qualified['reference_geometry_read'] = True
+    if fault == 'top_extra': qualified['model_quality'] = 1
+    if fault == 'top_mutation': qualified['source_proof']['verified'] = 1
+    if fault == 'reorder': qualified['records'] = qualified['records'][::-1]
+    if fault == 'duplicate': parent['records'][1] = copy.deepcopy(parent['records'][0]); qualified['records'][1] = copy.deepcopy(qualified['records'][0])
+    if fault == 'replace': acquired['image_id'] = 'e'*16
+    if fault == 'parent_header': parent['records'][0]['original_JPEG_header'] = dict(header)
+    if fault == 'missing_header': acquired.pop('original_JPEG_header')
+    if fault == 'header_extra': header['model_score'] = .9
+    if fault == 'width_bool': header.update(width=True, pixels=header['height'])
+    if fault == 'height_float': header['height'] = float(header['height'])
+    if fault == 'pixels_bool': header.update(width=1, height=1, pixels=True)
+    if fault == 'pixels_mismatch': header['pixels'] -= 1
+    if fault == 'width_zero': header.update(width=0, pixels=0)
+    if fault == 'height_negative': header.update(height=-1, pixels=-header['width'])
+    if fault == 'format_int': header['format'] = 1
+    if fault == 'animation_int': header['is_animated'] = 0
+    if fault == 'acquired_too_large': header.update(width=4097, pixels=4097*header['height'])
+    if fault == 'acquired_not_jpeg': header['format'] = 'PNG'
+    if fault == 'acquired_animated': header['is_animated'] = True
+    if fault == 'false_censor': censored['original_JPEG_header'].update(width=4096, pixels=4096**2)
+    if fault == 'bad_reason': censored['reason'] = 'no_detected_interaction'
+    if fault == 'parent_pin_field': acquired['image_pin'] = {'bytes': 1, 'sha256': '0'*64}
+    if fault == 'parent_metadata': acquired['publisher_original_metadata']['Author'] = 'Other'
+    if fault == 'parent_bool_as_int': acquired['publisher_md5_matched'] = 1
+    if fault == 'record_extra': acquired['ranking_result'] = 1
+    if fault == 'missing_mutated': missing['reason'] = 'model_error'
+    if fault == 'missing_header_added': missing['original_JPEG_header'] = dict(header)
+    if fault == 'missing_promoted': missing['status'] = 'acquired'
+    if fault == 'source_reason_changed': censored['creator_grant_verified'] = False
+    calls = []
+    monkeypatch.setattr(gate, 'exact', lambda *args: calls.append('RGB'))
+    monkeypatch.setattr(gate, 'old_source', lambda *args: calls.append('model'))
+    with pytest.raises(ValueError):
+        gate.authenticate_external_cohort(SimpleNamespace(pinned=lambda path, *args: values[str(path)]), p)
+    assert calls == []
+
+
+@pytest.mark.parametrize('format_,animated', [('PNG', None), (None, None), ('JPEG', True), ('JPEG', False)])
+def test_header_reason_uses_only_available_format_animation_area(gate, format_, animated):
+    p, _, _, parent, qualified = qualified_fixture(gate); c = p['external_cohort']
+    row = next(r for r in qualified['records'] if r['status'] == 'unscorable_header')
+    header = row['original_JPEG_header']; header.update(format=format_, width=2, height=3, pixels=6)
+    if animated is not None: header['is_animated'] = animated
+    if format_ == 'JPEG' and animated is False:
+        with pytest.raises(ValueError): gate.validate_external_cohort_qualification(parent, qualified, c['manifest'], c['root'])
+    else:
+        assert gate.validate_external_cohort_qualification(parent, qualified, c['manifest'], c['root'])['header_unscorable'] == 12
+
+
+@pytest.mark.parametrize('maxpixels', [True, 0, -1, float(16 << 20)])
+def test_header_area_policy_rejects_noninteger_or_nonpositive_bound(gate, maxpixels):
+    p, _, _, parent, qualified = qualified_fixture(gate)
+    with pytest.raises(ValueError):
+        gate.validate_external_cohort_qualification(parent, qualified, p['external_cohort']['manifest'], p['external_cohort']['root'], maxpixels)
+
+
+def test_header_qualification_keeps_old15_missing_policy_unchanged(gate, p, monkeypatch):
+    values, _ = fixture(gate, p)
+    row = next(r for r in values[p['external_cohort']['root']+'/manifest.json']['records'] if r['status'] != 'acquired')
+    row.update(status='unscorable_header', reason='predeclared_original_JPEG_16Mi_pixel_limit_no_replacement')
+    monkeypatch.setattr(gate, 'exact', lambda *args: None)
+    with pytest.raises(ValueError):
+        gate.authenticate_external_cohort(SimpleNamespace(pinned=lambda path, *args: values[str(path)]), p)

@@ -32,8 +32,8 @@ IMAGE_PROTOCOL = 'configs/hoi_detr_image_probe_v1.json'
 IMAGE_PROTOCOL_PIN = dict(bytes=6550, sha256='f556b700e4f331b7d92631711aa453e37cbd18d91e5bc0da1738c7e70ce3d9c9')
 COHORT_PROTOCOL = 'configs/hoi_detr_external_cohort_v1.json'
 COHORT_PROTOCOL_PIN = dict(bytes=8752, sha256='7d99a68fccf780e24cff46a2654103bb65f9894577853ce1ad15ddb6319097d4')
-COHORT128_PROTOCOL = 'configs/hoi_detr_external_cohort128_v2.json'
-COHORT128_PROTOCOL_PIN = {'bytes': 33079, 'sha256': 'da9cf0d7fc54b28ec40bc6384b2b108e597c4364df5be0f09c1ae90669d70060'}
+COHORT128_PROTOCOL = 'configs/hoi_detr_external_cohort128_v3.json'
+COHORT128_PROTOCOL_PIN = {'bytes': 28867, 'sha256': '2ca2385871ffadcca826a7d80aeb3624451b7fdd2f85f9b91c9ee3284741bedf'}
 HELPERS = ('infra/hoi_detr_model_qualify.py', 'infra/run_hoi_detr_model_qualify.sh', PROTOCOL,
            'infra/hoi_detr_runtime_verify.py', 'infra/hoi_detr_acquire.py',
            'infra/mediapipe_cpu_runtime_verify.py', 'infra/mediapipe_hands_acquire.py',
@@ -73,7 +73,7 @@ def protocol(rt, code, *, external_rgb=False, external_cohort=False, external_co
     require(sum((external_rgb, external_cohort, external_cohort128)) <= 1, 'Exactly one inference scope required')
     name, pin = (COHORT128_PROTOCOL, COHORT128_PROTOCOL_PIN) if external_cohort128 else ((COHORT_PROTOCOL, COHORT_PROTOCOL_PIN) if external_cohort else ((IMAGE_PROTOCOL, IMAGE_PROTOCOL_PIN) if external_rgb else (PROTOCOL, PROTOCOL_PIN)))
     p = rt.pinned(code/name, pin, (64 if external_cohort128 else 16) << 10)
-    schema, scope, output = ('world_reward.hoi_detr_external_cohort128.v2', 'fixed128_external_full_native_observations_before_reference_evaluation', 'results/hoi-detr-external-cohort128-v2') if external_cohort128 else (('world_reward.hoi_detr_external_cohort.v1', 'fixed_external_cohort_full_native_observations_before_reference_evaluation', 'results/hoi-detr-external-cohort-v1') if external_cohort else (('world_reward.hoi_detr_image_probe.v1', 'one_external_RGB_native_pair_head_runtime_only', 'results/hoi-detr-image-probe-v1') if external_rgb else (
+    schema, scope, output = ('world_reward.hoi_detr_external_cohort128.v3', 'fixed128_external_full_native_observations_before_reference_evaluation', 'results/hoi-detr-external-cohort128-v3') if external_cohort128 else (('world_reward.hoi_detr_external_cohort.v1', 'fixed_external_cohort_full_native_observations_before_reference_evaluation', 'results/hoi-detr-external-cohort-v1') if external_cohort else (('world_reward.hoi_detr_image_probe.v1', 'one_external_RGB_native_pair_head_runtime_only', 'results/hoi-detr-image-probe-v1') if external_rgb else (
         'world_reward.hoi_detr_model_qualification.v4', 'one_procedural_RGB_full_native_model_runtime_only', 'results/hoi-detr-model-qualify-v4')
     ))
     require(p['schema'] == schema and p['scope'] == scope
@@ -90,12 +90,78 @@ def protocol(rt, code, *, external_rgb=False, external_cohort=False, external_co
 
 
 def selected_protocol_pin(p):
-    return COHORT128_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v2' else (COHORT_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_external_cohort.v1' else (IMAGE_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_image_probe.v1' else PROTOCOL_PIN))
+    return COHORT128_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v3' else (COHORT_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_external_cohort.v1' else (IMAGE_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_image_probe.v1' else PROTOCOL_PIN))
+
+
+def validate_external_cohort_qualification(parent, qualified, pin, root, maxpixels=16 << 20):
+    """Pure header-only qualification; never select on predictions or references.
+
+    Preserve all parent record fields and original slots, including missing ones.
+    The actual four-field JPEG header is supported; animation is evidence only
+    when an optional explicit boolean is present. No image decoding occurs here.
+    """
+    def identical(a, b):
+        # JSON equality must distinguish booleans/integers/floats in provenance.
+        return json.dumps(a, sort_keys=True, allow_nan=False, separators=(',', ':')) == json.dumps(b, sort_keys=True, allow_nan=False, separators=(',', ':'))
+
+    require(type(parent) is dict and type(qualified) is dict and type(maxpixels) is int and maxpixels > 0,
+            'Exact parent and bounded JPEG qualification required')
+    additions = {'schema', 'parent_acquisition_pin', 'original_RGB_root', 'header_only_CPU', 'reference_geometry_read', 'records'}
+    require(qualified.get('schema') == 'world_reward.openimages_fresh128_input_qualification.v1'
+            and identical(qualified.get('parent_acquisition_pin'), pin)
+            and qualified.get('original_RGB_root') == str(root) and qualified.get('header_only_CPU') is True
+            and qualified.get('reference_geometry_read') is False
+            and set(qualified) == set(parent) | additions
+            and identical({k: v for k, v in qualified.items() if k not in additions},
+                          {k: v for k, v in parent.items() if k not in additions}),
+            'Only original JPEG header qualification metadata may be added')
+    originals = parent.get('records'); rows = qualified.get('records')
+    require(type(originals) is list and type(rows) is list and len(originals) == len(rows) and len(rows) > 0,
+            'All original cohort slots preserved after header qualification')
+    ids = []; counts = dict(parent_acquired=0, qualified_acquired=0, header_unscorable=0, original_missing=0)
+    for original, row in zip(originals, rows):
+        require(type(original) is dict and type(row) is dict
+                and type(original.get('image_id')) is str and re.fullmatch('[0-9a-f]{16}', original['image_id'])
+                and row.get('image_id') == original['image_id'] and original.get('reference_geometry_read') is False
+                and original.get('status') in ('acquired', 'unavailable', 'unscorable_rotation')
+                and 'original_JPEG_header' not in original, 'Original acquisition record and slot required')
+        ids.append(original['image_id'])
+        if original['status'] != 'acquired':
+            require(identical(row, original), 'Original missing acquisition record must remain unchanged')
+            counts['original_missing'] += 1
+            continue
+        counts['parent_acquired'] += 1
+        header = row.get('original_JPEG_header')
+        require(type(header) is dict and set(header) in ({'format', 'width', 'height', 'pixels'},
+                {'format', 'width', 'height', 'pixels', 'is_animated'})
+                and (type(header['format']) is str or header['format'] is None)
+                and all(type(header[k]) is int and header[k] > 0 for k in ('width', 'height', 'pixels'))
+                and header['pixels'] == header['width'] * header['height']
+                and ('is_animated' not in header or type(header['is_animated']) is bool),
+                'Original finite positive integer JPEG header required')
+        eligible = header['format'] == 'JPEG' and not header.get('is_animated', False) and header['pixels'] <= maxpixels
+        restored = {k: v for k, v in row.items() if k != 'original_JPEG_header'}
+        if eligible:
+            require(identical(restored, original), 'Eligible JPEG parent record must remain unchanged')
+            counts['qualified_acquired'] += 1
+        else:
+            require(row.get('status') == 'unscorable_header'
+                    and row.get('reason') == 'predeclared_original_JPEG_16Mi_pixel_limit_no_replacement',
+                    'Only evidenced predeclared JPEG header failure may censor a record')
+            restored['status'] = original['status']
+            if 'reason' in original:
+                restored['reason'] = original['reason']
+            else:
+                restored.pop('reason', None)
+            require(identical(restored, original), 'Header-censored record must preserve every original field')
+            counts['header_unscorable'] += 1
+    require(len(ids) == len(set(ids)), 'Unique original cohort IDs required')
+    return counts
 
 
 def authenticate_external_cohort(rt, p):
     """Host-only rights/metadata binding. The GPU receives original JPEGs only."""
-    c = p['external_cohort']; folder = Path(c['root']); large = p['schema'] == 'world_reward.hoi_detr_external_cohort128.v2'
+    c = p['external_cohort']; folder = Path(c['root']); large = p['schema'] == 'world_reward.hoi_detr_external_cohort128.v3'
     require((str(folder) == '/srv/world-reward-data/openimages_holds_fresh128_acquisition_v1'
              and c['slots'] == 128 and 0 < c['acquired'] <= 128 and c['missing'] == 128-c['acquired']) if large else
             (str(folder) == '/srv/world-reward-data/openimages_holds_fresh_acquisition_v1' and (c['slots'], c['acquired'], c['missing']) == (15, 8, 7)),
@@ -109,10 +175,16 @@ def authenticate_external_cohort(rt, p):
             and manifest['local_heavy_transfer'] is False and len(manifest['records']) == c['slots'],
             'Fresh external metadata cohort required')
     frozen = {str(folder/'manifest.json'): c['manifest']}; expected = []
-    for slot, row in enumerate(manifest['records']):
+    inference_manifest = manifest
+    if large:
+        q = c['qualified_manifest']; inference_manifest = rt.pinned(Path(q['path']), q['identity'], 256 << 10)
+        validate_external_cohort_qualification(manifest, inference_manifest, c['manifest'], folder, 16 << 20)
+        frozen[q['path']] = q['identity']
+    for slot, row in enumerate(inference_manifest['records']):
         require(row['reference_geometry_read'] is False and row['image_id'] != c['excluded_QA_image'], 'No QA/reference record in fresh inference')
         if row['status'] != 'acquired':
-            require(row['status'] in ('unavailable', 'unscorable_rotation'), 'Explicit missing cohort slot required')
+            require(row['status'] in (('unavailable', 'unscorable_rotation', 'unscorable_header') if large else
+                                     ('unavailable', 'unscorable_rotation')), 'Explicit missing cohort slot required')
             continue
         iid = row['image_id']; require(re.fullmatch('[0-9a-f]{16}', iid), 'Original image ID required')
         meta = row['publisher_original_metadata']; rights_path = folder/iid/'rights.json'
@@ -521,7 +593,7 @@ def gpu_model(code, revision, p, proof_pin):
     # Complete per-image identities live in a separately pinned concise manifest,
     # not truncated rows or a larger deadline/receipt policy.
     saved_outputs = outputs
-    if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v2':
+    if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v3':
         rt.write(out/'observations_manifest.json', (json.dumps(dict(schema='world_reward.hoi_detr_observations_manifest.v1', observations=outputs), sort_keys=True, allow_nan=False)+'\n').encode(), 0o444)
         saved_outputs = rt.identity(out/'observations_manifest.json', 256 << 10)
     value = dict(stage='hoi_detr_full_native_model', status='pass', source_binding=proof['source_binding'], checkpoint_identity=p['acquisition']['checkpoint'], strict_checkpoint=loaded, checkpoint_buffer_schema=buffer_schema,
@@ -558,7 +630,7 @@ def container_plan(code, out, revision, p, proof, phase, deadline):
              'WR_IMAGE_ID='+image_id, 'WR_MODEL_DEADLINE='+format(deadline, '.17g'), 'OMP_NUM_THREADS=4', 'OPENBLAS_NUM_THREADS=4', 'CUDA_VISIBLE_DEVICES=0' if phase == 'model' else 'CUDA_VISIBLE_DEVICES=-1',
              '/opt/conda/bin/python', '-I', '-B', str(code/HELPERS[0]), '--'+phase, '--proof-bytes', str(proof['pin']['bytes']), '--proof-sha256', proof['pin']['sha256']]
     if 'external_RGB' in p: args.append('--external-rgb')
-    if 'external_cohort' in p: args.append('--external-cohort128' if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v2' else '--external-cohort')
+    if 'external_cohort' in p: args.append('--external-cohort128' if p['schema'] == 'world_reward.hoi_detr_external_cohort128.v3' else '--external-cohort')
     return name, cid, mounts, args
 
 
