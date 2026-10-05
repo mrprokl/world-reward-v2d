@@ -394,6 +394,22 @@ small continuous full-T independent holdout. OakInk2's CC-BY-SA4 dataset has
 upper-body/hands-object coverage and separate body-model rights; lower-body
 parameters are documented unused. Both remain deferred, with no acquisition.
 
+Fresh metadata-only OakInk2 audit at HF21705616140d726607027e70d58b7837f442ffd8:
+ungated/card CC-BY-SA4, exact program.tar3594240B/
+67d234e396e8392c95234db5dd84b33163469419aa68117bf1c355ee7319d500.
+Toolkit502a02809b50b7f5d0037f92a1ccd2a479051ad1 has no LICENSE in its complete
+tree and no setup license; do not incorporate it. Task-object references can
+avoid MANO/SMPL-X but require separate private geometric projection and do not
+test bystander actor selection. No heavy acquisition justified at this stage.
+
+MASA source c5472b9c7615f35abdf1188cb1a0c5408fe50d66 is Apache2; independent
+R50 publisher card25ed372c47f2c46cf36fd446d1b657b656bc7ea9 declares Apache2.
+Declared training SA1B500k, overlap unknown. Acquisition/runtime are prospective,
+not submission clearance or an interaction-quality certificate.
+V-COCO roles at489cc4db74f2f10ab4b134f67da3874afbf245ab remain deferred:
+MIT software/documentation grant is not verified explicit DATA permission for
+those added role annotations. Original COCO/Flickr image rights are separate.
+
 ## Experimental general solid certificate (October4, not adoption)
 
 The independently written certified_solid_query.cpp glue is Apache-2.0.

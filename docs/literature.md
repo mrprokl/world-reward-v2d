@@ -1657,3 +1657,37 @@ execution only; it does not validate its relationship accuracy. Parallel clean
 `hoi_mask_bridge` analytically retains **all** positive box/pixel-cell overlaps
 plus NULL, complete original masks and proposal slots; no max-IoU identity,
 weight/confidence/selection or actual mask-model execution is implied.
+
+### October5 — temporal instance association, not another top1 selector
+
+[MASA, CVPR2024](https://arxiv.org/abs/2406.04221) learns instance appearance
+correspondence from transformed static segmentation proposals. The independently
+audited [R50 config@c5472b9](https://github.com/siyuanliii/masa/blob/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/configs/masa-one/masa_r50_plug_and_play.py)
+(6951B/749b8b77c18fc985a7604a4f3cd4af745b82be672f64cda67097c48bb53fac12)
+uses given automatic boxes, caffe ResNet50/FPN/three DCNv2 fusion blocks and
+native MMDet3 QuasiDenseTrackHead embeddings[N,256]. Extract all slots before
+the author's confidence filtering/greedy tracking; never introduce hard top1
+actor/object or interpret an appearance similarity as manipulation/contact.
+Publisher R50 at HF25ed372c47f2c46cf36fd446d1b657b656bc7ea9 is528391980B/
+082670efc6e8820eff8257f78ea14dfb52d6cdbe2910ecccf0901a74f4a0fd76;
+source/card Apache2, declared SA1B500k training, challenge overlap unknown.
+Original model is not yet acquired/executed here. MMDet3.3/MMCV2.1 require an
+isolated ABI qualification; our successful HOI/MMCV1.7 runtime is NOT compatible.
+Avoid broad package/demo imports that pull datasets/SAM/GroundingDINO/downloads.
+First qualify complete original config/strict checkpoint loading and full-bank
+embeddings on procedural images, then a separately frozen external temporal
+comparison. No scientific adoption or new experiment on the closed128 cohort.
+
+External-reference audit fails fast on two costly distractions. OakInk2 provides
+annotated task-involved objects, NOT contact-negative labels or multiperson actor
+selection. Its documented frame IDs lie in the120Hz mocap domain with30Hz RGB;
+never replace them by frame ordinals. Ten metadata-only candidate RGB archives
+would cost55.31GB plus0.975GB annotations and private scan/pose projection, yet
+do not test our bystander failure. Defer heavy acquisition; its toolkit has no
+explicit source license at502a02809b50b7f5d0037f92a1ccd2a479051ad1.
+[V-COCO](https://github.com/s-gupta/v-coco/tree/489cc4db74f2f10ab4b134f67da3874afbf245ab)
+has genuine person annotation IDs and role-object IDs, so is scientifically
+closer. Its MIT software grant does not explicitly clear the added DATA roles;
+COCO's annotation grant does not automatically clear these, and original Flickr
+image rights require separate verification. Do not acquire/adopt under an
+unverified waiver. Neither audit establishes contact/3D quality or CARI4D gain.

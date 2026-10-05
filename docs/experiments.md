@@ -10364,3 +10364,20 @@ Next is unchanged full360-frame surface pose execution; no pose, CARI chain,
 packing, accuracy, all30 coverage or leaderboard result inferred yet.
 281 targeted tiny tests PASS36.20s, one Azure-only geometry dependency skipped;
 exact current sixteen-helper hashes and clean diff verified locally.
+
+603272b actual second preregistered surface proposal EP17 COMPLETE PASS
+212.113581s, full419-frame source, one unchanged QSlim/2044V/4096F/fifteen
+components. Native944300B/
+a66623cfdf015e5d2c2dfb660bd3b57e83d8e06c1b6fafd2db27e521a54a4a4e;
+host1048203B/4b9815968cb0d18042eea86e55ce9a99d6fb9991a4781fb71cff349d4741f4a0.
+Independent complete original producer source/runtime/qualification/inputs,
+native validation and every output/posthash/owned-container/scratch absence PASS.
+Fifteen-artifact/sixteen-current-helper consumer pins5973B/
+e845984ae3b68e98e94d2f0e6f28666e548305eb938024a5dfe7795a6f56482d.
+Initial metadata dispatch collided with an active Azure Run Command and was
+unacknowledged; independent unit/log/output absence confirmed no execution,
+then explicit identical-source dispatch acknowledged and actual run verified.
+EP16's separate full native pose is confirmed live by systemd PID2006974 and
+exact owned H100 container/process2007129; no trajectory PASS inferred yet.
+CPU EP17 ran independently without GPU or duplicate pose work. Original EP17
+closed-solid failure remains unchanged, no repair/manual selection/accuracy claim.
