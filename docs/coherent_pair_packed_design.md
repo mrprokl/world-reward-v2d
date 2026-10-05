@@ -87,3 +87,13 @@ sur5548B fabriqués reconstruit les clés depuis l'evidence originale, pas le
 helper de préparation :18 refs, marges inégales, alias, zéros signés, supports,
 échelles désactivées, absences et rejet de tables forgées PASS. Cela n'établit
 ni débit/mémoire full-bank, ni performance GPU ou précision de sélection.
+
+Le scorer CPU `coherent_pair_packed_score` est maintenant implémenté :
+produits par composant, marge→géométrie→côté LME et VJP analytique17/alpha,
+sans tableau global routes×17. Tolérance de comparaison minuscule pré-déclarée
+rtol=atol=1e-12 ; FD h1e-6/tol1e-7, alpha0 un seul chemin bit-exact A/B.
+Root299 contrôles combinés PASS2.41s. Audit indépendant sur6444B fabriqués,
+énumération depuis l'evidence originale en longdouble : écart maximal2.22e-16,
+17 FD/dérivée droite alpha0, alias/absence/support/immutabilité PASS. Pas de
+FIT/optimiseur ou temps full-bank mesuré. La future voie GPU est séparément
+auditée dans `coherent_pair_gpu_reduction_audit.md`, pas encore exécutée.
