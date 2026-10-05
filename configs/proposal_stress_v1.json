@@ -1,0 +1,29 @@
+{
+  "schema": "world_reward.proposal_stress_recipe.v1",
+  "seed": 2026100517,
+  "scenes": 16,
+  "development_scenes": 8,
+  "reserved_scenes": 8,
+  "frames_per_scene": 2,
+  "width": 640,
+  "height": 480,
+  "focal_px": 700.0,
+  "budget_seconds": 300,
+  "output": "validation/proposal_stress_v1",
+  "image_id_namespace": "world_reward.proposal_stress_new_v1/",
+  "image": "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3",
+  "mhr_asset": {
+    "file": "weights/cari4d/sam3d_body/checkpoints/sam-3d-body-dinov3/assets/mhr_model.pt",
+    "bytes": 696110248,
+    "sha256": "352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc"
+  },
+  "pytorch3d_revision": "33824be3cbc87a7dd1db0f6a9a9de9ac81b2d0ba",
+  "shape_coefficients": [-0.3, 0.2, 0.4],
+  "human_scales": [0.92, 1.04, 0.98],
+  "object_forms": ["cuboid", "cylinder", "ellipsoid", "duplicate"],
+  "minimum_scene_foreground_pixels": 1024,
+  "minimum_visible_humans": 2,
+  "minimum_visible_human_pixels": 32,
+  "resamples": 0,
+  "scope": "synthetic_proposal_and_visible_mask_recall_cost_only"
+}
