@@ -10546,3 +10546,18 @@ DCNv2 versus RoIAlign; no specific ABI cause claimed. Preserve this FAIL before
 any separately published technical diagnostic, never relax numerical gates or
 call the checkpoint/model/association qualified. EP20 full-index pose is queued
 behind the cooperative lock after its independently authenticated CPU proposal.
+
+76f655a fresh metadata-only MASA operator diagnostic CLOSED technicalFAIL
+13.517588s, fixed sub-gate dcn_zero_offset/RuntimeError. Construction completed;
+failure is within native zero-offset forward/reference/synchronization, not an
+identified kernel-architecture cause. Host2887B/
+4b752e73a7b91c7af0e70c6d61872bfd015bbc29a88d28919bf110de1596e83d;
+native2569B/7219938122e55845d5cfea454a8cc28c6401bda8dbc0246b23aa81439cb21f61.
+Independent complete source/proof/runtime/all artifact posthashes, sealed owned
+outputs and CID/name absence PASS. No weights decoded/model constructed; both
+FAILs stay immutable. Additional saved-wheel architecture audit INCONCLUSIVE:
+cuobjdump absent and sole extension340555184B exceeds its fixed150MB extraction
+cap, so no extraction or architecture claim. Do not build a replacement or
+relax tests without identifying the actual technical cause. Parent144 combined
+tiny tests PASS3.33s; operator AST is unchanged after stripping diagnostic-only
+progress assignments. No tracking, physical ownership or quality gain.
