@@ -352,10 +352,22 @@ all corner coordinates bymax(H,W), retaining padding/out-of-image proposals.
 FP32 source/config/whole-bank checks are numerical contracts, not detections.
 
 Official prospective [google checkpoint](https://huggingface.co/google/owlv2-base-patch16-ensemble/tree/57beb61adb5abda3de4a9796bc35ae60bc4b9802)
-619918824B SHAe1e130b9…99e7 is **not acquired or qualified**. Processor425B
+619918824B SHAe1e130b9…99e7 is **acquired and byte-verified on Azure, not yet
+native-qualified**. Processor425B
 SHAcf3e3966…0064/config414B SHAba9df8c2…acb2 and Apache2 notice are separate
 source pins; COCO/OpenImages/web training overlap remains explicit/unknown in
 detail. No claim of unseen validation or general physical-object truth.
 Root157combined numerical seam/person/candidate/scorer testsPASS.54s, including
 28new OWLv2 fixtures. Next native runtime/strict checkpoint qualification must
 precede a new photo-disjoint cohort; the closed COCO32 is not reopened.
+
+Actual acquisition V1 closes on a transport-only failure before checkpoint
+streaming: original publisher302→`us.aws.cdn.hf.co` was not in our outer exact
+allowlist. Original three tiny assets/report stay immutable. Fresh V2 adds only
+that observed CDN; the original MASA streamer/inner endpoint and all model pins
+are unchanged. V2 PASS9.401160s; independent fullGit273files/XZmarker/4assets
+posthash PASS1.425606s. No checkpoint decode/GPU/model/data or quality claim.
+81 native qualification fixture testsPASS.21s precede its data-free H100 run.
+The lossless objectness→generic-candidate bridge retains all3600IDs/FP32 logits,
+zero/padded/duplicate boxes and source fingerprints without ranking or filtering;
+111 related fixturesPASS.69s. It does not certify object or owner identity.

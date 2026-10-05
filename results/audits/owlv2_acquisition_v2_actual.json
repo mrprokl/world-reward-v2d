@@ -1,0 +1,44 @@
+{
+  "assets": {
+    "README.md": {
+      "bytes": 4838,
+      "sha256": "7c7426bc5ec939a42d1f96fb093031b6263400cceac4129ebb941a0c8c11b9b9"
+    },
+    "config.json": {
+      "bytes": 414,
+      "sha256": "ba9df8c25a4b8461887dd0a93d9252c9cd84697fe8d49a9d8794ce409af9acb2"
+    },
+    "model.safetensors": {
+      "bytes": 619918824,
+      "sha256": "e1e130b9e404cf91a75ad45644c1da9d7fa5284085eecc864266a6923efb99e7"
+    },
+    "preprocessor_config.json": {
+      "bytes": 425,
+      "sha256": "cf3e396635b797ee1a464e1b2836e98748f8edac19e89aaa2c93b55ac15b0064"
+    }
+  },
+  "audit_elapsed_seconds": 1.4256055949954316,
+  "challenge_overlap_verified": false,
+  "credentials_used": false,
+  "failed_V1_preserved": true,
+  "independent_full_git_assets_rehashed_after": true,
+  "license_clearance_verified": false,
+  "local_heavy_transfer": false,
+  "mechanical_audit_errors": [],
+  "models_loaded": false,
+  "native_elapsed_seconds": 9.401159973989706,
+  "native_owl_qualified": false,
+  "old_MASA_streamer_unchanged": true,
+  "original_namespace": "weights/owlv2_objectness_v2",
+  "producer_revision": "614c34e72356d64ce957bad26f98d802b74d6b1d",
+  "quality_verified": false,
+  "receipt_identity": {
+    "bytes": 3767,
+    "sha256": "6d7d5da5e50866b9bba00b1b7286fcf2921f360983aa16d675bb0a68e58e88f2"
+  },
+  "schema": "world_reward.owlv2_acquisition_actual.v2",
+  "source_archive_xz_sha256": "994583cbeb49aa551ed54aa95d3b0c93a2887ebbee2c548adccc165105ca79a5",
+  "source_files": 273,
+  "status": "pass",
+  "training_overlap_verified": false
+}

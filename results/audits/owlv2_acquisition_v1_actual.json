@@ -1,0 +1,33 @@
+{
+  "audit_elapsed_seconds": 0.2434038259962108,
+  "checkpoint_bytes_acquired": 0,
+  "decision": "fresh technical V2 only: exact observed CDN added to new outer allowlist, unchanged upstream MASA streamer/publisher/model pins/science",
+  "independent_full_git_assets_rehashed_after": true,
+  "mechanical_observer_errors": [
+    "comparison included mutable access time; corrected stable content fields only",
+    "observer wrongly assumed native PASS; failure inspected explicitly"
+  ],
+  "models_loaded": false,
+  "native_elapsed_seconds": 0.559610636002617,
+  "native_owl_qualified": false,
+  "observed_publisher_redirect": {
+    "body_read": false,
+    "from_host": "huggingface.co",
+    "header_diagnostic_elapsed_seconds": 0.1272763189917896,
+    "status": 302,
+    "to_host": "us.aws.cdn.hf.co"
+  },
+  "old_receipt_and_outputs_preserved": true,
+  "owned_partials_absent": true,
+  "producer_revision": "042c94cdb3f901109cf9bbf0089e4614a595e57c",
+  "quality_verified": false,
+  "receipt_identity": {
+    "bytes": 3115,
+    "sha256": "f5bd6d7a2ce184caff00ebcf5017bafab19cd35ef05fd003f19d26206ba679ed"
+  },
+  "schema": "world_reward.owlv2_acquisition_actual.v1",
+  "source_archive_xz_sha256": "f274d3983fd90d465952d75f94a19b74899389058ab4a9c1d130ece6e29fe262",
+  "source_files": 269,
+  "status": "audited_native_transport_failure",
+  "tiny_assets_verified": 3
+}

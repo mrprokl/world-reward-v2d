@@ -11129,3 +11129,20 @@ schemas and posthashes pass; no new model/GPU/optimizer. The two mechanical
 observer errors (readonly memmap exact type, absent non-required consumer module)
 remain recorded, original producers untouched. Six downstream pins/audits are
 frozen. EP16 official packing and EP17export/EP19forward remain separate gates.
+
+OWL assets V1 transportFAIL.559611s before checkpoint stream: publisher302
+redirects to unlisted `us.aws.cdn.hf.co`. Exact original failure, three tiny
+assets and receipt remain readonly. Header-only diagnostic.127276s reads no
+body; only the new outer allowlist changes in freshV2, unchanged MASA streamer
+and scientific configuration/checkpoint. V2 actualPASS9.401160s and independent
+wholeGit273files/XZmarker/4assetprepost auditPASS1.425606s. Complete safeweights
+619918824B SHAe1e130b9…99e7 stays Azure; no decode/model/nativeOWL quality yet.
+Two mechanical V1 observer assumptions are preserved in its failure audit.
+
+Native OWLv2 qualifier81tinycontrolsPASS.21s: strict original all-head state,
+original image-only processor and square-pad inverse, one load/threeprocedural
+frames/all3600patches, full original image/source/asset/CID cleanup contracts.
+The external role-validation source audit separates V-COCO localized positive
+pair recall from inclusive official-v3AP, hand ownership and temporal identity.
+Annotation data grant/actual checkpoint overlap are unresolved; no GT acquired.
+EP17export, EP19forward and EP16official CPU pack are dispatch-only pending.

@@ -1,0 +1,35 @@
+{
+  "schema": "world_reward.owlv2_native_qualification.v1",
+  "image_id": "sha256:fd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252",
+  "output": "/srv/scenesmith/world-reward/results/owlv2-native-qualification-v1",
+  "budget_seconds": 120,
+  "memory_bytes": 68719476736,
+  "model_loads": 1,
+  "image_embed_calls": 3,
+  "patches_per_frame": 3600,
+  "text_queries": 0,
+  "all_patches_retained": true,
+  "quality_verified": false,
+  "adopted": false,
+  "publisher_revision": "57beb61adb5abda3de4a9796bc35ae60bc4b9802",
+  "python": "3.11.10",
+  "versions": {"torch": "2.5.1+cu124", "torchvision": "0.20.1+cu124", "transformers": "4.53.3", "safetensors": "0.6.2", "scipy": "1.16.3", "numpy": "1.26.3", "Pillow": "10.2.0", "protobuf": "7.36.2"},
+  "adapter_identity": {"bytes": 8748, "sha256": "8587489a860b44a74bc0149c67960128b6b12aa1e4d51bc07e0e52103da5b888"},
+  "rt_identity": {"bytes": 23559, "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"},
+  "native_sources": {
+    "transformers/models/owlv2/modeling_owlv2.py": {"bytes": 78926, "sha256": "98e94770ce96e7b6b09be14596fad0600aac7a60e47b5fda846464547ae4d05e"},
+    "transformers/models/owlv2/image_processing_owlv2.py": {"bytes": 28040, "sha256": "b20c2be9d906b104e65be6e8851d9a597ea228b474830775dbe7ddacf1a2253f"},
+    "transformers/image_transforms.py": {"bytes": 41526, "sha256": "05adea2df9217d301af319b8cf525a287ddb22ddf7b76da2e87e2953e3baad70"},
+    "scipy/__init__.py": {"bytes": 4063, "sha256": "a72412a5c62442876e073a01da1910c84b7214d1382380b71a873b470420dd68"}
+  },
+  "assets": {
+    "README.md": {"bytes": 4838, "sha256": "7c7426bc5ec939a42d1f96fb093031b6263400cceac4129ebb941a0c8c11b9b9"},
+    "config.json": {"bytes": 414, "sha256": "ba9df8c25a4b8461887dd0a93d9252c9cd84697fe8d49a9d8794ce409af9acb2"},
+    "preprocessor_config.json": {"bytes": 425, "sha256": "cf3e396635b797ee1a464e1b2836e98748f8edac19e89aaa2c93b55ac15b0064"},
+    "model.safetensors": {"bytes": 619918824, "sha256": "e1e130b9e404cf91a75ad45644c1da9d7fa5284085eecc864266a6923efb99e7"}
+  },
+  "license_clearance_verified": false,
+  "training_overlap_verified": false,
+  "challenge_overlap_verified": false,
+  "acquisition_receipt": "mandatory_independent_actual_CLI_revision_bytes_sha256_no_placeholder"
+}
