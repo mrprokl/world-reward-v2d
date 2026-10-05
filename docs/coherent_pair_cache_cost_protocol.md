@@ -36,3 +36,22 @@ Root172 manufactured tests PASS1.82s, including unchanged old cost tests,
 new25 controls and cache/source contracts; AST/bash-n and full298-file static
 runtime closure pass. Independent read-only audit found no concrete blocker in
 the frozen numerical/ownership/deadline scope. First actual run remains required.
+
+## Actual paired control — measured cost gate rejected
+
+Producer `99a256bb636805bfe682631396c32bdafb7d8c50` completes technical
+PASS33.618632091s, terminal unit exit0/CID removed. All six paired full-native
+score/support/ID/metadata and loss/gradient comparisons are bit-identical.
+P4/K64 zero-tie pass: original10.343094624s, cache1.108000376s. The other
+cached passes are .379748533/.261482708/.270821504/.526446052/.550738604s;
+preparation .162577884/.337979200s. Peak native RSS124731392B.
+
+Worst-observed recipe projection36388.683678271s exceeds720s. Decision:
+**CACHE_RECIPE_COST_UNQUALIFIED_NO_REAL_FIT**. The substantial single zero-tie
+speedup does not qualify the fixed512-step recipe or generalize statistically.
+No actual FIT ran; cost rejection is not a scientific quality result.
+Host report2738B SHA256
+`6fc7c70e091c5a6cc93c3c2879b3eed192b27583f2ddedf80085f2f86f0d5229`;
+native report8495B SHA256
+`2d42d06dc0a02f05e037775ce4eb0991e39c2f20af232d6b4f0cffc40c418b6a`.
+Independent saved-only authentication is pending; neither producer is rerun.

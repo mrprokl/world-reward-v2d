@@ -68,7 +68,11 @@ procedural cost probe rejects qualifying its512-step recipe under720s, not the
 geometry hypothesis. A new source-authenticated cache retains exact complete
 route arithmetic and native identities;116 tiny controls and independent
 constructor/mutable-copy audits pass, with no speed or ownership claim.
-A separately frozen paired full3600 control is dispatched, not yet a result.
+A separately frozen paired full3600 control completes technical PASS: all six
+full-score/loss-gradient comparisons are bit-identical. Zero-tie P4/K64 drops
+10.343→1.108s in its single paired measurement, but worst-observed recipe
+projection36388.684s exceeds720s: fixed512-step FIT still not cost-qualified.
+Independent saved-only audit is pending; no real selector was trained.
 
 Fresh Visual Genome metadata acquisition and independent saved-only audit pass:
 135026437B remain Azure, zero RGB/annotation values consulted. New census will
