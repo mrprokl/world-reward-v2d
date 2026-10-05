@@ -10477,3 +10477,19 @@ mount mismatch, not a demonstrated Python/CUDA ABI failure. Preserve v2 FAIL;
 new CPU-only offline preflight explicitly permits exec in its bounded512MiB
 tmpfs (no network/capabilities), with unchanged isolated venv, dependency/numeric
 pins and1800s budget. The original base remains immutable, no packages installed.
+
+MASA data-free native qualification frozen prospectively: actual runtime PASS
+and independent report/image CLI pins are prerequisites, not inferred from a
+build dispatch. One fresh600s H100 contract executes synchronized DCNv2/RoIAlign
+gates before decoding the publisher-pinned checkpoint, then exact complete
+state loading without prefix/EMA/partial fallback. Four original pinned registry
+leaves, original inference pipeline/SyncBN conversion and independent bytewise
+BGR resize/normalization/padding reference; raw four-slot embedding bank includes
+duplicate and zero-area boxes, permutation and actual empty-bank calls, without
+tracker filters or challenge inputs. Parent107 combined tiny tests PASS2.13s.
+Independent producer/consumer audit caught runtime-report identity variable
+shadowing and the actual notice's publisher_md5:null field before any native
+dispatch; dedicated identities and faithful three-key fixtures fix both without
+changing model, dependencies, numeric gates or original producer receipts.
+No actual CUDA/checkpoint/model qualification, tracking/ownership correctness,
+training-overlap clearance, license eligibility, adoption or quality claim yet.

@@ -1,0 +1,85 @@
+{
+  "schema": "world_reward.masa_native_qualification.v1",
+  "budget_seconds": 600,
+  "publication_grace_seconds": 30,
+  "cpus": 4,
+  "memory_bytes": 8589934592,
+  "device": "H100_SM90",
+  "precision": "float32_no_autocast_tf32_disabled",
+  "runtime_pin_source": "mandatory_exact_revision_report_bytes_sha256_image_id_cli_frozen_before_invocation",
+  "acquisition": {
+    "producer_revision": "6540b32a2ac26624b9dcdb08419ded60ea83e73d",
+    "report": {"bytes": 6409,"sha256": "10a5f0c971e26aa8e74a4714efc866b86ca76ae27373a29e2fdd6332ca211f7d"},
+    "source_helper": {"bytes": 17128,"sha256": "2e9e0539c0ddf6d0d9045a377516f4a89424a8b29ebdf04503f1444f2b512238"},
+    "config": {"bytes": 7148,"sha256": "488cbf89b15d1843ad1a6b578d77fbb12d7742a550a77f6885f26d337875974d"}
+  },
+  "operator_gates_before_checkpoint": {
+    "dcn_zero_offset_mask_one_vs_conv2d": {"atol": 0.00001,"rtol": 0.00001},
+    "dcn_nonzero_offset_nontrivial_mask_repeat_exact": true,
+    "roi_align_cuda_vs_cpu": {"atol": 0.00001,"rtol": 0.00001},
+    "roi_align_output_size": 7,
+    "roi_align_sampling_ratio": 0,
+    "roi_align_constructor_defaults_unchanged": true,
+    "operator_inputs": {"height": 9,"width": 11,"input_channels": 2,"output_channels": 3,"kernel_size": 3}
+  },
+  "checkpoint_policy": {
+    "file": "weights/masa_r50.pth",
+    "bytes": 528391980,
+    "sha256": "082670efc6e8820eff8257f78ea14dfb52d6cdbe2910ecccf0901a74f4a0fd76",
+    "weights_only": true,
+    "map_location": "cpu",
+    "accepted_layout": "exact_tensor_mapping_or_single_explicit_state_dict_tensor_mapping",
+    "state_key_rewrite": false,
+    "strict_state_load": true,
+    "ema_selection": false
+  },
+  "source_execution": {
+    "scope": "four_pinned_native_registry_leaves_not_root_masa_package",
+    "registry_leaves": [
+      "masa/models/mot/masa.py",
+      "masa/models/necks/deform_fusion.py",
+      "masa/models/losses/unbiased_contrastive_loss.py",
+      "masa/models/tracker/masa_tao_tracker.py"
+    ],
+    "config": "configs/masa-one/masa_r50_plug_and_play.py",
+    "scope_name": "mmdet",
+    "given_dets": true,
+    "load_public_dets": false,
+    "use_masa_backbone": true,
+    "revert_sync_batchnorm_before_strict_load": true,
+    "deform_fusion_fix_upsample_override": false,
+    "test_pipeline": "original_Config.inference_pipeline_TransformBroadcaster_Resize1024_keep_ratio_PackTrackInputs_default_collate",
+    "preprocessing": "original_float32_BGR_TrackDataPreprocessor_no_resize_or_halfpixel_second_time",
+    "raw_path": "backbone.forward_then_masa_adapter_then_track_head.predict(features,[original_boxes_times_actual_scale_factor])",
+    "tracker_or_detection_postprocessing_executed": false
+  },
+  "procedural_model_control": {
+    "height": 173,
+    "width": 257,
+    "channels": 3,
+    "image_recipe": "BGR_uint8_(x*3+y*5+c*17)%256_promoted_float32",
+    "boxes_xyxy": [[12,9,83,104],[96,32,238,154],[12,9,83,104],[71,43,71,43]],
+    "native_slot_ids": [0,1,2,3],
+    "permutation": [3,1,0,2],
+    "expected_embedding_channels": 256,
+    "embedding_calls": 3,
+    "encoder_calls": 1,
+    "permutation_atol": 0.00001,
+    "permutation_rtol": 0.00001,
+    "duplicate_rows_equal_exact": true,
+    "empty_bank_preserved": true,
+    "zero_area_box_preserved": true
+  },
+  "claims": {
+    "model_operator_contract_only": true,
+    "tracking_correctness_verified": false,
+    "identity_or_physical_ownership_verified": false,
+    "quality_verified": false,
+    "adoption": false,
+    "challenge_inputs_used": false,
+    "ground_truth_used": false,
+    "dataset_builder_called": false,
+    "training_overlap_verified": false,
+    "license_eligibility_verified": false
+  }
+}
