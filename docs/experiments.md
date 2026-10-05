@@ -10712,3 +10712,18 @@ Config20926B/fdc0134a5037bf446f8f7c755c4252749b4ffba492dda93a43932d14674f252b;
 parent72 build/transport/person-bank tests PASS0.33s. Native compile remains
 unverified. This addresses a demonstrated file-format defect, not a numerical
 gate relaxation or another data/parameter experiment.
+
+5e4255d fresh actual all-person DWPose diagnostic COMPLETE PASS2.958846s.
+Six original recorded banks: EP9 0/27/55 retain2/3/3 persons; EP26 0/26/53
+retain2/2/2. One native ORT session,14 original batch-one calls, every call
+completed. Receipt24928B/0d8227caf7d35df87547c3a7cd92cb89686d08372f22adc8ee3fd8b940aadac6.
+Independent whole source/frozen inputs/saved arrays/readonly output/CID-name
+absence checks PASS. Private offline install prefix removed. Observer's first
+hash comprehension had a Python variable-shadowing bug; corrected readonly
+observer verifies the same producer, no inference rerun. Quality/ownership/
+adoption remain false; neither complete original video coverage nor a pair
+selector was tested. All prediction arrays/media remain on Azure.
+
+e91798b signed-DEB transport correction dispatched once as masa-sm90-build-v2
+with unchanged original full-source compile/budgets/ABI. Actual VM02PID473756
+active, no compiler receipt at observation; all earlier failures stay closed.

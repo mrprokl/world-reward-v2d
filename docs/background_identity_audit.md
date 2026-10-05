@@ -139,6 +139,16 @@ process_one_image blindly reshapes provided masks to[N,H,W,1]. Input[H,W,N]
 would mix people rather than transpose. Our historical N=1 calls are unchanged;
 any future all-person Body call must use explicit person-first mask layout.
 
+Actual fresh producer5e4255d CPU diagnostic PASS2.958846s: EP9 frames0/27/55
+retain2/3/3 persons, EP26 frames0/26/53 retain2/2/2. One session executes14
+original batch-one forwards; all six bank arrays stay on Azure. Independent
+whole-source, frozen input and prediction hashes, readonly outputs and owned
+CID/name absence pass; receipt24928B/
+0d8227caf7d35df87547c3a7cd92cb89686d08372f22adc8ee3fd8b940aadac6.
+The earlier9d8703 preflight path failure remains closed. This qualifies the
+native complete recorded-bank transport only, not full-T observation coverage,
+person identity, anatomical correctness, manipulation, adoption or accuracy.
+
 ### External validation is a separate remaining dependency
 
 A bounded independent audit did not identify a fully qualified public
