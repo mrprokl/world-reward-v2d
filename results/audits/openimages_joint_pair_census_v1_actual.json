@@ -1,0 +1,32 @@
+{
+  "adopted": false,
+  "counts": {
+    "eligible_images": 270,
+    "metadata_eligible_images": 296,
+    "new_relation_images": 897,
+    "old_ids_excluded": 144,
+    "source_author_groups": 232,
+    "two_separated_object_images": 671,
+    "two_separated_person_images": 313,
+    "unscorable_positive_pairs": 71
+  },
+  "decision": "FEASIBLE_PENDING_INDIVIDUAL_RIGHTS_AND_FROZEN_NEW_EXPERIMENT",
+  "frozen_file_count": 6,
+  "independent_audit_elapsed_seconds": 0.17004523699870333,
+  "local_heavy_transfer": false,
+  "prediction_accuracy_verified": false,
+  "producer_elapsed_seconds": 2.844554439012427,
+  "producer_revision": "bf47f065c6e076d9a73e5084fe02d9b91cb45d9c",
+  "readonly_files": true,
+  "report": {
+    "bytes": 842858,
+    "sha256": "106fbe042343f5ce3462c89245c2e02eaf4dfaabad145782cc4b06caf4df30d7"
+  },
+  "rgb_read": false,
+  "schema": "world_reward.openimages_joint_pair_census_integrity.v1",
+  "source_archive_sha256": "e62918faf20cfd01452d2eb45653db790643cbd162b7917c86cb534d7b4bbd5f",
+  "source_closure_sha256": "78105e30b89f52d5c5ab4483d0401c7d43093712113de7757075534b4dae644a",
+  "source_entries": 255,
+  "source_inputs_after_verified": true,
+  "status": "pass"
+}

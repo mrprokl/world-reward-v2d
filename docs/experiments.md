@@ -10991,3 +10991,24 @@ total corrected to106. Compact final proof: results/audits/hoi_person_bank_v1_ac
 Disposable local observer scripts removed after final audit; no heavy artifact
 arrived locally. External validation still requires a signed EgoExo grant and
 a real sealed two-person/two-object cohort. No verified win/first place/submission.
+
+New joint-pair metadata census bf47f065c actual PASS2.844554s, no RGB/model/network:
+897 new holds images (all144oldIDs excluded),296geometry-qualified,
+270orientation-qualified /232author-profile groups. Frozen gate>=16images and
+>=8authors clears feasibility only; rights and actual retrieval remain unverified.
+Receipt842858B SHA106fbe042343f5ce3462c89245c2e02eaf4dfaabad145782cc4b06caf4df30d7.
+Independent source/input/seal audit pending. Source arithmetic/current tests:
+171targetedPASS0.25s including40newgeneric-bank and12newcensus controls; no score.
+
+EP22 original full surface pose PASS533frames/2428.475249s, independently audited
+344Gitfiles/349entries,1624inputs before/after, properfullTselectedpath/geometry,
+3readonly outputs and originalCID/process/cgroup absence. CPU inert payload
+verification only, no model/GPU/solver rerun. Two observer errors (leaf mounts
+synthesized0755parent; reassignedargv in posthashclosure) fixed in observer only;
+original producer unchanged. Compact pins results/audits/coverage_22_full_pose_actual.json.
+EP23pose, EP17CPUprepare and EP16forward still active; no restart or new quality claim.
+
+Joint-pair census independent saved-only audit PASS0.170045s:250Gitfiles,
+255source entries closure78105e30…e644a/archivee62918fa…bbd5f; sixoriginal
+publisher/exclusion CSV/census files rehashed, report444/out555 unchanged.
+No RGB/models/predictions/network. Compact results/audits/openimages_joint_pair_census_v1_actual.json.

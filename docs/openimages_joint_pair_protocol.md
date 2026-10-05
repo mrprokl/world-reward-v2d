@@ -40,3 +40,29 @@ Those need different explicit external references. No CARI4D win claim follows.
 
 All CSV/image/model bytes stay Azure. Record only pins, counts and decisions
 locally. No new backbone or transport system is needed for this census.
+
+## Actual metadata result and next frozen sample
+
+Producerbf47f065c6e076d9a73e5084fe02d9b91cb45d9c: PASS2.844554s,
+897 untouched relation images after excluding144oldIDs;296geometry-qualified,
+270also publisher-orientation-qualified,232nonempty source-author profiles.
+Receipt842858B SHA106fbe042343f5ce3462c89245c2e02eaf4dfaabad145782cc4b06caf4df30d7.
+This clears only the metadata feasibility gate; no new RGB/predictions were read.
+
+Freeze64slots from the eligible population sorted by SHA256
+(`world_reward.oi_joint_pair_v1/`+ImageID), retaining at most one author profile
+and one original MD5/photo identity. Exclude exact original-photo identities of
+old144 records as well. First32are DEV, next32 TEST; DEV first24FIT and next8
+DECISION. No failed-download replacement, no choice based on image content or
+predictions. Creator and original-file gates are unchanged; original32TEST slots
+remain the evaluation denominator even if rights/access/header/proposal support
+fails. Source-author disjoint is not depicted-person/event/pretraining disjoint.
+
+Learned-score comparison is a subsequent frozen protocol, not this acquisition:
+positive-set listwise loss may rank observed positives above unknown competitors;
+its gradient implicitly suppresses unannotated alternatives. Never call this
+unbiased contact classification or manufacture absent-pair ground-truth negatives.
+Multiple-positive linear loss is not guaranteed convex; numerical termination and
+fixed fit recipe must be checked. Without any matched positive, a FIT record has
+no defined positive-set loss and cannot be repaired with GT proposals. Preserve
+such records as explicit support failures in evaluation. No OFF training here.
