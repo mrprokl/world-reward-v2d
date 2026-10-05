@@ -115,6 +115,34 @@ Baseline full-surface coverage, query support and proper export remain priority.
 
 ## Priority order
 
+### October5 targeted follow-up: real interaction, not persistent background
+
+[ROHIT/COP v2, June2,2026](https://arxiv.org/html/2512.07394v2) separates
+scene-static, changing contact and stable-grasp segments, with object pose
+propagation across them. Its stable grasp preserves contact-region consistency,
+not a constant object-to-hand transform: articulated fingers can still move.
+This motivates a falsifiable temporal interaction-state likelihood rather than
+choosing the largest/most persistent person or permanently nearest object.
+However, the paper takes a given object/timeline and known CAD in its primary
+setting; it does not solve crowded full-body task-owner selection. Our proposed
+states must be automatically inferred, no manual timeline or target on Track1.
+
+[Current primary repository](https://github.com/zhifanzhu/objects-along-hit)
+has executable code and distinguishes MIT code from EPIC CC-BY-NC derivatives,
+HOT3D share-alike/no-selling derivatives and MANO-dependent runtime. Its example
+inputs contain precomputed masks/HaMeR/metric fields, not a permitted drop-in
+challenge input. No repository asset, annotations, calibrated media, model or
+code execution was acquired; cutoff code commit/individual rights are not yet
+audited. Do not adopt its static-segment prior as a rule that suppresses actual
+object motion, or project its conditional2D gains into Track1 accuracy.
+
+[Open-CHOIR primary page](https://geometry.cs.ucl.ac.uk/projects/2026/openChoir/)
+also explicitly couples relative hand/object placement and changing contact,
+but lists code coming soon and no independently verified pre-September30
+paper/release date here. It remains availability-unqualified, not September
+SOTA adopted on a marketing page. No videos/images/checkpoints were downloaded.
+
+
 1. Reproduce frozen CARI4D baseline. It is a full-body category-agnostic metric 4D reference, not just a per-image PA-aligned method. It explicitly lacks detailed finger articulation and cannot fix major FoundationPose flips; first-frame object visibility is assumed.
 2. Body branch: compare GEM-X/SOMA temporal output and SAM3D Body/MHR framewise output against original NLF on permitted non-overlapping external validation. Native SOMA reduces challenge export impedance. Couple a fixed sequence identity and image reprojected evidence; do not replace metric/global evaluation by PA-only.
 3. Object branch: multi-keyframe/seed shape candidates, SAM3D vs Hunyuan, score on withheld *same monocular video* frames for visible silhouette, photometry and robust inferred depth. Shared shape+scale. Do-as-I-Do guided SAM3D shape-fixed tracking is a deployable alternate to FP initialization failures.
