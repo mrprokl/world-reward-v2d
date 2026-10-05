@@ -389,7 +389,13 @@ inverse, wheel RECORD/runtime/source/assets/inputs/seals rechecked.481 retained
 person proposals are a census, **not481 correct actors**. Producer7b557290140d;
 see `results/audits/rgb_endpoint_bank_v2_actual.json` for exact pins.
 
-Endpoint **recall evaluation remains pending**. Its preregistered conjunction
+Independent DEV endpoint **recall evaluation PASS**: P78.746%, O@12889.993%
+(one-to-one IoU.5 fixed32 macro). Scalar IoU/independent matching reproduce all
+32 rows and budgets; RESERVED references were not mounted in that audit.
+The separate RESERVED producer also reports PASS, P81.195% and O@12886.790%;
+its independent audit PASS4.5506s reproduces every metric and32 rows,
+with0 DEV reference values reread. These are endpoint ceilings, not
+interaction/ownership results. The protocol remains frozen. Its preregistered conjunction
 is P recall≥.70 AND objectness O@128 recall≥.70, one-to-one matching IoU≥.5,
 fixed32-image macro, no compensation or best-budget rescue. Only after DEV
 passes may a separate CPU phase mount RESERVED references. Even both PASS would
