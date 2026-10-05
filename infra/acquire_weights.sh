@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run on Azure after bootstrap; use the environment already installed there.
 set -euo pipefail
-if [[ $# == 1 && "$1" == --mhr-release-only ]]; then
+if [[ $# == 1 && ( "$1" == --mhr-release-only || "$1" == --mhr-release-inventory-only ) ]]; then
   ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
   [[ "$(uname -s)" == Linux && "$ROOT" == /srv/scenesmith/world-reward \
     && "$REV" =~ ^[0-9a-f]{40}$ && "$CODE" == "$ROOT/jobs/$REV/acquire_weights/code" ]] || exit 2

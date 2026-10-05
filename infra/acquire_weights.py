@@ -20,6 +20,65 @@ MHR_PROTOCOL = "configs/mhr_official_release_protocol_v1.json"
 MHR_PROTOCOL_PIN = dict(bytes=1914, sha256="7b5128a0acee793501d685299510933ee4beb2f4605d222beebaae7fa7b84ce1")
 MHR_HELPERS = ("infra/acquire_weights.py", "infra/acquire_weights.sh", MHR_PROTOCOL,
                "infra/mediapipe_cpu_runtime_verify.py")
+MHR_FAILED_REVISION = '4ed17ad0846b3acbf020fe29e1f58cd272c4ebc4'
+MHR_FAILED_REPORT = dict(bytes=2270,sha256='a6f68fac3a81a2cba27bed853e907aeb66ab596bf1c6deb46d194aec3f5c2e31')
+MHR_FAILED_ARCHIVE = 'd74c1263edefa0e531f2d71394c4e8c62f19b7434fe3d8defc285fea582ed54b'
+
+
+def _mhr_failure(rt, root, protocol):
+    out=rt.canonical(root/'results/mhr-official-release-license-v1')
+    rt.require(out.stat().st_mode&0o777==0o555 and {p.name for p in out.iterdir()}==
+        {'primary-LICENSE','primary-README.md','release-metadata.json','report.json'}, 'Exact original failed inventory required')
+    old=rt.pinned(out/'report.json',MHR_FAILED_REPORT,4<<20)
+    rt.require(old.get('stage')=='mhr_official_release_license_v1' and old.get('status')=='fail'
+        and old.get('phase')=='inventory' and old.get('producer_revision')==MHR_FAILED_REVISION
+        and old.get('protocol_identity')==MHR_PROTOCOL_PIN and old.get('whole_archive_sha_verified') is True
+        and old.get('owned_archive_removed') is True and old.get('source_rehashed_after') is True
+        and old.get('existing_model_rehashed_after') is True and 'asset_notices' not in old
+        and old.get('existing_model')=={k:protocol['model'][k] for k in ('bytes','sha256')}
+        and old.get('archive')=={k:protocol['archive'][k] for k in ('bytes','sha256')}, 'Original failure scope differs')
+    code=root/'jobs'/MHR_FAILED_REVISION/'acquire_weights/code'
+    source=rt.source(root,code,MHR_FAILED_REVISION,'acquire_weights',MHR_HELPERS)
+    rt.require(source==old['source_before'] and (code.parent/'source-sha256').read_bytes()==(MHR_FAILED_ARCHIVE+'\n').encode(), 'Original failed source changed')
+    expected={'report.json':MHR_FAILED_REPORT,'release-metadata.json':old['primary_metadata']}
+    expected.update({'primary-'+n:{k:p[k] for k in ('bytes','sha256')} for n,p in protocol['primary_texts'].items()})
+    files={n:rt.identity(out/n,4<<20) for n in expected}
+    rt.require(files==expected and all((out/n).stat().st_mode&0o777==0o444 for n in expected), 'Original retained text changed')
+    return dict(report=MHR_FAILED_REPORT,source=source,files=files,original_status='fail')
+
+
+def _mhr_inventory(z, protocol):
+    """Same ordered v1 predicates; diagnostic never repairs or reads payload."""
+    limits=protocol['archive_limits'];rows=[];seen=set();expanded=0;first=None;safe=True
+    for index,member in enumerate(z.infolist()):
+        name=member.filename;path=PurePosixPath(name);mode=member.external_attr>>16
+        guards=(('name_nonempty',bool(name)),('original_name',member.orig_filename==name),
+            ('name_controls',not any(ord(c)<32 or ord(c)==127 for c in name)),('backslash','\\' not in name),
+            ('absolute',not path.is_absolute()),('traversal','..' not in path.parts),
+            ('canonical',name==str(path)+('/' if member.is_dir() else '')),('duplicate',name not in seen),
+            ('encrypted',not member.flag_bits&1),('compression',member.compress_type in (zipfile.ZIP_STORED,zipfile.ZIP_DEFLATED)),
+            ('type',stat.S_IFMT(mode) in ((0,stat.S_IFDIR) if member.is_dir() else (0,stat.S_IFREG))),
+            ('member_bytes',member.file_size<=limits['member_bytes']))
+        rejected=next((key for key,passed in guards if not passed),None)
+        seen.add(name);expanded+=member.file_size
+        if rejected is None and len(seen)>limits['members']:rejected='member_count'
+        if rejected is None and expanded>limits['expanded_bytes']:rejected='expanded_bytes'
+        if rejected:
+            safe=False
+            if first is None:first=dict(index=index,guard=rejected,name=name[:1024],mode_octal=oct(mode),
+                flags=member.flag_bits,compression=member.compress_type,bytes=member.file_size)
+        if index<limits['members']:
+            rows.append(dict(name=name[:1024],orig_filename=member.orig_filename[:1024],
+                full_name_sha256=hashlib.sha256(name.encode('utf8')).hexdigest(),name_truncated=len(name)>1024,
+                bytes=member.file_size,compressed_bytes=member.compress_size,CRC=member.CRC,directory=member.is_dir(),
+                flags=member.flag_bits,mode_octal=oct(mode),compression=member.compress_type))
+    if first is None and ('assets/LICENSE' not in seen or protocol['model']['member'] not in seen):
+        first=dict(guard='required_members',assets_LICENSE_present='assets/LICENSE' in seen,
+            model_present=protocol['model']['member'] in seen)
+    return dict(rows=rows,count=len(z.infolist()),expanded_bytes=expanded,
+        maximum_member_bytes=max((m.file_size for m in z.infolist()),default=0),
+        maximum_compressed_member_bytes=max((m.compress_size for m in z.infolist()),default=0),structurally_safe=safe,
+        first_v1_rejection=first,v1_inventory_accepted=first is None,inventory_rows_truncated=len(z.infolist())>limits['members'])
 
 
 def _mhr_opener():
@@ -55,13 +114,13 @@ def _mhr_download(url, path, maximum):
         stream.flush(); os.fsync(stream.fileno())
 
 
-def mhr_release(root, code, revision, rt, *, fetch=_mhr_fetch, download=_mhr_download):
+def mhr_release(root, code, revision, rt, *, fetch=_mhr_fetch, download=_mhr_download, inventory_only=False):
     """Authenticate one independent official release; never load/replace a model."""
     start = time.monotonic()
     def expired(*_): raise TimeoutError('Official MHR release exceeded300s')
     old_alarm = signal.signal(signal.SIGALRM, expired); old_term = signal.signal(signal.SIGTERM, expired)
-    signal.alarm(300); out = partial = None; lease = None; before = existing_before = None
-    report = dict(stage='mhr_official_release_license_v1', status='fail', phase='source',
+    signal.alarm(300); out = partial = None; lease = None; before = existing_before = previous = None
+    report = dict(stage='mhr_official_release_inventory_v1' if inventory_only else 'mhr_official_release_license_v1', status='fail', phase='source',
         models_loaded=False, packages_installed=False, gpu_used=False, dataset_read=False,
         sam_provenance_relabelled=False, competition_eligibility_verified=False,
         training_overlap_verified=False, adoption=False)
@@ -74,7 +133,11 @@ def mhr_release(root, code, revision, rt, *, fetch=_mhr_fetch, download=_mhr_dow
         rt.require(model.lstat().st_uid in protocol['model']['accepted_uids'], 'Unexpected existing model owner')
         existing_before = rt.identity(model, wanted['bytes'], readonly=False)
         rt.require(existing_before==wanted, 'Existing standalone MHR bytes differ')
-        destination = rt.canonical(root/protocol['namespace']); destination.mkdir(mode=0o700); out = destination
+        if inventory_only:previous=_mhr_failure(rt,root,protocol)
+        destination = rt.canonical(root/('results/mhr-official-release-inventory-v1' if inventory_only else protocol['namespace']))
+        destination.mkdir(mode=0o700); out = destination
+        if inventory_only:report.update(previous_failure=previous,asset_LICENSE_verified=False,model_member_streamed=False,
+            model_member_extracted=False,whole_members_CRC_verified=False,diagnostic_only=True)
         report.update(producer_revision=revision, source_before=before, protocol_identity=MHR_PROTOCOL_PIN,
                       existing_model=existing_before, phase='primary_metadata')
         primary = {}
@@ -103,41 +166,41 @@ def mhr_release(root, code, revision, rt, *, fetch=_mhr_fetch, download=_mhr_dow
         current=partial.lstat();rt.require((current.st_dev,current.st_ino,current.st_uid)==(lease.st_dev,lease.st_ino,lease.st_uid), 'Downloaded partial ownership changed')
         rt.require(rt.identity(partial,archive['bytes'])=={k:archive[k] for k in ('bytes','sha256')}, 'Whole published archive SHA differs')
         report.update(archive={k:archive[k] for k in ('bytes','sha256')},whole_archive_sha_verified=True,phase='inventory')
-        limits = protocol['archive_limits']; inventory = []; seen = set(); expanded = 0
+        limits = protocol['archive_limits']
         with zipfile.ZipFile(partial) as z:
-            for member in z.infolist():
-                name=member.filename; path=PurePosixPath(name); mode=member.external_attr>>16
-                rt.require(name and member.orig_filename==name and not any(ord(c)<32 or ord(c)==127 for c in name) and '\\' not in name and not path.is_absolute() and '..' not in path.parts
-                    and name==str(path)+('/' if member.is_dir() else '') and name not in seen and not member.flag_bits&1
-                    and member.compress_type in (zipfile.ZIP_STORED,zipfile.ZIP_DEFLATED)
-                    and (stat.S_IFMT(mode) in (0,stat.S_IFDIR) if member.is_dir() else stat.S_IFMT(mode) in (0,stat.S_IFREG))
-                    and member.file_size<=limits['member_bytes'], 'Unsafe release ZIP member')
-                seen.add(name); expanded+=member.file_size
-                rt.require(len(seen)<=limits['members'] and expanded<=limits['expanded_bytes'], 'Release inventory bound exceeded')
-                inventory.append(dict(name=name,bytes=member.file_size,CRC=member.CRC,directory=member.is_dir()))
-            rt.require('assets/LICENSE' in seen and protocol['model']['member'] in seen, 'Official asset LICENSE/model missing')
-            report.update(archive_inventory=inventory, expanded_bytes=expanded, phase='asset_proof')
+            inventory=_mhr_inventory(z,protocol)
+            if not inventory_only:rt.require(inventory['v1_inventory_accepted'],'Original release inventory predicate rejected')
+            rows=inventory['rows'] if inventory_only else [{k:r[k] for k in ('name','bytes','CRC','directory')} for r in inventory['rows']]
+            report.update(archive_inventory=rows, expanded_bytes=inventory['expanded_bytes'], phase='asset_proof')
+            if inventory_only:report['inventory_diagnostic']=inventory
             notices=[]; total=0
-            for member in z.infolist():
+            for member in z.infolist() if not inventory_only or inventory['structurally_safe'] else ():
                 if member.is_dir() or PurePosixPath(member.filename).name.upper() not in {'LICENSE','LICENSE.TXT','LICENSE.MD','NOTICE','NOTICE.TXT','COPYING'}: continue
                 rt.require(member.file_size<=limits['notice_bytes'], 'Asset notice bound exceeded')
-                raw=z.read(member);total+=len(raw);rt.require(total<=limits['total_notice_bytes'], 'Total notice cap exceeded')
+                rt.require(total+member.file_size<=limits['total_notice_bytes'], 'Total notice cap exceeded')
+                raw=z.read(member);total+=len(raw)
                 pin=dict(bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
                 output='asset-notice-'+str(len(notices))+'.txt'
                 with (out/output).open('xb') as stream: stream.write(raw);os.fchmod(stream.fileno(),0o444)
-                notices.append(dict(member=member.filename,file=output,**pin))
+                notice=dict(member=member.filename,file=output,**pin)
+                if inventory_only:notice['matches_primary_LICENSE_exactly']=pin==primary['LICENSE']
+                notices.append(notice)
                 report['asset_notices']=notices
-                if member.filename=='assets/LICENSE': rt.require(pin==primary['LICENSE'], 'Embedded asset licence differs from primary Apache text')
-            member=z.getinfo(protocol['model']['member']);rt.require(not member.is_dir() and member.file_size==wanted['bytes'], 'Official model member length differs')
-            digest=hashlib.sha256()
-            with z.open(member) as stream:
-                for block in iter(lambda:stream.read(1<<20),b''):digest.update(block)
-            rt.require(digest.hexdigest()==wanted['sha256'], 'Official model member differs from existing JIT')
-            rt.require(rt.identity(partial,archive['bytes'])==report['archive'], 'Whole archive changed after member interpretation')
-            report.update(asset_notices=notices,asset_license_matches_primary_exactly=True,archive_rehashed_after=True,
-                member_model=wanted,model_byte_identical=True,model_copy_written=False,
-                selected_members_crc_verified=True,all_members_crc_verified=False,
-                purpose=protocol['purpose'],phase='posthash')
+                if not inventory_only and member.filename=='assets/LICENSE': rt.require(pin==primary['LICENSE'], 'Embedded asset licence differs from primary Apache text')
+            if inventory_only:
+                rt.require(rt.identity(partial,archive['bytes'])==report['archive'],'Archive changed after central inventory')
+                report.update(asset_notices=notices,notice_payloads_read=len(notices),archive_rehashed_after=True,phase='posthash')
+            else:
+                member=z.getinfo(protocol['model']['member']);rt.require(not member.is_dir() and member.file_size==wanted['bytes'], 'Official model member length differs')
+                digest=hashlib.sha256()
+                with z.open(member) as stream:
+                    for block in iter(lambda:stream.read(1<<20),b''):digest.update(block)
+                rt.require(digest.hexdigest()==wanted['sha256'], 'Official model member differs from existing JIT')
+                rt.require(rt.identity(partial,archive['bytes'])==report['archive'], 'Whole archive changed after member interpretation')
+                report.update(asset_notices=notices,asset_license_matches_primary_exactly=True,archive_rehashed_after=True,
+                    member_model=wanted,model_byte_identical=True,model_copy_written=False,
+                    selected_members_crc_verified=True,all_members_crc_verified=False,
+                    purpose=protocol['purpose'],phase='posthash')
     except Exception as error:
         report.update(error_type=type(error).__name__)
     finally:
@@ -146,6 +209,9 @@ def mhr_release(root, code, revision, rt, *, fetch=_mhr_fetch, download=_mhr_dow
         try:
             if before is not None: rt.require(rt.source(root,code,revision,'acquire_weights',MHR_HELPERS)==before,'Source changed')
             if existing_before is not None: rt.require(rt.identity(model,wanted['bytes'],readonly=False)==existing_before,'Original model changed')
+            if previous is not None:
+                rt.require(_mhr_failure(rt,root,protocol)==previous,'Original failure/source changed')
+                report['original_failure_unchanged']=True
             report.update(source_rehashed_after=before is not None,existing_model_rehashed_after=existing_before is not None)
         except Exception as error: post=False;report.update(postcheck_error_type=type(error).__name__)
         try:
@@ -174,19 +240,23 @@ def mhr_release(root, code, revision, rt, *, fetch=_mhr_fetch, download=_mhr_dow
 
 def main(argv=None) -> None:
     parser=argparse.ArgumentParser(description=__doc__,allow_abbrev=False)
-    parser.add_argument('--mhr-release-only',action='store_true');arguments=sys.argv[1:] if argv is None else argv
+    group=parser.add_mutually_exclusive_group()
+    group.add_argument('--mhr-release-only',action='store_true');group.add_argument('--mhr-release-inventory-only',action='store_true')
+    arguments=sys.argv[1:] if argv is None else argv
     args=parser.parse_args(arguments)
-    if arguments.count('--mhr-release-only')>1: parser.error('Release mode must be specified exactly once')
+    if any(arguments.count(flag)>1 for flag in ('--mhr-release-only','--mhr-release-inventory-only')): parser.error('Release mode must be specified exactly once')
     if platform.system() != "Linux":
         raise RuntimeError("Model downloads are restricted to Azure Linux")
     root = Path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"))
-    if args.mhr_release_only:
+    if args.mhr_release_only or args.mhr_release_inventory_only:
         code=Path(os.environ['WR_CODE']);sys.path.insert(0,str(code/'infra'))
         import mediapipe_cpu_runtime_verify as rt
         if Path(rt.__file__).resolve()!=code/'infra/mediapipe_cpu_runtime_verify.py': raise ValueError('Actual immutable helper required')
         rt.require(Path(__file__).resolve()==code/'infra/acquire_weights.py','Actual immutable acquisition source required')
-        report=mhr_release(root,code,os.environ['WR_CODE_REVISION'],rt)
-        print(json.dumps({k:report[k] for k in ('stage','status','elapsed_seconds','model_byte_identical')}));return
+        options={'inventory_only':True} if args.mhr_release_inventory_only else {}
+        report=mhr_release(root,code,os.environ['WR_CODE_REVISION'],rt,**options)
+        fields=('stage','status','elapsed_seconds') if args.mhr_release_inventory_only else ('stage','status','elapsed_seconds','model_byte_identical')
+        print(json.dumps({k:report[k] for k in fields}));return
     os.environ["HF_TOKEN"] = (root / ".secrets/hf_token").read_text().strip()
     os.environ["HF_HOME"] = str(root / "cache/huggingface")
     from huggingface_hub import snapshot_download
