@@ -10815,3 +10815,44 @@ budget remain unchanged; all six historical critical functions are byte-exact
 in parent review. Tool archive/notices are retained, owned scratch removed.
 Parent196 combined qualifier/build/transport tests PASS5.65s; no new GPU result
 or appearance/ownership/quality qualification exists yet.
+
+Public59729d9 explicit SM90 native qualifier dispatched once on VM02. All252
+immutable code files published on Azure; ACK proves dispatch only. GPU,
+checkpoint, operators, model and complete600s outcome remain unobserved.
+Public commit/contents API and eventual exact raw bytes verified; early raw
+404 during GitHub publication was not an artifact or inference failure.
+
+59729d9 actual separate MASA native SM90 run CLOSED FAIL18.347576s.
+Host15525B/54362ecc88a67e7914ea2d405390cb3d127b2bbfd4ee40b3d7c884db03a6979b;
+native15451B/50d8d8facbc66b0b79c1be38759c76d86d565ba93486241cb49eea45f6974de5.
+Actual CPU cuobjdump embedded-sm_90 gate PASS before GPU; DCNv2 zero-offset
+maxerror0/nontrivial repeat exact and RoIAlign CPU/GPU maxerror2.980232e-08
+PASS under unchanged1e-5 tolerances, before checkpoint decode. The next native
+gate fails at weights_decode with bounded class other; model is not loaded and
+no encoder/embedding is qualified. Source/image/artifact posthash, owned cleanup
+and seal verified by producer; final independent full audit still pending.
+Do not bypass weights_only=True or execute opaque pickle globals. One bounded
+read-only static checkpoint-opcode audit is next; preserve this failed receipt.
+
+3ff769c actual six-bank CPU preview reports PASS1.880942s, JPEG95135B/
+1b09b1ee7a6fd56ff993452b03bc939a37bfca6759151e5fefbf4d36f4df595d;
+receipt5368B/4b49227619a7321156f0b8e5cf6be97b58bfc8c1a5331299808fa90b75b4b498.
+Original decoded pixels and all saved predictions rehashed unchanged. Final
+owned-container/file checks and private tiny-preview transfer remain pending;
+no new inference, labels, target or accuracy assertion.
+
+EP16 final independent read-only audit PASS5.901s,247 original Git files,
+full15 input BEFORE/AFTER identities, native source/assets, all four saved
+outputs and actual process/output-mount-container absence. All12 native
+attempt/return/validated counters equal23,22×16 plus8 last frames; original360
+frame coverage. Authenticated producer fidelity (no new replay): native direct
+max0.002400mm, replay0.000533mm, reference maxpoint0.002350mm under original
+gates. Outputfiles readonly; historical directory755 unchanged, collectedunit
+exitunknown, FD9 isolation notverified. New downstream pins freeze these exact
+artifacts without algorithmchange or scientificaccuracyclaim. EP23 supplement
+recovered native552T/video4b132f8e/scale0.7398347854614258 but five-source
+producer-input comparison is stillpartial; do notpromote newpose configyet.
+
+Six-bank tiny preview finalfiles/pixels/predictionhashes and actual CID/name
+absence PASS; private Azure Blob95135B transferred under exact ETag solely for
+user-authorized QA. Colors are per-image detection slots, never actor labels.
