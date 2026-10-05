@@ -1,0 +1,1425 @@
+{
+  "assets": [
+    {
+      "bytes": 464,
+      "file": "weights/README.md",
+      "hash_basis": "independent_primary_text_sha256",
+      "sha256": "9b64b43ea1d58635f14f2ebe5664c22be6fee8943943ece39a14e98b1da4378c",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/README.md"
+    },
+    {
+      "bytes": 1987,
+      "file": "weights/pipeline.json",
+      "hash_basis": "independent_primary_text_sha256",
+      "sha256": "2686b6c9b3b0a100b544d5f9dc7b3ecb15c9d98be9852d68e8731bd8dbe52a42",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/pipeline.json"
+    },
+    {
+      "bytes": 843,
+      "file": "weights/ckpts/slat_dec_gs_swin8_B_64l8gs32_fp16.json",
+      "hash_basis": "independent_primary_text_sha256",
+      "sha256": "ebe9d3eade6d9cb7662efae109197e97d7ab58aebd5e8ede0c8991dfce88a06a",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/ckpts/slat_dec_gs_swin8_B_64l8gs32_fp16.json"
+    },
+    {
+      "bytes": 372,
+      "file": "weights/ckpts/slat_dec_mesh_swin8_B_64l8m256c_fp16.json",
+      "hash_basis": "independent_primary_text_sha256",
+      "sha256": "293900795cb69cc972d1a20a4940ee12f7e007952c2ae92d128dda91b96ac317",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/ckpts/slat_dec_mesh_swin8_B_64l8m256c_fp16.json"
+    },
+    {
+      "bytes": 396,
+      "file": "weights/ckpts/slat_dec_rf_swin8_B_64l8r16_fp16.json",
+      "hash_basis": "independent_primary_text_sha256",
+      "sha256": "9b46a04602988b9cd83f1d0537de1cb93c4c1b6d35a0bbbcb07bb37bac66b766",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/ckpts/slat_dec_rf_swin8_B_64l8r16_fp16.json"
+    },
+    {
+      "bytes": 442,
+      "file": "weights/ckpts/slat_flow_img_dit_L_64l8p2_fp16.json",
+      "hash_basis": "independent_primary_text_sha256",
+      "sha256": "c0a9bd57227f55cf75ff02562c27bb05c50174f06955f56a79dea2982fd7a8f9",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/ckpts/slat_flow_img_dit_L_64l8p2_fp16.json"
+    },
+    {
+      "bytes": 245,
+      "file": "weights/ckpts/ss_dec_conv3d_16l8_fp16.json",
+      "hash_basis": "independent_primary_text_sha256",
+      "sha256": "646781293f1cda74720de85d1cef50a957fb4aebd9a4bd014e454e32f2330ac5",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/ckpts/ss_dec_conv3d_16l8_fp16.json"
+    },
+    {
+      "bytes": 385,
+      "file": "weights/ckpts/ss_flow_img_dit_L_16l8_fp16.json",
+      "hash_basis": "independent_primary_text_sha256",
+      "sha256": "bf69161da7ece9a87394dd4441f0cfa6d4261696a214a8f68388c81fa9a6b5b7",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/ckpts/ss_flow_img_dit_L_16l8_fp16.json"
+    },
+    {
+      "bytes": 10139,
+      "file": "source/kaolin_apache/LICENSE",
+      "hash_basis": "independent_primary_text_sha256",
+      "sha256": "1f81d44e1506aef37184653d2d31d00ae6e4f453d431de971c2879be960665b8",
+      "url": "https://raw.githubusercontent.com/NVIDIAGameWorks/kaolin/v0.17.0/LICENSE"
+    },
+    {
+      "bytes": 21630,
+      "file": "source/kaolin_apache/testing.py",
+      "hash_basis": "independent_primary_text_sha256",
+      "sha256": "d29a67558c7707e407636b96004e9f5d73d33907317d96880d7df1b86687f71b",
+      "url": "https://raw.githubusercontent.com/NVIDIAGameWorks/kaolin/v0.17.0/kaolin/utils/testing.py"
+    },
+    {
+      "bytes": 171450952,
+      "file": "weights/ckpts/slat_dec_gs_swin8_B_64l8gs32_fp16.safetensors",
+      "hash_basis": "publisher_git_lfs_sha256",
+      "sha256": "38c84bcef5ce0af1f48b1b5558dabc7575a13346043c41a7e0610f1fa619a161",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/ckpts/slat_dec_gs_swin8_B_64l8gs32_fp16.safetensors"
+    },
+    {
+      "bytes": 181903412,
+      "file": "weights/ckpts/slat_dec_mesh_swin8_B_64l8m256c_fp16.safetensors",
+      "hash_basis": "publisher_git_lfs_sha256",
+      "sha256": "3e87aba94b5786407eb06d0502c1ed0885a0027a3f2b8537bfe15b0a92c01859",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/ckpts/slat_dec_mesh_swin8_B_64l8m256c_fp16.safetensors"
+    },
+    {
+      "bytes": 171450488,
+      "file": "weights/ckpts/slat_dec_rf_swin8_B_64l8r16_fp16.safetensors",
+      "hash_basis": "publisher_git_lfs_sha256",
+      "sha256": "737da6578d01948016b7c39786113af0d64a46f7922f6b8b5e698b84643be514",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/ckpts/slat_dec_rf_swin8_B_64l8r16_fp16.safetensors"
+    },
+    {
+      "bytes": 1203755136,
+      "file": "weights/ckpts/slat_flow_img_dit_L_64l8p2_fp16.safetensors",
+      "hash_basis": "publisher_git_lfs_sha256",
+      "sha256": "693fb2a58ad497bd222007301eeec49d14d60f8c12d2f2f00c221fa747b4c66c",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/ckpts/slat_flow_img_dit_L_64l8p2_fp16.safetensors"
+    },
+    {
+      "bytes": 147591972,
+      "file": "weights/ckpts/ss_dec_conv3d_16l8_fp16.safetensors",
+      "hash_basis": "publisher_git_lfs_sha256",
+      "sha256": "1c76d4a40519aa2d711cc263a8404105231ac26db31d946bed48b84fee79009a",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/ckpts/ss_dec_conv3d_16l8_fp16.safetensors"
+    },
+    {
+      "bytes": 1130770840,
+      "file": "weights/ckpts/ss_flow_img_dit_L_16l8_fp16.safetensors",
+      "hash_basis": "publisher_git_lfs_sha256",
+      "sha256": "96dc6bfd4136fd950af564dd16b4ae533c9ba6af8f26c670646b2a9f2789b1db",
+      "url": "https://huggingface.co/microsoft/TRELLIS-image-large/resolve/25e0d31ffbebe4b5a97464dd851910efc3002d96/ckpts/ss_flow_img_dit_L_16l8_fp16.safetensors"
+    }
+  ],
+  "budget_seconds": 3600,
+  "data_root": "/srv/world-reward-data/trellis_v1",
+  "future_runtime": {
+    "attention_and_sparse_ABI_qualified": false,
+    "build_executed": false,
+    "dependency_manifest_status": "not_yet_qualified",
+    "dino_model": "dinov2_vitl14_reg",
+    "dino_source_revision": "7764ea0f912e53c92e82eb78a2a1631e92725fc8",
+    "dino_transfer_performed": false,
+    "existing_images_modified": false,
+    "kaolin_package_imported": false,
+    "model_constructor_policy": "original_factory_loads_all_six; no implicit Hub network",
+    "raw_mesh_policy": "all_original_vertices_faces_before_postprocessing"
+  },
+  "kaolin_checker": {
+    "exact_function_bytes": 1422,
+    "exact_function_sha256": "2762f76719ff39e5a60e44e45869a6f75083c29fda9accd42fe45e9572dbe056",
+    "function": "check_tensor",
+    "generated_bytes": 2125,
+    "generated_sha256": "ea2a246ab8d93e55359c5264624c5858bfbbb4eb3ed8f1cfb3994d224908deed",
+    "output": "source/kaolin_apache/check_tensor.py",
+    "source": "source/kaolin_apache/testing.py"
+  },
+  "maximum_total_bytes": 4000000000,
+  "minimum_free_bytes": 30000000000,
+  "model_bytes": 3006922800,
+  "model_count": 6,
+  "model_revision": "25e0d31ffbebe4b5a97464dd851910efc3002d96",
+  "outer_seconds": 3630,
+  "report": "results/trellis-runtime-acquire-v1.json",
+  "schema": "world_reward.trellis_runtime_protocol.v1",
+  "scope": {
+    "challenge_overlap_verified": false,
+    "dataset_read": false,
+    "gpu_used": false,
+    "isolated_checker_license": "Apache-2.0",
+    "license_eligibility_verified": false,
+    "models_loaded": false,
+    "modified_flexicubes_license": "Apache-2.0",
+    "official_closed_solid_requirement": false,
+    "packages_installed": false,
+    "quality_verified": false,
+    "source_archive_hash_basis": "measured_archive_sha256_and_all_pinned_git_blob_sha1",
+    "training_overlap_status": "unknown",
+    "training_overlap_verified": false,
+    "training_sources": [
+      "ObjaverseXL",
+      "ABO",
+      "3D-FUTURE",
+      "HSSD",
+      "Toys4k"
+    ],
+    "trellis_source_license": "MIT",
+    "upstream_model_license": "MIT"
+  },
+  "sources": [
+    {
+      "archive_prefix": "TRELLIS-442aa1e1afb9014e80681d3bf604e8d728a86ee7",
+      "maximum_archive_bytes": 80000000,
+      "maximum_expanded_bytes": 50000000,
+      "members": [
+        {
+          "bytes": 4685,
+          "git_blob_sha1": "732783d2abcc3f697092297509c12db67109107e",
+          "path": ".github/workflows/codeql.yml"
+        },
+        {
+          "bytes": 6860,
+          "git_blob_sha1": "8a30d258ed9d0288d3e2889b3d0e2174b2028225",
+          "path": ".gitignore"
+        },
+        {
+          "bytes": 155,
+          "git_blob_sha1": "dd2b5ebb840b37463bc4a37a29caf545f4b1e760",
+          "path": ".gitmodules"
+        },
+        {
+          "bytes": 444,
+          "git_blob_sha1": "f9ba8cf65f3e3104dd061c178066ec8247811f33",
+          "path": "CODE_OF_CONDUCT.md"
+        },
+        {
+          "bytes": 8694,
+          "git_blob_sha1": "bf215807748fdf1fb97c31455201989318ed7776",
+          "path": "DATASET.md"
+        },
+        {
+          "bytes": 1141,
+          "git_blob_sha1": "9e841e7a26e4eb057b24511e7b92d42b257a80e5",
+          "path": "LICENSE"
+        },
+        {
+          "bytes": 22007,
+          "git_blob_sha1": "052d6261d5a0812e28f0834cd7d165a2a81078ac",
+          "path": "README.md"
+        },
+        {
+          "bytes": 2656,
+          "git_blob_sha1": "b3c89efc852e22f71eabf5dfbc6ac62493425eb6",
+          "path": "SECURITY.md"
+        },
+        {
+          "bytes": 1244,
+          "git_blob_sha1": "291d4d43733f4c15a81ff598ec1c99fd6c18f64c",
+          "path": "SUPPORT.md"
+        },
+        {
+          "bytes": 15007,
+          "git_blob_sha1": "bd859467b6d396eb212160f7588b7865c96edb44",
+          "path": "app.py"
+        },
+        {
+          "bytes": 9585,
+          "git_blob_sha1": "56b414bdee5279aa26803f16bdd850eb42f12e05",
+          "path": "app_text.py"
+        },
+        {
+          "bytes": 2089367,
+          "git_blob_sha1": "cf87a2e8a3634c9511fb6e4edc770f36b4cf4c2d",
+          "path": "assets/T.ply"
+        },
+        {
+          "bytes": 954642,
+          "git_blob_sha1": "79af51bc9d711951fbc63be16b7d07c84294355b",
+          "path": "assets/example_image/T.png"
+        },
+        {
+          "bytes": 546948,
+          "git_blob_sha1": "4f9adcf79d4297bb9b906608c23c311f9b8f23d2",
+          "path": "assets/example_image/typical_building_building.png"
+        },
+        {
+          "bytes": 426358,
+          "git_blob_sha1": "5f5f50733f3b8ed168026340ed679df357ccb9ec",
+          "path": "assets/example_image/typical_building_castle.png"
+        },
+        {
+          "bytes": 609383,
+          "git_blob_sha1": "94616b19be6a896413c287b3168b3b7886d64a56",
+          "path": "assets/example_image/typical_building_colorful_cottage.png"
+        },
+        {
+          "bytes": 231664,
+          "git_blob_sha1": "1d87f3c3980f80eee878b4f8ab69e32279a5ea50",
+          "path": "assets/example_image/typical_building_maya_pyramid.png"
+        },
+        {
+          "bytes": 488032,
+          "git_blob_sha1": "c4db49d4284e6fec83b2ea548e7e85d489711b84",
+          "path": "assets/example_image/typical_building_mushroom.png"
+        },
+        {
+          "bytes": 619626,
+          "git_blob_sha1": "e37a5806d403dccc098d82492d687d71afa36850",
+          "path": "assets/example_image/typical_building_space_station.png"
+        },
+        {
+          "bytes": 563963,
+          "git_blob_sha1": "c3fb92ff0400451c69f44fb75156f50db93da6ec",
+          "path": "assets/example_image/typical_creature_dragon.png"
+        },
+        {
+          "bytes": 481919,
+          "git_blob_sha1": "6fc3cf1776c66b91e739cad8e839b52074a57e4c",
+          "path": "assets/example_image/typical_creature_elephant.png"
+        },
+        {
+          "bytes": 647568,
+          "git_blob_sha1": "eb4e8d6c6cac1e03a206429eaf7de261c6f14072",
+          "path": "assets/example_image/typical_creature_furry.png"
+        },
+        {
+          "bytes": 685321,
+          "git_blob_sha1": "b246e08e05702051fb22cced1366ab765cd6fbb0",
+          "path": "assets/example_image/typical_creature_quadruped.png"
+        },
+        {
+          "bytes": 594232,
+          "git_blob_sha1": "8b4e10b353e0e9b60634ea272ff8fd9135fdd640",
+          "path": "assets/example_image/typical_creature_robot_crab.png"
+        },
+        {
+          "bytes": 632292,
+          "git_blob_sha1": "7f8f51728fe1fecb0532673756b1601ef46edc2c",
+          "path": "assets/example_image/typical_creature_robot_dinosour.png"
+        },
+        {
+          "bytes": 648344,
+          "git_blob_sha1": "29dc243b197d9b3ee4df9355a5f08752ef0b9b9e",
+          "path": "assets/example_image/typical_creature_rock_monster.png"
+        },
+        {
+          "bytes": 441407,
+          "git_blob_sha1": "195212e38e6a8e331b02c2d58728ba41dba429a1",
+          "path": "assets/example_image/typical_humanoid_block_robot.png"
+        },
+        {
+          "bytes": 481371,
+          "git_blob_sha1": "61ca2d9e69634c12ee9ae6f7e77f84839df83fdb",
+          "path": "assets/example_image/typical_humanoid_dragonborn.png"
+        },
+        {
+          "bytes": 498425,
+          "git_blob_sha1": "16de1631fff3cc42a3a5d6a8b0f638da75ad7b2f",
+          "path": "assets/example_image/typical_humanoid_dwarf.png"
+        },
+        {
+          "bytes": 496430,
+          "git_blob_sha1": "4e4fe04517801d5722817e8dfaed2af83b31d67e",
+          "path": "assets/example_image/typical_humanoid_goblin.png"
+        },
+        {
+          "bytes": 849947,
+          "git_blob_sha1": "f0fbbdf6cda5636f517b6e2fa3f20e15e56e3777",
+          "path": "assets/example_image/typical_humanoid_mech.png"
+        },
+        {
+          "bytes": 642105,
+          "git_blob_sha1": "c3086f885bf9fc27c398b5bacfb04a65bd7dfbd9",
+          "path": "assets/example_image/typical_misc_crate.png"
+        },
+        {
+          "bytes": 558466,
+          "git_blob_sha1": "82d79bc10346604a8b8b9cc8e2c317e8dc6d8c47",
+          "path": "assets/example_image/typical_misc_fireplace.png"
+        },
+        {
+          "bytes": 572414,
+          "git_blob_sha1": "fa77919f9d9faabc26b9287b35c4dd3b4006163e",
+          "path": "assets/example_image/typical_misc_gate.png"
+        },
+        {
+          "bytes": 300270,
+          "git_blob_sha1": "4c93f5dea2638a5a169dd1557a36f6d34b57144d",
+          "path": "assets/example_image/typical_misc_lantern.png"
+        },
+        {
+          "bytes": 496050,
+          "git_blob_sha1": "7dc521a10fda176694c30170811809050f478a66",
+          "path": "assets/example_image/typical_misc_magicbook.png"
+        },
+        {
+          "bytes": 631146,
+          "git_blob_sha1": "b6e8bc50cd270bb7462eee2af7a6d5649ef54cf2",
+          "path": "assets/example_image/typical_misc_mailbox.png"
+        },
+        {
+          "bytes": 690259,
+          "git_blob_sha1": "6d544370fa306138e7dbab3e548d6e05b8ef2317",
+          "path": "assets/example_image/typical_misc_monster_chest.png"
+        },
+        {
+          "bytes": 613984,
+          "git_blob_sha1": "a630074dbfe32c53f52f2f27e5b6b3eff8469a9e",
+          "path": "assets/example_image/typical_misc_paper_machine.png"
+        },
+        {
+          "bytes": 517193,
+          "git_blob_sha1": "668662d741344ac16427259fc966186ef8ca97a9",
+          "path": "assets/example_image/typical_misc_phonograph.png"
+        },
+        {
+          "bytes": 386106,
+          "git_blob_sha1": "666daa75fbaf7df55585f7143906d158175be6be",
+          "path": "assets/example_image/typical_misc_portal2.png"
+        },
+        {
+          "bytes": 632296,
+          "git_blob_sha1": "38f4bd31f8eb62badcc5e1a51d4612e528b4069e",
+          "path": "assets/example_image/typical_misc_storage_chest.png"
+        },
+        {
+          "bytes": 647557,
+          "git_blob_sha1": "a0a7d65a300d9f1adc55b2fc36951731f5abb355",
+          "path": "assets/example_image/typical_misc_telephone.png"
+        },
+        {
+          "bytes": 627348,
+          "git_blob_sha1": "1d6b5882b42ce532f6a60080ad55bda7053530c0",
+          "path": "assets/example_image/typical_misc_television.png"
+        },
+        {
+          "bytes": 462693,
+          "git_blob_sha1": "88024f960ff56aa619b0c496f85de390076bbf5a",
+          "path": "assets/example_image/typical_misc_workbench.png"
+        },
+        {
+          "bytes": 574448,
+          "git_blob_sha1": "7427cad3270d8ed33dad05c7a2ae1b0092b4beb2",
+          "path": "assets/example_image/typical_vehicle_biplane.png"
+        },
+        {
+          "bytes": 692767,
+          "git_blob_sha1": "17ffe389498d9561ef92766de654ef17b5755f60",
+          "path": "assets/example_image/typical_vehicle_bulldozer.png"
+        },
+        {
+          "bytes": 693145,
+          "git_blob_sha1": "137bb4887f3879691ffff21227951790eb1840b4",
+          "path": "assets/example_image/typical_vehicle_cart.png"
+        },
+        {
+          "bytes": 712062,
+          "git_blob_sha1": "c434e8b0ab142ecc35caf91d42df5f4541825b8f",
+          "path": "assets/example_image/typical_vehicle_excavator.png"
+        },
+        {
+          "bytes": 352731,
+          "git_blob_sha1": "39c2497d22ea519cddf576c6504954c338f943e4",
+          "path": "assets/example_image/typical_vehicle_helicopter.png"
+        },
+        {
+          "bytes": 806246,
+          "git_blob_sha1": "dac6a2a2de9e8830bac53d3893aa1d3741916b1a",
+          "path": "assets/example_image/typical_vehicle_locomotive.png"
+        },
+        {
+          "bytes": 611289,
+          "git_blob_sha1": "9eed1529f309c64fc6237caba97631cc1f2bab53",
+          "path": "assets/example_image/typical_vehicle_pirate_ship.png"
+        },
+        {
+          "bytes": 502071,
+          "git_blob_sha1": "46e8a9dc123aaf71a41e994a8e50eabb4e53e721",
+          "path": "assets/example_image/weatherworn_misc_paper_machine3.png"
+        },
+        {
+          "bytes": 171816,
+          "git_blob_sha1": "743117c4458af4a9db717c7c7c6b05b6b08037dc",
+          "path": "assets/example_multi_image/character_1.png"
+        },
+        {
+          "bytes": 198217,
+          "git_blob_sha1": "5fc37f61179b2dc4293a40bec2959ac82fd7503c",
+          "path": "assets/example_multi_image/character_2.png"
+        },
+        {
+          "bytes": 145868,
+          "git_blob_sha1": "c6e8cb9fb2ab3e86e749405f96ee026273e1e99b",
+          "path": "assets/example_multi_image/character_3.png"
+        },
+        {
+          "bytes": 434321,
+          "git_blob_sha1": "982645f790b3c374ccab05f33371b2979b5a4031",
+          "path": "assets/example_multi_image/mushroom_1.png"
+        },
+        {
+          "bytes": 461694,
+          "git_blob_sha1": "48e961e28e6996bce3259b114da8c6aced35e777",
+          "path": "assets/example_multi_image/mushroom_2.png"
+        },
+        {
+          "bytes": 424840,
+          "git_blob_sha1": "16f2022458343da9a084013d8dba92faad0c2103",
+          "path": "assets/example_multi_image/mushroom_3.png"
+        },
+        {
+          "bytes": 632098,
+          "git_blob_sha1": "5221021f6bde7d3fcb25fe0002ca3de528e4443d",
+          "path": "assets/example_multi_image/orangeguy_1.png"
+        },
+        {
+          "bytes": 447045,
+          "git_blob_sha1": "156aea1f404d7748b73694c34037b1b13d87db66",
+          "path": "assets/example_multi_image/orangeguy_2.png"
+        },
+        {
+          "bytes": 545243,
+          "git_blob_sha1": "0c15598b97acb46301876c4cdde34aacc8580a68",
+          "path": "assets/example_multi_image/orangeguy_3.png"
+        },
+        {
+          "bytes": 311311,
+          "git_blob_sha1": "81f1838f3a3698441d3d33bf04f0fce5dcdf05f3",
+          "path": "assets/example_multi_image/popmart_1.png"
+        },
+        {
+          "bytes": 288176,
+          "git_blob_sha1": "ac6fdf3c53aa95dd0763a4e865ba7583768f2ac8",
+          "path": "assets/example_multi_image/popmart_2.png"
+        },
+        {
+          "bytes": 310746,
+          "git_blob_sha1": "c83ea960e3aa151151260427d10fc5671619cbee",
+          "path": "assets/example_multi_image/popmart_3.png"
+        },
+        {
+          "bytes": 359949,
+          "git_blob_sha1": "0cd5708a752cb3951d5edb41165d23f1246955e1",
+          "path": "assets/example_multi_image/rabbit_1.png"
+        },
+        {
+          "bytes": 492291,
+          "git_blob_sha1": "95492498199904f299a88ba06a80fc0742f874f9",
+          "path": "assets/example_multi_image/rabbit_2.png"
+        },
+        {
+          "bytes": 339992,
+          "git_blob_sha1": "a83285e29702f9680cd5530fa2ab9526e7812352",
+          "path": "assets/example_multi_image/rabbit_3.png"
+        },
+        {
+          "bytes": 426296,
+          "git_blob_sha1": "c4f87f93b63873a81c1e2bda18937a165d49a773",
+          "path": "assets/example_multi_image/tiger_1.png"
+        },
+        {
+          "bytes": 731448,
+          "git_blob_sha1": "8fb9818ab2c6920be720811c04babb4024372c40",
+          "path": "assets/example_multi_image/tiger_2.png"
+        },
+        {
+          "bytes": 646392,
+          "git_blob_sha1": "53689b9b2e3deeeb968628f6fcb636cf6d1223a4",
+          "path": "assets/example_multi_image/tiger_3.png"
+        },
+        {
+          "bytes": 245840,
+          "git_blob_sha1": "da323f970a288542665e316a8447b1cccf54998d",
+          "path": "assets/example_multi_image/yoimiya_1.png"
+        },
+        {
+          "bytes": 182235,
+          "git_blob_sha1": "d38d854fc264025034ded35f3363e95cf509a0b4",
+          "path": "assets/example_multi_image/yoimiya_2.png"
+        },
+        {
+          "bytes": 239134,
+          "git_blob_sha1": "f2c8a7ca4085badda0fede3e4ca92dac1565ed24",
+          "path": "assets/example_multi_image/yoimiya_3.png"
+        },
+        {
+          "bytes": 1403066,
+          "git_blob_sha1": "d50c8a9e51f4524bd0eaa04265b2ada49b2a7411",
+          "path": "assets/logo.webp"
+        },
+        {
+          "bytes": 2098442,
+          "git_blob_sha1": "8c05e51c74ef0807cdd4d5fe7482110d882d8947",
+          "path": "assets/teaser.png"
+        },
+        {
+          "bytes": 3174,
+          "git_blob_sha1": "0a4c8941258e47b1f6a1cbccf449539593a408c0",
+          "path": "configs/generation/slat_flow_img_dit_L_64l8p2_fp16.json"
+        },
+        {
+          "bytes": 3151,
+          "git_blob_sha1": "27873c003832af102e20a903cbbb5224edace08f",
+          "path": "configs/generation/slat_flow_txt_dit_B_64l8p2_fp16.json"
+        },
+        {
+          "bytes": 3151,
+          "git_blob_sha1": "1acf825e750f05142dcdf2a6b238ecc49a013519",
+          "path": "configs/generation/slat_flow_txt_dit_L_64l8p2_fp16.json"
+        },
+        {
+          "bytes": 3151,
+          "git_blob_sha1": "0e3d002c6e03daa7abd0e7b2460fa2b6f73e88ef",
+          "path": "configs/generation/slat_flow_txt_dit_XL_64l8p2_fp16.json"
+        },
+        {
+          "bytes": 2036,
+          "git_blob_sha1": "8b6a4a7b29bf656747dfabc8fc3f75f7bf7f7225",
+          "path": "configs/generation/ss_flow_img_dit_L_16l8_fp16.json"
+        },
+        {
+          "bytes": 2013,
+          "git_blob_sha1": "d57e45a9c534dbec7af7a8049b377fe09179e4d4",
+          "path": "configs/generation/ss_flow_txt_dit_B_16l8_fp16.json"
+        },
+        {
+          "bytes": 2013,
+          "git_blob_sha1": "6fb5130771dd7fff0196fe1ef4adf6fbd6474050",
+          "path": "configs/generation/ss_flow_txt_dit_L_16l8_fp16.json"
+        },
+        {
+          "bytes": 2056,
+          "git_blob_sha1": "316d5e9fd87562ddfc0dc8e95eced81d32b924ff",
+          "path": "configs/generation/ss_flow_txt_dit_XL_16l8_fp16.json"
+        },
+        {
+          "bytes": 2082,
+          "git_blob_sha1": "c86b42cbe94e6acda72c0436d57dd50189ef927d",
+          "path": "configs/vae/slat_vae_dec_mesh_swin8_B_64l8_fp16.json"
+        },
+        {
+          "bytes": 2007,
+          "git_blob_sha1": "5a7aed900f86e946ef671abe8ecde047827b4f6c",
+          "path": "configs/vae/slat_vae_dec_rf_swin8_B_64l8_fp16.json"
+        },
+        {
+          "bytes": 3168,
+          "git_blob_sha1": "d012b50bc0243acf22655ad1b4c79e99754f9ac3",
+          "path": "configs/vae/slat_vae_enc_dec_gs_swin8_B_64l8_fp16.json"
+        },
+        {
+          "bytes": 1763,
+          "git_blob_sha1": "3847cb8cc87000c31f5f29855c958cd92ee4eac8",
+          "path": "configs/vae/ss_vae_conv3d_16l8_fp16.json"
+        },
+        {
+          "bytes": 34685,
+          "git_blob_sha1": "f2e2fdbc193c58e8b8860dfcd3a9dbf9dc6905df",
+          "path": "dataset_toolkits/blender_script/io_scene_usdz.zip"
+        },
+        {
+          "bytes": 20037,
+          "git_blob_sha1": "1fbd5867186d6ebd86cff6e1f98f1a2e1d375e3c",
+          "path": "dataset_toolkits/blender_script/render.py"
+        },
+        {
+          "bytes": 13422,
+          "git_blob_sha1": "e2a314cd98465ed628b41f9a5c68f1ba6ad396e3",
+          "path": "dataset_toolkits/build_metadata.py"
+        },
+        {
+          "bytes": 4116,
+          "git_blob_sha1": "92ce30c4fc83a2b33b4f405dce4e0149bd3b2b3c",
+          "path": "dataset_toolkits/calculate_aesthetic_scores.py"
+        },
+        {
+          "bytes": 3871,
+          "git_blob_sha1": "a5ccc632de8e5a1d4f4a3b2b3024b8a3361e12c4",
+          "path": "dataset_toolkits/datasets/3D-FUTURE.py"
+        },
+        {
+          "bytes": 3834,
+          "git_blob_sha1": "b0aba22c2c4980b024091058a458811ab93805dd",
+          "path": "dataset_toolkits/datasets/ABO.py"
+        },
+        {
+          "bytes": 3654,
+          "git_blob_sha1": "465e6a140010d0b33ba6435e8129825599dda5db",
+          "path": "dataset_toolkits/datasets/HSSD.py"
+        },
+        {
+          "bytes": 3460,
+          "git_blob_sha1": "b2f5c76c07701b198a20af32fc87c81614ae7f79",
+          "path": "dataset_toolkits/datasets/ObjaverseXL.py"
+        },
+        {
+          "bytes": 3547,
+          "git_blob_sha1": "378afdaa87b1b2a5962a33e7e55efa9540f28436",
+          "path": "dataset_toolkits/datasets/Toys4k.py"
+        },
+        {
+          "bytes": 2125,
+          "git_blob_sha1": "36e684ff5e61105d8c69c101291dc8fa4415af3d",
+          "path": "dataset_toolkits/download.py"
+        },
+        {
+          "bytes": 5923,
+          "git_blob_sha1": "a5b078f833b2c1c0868956e4b37db36cfd22b31b",
+          "path": "dataset_toolkits/encode_latent.py"
+        },
+        {
+          "bytes": 5725,
+          "git_blob_sha1": "a59549ee58d68aa0cc393cf0319bcbe32efb62f3",
+          "path": "dataset_toolkits/encode_ss_latent.py"
+        },
+        {
+          "bytes": 7887,
+          "git_blob_sha1": "1ded2fe03b3e4355da00af429c9439a68069308a",
+          "path": "dataset_toolkits/extract_feature.py"
+        },
+        {
+          "bytes": 4987,
+          "git_blob_sha1": "636f3b308fa9a33e1304b6b64370221167885118",
+          "path": "dataset_toolkits/render.py"
+        },
+        {
+          "bytes": 5313,
+          "git_blob_sha1": "b2a40e6d9974a9e7256571d9ed636f4a5758b5c7",
+          "path": "dataset_toolkits/render_cond.py"
+        },
+        {
+          "bytes": 135,
+          "git_blob_sha1": "8d49e2468714cdeffb116588be8b4ce3e85b46ec",
+          "path": "dataset_toolkits/setup.sh"
+        },
+        {
+          "bytes": 2563,
+          "git_blob_sha1": "7f27a062bb8be898ef6c705a3f3d9488f94299fe",
+          "path": "dataset_toolkits/stat_latent.py"
+        },
+        {
+          "bytes": 1243,
+          "git_blob_sha1": "69830845d40697bd2c4e7c68e64e54b4d4091a81",
+          "path": "dataset_toolkits/utils.py"
+        },
+        {
+          "bytes": 4159,
+          "git_blob_sha1": "390575ab9e26e73b467151dadc8252eae3c96424",
+          "path": "dataset_toolkits/voxelize.py"
+        },
+        {
+          "bytes": 2098,
+          "git_blob_sha1": "21033c15095c310255128c780e41eace71d18d64",
+          "path": "example.py"
+        },
+        {
+          "bytes": 1752,
+          "git_blob_sha1": "3b33306e9b576063ae7d385d89abd7d3b09e92d3",
+          "path": "example_multi_image.py"
+        },
+        {
+          "bytes": 2038,
+          "git_blob_sha1": "31f57e856a5645f1298bcbffbd8ee878d47bbfac",
+          "path": "example_text.py"
+        },
+        {
+          "bytes": 1684,
+          "git_blob_sha1": "637f3190718ef2209f3f4fa220e6ef8ce65594ff",
+          "path": "example_variant.py"
+        },
+        {
+          "bytes": 11579,
+          "git_blob_sha1": "98d3178787e1318eb686a74f3f2f103378354ff9",
+          "path": "setup.sh"
+        },
+        {
+          "bytes": 5834,
+          "git_blob_sha1": "2cf74db190609162b30da16aae116bb5aa101bb8",
+          "path": "train.py"
+        },
+        {
+          "bytes": 141,
+          "git_blob_sha1": "20d240afc9c26a21aee76954628b3d4ef9a1ccbd",
+          "path": "trellis/__init__.py"
+        },
+        {
+          "bytes": 1704,
+          "git_blob_sha1": "6798ca08a4bd855ba91fad3a5f85aef0146ff919",
+          "path": "trellis/datasets/__init__.py"
+        },
+        {
+          "bytes": 4874,
+          "git_blob_sha1": "9c863d6243324ec5acf17aac4f50d55b1335b3a1",
+          "path": "trellis/datasets/components.py"
+        },
+        {
+          "bytes": 4847,
+          "git_blob_sha1": "65bf488aeaab5ace5d55612dafc9d4959dc154c6",
+          "path": "trellis/datasets/sparse_feat2render.py"
+        },
+        {
+          "bytes": 4153,
+          "git_blob_sha1": "863fd7355621a077c2dabab11779416172824027",
+          "path": "trellis/datasets/sparse_structure.py"
+        },
+        {
+          "bytes": 7189,
+          "git_blob_sha1": "af4c5d1a81e3e19b7fe629d524965ed3c74aa3a1",
+          "path": "trellis/datasets/sparse_structure_latent.py"
+        },
+        {
+          "bytes": 8426,
+          "git_blob_sha1": "f8b8f24963ec008264396148f2c92afd5fae6d52",
+          "path": "trellis/datasets/structured_latent.py"
+        },
+        {
+          "bytes": 5316,
+          "git_blob_sha1": "466737ab36c229aaeb368ad4b3af5cb97393eee1",
+          "path": "trellis/datasets/structured_latent2render.py"
+        },
+        {
+          "bytes": 3173,
+          "git_blob_sha1": "ae9d17cbaa645a61d7d173cb185cdb090f96b74f",
+          "path": "trellis/models/__init__.py"
+        },
+        {
+          "bytes": 882,
+          "git_blob_sha1": "66d204c89bedabc2afd1795cdfc6f5d58a6b1ac0",
+          "path": "trellis/models/sparse_elastic_mixin.py"
+        },
+        {
+          "bytes": 7348,
+          "git_blob_sha1": "aee71a9686fd3795960cf1df970e9b8db0ebd57a",
+          "path": "trellis/models/sparse_structure_flow.py"
+        },
+        {
+          "bytes": 9886,
+          "git_blob_sha1": "c3e09136cf294c4c1b47b0f09fa6ee57bad2166d",
+          "path": "trellis/models/sparse_structure_vae.py"
+        },
+        {
+          "bytes": 10390,
+          "git_blob_sha1": "4d6f61b8a58b64069bb93413ba891d52896c3300",
+          "path": "trellis/models/structured_latent_flow.py"
+        },
+        {
+          "bytes": 273,
+          "git_blob_sha1": "4e2ac3531d71b5f4fb168cae62e776a7d4d55576",
+          "path": "trellis/models/structured_latent_vae/__init__.py"
+        },
+        {
+          "bytes": 4332,
+          "git_blob_sha1": "ab0bf6a850b1c146e081c32ad92c7c44ead5ef6e",
+          "path": "trellis/models/structured_latent_vae/base.py"
+        },
+        {
+          "bytes": 5519,
+          "git_blob_sha1": "47304f381833bf9529f6576000972ae14f0cc4ba",
+          "path": "trellis/models/structured_latent_vae/decoder_gs.py"
+        },
+        {
+          "bytes": 5934,
+          "git_blob_sha1": "f9f5659d1d0556bcf51b973ace584fdb347ac4d6",
+          "path": "trellis/models/structured_latent_vae/decoder_mesh.py"
+        },
+        {
+          "bytes": 4239,
+          "git_blob_sha1": "bb1809449f689dfa7bb03673782039f3015d8479",
+          "path": "trellis/models/structured_latent_vae/decoder_rf.py"
+        },
+        {
+          "bytes": 2568,
+          "git_blob_sha1": "77f6fb193ea2bee41fd0b77cd06e37bd14bf6793",
+          "path": "trellis/models/structured_latent_vae/encoder.py"
+        },
+        {
+          "bytes": 758,
+          "git_blob_sha1": "f452320d5dbc4c0aa1664e33f76c56ff4bbe2039",
+          "path": "trellis/modules/attention/__init__.py"
+        },
+        {
+          "bytes": 4932,
+          "git_blob_sha1": "d9ebf6380a78906d4c6e969c63223fb7b398e5a7",
+          "path": "trellis/modules/attention/full_attn.py"
+        },
+        {
+          "bytes": 6231,
+          "git_blob_sha1": "dbe6235c27134f0477e48d3e12de3068c6a500ef",
+          "path": "trellis/modules/attention/modules.py"
+        },
+        {
+          "bytes": 720,
+          "git_blob_sha1": "09035726081fb7afda2c62504d5474cfa483c58f",
+          "path": "trellis/modules/norm.py"
+        },
+        {
+          "bytes": 2907,
+          "git_blob_sha1": "726756c16dcfe0f04de0d2ea5bdce499fa220160",
+          "path": "trellis/modules/sparse/__init__.py"
+        },
+        {
+          "bytes": 108,
+          "git_blob_sha1": "32b3c2c837c613e41755ac4c85f9ed057a6f5bfb",
+          "path": "trellis/modules/sparse/attention/__init__.py"
+        },
+        {
+          "bytes": 9206,
+          "git_blob_sha1": "e9e27aeb98419621f3f9999fd3b11eebf2b90a40",
+          "path": "trellis/modules/sparse/attention/full_attn.py"
+        },
+        {
+          "bytes": 6103,
+          "git_blob_sha1": "5d2fe782b0947700e308e9ec0325e7e91c84e3c2",
+          "path": "trellis/modules/sparse/attention/modules.py"
+        },
+        {
+          "bytes": 8258,
+          "git_blob_sha1": "5950b75b2f5a6d6e79ab6d472b8501aaa5ec4a26",
+          "path": "trellis/modules/sparse/attention/serialized_attn.py"
+        },
+        {
+          "bytes": 6075,
+          "git_blob_sha1": "cd642c5252e29a3a5e59fad7ed3880b7b00bcf9a",
+          "path": "trellis/modules/sparse/attention/windowed_attn.py"
+        },
+        {
+          "bytes": 17454,
+          "git_blob_sha1": "8837f44052f6d573d09e3bfb897e659e10516bb5",
+          "path": "trellis/modules/sparse/basic.py"
+        },
+        {
+          "bytes": 537,
+          "git_blob_sha1": "340a87126a8de574ee0276feb96b49824a2ce234",
+          "path": "trellis/modules/sparse/conv/__init__.py"
+        },
+        {
+          "bytes": 3955,
+          "git_blob_sha1": "524bcd4a845b2d6bd090a5f74bc8859978727528",
+          "path": "trellis/modules/sparse/conv/conv_spconv.py"
+        },
+        {
+          "bytes": 1716,
+          "git_blob_sha1": "1d612582d4b31f90aca3c00b693bbbc2550dc62c",
+          "path": "trellis/modules/sparse/conv/conv_torchsparse.py"
+        },
+        {
+          "bytes": 387,
+          "git_blob_sha1": "a854e77ce87d1a190b9730d91f363a821ff250bd",
+          "path": "trellis/modules/sparse/linear.py"
+        },
+        {
+          "bytes": 875,
+          "git_blob_sha1": "f200098dd82011a3aeee1688b9eb17018fa78295",
+          "path": "trellis/modules/sparse/nonlinearity.py"
+        },
+        {
+          "bytes": 2151,
+          "git_blob_sha1": "6b38a36682c098210000dc31d68ddc31ccd2929d",
+          "path": "trellis/modules/sparse/norm.py"
+        },
+        {
+          "bytes": 4567,
+          "git_blob_sha1": "ad7121473f335b307e2f7ea5f05c964d3aec0440",
+          "path": "trellis/modules/sparse/spatial.py"
+        },
+        {
+          "bytes": 46,
+          "git_blob_sha1": "b08b0d4e5bc24060a2cdc8df75d06dce122972bd",
+          "path": "trellis/modules/sparse/transformer/__init__.py"
+        },
+        {
+          "bytes": 5181,
+          "git_blob_sha1": "9d037a49bf83e1c2dfb2f8c4b23d2e9d6c51e9f0",
+          "path": "trellis/modules/sparse/transformer/blocks.py"
+        },
+        {
+          "bytes": 6124,
+          "git_blob_sha1": "4a8416559f39acbed9e5996e9891c97f95c80c8f",
+          "path": "trellis/modules/sparse/transformer/modulated.py"
+        },
+        {
+          "bytes": 1763,
+          "git_blob_sha1": "79e268d36c2ba49b0275744022a1a1e19983dae3",
+          "path": "trellis/modules/spatial.py"
+        },
+        {
+          "bytes": 46,
+          "git_blob_sha1": "b08b0d4e5bc24060a2cdc8df75d06dce122972bd",
+          "path": "trellis/modules/transformer/__init__.py"
+        },
+        {
+          "bytes": 5865,
+          "git_blob_sha1": "c37eb7ed92f4aacfc9e974a63b247589d95977da",
+          "path": "trellis/modules/transformer/blocks.py"
+        },
+        {
+          "bytes": 5587,
+          "git_blob_sha1": "d4aeca0689e68f656b08f7aa822b7be839aa727d",
+          "path": "trellis/modules/transformer/modulated.py"
+        },
+        {
+          "bytes": 1157,
+          "git_blob_sha1": "f0afb1b6c767aa2ad00bad96649fb30315e696ea",
+          "path": "trellis/modules/utils.py"
+        },
+        {
+          "bytes": 759,
+          "git_blob_sha1": "0e33c6ead4958f06a904711f5ffbd95f55006f7b",
+          "path": "trellis/pipelines/__init__.py"
+        },
+        {
+          "bytes": 1840,
+          "git_blob_sha1": "9d214e41b9422846decf1c2ec9d075ed3d08b5e7",
+          "path": "trellis/pipelines/base.py"
+        },
+        {
+          "bytes": 121,
+          "git_blob_sha1": "54d412fc5d8eb662081a92a56ad078243988c2f9",
+          "path": "trellis/pipelines/samplers/__init__.py"
+        },
+        {
+          "bytes": 286,
+          "git_blob_sha1": "1966ce787009a5ee0c1ed06dce491525ff1dbcbf",
+          "path": "trellis/pipelines/samplers/base.py"
+        },
+        {
+          "bytes": 454,
+          "git_blob_sha1": "5701b25f5d7a2197612eb256f8ee13e8c489da1f",
+          "path": "trellis/pipelines/samplers/classifier_free_guidance_mixin.py"
+        },
+        {
+          "bytes": 7155,
+          "git_blob_sha1": "cd463f26a1c5670fb26691857dfd46abf100c55e",
+          "path": "trellis/pipelines/samplers/flow_euler.py"
+        },
+        {
+          "bytes": 629,
+          "git_blob_sha1": "7074a4d5fea20a8f799416aa6571faca4f9eea06",
+          "path": "trellis/pipelines/samplers/guidance_interval_mixin.py"
+        },
+        {
+          "bytes": 15345,
+          "git_blob_sha1": "3725da20442aae57a58038b766628cbaf547aeed",
+          "path": "trellis/pipelines/trellis_image_to_3d.py"
+        },
+        {
+          "bytes": 10366,
+          "git_blob_sha1": "f64ada43d4bfe65e713cf53784bbbe279dc60421",
+          "path": "trellis/pipelines/trellis_text_to_3d.py"
+        },
+        {
+          "bytes": 930,
+          "git_blob_sha1": "0339355c56b8d17f72e926650d140a658452fbe9",
+          "path": "trellis/renderers/__init__.py"
+        },
+        {
+          "bytes": 8122,
+          "git_blob_sha1": "57108e3cccf6aab8e3059431557c461de46aff1a",
+          "path": "trellis/renderers/gaussian_render.py"
+        },
+        {
+          "bytes": 5348,
+          "git_blob_sha1": "b504fa4d140c68ef3c611669ea075000d9723a04",
+          "path": "trellis/renderers/mesh_renderer.py"
+        },
+        {
+          "bytes": 11482,
+          "git_blob_sha1": "136069cdb0645b5759d5d17f7815612a1dfc7bea",
+          "path": "trellis/renderers/octree_renderer.py"
+        },
+        {
+          "bytes": 4371,
+          "git_blob_sha1": "bbca7d192aa3a7edf8c5b2d24dee535eac765785",
+          "path": "trellis/renderers/sh_utils.py"
+        },
+        {
+          "bytes": 143,
+          "git_blob_sha1": "549ffdb97e87181552e9b3e086766f873e4bfb5e",
+          "path": "trellis/representations/__init__.py"
+        },
+        {
+          "bytes": 36,
+          "git_blob_sha1": "e3de6e180bd732836af876d748255595be2d4d74",
+          "path": "trellis/representations/gaussian/__init__.py"
+        },
+        {
+          "bytes": 9578,
+          "git_blob_sha1": "54ba16f1550e8edb1728605202cc31b6dd805d90",
+          "path": "trellis/representations/gaussian/gaussian_model.py"
+        },
+        {
+          "bytes": 3971,
+          "git_blob_sha1": "541c0825229a2d86e84460b765879f86f724a59d",
+          "path": "trellis/representations/gaussian/general_utils.py"
+        },
+        {
+          "bytes": 62,
+          "git_blob_sha1": "38cf35c0853d11cf09bdc228a87ee9d0b2f34b62",
+          "path": "trellis/representations/mesh/__init__.py"
+        },
+        {
+          "bytes": 5480,
+          "git_blob_sha1": "44e8776fafbc21d787e2ba855e4c99bd191a0762",
+          "path": "trellis/representations/mesh/cube2mesh.py"
+        },
+        {
+          "bytes": 2650,
+          "git_blob_sha1": "23913c97bb2d57dfa0384667c69f9860ea0a4155",
+          "path": "trellis/representations/mesh/utils_cube.py"
+        },
+        {
+          "bytes": 33,
+          "git_blob_sha1": "f66a39a5a7498e2e99fe9d94d663796b3bc157b5",
+          "path": "trellis/representations/octree/__init__.py"
+        },
+        {
+          "bytes": 18481,
+          "git_blob_sha1": "c2bd4dc41b0d471227df0248f8c122be9bf9f453",
+          "path": "trellis/representations/octree/octree_dfs.py"
+        },
+        {
+          "bytes": 28,
+          "git_blob_sha1": "b72a1b7e76b509ee5a5e6979858eb17b4158a151",
+          "path": "trellis/representations/radiance_field/__init__.py"
+        },
+        {
+          "bytes": 739,
+          "git_blob_sha1": "8fc4b749786d934dae82864b560baccd91fcabbc",
+          "path": "trellis/representations/radiance_field/strivec.py"
+        },
+        {
+          "bytes": 2394,
+          "git_blob_sha1": "29b54f950a639362bbe336486da180ac7a97e575",
+          "path": "trellis/trainers/__init__.py"
+        },
+        {
+          "bytes": 15515,
+          "git_blob_sha1": "15463a082dca87c3c0096c9d5ed3b452f62e4f6c",
+          "path": "trellis/trainers/base.py"
+        },
+        {
+          "bytes": 20469,
+          "git_blob_sha1": "f5cf304024b755a17cf136c7393e935a16298de3",
+          "path": "trellis/trainers/basic.py"
+        },
+        {
+          "bytes": 13626,
+          "git_blob_sha1": "1df8efa29e4e0dcf027f38e28a81a0130beb26bf",
+          "path": "trellis/trainers/flow_matching/flow_matching.py"
+        },
+        {
+          "bytes": 2349,
+          "git_blob_sha1": "548e007bbf3122d818fe05041fba171665d7e450",
+          "path": "trellis/trainers/flow_matching/mixins/classifier_free_guidance.py"
+        },
+        {
+          "bytes": 3491,
+          "git_blob_sha1": "be18d64a91d235560e69744f998cf768b3fd0bdb",
+          "path": "trellis/trainers/flow_matching/mixins/image_conditioned.py"
+        },
+        {
+          "bytes": 2449,
+          "git_blob_sha1": "85f1dcf2582c07edd9b629c07181265f24a90134",
+          "path": "trellis/trainers/flow_matching/mixins/text_conditioned.py"
+        },
+        {
+          "bytes": 11599,
+          "git_blob_sha1": "761d67701fafb448c2e9a69cd127e4343bd379f8",
+          "path": "trellis/trainers/flow_matching/sparse_flow_matching.py"
+        },
+        {
+          "bytes": 2383,
+          "git_blob_sha1": "e88a795360f69f223cc3e406b064634351087a3f",
+          "path": "trellis/trainers/utils.py"
+        },
+        {
+          "bytes": 4940,
+          "git_blob_sha1": "5c0c418b851f49fc05fe13511f28b95a1d2e540d",
+          "path": "trellis/trainers/vae/sparse_structure_vae.py"
+        },
+        {
+          "bytes": 11324,
+          "git_blob_sha1": "29ff3657862b63fb77de260a3b47e3e70c773373",
+          "path": "trellis/trainers/vae/structured_latent_vae_gaussian.py"
+        },
+        {
+          "bytes": 17468,
+          "git_blob_sha1": "f3c9a6b4097e3cc34467247831a48a2bd1dce455",
+          "path": "trellis/trainers/vae/structured_latent_vae_mesh_dec.py"
+        },
+        {
+          "bytes": 8889,
+          "git_blob_sha1": "6021ea1e9efafe21e8cee553f88fa6142567a736",
+          "path": "trellis/trainers/vae/structured_latent_vae_rf_dec.py"
+        },
+        {
+          "bytes": 0,
+          "git_blob_sha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "path": "trellis/utils/__init__.py"
+        },
+        {
+          "bytes": 8887,
+          "git_blob_sha1": "805b6cc118106857e7ef767ab4bfd133dbd78e6f",
+          "path": "trellis/utils/data_utils.py"
+        },
+        {
+          "bytes": 2533,
+          "git_blob_sha1": "348799c064804ed3ae1a98144249bd9b6bfb9915",
+          "path": "trellis/utils/dist_utils.py"
+        },
+        {
+          "bytes": 8022,
+          "git_blob_sha1": "cba3cf83836e5b58f5bc3333e809ffc932375a04",
+          "path": "trellis/utils/elastic_utils.py"
+        },
+        {
+          "bytes": 6369,
+          "git_blob_sha1": "c0d765f4d5a216e1485d55f7cf9251cbfdc768a8",
+          "path": "trellis/utils/general_utils.py"
+        },
+        {
+          "bytes": 3285,
+          "git_blob_sha1": "990a4352e24fc73bf732d8eb0f8ca9a07365b49e",
+          "path": "trellis/utils/grad_clip_utils.py"
+        },
+        {
+          "bytes": 2983,
+          "git_blob_sha1": "52049f69543f2700bc5525b09cbf2fb25c08aa9e",
+          "path": "trellis/utils/loss_utils.py"
+        },
+        {
+          "bytes": 25978,
+          "git_blob_sha1": "0a8d9fb79ad73effecc9ebcbfe241a12f8022e0f",
+          "path": "trellis/utils/postprocessing_utils.py"
+        },
+        {
+          "bytes": 867,
+          "git_blob_sha1": "5b668c277b51f4930991912a80573adc79364028",
+          "path": "trellis/utils/random_utils.py"
+        },
+        {
+          "bytes": 5637,
+          "git_blob_sha1": "c13d902c85502ec7984cefa2b974c54e3c342edd",
+          "path": "trellis/utils/render_utils.py"
+        }
+      ],
+      "name": "trellis",
+      "repository": "microsoft/TRELLIS",
+      "retained_files": [
+        ".gitmodules",
+        "LICENSE",
+        "README.md",
+        "setup.sh",
+        "trellis/__init__.py",
+        "trellis/datasets/__init__.py",
+        "trellis/datasets/components.py",
+        "trellis/datasets/sparse_feat2render.py",
+        "trellis/datasets/sparse_structure.py",
+        "trellis/datasets/sparse_structure_latent.py",
+        "trellis/datasets/structured_latent.py",
+        "trellis/datasets/structured_latent2render.py",
+        "trellis/models/__init__.py",
+        "trellis/models/sparse_elastic_mixin.py",
+        "trellis/models/sparse_structure_flow.py",
+        "trellis/models/sparse_structure_vae.py",
+        "trellis/models/structured_latent_flow.py",
+        "trellis/models/structured_latent_vae/__init__.py",
+        "trellis/models/structured_latent_vae/base.py",
+        "trellis/models/structured_latent_vae/decoder_gs.py",
+        "trellis/models/structured_latent_vae/decoder_mesh.py",
+        "trellis/models/structured_latent_vae/decoder_rf.py",
+        "trellis/models/structured_latent_vae/encoder.py",
+        "trellis/modules/attention/__init__.py",
+        "trellis/modules/attention/full_attn.py",
+        "trellis/modules/attention/modules.py",
+        "trellis/modules/norm.py",
+        "trellis/modules/sparse/__init__.py",
+        "trellis/modules/sparse/attention/__init__.py",
+        "trellis/modules/sparse/attention/full_attn.py",
+        "trellis/modules/sparse/attention/modules.py",
+        "trellis/modules/sparse/attention/serialized_attn.py",
+        "trellis/modules/sparse/attention/windowed_attn.py",
+        "trellis/modules/sparse/basic.py",
+        "trellis/modules/sparse/conv/__init__.py",
+        "trellis/modules/sparse/conv/conv_spconv.py",
+        "trellis/modules/sparse/conv/conv_torchsparse.py",
+        "trellis/modules/sparse/linear.py",
+        "trellis/modules/sparse/nonlinearity.py",
+        "trellis/modules/sparse/norm.py",
+        "trellis/modules/sparse/spatial.py",
+        "trellis/modules/sparse/transformer/__init__.py",
+        "trellis/modules/sparse/transformer/blocks.py",
+        "trellis/modules/sparse/transformer/modulated.py",
+        "trellis/modules/spatial.py",
+        "trellis/modules/transformer/__init__.py",
+        "trellis/modules/transformer/blocks.py",
+        "trellis/modules/transformer/modulated.py",
+        "trellis/modules/utils.py",
+        "trellis/pipelines/__init__.py",
+        "trellis/pipelines/base.py",
+        "trellis/pipelines/samplers/__init__.py",
+        "trellis/pipelines/samplers/base.py",
+        "trellis/pipelines/samplers/classifier_free_guidance_mixin.py",
+        "trellis/pipelines/samplers/flow_euler.py",
+        "trellis/pipelines/samplers/guidance_interval_mixin.py",
+        "trellis/pipelines/trellis_image_to_3d.py",
+        "trellis/pipelines/trellis_text_to_3d.py",
+        "trellis/renderers/__init__.py",
+        "trellis/renderers/gaussian_render.py",
+        "trellis/renderers/mesh_renderer.py",
+        "trellis/renderers/octree_renderer.py",
+        "trellis/renderers/sh_utils.py",
+        "trellis/representations/__init__.py",
+        "trellis/representations/gaussian/__init__.py",
+        "trellis/representations/gaussian/gaussian_model.py",
+        "trellis/representations/gaussian/general_utils.py",
+        "trellis/representations/mesh/__init__.py",
+        "trellis/representations/mesh/cube2mesh.py",
+        "trellis/representations/mesh/utils_cube.py",
+        "trellis/representations/octree/__init__.py",
+        "trellis/representations/octree/octree_dfs.py",
+        "trellis/representations/radiance_field/__init__.py",
+        "trellis/representations/radiance_field/strivec.py",
+        "trellis/trainers/__init__.py",
+        "trellis/trainers/base.py",
+        "trellis/trainers/basic.py",
+        "trellis/trainers/flow_matching/flow_matching.py",
+        "trellis/trainers/flow_matching/mixins/classifier_free_guidance.py",
+        "trellis/trainers/flow_matching/mixins/image_conditioned.py",
+        "trellis/trainers/flow_matching/mixins/text_conditioned.py",
+        "trellis/trainers/flow_matching/sparse_flow_matching.py",
+        "trellis/trainers/utils.py",
+        "trellis/trainers/vae/sparse_structure_vae.py",
+        "trellis/trainers/vae/structured_latent_vae_gaussian.py",
+        "trellis/trainers/vae/structured_latent_vae_mesh_dec.py",
+        "trellis/trainers/vae/structured_latent_vae_rf_dec.py",
+        "trellis/utils/__init__.py",
+        "trellis/utils/data_utils.py",
+        "trellis/utils/dist_utils.py",
+        "trellis/utils/elastic_utils.py",
+        "trellis/utils/general_utils.py",
+        "trellis/utils/grad_clip_utils.py",
+        "trellis/utils/loss_utils.py",
+        "trellis/utils/postprocessing_utils.py",
+        "trellis/utils/random_utils.py",
+        "trellis/utils/render_utils.py"
+      ],
+      "revision": "442aa1e1afb9014e80681d3bf604e8d728a86ee7",
+      "submodules": [
+        {
+          "acquired_separately": true,
+          "path": "trellis/representations/mesh/flexicubes",
+          "revision": "815e075a2a400d06c48d94c347674344ed6ae5c5"
+        }
+      ],
+      "url": "https://codeload.github.com/microsoft/TRELLIS/tar.gz/442aa1e1afb9014e80681d3bf604e8d728a86ee7"
+    },
+    {
+      "archive_prefix": "FlexiCubes-815e075a2a400d06c48d94c347674344ed6ae5c5",
+      "maximum_archive_bytes": 80000000,
+      "maximum_expanded_bytes": 50000000,
+      "members": [
+        {
+          "bytes": 1365,
+          "git_blob_sha1": "d950df0c3f68ca2457f5e81e6dc31cbf3f279835",
+          "path": "DCO.txt"
+        },
+        {
+          "bytes": 11357,
+          "git_blob_sha1": "7a4a3ea2424c09fbe48d455aed1eaa94d9124835",
+          "path": "LICENSE.txt"
+        },
+        {
+          "bytes": 7896,
+          "git_blob_sha1": "cecacdfebf827158fc8d8f2707132be7cac2e8be",
+          "path": "README.md"
+        },
+        {
+          "bytes": 132062,
+          "git_blob_sha1": "2e047a63ab629597fb07f7620b97bd9806fc918c",
+          "path": "examples/data/inputmodels/block.obj"
+        },
+        {
+          "bytes": 1667,
+          "git_blob_sha1": "fa1bdddd4221f81d86c3f93bfead8bc90a9947ad",
+          "path": "examples/download_data.py"
+        },
+        {
+          "bytes": 1841141,
+          "git_blob_sha1": "b0c6264f2d58d54406dbcf98a8a7eea21f64b294",
+          "path": "examples/extraction.ipynb"
+        },
+        {
+          "bytes": 4397,
+          "git_blob_sha1": "2e97160d789ddf805d597fa6a6a1cd73500a0163",
+          "path": "examples/loss.py"
+        },
+        {
+          "bytes": 497248,
+          "git_blob_sha1": "19a0706569b65810db123ff4998db50266bccc06",
+          "path": "examples/optimization.ipynb"
+        },
+        {
+          "bytes": 8567,
+          "git_blob_sha1": "21771016028fdc8443ff9ff2f6c272dd85947826",
+          "path": "examples/optimize.py"
+        },
+        {
+          "bytes": 11211,
+          "git_blob_sha1": "6aecbda0161f987138c99387ead3c89279e9df01",
+          "path": "examples/render.py"
+        },
+        {
+          "bytes": 5470,
+          "git_blob_sha1": "cdd04996b373f4586138760a885e5404cee1d378",
+          "path": "examples/util.py"
+        },
+        {
+          "bytes": 20945,
+          "git_blob_sha1": "93e47b6e851b30b3a397a3d5ed8d18981d80aebb",
+          "path": "flexicubes.py"
+        },
+        {
+          "bytes": 73011,
+          "git_blob_sha1": "461bd1ce2a73d6b6e0ee61648af7746c2254bc53",
+          "path": "images/ablate_L_dev.jpg"
+        },
+        {
+          "bytes": 55999,
+          "git_blob_sha1": "8b197719e1a3b09bce4a99077e4e0752aa21fe9b",
+          "path": "images/block_final.png"
+        },
+        {
+          "bytes": 198533,
+          "git_blob_sha1": "3c682b95a92ca803c00a3f105a9952b937e17998",
+          "path": "images/block_init.png"
+        },
+        {
+          "bytes": 3562986,
+          "git_blob_sha1": "719ddc27e83ad69955bc5b71509e22063a2f0892",
+          "path": "images/teaser_top.png"
+        },
+        {
+          "bytes": 40967,
+          "git_blob_sha1": "659bca7ba1f2f22a0955e99c17c76f740954967a",
+          "path": "tables.py"
+        }
+      ],
+      "name": "flexicubes",
+      "repository": "MaxtirError/FlexiCubes",
+      "retained_files": [
+        "LICENSE.txt",
+        "README.md",
+        "flexicubes.py",
+        "tables.py"
+      ],
+      "revision": "815e075a2a400d06c48d94c347674344ed6ae5c5",
+      "submodules": [],
+      "url": "https://codeload.github.com/MaxtirError/FlexiCubes/tar.gz/815e075a2a400d06c48d94c347674344ed6ae5c5"
+    }
+  ],
+  "stage": "source_model_acquisition_only",
+  "vm": "world-reward-ncc-h100-02"
+}
