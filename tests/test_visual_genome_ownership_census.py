@@ -146,16 +146,21 @@ def test_primary_requests_exact_one_pinned_text(monkeypatch):
 
 def test_frozen_config_no_existing_producer_execution_or_media():
     root=Path(__file__).resolve().parents[1]; cfg=json.loads((root/vg.CONFIG).read_text())
-    assert cfg['minimum_distinct_photos']==96 and cfg['budget_seconds']==600 and len(cfg['target_names'])==79
+    assert cfg['minimum_distinct_photos']==96 and cfg['budget_seconds']==1200 and len(cfg['target_names'])==79
     assert set(cfg['person_names'])==vg.PERSON and set(cfg['predicates'])==vg.PREDICATES
-    assert len(cfg['inputs'])==20 and len(cfg['history_names'])==6 and len(cfg['primary_texts'])==3
+    assert len(cfg['inputs'])==21 and len(cfg['history_names'])==6 and len(cfg['primary_texts'])==3
     assert not any('reference_' in row['path'] or '/videos/' in row['path'] for row in cfg['inputs'].values())
     for name in cfg['helper_pins']:assert vg.pin((root/name).read_bytes())==cfg['helper_pins'][name]
-    wrapper=(root/vg.HELPERS[1]).read_text(); assert 'python3 -I -B' in wrapper and 'CUDA_VISIBLE_DEVICES=-1' in wrapper and '615s' in wrapper
+    wrapper=(root/vg.HELPERS[1]).read_text(); assert 'python3 -I -B' in wrapper and 'CUDA_VISIBLE_DEVICES=-1' in wrapper and '1215s' in wrapper
     assert vg.configuration(cfg) == cfg
-    for key,value in [('minimum_distinct_photos',95),('budget_seconds',1800),('selection_performed',True)]:
+    for key,value in [('minimum_distinct_photos',95),('budget_seconds',600),('budget_seconds',1800),
+                      ('outer_seconds',615),('schema','world_reward.visual_genome_ownership_census.v1'),('selection_performed',True)]:
         altered=dict(cfg,**{key:value})
         with pytest.raises(ValueError):vg.configuration(altered)
+    assert not (root/'configs/visual_genome_ownership_census_v1.json').exists()
+    cost=cfg['sources']['parser_cost']
+    assert cost['revision']=='b8d8a02f2ee337b0098579dfa816d171ba0711b6' and cost['files']==293 and cost['entries']==298
+    assert cfg['inputs']['closed_parser_cost']['pin']==dict(bytes=3822,sha256='0f2c2b9646ad8cf97ecd10cfb3e1f2f89938adab89a282f94a0784d123a4c1cc')
 
 
 def test_authenticate_distinct_original_receipt_abis_and_all_rechecks(tmp_path,monkeypatch):
@@ -172,7 +177,11 @@ def test_authenticate_distinct_original_receipt_abis_and_all_rechecks(tmp_path,m
         cohort_identity=cfg['inputs']['ownership_cohort']['pin'],source_and_inputs_rehashed_after=True,outputs_sealed=True,
         input_proof=dict(frozen_inputs={r['path']:dict(pin=r['pin']) for r in cfg['inputs'].values()},
             original_closed_failure=dict(report_identity=cfg['inputs']['original_closed_failure']['pin'])))
-    values=dict(vg_report=dict(status='pass',source_binding={k:proofs['vg'][k] for k in ('binding','modes_identity')},
+    values=dict(closed_parser_cost=dict(schema='world_reward.metadata_json_cost_probe.v1',status='fail',
+        decision='CLOSED_PARSER_COST_INSUFFICIENT',capacity_gate_passed=False,
+        source_binding={k:proofs['parser_cost'][k] for k in ('binding','modes_identity')},
+        source_rehashed_after=True,outputs_sealed=True,actual_dataset_values_read=False,projected_seconds=697.6067469293372),
+        vg_report=dict(status='pass',source_binding={k:proofs['vg'][k] for k in ('binding','modes_identity')},
         artifact_identities={n:cfg['inputs'][n]['pin'] for n in cfg['vg_files']},source_rehashed_after=True,outputs_sealed=True),ownership_report=selected,
         ownership_cohort=dict(source_binding=own,producer_revision=own['producer_revision'],reference_values_exposed=False),
         ownership_acquired=dict(source_binding=own,producer_revision=own['producer_revision'],phase='acquire',status='fail',
@@ -197,7 +206,10 @@ def test_authenticate_distinct_original_receipt_abis_and_all_rechecks(tmp_path,m
         def hexdigest(self):return 'f4bbac642086de4f52a3fdda2de5fa2c'
     monkeypatch.setattr(vg.hashlib,'md5',MD5)
     result=vg.authenticate(cfg,tmp_path/'current','c'*40)
-    assert len(result['inputs'])==20 and result['historical']==proofs
+    assert len(result['inputs'])==21 and result['historical']==proofs
+    closed=values['closed_parser_cost'];closed['status']='pass';(tmp_path/'closed_parser_cost').write_bytes(vg.encode(closed))
+    with pytest.raises(ValueError,match='failure must remain closed'):vg.authenticate(cfg,tmp_path/'current','c'*40)
+    closed['status']='fail';(tmp_path/'closed_parser_cost').write_bytes(vg.encode(closed))
     selected['cohort_identity']={'bytes':1,'sha256':'0'*64};(tmp_path/'ownership_report').write_bytes(vg.encode(selected))
     with pytest.raises(ValueError,match='Closed96'):vg.authenticate(cfg,tmp_path/'current','c'*40)
 

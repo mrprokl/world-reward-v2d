@@ -1,8 +1,8 @@
 {
-  "schema": "world_reward.visual_genome_ownership_census.v1",
-  "output": "/srv/world-reward-data/visual_genome_ownership_census_v1",
-  "budget_seconds": 600,
-  "outer_seconds": 615,
+  "schema": "world_reward.visual_genome_ownership_census.v2",
+  "output": "/srv/world-reward-data/visual_genome_ownership_census_v2",
+  "budget_seconds": 1200,
+  "outer_seconds": 1215,
   "max_row_bytes": 16777216,
   "max_expanded_bytes": 2147483648,
   "minimum_distinct_photos": 96,
@@ -314,6 +314,15 @@
       },
       "readonly": true,
       "maximum_bytes": 1048576
+    },
+    "closed_parser_cost": {
+      "path": "/srv/world-reward-data/metadata_json_cost_probe_v1/report.json",
+      "pin": {
+        "bytes": 3822,
+        "sha256": "0f2c2b9646ad8cf97ecd10cfb3e1f2f89938adab89a282f94a0784d123a4c1cc"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
     }
   },
   "streams": {
@@ -406,6 +415,21 @@
       "archive_xz_sha256": "824363870053ba0d05056acd0de3d06b9721537c88d4ff939db51b7376ff74f8",
       "files": 296,
       "entries": null
+    },
+    "parser_cost": {
+      "revision": "b8d8a02f2ee337b0098579dfa816d171ba0711b6",
+      "entry": "run_metadata_json_cost_probe",
+      "helpers": [
+        "infra/metadata_json_cost_probe.py",
+        "infra/run_metadata_json_cost_probe.sh",
+        "infra/metadata_json_stream.py",
+        "infra/mediapipe_cpu_runtime_verify.py",
+        "infra/visual_genome_metadata_acquire.py"
+      ],
+      "closure_sha256": "a5ecf194a83130a618873f60ba73f4f2ad03aab42b1aaca4035a92695f748a42",
+      "archive_xz_sha256": "ed307044a7ae3fbe77a6ecab334f5a2c3097582db4a0f8a6e52ac2d4949fce1a",
+      "files": 293,
+      "entries": 298
     }
   },
   "history_names": [

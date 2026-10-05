@@ -102,3 +102,9 @@ This supersedes the unexecuted600s v1 design, not a failed real census or
 historical cohort. The measured697.61s projection fits the new budget without
 altering data or algorithm; actual timeout remains fail-closed. Capacity/rights/
 quality remain unverified until their respective actual stages.
+
+V2 source qualification: root132 tiny controls PASS0.19s, AST/bash-n and
+independent read-only source/receipt-ABI review PASS before first execution.
+Closed parser-cost receipt and its full original source become the21st pinned
+input/fourth source, rehashed before/after; no cost replay. First actual census
+remains required; no eligible photo count is assumed.

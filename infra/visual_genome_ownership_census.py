@@ -26,9 +26,9 @@ import openimages_joint_pair_acquire as identities
 import coco_proposal_prepare as coco
 
 ROOT = Path('/srv/scenesmith/world-reward')
-DATA = Path('/srv/world-reward-data/visual_genome_ownership_census_v1')
+DATA = Path('/srv/world-reward-data/visual_genome_ownership_census_v2')
 ENTRY = 'run_visual_genome_ownership_census'
-CONFIG = 'configs/visual_genome_ownership_census_v1.json'
+CONFIG = 'configs/visual_genome_ownership_census_v2.json'
 HELPERS = ('infra/visual_genome_ownership_census.py', 'infra/run_visual_genome_ownership_census.sh', CONFIG,
     'infra/metadata_json_stream.py', 'infra/mediapipe_cpu_runtime_verify.py',
     'infra/openimages_joint_pair_acquire.py', 'infra/coco_proposal_prepare.py', 'configs/ownership_pair_prepare_v1.json')
@@ -94,6 +94,13 @@ def authenticate(cfg, code, revision):
         row = cfg['inputs'][name]; proof = selected['input_proof']['frozen_inputs'][row['path']]
         rt.require(proof['pin'] == row['pin'], 'Historical input not bound by original selection')
     rt.require(selected['input_proof']['original_closed_failure']['report_identity'] == cfg['inputs']['original_closed_failure']['pin'], 'Original closed failure not bound')
+    cost = value('closed_parser_cost')
+    rt.require(cost['schema'] == 'world_reward.metadata_json_cost_probe.v1' and cost['status'] == 'fail'
+        and cost['decision'] == 'CLOSED_PARSER_COST_INSUFFICIENT' and cost['capacity_gate_passed'] is False
+        and cost['source_binding'] == {k:historical['parser_cost'][k] for k in ('binding','modes_identity')}
+        and cost['source_rehashed_after'] is True and cost['outputs_sealed'] is True
+        and cost['actual_dataset_values_read'] is False and cost['projected_seconds'] > 600,
+        'Original data-free600s cost failure must remain closed')
     return dict(current=current,historical=historical,inputs=frozen)
 
 
@@ -261,8 +268,8 @@ def configuration(cfg):
     rt.require(set(cfg) == {'schema','output','budget_seconds','outer_seconds','max_row_bytes','max_expanded_bytes',
         'minimum_distinct_photos','selection_performed','person_names','predicates','target_names','primary_texts',
         'inputs','streams','sources','history_names','vg_files','helper_pins','limitations'}, 'Exact complete census configuration required')
-    fixed = dict(schema='world_reward.visual_genome_ownership_census.v1',output=str(DATA),budget_seconds=600,
-        outer_seconds=615,max_row_bytes=16 << 20,max_expanded_bytes=2 << 30,minimum_distinct_photos=96,selection_performed=False)
+    fixed = dict(schema='world_reward.visual_genome_ownership_census.v2',output=str(DATA),budget_seconds=1200,
+        outer_seconds=1215,max_row_bytes=16 << 20,max_expanded_bytes=2 << 30,minimum_distinct_photos=96,selection_performed=False)
     rt.require(all(type(cfg[k]) is type(v) and cfg[k] == v for k,v in fixed.items())
         and cfg['person_names'] == sorted(PERSON) and cfg['predicates'] == ['holding','holds']
         and len(cfg['target_names']) == len(set(cfg['target_names'])) == 79 and not set(cfg['target_names'])&PERSON,
@@ -272,9 +279,12 @@ def configuration(cfg):
         ('relationship_alias.txt',122102,'15f7f64802c95c5bf5b5690457566b1b19ee64eac7a94d8b8cbb3a4378f2ec7c'),
         ('object_alias.txt',60166,'0c8e059fc31eeebfd98231f5789892da8ae33bfa00434c70aee969dc6eaa853b')]
     rt.require(cfg['primary_texts'] == [dict(file=n,url=base+n,pin=dict(bytes=s,sha256=h)) for n,s,h in expected], 'Exact audited primary texts required')
-    rt.require(set(cfg['helper_pins']) == set(HELPERS[3:7]) and set(cfg['sources']) == {'vg','coco','ownership'}
+    rt.require(set(cfg['helper_pins']) == set(HELPERS[3:7]) and set(cfg['sources']) == {'vg','coco','ownership','parser_cost'}
         and cfg['history_names'] == ['oi16','oi128','oi64','oi32','coco32','coco64'], 'Complete independent provenance closure required')
-    rt.require(set(cfg['streams']) == {'coco','images','objects','relations'} and len(cfg['inputs']) == 20, 'Complete bounded input inventory required')
+    rt.require(set(cfg['streams']) == {'coco','images','objects','relations'} and len(cfg['inputs']) == 21, 'Complete bounded input inventory required')
+    rt.require(cfg['inputs']['closed_parser_cost'] == dict(path='/srv/world-reward-data/metadata_json_cost_probe_v1/report.json',
+        pin=dict(bytes=3822,sha256='0f2c2b9646ad8cf97ecd10cfb3e1f2f89938adab89a282f94a0784d123a4c1cc'),
+        readonly=True,maximum_bytes=1 << 20), 'Exact independently audited closed cost receipt required')
     for name, key in (('coco','coco_archive'),('images','image_data.json.zip'),('objects','objects.json.zip'),('relations','relationships.json.zip')):
         spec = cfg['streams'][name]; rt.require(spec['path'] == cfg['inputs'][key]['path']
             and 0 < spec['expanded_bytes'] <= 1 << 30, 'Authenticated bounded stream path required')
@@ -317,7 +327,7 @@ def census(cfg, excluded, checkpoint):
 
 
 def run():
-    started = time.monotonic(); deadline = started+600
+    started = time.monotonic(); deadline = started+1200
     rt.require(os.geteuid() == 0 and sys.platform == 'linux' and os.uname().nodename == 'world-reward-ncc-h100-02', 'Exact Azure metadata CPU host required')
     code,revision = Path(os.environ['WR_CODE']),os.environ['WR_CODE_REVISION']
     rt.require(Path(__file__).resolve() == code/HELPERS[0], 'Immutable driver origin required')
