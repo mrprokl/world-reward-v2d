@@ -10533,3 +10533,16 @@ frozen for the unchanged full-index native pose consumer. First read-only audit
 left EP17 in one validation argument; correcting only that observer to EP20
 passes, without proposal rerun or artifact changes. No geometry repair, frame
 deletion, full trajectory, refinement/packing or reconstruction accuracy claim.
+
+82dd9af actual MASA data-free native qualification CLOSED technicalFAIL
+13.459273s during operators/RuntimeError, before weights decode/model construction
+or full-bank inference. Host2887B/
+2e02b7a6e56c41e4a227a7678eab9633e363dc994bc57ad042e2d14c2c2d208f;
+native2530B/058b1d055264dbfb1aedcaaeebdf2f16b1300ed92155b4bfa150c565976a51e4.
+Independent actual source/proof/runtime/checkpoint-opaque asset posthash and
+sealed output/owned CID/name absence PASS; runtime build remains a separate
+valid CPU-import result. The current fixed operator bucket does not identify
+DCNv2 versus RoIAlign; no specific ABI cause claimed. Preserve this FAIL before
+any separately published technical diagnostic, never relax numerical gates or
+call the checkpoint/model/association qualified. EP20 full-index pose is queued
+behind the cooperative lock after its independently authenticated CPU proposal.
