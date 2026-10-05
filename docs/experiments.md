@@ -10573,3 +10573,15 @@ AST-neutral operators and end-to-end model-not-reached/no-secret failure receipt
 This diagnoses a family, not the true architecture/root cause by itself; both
 historical failures remain closed and no replacement build is authorized by
 their generic RuntimeError alone.
+
+0f59788 fresh exact-recipe CUDA family diagnostic CLOSED technicalFAIL
+13.521542s at DCNv2 zero-offset native_forward, category cuda_no_kernel_image.
+Host2886B/ed8f47c36ff785e63854d88a2b976491c5150cac8e95d482069eba924bf22de9;
+native2655B/9155164ecb8b50b61e81b282fb03ad35b150a153df0dc19af41b24297e57e1c9.
+Independent actual current/historical source, all frozen input/runtime asset
+hashes, sealed output identities and CID absence PASS. No weights decoded or
+model constructed. This identifies no compatible native kernel image for this
+device, but does not inventory the wheel's exact cubin/PTX architectures.
+Preserve all previous failures. Next legitimate technical branch is a fresh
+isolated full original MMCV2.1 build for SM90 against the same author Torch2.1/
+CUDA11.8 ABI, not a kernel rewrite, Torch2.5/MMCV1.7 substitution or relaxed gate.
