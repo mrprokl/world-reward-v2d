@@ -1,0 +1,104 @@
+{
+  "GPU_used": false,
+  "RGB_read": false,
+  "VM02_released": true,
+  "adopted": false,
+  "archive_identity": {
+    "bytes": 252872794,
+    "sha256": "031296bbc80c45a1d1f76bf9a90ead27e94e99ec629208449507a4917a3bf009"
+  },
+  "archive_sha256_basis": "first_read_descriptive_not_publisher_certified",
+  "audit_status": "pass",
+  "azure_cli_exit": 0,
+  "azure_resource_group": "WORLD-REWARD-RESEARCH",
+  "azure_vm": "world-reward-ncc-h100-02",
+  "challenge_overlap_verified": false,
+  "decision": "METADATA_QUALIFIED_PENDING_SEPARATE_CENSUS",
+  "expanded_catalogue_bytes": 844813048,
+  "git_blob_files_verified": 15,
+  "independent_crc_stream_reexecuted": false,
+  "legal_certainty_claimed": false,
+  "models_loaded": false,
+  "native_driver_absent": true,
+  "native_elapsed_seconds": 15.304575789021328,
+  "native_status": "pass",
+  "observer_elapsed_seconds": 0.596856652002316,
+  "observer_files_written": false,
+  "opaque_artifact_count": 18,
+  "opaque_role_split_identities": {
+    "data__splits__vcoco_all.ids": {
+      "bytes": 70521,
+      "sha256": "78d776cbef72d42282602826dfda58666fa93fdf1e7a74c77b81b76a20458944"
+    },
+    "data__splits__vcoco_test.ids": {
+      "bytes": 33736,
+      "sha256": "53a3d56987caff97125eea0f8a4c768c91f70a27eee146970faf0befaaa2fb23"
+    },
+    "data__splits__vcoco_train.ids": {
+      "bytes": 17251,
+      "sha256": "9dfbf2164ad2ca6fe0d6efaf48b9cb7e2a95ecc76730d956b8cef22619cb800d"
+    },
+    "data__splits__vcoco_trainval.ids": {
+      "bytes": 36785,
+      "sha256": "e5b61e7b80d8312b1a5de52ebdd71c9a922d3399353eca12b220afb8d3aaa8c2"
+    },
+    "data__splits__vcoco_val.ids": {
+      "bytes": 19534,
+      "sha256": "bed7ea7e9f837b748373cf2b917dfe7b37bf12ae7b5978d3471f104c9367bbd3"
+    },
+    "data__vcoco__vcoco_test.json": {
+      "bytes": 6193877,
+      "sha256": "71de9842b5c102b2f972e35362787e7ba00c29dcabc32eedac65c0ec13361a23"
+    },
+    "data__vcoco__vcoco_train.json": {
+      "bytes": 3135892,
+      "sha256": "2267afe7adc0a6c3e8ac90fb35f6d3a5bd5cd3c7edebf0622d0cbb7a67fddf19"
+    },
+    "data__vcoco__vcoco_trainval.json": {
+      "bytes": 6722166,
+      "sha256": "c3c10fbafb6399a53a26d290c980e0db9cac2f93753ab59303ba4a416fcd6418"
+    },
+    "data__vcoco__vcoco_val.json": {
+      "bytes": 3590505,
+      "sha256": "2025bf42ce985a079ad88fd052aba47d85f1531c5b04a95804427c8bcb75eedd"
+    }
+  },
+  "outputs_modes_verified": true,
+  "prior_observer_partial_preserved": true,
+  "producer_crc_evidence_verified": true,
+  "producer_revision": "9976f0f0d9caccdf72105d6cb7b7d8a3cc1d689d",
+  "public_bytes_received": 272739841,
+  "qualification": "sealed_metadata_acquisition_only_unit_exit_unavailable",
+  "quality_validated": false,
+  "report": {
+    "bytes": 8529,
+    "sha256": "aaf173055797b021fb6e1ecbc578b5676a3de5ea333534aa29860d0508b667d1"
+  },
+  "saved_only_runcommands": 1,
+  "schema": "world_reward.vcoco_metadata_saved_audit.v2",
+  "semantic_values_consulted": false,
+  "source": {
+    "closure_sha256": "8421adb0b29407a9340f1eec127f2109eaf862082c30ae5aace75cada721ec70",
+    "entries": 297,
+    "files": 292,
+    "modes_verified": true,
+    "xz_bytes": 207024,
+    "xz_sha256": "66d9fd41c95f30d513b39bdc280823df853e69d5249857fcffa4ea8e7a8798f2"
+  },
+  "source_and_artifacts_rehashed_after": true,
+  "training_overlap_verified": false,
+  "underlying_image_rights_verified": false,
+  "unit": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  },
+  "unit_exit_verified": false,
+  "unit_limitation": "collected_or_missing_unit_not_native_exit_evidence",
+  "zip_catalogue_verified": true,
+  "zip_decompressed": false,
+  "zip_members": 6
+}

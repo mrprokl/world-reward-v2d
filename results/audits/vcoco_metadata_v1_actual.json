@@ -1,0 +1,50 @@
+{
+  "GPU_used": false,
+  "RGB_read": false,
+  "VM02_released": true,
+  "adopted": false,
+  "audit_status": "partial",
+  "azure_cli_exit": 0,
+  "azure_resource_group": "WORLD-REWARD-RESEARCH",
+  "azure_vm": "world-reward-ncc-h100-02",
+  "challenge_overlap_verified": false,
+  "legal_certainty_claimed": false,
+  "local_observer_compile_repair_before_dispatch": "SyntaxError_no_Azure_call",
+  "local_original_git_descriptor": {
+    "closure_sha256": "8421adb0b29407a9340f1eec127f2109eaf862082c30ae5aace75cada721ec70",
+    "entries": 297,
+    "files": 292,
+    "modes_identity": {
+      "bytes": 17516,
+      "sha256": "b79b5dd0336532fe724a9f064816207af045ee0aa8d276d389f7e08fd26afb40"
+    },
+    "xz_bytes": 207024,
+    "xz_sha256": "66d9fd41c95f30d513b39bdc280823df853e69d5249857fcffa4ea8e7a8798f2"
+  },
+  "mechanical_error_type": "ValueError",
+  "mechanical_failure_gate": "requested_unit_not_found",
+  "metadata_artifact_hashes_observed": false,
+  "models_loaded": false,
+  "native_status": "unconfirmed",
+  "observer_elapsed_seconds": 0.004999294993467629,
+  "observer_files_written": false,
+  "producer_revision": "9976f0f0d9caccdf72105d6cb7b7d8a3cc1d689d",
+  "quality_validated": false,
+  "requested_unit": "world-reward-vcoco-metadata-v1.service",
+  "saved_only_runcommands": 1,
+  "schema": "world_reward.vcoco_metadata_saved_audit.v1",
+  "semantic_values_consulted": false,
+  "source_hashes_observed_remotely": false,
+  "training_overlap_verified": false,
+  "underlying_image_rights_verified": false,
+  "unit": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  },
+  "unit_default_fields_not_native_success_evidence": true,
+  "zip_decompressed": false
+}

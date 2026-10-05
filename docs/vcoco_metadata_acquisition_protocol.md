@@ -62,6 +62,29 @@ failure demotes the same opened report FD to FAIL. Sanitized fixed exception
 classes only; no raw URLs/errors/annotation values in stdout. A technical PASS is
 `METADATA_QUALIFIED_PENDING_SEPARATE_CENSUS`, never permission to train or submit.
 
+## Actual metadata-only result — 2026-10-06
+
+Producer `9976f0f0d9caccdf72105d6cb7b7d8a3cc1d689d` sealed a PASS receipt in
+15.304575789 s: 272739841 acquired bytes, 18 original assets plus report. The
+report is 8529 bytes/SHA256
+`aaf173055797b021fb6e1ecbc578b5676a3de5ea333534aa29860d0508b667d1`;
+COCO2014 archive SHA256 is
+`031296bbc80c45a1d1f76bf9a90ead27e94e99ec629208449507a4917a3bf009`
+(first-read descriptive identity, not publisher certification).
+
+Saved-only independent audit v2 authenticated all 292 Git source files/297
+entries, original markers/modes, protocol, 18 artifact hashes, 15 publisher Git
+blobs, six central-directory entries/tail and source/output post-hashes. CRC and
+expanded SHA evidence is authenticated **producer evidence**; the observer did
+not decompress or parse any annotation. Exact native driver was absent. The
+systemd unit was already collected/missing: unit exit status is **unavailable**,
+and its default success/0 fields are not native execution proof. Acquisition
+qualification rests on the sealed, source-bound receipt with this limitation.
+The first observer's unit-not-found PARTIAL remains unchanged; v2 did not rerun
+acquisition. References: `results/audits/vcoco_metadata_v1_actual_v2.json`.
+No capacity, photograph rights, ownership quality, FIT or model adoption is
+qualified. A separately frozen metadata census is still required.
+
 ## Source qualification, October6, before execution
 
 Root159 combined tiny tests PASS0.41s, with no real HTTP/annotation values.
@@ -69,6 +92,5 @@ Independent four stdlib fault controls pass: header rejection before body,
 incorrect Git blob cleans only its partial, DEFLATE CRC corruption preserves
 the original, and late receipt publication closes FAIL. Fresh directory
 device/inode/UID/GID and700 mode are now checked before inventory/publication;
-this was corrected before any attempt. No actual acquisition has run yet.
-VM02 dispatch must wait for the current GPU observer to release RunCommand
-ownership, and use one exact public frozen commit, not a mutable working tree.
+this was corrected before the single frozen acquisition. These checks preceded
+execution; the actual result above supersedes the prospective dispatch status.
