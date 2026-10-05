@@ -1,0 +1,26 @@
+{
+  "schema": "world_reward.visual_genome_metadata_acquire.v1",
+  "entry": "run_visual_genome_metadata_acquire",
+  "output": "/srv/world-reward-data/visual_genome_metadata_v1",
+  "budget_seconds": 600,
+  "outer_seconds": 615,
+  "workers": 2,
+  "request_timeout_seconds": 15,
+  "max_total_compressed_bytes": 146800640,
+  "max_expanded_asset_bytes": 1073741824,
+  "max_total_expanded_bytes": 2147483648,
+  "assets": [
+    {"file": "image_data.json.zip", "member": "image_data.json", "url": "https://homes.cs.washington.edu/~ranjay/visualgenome/data/dataset/image_data.json.zip", "observed_bytes": 1780854, "version": "1.2"},
+    {"file": "objects.json.zip", "member": "objects.json", "url": "https://homes.cs.washington.edu/~ranjay/visualgenome/data/dataset/objects.json.zip", "observed_bytes": 55323929, "version": "1.4"},
+    {"file": "relationships.json.zip", "member": "relationships.json", "url": "https://homes.cs.washington.edu/~ranjay/visualgenome/data/dataset/relationships.json.zip", "observed_bytes": 77904473, "version": "1.4"}
+  ],
+  "publisher_texts": [
+    {"file": "publisher_about.html", "url": "https://homes.cs.washington.edu/~ranjay/visualgenome/about.html", "bytes": 8984, "sha256": "29ec54c0554a4e12c4f695afd7f6bbe7a77db411090ee3031268950ea38a3a7b"},
+    {"file": "publisher_api.html", "url": "https://homes.cs.washington.edu/~ranjay/visualgenome/api.html", "bytes": 8197, "sha256": "43a80892dbc5f5ca6215ad75f7bf3d57c510ddd7444d2d9025165f52e80f7774"}
+  ],
+  "source_helper_pin": {"bytes": 23559, "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"},
+  "retry_count": 0,
+  "no_redirects": true,
+  "no_json_values_consulted": true,
+  "no_rgb": true
+}
