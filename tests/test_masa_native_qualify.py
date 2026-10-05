@@ -3,6 +3,7 @@ import ast
 import copy
 import hashlib
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -192,6 +193,94 @@ def test_native_model_static_contract_no_tracker_or_original_package_import(gate
     assert 'padded_h=(original_resize.shape[0]+31)//32*32'in s and 'torch.equal(inputs[0,0],expected)'in s
 
 
+def test_observability_is_ast_neutral_for_native_math_and_runtime(gate):
+    tree=ast.parse((REPO/'infra/masa_native_qualify.py').read_bytes())
+    pins={'operators':'d2d6fa2535808b189d04816fdb813c1e3159a6704dfa6a030313a1ec38c4dcd3',
+          'native_model':'7114a80269be6e2a2d2ce2fc273e3d6d8d32bcd74e799cf27f6d92383f855ee1',
+          'strict_state':'aaf5767b0bd4ab5bce8a1121075923f51bd56961f6fb2748a390eee6506ff97d',
+          'authenticate':'587d4dfd92106154ebf6ceba37213015c567421e5c624859a88d880271eb4bdd',
+          'command':'27998ae76ac5265b4011a2bb6bb746152ea72d0e3c965e351ac1ff7f8e8e60d6',
+          'image':'cd189a335a9d50ef5eb49fa58e764fb7332ba51613334faa45de9fa3690c88e9'}
+    class RemoveDiagnostics(ast.NodeTransformer):
+        def visit_Assign(self,node):
+            if (len(node.targets)==1 and isinstance(node.targets[0],ast.Subscript)
+                and isinstance(node.targets[0].value,ast.Name)and node.targets[0].value.id=='progress'
+                and isinstance(node.targets[0].slice,ast.Constant)and node.targets[0].slice.value=='subgate'):
+                assert isinstance(node.value,ast.Constant)and node.value.value in gate.FAILURE_GATES
+                return None
+            return node
+    for fn in tree.body:
+        if isinstance(fn,ast.FunctionDef)and fn.name in pins:
+            actual=RemoveDiagnostics().visit(copy.deepcopy(fn))
+            assert hashlib.sha256(ast.dump(actual,include_attributes=False).encode()).hexdigest()==pins[fn.name]
+
+
+@pytest.mark.parametrize('kind',[ImportError,ModuleNotFoundError,ValueError,TypeError,KeyError,AttributeError,RuntimeError,
+                               OSError,FileNotFoundError,PermissionError,TimeoutError,MemoryError,AssertionError,
+                               subprocess.TimeoutExpired])
+def test_failure_type_allowlist_never_reads_exception_text(gate,kind):
+    secret='SECRET_TOKEN_MUST_NOT_BE_SERIALIZED'
+    exc=kind(['command',secret],1,output=secret,stderr=secret)if kind is subprocess.TimeoutExpired else kind(secret)
+    report={};gate.failure(report,'weights_decode',exc)
+    assert report==dict(failure_gate='weights_decode',failure_class=kind.__name__)
+    assert secret not in json.dumps(report)
+    gate.failure(report,'host_cleanup',TypeError(secret))
+    assert report==dict(failure_gate='weights_decode',failure_class=kind.__name__)
+
+
+def test_unknown_exception_and_gate_are_other_without_text_or_classname(gate):
+    class Unknown(RuntimeError):
+        def __str__(self):raise AssertionError('Exception text was read')
+    Unknown.__name__='SECRET_CUSTOM_EXCEPTION_CLASS'
+    report={};gate.failure(report,'SECRET_UNTRUSTED_GATE',Unknown('SECRET_EXCEPTION_PAYLOAD'))
+    assert report==dict(failure_gate='other',failure_class='other')and 'SECRET'not in json.dumps(report)
+
+
+def test_terminal_failure_message_contains_only_allowlisted_diagnostics(gate):
+    class Unknown(RuntimeError):
+        def __str__(self):raise AssertionError('Exception text was read')
+    def main():raise Unknown('SECRET_TERMINAL_PAYLOAD')
+    terminal=ast.parse((REPO/'infra/masa_native_qualify.py').read_bytes()).body[-1];stderr=io.StringIO()
+    namespace=dict(vars(gate),__name__='__main__',main=main,sys=SimpleNamespace(stderr=stderr))
+    with pytest.raises(SystemExit):exec(compile(ast.Module(body=[terminal],type_ignores=[]),'<safe-terminal>','exec'),namespace)
+    assert stderr.getvalue()=='MASA native contract failed {"failure_class": "other", "failure_gate": "bootstrap"}\n'
+
+
+@pytest.mark.parametrize('subgate',[None,'operators','registry','config','model_construct','weights_decode','strict_state',
+                                   'model_device','preprocess','encoder','embedding'])
+def test_mock_native_failure_subgate_and_class_without_gpu_or_payload(gate,tmp_path,monkeypatch,subgate):
+    rt,root,code,args,c=setup(gate,tmp_path,monkeypatch);out=tmp_path/'native';out.mkdir()
+    proof=gate.authenticate(rt,code,args);rt.write(out/'proof.json',json.dumps(proof).encode(),0o444)
+    fake_torch=SimpleNamespace(__version__='2.1.2+cu118',cuda=SimpleNamespace(is_available=lambda:True,
+      get_device_capability=lambda:(9,0),get_device_name=lambda:'H100'))
+    monkeypatch.setitem(gate.sys.modules,'torch',fake_torch);monkeypatch.setattr(gate.sys,'prefix',gate.VENV)
+    class Unknown(RuntimeError):
+        def __str__(self):raise AssertionError('Exception text was read')
+    def operators(*a):
+        if subgate=='operators':raise ImportError('SECRET_OPERATOR_PAYLOAD')
+        return {'checkpoint_read':False}
+    def model(torch,policy,deadline,progress):
+        if subgate:
+            progress['subgate']=subgate
+            if subgate=='embedding':raise Unknown('SECRET_MODEL_PAYLOAD')
+            raise ValueError('SECRET_MODEL_PAYLOAD')
+        progress.update(model_constructed=True,weights_decoded=True,model_loaded=True)
+        return {'native_encoder_calls':1,'native_embedding_calls':3}
+    monkeypatch.setattr(gate,'operators',operators);monkeypatch.setattr(gate,'native_model',model)
+    if subgate:
+        with pytest.raises(ValueError,match='Native contract failed'):
+            gate.run_native(code,args.revision,out,rt.identity(out/'proof.json'),gate.time.monotonic()+600)
+        report=json.loads((out/'native.json').read_bytes())
+        assert report['status']=='fail'and report['failure_gate']==subgate
+        assert report['failure_class']==('ImportError'if subgate=='operators'else'other'if subgate=='embedding'else'ValueError')
+        assert 'SECRET'not in json.dumps(report)
+    else:
+        report=gate.run_native(code,args.revision,out,rt.identity(out/'proof.json'),gate.time.monotonic()+600)
+        assert report['status']=='pass'and report['subgate']=='complete'
+        assert 'failure_gate'not in report and 'failure_class'not in report
+    assert report['source_artifacts_rehashed_after']
+
+
 @pytest.mark.parametrize('fault',[None,'native_fail','source_posthash','foreign_entry','mutated_native','cleanup_error','missing_cid','late_publication'])
 def test_mock_dispatch_actual_complete_native_receipt_and_cleanup(gate,tmp_path,monkeypatch,fault):
     rt,root,code,args,c=setup(gate,tmp_path,monkeypatch);calls=[]
@@ -241,6 +330,13 @@ def test_mock_dispatch_actual_complete_native_receipt_and_cleanup(gate,tmp_path,
     assert report['owned_cleanup_verified']==(fault!='cleanup_error')
     assert report['source_artifacts_rehashed_after']==(fault!='source_posthash')
     assert report.get('owned_output_sealed')==(fault not in('foreign_entry','mutated_native','missing_cid'))
+    if fault:
+        expected={'native_fail':'native_receipt','source_posthash':'host_posthash','foreign_entry':'output_seal',
+                  'mutated_native':'output_seal','cleanup_error':'host_cleanup','missing_cid':'output_seal',
+                  'late_publication':'host_deadline'}
+        assert report['failure_gate']==expected[fault]
+        assert report['failure_class']==('TimeoutError'if fault=='late_publication'else'ValueError')
+    else:assert report['subgate']=='complete'and 'failure_gate'not in report and 'failure_class'not in report
     if fault=='late_publication':assert report['error']=='inclusive_host_deadline_exceeded'and report['elapsed_seconds']>=600
     if fault=='foreign_entry':
         p=root/'results'/('masa-native-qualification-'+args.revision)/'native/foreign'

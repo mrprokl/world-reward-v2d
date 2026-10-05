@@ -10505,3 +10505,18 @@ git-show confirms actual8fc5efe3 and the corrected assertion passes without
 pose rerun/output mutation. CPU CARI input preparation dispatched separately
 only after this audit; no complete refinement/export/packing claim for EP16.
 EP17 native pose remains live and EP19 waits the cooperative lock.
+
+c5e979b actual MASA isolated author runtime COMPLETE PASS372.559528s;
+report47017B/ac797a6c9c9fe3fe07e813aaad1425b6605c8eca16a36a8a3aed38b8bf928063.
+Independent read-only audit verifies all239 original Git files/full archive,
+52 wheels/ZIP metadata/publisher notices, four primary notice identities,
+sealed owned outputs, original base and child layers/owner/tag, native CPU log
+versions/isolated Python3.11/no CUDA initialization and both CID/name absences.
+Child sha256:5b4cda06057d53e3e1fdd5408e5b14aa2b702318df2b50252558d098300a5ec6;
+actual MMCV SHA256 f765bd9da2bae155715aa8da5d0b1bf9432cba3adc7eeacce7d21b7501ae4191
+also matches its original publisher MD5. No GPU kernel/model/quality claim.
+Prior read-only audit failures were directory/identity representation mistakes,
+not changed artifacts or runtime reruns. Data-free native qualifier now records
+only fixed sub-gates and allowlisted first exception classes, never exception
+text/arguments; core math/config/runtime AST stays unchanged. Parent135 combined
+tiny tests PASS2.69s. Real H100/checkpoint qualification is a separate fresh job.

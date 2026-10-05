@@ -25,6 +25,17 @@ HELPERS=('infra/masa_native_qualify.py','infra/run_masa_native_qualify.sh',CONFI
  'infra/mediapipe_cpu_runtime_verify.py','infra/masa_acquire.py','configs/masa_acquisition_v1.json',
  'infra/masa_runtime_build.py','configs/masa_runtime_v1.json','infra/mediapipe_hands_acquire.py')
 ENV=dict(PATH='/usr/bin:/bin',HOME='/nonexistent',LANG='C.UTF-8',DOCKER_HOST='unix://'+str(ROOT/'docker.sock'))
+FAILURE_GATES=frozenset(('bootstrap','runtime_import','operators','registry','config','model_construct','weights_decode',
+ 'strict_state','model_device','preprocess','encoder','embedding','native_posthash','native_deadline','gpu_lock',
+ 'gpu_idle','container_absence','container_dispatch','native_receipt','host_cleanup','host_posthash','output_seal','host_deadline'))
+EXCEPTION_CLASSES={cls:cls.__name__ for cls in (ImportError,ModuleNotFoundError,ValueError,TypeError,KeyError,AttributeError,
+ RuntimeError,OSError,FileNotFoundError,PermissionError,TimeoutError,MemoryError,AssertionError,subprocess.TimeoutExpired)}
+
+
+def failure(report,gate,exc):
+    """First failure only: fixed gate/type labels, never exception text or args."""
+    report.setdefault('failure_gate',gate if gate in FAILURE_GATES else 'other')
+    report.setdefault('failure_class',EXCEPTION_CLASSES.get(type(exc),'other'))
 
 
 def rt_helper(code):
@@ -173,6 +184,7 @@ def operators(torch,c):
 
 
 def native_model(torch,c,deadline,progress):
+    progress['subgate']='registry'
     import numpy as np
     import mmdet.models
     import mmdet.datasets.transforms
@@ -187,15 +199,21 @@ def native_model(torch,c,deadline,progress):
         m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
         if Path(m.__file__)!=p:raise ValueError('Native registry source origin differs')
     if any(n=='masa'or n.startswith('masa.')for n in sys.modules):raise ValueError('Root MASA package import forbidden')
+    progress['subgate']='config'
     cfg=Config.fromfile(str(DATA/'source'/c['source_execution']['config']));init_default_scope(cfg.default_scope)
     if not(cfg.model.given_dets and not cfg.model.load_public_dets and cfg.model.use_masa_backbone):raise ValueError('Original model branch differs')
+    progress['subgate']='model_construct'
     model=revert_sync_batchnorm(MODELS.build(cfg.model))
     progress['model_constructed']=True
+    progress['subgate']='weights_decode'
     payload=torch.load(DATA/c['checkpoint_policy']['file'],map_location='cpu',weights_only=True)
     progress['weights_decoded']=True
+    progress['subgate']='strict_state'
     state,layout=strict_state(torch,payload,model.state_dict());model.load_state_dict(state,strict=True)
     progress['model_loaded']=True
+    progress['subgate']='model_device'
     model.to('cuda').eval()
+    progress['subgate']='preprocess'
     p=c['procedural_model_control'];y,x,ch=np.indices((p['height'],p['width'],3))
     rgb=((x*3+y*5+ch*17)%256).astype(np.uint8)
     pipeline=Compose(cfg.inference_pipeline)
@@ -226,7 +244,9 @@ def native_model(torch,c,deadline,progress):
     if scale.cpu().tolist()!=torch.tensor(actual_scale,dtype=torch.float32).tolist():raise ValueError('Original full-image resize scale differs')
     boxes=torch.tensor(p['boxes_xyxy'],dtype=torch.float32,device='cuda');scaled=boxes*scale.repeat(2)
     with torch.no_grad():
+        progress['subgate']='encoder'
         features=model.masa_adapter(model.backbone.forward(inputs[:,0].contiguous()))
+        progress['subgate']='embedding'
         embeddings=model.track_head.predict(features,[scaled]);permutation=torch.tensor(p['permutation'],device='cuda')
         permuted=model.track_head.predict(features,[scaled[permutation]])
         empty=model.track_head.predict(features,[scaled[:0]])
@@ -255,16 +275,18 @@ def run_native(code,revision,out,proof_pin,deadline):
        image_id=proof['image_id'],protocol_identity=CONFIG_PIN,proof_identity=proof_pin,gpu_used=False,model_loaded=False,
        model_constructed=False,weights_decoded=False,
        challenge_inputs_used=False,ground_truth_used=False,quality_verified=False,adoption=False,tracking_correctness_verified=False,
-       identity_or_physical_ownership_verified=False,source_artifacts_rehashed_after=False)
+       identity_or_physical_ownership_verified=False,source_artifacts_rehashed_after=False,subgate='runtime_import')
     try:
         import torch
         rt.require(torch.__version__=='2.1.2+cu118'and torch.cuda.is_available()and torch.cuda.get_device_capability()==(9,0)
                    and 'H100'in torch.cuda.get_device_name()and sys.prefix==VENV,'Actual author H100 runtime required')
         report['gpu_used']=True
+        report['subgate']='operators'
         report['operators']=operators(torch,c);report['phase']='strict_checkpoint_model'
         report['model']=native_model(torch,c,deadline,report)
-        report.update(status='pass',phase='complete')
-    except BaseException:report['error']='bounded_native_contract_failed'
+        report.update(status='pass',phase='complete',subgate='complete')
+    except BaseException as exc:
+        failure(report,report['subgate'],exc);report['error']='bounded_native_contract_failed'
     finally:
         signal.setitimer(signal.ITIMER_REAL,0)
         try:
@@ -274,8 +296,10 @@ def run_native(code,revision,out,proof_pin,deadline):
             rt.require(rt.identity(out/'proof.json',4<<20)==proof_pin,'Native invocation proof changed')
             for path,pin in proof['files'].items():rt.require(rt.identity(Path(path),2500000000)==pin,'Frozen artifact changed after execution')
             report['source_artifacts_rehashed_after']=True
-        except BaseException:report.update(status='fail',error='native_source_artifact_posthash_failed')
-        if time.monotonic()>=deadline:report.update(status='fail',error='inclusive_native_deadline_exceeded')
+        except BaseException as exc:
+            failure(report,'native_posthash',exc);report.update(status='fail',error='native_source_artifact_posthash_failed')
+        if time.monotonic()>=deadline:
+            failure(report,'native_deadline',TimeoutError());report.update(status='fail',error='inclusive_native_deadline_exceeded')
         rt.write(out/'native.json',(json.dumps(report,sort_keys=True,allow_nan=False)+'\n').encode(),0o444)
     if report['status']!='pass':raise ValueError('Native contract failed')from None
     return report
@@ -344,12 +368,15 @@ def dispatch(args,code):
     lock=rt.canonical(ROOT/'jobs/.world-reward-h100.lock');s=lock.lstat();rt.require(stat.S_ISREG(s.st_mode)and s.st_nlink==1,'Existing cooperative GPU lock required')
     fd=acquire_lock_fd(lock)
     report=dict(stage='masa_native_qualification_host',status='fail',phase='preflight',source_binding=proof['source_binding'],producer_revision=args.revision,
-       image_id=args.image_id,protocol_identity=CONFIG_PIN,quality_verified=False,adoption=False,owned_cleanup_verified=False,source_artifacts_rehashed_after=False)
+       image_id=args.image_id,protocol_identity=CONFIG_PIN,quality_verified=False,adoption=False,owned_cleanup_verified=False,
+       source_artifacts_rehashed_after=False,subgate='gpu_lock')
     try:
         fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB)
         rt.require((os.fstat(fd).st_dev,os.fstat(fd).st_ino)==(s.st_dev,s.st_ino),'Existing cooperative lock changed')
+        report['subgate']='gpu_idle'
         idle=command(['nvidia-smi','--query-compute-apps=pid','--format=csv,noheader,nounits'],deadline)
         rt.require(idle.returncode==0 and not idle.stdout.strip(),'GPU busy after lock')
+        report['subgate']='container_absence'
         absent=command(['docker','ps','-aq','--no-trunc','--filter','name=^/'+name+'$'],deadline)
         rt.require(absent.returncode==0 and not absent.stdout.strip(),'Fresh exact native container name required')
         mounts=[code.parent,*map(Path,proof['old_source_parents']),DATA,ROOT/'results'/('masa-runtime-build-'+args.runtime_revision)]
@@ -363,7 +390,9 @@ def dispatch(args,code):
           'MPLBACKEND=Agg','PYTHONDONTWRITEBYTECODE=1',VENV+'/bin/python',
           '-I','-B',str(code/HELPERS[0]),'--native','--revision',args.revision,'--out',str(native),'--proof-bytes',str(proof_pin['bytes']),
           '--proof-sha256',proof_pin['sha256'],'--deadline',repr(deadline)]
+        report['subgate']='container_dispatch'
         report['phase']='native';r=command(argv,deadline,log=out/'native.log',pass_fds=(fd,));report['native_exit_status']=r.returncode
+        report['subgate']='native_receipt'
         report['native_report_identity']=rt.identity(native/'native.json',100000)
         n=rt.pinned(native/'native.json',report['native_report_identity'],100000)
         same(rt,n,dict(stage='masa_native_data_free_contract',status='pass',phase='complete',producer_revision=args.revision,
@@ -373,18 +402,22 @@ def dispatch(args,code):
           identity_or_physical_ownership_verified=False))
         rt.require(r.returncode==0 and n['operators']['checkpoint_read']is False and n['model']['native_encoder_calls']==1
           and n['model']['native_embedding_calls']==3,'Real native operator-before-checkpoint/full bank census required')
-        report.update(status='pass',phase='complete',native_report_identity=rt.identity(native/'native.json',100000))
-    except BaseException:report['error']='bounded_native_lifecycle_failed'
+        report.update(status='pass',phase='complete',subgate='complete',native_report_identity=rt.identity(native/'native.json',100000))
+    except BaseException as exc:
+        failure(report,report['subgate'],exc);report['error']='bounded_native_lifecycle_failed'
     finally:
         signal.setitimer(signal.ITIMER_REAL,0)
         try:cleanup(rt,cid,name,args.image_id,args.revision,deadline+GRACE);report['owned_cleanup_verified']=True
-        except BaseException:report.update(status='fail',error='owned_native_cleanup_failed')
+        except BaseException as exc:
+            failure(report,'host_cleanup',exc);report.update(status='fail',error='owned_native_cleanup_failed')
         try:
             rt.require(authenticate(rt,code,args)=={k:v for k,v in proof.items()if k!='host_start_monotonic'},'Native inputs/source changed after cleanup')
             rt.require(image(rt,args.image_id,deadline+GRACE)==proof['image'],'Actual runtime changed');report['source_artifacts_rehashed_after']=True
-        except BaseException:report.update(status='fail',error='source_artifact_runtime_postcheck_failed')
+        except BaseException as exc:
+            failure(report,'host_posthash',exc);report.update(status='fail',error='source_artifact_runtime_postcheck_failed')
         report['elapsed_seconds']=time.monotonic()-started
-        if report['elapsed_seconds']>=BUDGET:report.update(status='fail',error='inclusive_host_deadline_exceeded')
+        if report['elapsed_seconds']>=BUDGET:
+            failure(report,'host_deadline',TimeoutError());report.update(status='fail',error='inclusive_host_deadline_exceeded')
         try:
             if 'native_report_identity'in report:
                 rt.require(rt.identity(native/'native.json',100000)==report['native_report_identity'],'Actual native receipt changed after cleanup')
@@ -392,7 +425,8 @@ def dispatch(args,code):
                 rt.require(set(out.rglob('*'))=={native,cid,out/'native.log',native/'proof.json',native/'native.json'},
                            'Complete native success output inventory required')
             report['outputs']=seal_outputs(rt,out,native,out_owner,native_owner,proof_pin);report['owned_output_sealed']=True
-        except BaseException:report.update(status='fail',error='owned_output_sealing_failed',owned_output_sealed=False)
+        except BaseException as exc:
+            failure(report,'output_seal',exc);report.update(status='fail',error='owned_output_sealing_failed',owned_output_sealed=False)
         rt.require(rt.canonical(out)==out and namespace_key(out)==out_owner,'Never publish into a foreign result namespace')
         report_path=out/'report.json';report_fd=os.open(report_path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o400)
         with os.fdopen(report_fd,'wb')as stream:
@@ -400,6 +434,7 @@ def dispatch(args,code):
             os.fchmod(stream.fileno(),0o444);out.chmod(0o555)
             elapsed=time.monotonic()-started
             if elapsed>=BUDGET and report['status']=='pass':
+                failure(report,'host_deadline',TimeoutError())
                 report.update(status='fail',elapsed_seconds=elapsed,error='inclusive_host_deadline_exceeded')
                 stream.seek(0);stream.truncate();stream.write((json.dumps(report,sort_keys=True,allow_nan=False)+'\n').encode())
                 stream.flush();os.fsync(stream.fileno())
@@ -448,4 +483,6 @@ def main():
 
 if __name__=='__main__':
     try:main()
-    except BaseException:print('MASA native contract failed',file=sys.stderr);raise SystemExit(1)from None
+    except BaseException as exc:
+        diagnostic={};failure(diagnostic,'bootstrap',exc)
+        print('MASA native contract failed '+json.dumps(diagnostic,sort_keys=True),file=sys.stderr);raise SystemExit(1)from None
