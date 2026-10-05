@@ -1,0 +1,94 @@
+{
+  "schema": "world_reward.proposal_external_acquire.v1",
+  "output": "/srv/world-reward-data/proposal_external_rgb_v1",
+  "slots": 32,
+  "dev": 16,
+  "reserved": 16,
+  "workers": 6,
+  "overall": 300,
+  "request_timeout": 15,
+  "max_image_bytes": 16777216,
+  "max_creator_page_bytes": 2097152,
+  "max_decoded_pixels": 16777216,
+  "max_total_image_bytes": 536870912,
+  "public_id_namespace": "world_reward.proposal_external_rgb_v1/",
+  "no_replacements": true,
+  "retry_count": 0,
+  "census": {
+    "producer_revision": "d1de716d9d6e94165d14224d17dee36fe2ef2fe5",
+    "report": {
+      "path": "results/proposal-external-census-v1/report.json",
+      "pin": {
+        "bytes": 3847,
+        "sha256": "5c9362852da341159ceefdfe37e4b866a06840ff4d69fbf281424d38b28e3849"
+      }
+    },
+    "cohort": {
+      "path": "results/proposal-external-census-v1/cohort.json",
+      "pin": {
+        "bytes": 18076,
+        "sha256": "4db28db7b8c9beb0ce58e574e8f012f05c86ef7447ff056a269d4b04cd74ed33"
+      }
+    }
+  },
+  "reused_helper_pins": {
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "infra/openimages_joint_pair_acquire.py": {
+      "bytes": 23252,
+      "sha256": "ab0cac6d8a66550b8898a6add435fe92bc2546cbb7536723d4de3b8d8597ad49"
+    },
+    "infra/proposal_external_census.py": {
+      "bytes": 14362,
+      "sha256": "a232af3312c10794211d483e314e56ce9f65977761bce95413bbc02bdd2b628f"
+    },
+    "infra/openimages_joint_pair_census.py": {
+      "bytes": 9799,
+      "sha256": "251da609bd87d40b5f63a06977ec2c1587c2019193c99a1650861baa32074ac9"
+    }
+  },
+  "census_helper_pins": {
+    "infra/proposal_external_census.py": {
+      "bytes": 14362,
+      "sha256": "a232af3312c10794211d483e314e56ce9f65977761bce95413bbc02bdd2b628f"
+    },
+    "infra/run_proposal_external_census.sh": {
+      "bytes": 711,
+      "sha256": "3cc1fff96c0f1c0080260bc4a3cd73d498188c01ca8602642428dc2b75e8a2a8"
+    },
+    "configs/proposal_external_census_v1.json": {
+      "bytes": 3994,
+      "sha256": "3be296f6a65a14d84e094971fbc6eee8aa8c1d4b39dfe38b47f907614ca6dbbf"
+    },
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "infra/openimages_joint_pair_census.py": {
+      "bytes": 9799,
+      "sha256": "251da609bd87d40b5f63a06977ec2c1587c2019193c99a1650861baa32074ac9"
+    },
+    "infra/openimages_joint_pair_acquire.py": {
+      "bytes": 23252,
+      "sha256": "ab0cac6d8a66550b8898a6add435fe92bc2546cbb7536723d4de3b8d8597ad49"
+    }
+  },
+  "scope": {
+    "original_RGB_only": true,
+    "reference_geometry_read": false,
+    "models_loaded": false,
+    "gpu_used": false,
+    "predictions_read": false,
+    "quality_verified": false,
+    "training_overlap_verified": false,
+    "challenge_overlap_verified": false,
+    "adopted": false,
+    "rights_private": true,
+    "all32_slots_private_manifest": true,
+    "public_manifest": "world_reward.rgb_proposal_inputs.v1_exact_6_keys_acquired_only_original_slot_filenames",
+    "creator_name_license_landing_verified_only": true,
+    "creator_account_identity_independently_verified": false
+  }
+}

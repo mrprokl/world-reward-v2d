@@ -97,3 +97,23 @@ defines `MaskPath`/`BoxID`; its CSV box is the annotation starting box, **not th
 mask's bounding box**. Instance masks omit small/ambiguous instances, so do not
 invent missing mask ground truth. Avoid that acquisition until bbox coverage
 justifies it. No ownership/adoption/CARI4D/leaderboard win follows from this gate.
+
+## Actual census and bounded acquisition implementation
+
+Actual producer`d1de716d9d6e94165d14224d17dee36fe2ef2fe5` completes census
+PASS3.274094s:208excluded IDs/197canonical excluded authors,
+175eligible remaining records/164distinct new authors. Frozen32cohort18076B SHA
+`4db28db7b8c9beb0ce58e574e8f012f05c86ef7447ff056a269d4b04cd74ed33`;
+report3847B SHA`5c9362852da341159ceefdfe37e4b866a06840ff4d69fbf281424d38b28e3849`.
+Parent's independent census audit and actual acquisition result are separate.
+
+New acquisition driver reuses unchanged original creator-rights/HTTPS/MD5/JPEG
+mechanics:32fixed slots,6workers,300s inclusive,16MiB/JPEG,15s socket timeout,
+zero retry/replacement. Full current/historical census source and all seven
+metadata inputs rehash before/after. Private root-only rights/ledger400 and
+directories500 retain every slot, including failed downloads. JPEG originals
+move by the same inode to`inputs/image_<original-slot:06d>.jpg`, unchanged hash,
+no duplicate or re-encoding. Public`rgb_proposal_inputs.v1` contains acquired RGB
+only and exactly six fields per image; no original ID/author/split/relations.
+Missing slots remain solely in the private manifest, not fake images. No GT,
+model, GPU, reference geometry or scientific success is implied by acquisition.

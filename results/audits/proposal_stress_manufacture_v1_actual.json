@@ -1,0 +1,30 @@
+{
+  "schema": "world_reward.proposal_stress_manufacture_actual.v1",
+  "status": "pass",
+  "producer_revision": "d7e1f8d61ae91611cc36da41e3cef6e49e039e04",
+  "report": {
+    "bytes": 22773,
+    "sha256": "aac632ee57d97266477042c7741e373e11740f98aba65d89daacba3e632b5549"
+  },
+  "public_manifest": {
+    "bytes": 6494,
+    "sha256": "c8faacc4487d2e3f4172c666334465321fd6bbc16a4660687629a604942834ce"
+  },
+  "source_entries": 264,
+  "source_files": 259,
+  "source_closure_sha256": "2bbb4f4698357a40639a3b0c9c7e0a3c940e6b9cc1cfdb04ff634052ba847b1b",
+  "archive_sha256": "b48f75c29fa159c1c372c1dbd89b85c75c0e3de00a3a919a41156d275f96384e",
+  "images": 32,
+  "native_model_loads": 1,
+  "native_MHR_forward_calls": 1,
+  "native_elapsed_seconds": 11.859999293985311,
+  "native_prerequisites_verified": true,
+  "all_original_rgb_and_opaque_private_files_hashed": true,
+  "reference_values_parsed": false,
+  "source_model_inputs_outputs_rehashed_after": true,
+  "original_owned_container_absent": true,
+  "gpu_idle": true,
+  "new_model_or_GPU_calls_in_audit": 0,
+  "quality_verified": false,
+  "adoption": false
+}
