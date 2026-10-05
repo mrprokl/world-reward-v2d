@@ -93,3 +93,20 @@ commercial prohibition. No publisher message or agreement has been obtained.
    Our continuous-XYWH retrieval is **not official V-COCO AP** (official evaluator
    uses clipped inclusive+1 IoU and two missing-role scenarios). Do not relabel
    role retrieval as ownership, contact accuracy, Track1 victory or eligibility.
+
+## October6 actual feasibility and private pilot decision
+
+Original opaque acquisition and crowded-role capacity are independently audited:
+199 eligible VAL photos and362 TEST, after all432 historical photo exclusions.
+No TRAIN-role capacity, RGB, fitting or pair-retrieval quality was measured.
+The follow-on pilot freezes8DEV/8RESERVED before original RGB, never replaces
+failed slots and exposes only the six-field opaque image manifest to inference.
+
+For that **private, unfitted pilot only**, accept the original publisher-recorded
+individual CC-BY2 photo grant, retaining source/Flickr/license metadata and
+disclosing creator identity as UNKNOWN. This repeats the authority distinction
+used in the earlier original-COCO research protocol; it is not a new creator
+authentication, legal guarantee, data redistribution or submission clearance.
+Existing model-specific COCO exposure and unknown exact-photo/challenge overlap
+must remain explicit before inference. See `vcoco_role_pilot_protocol.md` and
+the separate prospective configuration, not a measured selector claim.

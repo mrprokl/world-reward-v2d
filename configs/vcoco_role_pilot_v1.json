@@ -1,0 +1,102 @@
+{
+  "schema": "world_reward.vcoco_role_prepare_config.v1",
+  "output": "/srv/world-reward-data/vcoco_role_pilot_v1",
+  "census": {
+    "producer_revision": "3f445f2d9ee4b2e9849ff15f5dd2cd31cbed964c",
+    "closure_sha256": "7b7891c92772c199a66d66d156d994bedb275707065324ce73add4cd3f6faefa",
+    "files": 300,
+    "entries": 305,
+    "archive_xz_sha256": "0af4bd1a440cfddfd819ee79d20f58d135faec71664b70810d9b957e9a5a6361",
+    "report": {
+      "path": "/srv/world-reward-data/vcoco_role_census_v1/report.json",
+      "pin": {
+        "bytes": 20320,
+        "sha256": "79142e6a49d11e3570ff28a41cb09b86056769052823e30a6b25b29712a37975"
+      }
+    },
+    "configuration": {
+      "path": "/srv/scenesmith/world-reward/jobs/3f445f2d9ee4b2e9849ff15f5dd2cd31cbed964c/run_vcoco_role_census/code/configs/vcoco_role_census_v1.json",
+      "pin": {
+        "bytes": 23243,
+        "sha256": "d994ce033a4268e8dd572299e6e183ab18118352006b2a78ce4a20ba269958d2"
+      }
+    }
+  },
+  "helper_pins": {
+    "infra/vcoco_role_census.py": {
+      "bytes": 29942,
+      "sha256": "5c785eca755a4d7be16c398a3e2b6e6c74e347e95e1ae3cbbf01adc626c9f09e"
+    },
+    "infra/metadata_json_stream.py": {
+      "bytes": 8322,
+      "sha256": "742b10d5f92e3446d17d4953f1d088281f051577653899ddcc7081f61545bf53"
+    },
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "infra/openimages_joint_pair_acquire.py": {
+      "bytes": 23252,
+      "sha256": "ab0cac6d8a66550b8898a6add435fe92bc2546cbb7536723d4de3b8d8597ad49"
+    },
+    "infra/coco_proposal_prepare.py": {
+      "bytes": 24704,
+      "sha256": "ee9ec3ddd540ec485ef6bbe5812dda5f98760e9633cd3c11fdc49dbde2f66574"
+    },
+    "infra/vcoco_role_stream.py": {
+      "bytes": 10552,
+      "sha256": "e2d213677aa91677f343a337f959e4023961416419a2a3d0f4c3665aca26a70f"
+    },
+    "src/world_reward/vcoco_role_reference.py": {
+      "bytes": 11628,
+      "sha256": "6aa4e088d8da9575b58645445db1231dfe3b2f9e710c75a3b2da4af2c6cdc75a"
+    }
+  },
+  "select": {
+    "budget_seconds": 1200,
+    "outer_seconds": 1215,
+    "max_host_memory_bytes": 8589934592,
+    "hash_namespace": "world_reward.vcoco_role_pilot_v1/",
+    "slots": 16,
+    "dev": 8,
+    "reserved": 8,
+    "dev_native_split": "val",
+    "reserved_native_split": "test",
+    "minimum_noncrowd_people": 2,
+    "minimum_nonperson_objects": 2,
+    "minimum_localized_positive_pairs": 1,
+    "expected_distinct_photos": {"val": 199, "test": 362},
+    "expected_inventory": {
+      "bytes": 36117,
+      "sha256": "7c374f0ff34d340983d93a117e51a4fcf09d4d4425e4d56392a327d84dd6c733"
+    },
+    "no_replacements": true,
+    "network_allowed": false,
+    "RGB_allowed": false,
+    "FIT_allowed": false
+  },
+  "acquire": {
+    "budget_seconds": 300,
+    "outer_seconds": 315,
+    "max_host_memory_bytes": 8589934592,
+    "workers": 4,
+    "request_timeout": 15,
+    "max_image_bytes": 16777216,
+    "max_decoded_pixels": 16777216,
+    "max_total_image_bytes": 268435456,
+    "min_acquired_dev": 6,
+    "min_acquired_reserved": 6,
+    "retry_count": 0,
+    "no_replacements": true,
+    "original_bucket": "https://s3.amazonaws.com/images.cocodataset.org/",
+    "image_license_id": 4,
+    "image_license_url": "http://creativecommons.org/licenses/by/2.0/",
+    "grant_authority": "publisher_recorded_individual_image_license_not_independent_creator_authentication",
+    "creator_identity": "UNKNOWN",
+    "rights_decision": "accept_publisher_CC_BY_2_record_for_private_unfitted_pilot_only",
+    "pretraining_overlap": "COCO_family_declared_exact_photo_and_challenge_overlap_unknown",
+    "raw_redistribution": false,
+    "FIT_allowed": false,
+    "submission_eligibility_verified": false
+  }
+}
