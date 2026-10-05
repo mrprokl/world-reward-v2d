@@ -9988,3 +9988,23 @@ Minimal fix requests `--format {{.Id}}`, preserving the strict previously pinned
 absence parser rather than accepting arbitrary output. Both FAILED units/logs
 and original seven prediction artifacts remain unchanged; zero labels/models
 or new GPU calls. This is lifecycle compatibility, not a scientific result.
+
+6f1442e independent saved-only audit v3 actual PASS5.747497s, native2.963613s:
+both full prediction ABIs, original source/runtime/bank/1493 RGB hash-only
+inputs and unchanged original CID stat verified before/after. Exact original
+FAILED unit/CID/name census and owned new-container cleanup pass; original
+HOSTFAIL is not modified. Host5252B/
+e1b766b047aa8d506716466865d775f099ad36cdc6a87865dadb921d901dc0f2;
+native16835B/993c7ef266575d931b06190902cbfb104402556056f9fde5f3a785e9bc55cac5.
+Zero models/decoders/trackers/GPU/private-reference values. These exact independent
+pins now qualify the frozen CPU evaluator input, not semantic or3D accuracy.
+
+bee1d8e HOI-DETR acquisition actual PASS74.206341s:1143 retained artifacts,
+5,860,644,421B entirely Azure, both full source and artifact posthash verified.
+Complete pinned2639-blob Git tree and3 link texts authenticated; media/archive
+removed and original licenses/card verified before5.855GB opaque checkpoint.
+Report4471B/b424f6227cefe69a9e112310a226b84cfcd44780f14fa3cf31f71934dad709a3;
+source manifest755745B/8ed68b93269dd216272c702603b56487ff47debaa38b72d891740d417f69b0fd.
+No checkpoint decode, upstream import/install/build/inference, runtime approval
+or overlap clearance.273 integrated tiny tests PASS2.79s; whole-stack native
+qualification and external relational evidence remain the next separate gates.
