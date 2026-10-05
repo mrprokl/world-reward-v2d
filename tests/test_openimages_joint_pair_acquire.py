@@ -94,6 +94,19 @@ def test_old_exclusions_use_only_original_selected_metadata():
     assert len(result['ids']) == len(result['photo']) == len(result['md5']) == 2
 
 
+def test_old_flickr_set_navigation_still_excludes_exact_photo_without_request_alias():
+    row = metadata(200)
+    original = row['OriginalLandingURL']
+    row['OriginalLandingURL'] = original+'in/set-123456789'
+    result = acq.old_exclusions([(1, dict(selected_ids=[row['ImageID']], public_metadata=[row]))])
+    assert result['photo'] == {'300'}
+    assert acq.excluded_photo_identity(original) == '300'
+    with pytest.raises(ValueError):
+        acq.photo_identity(row['OriginalLandingURL'])
+    with pytest.raises(ValueError):
+        acq.excluded_photo_identity('https://www.flickr.com.evil/photos/a/300/in/set-123')
+
+
 @pytest.mark.parametrize('change', ['empty_author', 'empty_md5', 'ineligible'])
 def test_unusable_selection_does_not_fetch_or_replace(change):
     rows = census(3)

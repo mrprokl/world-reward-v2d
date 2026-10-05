@@ -11012,3 +11012,28 @@ Joint-pair census independent saved-only audit PASS0.170045s:250Gitfiles,
 255source entries closure78105e30…e644a/archivee62918fa…bbd5f; sixoriginal
 publisher/exclusion CSV/census files rehashed, report444/out555 unchanged.
 No RGB/models/predictions/network. Compact results/audits/openimages_joint_pair_census_v1_actual.json.
+
+Future surfaceprepare Docker limits4CPU/64GiB/256PIDs and4BLAS/OpenMPthreads
+verified301PASS/1platformskip29.31s. First parallel local test run lost shared
+pytest temporary root when another process with retention_none finished; that
+run was invalid (122pass/1failure/178fixtureerrors), not a native outcome. Rerun
+used a unique owned basetemp and passed; parallel agents now use distinct temps.
+The original running17 receipt/source untouched. Fresh19CPUprepare dispatched
+447f25d738e50635bf5d0c3932e40dc6a76ab906 (ACK/result pending): resource census
+327GBavailable/load2.17, old17Docker~1.34GB/noGPU/80PIDs. New19container independently
+capped4CPU64GiB and native math unchanged; no timing-isolation benchmark claimed.
+
+Fresh64 acquisition dispatched447f25d,32DEV/32TEST/oneauthor+MD5/photoidentity,
+selection sealed before HTTP; ACK/result pending. Root150combined acquisition/
+metric/generic-bank/transport tiny testsPASS0.23s; native models not yet run on
+this new cohort. Missing rights/downloads/header support remain fixed-slot misses.
+
+First acquisition447f25d CLOSEDpreflightFAIL before cohort/output/HTTP: one old
+excluded metadata landingURL has publisher `/in/set-72157625087382834` navigation
+suffix. Exclusion photo identity parser was too narrow. Correct only oldmetadata
+identity parsing to recognize this exactFlickrset suffix and still exclude the
+samephotoID; NEW creator request/HTTPS/rights/MD5/redirect rules remain unchanged.
+No image/prediction/metric read, sample/params unchanged.64focusedtestsPASS0.10s,
+new regression explicitly forbids set-suffix acquisition URL. New unit/revision
+required for retry; old failedunit/log/source untouched. No researcher intervention
+on any image label or challenge episode.

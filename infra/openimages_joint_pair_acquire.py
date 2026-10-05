@@ -73,6 +73,18 @@ def photo_identity(url):
     return match.group(1)
 
 
+def excluded_photo_identity(url):
+    """Metadata identity only: Flickr set navigation never creates a new photo.
+
+    This accepts the original publisher's /in/set-... suffix for EXCLUSION,
+    never for a creator request or acquisition URL. New image rights still
+    require the unchanged exact HTTPS landing page and no redirects.
+    """
+    match = re.fullmatch(r'https://www\.flickr\.com/photos/[^/?#]+/([0-9]+)(?:/in/set-[0-9]+)?/?', url)
+    rt.require(match is not None, 'Exact publisher Flickr exclusion identity required')
+    return match.group(1)
+
+
 def md5_identity(value):
     raw = base64.b64decode(value, validate=True)
     rt.require(len(raw) == 16 and base64.b64encode(raw).decode() == value, 'Canonical original MD5 required')
@@ -92,7 +104,7 @@ def old_exclusions(groups):
             if row['OriginalMD5']:
                 excluded['md5'].add(md5_identity(row['OriginalMD5']))
             excluded['url'].add(row['OriginalURL'])
-            excluded['photo'].add(photo_identity(row['OriginalLandingURL']))
+            excluded['photo'].add(excluded_photo_identity(row['OriginalLandingURL']))
     return excluded
 
 
