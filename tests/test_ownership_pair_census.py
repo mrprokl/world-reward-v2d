@@ -11,6 +11,12 @@ import pytest
 import ownership_pair_census as p
 
 
+@pytest.fixture(autouse=True)
+def strict_default_version(monkeypatch):
+    monkeypatch.setattr(p, 'ENTRY', p.V1_ENTRY); monkeypatch.setattr(p, 'CONFIG', p.V1_CONFIG)
+    monkeypatch.setattr(p, 'HELPERS', p.V1_HELPERS)
+
+
 def metadata(i, author=None):
     return dict(ImageID=f'{i:016x}', OriginalLandingURL=f'https://www.flickr.com/photos/a{i}/{100000+i}/',
                 OriginalURL=f'https://c1.staticflickr.com/{i}_o.jpg', OriginalSize='123',
@@ -177,7 +183,8 @@ def test_config_pins_exact_four_cached_csv_six_ledgers_and_helper_sources():
     assert all(p.pin((root/k).read_bytes()) == v for k,v in cfg['reused_helper_pins'].items())
 
 
-def fake_run(monkeypatch, tmp_path, *, enough=True, changed=False, failing=False):
+def fake_run(monkeypatch, tmp_path, *, enough=True, changed=False, failing=False, v2=False, prior_changed=False):
+    if v2: p._select_version([p.V2_FLAG])
     root=Path(__file__).resolve().parents[1]; cfg=json.loads((root/p.CONFIG).read_text())
     target=tmp_path/'root'; (target/'results').mkdir(parents=True)
     code=tmp_path/'immutable-code'; (code/'infra').mkdir(parents=True)
@@ -197,6 +204,12 @@ def fake_run(monkeypatch, tmp_path, *, enough=True, changed=False, failing=False
     def source_read(*_):
         calls.append('source'); return {'changed':True} if changed and calls.count('source')>1 else source
     monkeypatch.setattr(p.rt,'source',source_read); monkeypatch.setattr(p,'configuration',lambda *_:cfg)
+    if v2:
+        reads=[]
+        def prior_read(*_):
+            reads.append(1)
+            return dict(immutable='changed' if prior_changed and len(reads)>2 else 'same')
+        monkeypatch.setattr(p,'_prior_failure',prior_read)
     monkeypatch.setattr(p.signal,'setitimer',lambda *_:None)
     def collect(*_):
         calls.append('collect')
@@ -263,3 +276,116 @@ def test_late_publication_after_seal_write_or_identity_cannot_leave_pass(monkeyp
 def test_fresh_output_namespace_not_reused(monkeypatch,tmp_path):
     output,_=fake_run(monkeypatch,tmp_path); output.mkdir()
     with pytest.raises(ValueError,match='Fresh'): p.run()
+
+
+def test_version_flag_explicit_and_default_strict():
+    p._select_version([p.V2_FLAG])
+    assert p.ENTRY=='run_ownership_pair_census_v2' and p.CONFIG=='configs/ownership_pair_census_v2.json'
+    assert p.V1_CONFIG in p.HELPERS and p.V1_HELPERS[1] in p.HELPERS
+    p._select_version([])
+    assert (p.ENTRY,p.CONFIG,p.HELPERS)==(p.V1_ENTRY,p.V1_CONFIG,p.V1_HELPERS)
+
+
+@pytest.mark.parametrize('args', [['--unknown'],[p.V2_FLAG,p.V2_FLAG],['--reject-invalid-identities-v2=1'],['image-id']])
+def test_unknown_version_or_per_image_flag_rejected(args):
+    with pytest.raises(ValueError,match='explicit'): p._select_version(args)
+
+
+def v2_collect_fixture(monkeypatch, n):
+    rows=[metadata(1000+i) for i in range(n)]
+    relations=[dict(ImageID=r['ImageID'],RelationshipLabel='holds',LabelName1='p',LabelName2='o') for r in rows]
+    data=dict(metadata=rows,relations=relations,triplets=[relations[0]],boxes=[])
+    monkeypatch.setattr(p.census,'csv_rows',lambda name:iter(data[name]))
+    monkeypatch.setattr(p.census,'image_census',lambda *_:dict(metadata_eligible=True,unscorable_positive_pairs=0))
+    return rows, data, dict(human_classes=['p'],body_part_classes=[],identity_policy=p.V2_POLICY)
+
+
+@pytest.mark.parametrize('bad', ['https://flickr.com/photos/a/123/', 'http://www.flickr.com/photos/a/123/',
+                                'https://www.flickr.com/unrecognized/'])
+def test_v2_rejects_counts_not_normalizes_landing_v1_still_fails(monkeypatch,bad):
+    rows,data,cfg=v2_collect_fixture(monkeypatch,97); rows[0]['OriginalLandingURL']=bad
+    before=deepcopy(rows)
+    counts=p.collect({k:k for k in data},cfg,empty(),lambda:None)
+    assert counts['invalid_metadata_identity_images']==1 and counts['independent_slots_lower_bound']==96
+    assert rows==before
+    del cfg['identity_policy']
+    with pytest.raises(ValueError,match='exclusion'): p.collect({k:k for k in data},cfg,empty(),lambda:None)
+
+
+@pytest.mark.parametrize('n,expected',[(97,96),(96,95)])
+def test_v2_reject_count_does_not_relax96_capacity(monkeypatch,n,expected):
+    rows,data,cfg=v2_collect_fixture(monkeypatch,n); rows[0]['AuthorProfileURL']='UNKNOWN'
+    counts=p.collect({k:k for k in data},cfg,empty(),lambda:None)
+    assert counts['invalid_metadata_identity_images']==1 and counts['independent_slots_lower_bound']==expected
+    assert (counts['independent_slots_lower_bound']>=96)==(expected==96)
+
+
+def test_v2_missing_metadata_field_or_duplicate_id_still_fail_closed(monkeypatch):
+    rows,data,cfg=v2_collect_fixture(monkeypatch,2); del rows[0]['OriginalLandingURL']
+    with pytest.raises(ValueError,match='fields'): p.collect({k:k for k in data},cfg,empty(),lambda:None)
+    rows,data,cfg=v2_collect_fixture(monkeypatch,2); data['metadata'].append(deepcopy(rows[0]))
+    with pytest.raises(ValueError,match='Duplicate'): p.collect({k:k for k in data},cfg,empty(),lambda:None)
+
+
+def test_v2_invalid_historical_identity_is_never_skipped():
+    p._select_version([p.V2_FLAG]); values=historical()
+    values[0]['public_metadata'][0]['OriginalLandingURL']='https://flickr.com/photos/a/123/'
+    with pytest.raises(ValueError,match='exclusion'): p._historical_exclusions(values)
+
+
+@pytest.mark.parametrize('enough',[True,False])
+def test_v2_native_lifecycle_explicit_policy_and_capacity(monkeypatch,tmp_path,capsys,enough):
+    output,_=fake_run(monkeypatch,tmp_path,enough=enough,v2=True); report=p.run(); capsys.readouterr()
+    assert report['status']=='pass' and report['capacity_gate_passed'] is enough
+    assert report['identity_policy']==p.V2_POLICY and report['invalid_identities_normalized'] is False
+    assert report['original_closed_failure']==dict(immutable='same')
+    assert json.loads((output/'report.json').read_bytes())==report
+
+
+def test_v2_prior_failure_changed_after_collect_closes_before_pass(monkeypatch,tmp_path,capsys):
+    output,_=fake_run(monkeypatch,tmp_path,v2=True,prior_changed=True); report=p.run(); capsys.readouterr()
+    assert report['status']=='fail' and report['source_and_inputs_rehashed_after'] is False
+    assert json.loads((output/'report.json').read_bytes())['status']=='fail'
+
+
+def test_v2_configuration_is_explicit_same_inputs_catalog_capacity(monkeypatch):
+    p._select_version([p.V2_FLAG]); root=Path(__file__).resolve().parents[1]
+    source=dict(helpers={n:p.pin((root/n).read_bytes()) for n in p.HELPERS})
+    def pinned(path,expected,*_):
+        raw=path.read_bytes(); assert p.pin(raw)==expected; return p.rt.strict(raw)
+    monkeypatch.setattr(p.rt,'pinned',pinned)
+    cfg=p.configuration(root,source)
+    assert cfg['identity_policy']==p.V2_POLICY and cfg['minimum_independent_slots']==96
+    actual=pinned
+    def malformed(path,expected,*a):
+        value=actual(path,expected,*a)
+        if str(path).endswith(p.CONFIG): value['identity_policy']='normalize_guess'
+        return value
+    monkeypatch.setattr(p.rt,'pinned',malformed)
+    with pytest.raises(ValueError,match='Frozen'):p.configuration(root,source)
+
+
+def test_original_fail_authentication_requires_actual_failure_and_original_source(monkeypatch,tmp_path):
+    root=tmp_path/'root'; cfg=json.loads((Path(__file__).resolve().parents[1]/'configs/ownership_pair_census_v2.json').read_text())
+    row=cfg['original_failed_receipt']; path=tmp_path/'report.json'; path.write_bytes(b'PLACEHOLDER'); path.chmod(0o444)
+    row['path']=str(path); code=root/'jobs'/row['producer_revision']/p.V1_ENTRY/'code'; code.mkdir(parents=True)
+    (code.parent/'source-sha256').write_text(row['source_archive_sha256']+'\n'); (code/'source').write_text('fixture')
+    row['source_files']=1
+    source=dict(helpers={p.V1_HELPERS[0]:row['original_driver'],p.V1_CONFIG:dict(bytes=1,sha256='0'*64)},closure_sha256=row['source_closure_sha256'])
+    report=dict(schema='world_reward.ownership_pair_census.v1',status='fail',error_type='ValueError',producer_revision=row['producer_revision'],
+                source_binding=source,configuration_identity=source['helpers'][p.V1_CONFIG],**{k:False for k in
+                ('selection_performed','rgb_read','network_used','predictions_read','models_loaded','gpu_used','historical_reference_values_read')})
+    monkeypatch.setattr(p,'ROOT',root); monkeypatch.setattr(p.rt,'pinned',lambda *_:deepcopy(report))
+    monkeypatch.setattr(p.rt,'source',lambda *_:source)
+    assert p._prior_failure(cfg)['source_binding']==source
+    report['status']='pass'
+    with pytest.raises(ValueError,match='closed'):p._prior_failure(cfg)
+
+
+def test_old_v1_configuration_and_wrapper_bytes_preserved():
+    root=Path(__file__).resolve().parents[1]
+    cfg=json.loads((root/'configs/ownership_pair_census_v2.json').read_text())
+    for name in (p.V1_CONFIG,p.V1_HELPERS[1]):
+        assert p.pin((root/name).read_bytes())==cfg['reused_helper_pins'][name]
+    assert cfg['reused_helper_pins'][p.V1_CONFIG]==dict(bytes=4877,sha256='28e82c5607a7453b376991c67fd1926149a70808ba002a5891d801b50506a5cb')
+    assert cfg['reused_helper_pins'][p.V1_HELPERS[1]]==dict(bytes=758,sha256='451351b52cdb5f872bf0beece1e02a2afcc0f0e0c1c0447e3ba3e674fef9eada')

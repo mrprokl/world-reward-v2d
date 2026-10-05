@@ -169,3 +169,54 @@ gate INCONCLUSIVE without lowering its threshold or choosing replacement rows.
 Sufficient capacity permits only a separately frozen, rights-checked new study,
 never selector adoption or a claim of held-out accuracy. Outputs and all ten
 inputs/source bytes and modes are sealed or checked before/after respectively.
+
+Actual producer4dda08752ae95687b7b2840aab9b06032e2dddd4 closes **technical
+FAIL1.099374s**, exit1, report5360B/SHA
+6ba7dfd843e47bae9043927c4d5f65059b99df2a09941dc2ee49c708d9d3198b.
+Historical336 slots/source/ten-input hashes and modes pass; no geometry, RGB,
+network, model or cohort selection follows. Independent saved-only diagnosis
+PASS1.1067s verifies289Gitfiles/294entries, all input pins and unchanged failure.
+801relation IDs have metadata without duplicates/missing IDs;5of698 examined
+new-record identity candidates have unsupported Flickr landing formats. The
+first is HTTPS on the bare `flickr.com` host rejected by the exact `www` rule.
+Diagnostic2417B/SHA79b179aa7ec43154d9ac1a18268dd18c60df614d96af7d05d0594167bd8e7bad.
+
+A distinct explicit metadata-only v2 may **count and exclude** unsupported new
+record identities, never guess/canonicalize them to recover photos. Historical
+unknown identities remain a hard failure; original failed source/receipt stay
+byte/mode-pinned before/after. Same180s/96-slot/no-RGB/class/geometry/capacity
+contracts and no previous scientific cohort reopened. No usable capacity has
+yet been measured, and no A/B study is authorized by this technical diagnosis.
+
+Explicit v2 implementation controls:255 parent tiny tests PASS1.19s, including
+56 census controls, strict old-mode behavior, rejection without URL changes,
+unchanged96 threshold, original-failure posthash changes closing FAIL and no
+per-record flags. This is an implementation check, not the actual census result.
+
+### Minimal A/B proposal — conditional, not a frozen experiment
+
+Independent audit proposes96 fresh slots (FIT32/CAL16/RESERVED48) **only if**
+the actual feasibility gate qualifies capacity. No cohort exists yet. Learn A's
+geometric coefficients on FIT; freeze them, then B learns only a nonnegative
+native-HOI-margin coefficient. Same complete routes/banks/supports and no raw
+object/person confidence or decayed HOI score in either arm. Assemble the whole
+route before route-max and latent side-max; sides are not supervised anatomy.
+
+Exact automatic endpoint-coordinate aliases have one group score (max over
+aliases), determined without labels/scores and with all raw slots preserved.
+The equal-image positive-set loss is `LSE(all groups)-LSE(observed positives)`
+plus fixed L2. Unknown competitors are implicitly suppressed, not real negative
+or OFF labels; this tests any-positive retrieval, not all interactions. FIT-only
+image/group-balanced scale division without centering avoids introducing an
+unrepresented bias on absent HOI routes. Constant/all-missing features have
+zero coefficients, not arbitrary floors. Optimizer, initialization, limits,
+stationarity check and CAL control must still be frozen before any FIT labels;
+latent-max/multiple-positive fitting is nonconvex, with no global-optimum claim.
+
+Proposed RESERVED gate: all48 fixed slots in the mean, positive paired delta,
+one-sided exact sign p<=.05 and at least32 nonzero image differences. At32
+informative images22 wins have null-tail.02505123; power is.84640537 **under an
+assumed**.75 directional-win probability. This arithmetic is not actual power:
+ties, access/matching failures and endpoint misses can make the study inadequate.
+Uninformative support closes INCONCLUSIVE, never resampling or threshold rescue.
+Claim scope remains annotated-holds person+object retrieval only.

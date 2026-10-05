@@ -22,6 +22,19 @@ HELPERS = ('infra/ownership_pair_census.py', 'infra/run_ownership_pair_census.sh
            'infra/mediapipe_cpu_runtime_verify.py', 'infra/openimages_joint_pair_census.py',
            'infra/openimages_joint_pair_acquire.py', 'infra/coco_proposal_prepare.py',
            'configs/proposal_external_census_v1.json', 'configs/coco_endpoint_v2.json')
+V1_ENTRY, V1_CONFIG, V1_HELPERS = ENTRY, CONFIG, HELPERS
+V2_FLAG = '--reject-invalid-identities-v2'
+V2_POLICY = 'reject_count_unknown_metadata_source_identity'
+
+
+def _select_version(args):
+    global ENTRY, CONFIG, HELPERS
+    rt.require(args in ([], [V2_FLAG]), 'Only the explicit metadata V2 flag is allowed')
+    ENTRY, CONFIG, HELPERS = V1_ENTRY, V1_CONFIG, V1_HELPERS
+    if args:
+        ENTRY = 'run_ownership_pair_census_v2'; CONFIG = 'configs/ownership_pair_census_v2.json'
+        HELPERS = (V1_HELPERS[0], 'infra/run_ownership_pair_census_v2.sh', CONFIG,
+                   *V1_HELPERS[3:], V1_CONFIG, V1_HELPERS[1])
 
 
 def encode(value):
@@ -130,11 +143,18 @@ def collect(paths, cfg, excluded, check):
             rt.require(r['ImageID'] not in metadata, 'Duplicate publisher metadata identity')
             metadata[r['ImageID']] = r
     rt.require(set(metadata) == set(relations), 'Publisher metadata missing untouched relation ID')
-    boxes = {}
+    boxes = {}; invalid_identity = 0; reject_invalid = cfg.get('identity_policy') == V2_POLICY
     for iid, row in metadata.items():
         check()
+        if reject_invalid:
+            rt.require(set(identities.METADATA_KEYS) <= set(row) and row['ImageID'] == iid
+                       and all(type(row[k]) is str for k in identities.METADATA_KEYS), 'Original metadata fields required')
         if row['Rotation'] != '0.0' or not row['AuthorProfileURL'] or not row['OriginalMD5']: continue
-        identity = _metadata_identity(row)
+        try:
+            identity = _metadata_identity(row)
+        except ValueError:
+            if not reject_invalid: raise
+            invalid_identity += 1; continue
         if not any(v in excluded[k] for v, k in zip(identity, ('authors', 'photos', 'md5', 'urls'))): boxes[iid] = []
     for r in census.csv_rows(paths['boxes']):
         check()
@@ -148,6 +168,7 @@ def collect(paths, cfg, excluded, check):
     counts.update(new_relation_images=len(relations), metadata_identity_eligible_images=len(boxes),
                   geometry_orientation_eligible_images=sum(r['eligible'] for r in records),
                   unscorable_positive_pairs=unresolved)
+    if reject_invalid: counts['invalid_metadata_identity_images'] = invalid_identity
     return counts
 
 
@@ -156,6 +177,11 @@ def configuration(code, source):
     fixed = dict(schema='world_reward.ownership_pair_census.v1', budget_seconds=180,
                  output='results/ownership-pair-census-v1', selection='none_feasibility_only', minimum_independent_slots=96,
                  historical_slots=336, historical_oi_slots=240, historical_coco_slots=96, network_allowed=False, retry_count=0)
+    v2 = ENTRY == 'run_ownership_pair_census_v2'
+    if v2:
+        fixed.update(schema='world_reward.ownership_pair_census.v2', output='results/ownership-pair-census-v2', identity_policy=V2_POLICY)
+    else:
+        rt.require('identity_policy' not in cfg and 'original_failed_receipt' not in cfg, 'V1 remains strict identity validation')
     rt.require(all(type(cfg.get(k)) is type(v) and cfg[k] == v for k, v in fixed.items()), 'Frozen feasibility scope required')
     rt.require(set(cfg['files']) == {'boxes', 'relations', 'triplets', 'metadata'}
                and [r['name'] for r in cfg['historical']] == ['oi16', 'oi128', 'oi64', 'oi32', 'coco32', 'coco64']
@@ -165,9 +191,40 @@ def configuration(code, source):
     original = rt.pinned(code/HELPERS[7], source['helpers'][HELPERS[7]], 16 << 10)
     rt.require(cfg['human_classes'] == original['human_classes'] and cfg['body_part_classes'] == original['body_part_classes'],
                'Unchanged original human/body-part catalogs required')
+    if v2:
+        old = rt.pinned(code/V1_CONFIG, source['helpers'][V1_CONFIG], 16 << 10)
+        rt.require(all(cfg[k] == old[k] for k in old if k not in ('schema', 'output', 'reused_helper_pins')),
+                   'Original metadata/geometry/capacity recipe changed')
+        rt.require(cfg['original_failed_receipt'] == dict(producer_revision='4dda08752ae95687b7b2840aab9b06032e2dddd4',
+            path=str(ROOT/'results/ownership-pair-census-v1/report.json'),
+            pin=dict(bytes=5360, sha256='6ba7dfd843e47bae9043927c4d5f65059b99df2a09941dc2ee49c708d9d3198b'),
+            source_closure_sha256='d9adeabc1927a5a8326288e68de4974da3a304c5d3678de62f03570b5e839a45',
+            source_archive_sha256='94d83b1107ed5fd0873cd9605f0efd15fccac2509b359d821a11060e9aec032b',
+            source_files=289, original_driver=dict(bytes=16801, sha256='4add28529c5961a600de2f324930942a30116f6f5bce7d51941efbf8738178a1')),
+            'Exact closed original FAIL identity required')
     for module, name in ((rt, HELPERS[3]), (census, HELPERS[4]), (identities, HELPERS[5]), (coco, HELPERS[6])):
         rt.require(Path(module.__file__).resolve() == code/name, 'Imported helper origin differs')
     return cfg
+
+
+def _prior_failure(cfg):
+    row = cfg['original_failed_receipt']; path = rt.canonical(row['path'])
+    report = rt.pinned(path, row['pin'], 16 << 10)
+    code = ROOT/'jobs'/row['producer_revision']/V1_ENTRY/'code'
+    source = rt.source(ROOT, code, row['producer_revision'], V1_ENTRY, V1_HELPERS)
+    rt.require(report['schema'] == 'world_reward.ownership_pair_census.v1' and report['status'] == 'fail'
+        and report['error_type'] == 'ValueError' and report['producer_revision'] == row['producer_revision']
+        and report['source_binding'] == source and report['configuration_identity'] == source['helpers'][V1_CONFIG]
+        and source['helpers'][V1_HELPERS[0]] == row['original_driver']
+        and source['closure_sha256'] == row['source_closure_sha256']
+        and sum(p.is_file() for p in code.rglob('*')) == row['source_files']
+        and (code.parent/'source-sha256').read_bytes() == (row['source_archive_sha256']+'\n').encode()
+        and all(report[k] is False for k in ('selection_performed', 'rgb_read', 'network_used', 'predictions_read',
+                                           'models_loaded', 'gpu_used', 'historical_reference_values_read')),
+        'Original closed metadata FAIL source/receipt differs')
+    return dict(report_identity=row['pin'], report_state=list(_state(path)), source_binding=source,
+                source_modes_identity=pin(encode({str(p.relative_to(code)): stat.S_IMODE(p.lstat().st_mode)
+                                                  for p in (code, *sorted(code.rglob('*')))})))
 
 
 def _state(path):
@@ -201,6 +258,7 @@ def run():
     revision, code = os.environ['WR_CODE_REVISION'], Path(os.environ['WR_CODE'])
     rt.require(Path(__file__).resolve() == code/HELPERS[0], 'Original immutable driver required')
     source = rt.source(ROOT, code, revision, ENTRY, HELPERS); cfg = configuration(code, source)
+    prior = _prior_failure(cfg) if ENTRY == 'run_ownership_pair_census_v2' else None
     files = [*cfg['files'].values(), *cfg['historical']]; paths = [rt.canonical(r['path']) for r in files]
     rt.require(len(paths) == len(set(paths)) == 10, 'Exactly ten distinct metadata inputs required')
     states = {str(p): _state(p) for p in paths}
@@ -212,6 +270,7 @@ def run():
         for path, row in zip(paths, files):
             rt.require(rt.identity(path, 100 << 20, readonly=row['readonly']) == row['pin']
                        and _state(path) == states[str(path)], 'Metadata input identity or mode changed')
+        if prior is not None: rt.require(_prior_failure(cfg) == prior, 'Original closed FAIL changed')
         check()
     rehash(); excluded, history_counts = _historical_exclusions([rt.strict(p.read_bytes()) for p in paths[4:]])
     output = rt.canonical(ROOT/cfg['output']); rt.require(not output.exists() and output.parent.is_dir(), 'Fresh census output required')
@@ -225,6 +284,9 @@ def run():
                   ownership_verified=False, quality_verified=False, adopted=False, old_studies_reopened=False,
                   coco_author_disjointness_verified=False, coco_byte_alias_exclusions_complete=False,
                   limitations=cfg['limitations'], source_and_inputs_rehashed_after=False, outputs_sealed=False)
+    if prior is not None:
+        report.update(identity_policy=V2_POLICY, original_closed_failure=prior, invalid_identities_normalized=False,
+                      invalid_identities_rejected_not_repaired=True)
     def interrupted(*_): raise TimeoutError('Census interrupted')
     handlers = {s: signal.signal(s, interrupted) for s in (signal.SIGTERM, signal.SIGINT, signal.SIGALRM)}
     signal.setitimer(signal.ITIMER_REAL, max(.001, deadline-time.monotonic()))
@@ -258,5 +320,5 @@ def run():
 
 
 if __name__ == '__main__':
-    rt.require(len(sys.argv) == 1, 'No per-record parameters allowed')
+    _select_version(sys.argv[1:])
     sys.exit(0 if run()['status'] == 'pass' else 1)
