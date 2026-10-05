@@ -1486,6 +1486,51 @@ credible interactions and domain gap must be explicit. Existing manufactured
 initialization/renderer masks are runtime controls, not that study. No new study,
 weights, calibrated gates, held-out benefit or CARI4D victory is claimed.
 
+### October5 — learned interaction evidence for the actual wrong-pair bottleneck
+
+[HOI-DETR paper2606.17384v1](https://arxiv.org/html/2606.17384v1), June16,
+predicts hands, directly interacted objects and tool targets jointly, with an
+ordered pair MLP on contextual decoder tokens supervised at every layer. This
+provides role/relationship evidence beyond semantic object-confidence or nearest
+box; it does not predict whole-body identity, calibrated contact or3D geometry.
+[Released code1b367292f3833afd64a204bd4d9d84519541d035](https://github.com/AhmadDarKhalil/HOI-DETR/tree/1b367292f3833afd64a204bd4d9d84519541d035)
+is real June29 source, not README-only. Its helper exposes query IDs/embeddings,
+original XYXY and all native surviving detections, then H→F/F→S pair scores.
+Native1500 queries/top1000 proposals, softNMS.5/threshold.3 are detector policy,
+not permission to select one global target. Raw pair logits are not calibrated
+probabilities. Avoid demo stride/copy-forward and exception-to-empty behavior.
+
+HF ahmaddarkhalil/hoi-detr2d737cbf189a1b61c2e8e86cfd03df5acba56f52,
+epoch_5.pth5855053598B/SHA4708fd0ddc5c3d386bad67c31152de58676840b911f6d01219e0092a603277d3;
+card declares MIT, code LICENSE1074B/
+5ee2c0225f66bf9f22815adbd5166fc5a2819c43ca643e6c8b6a05bf46ba0754.
+No checkpoint acquired/decoded or inference performed at this audit. Paper
+reports COCO pretraining/refinedHands23 fine-tuning; checkpoint training overlap
+remains unknown. Apparent HOIST config was a triple-quoted comment, confirmed by
+AST, not evidence of training leakage. Active validation config uses EgoHands;
+an image-only adapter must never instantiate any dataset or train/test pipeline.
+GH200 guide is not a verified x86H100/Torch2.5.1 runtime; MMCV attention/NMS
+operators need an independent isolated qualification and original notices.
+
+[SL-HOI2603.27500](https://arxiv.org/abs/2603.27500), CVPR2026, directly predicts
+person–object interactions with DINOv3/DINOtxt and HICO/SWIG vocabularies.
+Code64483cb35639198bbea66af500d1d05f8ac1e978/HF104792b9c105d432f1d167ccdd8a2fb7a546d979
+are available before cutoff; advertised Torch2.5.1 alone does not qualify its
+dependencies. MIT wrapper does not override DINOv3's custom source/weight terms.
+Old100DOH MIT code uses a predicted vector followed by nearest-object matching,
+not a learned classifier over all pairs; ego checkpoint/data terms are distinct.
+
+Research decision: prioritize lawful HOI-DETR acquisition/runtime feasibility
+as a relational observation source, alongside the already frozen AMG/Boots test.
+AMG proposals retain dormant/released objects: role-based detection absence must
+not delete an object, restart its identity or imply absence of real contact.
+Full-body/hand ownership and persistent pair selection remain to validate.
+Compare learned links with spatial association on the SAME automatic proposals,
+preserving missed instances; do not tune on episode8/9 or call their QA labels.
+HD-EPIC-HOI uses movement/contact-change pseudo-labels, not independent stationary
+contact truth; HOIST is object-only, FineBio requires signed access. These are
+not already qualified external pair benchmarks or CARI4D comparisons.
+
 ### October5 — checkpoint-free articulation seam, still prospective
 
 Independent primary audit favors direct named native controls into the selected
