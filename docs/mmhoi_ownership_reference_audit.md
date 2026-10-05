@@ -71,7 +71,7 @@ scenario. It is not a complete census, and named folders alone do not establish
 synchronization, subject disjointness or uninterrupted video availability.
 
 On Azure only: establish complete inventory using an authenticated documented
-container interface or bounded central-directory reader; acquire only original
+interface or bounded central-directory reader; acquire only original
 schema/split/CSV members needed for a metadata census. No93GB archive download
 before showing that this solves a useful research gap. Freeze scenario/session
 disjoint FIT/CAL/RESERVED before RGB, excluding all earlier schema-read scenes.
@@ -83,3 +83,35 @@ endpoint support and direct person–target retrieval measured separately from
 side/bodypart/contact. Raw predictor has no labels/IDs/camera/source geometry.
 Freeze A/B outputs before references; retain misses and multiple positives.
 No static result certifies temporal identity, metric3D quality or a CARI4D win.
+
+## Actual API boundary and frozen inventory gate
+
+Independent backend-source audit catches a dangerous false shortcut:
+[`invenio-records-resources/extractors/zip.py`3afc2588](https://github.com/inveniosoftware/invenio-records-resources/blob/3afc25887baf7e2e48067326425e652b8661511b/invenio_records_resources/services/files/extractors/zip.py),
+14565B/SHA256
+`e5c8721771e22735e872a7f97779ca9a48218d9b690c3a856800c9fc235657bf`,
+caps files+directories at1000. The observed955+45 explains truncation;
+`total` counts returned files, not the archive. **A directory container link
+streams a ZIP of that directory, not a paginated JSON inventory. Never GET it
+for a census.** Deployed backend version is unknown; these observed semantics
+are consistent with the audited source, not exact deployed-version proof.
+
+The original publisher file metadata763B/SHA256
+`1e7204a4196f11461755d6f30b8e6b97e00742a4d6e2f135794a090c6414031c`
+binds version UUID`f74a5b6d-72a3-4fc6-b7d5-f0b35126696b`, file
+`d359ea34-9233-4302-8308-f94aff1748ee`, bucket
+`fcb5c16d-d1d3-4900-ad0d-854bef1453a2` and the original content URL.
+HEAD is200/93,682,766,723B/Last-Modified2025-12-01; no ETag or Accept-Ranges
+was announced, so operational Range support is **unverified**.
+
+`infra/mmhoi_inventory.py` freezes one Azure-only attempt: pin metadata before
+ranges, no redirects/retries,180s inclusive, ≤128MiB central-directory bytes,
+≤1million members,8MiB request chunks. Read only the final22B/ZIP64 trailer and
+exact central-directory region. Require206, exact Content-Range/length/encoding/
+Last-Modified **before any response body**; a200 archive response fails without
+reading it. No comment scanning into members, CRC/data extraction or whole
+archive authenticity claim. Complete safe names/types/lengths and counts alone
+may pass; CSV meanings, frame map, cohort, RGB and ownership remain unqualified.
+20tiny authored tests PASS0.35s including ZIP64 sparse offsets, unsafe names,
+budget rejection and zero body reads on invalid HTTP headers. Independent source
+audit confirms the exact763B metadata ABI/firewall; no actual Azure result yet.
