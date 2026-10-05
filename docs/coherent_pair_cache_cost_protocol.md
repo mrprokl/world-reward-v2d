@@ -54,4 +54,10 @@ Host report2738B SHA256
 `6fc7c70e091c5a6cc93c3c2879b3eed192b27583f2ddedf80085f2f86f0d5229`;
 native report8495B SHA256
 `2d42d06dc0a02f05e037775ce4eb0991e39c2f20af232d6b4f0cffc40c418b6a`.
-Independent saved-only authentication is pending; neither producer is rerun.
+Independent saved-only authentication PASS0.258667702s: complete298-file/
+303-entry source closure and all four sealed outputs unchanged before/after;
+original container, name and owner label absent, terminal unit success/exit0.
+The observer authenticates producer parity receipts, **not an independent
+numerical replay**. Neither producer is rerun. Concise audit:
+`results/audits/coherent_pair_cache_cost_v1_actual.json`4350B/SHA256
+`d0680cd02904f1ea3abc2a8c4f3be0b8f377de1ca3378d26922501030d13ecc1`.

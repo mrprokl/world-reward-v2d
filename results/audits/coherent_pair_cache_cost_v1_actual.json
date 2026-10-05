@@ -1,0 +1,132 @@
+{
+  "adoption": false,
+  "audit_elapsed_seconds": 0.2586677019717172,
+  "cache_preparation_seconds": [
+    0.16257788403891027,
+    0.33797920000506565
+  ],
+  "cached_seconds": [
+    0.3797485330142081,
+    0.26148270803969353,
+    0.270821504003834,
+    1.1080003759707324,
+    0.5264460520120338,
+    0.5507386039826088
+  ],
+  "cid_absent": true,
+  "container_name_absent": true,
+  "cost_gate_passed": false,
+  "decision": "CACHE_RECIPE_COST_UNQUALIFIED_NO_REAL_FIT",
+  "fixture_bank_hashes": [
+    "16c0f5d1f2ff9b42983a89a445e821d28fe17bf90436008b300f1f5a3e2e0479",
+    "af99762084b17ee70c5e1ef898cdea3c5ecca3e0b7413bc1cd6517343e95ca69"
+  ],
+  "fixture_factor_hashes": [
+    "145dbc06b462d2d3537320d26de07dff32a5e373091ecfde60fedcdff86755f0",
+    "c5dcf29ebaf84234ede86b20bf7de775045f47ab31dcbcc63e4f374a9d711337"
+  ],
+  "fixture_original_observations_hashes": [
+    "ce59df38764df6b0f984a803780bb698b8d230afd7009a3fb823febe3878452e",
+    "192f072fab3662846dc912953c1ffff4c959d038195a36814a539dffbe92fe23"
+  ],
+  "fixtures": [
+    [
+      2,
+      3600,
+      4,
+      1500
+    ],
+    [
+      4,
+      3600,
+      64,
+      1500
+    ]
+  ],
+  "fixtures_rerun": false,
+  "full_fit_executed": false,
+  "full_score_hashes": [
+    "c5b6911c716bdc0d3a8f2645e85c20f5b19afb51fbd2d2f07ff8c8980f7cbe94",
+    "5e88a32c70bd7b807745cab166b122f744f06bcf9124ddf17a16f1c8d9ee3736",
+    "7680157462f03a85952f9e62af2d2984bbd64c54c66443661b6e840a459bf13a",
+    "d40c802f826be6f3601d5fa7658b3c5641e43714200c6bd820ef6782e972647b",
+    "5ca1efb21fa752123ea586564644e7bf6597e91d91fc1510f99b68e802d1818b",
+    "b768553775d601e571bb278a549c3402f9fa056c80485ba01ebb040ce90180d6"
+  ],
+  "gpu_used": false,
+  "gradient_lengths": [
+    17,
+    17,
+    1,
+    17,
+    17,
+    1
+  ],
+  "historical_label_verified_independently": false,
+  "host_elapsed_seconds": 33.61863209097646,
+  "image_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "image_rootfs_sha256": "5ae610524943c42f72e2fa1ac06a9dbe8fa14bf2d572efd8a57cded6ead3503d",
+  "independent_numerical_parity_reexecuted": false,
+  "limitation": "Saved producer parity claims only; no numerical replay. One paired speedup is descriptive, not statistical/general. Projection is not a bound; actual FIT remains unexecuted.",
+  "local_preflight_repairs": 1,
+  "loss_calls": 0,
+  "max_rss_bytes": 124731392,
+  "models_loaded": false,
+  "observer_remote_scaffolds_created": false,
+  "observer_sha256": "d22365410db22ec465745b960e50b5aeae47ff2c986d35f72c407b3ba52c6eab",
+  "original_driver_absent": true,
+  "original_seconds": [
+    0.5948387610260397,
+    0.28917429503053427,
+    0.29589856398524716,
+    10.343094623996876,
+    0.6858413040172309,
+    0.622155744000338
+  ],
+  "output_identities": {
+    "container.cid": {
+      "bytes": 64,
+      "sha256": "5a2c5e8e68e69137d6bb7ce1177b4119daf1ed7b80aad48c00ada5c70abf1dfa"
+    },
+    "native.json": {
+      "bytes": 8495,
+      "sha256": "2d42d06dc0a02f05e037775ce4eb0991e39c2f20af232d6b4f0cffc40c418b6a"
+    },
+    "proof.json": {
+      "bytes": 5724,
+      "sha256": "0a275e9f538ae1d21267f3ba935f07c77211ae06717f154172b4564b7cec96ae"
+    },
+    "report.json": {
+      "bytes": 2738,
+      "sha256": "6fc7c70e091c5a6cc93c3c2879b3eed192b27583f2ddedf80085f2f86f0d5229"
+    }
+  },
+  "outputs_before_after": true,
+  "outputs_sealed": true,
+  "owner_label_containers_absent": true,
+  "producer_exact_full_parity_flags_verified": true,
+  "producer_revision": "99a256bb636805bfe682631396c32bdafb7d8c50",
+  "projected_recipe_seconds": 36388.68367827125,
+  "quality_verified": false,
+  "references_read": false,
+  "rgb_read": false,
+  "saved_only": true,
+  "schema": "world_reward.coherent_pair_cache_cost_actual_audit.v1",
+  "source_archive_xz_bytes": 226924,
+  "source_archive_xz_sha256": "f78def71d8dac2ad5ce5f9e6b9897dcb8423a73b42bc76c7b5ade44faf273c88",
+  "source_before_after": true,
+  "source_closure_sha256": "25f2954ae57c5504292b08a53f586243e012d63d005806b0f3cd948cf30663a5",
+  "source_entries": 303,
+  "source_files": 298,
+  "status": "pass",
+  "transport_cli_exit": 0,
+  "unit": "world-reward-coherent-pair-cache-cost-v1.service",
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  },
+  "zero_k64_paired_speedup_descriptive": 9.334919778285425
+}

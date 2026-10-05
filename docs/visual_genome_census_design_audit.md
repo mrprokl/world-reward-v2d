@@ -81,3 +81,17 @@ Primary text pins (no annotation/image values): readme746B/SHA
 [object aliases](https://homes.cs.washington.edu/~ranjay/visualgenome/data/dataset/object_alias.txt)
 60166B/0c8e059fc31eeebfd98231f5789892da8ae33bfa00434c70aee969dc6eaa853b.
 Photo-disjoint≠pretrained-disjoint; exact overlap unverified. No adoption/CARI4D claim.
+
+## Source qualification, not actual census
+
+Root169 tiny manufactured tests PASS0.62s across streaming/census, acquisition,
+cache/cost and launcher contracts. Independent parser review found no blocker
+in actual default callers; generic nonpositive/noninteger limits now reject
+before reading the source. Excluded semantic values, ID field order, native
+conflicts, source-receipt ABI and late-publication demotion are tested.
+
+No real annotation row has been consulted. Before the first census, qualify
+the native CPU parser with separate authored streams: parsing all expanded
+metadata may exceed600s despite small compressed inputs. This pre-gate does
+not relax a failed actual census or select a cohort. Capacity/rights/quality
+remain unverified until their respective actual stages.

@@ -1,0 +1,452 @@
+{
+  "schema": "world_reward.visual_genome_ownership_census.v1",
+  "output": "/srv/world-reward-data/visual_genome_ownership_census_v1",
+  "budget_seconds": 600,
+  "outer_seconds": 615,
+  "max_row_bytes": 16777216,
+  "max_expanded_bytes": 2147483648,
+  "minimum_distinct_photos": 96,
+  "selection_performed": false,
+  "person_names": [
+    "boy",
+    "boys",
+    "girl",
+    "girls",
+    "human",
+    "humans",
+    "man",
+    "mans",
+    "person",
+    "persons",
+    "woman",
+    "womans",
+    "women",
+    "womens"
+  ],
+  "predicates": [
+    "holding",
+    "holds"
+  ],
+  "target_names": [
+    "bicycle",
+    "car",
+    "motorcycle",
+    "airplane",
+    "bus",
+    "train",
+    "truck",
+    "boat",
+    "traffic light",
+    "fire hydrant",
+    "stop sign",
+    "parking meter",
+    "bench",
+    "bird",
+    "cat",
+    "dog",
+    "horse",
+    "sheep",
+    "cow",
+    "elephant",
+    "bear",
+    "zebra",
+    "giraffe",
+    "backpack",
+    "umbrella",
+    "handbag",
+    "tie",
+    "suitcase",
+    "frisbee",
+    "skis",
+    "snowboard",
+    "sports ball",
+    "kite",
+    "baseball bat",
+    "baseball glove",
+    "skateboard",
+    "surfboard",
+    "tennis racket",
+    "bottle",
+    "wine glass",
+    "cup",
+    "fork",
+    "knife",
+    "spoon",
+    "bowl",
+    "banana",
+    "apple",
+    "sandwich",
+    "orange",
+    "broccoli",
+    "carrot",
+    "hot dog",
+    "pizza",
+    "donut",
+    "cake",
+    "chair",
+    "couch",
+    "potted plant",
+    "bed",
+    "dining table",
+    "toilet",
+    "tv",
+    "laptop",
+    "mouse",
+    "remote",
+    "keyboard",
+    "cell phone",
+    "microwave",
+    "oven",
+    "toaster",
+    "sink",
+    "refrigerator",
+    "book",
+    "clock",
+    "vase",
+    "scissors",
+    "teddy bear",
+    "hair drier",
+    "toothbrush"
+  ],
+  "primary_texts": [
+    {
+      "file": "readme_v1_4.txt",
+      "url": "https://homes.cs.washington.edu/~ranjay/visualgenome/data/dataset/readme_v1_4.txt",
+      "pin": {
+        "bytes": 746,
+        "sha256": "788334c8c396b15869cea8cf3097e837a8f0752fefececb9c10ea3d28089be0e"
+      }
+    },
+    {
+      "file": "relationship_alias.txt",
+      "url": "https://homes.cs.washington.edu/~ranjay/visualgenome/data/dataset/relationship_alias.txt",
+      "pin": {
+        "bytes": 122102,
+        "sha256": "15f7f64802c95c5bf5b5690457566b1b19ee64eac7a94d8b8cbb3a4378f2ec7c"
+      }
+    },
+    {
+      "file": "object_alias.txt",
+      "url": "https://homes.cs.washington.edu/~ranjay/visualgenome/data/dataset/object_alias.txt",
+      "pin": {
+        "bytes": 60166,
+        "sha256": "0c8e059fc31eeebfd98231f5789892da8ae33bfa00434c70aee969dc6eaa853b"
+      }
+    }
+  ],
+  "inputs": {
+    "vg_report": {
+      "path": "/srv/world-reward-data/visual_genome_metadata_v1/report.json",
+      "pin": {
+        "bytes": 4623,
+        "sha256": "b1c5d6a9e2212ca90751edd568f104e7f4d388d09604a36b7290b0fe82925717"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
+    },
+    "image_data.json.zip": {
+      "path": "/srv/world-reward-data/visual_genome_metadata_v1/image_data.json.zip",
+      "pin": {
+        "bytes": 1780854,
+        "sha256": "b87a94918cb2ff4d952cf1dfeca0b9cf6cd6fd204c2f8704645653be1163681a"
+      },
+      "readonly": true,
+      "maximum_bytes": 146800640
+    },
+    "objects.json.zip": {
+      "path": "/srv/world-reward-data/visual_genome_metadata_v1/objects.json.zip",
+      "pin": {
+        "bytes": 55323929,
+        "sha256": "efa456069aedb420b7dabf54f4608c89c78a00de550f1433066e9b6f84fb629c"
+      },
+      "readonly": true,
+      "maximum_bytes": 146800640
+    },
+    "publisher_about.html": {
+      "path": "/srv/world-reward-data/visual_genome_metadata_v1/publisher_about.html",
+      "pin": {
+        "bytes": 8984,
+        "sha256": "29ec54c0554a4e12c4f695afd7f6bbe7a77db411090ee3031268950ea38a3a7b"
+      },
+      "readonly": true,
+      "maximum_bytes": 146800640
+    },
+    "publisher_api.html": {
+      "path": "/srv/world-reward-data/visual_genome_metadata_v1/publisher_api.html",
+      "pin": {
+        "bytes": 8197,
+        "sha256": "43a80892dbc5f5ca6215ad75f7bf3d57c510ddd7444d2d9025165f52e80f7774"
+      },
+      "readonly": true,
+      "maximum_bytes": 146800640
+    },
+    "relationships.json.zip": {
+      "path": "/srv/world-reward-data/visual_genome_metadata_v1/relationships.json.zip",
+      "pin": {
+        "bytes": 77904473,
+        "sha256": "e648867b8087e4aeb10019a959f914e2580909f1c3e50a21b25de8741679182f"
+      },
+      "readonly": true,
+      "maximum_bytes": 146800640
+    },
+    "coco_report": {
+      "path": "/srv/world-reward-data/coco_proposal_v1/metadata/report.json",
+      "pin": {
+        "bytes": 3562,
+        "sha256": "c8dcee4e4f78b56a5ba8b9f644f94507715a9c46f6c05d0a305f8ce977f58786"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
+    },
+    "coco_archive": {
+      "path": "/srv/world-reward-data/coco_proposal_v1/metadata/annotations_trainval2017.zip",
+      "pin": {
+        "bytes": 252907541,
+        "sha256": "113a836d90195ee1f884e704da6304dfaaecff1f023f49b6ca93c4aaae470268"
+      },
+      "readonly": true,
+      "maximum_bytes": 253000000
+    },
+    "oi16": {
+      "path": "/srv/world-reward-data/openimages_holds_census_v1/census_v2.json",
+      "pin": {
+        "bytes": 10130,
+        "sha256": "b4333ea57bb408b0eafdbc5eee51d2b3ee3e6e963ef9ec269178bbd45480ff4a"
+      },
+      "readonly": false,
+      "maximum_bytes": 1048576
+    },
+    "oi128": {
+      "path": "/srv/world-reward-data/openimages_holds_census_fresh128_v1/census.json",
+      "pin": {
+        "bytes": 76839,
+        "sha256": "bf576b143bf8304981eb8dddfa64726945262d79c24cff07601f14e20a4fd452"
+      },
+      "readonly": false,
+      "maximum_bytes": 1048576
+    },
+    "oi64": {
+      "path": "/srv/scenesmith/world-reward/results/openimages-joint-pair-selection-v1/cohort.json",
+      "pin": {
+        "bytes": 31043,
+        "sha256": "441bdc57e101cb4e8291ca6bbebc554ca397619e2a892469d9e410a16359a456"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
+    },
+    "oi32": {
+      "path": "/srv/scenesmith/world-reward/results/proposal-external-census-v1/cohort.json",
+      "pin": {
+        "bytes": 18076,
+        "sha256": "4db28db7b8c9beb0ce58e574e8f012f05c86ef7447ff056a269d4b04cd74ed33"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
+    },
+    "coco32": {
+      "path": "/srv/world-reward-data/coco_proposal_v1/metadata/cohort.json",
+      "pin": {
+        "bytes": 24029,
+        "sha256": "c78f2e100cd0c724f3b8873a3256299a7074c473ecb93c960dec509941994e67"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
+    },
+    "coco64": {
+      "path": "/srv/world-reward-data/coco_endpoint_v2/metadata/cohort.json",
+      "pin": {
+        "bytes": 41315,
+        "sha256": "5b2e6e99f3979f02586b7aa67ccef74a913f836bdc2b7314bcf94d06777562c6"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
+    },
+    "coco32_acquired": {
+      "path": "/srv/world-reward-data/coco_proposal_v1/eval_private/manifest.json",
+      "pin": {
+        "bytes": 37509,
+        "sha256": "6f3346be5a0ccb065084226ad6cdaa2423dd0d460427d43823b9635f57141ae6"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
+    },
+    "coco64_acquired": {
+      "path": "/srv/world-reward-data/coco_endpoint_v2/eval_private/manifest.json",
+      "pin": {
+        "bytes": 72806,
+        "sha256": "53de338a0c23409e12afa2a24b39538ff9873d40fc18c2d142b512790bf5ae10"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
+    },
+    "ownership_report": {
+      "path": "/srv/world-reward-data/ownership_pair_v1/metadata/report.json",
+      "pin": {
+        "bytes": 16328,
+        "sha256": "50ce281d7dce7c6b409cf5dfb4d6f0f1a39beb7edc065b5e3b007ef7cd24342c"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
+    },
+    "ownership_cohort": {
+      "path": "/srv/world-reward-data/ownership_pair_v1/metadata/cohort.json",
+      "pin": {
+        "bytes": 47482,
+        "sha256": "3e557abbfe909c110dfdd81cbc00827431a24c2ab88e3614b48e13ed35acef3e"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
+    },
+    "ownership_acquired": {
+      "path": "/srv/world-reward-data/ownership_pair_v1/eval_private/manifest.json",
+      "pin": {
+        "bytes": 62025,
+        "sha256": "ae0701546825725d5b665b38af9dd3ca09c3f41365befae12cd5af9609dc93fd"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
+    },
+    "original_closed_failure": {
+      "path": "/srv/scenesmith/world-reward/results/ownership-pair-census-v1/report.json",
+      "pin": {
+        "bytes": 5360,
+        "sha256": "6ba7dfd843e47bae9043927c4d5f65059b99df2a09941dc2ee49c708d9d3198b"
+      },
+      "readonly": true,
+      "maximum_bytes": 1048576
+    }
+  },
+  "streams": {
+    "images": {
+      "kind": "vg",
+      "path": "/srv/world-reward-data/visual_genome_metadata_v1/image_data.json.zip",
+      "member": "image_data.json",
+      "expanded_bytes": 17612822,
+      "expanded_sha256": "93d0053d7e8f451497646fa513e8fb9b1a889df6e757010b88e51e2e21803487",
+      "crc32": "d76e1675"
+    },
+    "objects": {
+      "kind": "vg",
+      "path": "/srv/world-reward-data/visual_genome_metadata_v1/objects.json.zip",
+      "member": "objects.json",
+      "expanded_bytes": 349437266,
+      "expanded_sha256": "94238b6187c0ea1f97acc1fdaec106bd3dee12bb0f81b23dc8b07e9173514985",
+      "crc32": "1a17521a"
+    },
+    "relations": {
+      "kind": "vg",
+      "path": "/srv/world-reward-data/visual_genome_metadata_v1/relationships.json.zip",
+      "member": "relationships.json",
+      "expanded_bytes": 743673397,
+      "expanded_sha256": "9a7d5f396bd9f1d150e6977c2896ca4feb6024068c6e4c51d571d385f5ab4e64",
+      "crc32": "3d187495"
+    },
+    "coco": {
+      "kind": "coco",
+      "path": "/srv/world-reward-data/coco_proposal_v1/metadata/annotations_trainval2017.zip",
+      "member": "annotations/instances_val2017.json",
+      "expanded_bytes": 19987840,
+      "expanded_sha256": "e8c7f7908f1d7278341fae127d0da654f102f11bd7b21d8aeefa635b8c810b6f"
+    }
+  },
+  "sources": {
+    "vg": {
+      "revision": "caf8e6309636d46986f70b1be58c31f00e9dd145",
+      "entry": "run_visual_genome_metadata_acquire",
+      "helpers": [
+        "infra/visual_genome_metadata_acquire.py",
+        "infra/run_visual_genome_metadata_acquire.sh",
+        "configs/visual_genome_metadata_acquire_v1.json",
+        "infra/mediapipe_cpu_runtime_verify.py"
+      ],
+      "closure_sha256": "9c8a00d4f086c545e956093431c2d437b86e3d21fa198da781d23bc181aff1bc",
+      "archive_xz_sha256": "6c3cfda3555da8deebc3b16252095bf8a04d48fd3fa859c1a127b7e5f6bba708",
+      "files": 288,
+      "entries": 293
+    },
+    "coco": {
+      "revision": "4657c8b45f733a1043c5a8af2f5b9d6ac027196a",
+      "entry": "run_coco_proposal_prepare",
+      "helpers": [
+        "infra/coco_proposal_prepare.py",
+        "infra/run_coco_proposal_prepare.sh",
+        "configs/coco_proposal_v1.json",
+        "infra/mediapipe_cpu_runtime_verify.py",
+        "infra/openimages_joint_pair_acquire.py"
+      ],
+      "closure_sha256": "bb8b44dc033c0bea7231ce767d0ce4e178c43be242b24ecfa99cfc9e17cc4670",
+      "archive_xz_sha256": "a4e4e35d699ba593847a7223f98f9b77ae5be3abfae0c1739f0ca2b1ee6d840f",
+      "files": 268,
+      "entries": 273
+    },
+    "ownership": {
+      "revision": "78daabd4a4521fecf4fde8df0f4c6f4f3ef65fc6",
+      "entry": "run_ownership_pair_prepare",
+      "helpers": [
+        "infra/ownership_pair_prepare.py",
+        "infra/run_ownership_pair_prepare.sh",
+        "configs/ownership_pair_prepare_v1.json",
+        "infra/ownership_pair_census.py",
+        "infra/mediapipe_cpu_runtime_verify.py",
+        "infra/openimages_joint_pair_census.py",
+        "infra/openimages_joint_pair_acquire.py",
+        "infra/coco_proposal_prepare.py",
+        "configs/proposal_external_census_v1.json",
+        "configs/coco_endpoint_v2.json",
+        "infra/coco_endpoint_prepare.py",
+        "infra/run_coco_endpoint_prepare.sh",
+        "infra/run_coco_proposal_prepare.sh",
+        "configs/coco_proposal_v1.json",
+        "configs/ownership_pair_census_v1.json",
+        "configs/ownership_pair_census_v2.json",
+        "infra/run_ownership_pair_census.sh",
+        "infra/run_ownership_pair_census_v2.sh"
+      ],
+      "closure_sha256": "a34376d782a89e7503aa6dc510891dd3be12b70369f1260351653e6e14b1863b",
+      "archive_xz_sha256": "824363870053ba0d05056acd0de3d06b9721537c88d4ff939db51b7376ff74f8",
+      "files": 296,
+      "entries": null
+    }
+  },
+  "history_names": [
+    "oi16",
+    "oi128",
+    "oi64",
+    "oi32",
+    "coco32",
+    "coco64"
+  ],
+  "vg_files": [
+    "image_data.json.zip",
+    "objects.json.zip",
+    "publisher_about.html",
+    "publisher_api.html",
+    "relationships.json.zip"
+  ],
+  "helper_pins": {
+    "infra/metadata_json_stream.py": {
+      "bytes": 8322,
+      "sha256": "742b10d5f92e3446d17d4953f1d088281f051577653899ddcc7081f61545bf53"
+    },
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "infra/openimages_joint_pair_acquire.py": {
+      "bytes": 23252,
+      "sha256": "ab0cac6d8a66550b8898a6add435fe92bc2546cbb7536723d4de3b8d8597ad49"
+    },
+    "infra/coco_proposal_prepare.py": {
+      "bytes": 24704,
+      "sha256": "ee9ec3ddd540ec485ef6bbe5812dda5f98760e9633cd3c11fdc49dbde2f66574"
+    }
+  },
+  "limitations": {
+    "creator_identity": "UNKNOWN",
+    "author_disjointness_verified": false,
+    "new_MD5_unknown_until_any_future_RGB_stage": true,
+    "pretraining_overlap": "VG_COCO_dataset_overlap_known_exact_photo_unknown",
+    "truth_scope": "positive_published_pair_not_anatomy_OFF_contact_task_temporal_or_3D",
+    "native_generic_bank_filtering": false
+  }
+}
