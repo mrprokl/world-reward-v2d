@@ -44,7 +44,10 @@ alpha>=0. Même support/prior/tau dans les deux bras.
 ## Exécution et arrêt proposés
 
 PyTorchFP64/H100, facteurs immuables par image/blocs, logsumexp stabilisé,
-autograd ; pas AMP/TF32 ni nouveaux modèles. Objectif complet déterministe,
+VJP analytique sur CSR fixes ; pas AMP/TF32 ni nouveaux modèles. Le premier
+plan autograd est remplacé par l'audit des réductions et le prototype explicite
+`coherent_pair_packed_torch`, pas par une modification d'un FIT historique.
+Objectif complet déterministe,
 pas minibatches différents dans une recherche linéaire.
 
 L-BFGS strong-Wolfe pour A lisse. TorchLBFGS sans bornes : pas alpha softplus
