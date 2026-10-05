@@ -1550,6 +1550,21 @@ not an argmax-IoU identity. First compare learned versus spatial links on the
 same proposals on fresh stationary/distractor/release/tool controls; semantic
 HO-Cap point retention alone cannot qualify those relational links.
 
+Native x86H100 feasibility audit: MMCV1.7.2 setup already selects C++17 for
+Torch>1.12.1; Torch2.5.1 retains the required THCAtomics/AT_ASSERTM symbols.
+HOI source already permits MMCV up to2.7, so the GH200 guide's version-bound
+patch is not needed here. Single-image plain-model inference needs neither its
+DDP patch nor Apex/xformers (native ViT xattn=False). Pin YAPF0.40.1 for the
+original verify=True formatting call; native CUDA12.4/compiler/SM90/Torch ABI
+and Python3.11 still need an actual isolated build and upstream numerical tests.
+MMCV setup25054B/72e752ce57550482d562d4ad96c1932e1ac24fe1aca04164be262e8140b01dcd.
+An additional author sys.path append exists in projects/models/co_detr.py
+(27476B/d63adcaa1e62b9ddf1f835a50ef4023332be28cfcc3039b7e9fdd9847b4f3212).
+Audit all foreign-path effects, not only mmdet.apis; any minimal compatibility
+patch must be exact, non-numerical and confined to a separate runtime copy.
+No actual build/operator/checkpoint/inference qualification follows from this
+primary-source compatibility audit.
+
 ### October5 — checkpoint-free articulation seam, still prospective
 
 Independent primary audit favors direct named native controls into the selected
