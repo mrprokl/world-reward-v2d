@@ -157,6 +157,14 @@ powered statistical comparison or proof of real-video superiority. This study
 is proposed only: acquisition/rights/render feasibility and tracker support
 remain prerequisites. Do not pass its oracle controls into challenge inference.
 
+La piste checkpoint-free ajoute un contrôle de composant distinct : appel direct
+au JIT MHR officiellement authentifié, contrôles articulaires par noms et support
+réel de transformée/parents/LBS, sans faux SAMHead ni PCA inventé. Le petit lot
+pré-déclaré vérifie neuf poses, pas une scène HOI, des gradients ou un grasp.
+Les bornes natives restent littérales et l'ancien échec reste fermé. Tests
+fabriqués uniquement à ce stade ; exécution Azure, rendu, calibration positive
+et remplacement de l'optimiseur sont des qualifications séparées.
+
 ### Première migration réalisée
 
 `world_reward.shared_scene` ajoute des adaptateurs explicites

@@ -9488,3 +9488,13 @@ Independent wrapper/native ABI audit READY; root595PASS1SKIP54.07s on tiny
 manufactured tests in a unique owned directory (no local media/array/model).
 Deployment remains gated by full native pose PASS plus saved-output audit;
 no preparation PASS, positive point benefit or CARI4D victory claimed.
+
+Fresh direct-MHR component helper, not a rescue of8e7c14d: authenticate actual
+c416200 selected release/source/model without executing its acquisition code.
+Inspect actualMHRDemo249/127 schemas, transform and LBS; make one fixed nine-pose
+native204 batch (zero reference, .01/.02rad for four named bilateral elbow/index
+controls) with literal all249bounds before decode. Constant identity/expression/
+scales and actual skeletal/material support are checked; noSAM/PCA/70bridge,
+render/tracker/optimizer, grasp, gradient or quality claim. Root34tinyPASS0.19s;
+no JIT/model/media loaded locally. An independently source/image-bound Azure
+caller and inclusive120s native control remain required before actual execution.
