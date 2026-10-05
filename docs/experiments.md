@@ -10424,3 +10424,19 @@ actual fresh_namespace_lease.v1 source, without acquisition rerun or mutation.
 No runtime, original strict state loading, H100 operator qualification,
 training-overlap clearance, license eligibility, association gain or adoption.
 Parent216 combined tiny source/surface/frontend/acquisition tests PASS2.69s.
+
+MASA author-runtime construction frozen prospectively after independent source/
+environment audit and parent65tiny tests PASS1.26s. New isolated venv/image
+derived from immutable ef12; never install into or retag the existing runtime.
+52 publisher-pinned wheels2683053759B plus four notices, all Azure-only;
+Torch2.1.2+cu118 is bundled CUDA, not the existing Torch2.5/cu124 and not a new
+Cu12 dependency stack. Python3.11/ensurepip/isolated-venv CPU probe precedes heavy
+downloads, exact wheel metadata/notices/SHA precede offline pip --no-index
+--no-deps and pip check. Import-only DCNv2/RoIAlign/MMDet3 checks do not execute
+CUDA or qualify the model. Fresh revision-owned tag,4CPU/8GiB,1800s inclusive
+root clock, exact source/wheel/image posthash and owned cleanup; late publication
+demoted FAIL on the same open receipt inode. Config55973B/
+c9c33343295a1baf9e3d9369d1ce9ca94a72cf5e94b7e8f47fa59966207f01b5;
+driver25754B/c564cdf0c51dc39a384b6eec4cca56de610e19db5733f5992168dfcae69189f6;
+shell1134B/d4237ec1c2e06f5186bd1c30303000e1d4445dd59d307173822038f18aa86055.
+No build, H100 ABI, strict checkpoint, association gain or adoption inferred.
