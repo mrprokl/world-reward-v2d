@@ -256,25 +256,25 @@ def test_media_weights_or_unneeded_tests_never_retained(gate, tmp_path, name):
 
 
 def test_actual_vm02_image_absence_contract(gate, monkeypatch):
-    target = 'world-reward/hoi-detr-mmcv-native-v3'
+    target = 'world-reward/hoi-detr-mmcv-native-v4'
     def absent(args, **kwargs):
         assert args == ['docker','image','inspect',target,'--format','{{.Id}}']
-        return subprocess.CompletedProcess(args,1,b'\n',b'Error response from daemon: No such image: world-reward/hoi-detr-mmcv-native-v3:latest\n')
+        return subprocess.CompletedProcess(args,1,b'\n',b'Error response from daemon: No such image: world-reward/hoi-detr-mmcv-native-v4:latest\n')
     monkeypatch.setattr(gate.subprocess,'run',absent)
     gate.absent(target,gate.time.monotonic()+30,image_name=True)
 
 
 @pytest.mark.parametrize('fault',['daemon','permission','rc','present','wrong_name','wrong_tag'])
 def test_absence_never_accepts_ambiguous_daemon_or_foreign_name(gate, monkeypatch, fault):
-    stderr = b'Error response from daemon: No such image: world-reward/hoi-detr-mmcv-native-v3:latest\n'; stdout = b'\n'; rc=1
+    stderr = b'Error response from daemon: No such image: world-reward/hoi-detr-mmcv-native-v4:latest\n'; stdout = b'\n'; rc=1
     if fault == 'daemon': stderr=b'Cannot connect to the Docker daemon\n'
     elif fault == 'permission': stderr=b'permission denied\n'
     elif fault == 'rc': rc=2
     elif fault == 'present': rc=0; stdout=b'sha256:'+b'a'*64+b'\n'; stderr=b''
     elif fault == 'wrong_name': stderr=b'Error response from daemon: No such image: foreign:latest\n'
-    else: stderr=b'Error response from daemon: No such image: world-reward/hoi-detr-mmcv-native-v3:other\n'
+    else: stderr=b'Error response from daemon: No such image: world-reward/hoi-detr-mmcv-native-v4:other\n'
     monkeypatch.setattr(gate.subprocess,'run',lambda args,**kw:subprocess.CompletedProcess(args,rc,stdout,stderr))
-    with pytest.raises(ValueError): gate.absent('world-reward/hoi-detr-mmcv-native-v3',gate.time.monotonic()+30,image_name=True)
+    with pytest.raises(ValueError): gate.absent('world-reward/hoi-detr-mmcv-native-v4',gate.time.monotonic()+30,image_name=True)
 
 
 def test_owned_scratch_cleanup_rejects_replacement_inode(gate,tmp_path):
@@ -396,11 +396,11 @@ def test_base_header_presence_still_required(gate, monkeypatch, tmp_path):
         gate.versions(p)
 
 
-def test_technical_v3_namespaces_preserve_original_v1_failure(gate):
+def test_technical_v4_namespaces_preserve_original_v1_failure(gate):
     p = json.loads((REPO/gate.PROTOCOL).read_bytes())
-    assert p['schema']=='world_reward.hoi_detr_runtime.v3'
-    assert gate.DATA==Path('/srv/world-reward-data/hoi_detr_runtime_v3') and p['data_root']==str(gate.DATA)
-    assert p['output']=='results/hoi-detr-runtime-v3' and p['target_image']=='world-reward/hoi-detr-mmcv-native-v3'
+    assert p['schema']=='world_reward.hoi_detr_runtime.v4'
+    assert gate.DATA==Path('/srv/world-reward-data/hoi_detr_runtime_v4') and p['data_root']==str(gate.DATA)
+    assert p['output']=='results/hoi-detr-runtime-v4' and p['target_image']=='world-reward/hoi-detr-mmcv-native-v4'
     assert (p['budget_seconds'],p['cleanup_grace_seconds'],p['outer_seconds'])==(1800,60,1860)
     source = (REPO/gate.HELPERS[0]).read_text()
     assert '/srv/world-reward-data/hoi_detr_runtime_v1' not in source and 'results/hoi-detr-runtime-v1' not in source
@@ -474,3 +474,15 @@ def test_only_image_packaging_uses_actual_local_builder_no_pull(gate, monkeypatc
     source=(REPO/gate.HELPERS[0]).read_text()
     assert "command(['docker', 'build', '--pull=false', '--network', 'none'" in source
     assert 'DOCKER_BUILDKIT' not in gate.SAFE_ENV
+
+
+def test_native_softnms_backend_and_original_return_device_are_distinct(gate):
+    p=json.loads((REPO/gate.PROTOCOL).read_bytes())
+    assert p['operators']['softNMS']['native_cpu_only'] is True
+    assert p['operators']['softNMS']['device']=='cpu'
+    assert p['operators']['softNMS']['input_device']==p['operators']['softNMS']['output_device']=='cuda'
+    source=(REPO/gate.HELPERS[0]).read_text()
+    assert 'require(dets.is_cuda and idx.is_cuda' in source
+    assert "native_backend_device='cpu'" in source
+    assert 'torch.equal(dets[:, :4], boxes[idx])' in source
+    assert 'torch.allclose(dets[:, 4], scores[idx])' in source

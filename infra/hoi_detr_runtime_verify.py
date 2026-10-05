@@ -24,10 +24,10 @@ import urllib.request
 import zipfile
 
 ROOT = Path('/srv/scenesmith/world-reward')
-DATA = Path('/srv/world-reward-data/hoi_detr_runtime_v3')
+DATA = Path('/srv/world-reward-data/hoi_detr_runtime_v4')
 ENTRY = 'run_hoi_detr_runtime_verify'
 PROTOCOL = 'configs/hoi_detr_runtime_v1.json'
-PROTOCOL_PIN = dict(bytes=7634, sha256='b6636cfc2ac56929489a577cdd7daefff768d8beaff00c8be5a6fe8fabb13d67')
+PROTOCOL_PIN = dict(bytes=7695, sha256='a5bd9a4953615db706986ca5e8a339f87bbfa63a30105a71cc335a5c114620f8')
 ACQUIRE_PIN = dict(bytes=29349, sha256='130ca5bb5c4925c0069b5a3181c54848b78cb6c043dc688f29aa1f8bb66c3845')
 HELPERS = ('infra/hoi_detr_runtime_verify.py', 'infra/run_hoi_detr_runtime_verify.sh', PROTOCOL,
            'infra/hoi_detr_acquire.py', 'infra/mediapipe_cpu_runtime_verify.py', 'infra/mediapipe_hands_acquire.py')
@@ -120,8 +120,8 @@ def source(rt, code, revision):
 
 def protocol(rt, code):
     p = rt.pinned(code/PROTOCOL, PROTOCOL_PIN, 32 << 10)
-    require(p['schema'] == 'world_reward.hoi_detr_runtime.v3' and p['scope'] == 'native_mmcv_operator_qualification_only'
-            and p['root'] == str(ROOT) and p['data_root'] == str(DATA) and p['output'] == 'results/hoi-detr-runtime-v3'
+    require(p['schema'] == 'world_reward.hoi_detr_runtime.v4' and p['scope'] == 'native_mmcv_operator_qualification_only'
+            and p['root'] == str(ROOT) and p['data_root'] == str(DATA) and p['output'] == 'results/hoi-detr-runtime-v4'
             and (p['budget_seconds'], p['cleanup_grace_seconds'], p['outer_seconds']) == (1800, 60, 1860)
             and p['minimum_free_bytes'] == 16 << 30 and all(p[k] is False for k in FLAGS), 'Frozen operator-only scope required')
     s = p['source']
@@ -426,8 +426,10 @@ def operator_cases(torch, ops, p):
     require(idx.is_cuda and idx.tolist() == c['NMS']['expected_indices'], 'Native CUDA NMS indices differ')
     records['NMS'] = dict(device='cuda', indices=idx.tolist(), exact=True)
     dets, idx = ops.soft_nms(boxes, scores, iou_threshold=c['softNMS']['iou_threshold'], method=c['softNMS']['method'], min_score=c['softNMS']['min_score'], offset=c['softNMS']['offset'])
-    require(not dets.is_cuda and not idx.is_cuda and idx.tolist() == c['softNMS']['expected_indices'] and torch.equal(dets[:, :4], boxes.cpu()[idx]) and torch.allclose(dets[:, 4], scores.cpu()[idx]), 'Original CPU soft-NMS decay/removal/indices differ')
-    records['softNMS'] = dict(device='cpu', native_cpu_only=True, indices=idx.tolist(), scores=dets[:, 4].tolist(), identical_overlap_score_decayed_to_zero=True)
+    # Original soft_nms executes its extension on CPU then returns to the
+    # input device. CUDA output is native transfer semantics, not a CUDA backend.
+    require(dets.is_cuda and idx.is_cuda and idx.tolist() == c['softNMS']['expected_indices'] and torch.equal(dets[:, :4], boxes[idx]) and torch.allclose(dets[:, 4], scores[idx]), 'Original CPU soft-NMS decay/removal/indices differ')
+    records['softNMS'] = dict(device='cuda', native_backend_device='cpu', native_cpu_only=True, input_device='cuda', output_device='cuda', indices=idx.tolist(), scores=dets[:, 4].tolist(), identical_overlap_score_decayed_to_zero=True)
     r = c['RoIAlign']; x = torch.arange(16, dtype=torch.float32, device='cuda').reshape(1, 1, 4, 4); rois = torch.tensor([[0., 0., 0., 4., 4.]], device='cuda')
     y = ops.roi_align(x, rois, r['output_size'], r['spatial_scale'], r['sampling_ratio'], r['pool_mode'], r['aligned']); target = torch.tensor([[[[2.5, 4.5], [10.5, 12.5]]]], device='cuda')
     require(y.is_cuda and y.dtype == torch.float32 and torch.allclose(y, target, rtol=0, atol=r['atol']), 'Native CUDA RoIAlign analytic grid differs')

@@ -10100,3 +10100,18 @@ base/rootfs. No COPY/install/tag/GPU/models or extra image layer. Fresh v3
 therefore changes packaging only: explicit classic local builder and --pull=false,
 new namespace, nine native functions AST-identical to v2. Same source/operators/
 32CPU/128GiB/1800s; no package/source/numerical repair or old-result relabel.
+
+79e2e88 v3 full compile PASS64.382673s and exact local image packaging reached
+actual CUDA operator execution. Lifecycle CLOSED FAIL120.590242s at soft-NMS
+return-device assertion; native CUDA MSDeformAttn/reference and NMS checks
+preceded it but no complete operator PASS. Host7473B/
+7f51e741e62b1e4eaef98c3848e378fd31964272bd275395263bb1f0d974444c;
+operator534B/26145847df3624786ab7a55344f72c8b167ee5daa447e16cd19cc3db28a8011e.
+Original source/input/base posthash, owned scratch/containers and failed image
+cleanup verified. Primary pinned nms.py21238B/fc136ea4 documents CPU backend
+but explicitly returns dets/indices to boxes.device. Our test incorrectly
+expected CPU outputs for CUDA inputs. Fresh v4 corrects ONLY that device
+assertion/reference-device bookkeeping, keeps exact indices/scores/boxes and
+all original sources/tolerances/budgets. No numerical backend patch, acceptance
+tolerance change or old result relabel. Backend CPU versus returned CUDA device
+are recorded separately; original native GPU qualification remains incomplete.
