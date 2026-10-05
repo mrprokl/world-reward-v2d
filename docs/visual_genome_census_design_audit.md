@@ -108,3 +108,30 @@ independent read-only source/receipt-ABI review PASS before first execution.
 Closed parser-cost receipt and its full original source become the21st pinned
 input/fourth source, rehashed before/after; no cost replay. First actual census
 remains required; no eligible photo count is assumed.
+
+## First actual census: capacity closed, no RGB
+
+Producer `47d29b99d5dcf3e72155b45a1762efd914d32f60` completes all four
+expanded streams and source/input postchecks in972.656085839s, within the
+prospective1200s budget. Native status **FAIL**,
+`CLOSED_INSUFFICIENT_CAPACITY_NO_RGB`:108077 VG images,39 rights-linked
+nonhistorical candidates,288 crosslink conflicts,38 rejected native schema/
+geometry/endpoint joins, one consulted image and **0 eligible photos**.
+The unchanged96-photo capacity gate fails. This is failure of this exact
+conservative validation protocol, not proof that VG has no useful interactions.
+No relaxing names/boxes/joins/rights, reselection or RGB acquisition follows.
+
+Independent saved-only audit PASS: complete297 Git files/302 entries, four
+historical sources and21 inputs unchanged before/after, five outputs scellées,
+terminal service exit1/PID0 and original driver absent. No annotation/ledger
+values, decompression or census are replayed. Report16060B SHA256
+`ee34c33a12c38085b5a02d5a1288daafc4102d00554eb94664ae83f9828b5c2e`;
+audit4417B SHA256
+`c5be8a3c417d00655b7155c0b874b29406f26fffcc28cdff229b4c3c920b16fe`.
+
+Decision: stop this reference path. The new marginal/packed operators have
+only data-free mathematical/source qualification; they cannot be fitted or
+adopted on this empty cohort. Next validation needs a genuinely separate,
+rights-qualified reference protocol. Actual GPU numerical qualification is
+also still required; neither engineering success nor this failed census
+establishes ownership or a CARI4D improvement.

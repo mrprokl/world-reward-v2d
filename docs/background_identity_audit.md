@@ -81,6 +81,13 @@ Fresh Visual Genome metadata acquisition and independent saved-only audit pass:
 require licensed photo-ID-linked COCO metadata and exclude all432 historical
 slots before new semantic references. No new selector is learned or adopted yet.
 
+The first strict VG/COCO-linked census now completes all metadata streams
+under its prospectively revised1200s budget but returns0 eligible photos:
+39 rights-linked candidates,38 native conflicts, no qualifying crowded hold.
+This exact reference path is closed, not relaxed/retried. No RGB was acquired;
+the result does not prove that all VG interactions are unusable. A separate
+qualified external validation source remains necessary before selector FIT.
+
 Latent sides with only published positive pair labels motivate permutation-
 invariant MIL, but a flexible attention/graph model does not identify ownership
 by itself. [Ilse et al.,2018](https://proceedings.mlr.press/v80/ilse18a.html)

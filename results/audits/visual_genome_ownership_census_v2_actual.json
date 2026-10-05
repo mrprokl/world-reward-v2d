@@ -1,0 +1,122 @@
+{
+  "GPU_used": false,
+  "RGB_read": false,
+  "adoption": false,
+  "audit_elapsed_seconds": 852.9007143040071,
+  "author_disjointness_verified": false,
+  "capacity_gate_passed": false,
+  "census_rerun": false,
+  "counts": {
+    "consulted_images": 1,
+    "crosslink_conflict": 288,
+    "distinct_eligible_photos": 0,
+    "duplicate_image_crosslinks": 0,
+    "eligible_images": 0,
+    "insufficient_positive_crowd": 1,
+    "object_schema_or_geometry": 5,
+    "person_ids": 0,
+    "published_direct_hold_edges": 0,
+    "rejected_images": 38,
+    "relation_schema_or_endpoint_conflict": 33,
+    "rights_eligible_images": 39,
+    "rights_unknown_or_historical": 107750,
+    "target_ids": 2,
+    "vg_images": 108077
+  },
+  "creator_identity_verified": false,
+  "decision": "CLOSED_INSUFFICIENT_CAPACITY_NO_RGB",
+  "expanded": {
+    "coco": {
+      "bytes": 19987840,
+      "crc_stream_verified": true,
+      "sha256": "e8c7f7908f1d7278341fae127d0da654f102f11bd7b21d8aeefa635b8c810b6f"
+    },
+    "images": {
+      "bytes": 17612822,
+      "crc_stream_verified": true,
+      "sha256": "93d0053d7e8f451497646fa513e8fb9b1a889df6e757010b88e51e2e21803487"
+    },
+    "objects": {
+      "bytes": 349437266,
+      "crc_stream_verified": true,
+      "sha256": "94238b6187c0ea1f97acc1fdaec106bd3dee12bb0f81b23dc8b07e9173514985"
+    },
+    "relations": {
+      "bytes": 743673397,
+      "crc_stream_verified": true,
+      "sha256": "9a7d5f396bd9f1d150e6977c2896ca4feb6024068c6e4c51d571d385f5ab4e64"
+    }
+  },
+  "historical_known_authors": 325,
+  "historical_known_md5": 432,
+  "historical_slots": 432,
+  "historical_source_count": 4,
+  "historical_sources_before_after": true,
+  "host_elapsed_seconds": 972.6560858389712,
+  "input_count": 21,
+  "input_inventory_sha256": "6fe391ccee83a76a4cef1a89008fc779197a93e45f49aafe882034eaa855572d",
+  "inputs_before_after": true,
+  "ledger_values_consulted": false,
+  "limitation": "Saved metadata counts/expanded CRC and SHA are producer claims authenticated by original source and receipt; no census, decompression or ledger semantic replay. Capacity is not image availability, identity, ownership or quality qualification.",
+  "models_loaded": false,
+  "observer_remote_scaffolds_created": false,
+  "observer_sha256": "166f12ec1c5dfb7632d9c8b1a412db117d77fa79068fd002757f703fdccac94b",
+  "original_driver_absent": true,
+  "output_identities": {
+    "eligible_metadata.json": {
+      "bytes": 116,
+      "sha256": "61450e8870c07fe6f12a7e7f9d355f8d09b550793748cf04efcca29240cc87a9"
+    },
+    "object_alias.txt": {
+      "bytes": 60166,
+      "sha256": "0c8e059fc31eeebfd98231f5789892da8ae33bfa00434c70aee969dc6eaa853b"
+    },
+    "readme_v1_4.txt": {
+      "bytes": 746,
+      "sha256": "788334c8c396b15869cea8cf3097e837a8f0752fefececb9c10ea3d28089be0e"
+    },
+    "relationship_alias.txt": {
+      "bytes": 122102,
+      "sha256": "15f7f64802c95c5bf5b5690457566b1b19ee64eac7a94d8b8cbb3a4378f2ec7c"
+    },
+    "report.json": {
+      "bytes": 16060,
+      "sha256": "ee34c33a12c38085b5a02d5a1288daafc4102d00554eb94664ae83f9828b5c2e"
+    }
+  },
+  "outputs_before_after": true,
+  "outputs_sealed": true,
+  "parser_rerun": false,
+  "photo_license_basis": "publisher_COCO_CC-BY2_crosslink_only",
+  "pretraining_overlap_verified": false,
+  "producer_revision": "47d29b99d5dcf3e72155b45a1762efd914d32f60",
+  "producer_status": "fail",
+  "quality_verified": false,
+  "report": {
+    "bytes": 16060,
+    "sha256": "ee34c33a12c38085b5a02d5a1288daafc4102d00554eb94664ae83f9828b5c2e"
+  },
+  "saved_only": true,
+  "schema": "world_reward.visual_genome_ownership_census_actual_audit.v2",
+  "source_archive_xz_bytes": 221504,
+  "source_archive_xz_sha256": "915f92c3d1a40919ba3bc70521b99475853588cd07f591fff24a41579eb098c6",
+  "source_before_after": true,
+  "source_closure_sha256": "a4dd1f7f1f14d661cfdfce226e6b4e590bb8e40398d5cb7f5109b0a9ce94bf7a",
+  "source_entries": 302,
+  "source_files": 297,
+  "stage": "complete",
+  "status": "pass",
+  "transport_cli_exit": 0,
+  "truth_scope": "positive_published_pair_not_anatomy_OFF_contact_task_temporal_or_3D",
+  "underlying_image_rights_independently_verified": false,
+  "unit": "world-reward-visual-genome-ownership-census-v2.service",
+  "unit_state": {
+    "ActiveState": "failed",
+    "ExecMainStatus": "1",
+    "LoadState": "loaded",
+    "MainPID": "0",
+    "Result": "exit-code",
+    "SubState": "failed"
+  },
+  "unit_wait_seconds": 851.7436464030179
+}

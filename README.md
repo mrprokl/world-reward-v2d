@@ -21,8 +21,13 @@ not manual episode reassignment or another downstream fit of the wrong pair.
 track-area selection do not resolve ownership. The new coherent-route core
 preserves every person/side/object and combines one native relation before
 reduction. Its masked variant and pure FIT-only learner prototype pass numerical
-controls, but no real selector has been fitted or adopted; native bank cost is
-being qualified before references.
+controls, but no real selector has been fitted or adopted. The fixed-step
+hard-max recipe fails its frozen cost gate. A separate normalized latent
+reference, compact factors/CSR and CPU analytic gradients pass tiny independent
+controls; the Torch device prototype has source-only qualification, no actual
+GPU numerical/cost test yet. The first strict VG/COCO-linked reference census
+completes but yields0 eligible photos: this path is closed without RGB, relaxed
+joins or retries. Fresh external validation remains necessary.
 MMHOI's complete Azure-only metadata census passes an independent audit; its
 supplement still does not qualify anatomical indices, sentinels or RGB alignment.
 The explicit corrected OpenImages metadata gate finds132 independent source
