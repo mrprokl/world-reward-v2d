@@ -10320,3 +10320,26 @@ RO, no RGB/model/GPU; official external references only after all prediction
 pins authenticate. Exact-case vocabulary/IoU binding/all-slot safety/sign-test
 remain preregistered. 339combined tiny tests PASS0.44s; independent read-only
 audit verifies child mounts/runtime/full source dependency closure.
+
+48384e0 actual external reference evaluation COMPLETE engineeringPASS10.558679s
+but scientific study **INCONCLUSIVE, permanently closed for adoption**.
+Only1 informative image versus preregistered minimum6, paired concordance
+delta0 (one tie), statistical p deliberately not reported under insufficient
+support. Full128-slot retrieval A=.15625/B=.171875 is descriptive only, NOT
+verified superiority.61predicted/67missing; no dropped missing/unscorable
+slots, parameter tuning, test switching, cohort expansion or resampling.
+Host3305B/2e31ca5075e463055f23f125754aa6eccba8978aa8103b71201d713a5851af69;
+native1722B/564a6fe37e67f95ad47d88171bbf6ec56078866953b15955a05e10a14bf8ae59;
+metrics57033B/7b93a368c6fb632aa6a605d9da151415f8e4c80d11c6904d153621ea08095f45.
+Original official bbox77484237B/
+fe22e579b9453875601576859d14ef3304058165de139c66b725e599202bd7b1,
+relationships9308608B/418a1e22a6da1fd2fdcffb53cb92fdc796cc41d7ca0c3311cfd298f1639c9ef6,
+vocabulary37869B/c53e939aef2b72512026ab2d944b9356481c08e647a4086f00b17237d558d38e;
+ETag MD5s verify all exact publisher bodies, all reference bytes Azure-only.
+Independent actual source/original+qualified metadata/all61NPZ/ref/proof/metric
+hashes and128denominator/sign counts/decision recomputation PASS; readonly
+sealing and owned-container cleanup complete, GPUidle. No contact, true hand
+ownership, training overlap, 3D quality, CARI4D victory or adoption verified.
+Decision: do not integrate this component on weak descriptive uplift; prioritize
+completing the native Track1 reconstruction/export and an informative independent
+validation source before another relation-comparison experiment.

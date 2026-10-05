@@ -82,3 +82,17 @@ or failed statistical superiority => REJECT for adoption on this study; no
 parameter tuning/retries/resampling. One frozen evaluation only. Report useful
 aggregates/decision/pins; no test-instance labels/renders local. Even a PASS
 requires separate continuous interaction/actor/3D validation before submission.
+
+## Frozen outcome — October 5
+
+Inference producer1dc58f7, evaluator48384e0; all61 header-qualified originals
+predicted automatically, all128slots retained including67misses. Original
+creator/download/orientation gates and the preregistered pixel cap are unchanged.
+Exact evaluator finds only1 informative image (minimum6), with zero paired
+concordance delta. **INCONCLUSIVE; this study is closed, no adoption, expansion,
+resampling, threshold change or statistical-test switching.** Full-slot
+retrieval A15.625%/B17.1875% is a descriptive diagnostic, not superiority.
+Reference support:22images with a matched positive,4with a matched negative,
+41with an eligible hand;76positive-person slots,1reference-unscorable.
+Native/evaluator engineering PASS and independent source/input/prediction/
+reference/metric/cleanup checks are recorded in docs/experiments.md.

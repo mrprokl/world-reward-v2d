@@ -32,10 +32,14 @@ not manual episode reassignment or another downstream fit of the wrong pair.
   checkpoint fields load strictly; one procedural image forward completes in
   the45.29s host gate. A separate licensed external image now executes both
   native hand→object pairs in45.96s, with all proposal/query evidence retained.
-  This qualifies pair-head execution, not semantic-quality. Next: a fresh
-  lawful attribution control on the same automatic proposals, not tuning the
-  rejected HO-Cap cohort or challenge episodes. Benchmark rights/training
-  overlap and submission eligibility remain separate unresolved gates.
+  This qualifies pair-head execution, not semantic quality. The separately
+  preregistered128-slot attribution study is now **closed INCONCLUSIVE**:
+  61 exact licensed originals predicted,67 explicit misses, only1 informative
+  image versus6 required. Full-bank retrieval15.625%→17.1875% is descriptive,
+  not a verified improvement; no component adoption or tuning on this cohort.
+  Prioritize existing full-native coverage and a genuinely informative external
+  interaction validation, not another expansion of this closed comparison.
+  Benchmark training overlap and submission eligibility remain unresolved.
 
 - **New generic operators:** [surface identity/LOD](docs/surface_lod_protocol.md)
   separates lawful open surfaces from our optional closed-solid backend; no
