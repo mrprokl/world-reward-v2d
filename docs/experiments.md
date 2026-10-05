@@ -11059,3 +11059,26 @@ A automatic fullP×Ogeometry vs futureB learned anatomy/HOI is preregistered bef
 new inference; same proposal bank, all32TEST slots, no reference-assisted hand
 assignment, explicitpositive-only limits. Actual64RGB acquisition e2b6019 and
 new20CPUprepare e2b6019 dispatch-only pending; no final native success inferred.
+
+### October5 — full coverage and real crowd proposal continuation
+
+EP19 native preparation is now independently auditedPASS443original frames:
+345originalGitfiles/350entries,1356inputs,15public files and5outputs before/after,
+saved-only CPU inventory and original container absence. No new model/GPU call.
+EP20/22 have actual nativePASS headers549/533frames, not yet full independent
+audits. EP16refined and EP17forward are under saved-only audit; dead unit states
+alone are not quality/nativePASS evidence. No submission or coverage victory.
+
+The authored crowd study's32banks/544masks receive an independent unpacked
+BooleanAND/OR IoU recomputation, exact agreement for all primary/diagnostic and
+DEV/reserved aggregates. Full three producer Git file sets/bytes/modes/markers
+and133prediction/reference/RGB receipts rehash before/after; CPU removed.
+2.663544s, no model/GPU call. The separate redundant installed-source-only probe
+remains partial/inconclusive; do not rewrite that historical observer outcome.
+Synthetic recall is proposal capacity, not ownership or a CARI4D win.
+
+The next real COCO cohort protocol is frozen at4657c8b;32metadata-selected slots,
+16DEV/16reserved, CC-BY2 photos/CC-BY4 annotations, all240closed OI photo IDs
+excluded. Actor/author/pretraining independence remains unverified. Actual
+metadata-only census dispatched on Azure, native result pending; no RGB/model
+or recall inferred from dispatch. All heavy bytes remain remote.

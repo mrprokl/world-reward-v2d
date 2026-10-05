@@ -1,0 +1,48 @@
+{
+  "adoption": false,
+  "all32_banks_checked": true,
+  "all_report_metrics_equal": true,
+  "duplicate_masks_retained": 0,
+  "elapsed_seconds": 2.66354381700512,
+  "evaluation_report": {
+    "bytes": 12167,
+    "sha256": "65b75b9a8766c0bc66e13a69ecce35673c63770b89802573981c749df0d54146"
+  },
+  "files_before_after": 133,
+  "full_source_Git_bytes_modes_markers_before_after": true,
+  "installed_runtime_scope": "Original native pre/post qualifier retained; redundant source-only auxiliary probe remains inconclusive in separate partial audit",
+  "matching_independence": "Uses original matching implementation, independently exhaustive3x3-tested; mask IoU BooleanANDOR is independent",
+  "native_masks": 544,
+  "new_GPU_calls": 0,
+  "new_model_calls": 0,
+  "observer_correction": "Initial observer used uncompressed tar hash for compressed source marker; corrected to exact lzma6 archive marker; no producer or method rerun",
+  "owned_CPU_removed": true,
+  "ownership_verified": false,
+  "primary_IoU": "independent_unpacked_logical_AND_OR",
+  "quality_verified": false,
+  "schema": "world_reward.independent_saved_proposal_recall.v1",
+  "source": {
+    "run_proposal_stress_evaluate": {
+      "archive_sha256": "5884de4519d8abaec10dfd2e911d99fdeac98c61fa1298471e406d6a8f236a69",
+      "files": 262,
+      "revision": "dd232ffbeec4726e5fb60034b16f318b68f32596"
+    },
+    "run_proposal_stress_render": {
+      "archive_sha256": "b48f75c29fa159c1c372c1dbd89b85c75c0e3de00a3a919a41156d275f96384e",
+      "files": 259,
+      "revision": "d7e1f8d61ae91611cc36da41e3cef6e49e039e04"
+    },
+    "run_rgb_region_bank": {
+      "archive_sha256": "3e5454716e23904ec7a54480347bffdc83f288b97dc18d6cb3a3ecb9707f864a",
+      "files": 271,
+      "revision": "15a6bde56308f9f598cd6c39fbb78334fec4261c"
+    }
+  },
+  "status": "pass",
+  "thresholds": [
+    0.25,
+    0.5,
+    0.75
+  ],
+  "zero_visible_instances": 0
+}

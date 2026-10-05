@@ -144,5 +144,6 @@
   "quality_verified": false,
   "ownership_verified": false,
   "adoption": false,
-  "independent_source_and_metric_audit_pending": true
+  "independent_source_and_metric_audit_pending": false,
+  "independent_metric_audit": "results/audits/proposal_stress_independent_metric_v1_actual.json"
 }
