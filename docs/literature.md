@@ -1691,3 +1691,16 @@ closer. Its MIT software grant does not explicitly clear the added DATA roles;
 COCO's annotation grant does not automatically clear these, and original Flickr
 image rights require separate verification. Do not acquire/adopt under an
 unverified waiver. Neither audit establishes contact/3D quality or CARI4D gain.
+
+Runtime audit favors the original MASA author environment: Python3.11,
+Torch2.1.2/cu118, torchvision0.16.2, NumPy1.26.4, MMCV2.1.0 and MMDet3.3.0.
+The official cp311 MMCV wheel is actually available (99,353,053B; publisher
+Content-MD5 65199300b098827d1ff8e6fabdb5082c), but no publisher SHA256 was
+provided. Compute the latter after Azure acquisition, without calling MD5 a
+SHA256. MMEngine0.10.3 is a proposed compatible pin, not an author-fixed pin.
+Use a new isolated runtime; do not modify the existing Torch2.5/MMCV1.7 images.
+Import/build success alone is insufficient: actual H100 FP32 DCNv2 must match
+conv2d at zero offsets/unit mask and remain finite/repeatable at nonzero offsets;
+actual native RoIAlign must match its same-parameter CPU reference. Synchronize
+CUDA before reporting. These data-free gates precede strict original checkpoint
+loading and full-bank embeddings, and prove neither association nor 3D quality.

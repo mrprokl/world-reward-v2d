@@ -1,0 +1,73 @@
+{
+  "schema": "world_reward.masa_acquisition.v1",
+  "source_revision": "c5472b9c7615f35abdf1188cb1a0c5408fe50d66",
+  "publisher_revision": "25ed372c47f2c46cf36fd446d1b657b656bc7ea9",
+  "source_scope": "authenticated_selected_native_R50_subset_not_whole_git_tree",
+  "native_source_files": [
+    "configs/masa-one/masa_r50_plug_and_play.py",
+    "configs/default_runtime.py",
+    "masa/models/mot/masa.py",
+    "masa/models/necks/deform_fusion.py",
+    "masa/models/losses/unbiased_contrastive_loss.py",
+    "masa/models/tracker/masa_tao_tracker.py",
+    "masa/apis/masa_inference.py",
+    "masa/apis/__init__.py"
+  ],
+  "import_boundary": {
+    "acquisition_executes_source": false,
+    "root_initializers_audit_only": ["masa/__init__.py", "masa/models/__init__.py"],
+    "root_package_import_qualified": false,
+    "future_registry_imports": ["MASA", "DeformFusion", "UnbiasedContrastLoss", "MasaTaoTracker"],
+    "future_external_dependencies": ["torch", "numpy", "einops", "mmcv", "mmdet", "mmengine"],
+    "author_documented_mmdet": "3.3.0",
+    "author_documented_mmcv": "2.1.0",
+    "author_mmengine_pin": null,
+    "runtime_compatibility_verified": false,
+    "given_dets": true,
+    "load_public_dets": false,
+    "tracker_id_filtering_or_matching_qualified": false
+  },
+  "limits": {
+    "budget_seconds": 600,
+    "outer_seconds": 610,
+    "maximum_total_bytes": 600000000,
+    "maximum_text_bytes": 500000,
+    "minimum_free_bytes": 4294967296,
+    "network_attempts_per_asset": 1,
+    "parallel_downloads": 1
+  },
+  "declarations": {
+    "upstream_source_license": "Apache-2.0",
+    "publisher_card_license": "apache-2.0",
+    "license_eligibility_verified": false,
+    "training_description": "source README describes SA-1B image training; no independent overlap clearance",
+    "training_overlap_status": "unknown",
+    "models_loaded": false,
+    "weights_decoded": false,
+    "packages_installed": false,
+    "rgb_or_datasets_used": false,
+    "ground_truth_used": false,
+    "quality_evaluated": false,
+    "adopted": false
+  },
+  "assets": [
+    {"file":"source/LICENSE","bytes":11342,"sha256":"157fd3f210262c332d99f5866c8a85990509e239fb6c7d6ca015c7e0511dac16","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/LICENSE","kind":"source_notice"},
+    {"file":"publisher/README.md","bytes":274,"sha256":"f4de0db0367dfd5824830c511051e5d95aca52e5c20b113ad6cbcfdf5b91609a","url":"https://huggingface.co/dereksiyuanli/masa/resolve/25ed372c47f2c46cf36fd446d1b657b656bc7ea9/README.md","kind":"publisher_card"},
+    {"file":"source/README.md","bytes":14437,"sha256":"0d45828a16b19f90ef4550c338be04ee9b549e5e149acbb1908034f016dc3798","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/README.md","kind":"source_metadata"},
+    {"file":"source/requirements.txt","bytes":364,"sha256":"03e8afe537c497887416e7db7cdb76d11a666ec5bd04c4e0496539a99ec7a025","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/requirements.txt","kind":"source_metadata"},
+    {"file":"source/environment.yml","bytes":245,"sha256":"e874c3d68d3a658731fe7cf6dcd1fdd555e0796b34fbccbb1a0c7afbbb8f60df","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/environment.yml","kind":"source_metadata"},
+    {"file":"source/docs/install.md","bytes":1131,"sha256":"aacdef092326cea146f40c2ff9b5319bd24eb58d40b28db5461662b6d8032e89","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/docs/install.md","kind":"source_metadata"},
+    {"file":"source/docs/model_zoo.md","bytes":3192,"sha256":"8cbae57a4a990f9c8890b96bc7ded04926dfeba4f302734c4e2208fcbf1af4d3","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/docs/model_zoo.md","kind":"source_metadata"},
+    {"file":"source/configs/masa-one/masa_r50_plug_and_play.py","bytes":6951,"sha256":"749b8b77c18fc985a7604a4f3cd4af745b82be672f64cda67097c48bb53fac12","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/configs/masa-one/masa_r50_plug_and_play.py","kind":"native_source"},
+    {"file":"source/configs/default_runtime.py","bytes":758,"sha256":"1af5edc8000540a1d3a48ec9216fce35028e4dc784955214ca67c440f7ed4142","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/configs/default_runtime.py","kind":"native_source"},
+    {"file":"source/masa/models/mot/masa.py","bytes":21362,"sha256":"1439cd038d15183f15766522d13cef8d2783922b93e40fac665677bd47489c44","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/masa/models/mot/masa.py","kind":"native_source"},
+    {"file":"source/masa/models/necks/deform_fusion.py","bytes":6695,"sha256":"1d8a1ed2c726606e9aeefc115c36460ca6bf78d14906edf58d52645ffc528b86","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/masa/models/necks/deform_fusion.py","kind":"native_source"},
+    {"file":"source/masa/models/losses/unbiased_contrastive_loss.py","bytes":2136,"sha256":"5e07cc2423aba2829c70779806ac8656c9b2f9e7b2e53f51ec23c632f1943d85","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/masa/models/losses/unbiased_contrastive_loss.py","kind":"native_source"},
+    {"file":"source/masa/models/tracker/masa_tao_tracker.py","bytes":13974,"sha256":"c963393eee82ba5321a4c8e3ac4cd8d5b066a46788ec2096cc8f4fb2713b787c","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/masa/models/tracker/masa_tao_tracker.py","kind":"native_source"},
+    {"file":"source/masa/apis/masa_inference.py","bytes":10215,"sha256":"7033fa399abff621b1f7198ec29e1e9e2feffe749efd979c3154f4d4952e4feb","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/masa/apis/masa_inference.py","kind":"native_source"},
+    {"file":"source/masa/apis/__init__.py","bytes":281,"sha256":"d5ae00b2b7e94576493ac0a4356c1a9dd59e6a4b8be968292feecb9772292efe","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/masa/apis/__init__.py","kind":"native_source"},
+    {"file":"source/masa/__init__.py","bytes":99,"sha256":"725f9014887483715231fe1c04b94966e91ca673aae28bb1b71ecc6f4a78da93","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/masa/__init__.py","kind":"audit_only_initializer"},
+    {"file":"source/masa/models/__init__.py","bytes":198,"sha256":"0729796db293f8afeaea65ea5a374e7cf84cac048cf7364431a6628c355444c3","url":"https://raw.githubusercontent.com/siyuanliii/masa/c5472b9c7615f35abdf1188cb1a0c5408fe50d66/masa/models/__init__.py","kind":"audit_only_initializer"},
+    {"file":"weights/masa_r50.pth","bytes":528391980,"sha256":"082670efc6e8820eff8257f78ea14dfb52d6cdbe2910ecccf0901a74f4a0fd76","url":"https://huggingface.co/dereksiyuanli/masa/resolve/25ed372c47f2c46cf36fd446d1b657b656bc7ea9/masa_r50.pth","kind":"opaque_checkpoint"}
+  ]
+}

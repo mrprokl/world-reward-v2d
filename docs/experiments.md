@@ -10381,3 +10381,18 @@ EP16's separate full native pose is confirmed live by systemd PID2006974 and
 exact owned H100 container/process2007129; no trajectory PASS inferred yet.
 CPU EP17 ran independently without GPU or duplicate pose work. Original EP17
 closed-solid failure remains unchanged, no repair/manual selection/accuracy claim.
+
+MASA acquisition implementation is frozen prospectively, not a completed run:
+18 original public assets528485634B, of which17 source/notices total93654B and
+one opaque R50 checkpoint528391980B/082670efc6e8820eff8257f78ea14dfb52d6cdbe2910ecccf0901a74f4a0fd76.
+Config7148B/488cbf89b15d1843ad1a6b578d77fbb12d7742a550a77f6885f26d337875974d;
+driver17128B/2e9e0539c0ddf6d0d9045a377516f4a89424a8b29ebdf04503f1444f2b512238;
+shell2114B/fb26326ab73b42fe3cf2e103d27848a71ea5bac413f344f1470c85d2c325cef5.
+Independent read-only audit and39 tiny manufactured tests PASS; parent repeats
+39PASS0.70s and shell syntax/source closure checks. These are not native tests.
+VM02 alone, fresh leased UID1000 namespace, notices before opaque weight,
+600s inclusive root-start budget/610s outer, credential-free exact publisher
+downloads, source/output posthash and owned-partial cleanup before PASS.
+Selected original source subset is explicit, not a complete root package import.
+No model decoding, package installation, GPU, dataset, eligibility/overlap
+clearance, scientific adoption or CARI4D superiority follows from acquisition.
