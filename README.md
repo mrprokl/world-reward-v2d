@@ -20,14 +20,19 @@ not manual episode reassignment or another downstream fit of the wrong pair.
 **Current research:** CARI4D's concept-mask union and 4DAnyone's largest summed
 track-area selection do not resolve ownership. The new coherent-route core
 preserves every person/side/object and combines one native relation before
-reduction;199 tiny controls pass, but no selector has been fitted or adopted.
+reduction. Its masked variant and pure FIT-only learner prototype pass numerical
+controls, but no real selector has been fitted or adopted; native bank cost is
+being qualified before references.
 MMHOI's complete Azure-only metadata census passes an independent audit; its
 supplement still does not qualify anatomical indices, sentinels or RGB alignment.
 The explicit corrected OpenImages metadata gate finds132 independent source
 slots above the unchanged96 gate; unsupported identities are excluded, not
 repaired, and the old failure stays immutable. Independent rederivation passes.
-Remaining COCO byte-alias exclusions precede any selection. No cohort has been
-acquired or selected, and no accuracy follows.
+All96 historical COCO original-byte identities are now excluded. A fresh96-slot
+cohort (32 FIT/16 CAL/48 RESERVED) is frozen in a new SHA order before HTTP;
+an independent saved-only audit reproduces selection and full source/input pins.
+Individual creator rights/original acquisition is the next separate gate, not
+accuracy or an ownership result.
 See [next ownership decision](docs/ownership_next_decision.md). No manual labels
 or episode-specific rescue are used.
 
