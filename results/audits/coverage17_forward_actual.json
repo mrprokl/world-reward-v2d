@@ -1,0 +1,64 @@
+{
+  "CPU_observer_removed": true,
+  "GPU_calls": 0,
+  "VM01_slot": "free",
+  "adoption": false,
+  "captured_windows": 5,
+  "elapsed_seconds": 110.87411111104302,
+  "episode": 17,
+  "files": {
+    "coconet.pth": {
+      "bytes": 320690428,
+      "sha256": "369b3119708c414b6ab33d715203be2be0c74493c96886b5a24e36bc9e1ddc49"
+    },
+    "report.json": {
+      "bytes": 66017,
+      "sha256": "8b799b4757d55ee36b2944adb2e548b27d96e955bde41f084d0693c4e7615e67"
+    }
+  },
+  "frames": 419,
+  "historical_CID_receipt_not_retained_by_original_wrapper": true,
+  "models_executed": false,
+  "observer_elapsed_seconds": 29.485129181994125,
+  "observer_sha256": "b7c60368bb038e2e6d0e8fbea589319089db6a16ca969d7b9f6c826d74f828d8",
+  "original_asset_input_output_bindings": 199,
+  "original_container_current_absence_verified": true,
+  "original_public_input_files": 15,
+  "producer_revision": "dd232ffbeec4726e5fb60034b16f318b68f32596",
+  "quality_verified": false,
+  "saved_CPU_native_validation": {
+    "all_native_FP32_parameters_and_proper_poses": true,
+    "cuda_initialized": false,
+    "faces_native_unchanged": true,
+    "fixed_inputs_byte_preserved": false,
+    "frames": 419,
+    "model_or_solver_calls": 0,
+    "original_JSON_and_public_producer_chain": true,
+    "role": "forward",
+    "saved_native_validation_no_optimizer": true,
+    "source_weights_not_loaded": true,
+    "status": "pass"
+  },
+  "schema": "world_reward.coverage_shared_forward_saved_audit.v1",
+  "script_sha256": "13aaf4d0ee3c287fca54e2c2e9d5fcde8f6680a701a97d05d38847b9cfcb8e65",
+  "source_archive_sha256": "48ce1cb6780488fdf560aa98e7c5548aa2751ebbd96bd7f43cda9d60304139a0",
+  "source_binding": {
+    "closure_sha256": "fcfa805228e2a020e26d7459259372c2df16f6cac611817428e3166b6a2730eb",
+    "entries": 285,
+    "markers": {
+      "revision": {
+        "bytes": 41,
+        "sha256": "25a57d5ae9f6a5e2becb70de0cd426f3ef633736ecfe63d1a74d735e06775db4"
+      },
+      "source-sha256": {
+        "bytes": 65,
+        "sha256": "512e7fc5964fff80349d6c775464219191c2072e6eb5df516d90f47d63f77204"
+      }
+    },
+    "producer_revision": "dd232ffbeec4726e5fb60034b16f318b68f32596"
+  },
+  "source_files": 280,
+  "source_inputs_assets_outputs_rehashed_beforeafter": true,
+  "status": "pass",
+  "whole_Git_source_exact_original_modes_beforeafter": true
+}

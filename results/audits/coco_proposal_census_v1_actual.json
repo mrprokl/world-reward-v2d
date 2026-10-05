@@ -1,0 +1,42 @@
+{
+  "adoption": false,
+  "all_inputs_outputs_before_after": 39,
+  "archive": {
+    "bytes": 252907541,
+    "sha256": "113a836d90195ee1f884e704da6304dfaaecff1f023f49b6ca93c4aaae470268"
+  },
+  "author_disjointness_verified": false,
+  "cohort": {
+    "bytes": 24029,
+    "sha256": "c78f2e100cd0c724f3b8873a3256299a7074c473ecb93c960dec509941994e67"
+  },
+  "counts": {
+    "eligible": 215,
+    "excluded_ids": 240,
+    "selected": 32
+  },
+  "elapsed_seconds": 1.3507054680085275,
+  "gpu_used": false,
+  "member": {
+    "bytes": 19987840,
+    "sha256": "e8c7f7908f1d7278341fae127d0da654f102f11bd7b21d8aeefa635b8c810b6f"
+  },
+  "metadata_selection_exact_replay": true,
+  "models_loaded": false,
+  "native_census_elapsed_seconds": 9.16687560401624,
+  "ownership_verified": false,
+  "private32_reference_rows_exact": true,
+  "producer_revision": "4657c8b45f733a1043c5a8af2f5b9d6ac027196a",
+  "quality_verified": false,
+  "report": {
+    "bytes": 3562,
+    "sha256": "c8dcee4e4f78b56a5ba8b9f644f94507715a9c46f6c05d0a305f8ce977f58786"
+  },
+  "rgb_read": false,
+  "schema": "world_reward.coco_proposal_census_actual.v1",
+  "source_archive_sha256": "a4e4e35d699ba593847a7223f98f9b77ae5be3abfae0c1739f0ca2b1ee6d840f",
+  "source_files": 268,
+  "source_fullGit_bytes_modes_markers_before_after": true,
+  "status": "pass",
+  "training_overlap_verified": false
+}
