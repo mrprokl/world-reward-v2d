@@ -1,0 +1,646 @@
+{
+  "FIT_allowed": false,
+  "RGB_allowed": false,
+  "archive": {
+    "catalogue_tail_identity": {
+      "bytes": 4096,
+      "sha256": "38c634460cccfad846182e4b24d721978afcfcec8c3675c34857a9417849139f"
+    },
+    "input": "coco_archive",
+    "instances_members": {
+      "train2014": "annotations/instances_train2014.json",
+      "val2014": "annotations/instances_val2014.json"
+    },
+    "member_catalogue": [
+      {
+        "compressed_bytes": 107297879,
+        "compression": 8,
+        "crc32": "3cd50ca9",
+        "expanded_bytes": 332556225,
+        "external_attr": 2176057344,
+        "flags": 0,
+        "member": "annotations/instances_train2014.json"
+      },
+      {
+        "compressed_bytes": 51955093,
+        "compression": 8,
+        "crc32": "264f83bf",
+        "expanded_bytes": 160682675,
+        "external_attr": 2176057344,
+        "flags": 0,
+        "member": "annotations/instances_val2014.json"
+      },
+      {
+        "compressed_bytes": 50041387,
+        "compression": 8,
+        "crc32": "23466a04",
+        "expanded_bytes": 170733465,
+        "external_attr": 2175008768,
+        "flags": 0,
+        "member": "annotations/person_keypoints_train2014.json"
+      },
+      {
+        "compressed_bytes": 23951481,
+        "compression": 8,
+        "crc32": "6976f7d7",
+        "expanded_bytes": 81637509,
+        "external_attr": 2175008768,
+        "flags": 0,
+        "member": "annotations/person_keypoints_val2014.json"
+      },
+      {
+        "compressed_bytes": 13124596,
+        "compression": 8,
+        "crc32": "35a1fcdb",
+        "expanded_bytes": 66782097,
+        "external_attr": 2176057344,
+        "flags": 0,
+        "member": "annotations/captions_train2014.json"
+      },
+      {
+        "compressed_bytes": 6501124,
+        "compression": 8,
+        "crc32": "8ef135f3",
+        "expanded_bytes": 32421077,
+        "external_attr": 2176057344,
+        "flags": 0,
+        "member": "annotations/captions_val2014.json"
+      }
+    ]
+  },
+  "budget_seconds": 1200,
+  "cpu_threads": 4,
+  "helper_pins": {
+    "infra/coco_proposal_prepare.py": {
+      "bytes": 24704,
+      "sha256": "ee9ec3ddd540ec485ef6bbe5812dda5f98760e9633cd3c11fdc49dbde2f66574"
+    },
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "infra/metadata_json_stream.py": {
+      "bytes": 8322,
+      "sha256": "742b10d5f92e3446d17d4953f1d088281f051577653899ddcc7081f61545bf53"
+    },
+    "infra/openimages_joint_pair_acquire.py": {
+      "bytes": 23252,
+      "sha256": "ab0cac6d8a66550b8898a6add435fe92bc2546cbb7536723d4de3b8d8597ad49"
+    },
+    "infra/vcoco_role_stream.py": {
+      "bytes": 10552,
+      "sha256": "e2d213677aa91677f343a337f959e4023961416419a2a3d0f4c3665aca26a70f"
+    },
+    "src/world_reward/vcoco_role_reference.py": {
+      "bytes": 11628,
+      "sha256": "6aa4e088d8da9575b58645445db1231dfe3b2f9e710c75a3b2da4af2c6cdc75a"
+    }
+  },
+  "history_names": [
+    "oi16",
+    "oi128",
+    "oi64",
+    "oi32",
+    "coco32",
+    "coco64"
+  ],
+  "inputs": {
+    "coco32": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/world-reward-data/coco_proposal_v1/metadata/cohort.json",
+      "pin": {
+        "bytes": 24029,
+        "sha256": "c78f2e100cd0c724f3b8873a3256299a7074c473ecb93c960dec509941994e67"
+      },
+      "readonly": true
+    },
+    "coco32_acquired": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/world-reward-data/coco_proposal_v1/eval_private/manifest.json",
+      "pin": {
+        "bytes": 37509,
+        "sha256": "6f3346be5a0ccb065084226ad6cdaa2423dd0d460427d43823b9635f57141ae6"
+      },
+      "readonly": true
+    },
+    "coco64": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/world-reward-data/coco_endpoint_v2/metadata/cohort.json",
+      "pin": {
+        "bytes": 41315,
+        "sha256": "5b2e6e99f3979f02586b7aa67ccef74a913f836bdc2b7314bcf94d06777562c6"
+      },
+      "readonly": true
+    },
+    "coco64_acquired": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/world-reward-data/coco_endpoint_v2/eval_private/manifest.json",
+      "pin": {
+        "bytes": 72806,
+        "sha256": "53de338a0c23409e12afa2a24b39538ff9873d40fc18c2d142b512790bf5ae10"
+      },
+      "readonly": true
+    },
+    "coco_archive": {
+      "maximum_bytes": 314572800,
+      "path": "/srv/world-reward-data/vcoco_metadata_v1/annotations_trainval2014.zip",
+      "pin": {
+        "bytes": 252872794,
+        "sha256": "031296bbc80c45a1d1f76bf9a90ead27e94e99ec629208449507a4917a3bf009"
+      },
+      "readonly": true
+    },
+    "data__splits__vcoco_all.ids": {
+      "maximum_bytes": 16777216,
+      "path": "/srv/world-reward-data/vcoco_metadata_v1/data__splits__vcoco_all.ids",
+      "pin": {
+        "bytes": 70521,
+        "sha256": "78d776cbef72d42282602826dfda58666fa93fdf1e7a74c77b81b76a20458944"
+      },
+      "readonly": true
+    },
+    "data__splits__vcoco_test.ids": {
+      "maximum_bytes": 16777216,
+      "path": "/srv/world-reward-data/vcoco_metadata_v1/data__splits__vcoco_test.ids",
+      "pin": {
+        "bytes": 33736,
+        "sha256": "53a3d56987caff97125eea0f8a4c768c91f70a27eee146970faf0befaaa2fb23"
+      },
+      "readonly": true
+    },
+    "data__splits__vcoco_train.ids": {
+      "maximum_bytes": 16777216,
+      "path": "/srv/world-reward-data/vcoco_metadata_v1/data__splits__vcoco_train.ids",
+      "pin": {
+        "bytes": 17251,
+        "sha256": "9dfbf2164ad2ca6fe0d6efaf48b9cb7e2a95ecc76730d956b8cef22619cb800d"
+      },
+      "readonly": true
+    },
+    "data__splits__vcoco_trainval.ids": {
+      "maximum_bytes": 16777216,
+      "path": "/srv/world-reward-data/vcoco_metadata_v1/data__splits__vcoco_trainval.ids",
+      "pin": {
+        "bytes": 36785,
+        "sha256": "e5b61e7b80d8312b1a5de52ebdd71c9a922d3399353eca12b220afb8d3aaa8c2"
+      },
+      "readonly": true
+    },
+    "data__splits__vcoco_val.ids": {
+      "maximum_bytes": 16777216,
+      "path": "/srv/world-reward-data/vcoco_metadata_v1/data__splits__vcoco_val.ids",
+      "pin": {
+        "bytes": 19534,
+        "sha256": "bed7ea7e9f837b748373cf2b917dfe7b37bf12ae7b5978d3471f104c9367bbd3"
+      },
+      "readonly": true
+    },
+    "data__vcoco__vcoco_test.json": {
+      "maximum_bytes": 16777216,
+      "path": "/srv/world-reward-data/vcoco_metadata_v1/data__vcoco__vcoco_test.json",
+      "pin": {
+        "bytes": 6193877,
+        "sha256": "71de9842b5c102b2f972e35362787e7ba00c29dcabc32eedac65c0ec13361a23"
+      },
+      "readonly": true
+    },
+    "data__vcoco__vcoco_train.json": {
+      "maximum_bytes": 16777216,
+      "path": "/srv/world-reward-data/vcoco_metadata_v1/data__vcoco__vcoco_train.json",
+      "pin": {
+        "bytes": 3135892,
+        "sha256": "2267afe7adc0a6c3e8ac90fb35f6d3a5bd5cd3c7edebf0622d0cbb7a67fddf19"
+      },
+      "readonly": true
+    },
+    "data__vcoco__vcoco_trainval.json": {
+      "maximum_bytes": 16777216,
+      "path": "/srv/world-reward-data/vcoco_metadata_v1/data__vcoco__vcoco_trainval.json",
+      "pin": {
+        "bytes": 6722166,
+        "sha256": "c3c10fbafb6399a53a26d290c980e0db9cac2f93753ab59303ba4a416fcd6418"
+      },
+      "readonly": true
+    },
+    "data__vcoco__vcoco_val.json": {
+      "maximum_bytes": 16777216,
+      "path": "/srv/world-reward-data/vcoco_metadata_v1/data__vcoco__vcoco_val.json",
+      "pin": {
+        "bytes": 3590505,
+        "sha256": "2025bf42ce985a079ad88fd052aba47d85f1531c5b04a95804427c8bcb75eedd"
+      },
+      "readonly": true
+    },
+    "metadata_report": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/world-reward-data/vcoco_metadata_v1/report.json",
+      "pin": {
+        "bytes": 8529,
+        "sha256": "aaf173055797b021fb6e1ecbc578b5676a3de5ea333534aa29860d0508b667d1"
+      },
+      "readonly": true
+    },
+    "oi128": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/world-reward-data/openimages_holds_census_fresh128_v1/census.json",
+      "pin": {
+        "bytes": 76839,
+        "sha256": "bf576b143bf8304981eb8dddfa64726945262d79c24cff07601f14e20a4fd452"
+      },
+      "readonly": false
+    },
+    "oi16": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/world-reward-data/openimages_holds_census_v1/census_v2.json",
+      "pin": {
+        "bytes": 10130,
+        "sha256": "b4333ea57bb408b0eafdbc5eee51d2b3ee3e6e963ef9ec269178bbd45480ff4a"
+      },
+      "readonly": false
+    },
+    "oi32": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/scenesmith/world-reward/results/proposal-external-census-v1/cohort.json",
+      "pin": {
+        "bytes": 18076,
+        "sha256": "4db28db7b8c9beb0ce58e574e8f012f05c86ef7447ff056a269d4b04cd74ed33"
+      },
+      "readonly": true
+    },
+    "oi64": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/scenesmith/world-reward/results/openimages-joint-pair-selection-v1/cohort.json",
+      "pin": {
+        "bytes": 31043,
+        "sha256": "441bdc57e101cb4e8291ca6bbebc554ca397619e2a892469d9e410a16359a456"
+      },
+      "readonly": true
+    },
+    "original_closed_failure": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/scenesmith/world-reward/results/ownership-pair-census-v1/report.json",
+      "pin": {
+        "bytes": 5360,
+        "sha256": "6ba7dfd843e47bae9043927c4d5f65059b99df2a09941dc2ee49c708d9d3198b"
+      },
+      "readonly": true
+    },
+    "ownership_acquired": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/world-reward-data/ownership_pair_v1/eval_private/manifest.json",
+      "pin": {
+        "bytes": 62025,
+        "sha256": "ae0701546825725d5b665b38af9dd3ca09c3f41365befae12cd5af9609dc93fd"
+      },
+      "readonly": true
+    },
+    "ownership_cohort": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/world-reward-data/ownership_pair_v1/metadata/cohort.json",
+      "pin": {
+        "bytes": 47482,
+        "sha256": "3e557abbfe909c110dfdd81cbc00827431a24c2ab88e3614b48e13ed35acef3e"
+      },
+      "readonly": true
+    },
+    "ownership_report": {
+      "maximum_bytes": 1048576,
+      "path": "/srv/world-reward-data/ownership_pair_v1/metadata/report.json",
+      "pin": {
+        "bytes": 16328,
+        "sha256": "50ce281d7dce7c6b409cf5dfb4d6f0f1a39beb7edc065b5e3b007ef7cd24342c"
+      },
+      "readonly": true
+    }
+  },
+  "license_id": 4,
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "max_expanded_bytes": 536870912,
+  "max_field_bytes": 2097152,
+  "max_host_memory_bytes": 8589934592,
+  "max_role_bytes": 16777216,
+  "max_row_bytes": 1048576,
+  "metadata_protocol": {
+    "archive": {
+      "bytes": 252872794,
+      "file": "annotations_trainval2014.zip",
+      "git_blob_sha1": null,
+      "mime": "application/zip",
+      "sha256": null,
+      "url": "https://s3.amazonaws.com/images.cocodataset.org/annotations/annotations_trainval2014.zip"
+    },
+    "budget_seconds": 600,
+    "catalogue": [
+      {
+        "compressed_bytes": 107297879,
+        "compression": 8,
+        "crc32": "3cd50ca9",
+        "expanded_bytes": 332556225,
+        "external_attr": 2176057344,
+        "flags": 0,
+        "member": "annotations/instances_train2014.json"
+      },
+      {
+        "compressed_bytes": 51955093,
+        "compression": 8,
+        "crc32": "264f83bf",
+        "expanded_bytes": 160682675,
+        "external_attr": 2176057344,
+        "flags": 0,
+        "member": "annotations/instances_val2014.json"
+      },
+      {
+        "compressed_bytes": 50041387,
+        "compression": 8,
+        "crc32": "23466a04",
+        "expanded_bytes": 170733465,
+        "external_attr": 2175008768,
+        "flags": 0,
+        "member": "annotations/person_keypoints_train2014.json"
+      },
+      {
+        "compressed_bytes": 23951481,
+        "compression": 8,
+        "crc32": "6976f7d7",
+        "expanded_bytes": 81637509,
+        "external_attr": 2175008768,
+        "flags": 0,
+        "member": "annotations/person_keypoints_val2014.json"
+      },
+      {
+        "compressed_bytes": 13124596,
+        "compression": 8,
+        "crc32": "35a1fcdb",
+        "expanded_bytes": 66782097,
+        "external_attr": 2176057344,
+        "flags": 0,
+        "member": "annotations/captions_train2014.json"
+      },
+      {
+        "compressed_bytes": 6501124,
+        "compression": 8,
+        "crc32": "8ef135f3",
+        "expanded_bytes": 32421077,
+        "external_attr": 2176057344,
+        "flags": 0,
+        "member": "annotations/captions_val2014.json"
+      }
+    ],
+    "catalogue_tail_identity": {
+      "bytes": 4096,
+      "sha256": "38c634460cccfad846182e4b24d721978afcfcec8c3675c34857a9417849139f"
+    },
+    "entry": "run_vcoco_metadata_acquire",
+    "helper_pins": {
+      "infra/mediapipe_cpu_runtime_verify.py": {
+        "bytes": 23559,
+        "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+      },
+      "infra/visual_genome_metadata_acquire.py": {
+        "bytes": 15022,
+        "sha256": "e6f36ee12240b379ddcb52ade7b9e9d413c9309995a73ca8f7df0e3c34695ada"
+      }
+    },
+    "max_expanded_asset_bytes": 536870912,
+    "max_host_memory_bytes": 8589934592,
+    "max_total_compressed_bytes": 314572800,
+    "max_total_expanded_bytes": 1073741824,
+    "no_json_values_consulted": true,
+    "no_redirects": true,
+    "no_rgb": true,
+    "notices": [
+      {
+        "bytes": 4031,
+        "file": "README.md",
+        "git_blob_sha1": "b0eb626353f539fe038b7d24d7b060dd5752fbee",
+        "mime": "text/plain",
+        "sha256": "08894a6d5304a49d0586c9ffeef31a87021d264d2a40d7dbe663c585e72ef5a0",
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/README.md"
+      },
+      {
+        "bytes": 1133,
+        "file": "LICENSE",
+        "git_blob_sha1": "3b60fbdec51e758b598bd7a4a4e4c80f5b67f9ce",
+        "mime": "text/plain",
+        "sha256": "f9eef0d2092d17798a6e11738be62c2ecd210bc52c9854d0d9ad5a38a2815c14",
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/LICENSE"
+      },
+      {
+        "bytes": 1107,
+        "file": "LICENSE_fast_rcnn",
+        "git_blob_sha1": "fde68786da5359ce20e221a88cf8e4ee5455e05e",
+        "mime": "text/plain",
+        "sha256": "dbfe88113cb11c3ae7ec02f7d344e2f2745574eb96a18afcdc4580ede3c8dd3f",
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/LICENSE_fast_rcnn"
+      },
+      {
+        "bytes": 5985,
+        "file": "vsrl_utils.py",
+        "git_blob_sha1": "ebf1a1284e420c62d1f59f96bce7de56ddd61164",
+        "mime": "text/plain",
+        "sha256": "5b8ae544d79dde56cdd8ee55c47271eed01ba1f0161c665977d5e7a8c32955ac",
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/vsrl_utils.py"
+      },
+      {
+        "bytes": 17878,
+        "file": "vsrl_eval.py",
+        "git_blob_sha1": "6a179214b65d4db992c0cd31ddd28aa94ce12090",
+        "mime": "text/plain",
+        "sha256": "eb6e765503bcc27fb73628476b641328e6f8bb26e4839f3f4645dc13afe72567",
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/vsrl_eval.py"
+      },
+      {
+        "bytes": 2823,
+        "file": "script_pick_annotations.py",
+        "git_blob_sha1": "993a663f33a94cb5b89cf66378f14c5795e5a5e3",
+        "mime": "text/plain",
+        "sha256": "adf1d6506a187a55ce08496e8d245dd351e784597c8aa2815a54ba2e22f31850",
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/script_pick_annotations.py"
+      },
+      {
+        "bytes": 11453,
+        "file": "publisher_coco_download.html",
+        "git_blob_sha1": null,
+        "mime": "text/plain",
+        "sha256": "fbc44eef7f0fd9a62786b15f9ea66b58754c6f3455a18aa3a8562639e425d5cc",
+        "url": "https://raw.githubusercontent.com/cocodataset/cocodataset.github.io/aaa6a5a0cc24bf1350247169cc512edd7ddf28b9/dataset/download.htm"
+      },
+      {
+        "bytes": 2370,
+        "file": "publisher_coco_terms.html",
+        "git_blob_sha1": null,
+        "mime": "text/plain",
+        "sha256": "bd019f88ee44c29b2f19c5b99888cf5bc2e7c16f57b6e52af8ed3a60462e8bdd",
+        "url": "https://raw.githubusercontent.com/cocodataset/cocodataset.github.io/aaa6a5a0cc24bf1350247169cc512edd7ddf28b9/dataset/termsofuse.htm"
+      }
+    ],
+    "opaque_git_assets": [
+      {
+        "bytes": 3135892,
+        "file": "data__vcoco__vcoco_train.json",
+        "git_blob_sha1": "fa808965b680c2baee3bb5f9041335515ef0af5e",
+        "mime": "text/plain",
+        "sha256": null,
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/data/vcoco/vcoco_train.json"
+      },
+      {
+        "bytes": 3590505,
+        "file": "data__vcoco__vcoco_val.json",
+        "git_blob_sha1": "fbd0af34173838b506a5054e88d559e3dac217d0",
+        "mime": "text/plain",
+        "sha256": null,
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/data/vcoco/vcoco_val.json"
+      },
+      {
+        "bytes": 6193877,
+        "file": "data__vcoco__vcoco_test.json",
+        "git_blob_sha1": "c633fc3aeca04ed7b14c8b5bf7ff5b68bb9552f8",
+        "mime": "text/plain",
+        "sha256": null,
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/data/vcoco/vcoco_test.json"
+      },
+      {
+        "bytes": 6722166,
+        "file": "data__vcoco__vcoco_trainval.json",
+        "git_blob_sha1": "017b349e9097ad3a194a3591e549380942f94876",
+        "mime": "text/plain",
+        "sha256": null,
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/data/vcoco/vcoco_trainval.json"
+      },
+      {
+        "bytes": 70521,
+        "file": "data__splits__vcoco_all.ids",
+        "git_blob_sha1": "f8dad90366d67d0df64f1e3c0c6f0b39885b1590",
+        "mime": "text/plain",
+        "sha256": null,
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/data/splits/vcoco_all.ids"
+      },
+      {
+        "bytes": 33736,
+        "file": "data__splits__vcoco_test.ids",
+        "git_blob_sha1": "d21ff6d2a17844d62fc6532145347be8c92b6617",
+        "mime": "text/plain",
+        "sha256": null,
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/data/splits/vcoco_test.ids"
+      },
+      {
+        "bytes": 17251,
+        "file": "data__splits__vcoco_train.ids",
+        "git_blob_sha1": "ad772f302bd5f6b15a083f7a5cd0a002e62550db",
+        "mime": "text/plain",
+        "sha256": null,
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/data/splits/vcoco_train.ids"
+      },
+      {
+        "bytes": 36785,
+        "file": "data__splits__vcoco_trainval.ids",
+        "git_blob_sha1": "98a7e9505db8e3e508757d14497c57a96599b6a5",
+        "mime": "text/plain",
+        "sha256": null,
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/data/splits/vcoco_trainval.ids"
+      },
+      {
+        "bytes": 19534,
+        "file": "data__splits__vcoco_val.ids",
+        "git_blob_sha1": "7ee718f17d34b5c88816b607f044e16393a37286",
+        "mime": "text/plain",
+        "sha256": null,
+        "url": "https://raw.githubusercontent.com/s-gupta/v-coco/489cc4db74f2f10ab4b134f67da3874afbf245ab/data/splits/vcoco_val.ids"
+      }
+    ],
+    "outer_seconds": 615,
+    "output": "/srv/world-reward-data/vcoco_metadata_v1",
+    "request_timeout_seconds": 15,
+    "retry_count": 0,
+    "schema": "world_reward.vcoco_metadata_acquire.v1",
+    "source_commit": "489cc4db74f2f10ab4b134f67da3874afbf245ab",
+    "source_tree": "517cee7d005cf57fa4e6e5f5bc1eaeb3b3118ac7",
+    "workers": 1
+  },
+  "metadata_protocol_sha256": "e8ad7610731087efa05de818545f326d6cf92b0eab53b0494881b17f64077b8d",
+  "minimum_distinct_photos": {
+    "test": 8,
+    "val": 8
+  },
+  "minimum_localized_positive_pairs": 1,
+  "minimum_noncrowd_people": 2,
+  "minimum_nonperson_objects": 2,
+  "network_allowed": false,
+  "outer_seconds": 1215,
+  "output": "/srv/world-reward-data/vcoco_role_census_v1",
+  "photo_rights_scope": "publisher_CC_BY_2_metadata_only_creator_unknown",
+  "positive_agents_ge2_is_diagnostic_only": true,
+  "roles": {
+    "test": "data__vcoco__vcoco_test.json",
+    "val": "data__vcoco__vcoco_val.json"
+  },
+  "schema": "world_reward.vcoco_role_census_config.v1",
+  "selection_performed": false,
+  "source_authenticated_provenance_not_leakage_certainty": true,
+  "sources": {
+    "coco": {
+      "archive_xz_sha256": "a4e4e35d699ba593847a7223f98f9b77ae5be3abfae0c1739f0ca2b1ee6d840f",
+      "closure_sha256": "bb8b44dc033c0bea7231ce767d0ce4e178c43be242b24ecfa99cfc9e17cc4670",
+      "entries": 273,
+      "entry": "run_coco_proposal_prepare",
+      "files": 268,
+      "helpers": [
+        "infra/coco_proposal_prepare.py",
+        "infra/run_coco_proposal_prepare.sh",
+        "configs/coco_proposal_v1.json",
+        "infra/mediapipe_cpu_runtime_verify.py",
+        "infra/openimages_joint_pair_acquire.py"
+      ],
+      "revision": "4657c8b45f733a1043c5a8af2f5b9d6ac027196a"
+    },
+    "metadata": {
+      "archive_xz_sha256": "66d9fd41c95f30d513b39bdc280823df853e69d5249857fcffa4ea8e7a8798f2",
+      "closure_sha256": "8421adb0b29407a9340f1eec127f2109eaf862082c30ae5aace75cada721ec70",
+      "entries": 297,
+      "entry": "run_vcoco_metadata_acquire",
+      "files": 292,
+      "helpers": [
+        "infra/vcoco_metadata_acquire.py",
+        "infra/run_vcoco_metadata_acquire.sh",
+        "infra/visual_genome_metadata_acquire.py",
+        "infra/mediapipe_cpu_runtime_verify.py"
+      ],
+      "revision": "9976f0f0d9caccdf72105d6cb7b7d8a3cc1d689d"
+    },
+    "ownership": {
+      "archive_xz_sha256": "824363870053ba0d05056acd0de3d06b9721537c88d4ff939db51b7376ff74f8",
+      "closure_sha256": "a34376d782a89e7503aa6dc510891dd3be12b70369f1260351653e6e14b1863b",
+      "entries": null,
+      "entry": "run_ownership_pair_prepare",
+      "files": 296,
+      "helpers": [
+        "infra/ownership_pair_prepare.py",
+        "infra/run_ownership_pair_prepare.sh",
+        "configs/ownership_pair_prepare_v1.json",
+        "infra/ownership_pair_census.py",
+        "infra/mediapipe_cpu_runtime_verify.py",
+        "infra/openimages_joint_pair_census.py",
+        "infra/openimages_joint_pair_acquire.py",
+        "infra/coco_proposal_prepare.py",
+        "configs/proposal_external_census_v1.json",
+        "configs/coco_endpoint_v2.json",
+        "infra/coco_endpoint_prepare.py",
+        "infra/run_coco_endpoint_prepare.sh",
+        "infra/run_coco_proposal_prepare.sh",
+        "configs/coco_proposal_v1.json",
+        "configs/ownership_pair_census_v1.json",
+        "configs/ownership_pair_census_v2.json",
+        "infra/run_ownership_pair_census.sh",
+        "infra/run_ownership_pair_census_v2.sh"
+      ],
+      "revision": "78daabd4a4521fecf4fde8df0f4c6f4f3ef65fc6"
+    }
+  },
+  "splits": {
+    "all": "data__splits__vcoco_all.ids",
+    "test": "data__splits__vcoco_test.ids",
+    "train": "data__splits__vcoco_train.ids",
+    "trainval": "data__splits__vcoco_trainval.ids",
+    "val": "data__splits__vcoco_val.ids"
+  }
+}

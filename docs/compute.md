@@ -168,6 +168,10 @@ source and selected assets against the producing stage's independent pins.
 - Serialize Azure Run Command calls. Inspect exact unit/PID/owned container and
   bound report; collected/missing units, provisioning success and observation
   timeouts never authorize restart or imply PASS.
+- Successful transient units may already be collected at observation. Preserve
+  unit exit as unavailable; verify sealed source-bound native/host receipts and
+  exact owned process/container absence instead of treating `not-found` or its
+  default success fields as a native result. Never restart to restore a unit.
 - `infra/azure_job.py` archives a verified committed import closure. Default
   requires a clean tree; strict `--revision <40hex>` supports disjoint edits.
   Source-only XZ/base64 is capped256KB. Long payloads use exclusive staged chunks,

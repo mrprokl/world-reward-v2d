@@ -158,7 +158,8 @@ def _actions(stream, previous, eligible):
 
 
 def project_vcoco_actions(open_source, eligible_image_ids, *, check=lambda: None,
-                          max_bytes=16 << 20, field_bytes=2 << 20, chunk_bytes=65536):
+                          max_bytes=16 << 20, field_bytes=2 << 20, chunk_bytes=65536,
+                          expected_image_ids=None):
     """Open the SAME immutable source twice; return selected native action rows.
 
     Returned role IDs retain role-major order over selected rows; original row
@@ -170,6 +171,10 @@ def project_vcoco_actions(open_source, eligible_image_ids, *, check=lambda: None
     _require(all(type(v) is int and v > 0 for v in (max_bytes, field_bytes, chunk_bytes)),
              'Positive integer byte limits required')
     eligible_image_ids = frozenset(eligible_image_ids)
+    _require(expected_image_ids is None or (type(expected_image_ids) in (set, frozenset)
+             and all(type(i) is int and i > 0 for i in expected_image_ids)),
+             'Explicit positive expected image IDs required')
+    expected_image_ids = None if expected_image_ids is None else frozenset(expected_image_ids)
     structures, actions, identity = None, None, None
     for pass_index in range(2):
         with closing(open_source()) as source:
@@ -178,6 +183,8 @@ def project_vcoco_actions(open_source, eligible_image_ids, *, check=lambda: None
             observed, projected = _actions(stream, structures, eligible_image_ids)
             pin = dict(bytes=reader.bytes, sha256=reader.digest.hexdigest())
         if pass_index == 0:
+            _require(expected_image_ids is None or {i for s in observed for i in s[3]} == expected_image_ids,
+                     'Structural role-file image IDs differ from official split')
             structures, identity = observed, pin
         else:
             _require(pin == identity, 'Complete source bytes changed between passes')

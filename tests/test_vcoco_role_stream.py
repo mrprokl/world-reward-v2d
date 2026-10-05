@@ -178,3 +178,31 @@ def test_filtered_coco_annotations_skip_historical_geometry_before_image_id(chun
 def test_filtered_coco_complete_syntax_and_structural_ids_fail(raw):
     with pytest.raises(ValueError):
         list(projection.iter_filtered_coco_annotations(io.BytesIO(raw), {501}, chunk_bytes=2))
+
+
+def test_projected_rows_join_with_original_slot_provenance_and_pair_weight():
+    from world_reward.vcoco_role_reference import parse_vcoco_role_reference
+
+    actions, _ = project(json.dumps(fixture()).encode())
+    images = [dict(id=i, width=80, height=60) for i in (501, 503)]
+    instances = [dict(id=aid, image_id=iid, category_id=category, iscrowd=0,
+                      bbox=[1, 2, 10, 20], area=200)
+                 for aid, iid, category in ((11, 501, 1), (13, 503, 1), (21, 501, 44), (23, 503, 44))]
+    result = parse_vcoco_role_reference(actions, instances, images)
+    assert [(r.action_slot, r.row_slot) for r in result.rows] == [(0, 0), (0, 2), (1, 0)]
+    assert [(p.agent_annotation_id, p.object_annotation_id) for p in result.localized_positive_pairs] == [(11, 21), (13, 23)]
+    assert result.localized_positive_pairs[1].row_role_references == ((0, 2, 1, 'new_action', 'obj'),)
+
+
+def test_split_consistency_checked_after_structural_pass_before_any_semantic_decode(monkeypatch):
+    raw = json.dumps(fixture()).encode()
+    original = projection._semantic_array
+
+    def forbidden(*args, **kwargs):
+        pytest.fail('Wrong official split consulted labels/role IDs')
+
+    monkeypatch.setattr(projection, '_semantic_array', forbidden)
+    with pytest.raises(ValueError, match='official split'):
+        project(raw, expected_image_ids={501, 502})
+    monkeypatch.setattr(projection, '_semantic_array', original)
+    assert project(raw, expected_image_ids={501, 502, 503})[0][0]['ann_id'] == [11, 13]
