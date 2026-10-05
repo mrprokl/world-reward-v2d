@@ -13,7 +13,7 @@ ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
  && "$CODE" == "$ROOT/jobs/$REV/run_openimages_joint_pair_gdi/code" \
  && "${BASH_SOURCE[0]}" == "$CODE/infra/run_openimages_joint_pair_gdi.sh" ]] || exit 2
 export DOCKER_HOST="unix://$ROOT/docker.sock"
-OUT="$ROOT/results/openimages-joint-pair-gdi-v1"
+OUT="$ROOT/results/openimages-joint-pair-gdi-v2"
 NAME="world-reward-oi-joint-gdi-${REV:0:12}";LOCK="$ROOT/jobs/.world-reward-h100.lock"
 IMAGE=sha256:fd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252
 HOSTENV=(/usr/bin/env -i PATH=/usr/bin:/bin HOME=/nonexistent WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" PYTHONDONTWRITEBYTECODE=1)

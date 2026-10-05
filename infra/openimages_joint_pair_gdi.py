@@ -23,7 +23,7 @@ ENTRY = 'run_openimages_joint_pair_gdi'
 CONFIG = 'configs/openimages_joint_pair_gdi_v1.json'
 ACQUISITION = Path('/srv/world-reward-data/openimages_joint_pair_acquisition_v1')
 COHORT = ROOT/'results/openimages-joint-pair-selection-v1/cohort.json'
-OUTPUT = ROOT/'results/openimages-joint-pair-gdi-v1'
+OUTPUT = ROOT/'results/openimages-joint-pair-gdi-v2'
 NATIVE = OUTPUT/'native'
 HELPERS = ('infra/openimages_joint_pair_gdi.py', 'infra/run_openimages_joint_pair_gdi.sh', CONFIG,
            'infra/mediapipe_cpu_runtime_verify.py', 'src/world_reward/prompt_selection.py',
@@ -50,11 +50,11 @@ def write(path, value):
 
 def configuration(code):
     value = rt.strict((code/CONFIG).read_bytes())
-    expected = dict(schema='world_reward.openimages_joint_pair_gdi.v1',
+    expected = dict(schema='world_reward.openimages_joint_pair_gdi.v2',
         acquisition_revision='e2b6019f502e18694a221aa6b1818804ef3d6d83',
         cohort=dict(bytes=31043, sha256='441bdc57e101cb4e8291ca6bbebc554ca397619e2a892469d9e410a16359a456'),
         manifest=dict(bytes=76232, sha256='57135ee4853afaff9d5820f11128fc2c8da9c42b2cb14b40597909c9f0f0eeb4'),
-        image_id=binding.IMAGE, output='results/openimages-joint-pair-gdi-v1', slots=64, acquired=50, missing=14,
+        image_id=binding.IMAGE, output='results/openimages-joint-pair-gdi-v2', slots=64, acquired=50, missing=14,
         budget_seconds=600, person_query='person.', object_query='object.', confidence=.3, text_threshold=.25,
         nms_iou=.7, challenge_inputs_used=False, quality_verified=False, adoption=False)
     rt.require(value == expected and all(type(value[k]) is type(v) for k,v in expected.items()), 'Frozen external GDI config required')
@@ -170,6 +170,38 @@ def retained_bank(boxes, scores, labels, image_id, kind, width, height):
         retained_ids=np.asarray([f'image:{image_id}/{kind}/retained:{i:06d}' for i in range(len(retained))],dtype=str))
 
 
+def validate_native_text_logits(boxes, logits, input_ids, attention_mask, max_text_len):
+    """Validate, not replace, native GroundingDINO masked -inf logits.
+
+    Transformers4.53.3 GroundingDinoContrastiveEmbedding.forward fills exactly
+    inactive attention-mask tokens and the max_text_len tail with -inf. Active
+    special tokens remain finite. This is not the text self-attention 3D mask.
+    Every original logit, token and mask survives unchanged in the NPZ.
+    """
+    import numpy as np
+    rt.require(type(max_text_len) is int and max_text_len == 256,
+               'Pinned original config.max_text_len required')
+    rt.require(type(boxes) is np.ndarray and boxes.shape == (1, 900, 4)
+               and boxes.dtype == np.float32 and np.isfinite(boxes).all(),
+               'All original finite900 native boxes required')
+    rt.require(type(input_ids) is np.ndarray and input_ids.ndim == 2
+               and input_ids.shape[0] == 1 and input_ids.dtype == np.int64
+               and 0 < input_ids.shape[1] <= max_text_len and (input_ids >= 0).all()
+               and type(attention_mask) is np.ndarray and attention_mask.shape == input_ids.shape
+               and attention_mask.dtype.kind in 'biu' and np.isin(attention_mask, [0, 1]).all()
+               and attention_mask.any(), 'Actual original token IDs and binary attention mask required')
+    rt.require(type(logits) is np.ndarray and logits.shape == (1, 900, max_text_len)
+               and logits.dtype == np.float32 and not np.isnan(logits).any()
+               and not np.isposinf(logits).any(), 'Original logits must have no NaN or positive infinity')
+    active = np.zeros((1, max_text_len), dtype=bool)
+    active[:, :input_ids.shape[1]] = attention_mask.astype(bool)
+    expected = np.broadcast_to(~active[:, None, :], logits.shape)
+    rt.require(np.array_equal(np.isneginf(logits), expected)
+               and np.isfinite(logits[~expected]).all(), 'Native -inf must exactly match original text padding')
+    return dict(active_tokens=int(active.sum()), masked_tokens=int((~active).sum()),
+                native_negative_infinities=int(expected.sum()), original_max_text_len=max_text_len)
+
+
 def observe(images, output, detect, decode, report, persist):
     import numpy as np
     for image in images:
@@ -180,9 +212,8 @@ def observe(images, output, detect, decode, report, persist):
             width=image['width'], height=image['height'], decoded_rgb_sha256=digest,
             input_file=image['file'],input_identity={k:image[k] for k in ('bytes','sha256')},queries=[])
         for kind,query in (('person','person.'),('object','object.')):
-            boxes,scores,labels,raw_boxes,raw_logits = detect(rgb,query)
-            rt.require(all(type(x) is np.ndarray and x.dtype.kind == 'f' and np.isfinite(x).all() for x in (raw_boxes,raw_logits)),
-                       'Native model proposal/logit arrays must remain finite')
+            boxes,scores,labels,raw_boxes,raw_logits,input_ids,attention_mask,max_text_len = detect(rgb,query)
+            padding = validate_native_text_logits(raw_boxes,raw_logits,input_ids,attention_mask,max_text_len)
             rt.require(raw_boxes.ndim==3 and raw_boxes.shape[0]==1 and raw_boxes.shape[2]==4
                 and raw_logits.ndim==3 and raw_logits.shape[:2]==raw_boxes.shape[:2], 'Native shared proposal/logit axes required')
             rt.require(hashlib.sha256(rgb.tobytes()).hexdigest() == digest, 'Detector mutated original RGB')
@@ -192,8 +223,10 @@ def observe(images, output, detect, decode, report, persist):
             arrays[kind+'_detector_scores'] = bank['retained_scores']
             record[kind+'_ids'] = bank['retained_ids'].tolist()
             arrays[kind+'_model_pred_boxes'] = raw_boxes; arrays[kind+'_model_logits'] = raw_logits
+            arrays[kind+'_model_input_ids'] = input_ids; arrays[kind+'_model_attention_mask'] = attention_mask
             report['native_forward_calls'] += 1
-            record['queries'].append(dict(kind=kind, query=query, postprocessor_rows=len(boxes), retained_rows=len(bank['retained_ids'])))
+            record['queries'].append(dict(kind=kind, query=query, postprocessor_rows=len(boxes),
+                                          retained_rows=len(bank['retained_ids']), text_padding_validation=padding))
         name = image['image_id']+'.npz'
         with (output/name).open('xb') as stream:
             os.fchmod(stream.fileno(),0o400); np.savez(stream,**arrays); stream.flush(); os.fsync(stream.fileno())
@@ -238,7 +271,8 @@ def native(code, revision, cfg, projected_pin):
                 result=processor.post_process_grounded_object_detection(prediction,value.input_ids,threshold=.3,
                     text_threshold=.25,target_sizes=[rgb.shape[:2]])[0]
             return (result['boxes'].cpu().numpy(),result['scores'].cpu().numpy(),result['text_labels'],
-                    prediction.pred_boxes.cpu().numpy(),prediction.logits.cpu().numpy())
+                    prediction.pred_boxes.cpu().numpy(),prediction.logits.cpu().numpy(),
+                    value.input_ids.cpu().numpy(),value.attention_mask.cpu().numpy(),model.config.max_text_len)
         def decode(row):
             path=Path(row['file']); wanted={k:row[k] for k in ('bytes','sha256')}
             rt.require(rt.identity(path,16 << 20)==wanted,'Original RGB changed before decode')

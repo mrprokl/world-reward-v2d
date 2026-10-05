@@ -124,3 +124,23 @@ Two earlier preflight failures read no RGB and acquired no sample: Flickr
 metadata identity parsing omitted set/direct route variants. Fixes broadened
 only exclusion identity parsing, not the stricter new creator-page requests;
 no failed selected slot was substituted and no predictions informed selection.
+
+## Native padding transport correction (not score tuning)
+
+FirstGDIproducer7e1971d58d654e44fd5982fe049e9590d0d97b37 failed before
+any bank was saved:0completed recorded forwards/0image predictions,9.480567s.
+Native receipt13339B SHAd3f9a5839f98baeb2bc9d3b3820344c4719535f33eb77a712b258d8586513fff
+is retained unchanged. Its all-finite raw-logit transport gate conflicts with
+GroundingDINO's native negative-infinity text padding, not with its postprocessor.
+
+Exact Transformers4.53.3 modeling_grounding_dino.py130590B SHA
+7e328d97b8ecbe823ef81445386537e45ba1f7fb92dda32af605aeca5ea61c20,
+ContrastiveEmbedding1349-1367 and object detector2564-2567, fill masked
+attention tokens and the256-token tail with-inf. Processing source14186B SHA
+287029fc832cdd1c7b8fd87a52f8773ef10ac0c6b80e6eb13d710858c4408b6e
+uses sigmoid(-inf)=0 natively. The freshv2 adapter saves actual input_ids,
+attention_mask and ALL900×256logits unchanged, accepting-inf only exactly at
+those original masked/tail positions; NaN/+inf and active-token-inf still fail.
+No model math, query, threshold, original sample, evaluation or FIT input changes.
+37manufactured adapter tests PASS. A nativev2 result must confirm this convention
+on actual inputs; the old receipt alone did not record its mask.

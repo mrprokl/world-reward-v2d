@@ -1,0 +1,19 @@
+{
+  "adopted": false,
+  "assets": 16,
+  "gpu_used": false,
+  "observer_bytecode_noise_removed": 4,
+  "producer_original_sources_repaired": false,
+  "producer_revision": "37a6d39045db215626b8a0268c1357019835af59",
+  "receipt": {
+    "bytes": 11455,
+    "sha256": "3967342c41fb81e16f8d3d08c705a6f39bf7ab4d650fdd90bb5e344ca7ec19cd"
+  },
+  "runtime_accuracy_verified": false,
+  "schema": "world_reward.joint_pair_dwpose_saved_integrity.v1",
+  "source_assets_rehashed": true,
+  "source_closure_sha256": "445a37de0da6cb704343724edd8bb659629a0d4628e21d9f5e23af50efe40e23",
+  "source_entries": 258,
+  "status": "pass",
+  "training_overlap_verified": false
+}

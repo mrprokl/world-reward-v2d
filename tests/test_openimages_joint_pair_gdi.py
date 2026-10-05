@@ -106,14 +106,14 @@ def test_real_callbacks_one_bank_per_query_every_image_and_native_arrays(tmp_pat
     def detector(rgb,query):
         calls.append(query)
         boxes=np.array([[1,1,5,8],[12,1,18,10]],np.float32);scores=np.array([.6,.9],np.float32)
-        return boxes,scores,[query]*2,np.zeros((1,900,4),np.float32),np.zeros((1,900,5),np.float32)
+        return boxes,scores,[query]*2,*native_arrays()
     gdi.observe(records,tmp_path,detector,decode,report,lambda:None)
     assert calls==['person.','object.']*3 and report['native_forward_calls']==6 and len(report['images'])==3
     for row in report['images']:
         assert [q['retained_rows'] for q in row['queries']]==[2,2]
         assert row['input_file']==records[int(row['image_id'],16)]['file'] and len(row['person_ids'])==2
         with np.load(tmp_path/row['prediction_file'],allow_pickle=False) as data:
-            assert data['person_raw_boxes'].dtype==np.float32 and data['person_model_logits'].shape==(1,900,5)
+            assert data['person_raw_boxes'].dtype==np.float32 and data['person_model_logits'].shape==(1,900,256)
             assert data['person_retained_raw_slots'].tolist()==[1,0]
             assert data['object_retained_ids'].dtype.kind=='U'
             np.testing.assert_array_equal(data['person_boxes_original_xyxy'],data['person_retained_boxes'])
@@ -123,7 +123,7 @@ def test_real_callbacks_one_bank_per_query_every_image_and_native_arrays(tmp_pat
 
 def test_empty_query_still_all_forward_calls_and_genuine_npz_empties(tmp_path):
     report=dict(native_forward_calls=0,images=[])
-    def detector(*_):return np.empty((0,4),np.float32),np.empty(0,np.float32),[],np.empty((1,0,4),np.float32),np.empty((1,0,3),np.float32)
+    def detector(*_):return np.empty((0,4),np.float32),np.empty(0,np.float32),[],*native_arrays()
     gdi.observe(images(1),tmp_path,detector,lambda _:np.zeros((16,24,3),np.uint8),report,lambda:None)
     assert report['native_forward_calls']==2 and all(q['retained_rows']==0 for q in report['images'][0]['queries'])
     with np.load(tmp_path/'0000000000000000.npz',allow_pickle=False) as data:assert data['person_retained_boxes'].shape==(0,4)
@@ -134,14 +134,14 @@ def test_decode_grid_or_rgb_mutation_fail_not_resized(tmp_path):
         gdi.observe(images(1),tmp_path,lambda *_:None,lambda _:np.zeros((8,12,3),np.uint8),dict(native_forward_calls=0,images=[]),lambda:None)
     def detector(rgb,_):
         rgb[0,0,0]=1
-        return np.empty((0,4),np.float32),np.empty(0,np.float32),[],np.empty((1,0,4),np.float32),np.empty((1,0,3),np.float32)
+        return np.empty((0,4),np.float32),np.empty(0,np.float32),[],*native_arrays()
     with pytest.raises(ValueError,match='mutated'):
         gdi.observe(images(1),tmp_path,detector,lambda _:np.zeros((16,24,3),np.uint8),dict(native_forward_calls=0,images=[]),lambda:None)
 
 
 def test_no_overwrite_or_repeated_partial_outputs(tmp_path):
     report=dict(native_forward_calls=0,images=[])
-    detector=lambda *_:(np.empty((0,4),np.float32),np.empty(0,np.float32),[],np.empty((1,0,4),np.float32),np.empty((1,0,3),np.float32))
+    detector=lambda *_:(np.empty((0,4),np.float32),np.empty(0,np.float32),[],*native_arrays())
     decode=lambda _:np.zeros((16,24,3),np.uint8)
     gdi.observe(images(1),tmp_path,detector,decode,report,lambda:None)
     with pytest.raises(FileExistsError):gdi.observe(images(1),tmp_path,detector,decode,report,lambda:None)
@@ -163,3 +163,51 @@ def test_wrapper_tight_projection_native_only_write_mount_and_no_reference():
     assert 'cohort.json' not in source and 'manifest.json"' not in source.replace('world-reward-frontend-assets-manifest.json"','')
     assert '/weights/sam2' not in source and 'src=$ACQUISITION' not in source
     assert 'docker rm --force "$NAME"' in source and 'docker rm -f' not in source
+
+
+def native_arrays():
+    logits=np.full((1,900,256),-np.inf,np.float32)
+    logits[:,:,:5]=0
+    return np.zeros((1,900,4),np.float32),logits,np.array([[101,123,124,119,102]],np.int64),np.ones((1,5),np.int64),256
+
+
+def test_native_padding_logits_remain_byte_identical(tmp_path):
+    raw=native_arrays();before=[x.tobytes()for x in raw[:-1]]
+    report=dict(native_forward_calls=0,images=[])
+    def detect(*_):return np.empty((0,4),np.float32),np.empty(0,np.float32),[],*raw
+    gdi.observe(images(1),tmp_path,detect,lambda _:np.zeros((16,24,3),np.uint8),report,lambda:None)
+    with np.load(tmp_path/'0000000000000000.npz',allow_pickle=False)as saved:
+        for name,value in zip(('model_pred_boxes','model_logits','model_input_ids','model_attention_mask'),raw[:-1]):
+            assert saved['person_'+name].tobytes()==value.tobytes()
+    assert [x.tobytes()for x in raw[:-1]]==before
+    assert report['images'][0]['queries'][0]['text_padding_validation']['native_negative_infinities']==251*900
+
+
+@pytest.mark.parametrize('value',[-np.inf,np.nan,np.inf])
+def test_active_native_tokens_must_remain_finite(value):
+    boxes,logits,ids,mask,width=native_arrays();logits[0,0,0]=value
+    with pytest.raises(ValueError):gdi.validate_native_text_logits(boxes,logits,ids,mask,width)
+
+
+@pytest.mark.parametrize('value',[0.,np.nan,np.inf])
+def test_all_masked_native_tokens_must_be_exact_negative_infinity(value):
+    boxes,logits,ids,mask,width=native_arrays();logits[0,0,255]=value
+    with pytest.raises(ValueError):gdi.validate_native_text_logits(boxes,logits,ids,mask,width)
+
+
+def test_original_internal_attention_mask_not_invented_special_token_mask():
+    boxes,logits,ids,mask,width=native_arrays();mask[0,2]=0;logits[:,:,2]=-np.inf
+    assert gdi.validate_native_text_logits(boxes,logits,ids,mask,width)['active_tokens']==4
+    logits[:,:,0]=-np.inf
+    with pytest.raises(ValueError,match='exactly match'):gdi.validate_native_text_logits(boxes,logits,ids,mask,width)
+
+
+@pytest.mark.parametrize('failure',['binary','shape','tokens','width','none'])
+def test_original_token_and_config_axes_required(failure):
+    boxes,logits,ids,mask,width=native_arrays()
+    if failure=='binary':mask[0,1]=2
+    elif failure=='shape':mask=mask[:,:3]
+    elif failure=='tokens':ids=ids.astype(np.float32)
+    elif failure=='width':width=255
+    else:mask=None
+    with pytest.raises(ValueError):gdi.validate_native_text_logits(boxes,logits,ids,mask,width)
