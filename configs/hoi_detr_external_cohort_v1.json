@@ -1,0 +1,248 @@
+{
+  "schema": "world_reward.hoi_detr_external_cohort.v1",
+  "scope": "fixed_external_cohort_full_native_observations_before_reference_evaluation",
+  "root": "/srv/scenesmith/world-reward",
+  "output": "results/hoi-detr-external-cohort-v1",
+  "budget_seconds": 1800,
+  "cleanup_grace_seconds": 60,
+  "outer_seconds": 1860,
+  "cpu_cpus": 4,
+  "cpu_memory": "16g",
+  "gpu_cpus": 4,
+  "gpu_memory": "64g",
+  "runtime": {
+    "path": "results/hoi-detr-runtime-v4/report.json",
+    "report": {
+      "bytes": 13248,
+      "sha256": "906bf42aaeaf6612586de1b93c4039a5f969233022f346d64ae84a975debb445"
+    },
+    "unresolved_pin_is_fail_before_checkpoint_decode": true
+  },
+  "acquisition": {
+    "producer_revision": "bee1d8e49c90f8926e6ff0f63347daef3ddfa99e",
+    "report": {
+      "bytes": 4471,
+      "sha256": "b424f6227cefe69a9e112310a226b84cfcd44780f14fa3cf31f71934dad709a3"
+    },
+    "source_manifest": {
+      "bytes": 755745,
+      "sha256": "8ed68b93269dd216272c702603b56487ff47debaa38b72d891740d417f69b0fd"
+    },
+    "source_revision": "1b367292f3833afd64a204bd4d9d84519541d035",
+    "git_root_tree_sha1": "e93a418345712fc6c011bfcc84bdddc90f496a70",
+    "checkpoint": {
+      "bytes": 5855053598,
+      "sha256": "4708fd0ddc5c3d386bad67c31152de58676840b911f6d01219e0092a603277d3"
+    }
+  },
+  "fairscale": {
+    "name": "fairscale",
+    "version": "0.4.13",
+    "license": "BSD-3-Clause",
+    "url": "https://files.pythonhosted.org/packages/c1/08/b3334d7b543ac10dcb129cef4f84723ab696725512f18d69ab3a784b0bf5/fairscale-0.4.13.tar.gz",
+    "file": "fairscale-0.4.13.tar.gz",
+    "bytes": 266261,
+    "sha256": "1b797825c427f5dba92253fd0d8daa574e8bd651a2423497775fab1b30cfb768",
+    "publisher_license": {
+      "url": "https://raw.githubusercontent.com/facebookresearch/fairscale/v0.4.13/LICENSE",
+      "file": "FairScale.LICENSE",
+      "bytes": 1739,
+      "sha256": "0a9b773f521ede2910204567bbe69c4f2a8ee8bede07dde0e667bcc6dfd268a0"
+    },
+    "maximum_expanded_bytes": 4194304,
+    "maximum_members": 1024,
+    "build_cuda_extensions": "0",
+    "offline_no_deps_no_build_isolation": true
+  },
+  "native_config": {
+    "path": "projects/configs/co_dino_vit/co_dino_5scale_vit_large_coco_with_relation_only_all_losses_custom.py",
+    "identity": {
+      "bytes": 19637,
+      "sha256": "018acf8bc176daf671959466726d928486977e5e43cc7bf03b4ce509ba6c00d9"
+    },
+    "original_load_from": "work_dirs/01_inter_full_low_1e4_corrected_auto80_100_h_f_s_w_3/epoch_5.pth",
+    "inference_overrides": {
+      "load_from": null,
+      "model.train_cfg": null
+    },
+    "custom_imports": false,
+    "full_model_components_retained": true
+  },
+  "compatibility_patch": {
+    "path": "projects/models/co_detr.py",
+    "identity": {
+      "bytes": 27476,
+      "sha256": "d63adcaa1e62b9ddf1f835a50ef4023332be28cfcc3039b7e9fdd9847b4f3212"
+    },
+    "remove_exact_sys_path_append": "/lus/lfs1aip2/projects/u6ev/ahmad/Co-DETR",
+    "all_other_AST_unchanged": true
+  },
+  "extra_base_distributions": {
+    "fvcore": "0.1.5.post20221221",
+    "iopath": "0.1.10",
+    "portalocker": "4.4.0",
+    "termcolor": "3.3.0",
+    "yacs": "0.1.8",
+    "tabulate": "0.10.0",
+    "tqdm": "4.66.5",
+    "typing_extensions": "4.16.0",
+    "timm": "1.0.30",
+    "scipy": "1.16.3",
+    "einops": "0.8.2"
+  },
+  "seed": 0,
+  "amp": false,
+  "tf32": false,
+  "quality_verified": false,
+  "actor_identity_verified": false,
+  "contact_verified": false,
+  "training_overlap_verified": false,
+  "license_eligibility_verified": false,
+  "ground_truth_used": false,
+  "challenge_inputs_used": false,
+  "adoption": false,
+  "import_wheels": [
+    {
+      "name": "terminaltables",
+      "version": "3.1.10",
+      "filename": "terminaltables-3.1.10-py2.py3-none-any.whl",
+      "file": "terminaltables-3.1.10-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/c4/fb/ea621e0a19733e01fe4005d46087d383693c0f4a8f824b47d8d4122c87e0/terminaltables-3.1.10-py2.py3-none-any.whl",
+      "bytes": 15155,
+      "sha256": "e4fdc4179c9e4aab5f674d80f09d76fa436b96fdc698a8505e0a36bf0804a874",
+      "publication_date": "2021-12-07",
+      "license": "MIT",
+      "publisher_license": {
+        "url": "https://raw.githubusercontent.com/matthewdeanmartin/terminaltables/v3.1.10/LICENSE",
+        "file": "terminaltables.LICENSE",
+        "bytes": 1065,
+        "sha256": "2e1320fd337db06a3136d0f4101bd62f13249c95c5b581304f35481e979d432a"
+      }
+    }
+  ],
+  "checkpoint_buffers": {
+    "source_path": "mmdet/core/hook/ema.py",
+    "source_identity": {
+      "bytes": 5150,
+      "sha256": "255d0d63865735bd2fe661cc1c4f375c68e7834aee0446e27eaaa861c7106663"
+    },
+    "native_hook": {
+      "type": "ExpMomentumEMAHook",
+      "momentum": 0.0001,
+      "priority": 49
+    },
+    "registration_only": true,
+    "skip_buffers": false,
+    "swap_or_update": false,
+    "forward_uses_original_non_ema_fields": true
+  },
+  "qualified_model": {
+    "path": "results/hoi-detr-model-qualify-v4/report.json",
+    "producer_revision": "b9571478c734c41531204f8c1a974556be6802dc",
+    "report": {
+      "bytes": 2967,
+      "sha256": "65eb67cf953a698e4c5decada37a2c051d3af23e34967610d7a40fca9413c3e5"
+    },
+    "native": {
+      "bytes": 3572,
+      "sha256": "51c30b02ba9127b3a6208e6e4f2ce77469f2e6434188742ed00d72b54bdd3dcb"
+    }
+  },
+  "external_cohort": {
+    "root": "/srv/world-reward-data/openimages_holds_fresh_acquisition_v1",
+    "manifest": {
+      "bytes": 15090,
+      "sha256": "e5856091d2a5b150baaa4ac2da2e8f39734d820510233c07a0536426ab10a0b4"
+    },
+    "slots": 15,
+    "acquired": 8,
+    "missing": 7,
+    "excluded_QA_image": "2333ac90234d7d50",
+    "zero_pair_outputs_are_valid": true,
+    "reference_geometry_read": false,
+    "no_replacements": true,
+    "metadata_to_GPU": false,
+    "inputs": [
+      {
+        "image_id": "49a5d1c428ceea5d",
+        "path": "/srv/world-reward-data/openimages_holds_fresh_acquisition_v1/49a5d1c428ceea5d/rgb.jpg",
+        "identity": {
+          "bytes": 3048523,
+          "sha256": "0154028c4cbf5f34c18bac249a1e44819ade8a7c5e217c61d51c258ebde841b3"
+        },
+        "cohort_slot": 0,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "ce62fcaca2e94d47",
+        "path": "/srv/world-reward-data/openimages_holds_fresh_acquisition_v1/ce62fcaca2e94d47/rgb.jpg",
+        "identity": {
+          "bytes": 820883,
+          "sha256": "fffe6c82df34758a356239e373f921338b868686db1ba239d0d02d41ac43a99a"
+        },
+        "cohort_slot": 1,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "ff1b9a76032517de",
+        "path": "/srv/world-reward-data/openimages_holds_fresh_acquisition_v1/ff1b9a76032517de/rgb.jpg",
+        "identity": {
+          "bytes": 171613,
+          "sha256": "070209f6ce7a25ad663da7f746f6a87d9be763e37903da51f3e73c93b59794e1"
+        },
+        "cohort_slot": 3,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "383f679fd7fe3445",
+        "path": "/srv/world-reward-data/openimages_holds_fresh_acquisition_v1/383f679fd7fe3445/rgb.jpg",
+        "identity": {
+          "bytes": 2230219,
+          "sha256": "7ba314c81473e53e5192c8363efdcc45a538685eb8d8716a120f842712f7ed6c"
+        },
+        "cohort_slot": 6,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "2951b7f2f54d5bd6",
+        "path": "/srv/world-reward-data/openimages_holds_fresh_acquisition_v1/2951b7f2f54d5bd6/rgb.jpg",
+        "identity": {
+          "bytes": 2579445,
+          "sha256": "fdc43bfff2603255e2bc9f833661bc2962176ed6483ef208a2d7ce8ceb14721c"
+        },
+        "cohort_slot": 7,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "fb9e518733744d5b",
+        "path": "/srv/world-reward-data/openimages_holds_fresh_acquisition_v1/fb9e518733744d5b/rgb.jpg",
+        "identity": {
+          "bytes": 3663122,
+          "sha256": "01265d33e6e3544e93916b3782aada43879a53f73eca2b8ab8bf0d854c23a8df"
+        },
+        "cohort_slot": 9,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "4f4cfcd4fcfd2f69",
+        "path": "/srv/world-reward-data/openimages_holds_fresh_acquisition_v1/4f4cfcd4fcfd2f69/rgb.jpg",
+        "identity": {
+          "bytes": 235459,
+          "sha256": "223ec03b3e7937ced8a1f3eaadda51a4688963dce36107adebc2ed35adaae0ad"
+        },
+        "cohort_slot": 10,
+        "original_frame_index": 0
+      },
+      {
+        "image_id": "96c14e4955debceb",
+        "path": "/srv/world-reward-data/openimages_holds_fresh_acquisition_v1/96c14e4955debceb/rgb.jpg",
+        "identity": {
+          "bytes": 2361515,
+          "sha256": "fbf83231471f5438b7d07c1c08fe03858887262869d36c435894c2094e579e52"
+        },
+        "cohort_slot": 14,
+        "original_frame_index": 0
+      }
+    ]
+  }
+}

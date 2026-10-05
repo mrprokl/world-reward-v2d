@@ -3,7 +3,7 @@
 # Original full model: procedural default or explicit licensed external RGB probe.
 # Never challenge images, dataset builders or GT inputs.
 set -euo pipefail
-[[ ( $# == 0 || ( $# == 1 && "$1" == --external-rgb ) ) && "$(uname -s)" == Linux && "$(id -u)" == 0 && "$(hostname)" == world-reward-ncc-h100-02 ]] || exit 2
+[[ ( $# == 0 || ( $# == 1 && ( "$1" == --external-rgb || "$1" == --external-cohort ) ) ) && "$(uname -s)" == Linux && "$(id -u)" == 0 && "$(hostname)" == world-reward-ncc-h100-02 ]] || exit 2
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ && "$CODE" == "$ROOT/jobs/$REV/run_hoi_detr_model_qualify/code" && "${BASH_SOURCE[0]}" == "$CODE/infra/run_hoi_detr_model_qualify.sh" ]] || exit 2
 exec env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME=/nonexistent LANG=C.UTF-8 WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" \
