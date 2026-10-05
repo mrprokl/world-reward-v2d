@@ -10076,3 +10076,10 @@ timm1.0.30/scipy1.16.3/einops0.8.2 are already installed. Preserve them. FairSca
 BSD3-style notice1739B/0a9b773f521ede2910204567bbe69c4f2a8ee8bede07dde0e667bcc6dfd268a0.
 Offline pure-Python construction with BUILD_CUDA_EXTENSIONS=0 is prospective;
 no install/strict checkpoint load/full-model inference is claimed.
+
+Fresh MMCV v2 freezes the independently observed9.0.1 metadata before dispatch.
+Eight original functions (compile/operators/native/mount validation/cleanup/
+context/source unpack) remain AST-identical to a68d9ef; no native math/backend
+change. Failure reports allow only fixed literal requirement labels, never
+upstream exception contents or environment.219 combined tiny tests PASS1.84s,
+syntax/diff checks PASS; actual native outcome must be read independently.
