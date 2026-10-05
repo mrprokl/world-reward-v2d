@@ -10493,3 +10493,15 @@ dispatch; dedicated identities and faithful three-key fixtures fix both without
 changing model, dependencies, numeric gates or original producer receipts.
 No actual CUDA/checkpoint/model qualification, tracking/ownership correctness,
 training-overlap clearance, license eligibility, adoption or quality claim yet.
+
+fad3940 actual EP16 fixed-shape surface pose COMPLETE PASS2443.181887s,
+all360original indices. Native report18358475B/
+f0ca7a6105156ccffb5c6e63782894342837d351d2d5d686dc8308eb57e73a81;
+geometry_and_poses57448B/6ebc806719d01940c2012ca58a7e4c87eb6c877a2bbd35cfbcbadb4dc1aef9e6.
+Independent original wrapper after-mode reproduces the exact frozen input/
+historical-source proof; all three outputs match native hashes and444/555 seal,
+exact owned CID absent. A first read-only audit carried the wrong wrapper SHA;
+git-show confirms actual8fc5efe3 and the corrected assertion passes without
+pose rerun/output mutation. CPU CARI input preparation dispatched separately
+only after this audit; no complete refinement/export/packing claim for EP16.
+EP17 native pose remains live and EP19 waits the cooperative lock.
