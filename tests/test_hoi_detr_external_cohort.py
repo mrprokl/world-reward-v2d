@@ -104,3 +104,23 @@ def test_batch_load_once_empty_outputs_valid_and_scope_flag_propagates(gate):
     assert 'continue' not in text and 'except' not in text
     main = next(n for n in t.body if isinstance(n, ast.FunctionDef) and n.name == 'main')
     assert 'external_cohort=args.external_cohort' in ast.unparse(main)
+
+
+def test_large_scope_complete73_inputs_and_bounded_sidecar(gate):
+    raw = (REPO/gate.COHORT128_PROTOCOL).read_bytes(); p = json.loads(raw)
+    assert gate.COHORT128_PROTOCOL_PIN == dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
+    c = p['external_cohort']
+    assert (c['slots'], c['acquired'], c['missing']) == (128, 73, 55)
+    assert len(c['inputs']) == len({r['image_id'] for r in c['inputs']}) == 73
+    assert len({r['cohort_slot'] for r in c['inputs']}) == 73
+    assert all(0 <= r['cohort_slot'] < 128 and r['original_frame_index'] == 0 for r in c['inputs'])
+    assert gate.selected_protocol_pin(p) == gate.COHORT128_PROTOCOL_PIN
+    original = json.loads((REPO/gate.COHORT_PROTOCOL).read_bytes())
+    for k in ('runtime', 'acquisition', 'native_config', 'checkpoint_buffers', 'amp', 'tf32', 'seed', 'budget_seconds'):
+        assert p[k] == original[k]
+    source = (REPO/gate.HELPERS[0]).read_text()
+    assert "out/'observations_manifest.json'" in source and 'saved_outputs' in source
+    proof = dict(runtime=dict(image=dict(Id='sha256:'+'f'*64)), pin=dict(bytes=1, sha256='a'*64))
+    _, _, mounts, args = gate.container_plan(Path('/tmp/code'), Path('/tmp/out'), 'a'*40, p, proof, 'model', 1800)
+    assert '--external-cohort128' in args and '--external-cohort' not in args
+    assert len([m for m in mounts if str(m[0]).startswith(c['root'])]) == 73
