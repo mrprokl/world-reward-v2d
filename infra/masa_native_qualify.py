@@ -3,15 +3,20 @@ import argparse
 import fcntl
 import hashlib
 import importlib.util
+import io
 import json
 import math
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import signal
 import stat
 import subprocess
 import sys
+import tarfile
+import tempfile
+import urllib.request
+import zipfile
 import time
 
 ROOT=Path('/srv/scenesmith/world-reward')
@@ -19,15 +24,18 @@ DATA=Path('/srv/world-reward-data/masa_native_v1')
 ENTRY='run_masa_native_qualify'
 CONFIG='configs/masa_native_qualification_v1.json'
 CONFIG_PIN=dict(bytes=3645,sha256='ad5e4a3cb78926512ab655a65ca3285c105f5542f68895ec014ddeaca5f31d2c')
+SM90_CONFIG='configs/masa_sm90_build_v1.json'
+SM90_CONFIG_PIN=dict(bytes=20926,sha256='fdc0134a5037bf446f8f7c755c4252749b4ffba492dda93a43932d14674f252b')
+CUOBJDUMP_PIN=dict(bytes=162092,sha256='28218273db8ffeb3ae4b31bfb4e4d90f0ae3373454c7970703c063dfd0377ba7')
 VENV='/opt/world-reward-masa'
 BUDGET,GRACE=600,30
 HELPERS=('infra/masa_native_qualify.py','infra/run_masa_native_qualify.sh',CONFIG,
  'infra/mediapipe_cpu_runtime_verify.py','infra/masa_acquire.py','configs/masa_acquisition_v1.json',
- 'infra/masa_runtime_build.py','configs/masa_runtime_v1.json','infra/mediapipe_hands_acquire.py')
+ 'infra/masa_runtime_build.py','configs/masa_runtime_v1.json','infra/mediapipe_hands_acquire.py',SM90_CONFIG)
 ENV=dict(PATH='/usr/bin:/bin',HOME='/nonexistent',LANG='C.UTF-8',DOCKER_HOST='unix://'+str(ROOT/'docker.sock'))
 FAILURE_GATES=frozenset(('bootstrap','runtime_import','operators','registry','config','model_construct','weights_decode',
  'strict_state','model_device','preprocess','encoder','embedding','native_posthash','native_deadline','gpu_lock',
- 'gpu_idle','container_absence','container_dispatch','native_receipt','host_cleanup','host_posthash','output_seal','host_deadline'))
+ 'embedded_architecture','gpu_idle','container_absence','container_dispatch','native_receipt','host_cleanup','host_posthash','output_seal','host_deadline'))
 OPERATOR_SUBGATES=frozenset(('imports','dcn_construct','dcn_zero_offset','dcn_nonzero','roi_construct',
                            'roi_cuda','roi_cpu','roi_compare','complete'))
 EXCEPTION_CLASSES={cls:cls.__name__ for cls in (ImportError,ModuleNotFoundError,ValueError,TypeError,KeyError,AttributeError,
@@ -146,6 +154,161 @@ def authenticate(rt,code,args):
       acquisition_source=r['source_binding'],runtime_source=runtime['source_binding'],old_source_parents=list(map(str,oldparents)))
 
 
+
+def profile(args):
+    return bool(getattr(args,'sm90_build_revision',None)or getattr(args,'sm90_child',False))
+
+
+def result_name(revision,sm90=False):
+    return ('masa-native-sm90-qualification-'if sm90 else'masa-native-qualification-')+revision
+
+
+def native_stage(sm90=False):
+    return 'masa_native_sm90_data_free_contract'if sm90 else'masa_native_data_free_contract'
+
+
+def authenticate_profile(rt,code,args):
+    """Original runtime stays original; new build is separately byte-authenticated."""
+    if not profile(args):return authenticate(rt,code,args)
+    c=rt.pinned(code/SM90_CONFIG,SM90_CONFIG_PIN,30000);parent=c['prior_runtime']
+    original=argparse.Namespace(**vars(args));original.image_id=parent['image_id']
+    rt.require(args.runtime_revision==parent['producer_revision']and
+      dict(bytes=args.runtime_report_bytes,sha256=args.runtime_report_sha256)==parent['report'],'Pinned original parent required')
+    proof=authenticate(rt,code,original);folder=ROOT/'results'/('masa-sm90-build-'+args.sm90_build_revision)
+    pin=dict(bytes=args.sm90_build_report_bytes,sha256=args.sm90_build_report_sha256)
+    r=rt.pinned(folder/'report.json',pin,2<<20)
+    same(rt,r,dict(schema='world_reward.masa_sm90_build_receipt.v1',stage='masa_full_original_mmcv_sm90_cpu_build',status='pass',
+      producer_revision=args.sm90_build_revision,config_identity=SM90_CONFIG_PIN,prior_runtime_revision=args.runtime_revision,
+      prior_runtime_report=proof['runtime_report'],prior_image=proof['image'],gpu_used=False,model_constructed=False,
+      checkpoint_read=False,dataset_read=False,operator_qualified=False,quality_verified=False,adopted=False,
+      license_eligibility_verified=False,source_rehashed_after=True,prior_runtime_rehashed_after=True,assets_rehashed_after=True,
+      prior_image_unchanged=True,owned_containers_removed=True,owned_disposable_cleanup=True,public_sealed=True))
+    required={'infra/masa_sm90_build.py','infra/run_masa_sm90_build.sh',SM90_CONFIG,'infra/masa_runtime_build.py',
+      'configs/masa_runtime_v1.json','infra/mediapipe_cpu_runtime_verify.py','infra/mediapipe_hands_acquire.py'}
+    rt.require(required<=set(r['source_binding']['helpers']),'Complete original SM90 builder helper closure required')
+    old=snapshot(rt,args.sm90_build_revision,'run_masa_sm90_build',r['source_binding'])
+    rt.require(rt.identity(old/SM90_CONFIG)==SM90_CONFIG_PIN and r['full_source']['root_tree']==c['source']['root_tree']
+      and r['full_source']['blobs']==c['source']['blob_count_including_symlink'],'Original whole MMCV source/config differs')
+    same(rt,r['compile'],dict(compiler='11.8.89',gcc='11.4.0',gxx='11.4.0',ninja='1.11.1',arch='sm_90',
+      tiny_object_compiled=True,ATen_CUDAContext_and_Python_headers_compiled=True,full_original_source_posthash=True,gpu_used=False))
+    rt.require(r['target_tag']=='world-reward/masa-sm90-runtime:'+args.sm90_build_revision and
+      r['child_image']['image_id']==args.image_id and args.image_id!=parent['image_id'] and
+      len(r['child_image']['layers'])>len(proof['image']['layers'])and
+      r['child_image']['layers'][:len(proof['image']['layers'])]==proof['image']['layers'],'New child lineage differs')
+    before,after=r['base_cpu_import'],r['child_cpu_import'];versions=before['versions']
+    runtime=rt.pinned(ROOT/'results'/('masa-runtime-build-'+args.runtime_revision)/'report.json',proof['runtime_report'],2<<20)
+    rt.require(versions==runtime['cpu_import']['versions'] and len(versions)==52 and
+      set(before['non_mmcv_distribution_file_digests'])==set(versions)-{'mmcv'} and
+      all(re.fullmatch('[0-9a-f]{64}',v)for v in before['non_mmcv_distribution_file_digests'].values())and
+      {k:v for k,v in before.items()if k!='mmcv_extension_sha256'}=={k:v for k,v in after.items()if k!='mmcv_extension_sha256'},
+      'All original non-MMCV distributions must remain byte-identical')
+    same(rt,after,dict(python='3.11',isolated_venv=True,cuda_build='11.8',cuda_initialized=False,operator_executed=False,model_constructed=False))
+    w=r['compiled_wheel'];rt.require(re.fullmatch(r'mmcv-2\.1\.0-cp311-cp311-linux_x86_64\.whl',w['file'])and
+      after['mmcv_extension_sha256']==w['inventory']['extension_sha256'],'Actual installed extension differs from compiled wheel')
+    rt.require(before['mmcv_extension_sha256']!=after['mmcv_extension_sha256'],'New source-built extension required')
+    rt.require(w['inventory']['extension_file']=='mmcv/_ext.cpython-311-x86_64-linux-gnu.so'and
+      0<w['inventory']['extension_bytes']<150000000 and re.fullmatch('[0-9a-f]{64}',w['inventory']['extension_sha256']),
+      'Bounded sole native extension required')
+    expected={('notices/'if x.get('file','').endswith('.html')else'downloads/')+x['file']:{k:x[k]for k in('bytes','sha256')}
+      for x in c['publisher_metadata']+c['assets']+c['header_assets']}
+    expected['downloads/mmcv-tree.json']={k:c['source']['recursive_tree_metadata'][k]for k in('bytes','sha256')}
+    expected[w['file']]=w['identity']
+    for name,lic in [('CUDA-11.8-EULA.html',c['license']['cuda_eula']),
+      ('NVIDIA-NC-StyleGAN2.html',c['license']['mmcv']['research_only_stylegan2_notice'])]:
+        expected['notices/'+name]={k:lic[k]for k in('bytes','sha256')}
+    rt.require(set(r['public_assets'])==set(expected)|{'downloads/mmcv-full-source.tar.gz'},'Exact original public build asset set required')
+    rt.require(all(r['public_assets'].get(k)==v for k,v in expected.items()),'Complete pinned build assets required')
+    proof['files'][str(folder/'report.json')]=pin
+    for name,asset in r['public_assets'].items():
+        p=PurePosixPath(name);rt.require(not p.is_absolute()and '..'not in p.parts and '\\'not in name and p.as_posix()==name,
+          'Bounded original build asset path required')
+        path=folder/name;rt.require(rt.identity(path,1000000000)==asset,'Original compiled build asset differs');proof['files'][str(path)]=asset
+    rows={}
+    for path in sorted((folder/'notices').rglob('*')):
+        if path.is_file():rows[path.relative_to(folder/'notices').as_posix()]=rt.identity(path,1000000);proof['files'][str(path)]=rows[path.relative_to(folder/'notices').as_posix()]
+    rt.require(dict(members=len(rows),bytes=sum(x['bytes']for x in rows.values()),
+      sha256=hashlib.sha256(json.dumps(rows,sort_keys=True).encode()).hexdigest())==r['preserved_notices'],'Preserved original notices differ')
+    allowed={folder/'report.json',folder/'downloads',folder/'notices',folder/'Dockerfile',folder/'.dockerignore',folder/'build.log'}
+    allowed|={folder/name for name in r['public_assets']}|set((folder/'notices').rglob('*'))
+    allowed|={folder/(label+suffix)for label in('base','compile','child')for suffix in('.cid','.log')}
+    rt.require(set(folder.rglob('*'))==allowed,'Exact original sealed build inventory required')
+    for p in (folder,*folder.rglob('*')):
+        st=p.lstat();rt.require(not p.is_symlink()and (stat.S_ISDIR(st.st_mode)and stat.S_IMODE(st.st_mode)==0o555 or
+          stat.S_ISREG(st.st_mode)and st.st_nlink==1 and stat.S_IMODE(st.st_mode)==0o444),'Sealed original build inventory required')
+    proof.update(original_image=proof['image'],image=r['child_image'],image_id=args.image_id,
+      sm90_child=dict(producer_revision=args.sm90_build_revision,report=pin,source_binding=r['source_binding'],
+        compiled_wheel=w,config_identity=SM90_CONFIG_PIN,prior_image=r['prior_image'],child_cpu_import=after))
+    proof['old_source_parents'].append(str(old.parent));proof['build_folder']=str(folder)
+    return proof
+
+
+def recheck_sources(rt,proof):
+    snapshot(rt,proof['policy']['acquisition']['producer_revision'],'run_masa_acquire',proof['acquisition_source'])
+    snapshot(rt,proof['runtime_revision'],'run_masa_runtime_build',proof['runtime_source'])
+    if 'sm90_child'in proof:
+        r=proof['sm90_child'];snapshot(rt,r['producer_revision'],'run_masa_sm90_build',r['source_binding'])
+
+
+
+def architecture_write(rt,path,raw,mode,owned):
+    fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
+    st=os.fstat(fd);owned[path]=((st.st_dev,st.st_ino,st.st_uid),None)
+    with os.fdopen(fd,'wb')as stream:
+        stream.write(raw);stream.flush();os.fsync(stream.fileno());os.fchmod(stream.fileno(),mode)
+    owned[path]=(owned[path][0],rt.identity(path,150000000))
+
+def architecture(rt,proof,deadline):
+    """One fixed CPU-only binary inspection; not native operator qualification."""
+    c=rt.pinned(Path(proof['old_source_parents'][-1])/'code'/SM90_CONFIG,SM90_CONFIG_PIN,30000)
+    row=next(x for x in c['optional_assets']if x['component']=='cuda_cuobjdump')
+    rt.require(row['version']=='11.8.86'and {k:row[k]for k in('bytes','sha256')}==CUOBJDUMP_PIN and
+      row['url']=='https://developer.download.nvidia.com/compute/cuda/redist/cuda_cuobjdump/linux-x86_64/'+row['file'],'Fixed official architecture tool required')
+    scratch=Path(tempfile.mkdtemp(prefix='wr-masa-sm90-arch-',dir=ROOT/'results'));owner=namespace_key(scratch);owned={};result=None
+    try:
+        path=scratch/'tool.tar.xz';request=urllib.request.Request(row['url'],headers={'Accept-Encoding':'identity'})
+        opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),type('NoRedirect',(urllib.request.HTTPRedirectHandler,),
+          {'redirect_request':lambda *_:(_ for _ in()).throw(ValueError('Tool redirect forbidden'))})())
+        with opener.open(request,timeout=min(30,max(.001,deadline-time.monotonic())))as response:
+            rt.require(response.status==200 and response.geturl()==row['url']and response.headers.get('Content-Encoding','identity')=='identity',
+              'Pinned direct tool response required');raw=response.read(row['bytes']+1)
+        rt.require(len(raw)==row['bytes']and hashlib.sha256(raw).hexdigest()==row['sha256'],'Official tool bytes differ')
+        architecture_write(rt,path,raw,0o444,owned)
+        prefix=row['file'].removesuffix('.tar.xz');tool=scratch/'cuobjdump'
+        with tarfile.open(fileobj=io.BytesIO(raw),mode='r:xz')as archive:
+            members=archive.getmembers();rt.require(len({m.name for m in members})==len(members)and len(members)<=64 and sum(m.size for m in members)<4000000,'Bounded tool archive required')
+            for m in members:
+                p=PurePosixPath(m.name);rt.require(not p.is_absolute()and '..'not in p.parts and p.parts and p.parts[0]==prefix and '\\'not in m.name
+                  and p.as_posix().rstrip('/')==m.name.rstrip('/')and (m.isdir()or m.isfile())and not m.mode&0o6000,'Safe original tool archive required')
+            candidates=[m for m in members if m.name==prefix+'/bin/cuobjdump'];rt.require(len(candidates)==1 and candidates[0].isfile(),'Sole official tool required')
+            architecture_write(rt,tool,archive.extractfile(candidates[0]).read(),0o555,owned)
+            notices={m.name.removeprefix(prefix+'/'):{'bytes':m.size,'sha256':hashlib.sha256(archive.extractfile(m).read()).hexdigest()}
+              for m in members if m.isfile()and re.search(r'(^|/)(LICENSE|EULA|COPYING|NOTICE)',m.name,re.I)}
+            rt.require(notices,'Original tool license/notice material required')
+        wheel=Path(proof['build_folder'])/proof['sm90_child']['compiled_wheel']['file'];w=proof['sm90_child']['compiled_wheel']
+        rt.require(rt.identity(wheel,1000000000)==w['identity'],'Frozen wheel changed before architecture check')
+        ext=scratch/'extension.so'
+        with zipfile.ZipFile(wheel)as z:
+            matches=[x for x in z.infolist()if x.filename==w['inventory']['extension_file']]
+            rt.require(len(matches)==1 and matches[0].file_size==w['inventory']['extension_bytes']and not matches[0].flag_bits&1
+              and not stat.S_ISLNK(matches[0].external_attr>>16),'Sole bounded wheel extension required')
+            architecture_write(rt,ext,z.read(matches[0]),0o444,owned)
+        rt.require(owned[ext][1]['sha256']==w['inventory']['extension_sha256'],'Actual ELF identity differs')
+        r=command([str(tool),'--list-elf',str(ext)],deadline)
+        rt.require(r.returncode==0 and len(r.stdout)+len(r.stderr)<200000 and not r.stderr.strip()and
+          re.search(rb'(?<![A-Za-z0-9_])sm_90(?![A-Za-z0-9_])',r.stdout),'Actual embedded sm_90 ELF required before GPU')
+        result=dict(tool_archive={k:row[k]for k in('bytes','sha256')},tool=owned[tool][1],extension=owned[ext][1],
+          listing=dict(bytes=len(r.stdout),sha256=hashlib.sha256(r.stdout).hexdigest()),embedded_sm90=True,
+          gpu_used=False,operator_qualified=False,checkpoint_read=False,notice_members=notices,_archive_bytes=raw)
+        for p,(key,pin)in owned.items():rt.require(namespace_key(p)==key and rt.identity(p,150000000)==pin,'Architecture material changed')
+    finally:
+        rt.require(namespace_key(scratch)==owner and set(scratch.iterdir())==set(owned),'Owned architecture scratch changed')
+        for p,(key,pin)in owned.items():
+            st=p.lstat();rt.require(namespace_key(p)==key and stat.S_ISREG(st.st_mode)and st.st_nlink==1 and
+              (pin is None or rt.identity(p,150000000)==pin),'Never remove foreign architecture material');p.unlink()
+        scratch.rmdir()
+    rt.require(time.monotonic()<deadline,'Architecture check exceeded inclusive budget');result['owned_scratch_removed']=True
+    return result
+
 def command(args,deadline,*,log=None,pass_fds=()):
     remaining=deadline-time.monotonic()
     if remaining<=0:raise TimeoutError('Inclusive native qualification deadline')
@@ -163,6 +326,19 @@ def image(rt,identity,deadline):
                'Actual immutable Linux CUDA runtime required')
     return dict(image_id=value['Id'],layers=value['RootFS']['Layers'])
 
+
+
+def active_image(rt,args,proof,deadline):
+    value=image(rt,args.image_id,deadline)
+    if profile(args):
+        target='world-reward/masa-sm90-runtime:'+args.sm90_build_revision
+        r=command(['docker','image','inspect',target,'--format','{{json .}}'],deadline)
+        rt.require(r.returncode==0 and len(r.stdout)<100000,'Actual owned child tag required')
+        j=rt.strict(r.stdout)
+        rt.require(j['Id']==value['image_id']and j['RootFS']['Layers']==value['layers']and
+          (j['Config'].get('Labels')or{}).get('world_reward_masa_sm90_owner')==args.sm90_build_revision,
+          'Actual child tag/owner differs')
+    return value
 
 def strict_state(torch,payload,expected):
     """Only explicit common native layouts; no prefix/EMA/partial-load guessing."""
@@ -307,17 +483,23 @@ def native_model(torch,c,deadline,progress):
        preprocessing_byte_reference_exact=True)
 
 
-def run_native(code,revision,out,proof_pin,deadline):
+def run_native(code,revision,out,proof_pin,deadline,*,sm90_child=False):
     rt=rt_helper(code);proof=rt.pinned(out/'proof.json',proof_pin,4<<20);c=proof['policy']
+    rt.require(('sm90_child'in proof)==sm90_child,'Explicit runtime profile differs from pinned proof')
     rt.require(current_source(rt,code,revision)==proof['source_binding'],'Current native source differs before execution')
-    snapshot(rt,proof['policy']['acquisition']['producer_revision'],'run_masa_acquire',proof['acquisition_source'])
-    snapshot(rt,proof['runtime_revision'],'run_masa_runtime_build',proof['runtime_source'])
+    recheck_sources(rt,proof)
+    if 'sm90_child'in proof:
+        rt.require(proof['embedded_architecture']['embedded_sm90']is True and proof['embedded_architecture']['owned_scratch_removed']is True
+          and proof['embedded_architecture']['extension']['sha256']==proof['sm90_child']['compiled_wheel']['inventory']['extension_sha256'],
+          'Actual completed CPU architecture evidence required before Torch')
     for path,pin in proof['files'].items():rt.require(rt.identity(Path(path),2500000000)==pin,'Frozen source/checkpoint/runtime bytes differ')
-    report=dict(stage='masa_native_data_free_contract',status='fail',phase='operators',producer_revision=revision,source_binding=proof['source_binding'],
+    report=dict(stage=native_stage('sm90_child'in proof),status='fail',phase='operators',producer_revision=revision,source_binding=proof['source_binding'],
        image_id=proof['image_id'],protocol_identity=CONFIG_PIN,proof_identity=proof_pin,gpu_used=False,model_loaded=False,
        model_constructed=False,weights_decoded=False,
        challenge_inputs_used=False,ground_truth_used=False,quality_verified=False,adoption=False,tracking_correctness_verified=False,
        identity_or_physical_ownership_verified=False,source_artifacts_rehashed_after=False,subgate='runtime_import')
+    if 'sm90_child'in proof:report.update(schema='world_reward.masa_sm90_native_qualification.v1',
+      sm90_child=proof['sm90_child'],embedded_architecture=proof['embedded_architecture'])
     try:
         import torch
         rt.require(torch.__version__=='2.1.2+cu118'and torch.cuda.is_available()and torch.cuda.get_device_capability()==(9,0)
@@ -334,8 +516,7 @@ def run_native(code,revision,out,proof_pin,deadline):
         signal.setitimer(signal.ITIMER_REAL,0)
         try:
             rt.require(current_source(rt,code,revision)==proof['source_binding'],'Native source changed')
-            snapshot(rt,c['acquisition']['producer_revision'],'run_masa_acquire',proof['acquisition_source'])
-            snapshot(rt,proof['runtime_revision'],'run_masa_runtime_build',proof['runtime_source'])
+            recheck_sources(rt,proof)
             rt.require(rt.identity(out/'proof.json',4<<20)==proof_pin,'Native invocation proof changed')
             for path,pin in proof['files'].items():rt.require(rt.identity(Path(path),2500000000)==pin,'Frozen artifact changed after execution')
             report['source_artifacts_rehashed_after']=True
@@ -382,6 +563,7 @@ def seal_outputs(rt,out,native,out_owner,native_owner,proof_pin):
       and namespace_key(native)==native_owner and out.is_dir()and native.is_dir(),'Owned result namespace changed')
     allowed={native:None,out/'container.cid':(out_owner[2],100),out/'native.log':(out_owner[2],1<<20),
       native/'proof.json':(out_owner[2],4<<20),native/'native.json':(native_owner[2],100000)}
+    if (out/'cuobjdump.tar.xz').exists():allowed[out/'cuobjdump.tar.xz']=(out_owner[2],1000000)
     entries=list(out.rglob('*'))
     for p in entries:
         s=p.lstat();rt.require(p in allowed and rt.canonical(p)==p,'Unowned result entry or alias')
@@ -402,17 +584,25 @@ def dispatch(args,code):
     started=time.monotonic();deadline=started+BUDGET;rt=rt_helper(code)
     cancelled=lambda *_:(_ for _ in()).throw(TimeoutError('Inclusive host qualification deadline'))
     signal.signal(signal.SIGTERM,cancelled);signal.signal(signal.SIGALRM,cancelled);signal.setitimer(signal.ITIMER_REAL,BUDGET)
-    proof=authenticate(rt,code,args);rt.require(image(rt,args.image_id,deadline)==proof['image'],'Actual runtime layers differ')
-    out=rt.canonical(ROOT/'results'/('masa-native-qualification-'+args.revision));rt.require(not out.exists(),'Fresh native qualification only')
+    proof=authenticate_profile(rt,code,args);rt.require(active_image(rt,args,proof,deadline)==proof['image'],'Actual runtime layers differ')
+    out=rt.canonical(ROOT/'results'/result_name(args.revision,profile(args)));rt.require(not out.exists(),'Fresh native qualification only')
+    if profile(args):
+        rt.require(image(rt,proof['original_image']['image_id'],deadline)==proof['original_image'],'Original parent image changed')
+        proof['embedded_architecture']=architecture(rt,proof,deadline)
     out.mkdir(mode=0o755);native=out/'native';native.mkdir(mode=0o700);os.chown(native,1000,1000)
     out_owner=namespace_key(out);native_owner=namespace_key(native)
+    if profile(args):
+        archive=proof['embedded_architecture'].pop('_archive_bytes');rt.write(out/'cuobjdump.tar.xz',archive,0o444)
+        rt.require(rt.identity(out/'cuobjdump.tar.xz',1000000)==proof['embedded_architecture']['tool_archive'],'Retained original tool archive differs')
     proof['host_start_monotonic']=started;rt.write(native/'proof.json',(json.dumps(proof,sort_keys=True)+'\n').encode(),0o444)
     proof_pin=rt.identity(native/'proof.json',4<<20);cid=out/'container.cid';name='world-reward-masa-native-'+args.revision
     lock=rt.canonical(ROOT/'jobs/.world-reward-h100.lock');s=lock.lstat();rt.require(stat.S_ISREG(s.st_mode)and s.st_nlink==1,'Existing cooperative GPU lock required')
     fd=acquire_lock_fd(lock)
-    report=dict(stage='masa_native_qualification_host',status='fail',phase='preflight',source_binding=proof['source_binding'],producer_revision=args.revision,
+    report=dict(stage='masa_native_sm90_qualification_host'if profile(args)else'masa_native_qualification_host',status='fail',phase='preflight',source_binding=proof['source_binding'],producer_revision=args.revision,
        image_id=args.image_id,protocol_identity=CONFIG_PIN,quality_verified=False,adoption=False,owned_cleanup_verified=False,
        source_artifacts_rehashed_after=False,subgate='gpu_lock')
+    if profile(args):report.update(schema='world_reward.masa_sm90_native_qualification_host.v1',
+      sm90_child=proof['sm90_child'],embedded_architecture=proof['embedded_architecture'])
     try:
         fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB)
         rt.require((os.fstat(fd).st_dev,os.fstat(fd).st_ino)==(s.st_dev,s.st_ino),'Existing cooperative lock changed')
@@ -423,6 +613,7 @@ def dispatch(args,code):
         absent=command(['docker','ps','-aq','--no-trunc','--filter','name=^/'+name+'$'],deadline)
         rt.require(absent.returncode==0 and not absent.stdout.strip(),'Fresh exact native container name required')
         mounts=[code.parent,*map(Path,proof['old_source_parents']),DATA,ROOT/'results'/('masa-runtime-build-'+args.runtime_revision)]
+        if profile(args):mounts.append(Path(proof['build_folder']))
         argv=['docker','run','--rm','--name',name,'--cidfile',str(cid),'--label','world_reward.masa_native.owner='+args.revision,
           '--gpus','all','--network','none','--read-only','--user','1000:1000','--cap-drop','ALL','--security-opt','no-new-privileges',
           '--cpus','4','--memory','8g','--tmpfs','/tmp:rw,exec,nosuid,size=512m']
@@ -433,16 +624,20 @@ def dispatch(args,code):
           'MPLBACKEND=Agg','PYTHONDONTWRITEBYTECODE=1',VENV+'/bin/python',
           '-I','-B',str(code/HELPERS[0]),'--native','--revision',args.revision,'--out',str(native),'--proof-bytes',str(proof_pin['bytes']),
           '--proof-sha256',proof_pin['sha256'],'--deadline',repr(deadline)]
+        if profile(args):argv+=['--sm90-child']
         report['subgate']='container_dispatch'
         report['phase']='native';r=command(argv,deadline,log=out/'native.log',pass_fds=(fd,));report['native_exit_status']=r.returncode
         report['subgate']='native_receipt'
         report['native_report_identity']=rt.identity(native/'native.json',100000)
         n=rt.pinned(native/'native.json',report['native_report_identity'],100000)
-        same(rt,n,dict(stage='masa_native_data_free_contract',status='pass',phase='complete',producer_revision=args.revision,
+        same(rt,n,dict(stage=native_stage(profile(args)),status='pass',phase='complete',producer_revision=args.revision,
           image_id=args.image_id,protocol_identity=CONFIG_PIN,proof_identity=proof_pin,source_binding=proof['source_binding'],
           source_artifacts_rehashed_after=True,quality_verified=False,adoption=False,challenge_inputs_used=False,ground_truth_used=False,
           model_loaded=True,model_constructed=True,weights_decoded=True,gpu_used=True,tracking_correctness_verified=False,
           identity_or_physical_ownership_verified=False))
+        if profile(args):
+            same(rt,n,dict(schema='world_reward.masa_sm90_native_qualification.v1',sm90_child=proof['sm90_child'],
+              embedded_architecture=proof['embedded_architecture']))
         rt.require(r.returncode==0 and n['operators']['checkpoint_read']is False and n['model']['native_encoder_calls']==1
           and n['model']['native_embedding_calls']==3,'Real native operator-before-checkpoint/full bank census required')
         report.update(status='pass',phase='complete',subgate='complete',native_report_identity=rt.identity(native/'native.json',100000))
@@ -454,8 +649,11 @@ def dispatch(args,code):
         except BaseException as exc:
             failure(report,'host_cleanup',exc);report.update(status='fail',error='owned_native_cleanup_failed')
         try:
-            rt.require(authenticate(rt,code,args)=={k:v for k,v in proof.items()if k!='host_start_monotonic'},'Native inputs/source changed after cleanup')
-            rt.require(image(rt,args.image_id,deadline+GRACE)==proof['image'],'Actual runtime changed');report['source_artifacts_rehashed_after']=True
+            rt.require(authenticate_profile(rt,code,args)=={k:v for k,v in proof.items()if k not in('host_start_monotonic','embedded_architecture')},'Native inputs/source changed after cleanup')
+            if profile(args):rt.require(rt.identity(out/'cuobjdump.tar.xz',1000000)==proof['embedded_architecture']['tool_archive'],'Retained official tool changed')
+            rt.require(active_image(rt,args,proof,deadline+GRACE)==proof['image'],'Actual runtime changed')
+            if profile(args):rt.require(image(rt,proof['original_image']['image_id'],deadline+GRACE)==proof['original_image'],'Original runtime changed')
+            report['source_artifacts_rehashed_after']=True
         except BaseException as exc:
             failure(report,'host_posthash',exc);report.update(status='fail',error='source_artifact_runtime_postcheck_failed')
         report['elapsed_seconds']=time.monotonic()-started
@@ -465,7 +663,9 @@ def dispatch(args,code):
             if 'native_report_identity'in report:
                 rt.require(rt.identity(native/'native.json',100000)==report['native_report_identity'],'Actual native receipt changed after cleanup')
             if report['status']=='pass':
-                rt.require(set(out.rglob('*'))=={native,cid,out/'native.log',native/'proof.json',native/'native.json'},
+                expected={native,cid,out/'native.log',native/'proof.json',native/'native.json'}
+                if profile(args):expected.add(out/'cuobjdump.tar.xz')
+                rt.require(set(out.rglob('*'))==expected,
                            'Complete native success output inventory required')
             report['outputs']=seal_outputs(rt,out,native,out_owner,native_owner,proof_pin);report['owned_output_sealed']=True
         except BaseException as exc:
@@ -489,18 +689,24 @@ def dispatch(args,code):
 def parse(argv):
     options=[a.split('=',1)[0]for a in argv if a.startswith('--')]
     if len(options)!=len(set(options)):raise ValueError('Duplicate CLI options forbidden')
-    p=argparse.ArgumentParser();p.add_argument('--native',action='store_true');p.add_argument('--revision',required=True)
-    for n in('runtime-revision','runtime-report-sha256','image-id','out','proof-sha256','deadline'):p.add_argument('--'+n)
-    for n in('runtime-report-bytes','proof-bytes'):p.add_argument('--'+n,type=int)
+    p=argparse.ArgumentParser();p.add_argument('--native',action='store_true');p.add_argument('--sm90-child',action='store_true');p.add_argument('--revision',required=True)
+    for n in('runtime-revision','runtime-report-sha256','image-id','out','proof-sha256','deadline','sm90-build-revision','sm90-build-report-sha256'):p.add_argument('--'+n)
+    for n in('runtime-report-bytes','proof-bytes','sm90-build-report-bytes'):p.add_argument('--'+n,type=int)
     a=p.parse_args(argv)
     if not re.fullmatch('[0-9a-f]{40}',a.revision):raise ValueError('Exact source revision required')
     if not a.native:
+        if a.sm90_child:raise ValueError('Native-only explicit child profile forbidden on host')
+        optional=(a.sm90_build_revision,a.sm90_build_report_bytes,a.sm90_build_report_sha256)
+        if any(x is not None for x in optional)and not(all(x is not None for x in optional)and
+          re.fullmatch('[0-9a-f]{40}',a.sm90_build_revision)and 0<a.sm90_build_report_bytes<=2<<20 and
+          re.fullmatch('[0-9a-f]{64}',a.sm90_build_report_sha256)):
+            raise ValueError('All independent SM90 build pins required together')
         if not(a.runtime_revision and re.fullmatch('[0-9a-f]{40}',a.runtime_revision)and a.runtime_report_bytes and 0<a.runtime_report_bytes<=2<<20
                and a.runtime_report_sha256 and re.fullmatch('[0-9a-f]{64}',a.runtime_report_sha256)and a.image_id and re.fullmatch('sha256:[0-9a-f]{64}',a.image_id)):
             raise ValueError('Independent exact runtime pins required before invocation')
         if any(getattr(a,n)is not None for n in('out','proof_bytes','proof_sha256','deadline')):raise ValueError('Native-only flags forbidden')
     else:
-        if any(getattr(a,n)is not None for n in('runtime_revision','runtime_report_bytes','runtime_report_sha256','image_id')):
+        if any(getattr(a,n)is not None for n in('runtime_revision','runtime_report_bytes','runtime_report_sha256','image_id','sm90_build_revision','sm90_build_report_bytes','sm90_build_report_sha256')):
             raise ValueError('Host-only runtime pins forbidden in native mode')
         if not(a.out and a.proof_bytes and 0<a.proof_bytes<=4<<20 and a.proof_sha256 and re.fullmatch('[0-9a-f]{64}',a.proof_sha256)
                and a.deadline and math.isfinite(float(a.deadline)) and time.monotonic()<float(a.deadline)<=time.monotonic()+BUDGET):
@@ -513,12 +719,12 @@ def main():
     if a.native:
         out=Path(a.out);deadline=float(a.deadline)
         if (sys.platform!='linux'or os.geteuid()!=1000
-            or out!=ROOT/'results'/('masa-native-qualification-'+a.revision)/'native'):
+            or out!=ROOT/'results'/result_name(a.revision,a.sm90_child)/'native'):
             raise ValueError('Exact unprivileged native output required')
         cancelled=lambda *_:(_ for _ in()).throw(TimeoutError('Inclusive native deadline'))
         signal.signal(signal.SIGTERM,cancelled);signal.signal(signal.SIGALRM,cancelled)
         signal.setitimer(signal.ITIMER_REAL,deadline-time.monotonic())
-        run_native(code,a.revision,out,dict(bytes=a.proof_bytes,sha256=a.proof_sha256),deadline)
+        run_native(code,a.revision,out,dict(bytes=a.proof_bytes,sha256=a.proof_sha256),deadline,sm90_child=a.sm90_child)
     else:
         if sys.platform!='linux'or os.geteuid()!=0:raise ValueError('Actual Azure host dispatch required')
         result=dispatch(a,code);print(json.dumps(dict(stage=result['stage'],status=result['status'])))

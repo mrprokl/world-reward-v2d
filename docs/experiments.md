@@ -10791,3 +10791,27 @@ extension25850576B/f95180d08e064f0f8397cec1a574519c1800f7d0b0f368a0742cad8d4ef85
 Original5b4 author runtime remains unchanged. Fresh explicit child
 authentication and actual embedded-architecture/native qualification remain
 required; appearance correspondence cannot establish manipulation ownership.
+
+EP16 shared native initializer actual receipt reports PASS17.845246s, full360
+frames; final independent source/input/output audit pending. Scheduling defect:
+root invoked the direct historical wrapper, which has no cooperative FD9 lock,
+while the EP20 pose job had an active GPU process at observation. No exclusive
+GPU execution is asserted and this timing is not a performance benchmark.
+Future GPU stages use the existing queued wrapper/after-gpu-lock route; no
+duplicate replay or weakening of numerical controls is authorized.
+
+EP16 independent observer did not execute: a Python syntax error in its
+collector handler caused pre-execution rejection. No hash, model, render,
+container or producer change occurred. The original shared initializer remains
+reported PASS, not independently qualified yet; collector will be syntax-tested
+locally before another bounded read-only inspection. No inference rerun.
+
+Fresh MASA SM90 native qualifier is prospective and explicitly opt-in. Its
+original acquisition/runtime52-wheel proof remains untouched; the new source
+build/child is authenticated separately. Before GPU lock or checkpoint decode,
+a pinned CUDA11.8.86 cuobjdump must actually inspect the compiled extension for
+embedded sm_90. Original DCNv2/RoIAlign/model numeric controls and600s inclusive
+budget remain unchanged; all six historical critical functions are byte-exact
+in parent review. Tool archive/notices are retained, owned scratch removed.
+Parent196 combined qualifier/build/transport tests PASS5.65s; no new GPU result
+or appearance/ownership/quality qualification exists yet.

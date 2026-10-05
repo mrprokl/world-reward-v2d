@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Source closure: /infra/masa_native_qualify.py /configs/masa_native_qualification_v1.json /infra/mediapipe_cpu_runtime_verify.py /infra/masa_acquire.py /configs/masa_acquisition_v1.json /infra/masa_runtime_build.py /configs/masa_runtime_v1.json
+# Source closure: /infra/masa_native_qualify.py /configs/masa_native_qualification_v1.json /infra/mediapipe_cpu_runtime_verify.py /infra/masa_acquire.py /configs/masa_acquisition_v1.json /infra/masa_runtime_build.py /configs/masa_runtime_v1.json /configs/masa_sm90_build_v1.json
 # One procedural CUDA/model contract; no RGB dataset, GT or tracking filters.
 set +x
 set -euo pipefail
