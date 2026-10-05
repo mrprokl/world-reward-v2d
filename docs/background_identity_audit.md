@@ -27,12 +27,38 @@ an architectural decision, not a corrected challenge prediction or quality gain.
   files and FoundationPose byte-identical at the October5 V2D HEAD; no switch
   of executed producer or post-cutoff adoption follows.
 
+## 4DAnyone does not supply an interaction selector
+
+New narrow source audit at
+[4DAnyone9cc2aa23](https://github.com/ant-research/4DAnyone/blob/9cc2aa230fe5d364da2c5634ec3dabadadcb0d60/fdanyone/motion/gvhmr.py#L195-L209):
+the wrapper calls `get_one_track`; an empty result becomes a full-image bbox
+repeated on every frame. The actually referenced GVHMR gitlink is
+`6ec3ca39336c50492c0fae65fba2fb831fc7d866`, not a guessed current tracker.
+[Its tracker60–93](https://github.com/zju3dv/GVHMR/blob/6ec3ca39336c50492c0fae65fba2fb831fc7d866/hmr4d/utils/preproc/tracker.py#L60-L93)
+calculates track lengths but ultimately sorts by **sum of normalized bbox areas**,
+takes top1, interpolates missing boxes and applies a five-sample moving average
+twice. Verified3830B/SHA256
+`0b32eeaddbdd7425a262266761968c50d8ebe7da4d1b5019a8a84c34f773e6f8`.
+A large/long-visible bystander can therefore win; generated human views do not
+establish the manipulated object or its owner. Do not adopt the full-frame
+fallback or interpolated boxes as observations. No new model/media was fetched.
+
+## Our remaining selection gap
+
 Our automatic alternative has a separate vulnerability: `actor_selection`
 first uses the top confidently separated **object detection**, then spatial
 affinity chooses a person. A highly scored background object can therefore
 produce a stable but semantically wrong pair. Mask/mesh agreement and low
 identity-switch counts cannot certify this pair. EP8/9 quality remains rejected;
 no hand reassignment, private prompt, parameter tuning or historical overwrite.
+
+The complete candidate adapters are not selectors. Existing
+`joint_pair_scorer.build_joint_pair_features` pools both sides and fits an
+OpenImages positive-only pair recipe; it cannot be relabelled person–side–target
+or OFF-specific supervision. Preserve that closed study unchanged. The next
+side-aware learner must retain SELF/other-person/OFF and unknown validity, using
+an adequately licensed fresh reference. Multiple indistinguishable simultaneous
+interactions require unresolved task identity, not arbitrary top1 or a hand label.
 
 ## Methods address different failure classes
 

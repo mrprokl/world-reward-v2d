@@ -1,0 +1,77 @@
+{
+  "CPU": {
+    "Torch_Joblib_imported": false,
+    "frames": 443,
+    "full_export_trajectory_valid": true,
+    "native_elapsed_seconds": 13.6222236600006,
+    "no_pack_calls": true,
+    "official_runtime_sources_exact": true,
+    "original_scratch_geometry_receipt_only": true,
+    "rowID_Arrow_projection_only": true,
+    "row_ID_digest_exact": true,
+    "scratch_absent": true,
+    "selected_frames": 283,
+    "selected_row_id_sha256": "08de3dbb067df6b4bb71c86fa22155b0dff03d967b5618570c86b04efffb9679",
+    "selected_rows": 22381,
+    "status": "pass"
+  },
+  "CPU_observer_sha256": "3831a2b79b0348a6cb20542ee9bef328059fe5e6ca400b45d5a22c0a261dad63",
+  "GPU_calls": 0,
+  "VM01_handed_back": true,
+  "adoption": false,
+  "all15publicinputs_before_after": true,
+  "audit_seconds": 20.559406400017906,
+  "bound_files": 78,
+  "episode": 19,
+  "export_original_source_before_after": true,
+  "export_source": {
+    "XZ6_archive_sha256": "4af7192a23915b4793f0dff336f3f81684b2fe6e6f098f79ff8e7712623121b8",
+    "entry": "run_cari_shared_stage_queued",
+    "inventory_sha256": "d36a5c742616142b624a6c03e31efacec3c47230800e4b515d4ec638aeb675fa",
+    "revision": "fff42b1377b3e0b91f34b7229938538fb838d050",
+    "tar_bytes": 1914880,
+    "tar_sha256": "c3bb014983c81272b814b84d0e08c84ca9423ac1ba525b825d3b52af76424506"
+  },
+  "export_source_files": 297,
+  "hashed_total_files": 655,
+  "historical_systemd_unit_exit": "not_inferred_from_collected_unit",
+  "model_optimizer_decoder_packer_upload_calls": 0,
+  "observer_repairs": [
+    {
+      "Azure_calls": 0,
+      "cause": "observer_ternary_missing_whitespace",
+      "error_type": "SyntaxError",
+      "event": "local_compile_before_remote",
+      "producer_changed": false
+    }
+  ],
+  "official_runtime_images_before_after": true,
+  "original_native_driver_absent": true,
+  "original_wrapper_historical_CID_receipt_retained": false,
+  "output_directory_mode755": true,
+  "output_report_mode444": true,
+  "owned_CPU_CID_absent": true,
+  "posthash": true,
+  "producer_revision": "9d251a3f94c363888535686fbee2607df1c322c4",
+  "quality_verified": false,
+  "receipt": {
+    "bytes": 10242,
+    "sha256": "4ddffdf3d0c89c57bd3197b6ab92d5c7bc793eb5260cd0827eb664f913d7b2a0"
+  },
+  "sample_XYZ_or_prediction_columns_read": false,
+  "schema": "world_reward.coverage19_official_pack_saved_audit.v1",
+  "scratch_absent": true,
+  "source": {
+    "XZ6_archive_sha256": "42ceaf0b940c58325640a460c2a47251748677aeca510c7f833aff2b52b7899f",
+    "entry": "run_official_track1_pack_gate",
+    "inventory_sha256": "4354bb0b4e5181d00795e8fd88ae6426bf1c7218ce637c3e6dc0402812923969",
+    "revision": "9d251a3f94c363888535686fbee2607df1c322c4",
+    "tar_bytes": 2017280,
+    "tar_sha256": "fa6a5b631b3686561df07677333670836745830b17a610d1b189d86dc33fa631"
+  },
+  "source_before_after": true,
+  "source_files": 304,
+  "source_pretrained_weights_decoded": false,
+  "status": "pass",
+  "submission_eligibility_verified": false
+}

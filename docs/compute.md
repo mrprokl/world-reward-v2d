@@ -29,10 +29,10 @@ frames, 30Hz, 1536×1152. This readiness does not decode or score predictions.
 | 12 | 405 | Full native refinement and direct export PASS31.726037s, whole source chain/four outputs pinned. Official packing PASS13.521699s/all405, scratch removed. |
 | 13 | 425 | Original full inputs and shared preparation PASS18.417917s/all425 frames; full source/geometry lineage pinned. Original collected-predecessor scheduling FAIL remains separate. Native forward PASS109.129234s/all425 and301-update refinement PASS220.562431s, both independently frozen. Direct export PASS31.882319s and official packing PASS13.458823s; scratch removed. |
 | 14 | 442 | Original full frontend/input PASS3319.999303s; independent15-input pins sealed. Shared preparation PASS18.842805s, native forward PASS111.789331s and301-update refinement PASS224.287833s; independently pinned. Direct export PASS32.767795s and original official packing PASS13.783991s, all442 source/83 scored frames and geometry preserved, scratch removed. No accuracy PASS. |
-| 16 | 360 | Original topology-budget FAIL preserved. Separately preregistered native surface proposal PASS163.916619s, one unchanged QSlim/2052V/4096F/two components, actual source/runtime/input/output independently audited and15-leaf pins frozen. Full pose/remaining chain not yet verified. |
-| 17 | 419 | Original topology-budget FAIL preserved. Separate preregistered surface proposal PASS212.113581s, one QSlim/2044V/4096F/fifteen components, complete original source/runtime/input/output independently audited and15-leaf consumer pins frozen. Full pose/remaining chain not yet verified. |
+| 16 | 360 | Original topology-budget FAIL preserved. Separate preregistered surface proposal PASS163.916619s, unchanged QSlim/2052V/4096F/two components. Full pose → shared preparation → native forward/refinement → direct export → official packing now independently audited PASS; pack13.186185s,240 scored frames/20,231 rows, row-ID-only sample access, scratch removed. Engineering only. |
+| 17 | 419 | Original topology-budget FAIL preserved. Separate surface proposal PASS212.113581s, QSlim/2044V/4096F/fifteen components. Full pose and complete native chain independently audited PASS; direct export31.722440s and official pack13.366124s,277 scored frames/22,081 rows. Shared identity/fullT and row-ID firewall authenticated; scratch removed. No ownership/accuracy adoption. |
 | 18 | 535 | Original source boundary/nonmanifold rejection preserved. Separate preregistered surface proposal also FAIL13.926072s at original oriented vertex-link domain, zeroQEM; complete source/input/runtime and owned cleanup independently authenticated. Closed, no repair or pose. |
-| 19 | 443 | Original topology-budget FAIL preserved. Separate preregistered surface proposal PASS204.233443s, one unchanged QSlim/2032V/4096F/six components; source/runtime/input/native/output independently audited and15-leaf pins frozen. Full pose/remaining chain not yet verified. |
+| 19 | 443 | Original topology-budget FAIL preserved. Separate surface proposal PASS204.233443s, unchanged QSlim/2032V/4096F/six components. Full pose → shared preparation → forward112.593576s →301-update refinement93.872342s → direct export32.427946s → official pack13.622224s independently audited PASS. All443 trajectory frames,283 scored frames/22,381 rows; sample row-ID only, scratch removed. Engineering/fidelity only. |
 | 20 | 549 | Original topology-budget FAIL before object pose at15:24:39UTC; all eight fixed whole/component candidates rejected after full body/depth/initializers. Closed without repair. |
 | 21 | 563 | Original full frontend/input and shared prepare PASS20.261004s, native forward PASS122.410949s,301-update refinement PASS271.100399s, direct export PASS35.803141s. All source-chain/output pins independently frozen. Original late loader/pack source-mismatch FAILs preserved; separately authenticated actualexport/currentconsumer passes loader12.215511s and officialpacking14.944041s, scratch deleted. Engineering only, no accuracy. |
 | 22 | — | Original predecessor-wait failure preserved. New full initializers complete, then native geometry rejects boundary/nonmanifold or orientation/Euler changes18:57:32UTC; no trajectory. |
@@ -57,7 +57,10 @@ CPU-only preview does not qualify correct attribution or contact; no original
 1.2MB image or1.46MB evidence archive crossed the laptop connection. Temporary
 private Azure preview blob removed after exact byte-pin verification locally.
 
-Fourteen complete packed episodes are engineering/fidelity evidence only. Scratch
+Seventeen complete packed episodes are engineering/fidelity evidence only
+(0,1,2,3,5,6,8,9,12,13,14,15,16,17,19,21,26). In particular, EP8/9's
+wrong-background selection remains rejected: pack integrity is not ownership.
+Scratch
 single-episode Parquets were deleted. No final all-episode Parquet, submission or
 verified CARI4D superiority exists. Other episodes are not presumed ready.
 
