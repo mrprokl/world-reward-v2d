@@ -1,0 +1,72 @@
+{
+  "adoption": false,
+  "audit_elapsed_seconds": 0.43313763302285224,
+  "cid": {
+    "bytes": 64,
+    "sha256": "e2aa5b0ca13a4399c71b1b41ddf3f9a057f627d8880c1bc0330d1059651e9ef9"
+  },
+  "cid_absent": true,
+  "decision": "COST_RECIPE_UNQUALIFIED_NO_REAL_FIT",
+  "fixtures_rerun": false,
+  "gpu_used": false,
+  "gradient_lengths": [
+    17,
+    17,
+    1,
+    17,
+    17,
+    1
+  ],
+  "host_elapsed_seconds": 13.834795297996607,
+  "image_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "image_rootfs_sha256": "5ae610524943c42f72e2fa1ac06a9dbe8fa14bf2d572efd8a57cded6ead3503d",
+  "limitation": "Optimistic extrapolation is not a rigorous runtime lower bound; full FIT was not executed.",
+  "loss_calls": 0,
+  "max_rss_bytes": 117858304,
+  "minimum_image_pass_seconds": 0.2814619460259564,
+  "models_loaded": false,
+  "native": {
+    "bytes": 6628,
+    "sha256": "eb2ed10363bd933b018db3db127144f72668bfdc7e3602cfdc88c3ff4f1c9790"
+  },
+  "observer_sha256": "002538d842d4a439816c2ed5b19d6d6447b1c59301be26068c24f83049c56807",
+  "optimistic_recipe_estimate_seconds": 9240.958611924201,
+  "outputs_before_after": true,
+  "producer_revision": "1bf7109d0d24d3618ee74f458d72e5107011ecf5",
+  "proof": {
+    "bytes": 5435,
+    "sha256": "1dc63834c6a2b101c958749478a6a8d0e7f6310bf9e2989c157b02852140cb6b"
+  },
+  "quality_verified": false,
+  "references_read": false,
+  "report": {
+    "bytes": 2432,
+    "sha256": "c0a6f2b291e93fe2edaa5979db4b2da4df6cfe15d3fe48c2e5de1dde1c43c02d"
+  },
+  "rgb_read": false,
+  "saved_only": true,
+  "schema": "world_reward.coherent_pair_cost_actual_audit.v1",
+  "source_archive_xz_sha256": "0dc972b950af4101e081fa47f472388627743609d606a88ac8bd0973f9f0592a",
+  "source_before_after": true,
+  "source_closure_sha256": "e3379aad284d21e20fe2d610df8388082b5c660c3084c4b3b7b6b3e850fe12d4",
+  "source_entries": 298,
+  "source_files": 293,
+  "status": "pass",
+  "timings_seconds": [
+    0.5862063359818421,
+    0.2814619460259564,
+    0.2862876959843561,
+    10.234581116994377,
+    0.6789672059821896,
+    0.614360929990653
+  ],
+  "transport_cli_exit": 0,
+  "unit": "world-reward-coherent-pair-cost-v1.service",
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  }
+}

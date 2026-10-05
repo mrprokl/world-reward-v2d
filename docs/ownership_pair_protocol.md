@@ -192,4 +192,7 @@ gates. Native report6628B/SHA
 `eb2ed10363bd933b018db3db127144f72668bfdc7e3602cfdc88c3ff4f1c9790`;
 host2432B/SHA
 `c0a6f2b291e93fe2edaa5979db4b2da4df6cfe15d3fe48c2e5de1dde1c43c02d`.
-Independent saved-only source/result audit remains a separate stage.
+Independent saved-only source/result audit PASS0.433138s authenticates293 Git
+files,298 source entries/XZ, B47 image layers, sealed receipts, all six gradient
+lengths/counts and descriptive estimate, with exact exit0/PID0 and absent CID.
+No fixture, loss, model, real reference or RGB was rerun during that audit.
