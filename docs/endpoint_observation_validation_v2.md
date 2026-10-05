@@ -186,3 +186,30 @@ Audited repository source at `5b03f2ffc78eeb3a8439770b67cd4923c32c4e58`:
 
 These hashes record this code audit, not independently qualified new prediction
 receipts. No Azure/data/model operation or research-reference read occurred here.
+
+
+## Actual outcome (frozen protocol, October5)
+
+The64 fresh slots all acquired once on Azure. Native GDI+OWL33.8373s /host39.2775s
+completed two model loads and64 calls per recipe, retaining all raw900+3600 rows.
+Independent saved-bank/source/runtime audit PASS4.5162s precedes reference reads.
+
+| Split (32 slots each) | P one-to-one recall | O@128 one-to-one recall | Gate |
+|---|---:|---:|---|
+| DEV |0.7874599358974359|0.8999335529666411|PASS|
+| RESERVED |0.8119521103896103|0.8678985329186941|PASS|
+
+Both use IoU≥.5, original continuous boxes and fixed equal-image denominators.
+Independent scalar IoU and separate maximum-cardinality matching reproduce all
+metrics and32 rows per split (DEV4.3555s; RESERVED4.5506s). RESERVED was mounted
+only in a separate phase after independently audited DEV PASS; its audit did
+not reread DEV references. One stdlib-host eager NumPy import failure preceded
+all numerical/reference execution; its lazy-import repair changed no metric or
+prediction and is recorded separately. No native GPU rerun, tuning or resampling.
+
+**Decision:** this unchanged bank meets the preregistered endpoint-capacity gate.
+Do not reopen these references for selector tuning, call this benchmark unseen
+pretraining, or claim correct hands/ownership/contact,3D quality or a CARI4D win.
+Next is an independently split interaction/ownership validation using the existing
+complete anatomical/relation/temporal evidence, not a largest/nearest heuristic.
+Exact receipts and qualifications are in `results/audits/coco_endpoint_*_v2_actual.json`.
