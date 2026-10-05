@@ -414,6 +414,7 @@ SURFACE_REPLAY_PROTOCOL = 'configs/surface_replay_protocol_v1.json'
 SURFACE_REPLAY_PIN = dict(bytes=1568, sha256='1326037566980f7e6276a0632f27947aa80fa06c5b6b5ef355f494fe385dfb93')
 SURFACE_REPLAY_HELPERS = ('infra/surface_replay_adapter.py', 'src/world_reward/surface_mapping_replay.py',
     'src/world_reward/exact_normal_dot.py', SURFACE_REPLAY_PROTOCOL)
+SURFACE_REPLAY_QUALIFICATION = 'configs/surface_replay_qualification_pins.json'
 SURFACE_TRIMESH_SOURCES = {
     'scene/transforms.py': dict(bytes=28938, sha256='f38beb118974172c42270d035f3bb77eb5d374de8c251aab7bce1a33afbe8ea2'),
     'transformations.py': dict(bytes=74801, sha256='644b112736124b7803c028a248279926d10f748649634006d493a90722eae360'),
@@ -540,11 +541,12 @@ def surface_source(code, revision, rt, *, control=False):
     require(Path(__file__).resolve() == code/'infra/object_budget_solid.py' and
         set(p.name for p in code.parent.iterdir()) == {'code', 'revision', 'source-sha256'}, 'Actual immutable dispatcher required')
     names = SURFACE_HELPERS + (SURFACE_REPLAY_HELPERS if control=='surface_replay_v1' else
-        (SURFACE_CONTROL, 'src/world_reward/surface_pose_geometry.py') if control else ())
+        (SURFACE_CONTROL, 'src/world_reward/surface_pose_geometry.py') if control else
+        (*SURFACE_REPLAY_HELPERS,SURFACE_REPLAY_QUALIFICATION))
     return rt.source(ROOT, code, revision, ENTRY, names)
 
 
-def surface_qualification(code, rt, q):
+def surface_qualification(code, rt, q, *, replay=False):
     """Authenticate qualified native controls without reclassifying failed hosts."""
     path = code/'configs/surface_qslim_qualification_pins.json'
     pinid = rt.identity(path); pins = rt.strict(path.read_bytes())
@@ -613,7 +615,43 @@ def surface_qualification(code, rt, q):
         independent_audit=pins['independent_audit_report'], original_host_status='fail',
         original_source_proof=old, original_source_ledger_sha256=ledger.hexdigest(), build=built,
         phase1=phase1, runtime=runtime, leaf_identities=leafs)
+    if replay:
+        replay_paths,replay_proof=surface_replay_qualification(code,rt,proof)
+        paths.extend(replay_paths);proof['replay_verifier']=replay_proof
     return binary, tuple(dict.fromkeys(paths)), proof
+
+
+def surface_replay_qualification(code, rt, expected_qualification):
+    """Authenticate completed paired control; never replay geometry or its QEM."""
+    pinpath=code/SURFACE_REPLAY_QUALIFICATION;pinid=rt.identity(pinpath);pins=rt.strict(pinpath.read_bytes())
+    require(pins['schema']=='world_reward.surface_replay_qualification_pins.v1'
+        and pins['independent_saved_receipt_audit'] is True and pins['adoption'] is False
+        and pins['dense_production_qualified'] is False,'Scoped independent verifier qualification required')
+    revision=pins['producer_revision'];require(re.fullmatch('[0-9a-f]{40}',revision),'Original replay-control revision required')
+    old=ROOT/'jobs'/revision/ENTRY/'code';out=ROOT/'results'/('surface-replay-control-'+revision)
+    source=rt.source(ROOT,old,revision,ENTRY,SURFACE_HELPERS+SURFACE_REPLAY_HELPERS)
+    require(source['entries']==pins['source_entries'] and source['closure_sha256']==pins['source_closure_sha256']
+        and (old.parent/'source-sha256').read_bytes()==(pins['source_archive_sha256']+'\n').encode()
+        and len([p for p in old.rglob('*')if p.is_file()])==pins['source_files'], 'Full original replay source changed')
+    require(stat.S_IMODE(out.stat().st_mode)==0o555 and {p.name for p in out.iterdir()}==set(pins['files']),
+        'Actual four-file sealed replay namespace required')
+    before={p.name:rt.identity(p,2<<20,empty=True)for p in out.iterdir()}
+    require(before==pins['files'] and all(stat.S_IMODE(p.stat().st_mode)==0o444 for p in out.iterdir()),'Frozen replay files differ')
+    host=rt.pinned(out/'report.json',pins['files']['report.json'],2<<20)
+    native=rt.pinned(out/'native.json',pins['files']['native.json'],2<<20)
+    require(host['qualification']==native['qualification']==expected_qualification,
+        'Completed replay uses the same original qualified binary/runtime/controls')
+    surface_replay_validate(native,source,host['qualification'])
+    require(host['status']=='pass' and host['phase']=='complete' and host['native']==native
+        and host['native_identity']==pins['files']['native.json'] and host['source_binding']==host['source_binding_after']==source
+        and all(host[k]is True for k in ('owned_container_removed','owned_scratch_removed','source_rehashed_after',
+            'inputs_qualification_rehashed_after','runtime_rehashed_after')) and 0<host['elapsed_seconds']<=700,
+        'Complete original replay host/native ancestry required')
+    require(all(rt.identity(code/n)==rt.identity(old/n)for n in SURFACE_REPLAY_HELPERS), 'Qualified current replay math differs')
+    require(rt.source(ROOT,old,revision,ENTRY,SURFACE_HELPERS+SURFACE_REPLAY_HELPERS)==source
+        and before=={p.name:rt.identity(p,2<<20,empty=True)for p in out.iterdir()},'Replay qualification changed while read')
+    return (old.parent,out),dict(pins_identity=pinid,producer_revision=revision,
+        files=before,source_binding=source,geometry_replayed=False,qualified_comparison_only=True)
 
 
 def surface_raw_source(path, rt, official, np, trimesh):
@@ -691,6 +729,11 @@ def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, 
         report.update(original_grounded_scale=scale, phase='raw_source')
     checkpoint('source_domain', vertices=len(v), faces=len(f))
     compiler = dict(status='fail', phase='source_domain'); report['compiler'] = compiler
+    verify=q.verify_mapping
+    if authored is None:
+        from surface_replay_adapter import verifier
+        require('replay_verifier'in report['qualification'],'Completed independent replay qualification required')
+        verify=verifier(q)
     def simplify(sv, sf):
         checkpoint('source_obj_write')
         q.write_obj(work/'input.obj', sv, sf)
@@ -706,7 +749,7 @@ def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, 
         mapping = rt.strict((work/'native_mapping.json').read_bytes())
         checkpoint('mapping_replay', committed_collapses=mapping.get('committed_collapses'))
         return u, g, mapping
-    try: proposal = prepare_surface_budget(v, f, simplify=simplify, verify_mapping=q.verify_mapping)
+    try: proposal = prepare_surface_budget(v, f, simplify=simplify, verify_mapping=verify)
     except SurfaceBudgetError as error: compiler.update(error.report); raise
     compiler.update(proposal.proof); left()
     checkpoint('metric_f32_serialization')
@@ -998,7 +1041,7 @@ def surface_native(episode, code, revision, work, rt, q, build, body, *, control
     old = {s: signal.signal(s, lambda *_: (_ for _ in ()).throw(TimeoutError('Surface inclusive deadline'))) for s in (signal.SIGALRM,signal.SIGTERM)}
     signal.alarm(SURFACE_SECONDS)
     try:
-        binary, _, proof = surface_qualification(code, rt, q); report['qualification'] = proof
+        binary, _, proof = surface_qualification(code, rt, q, replay=not control); report['qualification'] = proof
         require(os.environ.get('WR_CPU_IMAGE_ID') == SURFACE_IMAGE, 'Actual qualified surface image required')
         inputs=None
         if not control:
@@ -1010,7 +1053,7 @@ def surface_native(episode, code, revision, work, rt, q, build, body, *, control
         elif control:surface_control_produce(code,binary,work,left,report,rt,q,build)
         else:surface_produce(episode, code, binary, work, left, report, rt, q, build)
         if not control:report['outputs'] = {n:rt.identity(work/n, 256<<20) for n in SURFACE_OUTPUTS}
-        require(surface_source(code,revision,rt,control=control) == source and surface_qualification(code,rt,q)[2] == proof and
+        require(surface_source(code,revision,rt,control=control) == source and surface_qualification(code,rt,q,replay=not control)[2] == proof and
             (control or input_binding(episode,body,build)[2] == inputs), 'Native source/input/runtime changed')
         report.update(status='pass', phase='complete', source_binding_after=source, source_rehashed_after=True,
             inputs_qualification_rehashed_after=True, runtime_rehashed_after=True)
@@ -1071,7 +1114,7 @@ def surface_remove_work(work, owner, rt, *, control=False):
 def surface_host(episode, code, revision, rt, q, build, body, *, control=False):
     started=time.monotonic(); left=lambda:q.modules()[3].remaining(started,SURFACE_HOST_SECONDS)
     require(sys.platform=='linux' and os.getuid()==0 and os.environ.get('DOCKER_HOST')=='unix://'+str(ROOT/'docker.sock'),'Private Linux CPU daemon required')
-    source=surface_source(code,revision,rt,control=control);binary,paths,proof=surface_qualification(code,rt,q)
+    source=surface_source(code,revision,rt,control=control);binary,paths,proof=surface_qualification(code,rt,q,replay=not control)
     inputpaths=();inputs=None
     if not control:_,inputpaths,inputs=input_binding(episode,body,build)
     image=rt.image(SURFACE_IMAGE)
@@ -1112,7 +1155,7 @@ def surface_host(episode, code, revision, rt, q, build, body, *, control=False):
             if control=='surface_replay_v1':surface_replay_validate(result,source,proof)
             elif control:surface_control_validate(result,source,proof)
             else:surface_validate(result,episode,source,proof,inputs)
-            require(surface_source(code,revision,rt,control=control)==source and surface_qualification(code,rt,q)[2]==proof and (control or input_binding(episode,body,build)[2]==inputs) and rt.image(SURFACE_IMAGE)==image,'Host source/input/runtime changed')
+            require(surface_source(code,revision,rt,control=control)==source and surface_qualification(code,rt,q,replay=not control)[2]==proof and (control or input_binding(episode,body,build)[2]==inputs) and rt.image(SURFACE_IMAGE)==image,'Host source/input/runtime changed')
             for n in (()if control else SURFACE_OUTPUTS):
                 require(rt.identity(work/n,256<<20)==result['outputs'][n],'Candidate changed');publish(out/n,(work/n).read_bytes(),published)
             report.update(status='pass',phase='complete',source_binding_after=source,source_rehashed_after=True,

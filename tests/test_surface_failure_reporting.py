@@ -128,7 +128,7 @@ def test_native_finally_persists_fail_after_computation_no_geometry_published(ga
     monkeypatch.setattr(gate.signal,'alarm',lambda n:calls.append(('alarm',n)))
     monkeypatch.setattr(gate,'surface_source',lambda *a,**k:source)
     proof=dict(build=dict(source_cpp=dict(sha256='c'*64)))
-    monkeypatch.setattr(gate,'surface_qualification',lambda *_:(tmp_path/'never_executed',(),proof))
+    monkeypatch.setattr(gate,'surface_qualification',lambda *_,**kw:(tmp_path/'never_executed',(),proof))
     monkeypatch.setenv('WR_CPU_IMAGE_ID',gate.SURFACE_IMAGE)
     monkeypatch.setattr(gate,'input_binding',lambda *_:(None,(),dict(video_sha256='d'*64)))
     def remaining(started,budget):

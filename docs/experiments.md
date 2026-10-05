@@ -9409,3 +9409,24 @@ only replay/root; source and final gates remain verbatim. Root combined172PASS
 1SKIP1.44s, historical13solid-function AST/syntax/diffPASS. These tests overlap
 agents and are not summed into scientific evidence. Native paired2QEM control
 has not executed; no production acceleration/adoption/accuracy claim.
+
+Actual44675df replay-onlycontrolPASS131.397384snative/133.061716shost.
+Same2nativeoutputs4224contractions; original/local wholeverifiers5.898654/1.385210s
+and8.793737/1.859716s (4.26×/4.73× on these controls only), complete topology
+equality,16fixedmutations rejected byboth peroutput;3preflights beforeanyQEM,
+fixedboundarynegative rejects preQEM. All3actualOBJ inputsha/prepost, outputs,
+originalfullsource/runtime/qualification prepostPASS. Native25493B/d08bffc3…dbdf29,
+host47385B/caf87f1e…9f1e23,297sources/archive247ec984…5e796/closure0fad6fa5…d739d.
+Independent saved-only audit authenticates4sealedfiles+exactCIDabsence, no
+replay/QEM/model calls. DisposablegeometryremovedAzure. Pins record scope;
+not denseproduction, wholeParquet, universal equivalence or reconstruction gain.
+
+Decision: production authenticates this completed paired control and all four
+byte-exact replay helpers before use; original QSlim, source admissibility and
+final geometry/topology gates remain unchanged. Independent read-only integration
+audit found no proof alias, historical-lineage or consumer-ABI blocker. A fresh
+EP26 technical run keeps the same600s native/700s host budget, with bounded phase
+evidence and FAIL-only reporting grace. No prediction recipe/threshold retuning,
+deadline relaxation, dense PASS or accuracy gain is assumed.
+Root integration369PASS2SKIP18.21s; shell syntax and diff checks PASS. Tests
+overlap existing coverage and are not independent reconstruction evidence.

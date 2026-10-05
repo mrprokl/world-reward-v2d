@@ -1,0 +1,25 @@
+{
+  "schema": "world_reward.surface_replay_qualification_pins.v1",
+  "producer_revision": "44675df50b2d27729fb58ac7897b2bcd2e4892ac",
+  "source_files": 297,
+  "source_entries": 302,
+  "source_archive_sha256": "247ec984c26756233ea7b2afcecf92a14332362c742a6a5d83a4a2d51235e796",
+  "source_closure_sha256": "0fad6fa563e7f113d9a0549933380ddd5a3836e6deff09bc2422c525e36d739d",
+  "files": {
+    "report.json": {"bytes": 47385, "sha256": "caf87f1e4323a9bebf8225b238ecbf248abe5525a86f2e49e09223d0759f1e23"},
+    "native.json": {"bytes": 25493, "sha256": "d08bffc376863b843f2c225e42b6774fa56dde7c952600144a198cd130dbdf29"},
+    ".container.cid": {"bytes": 64, "sha256": "e037ee763ea9e58c1a7af4353a3a02fb11a94b66dcdfcf361cf6d727bab57988"},
+    "native.log": {"bytes": 1630, "sha256": "4aea9a9e14e5185b77b682c4c60d426adbff479631ab4b414042c322a0c69f26"}
+  },
+  "host_seconds": 133.06171580101363,
+  "native_seconds": 131.3973844270222,
+  "QEM_calls": 2,
+  "preflight_calls": 3,
+  "negative_mutations_rejected_by_both_per_output": 16,
+  "independent_saved_receipt_audit": true,
+  "owned_container_and_scratch_removed": true,
+  "original_historical_host_status": "fail",
+  "dense_production_qualified": false,
+  "reconstruction_accuracy_verified": false,
+  "adoption": false
+}
