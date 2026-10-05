@@ -9703,3 +9703,15 @@ is therefore unproven; do not deploy a compatibility adapter as a presumed fix.
 No image/graph/layer bytes were inspected or changed. Original model/assets and
 206-file source closure rehashed unchanged. Next inspect actual storage/save
 diagnostics; preserve both failures, no runtime/model qualification replay.
+
+EP26 unchanged full399 refinement d15be58 nativePASS220.401099s/301updates;
+two outputs retain13814B/feee1a0498675375adc4a4e1685b5e45ff59d3aa2131dffebca0126fac2aab30
+and305436576B/d3fba25f2125bc28b8b96806400ba7f2ca20729b6aca72b73ccc766061173ef7.
+Direct export daa7b9d nativePASS31.564454s; independent saved-only fullsource/
+upstream/model/input/previous-stage binding auditPASS234files/closure
+093a8824f16c8d49c2c6f532dada5555b8a5d06be2e4ebae371c831926223546,
+all399 frames and original aligned surface preserved. Native directmax.002396262mm,
+replaymax.000533953mm, reference maxpoint.002213092mm; unchangedfidelitygates.
+Five exact original export leaves are frozen in episode26shared_export_pins;
+no arrays/models/GPU replay in audit. Packing/quality/submission unverified.
+Root520 relevant tiny/regressiontestsPASS3.07s; no scientificaccuracy claim.
