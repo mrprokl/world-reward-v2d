@@ -221,7 +221,7 @@ def cpu(rt,image_id,out,label,script,deadline,*,isolated=False):
     namespace_absent(rt,name,deadline)
     r=command(['docker','run','--rm','--cidfile',str(cid),'--name',name,'--label','world_reward_masa_runtime_owner='+label,
        '--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--memory','8g','--cpus','4',
-       '--tmpfs','/tmp:rw,nosuid,size=512m','--entrypoint','/usr/bin/env',image_id,'-i',
+       '--tmpfs','/tmp:rw,exec,nosuid,size=512m','--entrypoint','/usr/bin/env',image_id,'-i',
        'PATH=/opt/conda/bin:/usr/local/bin:/usr/bin:/bin','HOME=/tmp','LD_LIBRARY_PATH=','CUDA_VISIBLE_DEVICES=',
        'PYTHONDONTWRITEBYTECODE=1','MPLBACKEND=Agg',VENV+'/bin/python'if isolated else 'python','-I','-B','-c',script],deadline,log=log)
     rt.require(r.returncode==0 and log.stat().st_size<100000,'Offline CPU import/probe failed')

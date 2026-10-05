@@ -184,6 +184,9 @@ def test_mock_actual_host_success_isolated_offline_no_base_mutation(gate,tmp_pat
     builds=[a for a in docker.calls if a[:2]==['docker','build']];assert len(builds)==1
     assert builds[0][builds[0].index('--network')+1]=='none'
     runs=[a for a in docker.calls if a[:2]==['docker','run']];assert len(runs)==2
+    # venv.EnvBuilder copies Python then executes it for ensurepip; Docker's
+    # default tmpfs noexec rejects that real subprocess before any download.
+    assert all(a[a.index('--tmpfs')+1]=='/tmp:rw,exec,nosuid,size=512m'for a in runs)
     assert gate.VENV+'/bin/python'in runs[1] and not any('--gpus'in a for a in docker.calls)
     recipe=gate.recipe(c).decode()
     assert '-m venv '+gate.VENV in recipe and '--no-index --no-deps'in recipe and '-m pip check'in recipe

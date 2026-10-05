@@ -10466,3 +10466,14 @@ exact-name/return1/empty-stdout variant and exact missing-container daemon form,
 while still rejecting daemon outages, foreign tags/IDs and extra diagnostics.
 No numeric/source/model/dependency/budget gate changed; fresh revision-scoped
 runtime attempt requires separate publication/dispatch, never restart old FAIL.
+
+d4d7e8d fresh MASA runtime v2 CLOSED technicalFAIL0.911409s at actual base CPU
+venv/ensurepip probe before any dependency download, model or GPU. Receipt1917B/
+c6c5fda696e2568f400bbb0c47dc7db30e924ecb663cd9c974216e149cd0fdba.
+Independent source/base/empty wheel inventory/owned CID absence verified;
+native Python3.11 creates its temporary venv, but executing the copied Python
+for ensurepip gets EACCES on Docker's default noexec tmpfs. This is a sandbox
+mount mismatch, not a demonstrated Python/CUDA ABI failure. Preserve v2 FAIL;
+new CPU-only offline preflight explicitly permits exec in its bounded512MiB
+tmpfs (no network/capabilities), with unchanged isolated venv, dependency/numeric
+pins and1800s budget. The original base remains immutable, no packages installed.
