@@ -9931,3 +9931,23 @@ protocol precedes model outputs; next run tracks every query over full native
 trajectories, seals both predictions, then opens only external semantic labels.
 245 integrated tiny tests PASS2.23s; this is execution evidence, not a video gain
 or a verified improvement over CARI4D.
+
+9ab14d6 real Boots execution completes one load/two full-T calls in46.910064s:
+all1493 JPEGs decoded first,3133 original queries, native visibility and source/
+public/bank/assets posthash retained. Both sealed outputs remain on Azure:
+702frames/1616queries29394484B/
+f8d1b9f5fdb06e8820982a356e81d59c4ecabfa97317ac40d532fd340ba5cdb4;
+791frames/1517queries30968919B/
+89302408062f87bd62a52e951e9793a9cabce6d70aec85808442faf16f65a211.
+Native report2006B/e8bae07453e0629cf858eeb7fdebc2415554bee3848bddafa1e4ef109e15174d.
+Overall lifecycle remains CLOSED HOSTFAIL49.980539s: cleanup accepted only an
+uppercase Docker absence message and empty stdout. Independent actual census
+finds rc1, stdout LF and lowercase `error: no such object: <exact CID>`;
+both exact CID/name listings and GPU compute-app list are empty. Host547B/
+571adb0a21e0d2ca21a27c240a9623a286e82dac94032c25247aeb1b909abf49
+stays FAIL; original files/CID mode are not changed. A new saved-only CPU audit
+must authenticate both full outputs, original sources/public inputs/runtime,
+and actual cleanup before private evaluation; no GPU rerun or label access.
+ba50330 implements the frozen evaluator,193 combined tiny tests PASS1.14s.
+Its original host-PASS gate still blocks this failed lifecycle; no semantic
+scores, external quality qualification or CARI4D superiority are inferred.
