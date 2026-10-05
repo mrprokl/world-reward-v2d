@@ -1531,6 +1531,25 @@ HD-EPIC-HOI uses movement/contact-change pseudo-labels, not independent stationa
 contact truth; HOIST is object-only, FineBio requires signed access. These are
 not already qualified external pair benchmarks or CARI4D comparisons.
 
+Further source audit changes the adapter boundary: native InteractionHead.forward
+with interaction_targets=None returns raw[P,2] logits; its misleadingly named
+forward_logits returns softmax. The demo additionally filters links at.6/.92,
+rounds probabilities and discards query IDs; its soft-NMS also discards decayed
+scores. Retain raw/damped detector scores separately and all ordered pair logits,
+not those exported shortcuts. Active sigmoid focal training does not calibrate
+the demo softmax as physical-contact probability. Code-declared decoder tensors
+are[6,1,1500,3] classes,[6,1,1500,4] boxes,[6,1,1500,256] tokens; checkpoint
+composition remains undecoded. Class0hand/1direct-object/2tool-target encodes no
+latéralité, body owner or persistent identity.
+
+Importing mmdet.apis also imports train/test; train.py appends an author /gpfs
+path. No dataset is thereby instantiated, but an isolated image-only boundary
+must exclude that path effect and all annotation/dataset builders. A prospective
+AMG bridge retains every positive-overlap box/mask correspondence plus NULL,
+not an argmax-IoU identity. First compare learned versus spatial links on the
+same proposals on fresh stationary/distractor/release/tool controls; semantic
+HO-Cap point retention alone cannot qualify those relational links.
+
 ### October5 — checkpoint-free articulation seam, still prospective
 
 Independent primary audit favors direct named native controls into the selected
