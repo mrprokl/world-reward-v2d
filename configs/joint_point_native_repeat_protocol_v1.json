@@ -1,0 +1,73 @@
+{
+  "schema": "world_reward.joint_point_native_repeat_protocol.v1",
+  "status": "prospective_not_executed",
+  "control": "native_repeat",
+  "base_protocol": {
+    "path": "configs/joint_point_authored_runtime_protocol_v1.json",
+    "bytes": 8529,
+    "sha256": "559c41d113f85083dd1cfb60346cb7f56cad656e050542f7d5094ddee03f668a"
+  },
+  "upstream_revision": "7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80",
+  "optimizer_source": {
+    "path": "learning/training/mhr_opt_refineout.py",
+    "bytes": 92824,
+    "sha256": "84e0e818a3bc0935bb30b75fcd82fd7c5e3730ed812864594cd759697ddb406b"
+  },
+  "runtime_image_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "inheritance": "all_exact_source_model_acquisition_renderer_contact_crop_kernel_optimizer_and_budget_contracts_of_bound_base_except_explicit_changes_below",
+  "cohort": {
+    "controls": 1,
+    "frames": 3,
+    "frame_indices": [0, 1, 2],
+    "frame_names": ["000000", "000001", "000002"],
+    "image_size": [480, 640],
+    "K": [[800, 0, 320], [0, 800, 240], [0, 0, 1]],
+    "seed": 0,
+    "previous_raw_arrays_reused": false
+  },
+  "human_translation": {
+    "linear_x_m": 0.0125,
+    "quadratic_x_m": 0.0075,
+    "z_m": 4,
+    "operation": "float64_original_t_arange_then_single_float32_cast_of_linear*t+quadratic*t*t"
+  },
+  "object": {
+    "vertices_float32_m": [[-0.046875, -0.03125, -0.03125], [0.0625, -0.015625, -0.015625], [-0.015625, 0.078125, -0.015625], [0.015625, 0.015625, 0.078125]],
+    "faces_int64_outward": [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]],
+    "placement": "same_primary_named_left_hand_frame0_vertex_mean_plus_[0,0,-0.045]_then_new_human_x_increment",
+    "rotation": "identity_all3",
+    "scale": 1,
+    "repair_or_reposition": false
+  },
+  "optimizer": {
+    "constructor_kind": "original_both",
+    "arms": ["A_native_first", "A_native_second"],
+    "point_optimizer_factory_calls": 0,
+    "point_evidence_bound": false,
+    "warmup_or_layer_reset_added": false,
+    "sequence": "shared_real_MHR_layer_first_constructor_probes0_181_301updates_then_second_constructor_probes0_181_301updates",
+    "probe_steps": [0, 181],
+    "updates_per_arm": 301,
+    "target_updates_total": 602,
+    "exact_mismatch_stops_before_second_run": true
+  },
+  "quantile_diagnostic": {
+    "enabled": true,
+    "operator": "same_canonical_mask_quantile_queries32_min8_distinct_unambiguous",
+    "timing": "once_after_first_original_constructor_before_initial_state",
+    "purpose": "availability_only_no_point_loss_attachment_no_tracker",
+    "retained_file": "quantile_diagnostic.npz",
+    "no_refill_or_gate_relaxation": true
+  },
+  "comparison": {
+    "exact_initial_state_optimizer_scheduler": true,
+    "exact_all_probe_losses_metrics_gradients_native_kernel_counts": true,
+    "exact_full_raw_input_final_result_history": true,
+    "result_metadata_removed": [],
+    "tolerance": null
+  },
+  "budgets_seconds": {"manufacture": 180, "pair": 1200, "inclusive": 1380, "outer": 1440, "owned_cleanup_grace": 30},
+  "failure_policy": "one_new_control_STOP_no_rerender_refill_reset_sweep_tolerance_or_closed_control_replay",
+  "interpretation": "FAIL_means_this_native_baseline_repeat_not_bitwise_qualified_NOT_extension_causation;PASS_is_only_this_new_control_NOT_universal_determinism_or_old_AB_reclassification",
+  "claims": {"executed": false, "runtime_qualified": false, "learned_inference": false, "tracker_executed": false, "positive_weight": false, "accuracy_verified": false, "adoption": false, "training_overlap_verified": false, "competition_license_eligibility_verified": false}
+}

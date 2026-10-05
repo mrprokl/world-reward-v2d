@@ -9234,3 +9234,11 @@ initialstatekey, stoppedafterreadonlycomparisons; ownCID-onlyscratchremoved,
 correctedsame12savedfilesaudit,no scientificrerun. Compactreportreadneeded
 becauseAzuretruncatedover4KB. OriginalFAILretained,nogaterelaxation/adoption.
 Nextquestion is freshoriginalA/Aselfreproducibility, notrerunthisscene/weightfit.
+
+Fresh native A/A protocol: same caller opt-in `--control native_repeat`, new
+dyadic tetra/new accelerated T3, two ORIGINAL constructors, no point factory,
+same shared decoder/seeds/301-update lifecycle and exact gates. Both initial
+snapshots/four probes persisted before comparison; separate result namespace.
+Root targeted integration521PASS11SKIP25.22s; strict names51PASS1.04s.
+Broad suite interrupted deliberately after2133PASS57.78s, not a full-suite PASS.
+No native execution yet; no closed A/B replay or tolerance change.

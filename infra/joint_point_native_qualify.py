@@ -125,10 +125,15 @@ def host_mounts(root, code):
     return tuple(sorted(set(paths)))
 
 
-def paired_execution(construct, probe, run, reset, release, initial, validate, report, persist):
+def paired_execution(construct, probe, run, reset, release, initial, validate, report, persist,
+                     *, arm_names=('A_original','B_point_weight_zero')):
     """Injectable sequencing tests are not a substitute real-native proof."""
+    if (type(arm_names) is not tuple or len(arm_names)!=2
+            or any(type(name)is not str or not re.fullmatch('[A-Za-z][A-Za-z0-9_]{0,63}',name) for name in arm_names)
+            or len(set(arm_names))!=2):
+        raise ValueError('Exactly two distinct explicit arm names required')
     baseline = None
-    for arm in ('A_original','B_point_weight_zero'):
+    for arm in arm_names:
         reset(); report['phase']=arm+'_constructor';report['constructor_attempts']+=1;persist()
         instance=construct(arm);report['constructor_returns']+=1
         observed={'initial_state':initial(instance),'probes':[]}

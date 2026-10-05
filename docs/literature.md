@@ -1446,3 +1446,23 @@ trainingoverlapclearance or experiment/adoption. EP25's actual querySIGSEGV is
 a technicalcertificatefailure, not evidenceagainst its shape or a reason to
 replace it by anothergenerator. Diagnose nativecrash first; externalproposal
 family tests need a distinct frozen cohort and allcomponent/cavity preservation.
+
+### October5 — numerical repeatability versus reconstruction evidence
+
+Real authored A/B failed exact parity; saved constructor differences precede
+loss rendering. Primary MHRHead returns vertices and skeleton separately from
+TorchScript, so equal joints do not imply equal vertices. Torch2.5.1 retains
+[profiling/optimized executor plans](https://github.com/pytorch/pytorch/blob/v2.5.1/torch/csrc/jit/runtime/profiling_graph_executor_impl.cpp#L676)
+which seed resets do not reset; this is a lifecycle hypothesis, not proven cause.
+[nvdiffrast v0.3.1 backward atomics](https://github.com/NVlabs/nvdiffrast/blob/v0.3.1/nvdiffrast/common/interpolate.cu#L207)
+cannot directly explain constructor differences; installed version still needs
+binding before attribution. Fresh original A/A is the immediate discriminant,
+not changing tolerance or asserting an extension defect.
+
+Independent ParaHome/CHOIS audits did not clear a real full-HOI reference (see
+licences). A distinct articulated authored RGB-only reconstruction study could
+test positive point coupling on development/test scenes, with truth isolated
+from all automatic frontends/initialization; model/renderer rights, physically
+credible interactions and domain gap must be explicit. Existing manufactured
+initialization/renderer masks are runtime controls, not that study. No new study,
+weights, calibrated gates, held-out benefit or CARI4D victory is claimed.

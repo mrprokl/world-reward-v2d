@@ -357,6 +357,20 @@ with annotations isolated to metrics, to choose a prize-eligible World Reward
 V2D method, without data redistribution/commercial exploitation, and publication
 of aggregate results? Human approval for outbound email is still outstanding.
 
+### October5 — two distinct full-HOI alternatives remain deferred
+
+[ParaHome@535dada](https://github.com/snuvclab/ParaHome/tree/535dada556536a54d8b3a5185f2a153e6e3ccbca)
+README5551B/SHA `ff0ac820b7539645a3131e05d525ffa36fdf5efe85d68c4c5b83e93892c85ef4`
+grants CC-BY-NC-SA4, explicitly non-commercial academic use. The site licence
+is not the dataset grant. No verified small synchronized RGB/GT bundle or prize
+permission; separate SMPL-X rights/overlap remain unknown. No acquisition.
+[CHOIS@8ec585a](https://github.com/lijiaman/chois_release/tree/8ec585aa0200fd2a890ffb12897bcf69ae719463)
+README5562B/SHA `5266e8a7df6dc2e4c0a745e7806982cc5d1575df22e32bb9568c023439d96fcf`;
+MIT LICENSE1066B/SHA `deb92c90a9b660c53ef267c7895f828ddc99783db191d55e26da4fee7883e5d6`
+covers software/documentation, not an independent grant of its processed OMOMO
+captures/scans. Motion generation is not a verified monocular reconstruction
+benchmark. Neither route unlocks lawful real full-HOI validation today.
+
 ## Experimental general solid certificate (October4, not adoption)
 
 The independently written certified_solid_query.cpp glue is Apache-2.0.

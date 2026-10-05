@@ -44,6 +44,22 @@ def test_pair_order_and_complete_counts():
     assert report['actual_native_updates_total']==602
 
 
+def test_explicit_native_repeat_names_keep_identical_sequencing():
+    report=counters();events=[]
+    q.paired_execution(lambda arm:events.append(arm) or arm,lambda _,step:{'step':step},
+        lambda _:dict(updates=301),lambda:None,lambda:None,lambda _:dict(state='exact'),
+        lambda value,_:value,report,lambda:None,arm_names=('A_native_first','A_native_second'))
+    assert events==['A_native_first','A_native_second'] and report['actual_native_updates_total']==602
+
+
+@pytest.mark.parametrize('names',[('A','A'),('A',),('A','B','C'),('A','../B'),['A','B'],('A',True),('A',[])])
+def test_bad_pair_names_fail_before_constructor(names):
+    events=[]
+    with pytest.raises(ValueError):
+        q.paired_execution(lambda arm:events.append(arm),None,None,None,None,None,None,{},None,arm_names=names)
+    assert not events
+
+
 def test_probe_difference_stops_before_second_run():
     execute,events,report=exercise(probe_change=True)
     with pytest.raises(ValueError,match='initial'):execute()

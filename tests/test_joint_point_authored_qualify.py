@@ -218,6 +218,7 @@ def test_runtime_sourceclosure_and_shell_syntax():
     files['pyproject.toml']=(ROOT/'pyproject.toml').read_bytes()
     paths=azure_job.runtime_bundle_paths(files,'infra/run_joint_point_authored_qualify.sh')
     assert set(q.HELPERS)<=set(paths)
+    assert q.REPEAT_PROTOCOL in paths
     subprocess.run(['bash','-n',str(ROOT/'infra/run_joint_point_authored_qualify.sh')],check=True)
 
 
@@ -233,3 +234,166 @@ def test_no_replay_or_positive_fit_and_frozen_native_calls():
     assert 'rt.control' not in source and 'rt.write' not in source
     imports=[n for n in tree.body if isinstance(n,(ast.Import,ast.ImportFrom))]
     assert all('numpy' not in ast.unparse(n) and 'torch' not in ast.unparse(n) for n in imports)
+
+
+def test_repeat_protocol_exact_identity_and_inherited_contracts():
+    raw=(ROOT/q.REPEAT_PROTOCOL).read_bytes()
+    assert q.REPEAT_PIN=={'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}
+    original=configuration();selected=q.protocol(SimpleNamespace(pinned=lambda p,pin,cap:rt.strict(p.read_bytes()),require=rt.require),ROOT,'native_repeat')
+    expected=copy.deepcopy(original);expected['control']='native_repeat'
+    expected['human']['x_coefficients']=json.loads(raw)['human_translation']
+    expected['object']['vertices_float32_m']=json.loads(raw)['object']['vertices_float32_m']
+    expected['optimizer']['arms']=['A_native_first','A_native_second']
+    assert selected==expected and configuration()==original
+    assert q.helpers()==q.HELPERS and q.helpers('native_repeat')==(*q.HELPERS,q.REPEAT_PROTOCOL)
+
+
+@pytest.mark.parametrize('kind',['base_bytes','repeat_bytes','base_reference','source','image'])
+def test_repeat_bound_protocol_tamper_before_any_scientific_calls(tmp_path,kind):
+    (tmp_path/'configs').mkdir();base=configuration();repeat=json.loads((ROOT/q.REPEAT_PROTOCOL).read_bytes())
+    if kind=='base_reference':repeat['base_protocol']['sha256']='f'*64
+    elif kind=='source':repeat['optimizer_source']['bytes']+=1
+    elif kind=='image':repeat['runtime_image_id']='sha256:'+'f'*64
+    for name,value in ((q.PROTOCOL,base),(q.REPEAT_PROTOCOL,repeat)):
+        raw=(ROOT/name).read_bytes() if kind in ('base_bytes','repeat_bytes') else json.dumps(value).encode()
+        if kind=='base_bytes' and name==q.PROTOCOL or kind=='repeat_bytes' and name==q.REPEAT_PROTOCOL:raw+=b' '
+        (tmp_path/name).write_bytes(raw);(tmp_path/name).chmod(0o444)
+    if kind in ('base_bytes','repeat_bytes'):gate=rt
+    else:gate=SimpleNamespace(pinned=lambda p,pin,cap:rt.strict(p.read_bytes()),require=rt.require)
+    with pytest.raises(ValueError):q.protocol(gate,tmp_path,'native_repeat')
+
+
+def test_repeat_fresh_dyadic_scene_and_single_float32_translation_cast():
+    gate=SimpleNamespace(pinned=lambda p,pin,cap:rt.strict(p.read_bytes()),require=rt.require);c=q.protocol(gate,ROOT,'native_repeat')
+    values=q.parameters(np,c,lambda a:np.zeros((3,260),np.float32),lambda a:np.zeros((3,54),np.float32),PARAMETER_DIMS)
+    assert np.array_equal(values['mhr_trans'][:,0],(.0125*np.arange(3)+.0075*np.arange(3)**2).astype(np.float32))
+    assert np.array_equal(values['mhr_trans'][:,2],np.full(3,4,np.float32))
+    v=np.asarray(c['object']['vertices_float32_m'],np.float32);f=np.asarray(c['object']['faces_int64_outward'],np.int64)
+    assert np.array_equal(v*64,np.array([[-3,-2,-2],[4,-1,-1],[-1,5,-1],[1,1,5]]))
+    assert all(np.dot(np.cross(v[b]-v[a],v[d]-v[a]),v[a]-v.mean(0))>0 for a,b,d in f)
+    assert not np.array_equal(v,np.asarray(configuration()['object']['vertices_float32_m'],np.float32))
+    assert np.array_equal(f,np.asarray(configuration()['object']['faces_int64_outward'],np.int64))
+
+
+@pytest.mark.parametrize('argv',[['--control'],['--control','unknown'],['--control','native_repeat','--control','native_repeat'],['--contro','native_repeat'],['native_repeat']])
+def test_repeat_strict_cli_invalid_or_duplicate(argv):
+    with pytest.raises(SystemExit):q.arguments(argv)
+
+
+def test_repeat_cli_default_and_native_forwarding():
+    assert q.arguments([]).control is None
+    args=q.arguments(['--native','16','a'*64,'--control','native_repeat'])
+    assert args.control=='native_repeat' and args.native==['16','a'*64]
+
+
+def test_namespaces_distinct_old_closed_directory_preserved(tmp_path):
+    old=q.output_path(tmp_path,'a'*40);old.mkdir(parents=True);(old/'report.json').write_bytes(b'original sealed FAIL');(old/'report.json').chmod(0o444);old.chmod(0o555)
+    new=q.output_path(tmp_path,'a'*40,'native_repeat');assert new!=old and not new.exists()
+    new.mkdir();new.chmod(0o555)
+    with pytest.raises(FileExistsError):new.mkdir()
+    assert (old/'report.json').read_bytes()==b'original sealed FAIL'
+    with pytest.raises(ValueError):q.output_path(tmp_path,'../escape','native_repeat')
+    with pytest.raises(ValueError):q.output_path(tmp_path,'a'*40,'arbitrary')
+
+
+def repeat_native_report():
+    r,proof=native_report();proof['control']='native_repeat';r['protocol_identity']=q.REPEAT_PIN
+    r.update(control='native_repeat',constructor_kind='original_both',arm_names=['A_native_first','A_native_second'],point_optimizer_factory_calls=0,point_evidence_bound=False,point_config=None)
+    r['A_native_first']=r.pop('A_original');r['A_native_second']=r.pop('B_point_weight_zero');return r,proof
+
+
+def test_repeat_native_proof_distinguishes_originals_from_old_ab():
+    r,proof=repeat_native_report();q.validate_native(rt,r,proof,'native_repeat')
+    with pytest.raises(ValueError):q.validate_native(rt,r,proof)
+    original,original_proof=native_report()
+    with pytest.raises(ValueError):q.validate_native(rt,original,original_proof,'native_repeat')
+
+
+@pytest.mark.parametrize('key,value',[('constructor_kind','point_extension'),('point_optimizer_factory_calls',True),('point_optimizer_factory_calls',1),('point_evidence_bound',True),('point_config',{}),('control',None),('protocol_identity',q.PROTOCOL_PIN)])
+def test_repeat_wrong_scope_never_certifies(key,value):
+    r,proof=repeat_native_report();r[key]=value
+    with pytest.raises(ValueError):q.validate_native(rt,r,proof,'native_repeat')
+
+
+def test_repeat_exact_mismatch_stops_before_second_run_no_tolerance():
+    report={k:0 for k in ('constructor_attempts','constructor_returns','probe_attempts','probe_returns','run_attempts','run_returns')};runs=[]
+    def probe(arm,step):return {'step':step,'gradient_sha256':('a' if arm=='A_native_first' or step==0 else 'b')*64}
+    with pytest.raises(ValueError,match='no tolerance'):
+        pair.paired_execution(lambda arm:arm,probe,lambda arm:runs.append(arm) or {'same':'full'},lambda:None,lambda:None,lambda arm:{'same':'state'},lambda r,arm:r,report,lambda:None,arm_names=q.profile('native_repeat')[2])
+    assert runs==['A_native_first'] and report['probe_returns']==4 and report['run_attempts']==report['run_returns']==1
+    assert 'actual_native_updates_total' not in report
+
+
+def test_precomparison_index_preserves_both_initials_four_probe_hashes_before_stop():
+    report={};saved=[]
+    for arm in q.profile('native_repeat')[2]:
+        report['phase']=arm+'_constructor'
+        q.precomparison_record(report,dict(state_sha256='a'*64,optimizer_sha256='b'*64,scheduler_sha256='c'*64),lambda:saved.append(copy.deepcopy(report)))
+        for step in (0,181):
+            report['phase']=arm+f'_loss_gradient_{step}'
+            q.precomparison_record(report,dict(step=step,loss_sha256='d'*64,metrics_sha256='e'*64,gradients='f'*64,native_calls={'contact':1,'render':1,'penetration':int(step==181),'kaolin_sign':int(step==181),'kaolin_distance':int(step==181)}),lambda:saved.append(copy.deepcopy(report)))
+    assert len(saved)==6 and len(saved[-1]['retained_precomparison'])==6
+    assert len(saved[0]['retained_precomparison'])==1
+    for arm in q.profile('native_repeat')[2]:
+        assert report['retained_precomparison'][arm+'_constructor']['optimizer_sha256']=='b'*64
+        assert report['retained_precomparison'][arm+'_loss_gradient_181']['native_calls']['kaolin_distance']==1
+
+
+def test_repeat_constructor_branch_uses_originals_and_quantiles_only(tmp_path,monkeypatch):
+    from dataclasses import dataclass
+    from world_reward import joint_point_objective as op
+    from world_reward.point_surface_queries import SurfaceQueries,MaskQueryDiagnostics
+    import world_reward.point_surface_queries as queries
+    import cari_full_refine as full
+    @dataclass
+    class Config:
+        penetration_collision_proxy_path:str
+        hand_surface_spec_path:str
+        report_every:int
+        checkpoint_path:object
+    class Tensor:
+        def __init__(self,array):self.array=array
+        def __getitem__(self,i):return Tensor(self.array[i])
+        def detach(self):return self
+        def cpu(self):return self
+        def numpy(self):return self.array
+    events=[]
+    class Original:
+        def __init__(self,*args,**kwargs):events.append('original');self.contact_mask=np.ones((3,2))
+        def _object_state(self,*args,**kwargs):return Tensor(np.tile(np.eye(3),(3,1,1))),Tensor(np.zeros((3,3))),None,None
+        def _contact_loss(self):pass
+    placeholder=lambda:None
+    optimizer=SimpleNamespace(MHRParityPostOptConfig=Config,MHRParityPostOptimizer=Original,object_inside_human_penetration_loss=placeholder)
+    monkeypatch.setitem(sys.modules,'Utils',SimpleNamespace(nvdiff_color_depth_render=placeholder))
+    monkeypatch.setitem(sys.modules,'kaolin.ops.mesh',SimpleNamespace(check_sign=placeholder))
+    monkeypatch.setitem(sys.modules,'kaolin.metrics.trianglemesh',SimpleNamespace(point_to_mesh_distance=placeholder))
+    monkeypatch.setenv('WR_CODE',str(ROOT));monkeypatch.setattr(op,'native_point_optimizer_class',lambda *a,**k:pytest.fail('No point factory in A/A'))
+    n=8;points=SurfaceQueries(np.zeros((n,3)),np.zeros((n,3)),np.zeros((n,2),np.int64),np.arange(n,dtype=np.int64),np.ones(n),np.zeros((n,3)))
+    diagnostic=MaskQueryDiagnostics(np.zeros((n,2),np.int64),np.ones(n,bool),np.ones(n,bool),np.zeros(n,bool),np.zeros(n,bool),np.ones(n,bool),n,True,True,n)
+    def select(*args,**kwargs):events.append('quantile');return SimpleNamespace(queries=points,diagnostics=diagnostic)
+    monkeypatch.setattr(queries,'canonical_mask_quantile_queries',select)
+    def execution(construct,*args,arm_names):
+        assert arm_names==('A_native_first','A_native_second')
+        assert all(type(construct(arm))is Original for arm in arm_names)
+    monkeypatch.setattr(pair,'paired_execution',execution)
+    gate=SimpleNamespace(pinned=lambda p,pin,cap:rt.strict(p.read_bytes()),require=rt.require);c=q.protocol(gate,ROOT,'native_repeat')
+    source={'frames':['000000','000001','000002'],'observations':{'object_mask':np.ones((3,480,640),bool)}}
+    monkeypatch.setattr(full,'fingerprint',lambda source:'a'*64)
+    monkeypatch.setattr(q,'runtime',lambda code:SimpleNamespace(identity=rt.identity,require=rt.require))
+    torch=SimpleNamespace(arange=lambda *a,**k:np.arange(a[0]),load=lambda *a,**k:source)
+    report={};q.paired_native(np,torch,object(),optimizer,source,np.zeros((4,3),np.float32),np.zeros((4,3),np.int64),np.ones((3,480,640)),c,tmp_path,report,lambda:None,lambda:None)
+    assert events==['original','quantile','original'] and report['point_optimizer_factory_calls']==0
+    assert report['constructor_kind']=='original_both' and report['point_evidence_bound'] is False and report['point_config'] is None
+    assert {p.name for p in tmp_path.iterdir()}=={'quantile_diagnostic.npz'}
+    with np.load(tmp_path/'quantile_diagnostic.npz',allow_pickle=False) as arrays:
+        assert set(arrays)==set(vars(points))|{k for k,v in vars(diagnostic).items() if isinstance(v,np.ndarray)}
+        assert arrays['face_indices'].dtype==np.int64 and arrays['qualified'].dtype==bool
+
+
+def test_native_cli_host_control_mismatch_before_torch_or_output(tmp_path,monkeypatch):
+    monkeypatch.setenv('WR_ROOT',str(tmp_path));monkeypatch.setenv('WR_CODE',str(ROOT));monkeypatch.setenv('WR_CODE_REVISION','a'*40)
+    gate=SimpleNamespace(pinned=lambda *a,**k:{'control':None},require=rt.require)
+    monkeypatch.setattr(q,'runtime',lambda code:gate)
+    monkeypatch.setattr(q,'native',lambda *a,**k:pytest.fail('No native calls on control mismatch'))
+    with pytest.raises(ValueError,match='selection differs'):q.main(['--native','16','a'*64,'--control','native_repeat'])
+    assert list(tmp_path.iterdir())==[]
