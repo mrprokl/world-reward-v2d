@@ -1,0 +1,64 @@
+{
+  "schema": "world_reward.rgb_endpoint_bank.v2",
+  "image_id": "sha256:fd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252",
+  "output": "/srv/scenesmith/world-reward/results/coco-endpoint-banks-v2",
+  "input_directory": "/srv/world-reward-data/coco_endpoint_v2/inputs",
+  "maximum_images": 64,
+  "maximum_input_bytes": 1073741824,
+  "maximum_image_bytes": 16777216,
+  "maximum_decoded_pixels": 16777216,
+  "maximum_bank_bytes": 16777216,
+  "maximum_output_bytes": 1073741824,
+  "budget_seconds": 600,
+  "person_query": "person.",
+  "confidence": 0.3,
+  "text_threshold": 0.25,
+  "nms_iou": 0.7,
+  "owl_patches": 3600,
+  "model_loads": 2,
+  "ground_truth_used": false,
+  "ownership_verified": false,
+  "quality_verified": false,
+  "adoption": false,
+  "helper_pins": {
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "infra/owlv2_native_qualify.py": {
+      "bytes": 25658,
+      "sha256": "dd2934a1146ad21eaaab8b422486c2e765535f3139032f74dd01e6047476875e"
+    },
+    "infra/openimages_joint_pair_gdi.py": {
+      "bytes": 26539,
+      "sha256": "6d5f5976de54b45ca179aed0c8d2ac3d9da2379b56334ec585326884d9887352"
+    },
+    "infra/bridge_frontend_bindings.py": {
+      "bytes": 15790,
+      "sha256": "94a1d1d99abd5c325e43511a6fa08cded20ad55f0bb28aaa0f13101b07951d6f"
+    },
+    "infra/frontend_selected_assets.py": {
+      "bytes": 10312,
+      "sha256": "28817bc5b6629c4721108c7ccb2f10b6b1ee30ba833c6e3eb85d202336a26c43"
+    },
+    "src/world_reward/prompt_selection.py": {
+      "bytes": 9971,
+      "sha256": "04c9ed2ce9d004920da436d2e15ce0d464275598f122411eac87b47bb8c95ae6"
+    },
+    "src/world_reward/owlv2_object_observations.py": {
+      "bytes": 8748,
+      "sha256": "8587489a860b44a74bc0149c67960128b6b12aa1e4d51bc07e0e52103da5b888"
+    }
+  },
+  "owl_qualification": {
+    "producer_revision": "5b03f2ffc78eeb3a8439770b67cd4923c32c4e58",
+    "native": {
+      "bytes": 2647,
+      "sha256": "db4a95a7e1ef68312086297d1f05d26e86e168ac0a73386ab50b7342dc282503"
+    },
+    "host": {
+      "bytes": 14465,
+      "sha256": "48cc1e8da7e0bedd71e54542521bb1f75f5bc48348fd83fdb29c2ef871ad5866"
+    }
+  }
+}
