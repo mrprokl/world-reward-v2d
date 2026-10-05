@@ -24,3 +24,15 @@ does **not** pass the original acquisition, certify asset licence scope, legal
 eligibility, training overlap or model membership. Any packaging correction
 would need its own explicit future protocol/producer; no v1 gate relaxation.
 Root integration212tiny tests PASS,23.49s; no archive was downloaded locally.
+
+## Actual bounded diagnostic (2026-10-05)
+
+Producer `bd58681a04fa7e5f82807997ab5d92a7bdc9723c`: PASS in2.966602s.
+Receipt17451B/SHA256`5e3188aa1fefa41ffe231575fbe445f3b476a683c9067b076f12e5fde623b193`.
+The authenticated archive has19 entries and4,767,087,611 expanded bytes. Its
+first v1 rejection is entry1, `assets/corrective_blendshapes_lod0.npz`,
+2,651,004,394B, exceeding the1GiB per-member cap. No payload was read. The actual
+notice member is `assets/LICENSE.txt`, not the v1 assumed `assets/LICENSE`.
+These are packaging findings, not malicious-content findings or licence proof.
+An independent read-only metadata/receipt/source/model/old-failure posthash
+audit also passed. Original v1 FAIL remains unchanged; no generic cap is raised.

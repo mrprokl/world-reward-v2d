@@ -112,6 +112,14 @@ preregistered same-invocation delegation check now passes on H100:301updates,
 303exact native total/metrics object pairs, no point arithmetic, real native
 kernels and full saved-file audit. This verifies the zero-weight branch without
 pretending independent stochastic optimizer trajectories are identical.
+
+The new [component preflight](authored_point_study_protocol.md) reuses this caller
+through one explicit mode: six T24 named-rig recipes, actual head PCA mappings,
+18 sentinel composites and full original material trajectories. The pure
+`authored_point_study` module owns manufacturing/diagnostics, not inference or
+provenance. Standalone native geometric contact eligibility needs no optimizer;
+algebraic attachment does not certify grasp or whole-body nonpenetration.
+Boots and positive-weight fits remain a separate prospective experiment.
 The next actual tracking seam needs no new model: BootsTAPIR already preserves
 full-T query slots, raw logits and native global XY256. The point objective's
 `diag(256/W,256/H)` maps **full-image** pixels, not native silhouette crop pixels.

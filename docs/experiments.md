@@ -9287,3 +9287,20 @@ wholeSHA/primarytexts and oldFAIL4file/source/modelpreposthash.300sCPU-only,
 noJITpayloadread, boundednoticesonlyafterstructuralsafety. Firstv1guardrecorded
 explicitly;diagnosticPASSnotassetgrant. Root212tinyintegrationPASS23.49s;
 codeonlypublicdispatchplanned, no actualnewinventoryoutcome yet.
+
+Actual MHR inventory bd58681 diagnosticPASS2.966602s:19metadataentries,
+4,767,087,611expandedB; firstv1rejectionentry1 correctiveLOD0=2,651,004,394B
+exceeds1GiB. Notice actualname assets/LICENSE.txt. WholeZIP/source/existingmodel/
+originalFAIL pre/postchecksPASS;0notice/modelpayloadreads. Receipt17451B
+5e3188aa…3b193, independentreadonlymetadataauditPASS. This does not certify
+licence/modelmembership or repair the original v1 FAIL.
+
+New prospective component cohort: six authored T24 MHR scenes, true wrist/finger
+articulation, clip-constant textured8x6cm material pad, full144decodes and18fixed
+sentinels. Named native mappings/PCA are authenticated; fullhand-to-originalpad
+surface eligibility is separate from algebraic attachment. No optimizer, Boots,
+challenge input or quality claim. Frozen source-only gates require all six scenes
+without support refill, clipping or post-value retuning.300s native/360s host.
+Root focused integration240PASS11SKIP1.06s plus shellsyntax/diffcheckPASS.
+Native component execution pending; future positive-weight A/B remains a separate
+unimplemented scope, not authorized by this preflight.

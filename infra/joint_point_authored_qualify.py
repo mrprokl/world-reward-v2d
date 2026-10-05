@@ -28,6 +28,8 @@ REPEAT_PROTOCOL='configs/joint_point_native_repeat_protocol_v1.json'
 REPEAT_PIN={'bytes':3591,'sha256':'db82e8b8d51058920e02301f20887d84d52e1b25d6c5488596ebd6e51c23706e'}
 DELEGATE_PROTOCOL='configs/joint_point_zero_delegate_protocol_v1.json'
 DELEGATE_PIN={'bytes':3759,'sha256':'b9d9590b9bafdd8568ee0730a69b57a3def041041522fbe15be191a56ab1d6ed'}
+STUDY_PROTOCOL='configs/authored_point_study_protocol_v1.json'
+STUDY_PIN={'bytes':6924,'sha256':'a1e61f4edef0741e2b96d1ccbef877f0a613ea90c54d115eca38c2834a2b09cd'}
 ARCHIVE_PINS='configs/frontend_asset_archive_pins.json'
 IMAGE='sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7'
 BODY='weights/cari4d/sam3d_body/checkpoints/sam-3d-body-dinov3'
@@ -50,11 +52,14 @@ def profile(mode=None):
     if mode is None:return PROTOCOL_PIN,'joint-point-authored-qualify-',('A_original','B_point_weight_zero')
     if mode=='native_repeat':return REPEAT_PIN,'joint-point-native-repeat-',('A_native_first','A_native_second')
     if mode=='zero_delegate':return DELEGATE_PIN,'joint-point-zero-delegate-',('Z_point_zero_delegate',)
+    if mode=='component_preflight':return STUDY_PIN,'joint-point-component-preflight-',()
     raise ValueError('Explicit known native control required')
 
 
 def helpers(mode=None):
-    profile(mode);return HELPERS if mode is None else (*HELPERS,DELEGATE_PROTOCOL if mode=='zero_delegate' else REPEAT_PROTOCOL)
+    profile(mode)
+    if mode=='component_preflight':return (*HELPERS,'src/world_reward/authored_point_study.py',STUDY_PROTOCOL)
+    return HELPERS if mode is None else (*HELPERS,DELEGATE_PROTOCOL if mode=='zero_delegate' else REPEAT_PROTOCOL)
 
 
 def output_path(root,revision,mode=None):
@@ -65,6 +70,11 @@ def output_path(root,revision,mode=None):
 def protocol(rt,code,mode=None):
     profile(mode);c=rt.pinned(code/PROTOCOL,PROTOCOL_PIN,16<<10)
     if mode is None:return c
+    if mode=='component_preflight':
+        rt.require(STUDY_PIN is not None,'Frozen component protocol release required')
+        selected=rt.pinned(code/STUDY_PROTOCOL,STUDY_PIN,32<<10)
+        rt.require(selected['schema']=='world_reward.authored_point_study_protocol.v1' and selected['base_protocol']==dict(path=PROTOCOL,**PROTOCOL_PIN),'Exact inherited component contracts required')
+        return dict(c,control=mode,component_study=selected)
     selected=rt.pinned(code/(DELEGATE_PROTOCOL if mode=='zero_delegate' else REPEAT_PROTOCOL),profile(mode)[0],16<<10)
     rt.require(selected['control']==mode and selected['base_protocol']==dict(path=PROTOCOL,**PROTOCOL_PIN)
         and selected['upstream_revision']==c['upstream_revision'] and selected['runtime_image_id']==c['runtime_image_id']
@@ -397,8 +407,110 @@ def paired_native(np,torch,layer,optimizer,source,vertices,faces,depth,c,out,rep
     rt.require(full.fingerprint(torch.load(out/'authored_source.pth',map_location='cpu',weights_only=False))==fingerprint,'Saved raw control reload differs')
 
 
+def study_parameters(np,recipe,head,body_converter,hand_converter):
+    """Named native204 -> original converters -> actual loaded hand PCA, no fit."""
+    from cari_converter import PARAMETER_DIMS
+    cpu=lambda value:value.detach().cpu().numpy().copy()
+    q=recipe.parameters;mean=cpu(head.hand_pose_mean);comps=cpu(head.hand_pose_comps)
+    if q.dtype!=np.float32 or q.shape!=(24,204) or mean.dtype!=np.float32 or comps.dtype!=np.float32 or mean.shape!=(54,) or comps.shape!=(54,54) or not np.isfinite(mean).all() or not np.isfinite(comps).all() or np.linalg.matrix_rank(comps)!=54:raise ValueError('Actual full-rank native hand PCA required')
+    values={k:np.zeros((24,n),np.float32) for k,n in PARAMETER_DIMS.items()}
+    values['mhr_global_rot6d'][:]=[1,0,0,1,0,0];values['mhr_trans'][:,2]=4
+    values['mhr_shape'][:]=recipe.identity;values['mhr_face'][:]=recipe.expression
+    compact=np.concatenate((q[:,6:136],np.zeros((24,3),np.float32)),axis=1)
+    values['mhr_body_pose_cont'][:]=body_converter(compact);hands=[];mapping=[];errors=[]
+    for side,indices in (('l',head.hand_joint_idxs_left),('r',head.hand_joint_idxs_right)):
+        ids=cpu(indices)
+        if ids.shape!=(27,) or ids.dtype!=np.int64 or len(np.unique(ids))!=27 or np.any(ids<68) or np.any(ids>=122):raise ValueError('Actual named hand index ABI required')
+        desired=hand_converter(q[:,ids]);coeff=np.linalg.solve(comps.astype(np.float64).T,(desired.astype(np.float64)-mean).T).T.astype(np.float32)
+        residual=float(np.max(np.abs(mean[None]+coeff@comps-desired)))
+        if not np.isfinite(coeff).all() or residual>1e-6:raise ValueError('Fixed native PCA reconstitution bound failed')
+        hands.append(coeff);mapping.append(ids);errors.append(residual)
+    if len(np.unique(np.concatenate(mapping)))!=54:raise ValueError('Native left/right hand mappings overlap')
+    values['mhr_hand'][:]=np.concatenate(hands,axis=1)
+    return values,dict(hand_pca_reconstruction_max_abs=errors,hand_order=['l','r'],network_executed=False)
+
+
+def component_native(np,torch,layer,optimizer,spec,c,out,report,persist,check):
+    """Six fresh native component scenes; no optimizer or point tracker."""
+    from world_reward import authored_point_study as study
+    from world_reward.point_surface_queries import canonical_mask_quantile_queries,MaskQueryError
+    from lib_mhr.body_pose import compact_model_params_to_cont_body_np,compact_model_params_to_cont_hand_np
+    from lib_mhr.postopt_crop import build_postopt_crop,stack_postopt_crops
+    from lib_mhr.hand_surface_contact import MHR_HAND_ORDER
+    import Utils
+    import nvdiffrast.torch as dr
+    import cari_full_refine as full
+    head=layer.backend._ensure_head(torch.device('cuda'));model=head.mhr;cpu=lambda a:a.detach().cpu().numpy().copy()
+    names=list(model.get_parameter_names());joints=list(model.get_joint_names());bounds=cpu(model.get_parameter_limits());parents=cpu(model.character_torch.skeleton.joint_parents)
+    transform=cpu(model.get_parameter_transform());lbs=model.get_lbsw();faces=cpu(layer.mesh_faces(device='cuda'))
+    if len(names)!=249 or len(set(names))!=249 or len(joints)!=127 or len(set(joints))!=127 or bounds.shape!=(249,2) or parents.shape!=(127,) or transform.shape!=(889,249) or type(lbs) is not tuple or len(lbs)!=2 or MHR_HAND_ORDER!=('left_hand','right_hand') or (model.get_num_identity_blendshapes(),model.get_num_face_expression_blendshapes())!=(45,72):raise ValueError('Exact native metadata ABI required')
+    indices,weights=map(cpu,lbs)
+    if names!=list(model.character_torch.parameter_transform.parameter_names) or joints!=list(model.character_torch.skeleton.joint_names) or not np.array_equal(faces,cpu(model.character_torch.mesh.faces)) or not np.array_equal(transform,cpu(model.character_torch.parameter_transform.parameter_transform)):raise ValueError('Native getter/submodule metadata differs')
+    meta=dict(bounds=bounds,parents=parents,transform=transform,lbs_indices=indices,lbs_weights=weights,faces=faces,
+        hand_pose_mean=cpu(head.hand_pose_mean),hand_pose_comps=cpu(head.hand_pose_comps),hand_left_indices=cpu(head.hand_joint_idxs_left),hand_right_indices=cpu(head.hand_joint_idxs_right),scale_mean=cpu(head.scale_mean),scale_comps=cpu(head.scale_comps))
+    for side,key in (('l','hand_left_indices'),('r','hand_right_indices')):
+        ids=meta[key]
+        if ids.dtype!=np.int64 or ids.shape!=(27,) or np.any(ids<68) or np.any(ids>=122) or any(not names[int(i)].startswith(side+'_') for i in ids):raise ValueError('Both native hand mappings must match actual named sides')
+    retain(out/'mhr_metadata.npz',lambda stream:np.savez(stream,**meta));write(out/'mhr_metadata.json',(json.dumps(dict(parameter_names=names,joint_names=joints,metadata_sha256=full.fingerprint(meta),network_executed=False),sort_keys=True)+'\n').encode())
+    context=dr.RasterizeCudaContext();K=np.asarray(c['cohort']['K'],np.float64);sentinels=np.asarray(study.SENTINELS,np.int64)
+    report.update(component_scenes=[],native_decode_calls=0,native_decoded_frames=0,sentinel_composites=0,primitive_render_calls=0,primitive_render_frames=0,optimizer_constructors=0,optimizer_loss_calls=0,optimizer_updates=0,tracker_executed=False,network_executed=False)
+    def render(v,f,colors):
+        report['primitive_render_calls']+=1
+        report['primitive_render_frames']+=len(v)
+        return Utils.nvdiff_color_depth_render(np.broadcast_to(K,(3,3,3)).copy(),context,dict(pos=v[0],faces=torch.tensor(f,device='cuda',dtype=torch.int32).contiguous(),vertex_color=torch.tensor(colors,device='cuda',dtype=torch.float32).contiguous()),(480,640),v.contiguous())
+    for scene in range(len(study.SCENES)):
+        check();report['phase']=f'component_{scene}_decode';persist()
+        recipe=study.named204_recipe(names,bounds,scene,scale68=meta['scale_mean'].astype(np.float32),identity45=np.zeros(45,np.float32))
+        params,mapping=study_parameters(np,recipe,head,compact_model_params_to_cont_body_np,compact_model_params_to_cont_hand_np)
+        hand_ids=meta['hand_left_indices'] if recipe.side=='l' else meta['hand_right_indices']
+        if any(not names[int(i)].startswith(recipe.side+'_') for i in hand_ids):raise ValueError('Actual hand mapping is not the named side')
+        with torch.no_grad():decoded=layer.mhr_forward({k:torch.from_numpy(v).cuda() for k,v in params.items()})
+        report['native_decode_calls']+=1;report['native_decoded_frames']+=24
+        arrays=dict(vertices=cpu(decoded.vertices),joints=cpu(decoded.joints),keypoints=cpu(decoded.keypoints),raw_joint_rotations=cpu(decoded.joint_global_rots))
+        if any(a.dtype!=np.float32 or not np.isfinite(a).all() or len(a)!=24 for a in arrays.values()):raise ValueError('All24 finite native decoded frames required')
+        flip=np.diag([1.,-1.,-1.]);rotations=flip@arrays['raw_joint_rotations'].astype(np.float64)@flip
+        articulation=study.articulation_metrics(arrays['joints'],rotations,joints,recipe.side)
+        hand_vertices=np.asarray(spec.vertex_indices[0 if recipe.side=='l' else 1],np.int64)
+        face=study.select_hand_triangle(faces,hand_vertices,indices,weights,joints,recipe.side)
+        pad=study.pad_mesh(scene);attachment=study.attach_pad(arrays['vertices'],faces,face);pose=np.broadcast_to(np.eye(4,dtype=np.float32),(24,4,4)).copy();pose[:,:3,:3]=attachment.rotation;pose[:,:3,3]=attachment.translation
+        record=dict(scene_id=recipe.scene_id,split=recipe.split,side=recipe.side,articulation=articulation,hand_parameter_mapping=mapping,hand_face_index=int(face),material_proximity=study.attachment_proximity(attachment,pad))
+        r,t=torch.tensor(pose[:,:3,:3],device='cuda'),torch.tensor(pose[:,:3,3],device='cuda');native_v=torch.tensor(pad.vertices.copy(),device='cuda');native_f=torch.tensor(pad.faces.copy(),device='cuda')
+        object_world=native_v[None]@r.transpose(1,2)+t[:,None]
+        if np.any(arrays['vertices'][...,2]<=0) or not bool((object_world[...,2]>0).all()):raise ValueError('Every original human/object vertex must have positive camera Z')
+        hand_ids=torch.tensor(np.asarray(spec.vertex_indices,np.int64),device='cuda');weights_native=torch.zeros((24,2),device='cuda');weights_native[:,0 if recipe.side=='l' else 1]=1
+        cfg=optimizer.MHRParityPostOptConfig();effective,distances,proximity=optimizer._initial_contact_activation(weights_native,decoded.vertices[:,hand_ids,:],r,t,native_v,native_f,cfg.contact_activation_distance_m)
+        record['native_contact']=dict(activation_distance_m=cfg.contact_activation_distance_m,effective_authored_side_all_frames=bool((effective[:,0 if recipe.side=='l' else 1]>0).all()),authored_not_inferred=True)
+        record['all_vertices_positive_Z']=True
+        retain(out/f'scene_{scene:02d}_components.npz',lambda stream:np.savez(stream,frame_index=recipe.frame_index,named_parameters=recipe.parameters,**params,**arrays,
+            object_vertices=pad.vertices,object_faces=pad.faces,object_colors=pad.colors,object_pose=pose,hand_surface_point=attachment.surface_point,hand_surface_normal=attachment.surface_normal,
+            native_contact_weights=cpu(weights_native),native_effective_contact=cpu(effective),native_contact_distances=cpu(distances),native_contact_proximity=cpu(proximity)))
+        report['phase']=f'component_{scene}_sentinels';persist()
+        human=decoded.vertices[sentinels]
+        hc,hz,_=render(human,faces,np.broadcast_to(np.array([.7,.6,.5],np.float32),(human.shape[1],3)))
+        oc,oz,_=render(object_world[sentinels],pad.faces,pad.colors)
+        hvalid,ovalid=hz>0,oz>0
+        if torch.any(hvalid&ovalid&(hz==oz)):raise ValueError('Native equal-depth visibility ambiguous')
+        obj=ovalid&(~hvalid|(oz<hz));person=hvalid&(~ovalid|(hz<oz));rgb=torch.where(obj[...,None],oc,torch.where(person[...,None],hc,torch.zeros_like(hc)))
+        depth=torch.where(obj,oz,torch.where(person,hz,torch.zeros_like(hz)));rgb,z,om,hm=map(cpu,(rgb,depth,obj,person));crops=stack_postopt_crops([build_postopt_crop(a,b,K) for a,b in zip(hm,om)],K)
+        rgb8=np.rint(np.clip(rgb,0,1)*255).astype(np.uint8)
+        try:selected=canonical_mask_quantile_queries(pad.vertices,pad.faces,pose[0,:3,:3],pose[0,:3,3],K,om[0],np.isfinite(z[0])&(z[0]>0),image_width=640,image_height=480)
+        except MaskQueryError as error:record['query_diagnostics']=error.diagnostics.scalar_report();report['component_scenes'].append(record);persist();raise
+        record['query_diagnostics']=selected.diagnostics.scalar_report()
+        record['sentinel_metrics']=study.sentinel_texture_metrics(rgb8,om)
+        record['translation_observability']=study.translation_observability(selected.queries.canonical_points@pose[0,:3,:3].T+pose[0,:3,3],K)
+        retain(out/f'scene_{scene:02d}_sentinels.npz',lambda stream:np.savez(stream,frame_index=sentinels,rgb=rgb,rgb_uint8=rgb8,depth=z,object_mask=om,human_mask=hm,K=K,**{k:v for k,v in crops.items() if isinstance(v,np.ndarray)},**vars(selected.queries)))
+        report['sentinel_composites']+=3;report['component_scenes'].append(record);persist();check()
+        if not all(record[k]['passed'] for k in ('articulation','material_proximity','sentinel_metrics','translation_observability')) or not record['native_contact']['effective_authored_side_all_frames']:raise ValueError('Frozen authored component gate failed')
+    after=dict(bounds=cpu(model.get_parameter_limits()),parents=cpu(model.character_torch.skeleton.joint_parents),transform=cpu(model.get_parameter_transform()),lbs_indices=cpu(model.get_lbsw()[0]),lbs_weights=cpu(model.get_lbsw()[1]),faces=cpu(layer.mesh_faces(device='cuda')),
+        hand_pose_mean=cpu(head.hand_pose_mean),hand_pose_comps=cpu(head.hand_pose_comps),hand_left_indices=cpu(head.hand_joint_idxs_left),hand_right_indices=cpu(head.hand_joint_idxs_right),scale_mean=cpu(head.scale_mean),scale_comps=cpu(head.scale_comps))
+    if full.fingerprint(after)!=full.fingerprint(meta) or list(model.get_parameter_names())!=names or list(model.get_joint_names())!=joints:raise ValueError('Actual native metadata changed during component study')
+    report.update(native_metadata_rehashed_after=True,penetration_proxy_executed=False)
+    report['outputs']={p.name:runtime(Path(os.environ['WR_CODE'])).identity(p,1_000_000_000) for p in out.iterdir() if p.name!='report.json'}
+    check();report['component_preflight_verified']=True
+
+
 def native(rt,root,code,revision,out,proof,persist,report,mode=None):
-    c=protocol(rt,code,mode);start=proof['host_start_monotonic'];deadline=start+1380
+    c=protocol(rt,code,mode);start=proof['host_start_monotonic'];deadline=start+(300 if mode=='component_preflight' else 1380)
     rt.require(proof.get('control')==mode,'Host/native control selection differs')
     check=lambda:rt.require(time.monotonic()<deadline,'Inclusive authored deadline')
     rt.require(sys.platform=='linux' and os.geteuid()==1000 and {p.name for p in Path('/sys/class/net').iterdir()}=={'lo'}
@@ -417,10 +529,15 @@ def native(rt,root,code,revision,out,proof,persist,report,mode=None):
     rt.require(torch.cuda.is_available() and str(torch.__version__)=='2.5.1+cu124' and torch.version.cuda=='12.4'
         and not torch.are_deterministic_algorithms_enabled(),'Original native CUDA policy required')
     torch.set_num_threads(4);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False
-    random.seed(0);np.random.seed(0);torch.manual_seed(0);torch.cuda.manual_seed_all(0);op._native_binding(optimizer)
+    random.seed(0);np.random.seed(0);torch.manual_seed(0);torch.cuda.manual_seed_all(0)
+    if mode!='component_preflight':op._native_binding(optimizer)
     layer=MHRLayer.from_mhr_assets(mhr_assets_root=Path('/workspace/v2d_sam3d_body/lib'),checkpoint_path=root/BODY/'model.ckpt',buffer_path=out/'never_compact_buffer.pt',mhr_model_path=root/BODY/'assets/mhr_model.pt',device='cuda')
     spec=load_mhr_hand_surface_spec(root/'weights/cari4d/refinement/mhr_hand_surface_spec.npz',faces=layer.mesh_faces(device='cuda').cpu().numpy())
     rt.require(spec.mhr_model_sha256==c['model_prerequisites']['native_model_sha256'],'Canonical hand spec model differs')
+    if mode=='component_preflight':
+        component_native(np,torch,layer,optimizer,spec,c,out,report,persist,check);check();check_native_sources(rt,root,proof)
+        rt.require(rt.source(root,code,revision,ENTRY,helpers(mode))==proof['source_binding'],'Own component source changed')
+        report.update(status='pass',phase='complete',source_inputs_assets_rehashed_after=True,elapsed_seconds=time.monotonic()-start);return
     report['phase']='manufacture';source,v,f,z=manufacture(np,torch,layer,optimizer,spec,c,out)
     report['decoder_identity']=layer.decoder_identity();report['manufacture_seconds']=time.monotonic()-start
     rt.require(report['manufacture_seconds']<=180,'Inclusive authored manufacture180 exceeded');persist()
@@ -431,12 +548,12 @@ def native(rt,root,code,revision,out,proof,persist,report,mode=None):
 
 
 def host(rt,root,code,revision,mode=None):
-    start=time.monotonic();rt.require(sys.platform=='linux' and os.geteuid()==0 and root==ROOT
+    start=time.monotonic();budget=360 if mode=='component_preflight' else 1380;rt.require(sys.platform=='linux' and os.geteuid()==0 and root==ROOT
         and Path(__file__).resolve()==code/HELPERS[0] and os.environ['DOCKER_HOST']=='unix://'+str(root/'docker.sock'),'Actual private immutable VM01 host required')
     pin,_,arms=profile(mode);proof=prerequisites(rt,root,code,revision,mode);proof['host_start_monotonic']=start
     if mode is not None:proof['control']=mode
     out=output_path(root,revision,mode);rt.canonical(out);rt.require(not out.exists(),'Fresh control only')
-    label='zero-delegate' if mode=='zero_delegate' else 'native-repeat' if mode else 'authored'
+    label='component-preflight' if mode=='component_preflight' else 'zero-delegate' if mode=='zero_delegate' else 'native-repeat' if mode else 'authored'
     name='world-reward-joint-point-'+label+'-'+revision;rt.require(not control(['docker','ps','-aq','--filter','name=^/'+name+'$']).strip(),'Owned name occupied')
     projection=rt.strict(control(['docker','image','inspect',IMAGE,'--format','{"Id":{{json .Id}},"Architecture":{{json .Architecture}},"Os":{{json .Os}},"RootFS":{{json .RootFS}}}']))
     rt.require(projection['Id']==IMAGE and projection['Architecture']=='amd64' and projection['Os']=='linux' and projection['RootFS']['Type']=='layers','Actual native image required')
@@ -445,12 +562,12 @@ def host(rt,root,code,revision,mode=None):
     lock=rt.canonical(root/'jobs/.world-reward-h100.lock');s=lock.lstat();rt.require(stat.S_ISREG(s.st_mode) and s.st_nlink==1,'Existing cooperative lock required')
     fd=os.open(lock,os.O_RDONLY|os.O_NOFOLLOW);os.dup2(fd,9)
     if fd!=9:os.close(fd)
-    report=dict(stage='joint_point_zero_delegate_host_seal_v1' if mode=='zero_delegate' else 'joint_point_native_repeat_host_seal_v1' if mode else 'joint_point_authored_host_seal_v1',status='fail',producer_revision=revision,source_binding=proof['source_binding'],protocol_identity=pin,
+    report=dict(stage='joint_point_component_preflight_host_seal_v1' if mode=='component_preflight' else 'joint_point_zero_delegate_host_seal_v1' if mode=='zero_delegate' else 'joint_point_native_repeat_host_seal_v1' if mode else 'joint_point_authored_host_seal_v1',status='fail',producer_revision=revision,source_binding=proof['source_binding'],protocol_identity=pin,
         image=projection,runtime_qualified=False,quality_verified=False,adoption=False,challenge_inputs_used=False,gt_used=False)
     if mode is not None:report['control']=mode
     cid=out/'.container.cid';failure=None
     def expired(*_):raise TimeoutError('Inclusive authored runtime deadline')
-    old_alarm=signal.signal(signal.SIGALRM,expired);old_term=signal.signal(signal.SIGTERM,expired);signal.setitimer(signal.ITIMER_REAL,max(.001,start+1380-time.monotonic()))
+    old_alarm=signal.signal(signal.SIGALRM,expired);old_term=signal.signal(signal.SIGTERM,expired);signal.setitimer(signal.ITIMER_REAL,max(.001,start+budget-time.monotonic()))
     try:
         subprocess.run(['flock','--nonblock','9'],check=True,pass_fds=(9,),timeout=5,capture_output=True)
         rt.require((os.fstat(9).st_dev,os.fstat(9).st_ino)==(lock.lstat().st_dev,lock.lstat().st_ino)==(s.st_dev,s.st_ino),'Lock changed')
@@ -465,27 +582,49 @@ def host(rt,root,code,revision,mode=None):
             'WR_ROOT='+str(root),'WR_CODE='+str(code),'WR_CODE_REVISION='+revision,'WR_IMAGE_ID='+IMAGE,'python','-B',str(code/HELPERS[0]),'--native',str(proof_pin['bytes']),proof_pin['sha256']]
         if mode is not None:args+=['--control',mode]
         with (out/'native.log').open('xb') as log:
-            os.fchmod(log.fileno(),0o444);result=subprocess.run(args,stdout=log,stderr=log,timeout=max(.001,1380-(time.monotonic()-start)))
+            os.fchmod(log.fileno(),0o444);result=subprocess.run(args,stdout=log,stderr=log,timeout=max(.001,budget-(time.monotonic()-start)))
         rt.require(result.returncode==0,'Actual native pair failed')
-        native_report=rt.strict((pred/'report.json').read_bytes());validate_native(rt,native_report,proof,mode)
-        expected={'authored_object.obj','authored_raw.npz','authored_source.pth','quantile_diagnostic.npz' if mode=='native_repeat' else 'point_evidence.npz','report.json'}|{arm+s for arm in arms for s in ('_constructor_initial.pth','_loss_gradient_0.pth','_loss_gradient_181.pth','_result.pth')}
+        native_report=rt.strict((pred/'report.json').read_bytes())
+        if mode=='component_preflight':validate_dynamic(rt,native_report,proof)
+        else:validate_native(rt,native_report,proof,mode)
+        expected={'mhr_metadata.json','mhr_metadata.npz','report.json'}|{f'scene_{n:02d}_{kind}.npz' for n in range(6) for kind in ('components','sentinels')} if mode=='component_preflight' else {'authored_object.obj','authored_raw.npz','authored_source.pth','quantile_diagnostic.npz' if mode=='native_repeat' else 'point_evidence.npz','report.json'}|{arm+s for arm in arms for s in ('_constructor_initial.pth','_loss_gradient_0.pth','_loss_gradient_181.pth','_result.pth')}
         rt.require({p.name for p in pred.iterdir()}==expected and pred.stat().st_mode&0o777==0o555,'Exact complete retained native control required')
         report['native_report_identity']=rt.identity(pred/'report.json');report['outputs']={p.name:rt.identity(p,1_000_000_000) for p in pred.iterdir()}
+        if mode=='component_preflight':rt.require(native_report['outputs']=={n:pin for n,pin in report['outputs'].items() if n!='report.json'},'All retained component artifact hashes differ')
     except BaseException as error:failure=error;report['error_type']=type(error).__name__
     finally:
         try:
             signal.setitimer(signal.ITIMER_REAL,0);cleanup(rt,name,revision,cid);report['owned_cleanup_verified']=True
         except BaseException as error:failure=failure or error;report['cleanup_error_type']=type(error).__name__
-        os.close(9);signal.setitimer(signal.ITIMER_REAL,max(.001,start+1380-time.monotonic()))
+        os.close(9);signal.setitimer(signal.ITIMER_REAL,max(.001,start+budget-time.monotonic()))
         try:
             after=prerequisites(rt,root,code,revision,mode);rt.require(after=={k:v for k,v in proof.items() if k not in ('host_start_monotonic','control')},'Source/assets postcheck differs')
-            rt.require(time.monotonic()-start<=1380,'Inclusive host sealing deadline');report['source_rehashed_after']=True
+            rt.require(time.monotonic()-start<=budget,'Inclusive host sealing deadline');report['source_rehashed_after']=True
         except BaseException as error:failure=failure or error;report['post_error_type']=type(error).__name__
         report.update(status='fail' if failure else 'pass',elapsed_seconds=time.monotonic()-start)
         write(out/'report.json',(json.dumps(report,sort_keys=True,allow_nan=False)+'\n').encode(),0o444);out.chmod(0o555)
-        try:rt.require(time.monotonic()-start<=1380,'Inclusive host final seal exceeded')
+        try:rt.require(time.monotonic()-start<=budget,'Inclusive host final seal exceeded')
         finally:signal.setitimer(signal.ITIMER_REAL,0);signal.signal(signal.SIGALRM,old_alarm);signal.signal(signal.SIGTERM,old_term)
     if failure:raise ValueError('Authored runtime qualification failed closed')
+
+
+def validate_dynamic(rt,r,proof):
+    required=dict(stage='joint_point_component_preflight_v1',status='pass',phase='complete',control='component_preflight',frames=144,native_decode_calls=6,native_decoded_frames=144,
+        sentinel_composites=18,primitive_render_calls=12,primitive_render_frames=36,optimizer_constructors=0,optimizer_loss_calls=0,optimizer_updates=0,component_preflight_verified=True,
+        native_metadata_rehashed_after=True,penetration_proxy_executed=False,
+        manufactured_not_inferred=True,tracker_executed=False,network_executed=False,positive_weight_executed=False,quality_verified=False,adoption=False,
+        ground_truth_used=False,challenge_inputs_used=False,source_inputs_assets_rehashed_after=True)
+    rt.require(all(type(r.get(k)) is type(v) and r[k]==v for k,v in required.items()) and r['source_binding']==proof['source_binding'] and r['protocol_identity']==STUDY_PIN
+        and proof.get('control')=='component_preflight','Complete component preflight proof required')
+    rows=r['component_scenes'];rt.require(type(rows) is list and len(rows)==6,'Six original scenes required')
+    expected=[('dev_left','development','l'),('dev_right','development','r'),('reserved_left_slow','reserved','l'),('reserved_right_slow','reserved','r'),('reserved_left_reverse','reserved','l'),('reserved_right_reverse','reserved','r')]
+    rt.require([(row['scene_id'],row['split'],row['side']) for row in rows]==expected,'Original fixed scene order required')
+    for row in rows:
+        rt.require(all(row[key]['passed'] is True for key in ('articulation','material_proximity','sentinel_metrics','translation_observability'))
+            and type(row['query_diagnostics']['qualified_candidates']) is int and row['query_diagnostics']['qualified_candidates']>=8
+            and type(row['query_diagnostics']['distinct_canonical_witnesses']) is int and row['query_diagnostics']['distinct_canonical_witnesses']>=8 and row['query_diagnostics']['raycast_complete'] is True
+            and row['native_contact']['effective_authored_side_all_frames'] is True and row['all_vertices_positive_Z'] is True
+            and type(row['hand_face_index']) is int and row['hand_face_index']>=0,'Every frozen component gate required')
 
 
 def validate_native(rt,r,proof,mode=None):
@@ -515,7 +654,7 @@ def validate_native(rt,r,proof,mode=None):
 
 
 def arguments(argv=None):
-    parser=argparse.ArgumentParser(allow_abbrev=False);parser.add_argument('--native',nargs=2);parser.add_argument('--control',action='append',choices=['native_repeat','zero_delegate']);args=parser.parse_args(argv)
+    parser=argparse.ArgumentParser(allow_abbrev=False);parser.add_argument('--native',nargs=2);parser.add_argument('--control',action='append',choices=['native_repeat','zero_delegate','component_preflight']);args=parser.parse_args(argv)
     if args.control and len(args.control)!=1:parser.error('Control selected exactly once')
     args.control=args.control[0] if args.control else None;return args
 
@@ -527,21 +666,23 @@ def main(argv=None):
     proof=rt.pinned(Path('/opt/authored-proof.json'),dict(bytes=int(args.native[0]),sha256=args.native[1]),4<<20)
     rt.require(proof.get('control')==args.control,'Host/native control selection differs')
     out=output_path(root,revision,args.control)/'native'
-    report=dict(stage='joint_point_zero_delegate_v1' if args.control=='zero_delegate' else 'joint_point_native_repeat_v1' if args.control else 'joint_point_authored_native_pair_v1',status='fail',phase='preflight',source_binding=proof['source_binding'],protocol_identity=pin,
+    report=dict(stage='joint_point_component_preflight_v1' if args.control=='component_preflight' else 'joint_point_zero_delegate_v1' if args.control=='zero_delegate' else 'joint_point_native_repeat_v1' if args.control else 'joint_point_authored_native_pair_v1',status='fail',phase='preflight',source_binding=proof['source_binding'],protocol_identity=pin,
         frames=3,constructor_attempts=0,constructor_returns=0,probe_attempts=0,probe_returns=0,run_attempts=0,run_returns=0,
         manufactured_not_inferred=True,tracker_executed=False,positive_weight_executed=False,quality_verified=False,adoption=False,ground_truth_used=False,challenge_inputs_used=False)
     if args.control is not None:report['control']=args.control
+    budget=300 if args.control=='component_preflight' else 1380
+    if args.control=='component_preflight':report['frames']=144
     def persist():
         temporary=out/'report.tmp';temporary.write_text(json.dumps(report,sort_keys=True,allow_nan=False));temporary.replace(out/'report.json')
     def expired(*_):raise TimeoutError('Inclusive authored runtime1380')
     signal.signal(signal.SIGALRM,expired);signal.signal(signal.SIGTERM,expired)
-    signal.setitimer(signal.ITIMER_REAL,max(.001,proof['host_start_monotonic']+1380-time.monotonic()))
+    signal.setitimer(signal.ITIMER_REAL,max(.001,proof['host_start_monotonic']+budget-time.monotonic()))
     try:native(rt,root,code,revision,out,proof,persist,report,args.control)
     except BaseException as error:report.update(status='fail',error_type=type(error).__name__,error_context=str(error)[-500:]);raise
     finally:
         report['elapsed_seconds']=time.monotonic()-proof['host_start_monotonic'];persist()
         for p in out.iterdir():p.chmod(0o444)
-        out.chmod(0o555);rt.require(time.monotonic()-proof['host_start_monotonic']<=1380,'Inclusive native seal exceeded');signal.setitimer(signal.ITIMER_REAL,0)
+        out.chmod(0o555);rt.require(time.monotonic()-proof['host_start_monotonic']<=budget,'Inclusive native seal exceeded');signal.setitimer(signal.ITIMER_REAL,0)
 
 
 if __name__=='__main__':main()
