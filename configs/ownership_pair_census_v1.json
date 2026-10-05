@@ -1,0 +1,158 @@
+{
+  "schema": "world_reward.ownership_pair_census.v1",
+  "budget_seconds": 180,
+  "output": "results/ownership-pair-census-v1",
+  "selection": "none_feasibility_only",
+  "minimum_independent_slots": 96,
+  "historical_slots": 336,
+  "historical_oi_slots": 240,
+  "historical_coco_slots": 96,
+  "network_allowed": false,
+  "retry_count": 0,
+  "files": {
+    "boxes": {
+      "readonly": false,
+      "path": "/srv/scenesmith/world-reward/results/openimages-holds-evaluate-v1/boxes.csv",
+      "pin": {
+        "bytes": 77484237,
+        "sha256": "fe22e579b9453875601576859d14ef3304058165de139c66b725e599202bd7b1"
+      }
+    },
+    "relations": {
+      "readonly": false,
+      "path": "/srv/scenesmith/world-reward/results/openimages-holds-evaluate-v1/relations.csv",
+      "pin": {
+        "bytes": 9308608,
+        "sha256": "418a1e22a6da1fd2fdcffb53cb92fdc796cc41d7ca0c3311cfd298f1639c9ef6"
+      }
+    },
+    "triplets": {
+      "readonly": false,
+      "path": "/srv/scenesmith/world-reward/results/openimages-holds-evaluate-v1/triplets.csv",
+      "pin": {
+        "bytes": 37869,
+        "sha256": "c53e939aef2b72512026ab2d944b9356481c08e647a4086f00b17237d558d38e"
+      }
+    },
+    "metadata": {
+      "readonly": false,
+      "path": "/srv/world-reward-data/openimages_holds_census_v1/metadata.csv",
+      "pin": {
+        "bytes": 45227339,
+        "sha256": "de55c6b8cbda32a79f4a20f28572d54e9c49d527a4006725675764074a51a36d"
+      }
+    }
+  },
+  "historical": [
+    {
+      "name": "oi16",
+      "path": "/srv/world-reward-data/openimages_holds_census_v1/census_v2.json",
+      "readonly": false,
+      "pin": {
+        "bytes": 10130,
+        "sha256": "b4333ea57bb408b0eafdbc5eee51d2b3ee3e6e963ef9ec269178bbd45480ff4a"
+      }
+    },
+    {
+      "name": "oi128",
+      "path": "/srv/world-reward-data/openimages_holds_census_fresh128_v1/census.json",
+      "readonly": false,
+      "pin": {
+        "bytes": 76839,
+        "sha256": "bf576b143bf8304981eb8dddfa64726945262d79c24cff07601f14e20a4fd452"
+      }
+    },
+    {
+      "name": "oi64",
+      "path": "/srv/scenesmith/world-reward/results/openimages-joint-pair-selection-v1/cohort.json",
+      "readonly": true,
+      "pin": {
+        "bytes": 31043,
+        "sha256": "441bdc57e101cb4e8291ca6bbebc554ca397619e2a892469d9e410a16359a456"
+      }
+    },
+    {
+      "name": "oi32",
+      "path": "/srv/scenesmith/world-reward/results/proposal-external-census-v1/cohort.json",
+      "readonly": true,
+      "pin": {
+        "bytes": 18076,
+        "sha256": "4db28db7b8c9beb0ce58e574e8f012f05c86ef7447ff056a269d4b04cd74ed33"
+      }
+    },
+    {
+      "name": "coco32",
+      "readonly": true,
+      "path": "/srv/world-reward-data/coco_proposal_v1/metadata/cohort.json",
+      "pin": {
+        "bytes": 24029,
+        "sha256": "c78f2e100cd0c724f3b8873a3256299a7074c473ecb93c960dec509941994e67"
+      }
+    },
+    {
+      "name": "coco64",
+      "readonly": true,
+      "path": "/srv/world-reward-data/coco_endpoint_v2/metadata/cohort.json",
+      "pin": {
+        "bytes": 41315,
+        "sha256": "5b2e6e99f3979f02586b7aa67ccef74a913f836bdc2b7314bcf94d06777562c6"
+      }
+    }
+  ],
+  "human_classes": [
+    "/m/01g317",
+    "/m/04yx4",
+    "/m/03bt1vf",
+    "/m/01bl7v",
+    "/m/05r655"
+  ],
+  "body_part_classes": [
+    "/m/014sv8",
+    "/m/015h_t",
+    "/m/0283dt1",
+    "/m/02p0tk3",
+    "/m/031n1",
+    "/m/035r7c",
+    "/m/039xj_",
+    "/m/03q69",
+    "/m/04hgtk",
+    "/m/0dzct",
+    "/m/0dzf4",
+    "/m/0k0pj",
+    "/m/0k65p"
+  ],
+  "reused_helper_pins": {
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "infra/openimages_joint_pair_census.py": {
+      "bytes": 9799,
+      "sha256": "251da609bd87d40b5f63a06977ec2c1587c2019193c99a1650861baa32074ac9"
+    },
+    "infra/openimages_joint_pair_acquire.py": {
+      "bytes": 23252,
+      "sha256": "ab0cac6d8a66550b8898a6add435fe92bc2546cbb7536723d4de3b8d8597ad49"
+    },
+    "infra/coco_proposal_prepare.py": {
+      "bytes": 24704,
+      "sha256": "ee9ec3ddd540ec485ef6bbe5812dda5f98760e9633cd3c11fdc49dbde2f66574"
+    },
+    "configs/proposal_external_census_v1.json": {
+      "bytes": 3994,
+      "sha256": "3be296f6a65a14d84e094971fbc6eee8aa8c1d4b39dfe38b47f907614ca6dbbf"
+    },
+    "configs/coco_endpoint_v2.json": {
+      "bytes": 4235,
+      "sha256": "eaea660286ea7570c9245c692d16ec203b660506cf5fcc550a77a3112103329a"
+    }
+  },
+  "capacity": "deterministic_ImageID_order_greedy_lower_bound_one_author_photo_md5_url_not_maximum_matching_not_cohort",
+  "limitations": {
+    "coco_author_identity": "UNKNOWN_photo_only_exclusion",
+    "coco_original_md5": "not_in_cohort_requires_future_acquisition_ledger_before_RGB",
+    "rights_verified": false,
+    "pretraining_overlap_verified": false,
+    "ownership_verified": false
+  }
+}

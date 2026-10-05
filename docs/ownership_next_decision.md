@@ -151,3 +151,21 @@ coefficient is learned with the same fixed geometry/bank/support. Declare the
 optimizer, stopping rule and CAL use before references, retain all3600objects,
 misses/unresolved positives and abstentions. No fulltuple, task, temporal3D or
 challenge improvement follows from such a positive-only static study.
+
+### Frozen metadata-only feasibility gate
+
+`ownership-pair-census-v1` reads only the four original SHA-bound cached CSVs
+and six complete historical metadata ledgers (336 slots). It reuses the original
+automatic relation-to-box census without consulting old predictions, reference
+values or RGB. All known historical author/photo/MD5/source-URL identities are
+excluded; COCO creator and original-byte identities remain explicitly UNKNOWN.
+The deterministic one-author/photo/MD5/URL greedy capacity is a lower bound,
+not maximum matching and not a selected cohort.
+
+Before the sole Azure CPU attempt:180s inclusive budget, no network/model/GPU,
+no retry, at least96 independent slots. Complete execution is a technical PASS;
+`capacity_gate_passed` is a separate decision. Insufficient capacity closes this
+gate INCONCLUSIVE without lowering its threshold or choosing replacement rows.
+Sufficient capacity permits only a separately frozen, rights-checked new study,
+never selector adoption or a claim of held-out accuracy. Outputs and all ten
+inputs/source bytes and modes are sealed or checked before/after respectively.
