@@ -1,0 +1,43 @@
+{
+  "adoption": false,
+  "full_independent_audit_pending": true,
+  "jobs": [
+    {
+      "elapsed_seconds": 18.686906446004286,
+      "episode": 19,
+      "frames": 443,
+      "producer_revision": "4657c8b45f733a1043c5a8af2f5b9d6ac027196a",
+      "report": {
+        "bytes": 22228,
+        "sha256": "81a242ffbf695e859ba1e46261bd8b4587c4f242b3c0aa2c911d6aa6096d965b"
+      },
+      "stage": "prepare"
+    },
+    {
+      "elapsed_seconds": 126.5414744609734,
+      "episode": 17,
+      "frames": 419,
+      "optimizer_updates": 301,
+      "producer_revision": "45730bd455498ea4609a158ea00bfe70874f1796",
+      "report": {
+        "bytes": 13914,
+        "sha256": "774059a916c41c996dd39a7e4ea3e4424ba0983eb284947eb514c367bce00af4"
+      },
+      "stage": "refined"
+    },
+    {
+      "elapsed_seconds": 30.450120373046957,
+      "episode": 16,
+      "frames": 360,
+      "producer_revision": "45730bd455498ea4609a158ea00bfe70874f1796",
+      "report": {
+        "bytes": 19214,
+        "sha256": "311de0cf08c93c5763bf9b410a6c33514d920171b2d6b2778d9df8d193905172"
+      },
+      "stage": "export"
+    }
+  ],
+  "quality_verified": false,
+  "schema": "world_reward.coverage_stages_observed.v1",
+  "status": "observed_native_pass_not_final_independent_audit"
+}
