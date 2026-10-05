@@ -9498,3 +9498,26 @@ scales and actual skeletal/material support are checked; noSAM/PCA/70bridge,
 render/tracker/optimizer, grasp, gradient or quality claim. Root34tinyPASS0.19s;
 no JIT/model/media loaded locally. An independently source/image-bound Azure
 caller and inclusive120s native control remain required before actual execution.
+
+Actual surface full399 pose PASS2140.790868s on4e7d946; independent saved-only
+audit PASS, full317source entries/closurec8ca580bece9da62e9f4c1a8075e63db00197e8a98255014b0432a68662354d7,
+all original input/source postledger unchanged and exact originalCID absent.
+Sealed3files: report20309793B/07ab39f7ac785875bfac1b9039c0afc8b9c8462a44e2a155847e5162c8f000aa;
+poses78259B/eb244d4dc5bb88aaf4ef4faecb6a2b52dabb7ad63283867b59d5697f22d593ce;
+canonical74728B/f691e573f9e8eb40869fc665fbee11c3f8c270adac02c773ef1037c650919f92.
+Readonly CPU array audit confirms full proper399poses, exact2068V/4096F,
+14components, clipconstantgeometry/objectscale1 and byte-identicalcanonical.
+Collected unit is not itself PASS evidence. No solver/model/GPU replay.
+Native CPU preparationc1c101a dispatched separately with existing399bodyadapter,
+304sourcefiles/archive52f4360cb0f5df819aed01fd3904c51115bbab77ba17aade7983e52a03cd5099;
+completion remains unverified, no quality or submission claim.
+
+Fresh direct-MHR caller now implemented separately from the bridge, source/selected
+release authenticated before one nine-pose call, strictfloat32/noTF32/JIToptFalse,
+120s inclusive load/control/posthash/seal and failure-only reporting, originalFD9
+lease and exact ownedCID cleanup. Only source snapshots, selected release texts
+and actualmodelleaf readonly; noSAM or challenge assets mounted. FinalFD9check
+precedes hostPASS; same exclusiveFD demotes late/failed sealing. Root58PASS0.23s.
+Actual JIT ABI is independently backed by earlier named54control/native geometry
+receipts and primaryMomentum quaternionxyzw/cm documentation. Those observations
+do not transfer SAM licensing, validate gradients/contact, or qualify futurefits.
