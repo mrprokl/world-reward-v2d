@@ -25,6 +25,7 @@ ROOT = base.ROOT
 ENTRY = 'run_articulated_point_study'
 PROTOCOL = 'configs/articulated_point_study_protocol_v1.json'
 PROTOCOL_PIN = dict(bytes=8076, sha256='d1a3fd38cfd0496fd22a2a0280ff95cbc684d866eb345beb525bbbece921db0c')
+REPLICA_PIN = dict(bytes=2967, sha256='2e77684bb9bf3e617066d0662901a8e3bbf3a0ea71c5bcfb8520d800f1270dfd')
 BOOT_IMAGE = 'sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4'
 STAGES = ('manufacture', 'tracks', 'fit')
 IMAGES = dict(manufacture=base.IMAGE, tracks=BOOT_IMAGE, fit=base.IMAGE)
@@ -35,6 +36,8 @@ HELPERS = (*base.HELPERS, 'infra/articulated_point_study.py',
     'infra/robotap_boots_infer.py', 'infra/robotap_boots_acquire.py',
     'configs/robotap_boots_protocol.json', 'configs/robotap_boots_inference_pins.json',
     'configs/bootstapir_runtime_verify_pins.json',
+    'configs/articulated_runtime_replica_pins.json',
+    'configs/articulated_runtime_image_archive_pins.json',
     'src/world_reward/articulated_point_cohort.py', 'src/world_reward/authored_point_study.py', PROTOCOL)
 
 
@@ -55,18 +58,85 @@ def output(revision):
     return ROOT/'validation/articulated_point_study_v1'/revision
 
 
+def replica_configuration(rt, code):
+    p = rt.pinned(code/'configs/articulated_runtime_replica_pins.json', REPLICA_PIN, 16 << 10)
+    rt.require(p['schema'] == 'world_reward.articulated_runtime_replica.pins.v1'
+        and p['qualified_config_id'] == BOOT_IMAGE
+        and re.fullmatch('[0-9a-f]{40}', p['producer_revision']), 'Frozen imported runtime binding required')
+    return p
+
+
+def replica_receipt_path(pins):
+    return ROOT/f"results/articulated-runtime-transfer-import-{pins['producer_revision']}/report.json"
+
+
+def validate_replica_binding(rt, replica, pins):
+    """The offline child consumes the exact host-sealed receipt, not a replay."""
+    rt.require(type(replica) is dict and set(replica) == {'path', 'identity', 'receipt'}
+        and replica['path'] == str(replica_receipt_path(pins))
+        and replica['identity'] == pins['report'], 'Original pinned import receipt path/identity required')
+    # The original transfer writer uses precisely this serialization. Rebinding
+    # the embedded bytes prevents an otherwise ignored receipt field changing.
+    raw = (json.dumps(replica['receipt'], sort_keys=True, allow_nan=False)+'\n').encode()
+    rt.require(dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest()) == pins['report'],
+        'Embedded receipt differs from independently audited original bytes')
+    return validate_replica(rt, replica['receipt'], pins)
+
+
+def validate_replica(rt, value, pins):
+    """Content graph is ancestry; only the independently pinned actual ID runs."""
+    g = value['image_graph']; actual = value['imported_runtime']; layers = g['rootfs_diff_ids']
+    fields = dict(schema='world_reward.articulated_runtime_replica.v1', stage='articulated_runtime_import',
+        status='pass', phase='complete', replica_only=True, model_execution=False, gpu_used=False,
+        dataset_transferred=False, secrets_recorded=False, image_rebuilt=False, image_retagged=False,
+        original_runtime_receipt_replayed=False, scratch_removed=True, asset_files=9)
+    rt.require(all(type(value.get(k)) is type(v) and value[k] == v for k, v in fields.items()),
+        'Complete typed byte-import receipt required')
+    rt.require(value['producer_revision'] == pins['producer_revision']
+        and value['source_proof'] == value['original_export_source_proof'] == pins['source_proof']
+        and value['archive'] == pins['archive'] and value['assets'] == pins['assets'],
+        'Exact original transfer/source/assets binding required')
+    rt.require(g['config_id'] == pins['qualified_config_id'] == BOOT_IMAGE
+        and g['platform_manifest_id'] == pins['platform_manifest_id']
+        and g['index_ids'] == pins['index_ids']
+        and type(g['layer_count']) is int and g['layer_count'] == 47
+        and type(layers) is list and len(layers) == 47
+        and all(type(x) is str and re.fullmatch('sha256:[0-9a-f]{64}', x) for x in layers)
+        and hashlib.sha256(json.dumps(layers, separators=(',', ':')).encode()).hexdigest()
+            == g['ordered_rootfs_sha256'] == pins['ordered_rootfs_sha256']
+        and g['pinned_legacy_metadata_verified'] is True and g['legacy_ids_derived'] is False
+        and g['legacy_metadata_manifest_sha256'] == pins['legacy_metadata_manifest_sha256'],
+        'Complete authenticated original runtime graph required')
+    rt.require(actual['image_id'] == pins['actual_image_id']
+        and actual['image_id'] in (g['config_id'], g['platform_manifest_id'], *g['index_ids'])
+        and actual['qualified_config_id'] == BOOT_IMAGE and type(actual['layers']) is int and actual['layers'] == 47
+        and actual['ordered_rootfs_sha256'] == pins['ordered_rootfs_sha256'],
+        'One independently pinned imported Docker identity required')
+    expected_image = dict(image_id=BOOT_IMAGE, layers=47,
+        ordered_rootfs_sha256=pins['ordered_rootfs_sha256'], **pins['image_archive'])
+    rt.require(value['image'] == expected_image, 'Original image byte identity differs')
+    return actual['image_id']
+
+
+def runtime_image_id(rt, code, proof, stage):
+    value = proof['images'][stage]
+    if stage == 'tracks':
+        pins = replica_configuration(rt, code)
+        actual = validate_replica_binding(rt, proof['runtime_replica'], pins)
+        rt.require(value['RootFS']['Layers'] == proof['runtime_replica']['receipt']['image_graph']['rootfs_diff_ids'],
+            'Actual Docker rootfs differs from imported graph')
+    else:
+        actual = IMAGES[stage]
+    rt.require(value['Id'] == actual and value['Architecture'] == 'amd64'
+        and value['Os'] == 'linux' and value['RootFS']['Type'] == 'layers', 'Actual immutable stage image differs')
+    return actual
+
+
 def image(rt, identifier):
     value = rt.strict(base.control(['docker', 'image', 'inspect', identifier,
         '--format', '{"Id":{{json .Id}},"Architecture":{{json .Architecture}},"Os":{{json .Os}},"RootFS":{{json .RootFS}}}']))
     rt.require(value['Id'] == identifier and value['Architecture'] == 'amd64'
         and value['Os'] == 'linux' and value['RootFS']['Type'] == 'layers', 'Exact immutable native image required')
-    if identifier == BOOT_IMAGE:
-        layers = value['RootFS']['Layers']
-        pin = rt.pinned(Path(os.environ['WR_CODE'])/'configs/bootstapir_runtime_verify_pins.json',
-            rt.identity(Path(os.environ['WR_CODE'])/'configs/bootstapir_runtime_verify_pins.json'), 16 << 10)
-        rt.require(len(layers) == pin['child_layers'] == 47
-            and hashlib.sha256(json.dumps(layers, separators=(',', ':')).encode()).hexdigest()
-                == pin['ordered_rootfs_sha256'], 'Original qualified Boots layer sequence required')
     return value
 
 
@@ -90,8 +160,14 @@ def prerequisites(rt, code, revision):
     c = configuration(rt, code)
     proof = base.prerequisites(rt, ROOT, code, revision, entry=ENTRY, source_helpers=HELPERS)
     boots, files = runtime_assets(rt, code)
+    pins = replica_configuration(rt, code)
+    receipt_path = replica_receipt_path(pins)
+    receipt = rt.pinned(receipt_path, pins['report'], 32 << 10)
+    actual = validate_replica(rt, receipt, pins)
     proof.update(boots_runtime=boots, boots_files={str(p): v for p, v in files.items()},
-        images={s: image(rt, i) for s, i in IMAGES.items()}, protocol_identity=PROTOCOL_PIN)
+        runtime_replica=dict(path=str(receipt_path), identity=pins['report'], receipt=receipt),
+        images={s: image(rt, actual if s == 'tracks' else i) for s, i in IMAGES.items()}, protocol_identity=PROTOCOL_PIN)
+    for stage in STAGES: runtime_image_id(rt, code, proof, stage)
     c['_articulated_proof'] = proof
     return c, proof
 
@@ -162,9 +238,10 @@ def stage_mounts(rt, code, c, proof, stage):
 def native(rt, code, revision, stage, proof_pin):
     target = output(revision)/stage/'native'
     proof = rt.pinned(Path('/opt/articulated-proof.json'), proof_pin, 4 << 20)
+    actual_image = runtime_image_id(rt, code, proof, stage)
     rt.require(sys.platform == 'linux' and os.geteuid() == 1000
         and {p.name for p in Path('/sys/class/net').iterdir()} == {'lo'}
-        and os.environ['WR_IMAGE_ID'] == IMAGES[stage] and not any(target.iterdir()), 'Fresh offline stage only')
+        and os.environ['WR_IMAGE_ID'] == actual_image and not any(target.iterdir()), 'Fresh offline stage only')
     own = rt.source(ROOT, code, revision, ENTRY, HELPERS)
     rt.require(own == proof['source_binding'], 'Actual source differs before native work')
     c = configuration(rt, code)
@@ -204,7 +281,7 @@ def native(rt, code, revision, stage, proof_pin):
     finally:
         try:
             r.update(source_binding=own, producer_revision=revision, protocol_identity=PROTOCOL_PIN,
-                image_id=IMAGES[stage], challenge_inputs_used=False, adoption=False)
+                image_id=actual_image, challenge_inputs_used=False, adoption=False)
             import articulated_point_native as authored
             r['policy_sha256'] = authored.policy_sha256(c)
             r['outputs'] = {p.name: rt.identity(p) for p in target.iterdir() if p.name != 'report.json'}
@@ -225,6 +302,7 @@ def native(rt, code, revision, stage, proof_pin):
 
 def run_stage(rt, code, revision, stage, c, proof):
     begin = time.monotonic()
+    actual_image = runtime_image_id(rt, code, proof, stage)
     parent = output(revision)/stage
     rt.canonical(parent); rt.require(not parent.exists(), 'Fresh stage, no overwrite/resume')
     parent.mkdir(mode=0o755); target = parent/'native'; target.mkdir(mode=0o700); os.chown(target, 1000, 1000)
@@ -242,13 +320,13 @@ def run_stage(rt, code, revision, stage, c, proof):
     for p in stage_mounts(rt, code, c, proof, stage):
         args += ['--mount', f'type=bind,src={p},dst={p},readonly']
     args += ['--mount', f'type=bind,src={parent}/proof.json,dst=/opt/articulated-proof.json,readonly',
-        '--mount', f'type=bind,src={target},dst={target}', '--entrypoint', '/usr/bin/env', IMAGES[stage],
+        '--mount', f'type=bind,src={target},dst={target}', '--entrypoint', '/usr/bin/env', actual_image,
         '-i', 'PATH=/opt/conda/bin:/usr/bin:/bin', 'HOME=/tmp', 'HF_HUB_OFFLINE=1',
         'TRANSFORMERS_OFFLINE=1', 'MOMENTUM_ENABLED=0', 'OMP_NUM_THREADS=4',
         'PYTHONDONTWRITEBYTECODE=1', 'CUBLAS_WORKSPACE_CONFIG=:4096:8',
         'PYTHONPATH='+str(code/'infra')+':'+str(code/'src')+':'+str(ROOT/'vendor/video_to_data'/base.NATIVE)+':/workspace/v2d_sam3d_body/lib',
         'WR_ROOT='+str(ROOT), 'WR_CODE='+str(code), 'WR_CODE_REVISION='+revision,
-        'WR_IMAGE_ID='+IMAGES[stage], 'python', '-B', str(code/'infra/articulated_point_study.py'),
+        'WR_IMAGE_ID='+actual_image, 'python', '-B', str(code/'infra/articulated_point_study.py'),
         '--native', stage, str(proof_pin['bytes']), proof_pin['sha256']]
     r = dict(stage=stage, status='fail', producer_revision=revision, outputs={})
     failure = None
@@ -259,6 +337,7 @@ def run_stage(rt, code, revision, stage, c, proof):
         rt.require(child.returncode == 0, 'Actual native stage failed; retained Azure evidence')
         value = rt.pinned(target/'report.json', rt.identity(target/'report.json'), 1 << 20)
         validate_stage(rt, value, stage, proof)
+        rt.require(value['image_id'] == actual_image, 'Native receipt must name the actual executed image')
         actual = {p.name: rt.identity(p) for p in target.iterdir() if p.name != 'report.json'}
         rt.require(actual == value['outputs'] and target.stat().st_mode & 0o777 == 0o555, 'Complete native seal differs')
         r.update(native_report_identity=rt.identity(target/'report.json'), outputs=actual)
@@ -266,7 +345,7 @@ def run_stage(rt, code, revision, stage, c, proof):
         failure = error; r.update(error_type=type(error).__name__)
     finally:
         try:
-            base.cleanup(rt, name, revision, cid, image=IMAGES[stage])
+            base.cleanup(rt, name, revision, cid, image=actual_image)
             r['owned_cleanup_verified'] = True
             _, after = prerequisites(rt, code, revision)
             rt.require(after == proof, 'Actual source/assets/images changed after stage')

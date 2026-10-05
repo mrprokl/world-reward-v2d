@@ -1,0 +1,66 @@
+{
+  "actual_image_id": "sha256:5b4272fc81d6f8d86ca3419ea5df5f546947997f269d9ae514cc4761be4dec40",
+  "archive": {
+    "bytes": 26572001280,
+    "sha256": "6ebc35f909c342708a3722931269457571f1174bab18a0326c57fc2e3f4bc5ee"
+  },
+  "assets": {
+    "results/bootstapir-runtime-verify-f3cfde1992c6cfc9a6504b393d8a1f24735dc94d/report.json": {
+      "bytes": 3051,
+      "sha256": "794b6e5313e992c2c86610f855f4a86dc8c9a994ede37c22e33093e6ad9fc5e7"
+    },
+    "validation/robotap_boots_v1/assets/bootstapir_checkpoint_v2.pt": {
+      "bytes": 218886140,
+      "sha256": "8493c7a69e02c85b9382fbb3c7b8b539b36bc08ede744b9e99feb739a0129f4b"
+    },
+    "validation/robotap_boots_v1/assets/tapnet_source/LICENSE": {
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "validation/robotap_boots_v1/assets/tapnet_source/README.md": {
+      "bytes": 22951,
+      "sha256": "c0cda10a66a91513fd78e1638ff6db7789d4320dc24e5897ce6bc1bd567c15c3"
+    },
+    "validation/robotap_boots_v1/assets/tapnet_source/tapnet/__init__.py": {
+      "bytes": 1350,
+      "sha256": "35b29d7968272465e0f9cbb0d2c1035003ef96b140f4de7516eb85a047ec9ab3"
+    },
+    "validation/robotap_boots_v1/assets/tapnet_source/tapnet/torch/__init__.py": {
+      "bytes": 656,
+      "sha256": "f7c8d8c66e2f93ac350ce82c03f02152ffc82524cd120ebc944c931b6ea879e1"
+    },
+    "validation/robotap_boots_v1/assets/tapnet_source/tapnet/torch/nets.py": {
+      "bytes": 12032,
+      "sha256": "4961a8e4882e8c9ac219c4714f6f2c811cc1ab665a439d4d2e79942002a9517c"
+    },
+    "validation/robotap_boots_v1/assets/tapnet_source/tapnet/torch/tapir_model.py": {
+      "bytes": 27917,
+      "sha256": "87c05fb17d48d0f4353a00b67c9d40d3a264e13e43d88e3f7b5829119845e3ba"
+    },
+    "validation/robotap_boots_v1/assets/tapnet_source/tapnet/torch/utils.py": {
+      "bytes": 10477,
+      "sha256": "a4267b3a6bd8ecf2dfe5effacab9f7a43664dc5d08966c98f6a0cc68f5ccedd3"
+    }
+  },
+  "image_archive": {
+    "bytes": 26353005568,
+    "sha256": "6a4bba2fe3bc562579f4cc86e8e76ff02e1e1b815b505ddde3ae802aa1b160e2"
+  },
+  "index_ids": [
+    "sha256:a13f16ea201073d3617df18f2aefaafc70722898c2522dafbc7469f236bf0e64"
+  ],
+  "legacy_metadata_manifest_sha256": "eb673ebafd97f99a69d1efc6f031124fa4d81452c7c9f3b4fcf6238919a576e0",
+  "ordered_rootfs_sha256": "0f1bf78024834b90e5841b8de8893fba8eec4176bf36c071516d0c1205d84fdc",
+  "platform_manifest_id": "sha256:5b4272fc81d6f8d86ca3419ea5df5f546947997f269d9ae514cc4761be4dec40",
+  "producer_revision": "226c781ac4421c405d17af0e8839e2eba16fdca2",
+  "qualified_config_id": "sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4",
+  "report": {
+    "bytes": 7487,
+    "sha256": "864f7b2c0526afdacd7bb51de929c7549ec78e908efe1be18f67b88f4029b5d8"
+  },
+  "schema": "world_reward.articulated_runtime_replica.pins.v1",
+  "source_proof": {
+    "files": 211,
+    "sha256": "59b359f00150957450c026bcfe863f0119f3eb03a9e31db489d5eae496f3d307"
+  }
+}

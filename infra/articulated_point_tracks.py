@@ -18,6 +18,7 @@ import time
 IMAGE = 'sha256:ef12f589dd270e56be3a2d2e2f33ccd356e5b160a5c6ca03b8a9449ccc10d1e4'
 BUDGET_SECONDS = 900
 SOURCE_HELPERS = ('infra/articulated_point_tracks.py', 'infra/articulated_point_native.py',
+    'infra/articulated_point_study.py', 'configs/articulated_runtime_replica_pins.json',
     'infra/tracker_noise_experiment.py', 'infra/robotap_boots_infer.py', 'infra/robotap_boots_acquire.py',
     'configs/robotap_boots_protocol.json', 'configs/robotap_boots_inference_pins.json',
     'src/world_reward/articulated_point_cohort.py', 'src/world_reward/point_surface_queries.py',
@@ -110,11 +111,15 @@ def native(rt, code, out, c):
     for module, name in ((authored, 'articulated_point_native'), (boots, 'robotap_boots_infer'),
                          (ancestry, 'tracker_noise_experiment')):
         rt.require(Path(module.__file__).resolve() == code/'infra'/f'{name}.py', 'Actual bound stage helper origin differs')
+    import articulated_point_study as controller
+    rt.require(Path(controller.__file__).resolve() == code/'infra/articulated_point_study.py',
+        'Actual source-bound runtime controller required')
+    actual_image = controller.runtime_image_id(rt, code, c['_articulated_proof'], 'tracks')
     manufacture_path, manufacture = authored.authenticate_manufacture(rt, c)
     runtime = ancestry.runtime_evidence(code)
     check()
     rt.require(sys.platform == 'linux' and os.geteuid() == 1000 and 'torch' not in sys.modules
-        and {p.name for p in Path('/sys/class/net').iterdir()} == {'lo'} and os.environ.get('WR_IMAGE_ID') == IMAGE
+        and {p.name for p in Path('/sys/class/net').iterdir()} == {'lo'} and os.environ.get('WR_IMAGE_ID') == actual_image
         and os.environ.get('CUBLAS_WORKSPACE_CONFIG') == ':4096:8',
         'Fresh exact native Boots runtime/workspace required before Torch import')
     import numpy as np
@@ -138,7 +143,7 @@ def native(rt, code, out, c):
         arrays, queries = _public_arrays(np, rt, path); public.append((path, view['identity'], len(queries.face_indices)))
         del arrays, queries; gc.collect(); check()
     report = dict(stage='articulated_point_tracks_native_v1', status='fail', phase='model_load',
-        image_id=IMAGE, frames=144, scene_ids=[r[0] for r in SCENES], model_loads=0,
+        image_id=actual_image, qualified_config_id=IMAGE, frames=144, scene_ids=[r[0] for r in SCENES], model_loads=0,
         native_calls_attempted=0, native_calls_returned=0, native_calls_completed=0,
         manufacture_report_identity=c['articulated_study']['manufacture']['report'],
         policy_sha256=authored.policy_sha256(c), source_binding=c['_articulated_proof']['source_binding'],
