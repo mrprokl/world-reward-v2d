@@ -10758,3 +10758,25 @@ Do not promote this to GPU operator/model qualification; the next fresh native
 qualifier must authenticate this new child separately from its unchanged
 original author-runtime parent, complete the architecture gate, then run the
 original DCNv2/ROIAlign/model controls without loosening numerical tolerances.
+
+EP16 original CPU CARI surface preparation FINAL ARTIFACT PASS360 frames,
+2641.974476s including host lifecycle (native2631.085263s). Original334-file
+Git source, full BEFORE/AFTER input proof, native/host receipts,15 exact public
+input leaves, readonly controls and CID/process/cgroup absence independently
+verified. Host698B/0c02cca834a1c5af55806c9c025b56b865559028d162fdd2e44be7430110e27f;
+native17534B/0975be8d242ed24cad4e2c8e6a02c12ed1a5f2b8ea6d027b383032dfc2494e0c;
+proof203991B/3dca9c4eb5ec6c54ae81e2138865d8f0d1fa54ef17cf7ec40c33c7eb24e838af.
+Fifteen-leaf downstream config3373B/
+753577737163cf68adb2d37150443b1138bafd0330452490838c9d0b5bc2a288
+binds original producer5f6161da/source9d6e9028. Parent399 tiny full-input/shared-
+prepare/transport checks PASS4.51s. No new estimation algorithm or quality gain.
+
+EP23 original surface proposal native/host/provenance audit PASS552frames,
+172.298844s, original QEM once/two components. Host953262B/
+ef287ec205ba0f4771cd0b155b8db035b525dda0256eff0473b03f86e22a545a;
+native825418B/354b24444caac5c1946c56cb50d3289ad482df012584495bc626d7b082b4547c.
+Actual source/input/runtime/receipt/output seals/CID/posthash verified. Five
+supplemental original-source file pins still need collection before a downstream
+config; observer requested a later config absent in original603272 closure.
+That collector failure does not revoke the independently verified producer,
+invent missing pins or permit a scientific rerun. Coverage is not target accuracy.
