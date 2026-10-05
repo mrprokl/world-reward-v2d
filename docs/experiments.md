@@ -10396,3 +10396,18 @@ downloads, source/output posthash and owned-partial cleanup before PASS.
 Selected original source subset is explicit, not a complete root package import.
 No model decoding, package installation, GPU, dataset, eligibility/overlap
 clearance, scientific adoption or CARI4D superiority follows from acquisition.
+
+603272b third preregistered native-coverage surface proposal EP18 CLOSED FAIL
+13.926072s/full535source frames, original vertex link neither one cycle nor one
+boundary path, before any QSlim call. Native typed SurfaceBudgetError carries
+the underlying ValueError domain proof; no geometry/component/orientation repair,
+deletion or source-array change. Host243994B/
+3da6505272fb89549b4b58ffc2590041f646d16677a360c91ce24cf88ee80315;
+native122665B/1c0d4c76b03e6979fc77a91c663f33302c89c7e672cab286a83d43e7e92ddff1.
+Independent actual original complete producer source, qualification,535-frame
+inputs and image posthash match both receipts; published geometry absent,
+owned exact CID and disposable scratch absent, report namespace sealed555.
+The first read-only audit incorrectly expected the underlying ValueError rather
+than its typed SurfaceBudgetError wrapper; corrected metadata assertion only,
+without rerunning or modifying native output. Both original and surface failures
+remain closed. Move numerical coverage order to19, not a domain/threshold reroll.
