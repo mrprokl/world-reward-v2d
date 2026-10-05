@@ -1,0 +1,35 @@
+{
+  "schema": "world_reward.proposal_external_census_actual.v1",
+  "status": "pass",
+  "producer_revision": "d1de716d9d6e94165d14224d17dee36fe2ef2fe5",
+  "source_files": 260,
+  "source_entries": 265,
+  "source_closure_sha256": "cf54657ff34941885832d06409e930bff1c82c86145d130b573b839ef3efe8dc",
+  "git_archive_sha256": "a4bfb032c81b117de8754950f548cdd531eb3dcfebe967780243302a2981da83",
+  "report": {
+    "bytes": 3847,
+    "sha256": "5c9362852da341159ceefdfe37e4b866a06840ff4d69fbf281424d38b28e3849"
+  },
+  "cohort": {
+    "bytes": 18076,
+    "sha256": "4db28db7b8c9beb0ce58e574e8f012f05c86ef7447ff056a269d4b04cd74ed33"
+  },
+  "counts": {
+    "eligible_after_all_exclusions": 175,
+    "source_author_profiles": 164,
+    "unique_author_photo_md5_slots": 164,
+    "new_relation_images": 833,
+    "geometry_orientation_eligible": 206,
+    "excluded_ids": 208,
+    "excluded_author_profiles": 197
+  },
+  "elapsed_seconds": 3.274094067979604,
+  "independent_metadata_replay_exact": true,
+  "source_inputs_outputs_rehashed_after": true,
+  "rgb_read": false,
+  "model_calls": 0,
+  "private_reference_selection_only": true,
+  "quality_verified": false,
+  "training_overlap_verified": false,
+  "adoption": false
+}
