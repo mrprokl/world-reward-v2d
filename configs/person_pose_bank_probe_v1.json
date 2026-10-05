@@ -1,0 +1,61 @@
+{
+  "schema": "world_reward.person_pose_bank_probe.v1",
+  "image_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "budget_seconds": 300,
+  "episodes": [
+    {
+      "episode": 9,
+      "total_frames": 415,
+      "automatic_source_sha256": "b6d5b543ace41c1cca6b327182ff23528328a1052ead0f4f1d7423dc7404e234",
+      "report": "outputs/episode_000009/automatic_masks/report.json",
+      "diagnostic": "outputs/episode_000009/automatic_masks/seed-diagnostics.json",
+      "video": "data/track_1/videos/chunk-000/episode_000009.mp4",
+      "files": {
+        "outputs/episode_000009/automatic_masks/report.json": {
+          "bytes": 12565,
+          "sha256": "a355d0239cc7e54de8da8f50c6f8cb07ab0683f227dd75e303ba35315e00a97a"
+        },
+        "outputs/episode_000009/automatic_masks/seed-diagnostics.json": {
+          "bytes": 9615,
+          "sha256": "fc2e36680cf097b4aa52977fd1b5ef6ee0ae2bd074e5bc5d069b9ecc0d06b8fc"
+        },
+        "data/track_1/videos/chunk-000/episode_000009.mp4": {
+          "bytes": 11564665,
+          "sha256": "4fe69ca521fc2717e2938339b0a37843ada391f4b074753584c7cd8c2e36a277"
+        }
+      }
+    },
+    {
+      "episode": 26,
+      "total_frames": 399,
+      "automatic_source_sha256": "b6d5b543ace41c1cca6b327182ff23528328a1052ead0f4f1d7423dc7404e234",
+      "report": "outputs/episode_000026/automatic_masks/report.json",
+      "diagnostic": "outputs/episode_000026/automatic_masks/seed-diagnostics.json",
+      "video": "data/track_1/videos/chunk-000/episode_000026.mp4",
+      "files": {
+        "outputs/episode_000026/automatic_masks/report.json": {
+          "bytes": 9632,
+          "sha256": "4482ef02ca68bf0b112eaa84282c8829d55df5dcedf172be3ce2f3f8d16741f9"
+        },
+        "outputs/episode_000026/automatic_masks/seed-diagnostics.json": {
+          "bytes": 7566,
+          "sha256": "864cc29c8673e74aeb4f699fbe4258032b0b2e3ab0fbe9ff365fe39cfb7b19f2"
+        },
+        "data/track_1/videos/chunk-000/episode_000026.mp4": {
+          "bytes": 13430270,
+          "sha256": "9cf9112417778299780a3e2a7f009d38bbf24059149eaa1591b8df02551607a4"
+        }
+      }
+    }
+  ],
+  "metadata_files": {
+    "results/input-manifest.json": {
+      "bytes": 13081,
+      "sha256": "3df960ce0f594b8f51675b21bb070925de7aa87a583332674eb89b0e90fc6263"
+    },
+    "data/track_1/meta/episodes.jsonl": {
+      "bytes": 6850,
+      "sha256": "11cc802c05ce62d83602e70d4f12991656e5701083a66d43e5452c16d3e4343b"
+    }
+  }
+}

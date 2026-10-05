@@ -109,3 +109,32 @@ No re-evaluation of the closed OpenImages pilots, no manual episode fix and no
 claim that a literature result, procedural test or prettier overlay solves the
 leaderboard objective. Useful memory operators may run in parallel, but they
 must not be mistaken for the missing initial interaction selector.
+
+## Executable person-attached observations
+
+October5: independent source audit selects the already deployed native DWPose133
+CPU model before a more expensive full-body pass. Original inference_pose accepts
+all automatic person bboxes and returns one133-point row per input crop, in order,
+via N sequential batch-one ORT calls. One whole-bank adapter call is not one
+batched ONNX forward. Body wrists9/10 and hand roots91/112 are different predicted
+landmarks; source metadata30735B/SHA256
+`8c73971296517eadef6b7df6de92eb8943119cb467b3f4d488a6e062470cf179`.
+
+The new person_pose_observations adapter retains IDs, duplicate competing boxes,
+native scores/coordinates and misses, skips native N=0 full-image fallback, and
+never selects a target. Parent109 combined tiny tests PASS0.42s; additional
+automatic-census diagnostic tests bring125PASS0.25s. These are manufactured API
+controls, not actual multiperson anatomical correctness.
+
+Next CPU probe uses all saved automatic person proposals from EP9/26's first
+three recorded seed banks, unchanged native model and separate fresh output.
+These are actual original linspace frame indices, not frames0/1/2; remaining
+seed positions contain counts only. No selected masks/prompts/Body/CARI enter.
+It is challenge-video diagnostic inference, not an independent validation
+cohort, hyperparameter tuning, identity correction or adoption. Actual execution
+and independent output/source/input cleanup audit are still required.
+
+A source audit also catches an upstream multi-person SAM3DBody mask pitfall:
+process_one_image blindly reshapes provided masks to[N,H,W,1]. Input[H,W,N]
+would mix people rather than transpose. Our historical N=1 calls are unchanged;
+any future all-person Body call must use explicit person-first mask layout.

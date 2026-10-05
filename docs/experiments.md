@@ -10627,3 +10627,38 @@ object produces a fully covered uncontaminated wrong actor and wrong seed.
 This explicitly demonstrates that sparse continuity/coverage alone do not fix
 initial target attribution. Parent136related tests PASS0.46s; no model, data,
 challenge prediction, parameter change or claimed quality improvement.
+
+October5 actionable background selection component: new all-person DWPose133
+adapter retains every automatic proposal and person-attached left/right points,
+never chooses a target. Parent205 tiny tests PASS0.75s across adapter, saved
+census, original DWPose runtime and Azure transport; prospective config2479B/
+ec8d6284f1003f0d75625a1df3091fc6ab1da5f032a0c5bf82b1c4ee5cf503f3
+binds actual original EP9(415T)/26(399T) detector receipts and Track1 metadata.
+The CPU probe is six complete recorded seed banks, NOT all frames or an external
+quality study; no selected masks/prompts/Body/CARI/private truth mounted. All
+unknown/off-grid/native-score misses retained; no N=0 full-image fallback.
+Actual native execution/adoption/ownership correctness still unverified.
+Independent audit fixed exact marker mounts, input whitelist/pre-read pin order,
+checked shell substitution and bounded owned cleanup before invocation.
+
+EP12 tiny visual actual engineeringPASS3.804973s: source0232118, unchanged235
+source entries, frozen405T export, original frames0/202/404,112482B JPEG/
+301674f41d62424871ce99cf02729d6e2d030a6fdb0f4ae383909454a612fde0.
+Report2339B/290bc4074cb56630ade2dbe43f1e0fc499d918fbf08a1493435482c2ae3c2386.
+Independent source/input/output/CID verification; only this authorized tiny QA
+image crossed locally via private Blob/AAD. Local DELETE permission denied;
+exact Azure managed identity If-Match cleanup subsequently returns202. No SAS/
+account key/public publication, manual labels, prediction fit or quality score.
+
+Coverage EP22 full native surface pose dispatched once at73f4c3 after CPU
+proposal audit; actual systemdPID2057786 waits original cooperative lock behind
+EP20PID2041845. No completed trajectory/quality claim. CPU surface EP23 uses
+original603272b code and original domain/budget, separately dispatched.
+
+Before any MASA SM90 build, actual isolated CPU author-image header census
+shows no cublas_v2/cusparse/cusolverDn/cuda_runtime headers under Torch. The
+three small NVCC/CUDART/CCCL archives are not full developer-header closure.
+Do not dispatch a known incomplete compiler recipe; independently pinned
+NVIDIA11.8 developer packages must supply include-only paths and notices in
+a new prospective acquisition budget. No CUDA12 header/ABI substitution, kernel
+rewrite or original operator gate relaxation. GPU model still unqualified.
