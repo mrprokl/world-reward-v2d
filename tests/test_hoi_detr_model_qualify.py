@@ -58,6 +58,67 @@ def test_protocol_declares_exact_publisher_and_native_sources(p):
     assert p['procedural_RGB'] == dict(height=96, width=128, original_frame_index=0, generator='uint8_xy_integer_ramp_v1')
 
 
+def test_external_probe_frozen_distinct_namespace_and_same_native_policy(gate, p):
+    raw = (REPO/gate.IMAGE_PROTOCOL).read_bytes(); c = json.loads(raw)
+    assert pin(raw) == gate.IMAGE_PROTOCOL_PIN == gate.selected_protocol_pin(c)
+    assert c['scope'] == 'one_external_RGB_native_pair_head_runtime_only' and 'procedural_RGB' not in c
+    assert c['output'] == 'results/hoi-detr-image-probe-v1'
+    for name in ('runtime', 'acquisition', 'fairscale', 'native_config', 'compatibility_patch', 'checkpoint_buffers',
+                 'import_wheels', 'budget_seconds', 'cpu_memory', 'gpu_memory', 'amp', 'tf32', 'seed'):
+        assert c[name] == p[name]
+    assert c['external_RGB']['minimum_native_hand_object_pairs'] == 1
+    assert all(c[name] is False for name in gate.FLAGS)
+
+
+def external_fixture(gate):
+    c = json.loads((REPO/gate.IMAGE_PROTOCOL).read_bytes()); x = c['external_RGB']; q = c['qualified_model']
+    h = dict(status='pass', phase='complete', actual_model_qualified=True, producer_revision=q['producer_revision'],
+             native_report_identity=q['native'], source_binding={'frozen': 'old'}, **{name: False for name in gate.FLAGS})
+    h.update({name: True for name in ('source_rehashed_after', 'inputs_rehashed_after', 'image_unchanged', 'owned_containers_removed', 'owned_overlay_removed')})
+    n = dict(status='pass', native_forward_calls=1, strict_checkpoint=dict(keys=1796, strict=True, weights_only=True), **{name: False for name in gate.FLAGS})
+    rights = dict(individual_creator_declaration_verified=True, image_id=x['image_id'], license='CC-BY-2.0',
+                  creator_ld_json=dict(license='https://creativecommons.org/licenses/by/2.0/', acquireLicensePage=x['creator_page'], author={'name': x['creator']}), quality_verified=False, adoption=False)
+    acquired = dict(image_pin=x['identity'], rights_pin=x['rights']['identity'], publisher_md5_matched=True,
+                    local_RGB_transfer=False, reference_geometry_read=False, adoption=False, image_id=x['image_id'])
+    values = {str(gate.ROOT/q['path']): h, str((gate.ROOT/q['path']).parent/'native.json'): n,
+              x['rights']['path']: rights, x['acquisition']['path']: acquired}
+    return c, values
+
+
+@pytest.mark.parametrize('fault', [None, 'prior_fail', 'partial', 'prior_adoption', 'rights', 'creator', 'image', 'oracle', 'threshold'])
+def test_external_preflight_exact_original_model_and_creator_grant(gate, monkeypatch, fault):
+    c, values = external_fixture(gate); x = c['external_RGB']; q = c['qualified_model']
+    if fault == 'prior_fail': values[str(gate.ROOT/q['path'])]['status'] = 'fail'
+    elif fault == 'partial': values[str((gate.ROOT/q['path']).parent/'native.json')]['strict_checkpoint']['keys'] = 898
+    elif fault == 'prior_adoption': values[str(gate.ROOT/q['path'])]['adoption'] = True
+    elif fault == 'rights': values[x['rights']['path']]['license'] = 'CC-BY-NC-2.0'
+    elif fault == 'creator': values[x['rights']['path']]['creator_ld_json']['author']['name'] = 'other'
+    elif fault == 'image': values[x['acquisition']['path']]['image_pin'] = {'bytes': 1, 'sha256': '0'*64}
+    elif fault == 'oracle': x['reference_geometry_read'] = True
+    elif fault == 'threshold': x['minimum_native_hand_object_pairs'] = 0
+    calls = []
+    monkeypatch.setattr(gate, 'old_source', lambda *args: calls.append('old_source'))
+    monkeypatch.setattr(gate, 'exact', lambda *args: calls.append('image_hash'))
+    rt = SimpleNamespace(pinned=lambda path, *_: values[str(path)])
+    if fault is None:
+        frozen = gate.authenticate_external_rgb(rt, c)
+        assert len(frozen) == 5 and frozen[x['path']] == x['identity']
+        assert calls == ['old_source', 'image_hash']
+    else:
+        with pytest.raises(ValueError): gate.authenticate_external_rgb(rt, c)
+
+
+def test_external_gpu_mount_is_rgb_leaf_not_creator_metadata_or_references(gate, tmp_path):
+    c = json.loads((REPO/gate.IMAGE_PROTOCOL).read_bytes()); image = 'sha256:'+'e'*64
+    proof = dict(runtime=dict(image=dict(Id=image)), pin=dict(bytes=123, sha256='1'*64))
+    _, _, mounts, args = gate.container_plan(tmp_path/'code', tmp_path/'out', 'a'*40, c, proof, 'model', 1800)
+    rgb = Path(c['external_RGB']['path'])
+    assert (rgb, rgb, True) in mounts and args[-1] == '--external-rgb'
+    assert not any(a == rgb.parent or a.name in ('rights.json', 'acquisition.json', 'relations.csv', 'metadata.csv') for a, _, _ in mounts)
+    _, _, cpu_mounts, cpu_args = gate.container_plan(tmp_path/'code', tmp_path/'out', 'a'*40, c, proof, 'overlay', 1800)
+    assert not any(a == rgb for a, _, _ in cpu_mounts) and cpu_args[-1] == '--external-rgb'
+
+
 def test_exact_nonnumeric_source_path_removal_preserves_AST(gate, p):
     path = p['compatibility_patch']['remove_exact_sys_path_append']
     raw = ("import sys\n\nsys.path.append('"+path+"')\nimport torch\ndef loss(x):\n return x*2+1\n").encode()

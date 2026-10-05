@@ -1609,3 +1609,51 @@ the closed cohort or proximity as manual truth. FineBio's signed-access and
 explicit intended-use/commercial grant remain the useful external next step;
 its sparse manual triplets still would not prove full-T release/stationarity.
 Native operator/full-model feasibility proceeds independently of those rights.
+
+### October5 — a narrower lawful external image control, not full-HOI validation
+
+Independent hand-specific audit:100DOH publisher agreement explicitly limits
+noncommercial research; ContactHands labels hand boxes/contact-state bits, not
+referenced object IDs, with mixed-source image rights unresolved. Hands23/NewDays
+has manual hand/direct-object/tool-target annotations but no verified per-image
+CC variant/creator/annotation grant; it is also in HOI-DETR's training family.
+Useful unsent request: dandans@umich.edu for written prize-bearing validation
+permission, reserved NewDays split, CC-BY/CC0 image attribution and annotation
+grant. Never equate MIT inference software with permission for its data.
+
+[Open Images V7](https://storage.googleapis.com/openimages/web/factsfigures_v7.html)
+provides manual person–object `holds` relations, exhaustive within its declared
+triplet vocabulary, and Google annotation CC-BY4. Its images are merely listed
+CC-BY2 and require individual verification. This is a narrower **object attribution**
+reference, not hand ownership, temporal stationary/release/contact/tool truth,
+whole3D or a known checkpoint-disjoint benchmark. No cross-dataset overlap claim.
+The [actual publisher download](https://storage.googleapis.com/openimages/web/download_v7.html)
+has field `RelationshipLabel`, despite its documentation example `RelationLabel`.
+A CPU-only exact-header diagnostic preserves that initial failed census;
+no aliases or private box matching were supplied to inference.
+
+Azure-only publisher metadata census: test relations9308608B/
+418a1e22a6da1fd2fdcffb53cb92fdc796cc41d7ca0c3311cfd298f1639c9ef6,
+image metadata45227339B/de55c6b8cbda32a79f4a20f28572d54e9c49d527a4006725675764074a51a36d,
+publisher ETag-MD5 values matched. Before RGB/model/reference geometry, freeze
+first16 SHA256(`world_reward.oi_holds_runtime_v1/`+ImageID) among declared
+person-holds-nonperson image IDs; first2333ac90234d7d50 is a runtime control only.
+Creator [Andrea Sartorati's page](https://www.flickr.com/photos/tomjoad/2327806535)
+has matching ImageObject JSON-LD CC-BY2/creator/photo URL. Exact original image
+1208691B/07eb3b6cac2c4c5f898c212fd9d136c0766b0f9d66157efae75141384ab5d181
+matches publisher OriginalMD5, remains Azure-only. Rights2166B/
+a953c8db234363aa81ef3ada555438dfaf952c1b536e81e26c7420bbb006994d;
+acquisition810B/9df9ff070634ab74a14d7dcb593f2c1076115ad57891a711d825c6ea7ce63a24.
+No RGB download/thumbnail substitution locally; no rotation guess from empty
+metadata and no private relation coordinates opened for this runtime control.
+
+Prospective original-model probe reuses the independently qualified full model
+and exactly the same native math/checkpoint/thresholds/config/resource limits.
+Only the original JPEG leaf enters the offline GPU mount; no creator metadata,
+category label, target box or relation annotation. Require at least one genuine
+surviving native hand→direct-object pair, retain all query evidence and logits,
+fail with no thresholds changed or replacement image. This qualifies pair-head
+execution only; it does not validate its relationship accuracy. Parallel clean
+`hoi_mask_bridge` analytically retains **all** positive box/pixel-cell overlaps
+plus NULL, complete original masks and proposal slots; no max-IoU identity,
+weight/confidence/selection or actual mask-model execution is implied.

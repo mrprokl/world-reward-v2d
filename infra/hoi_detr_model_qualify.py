@@ -28,6 +28,8 @@ DATA = Path('/srv/world-reward-data/hoi_detr_v1')
 ENTRY = 'run_hoi_detr_model_qualify'
 PROTOCOL = 'configs/hoi_detr_model_qualify_v1.json'
 PROTOCOL_PIN = dict(bytes=5005, sha256='8d6184588be0d4be5d8feec600b74b6e7806e953cc3b81c7c87c3e7579e937ac')
+IMAGE_PROTOCOL = 'configs/hoi_detr_image_probe_v1.json'
+IMAGE_PROTOCOL_PIN = dict(bytes=6550, sha256='f556b700e4f331b7d92631711aa453e37cbd18d91e5bc0da1738c7e70ce3d9c9')
 HELPERS = ('infra/hoi_detr_model_qualify.py', 'infra/run_hoi_detr_model_qualify.sh', PROTOCOL,
            'infra/hoi_detr_runtime_verify.py', 'infra/hoi_detr_acquire.py',
            'infra/mediapipe_cpu_runtime_verify.py', 'infra/mediapipe_hands_acquire.py',
@@ -63,10 +65,13 @@ def source(rt, code, revision):
     return rt.source(ROOT, code, revision, ENTRY, HELPERS)
 
 
-def protocol(rt, code):
-    p = rt.pinned(code/PROTOCOL, PROTOCOL_PIN, 16 << 10)
-    require(p['schema'] == 'world_reward.hoi_detr_model_qualification.v4' and p['scope'] == 'one_procedural_RGB_full_native_model_runtime_only'
-            and p['root'] == str(ROOT) and p['output'] == 'results/hoi-detr-model-qualify-v4'
+def protocol(rt, code, *, external_rgb=False):
+    name, pin = (IMAGE_PROTOCOL, IMAGE_PROTOCOL_PIN) if external_rgb else (PROTOCOL, PROTOCOL_PIN)
+    p = rt.pinned(code/name, pin, 16 << 10)
+    schema, scope, output = ('world_reward.hoi_detr_image_probe.v1', 'one_external_RGB_native_pair_head_runtime_only', 'results/hoi-detr-image-probe-v1') if external_rgb else (
+        'world_reward.hoi_detr_model_qualification.v4', 'one_procedural_RGB_full_native_model_runtime_only', 'results/hoi-detr-model-qualify-v4')
+    require(p['schema'] == schema and p['scope'] == scope
+            and p['root'] == str(ROOT) and p['output'] == output
             and (p['budget_seconds'], p['cleanup_grace_seconds'], p['outer_seconds']) == (1800, 60, 1860)
             and (p['cpu_cpus'], p['cpu_memory'], p['gpu_cpus'], p['gpu_memory']) == (4, '16g', 4, '64g')
             and p['amp'] is False and p['tf32'] is False and p['seed'] == 0 and all(p[k] is False for k in FLAGS), 'Frozen one-forward scope required')
@@ -76,6 +81,41 @@ def protocol(rt, code):
             and p['import_wheels'][0]['version'] == '3.1.10' and p['import_wheels'][0]['bytes'] == 15155
             and p['import_wheels'][0]['publication_date'] <= '2026-09-30', 'Minimal pre-cutoff import wheel required')
     return p
+
+
+def selected_protocol_pin(p):
+    return IMAGE_PROTOCOL_PIN if p['schema'] == 'world_reward.hoi_detr_image_probe.v1' else PROTOCOL_PIN
+
+
+def authenticate_external_rgb(rt, p):
+    """CPU metadata only; never annotation boxes/targets or a quality evaluator."""
+    c = p['external_RGB']; prior = p['qualified_model']
+    h = rt.pinned(ROOT/prior['path'], prior['report'], 32 << 10)
+    n = rt.pinned((ROOT/prior['path']).parent/'native.json', prior['native'], 32 << 10)
+    require(h['status'] == 'pass' and h['phase'] == 'complete' and h['actual_model_qualified'] is True
+            and h['producer_revision'] == prior['producer_revision'] and h['native_report_identity'] == prior['native']
+            and n['status'] == 'pass' and n['native_forward_calls'] == 1 and n['strict_checkpoint']['keys'] == 1796
+            and n['strict_checkpoint']['strict'] is True and n['strict_checkpoint']['weights_only'] is True
+            and all(h[k] is True for k in ('source_rehashed_after', 'inputs_rehashed_after', 'image_unchanged', 'owned_containers_removed', 'owned_overlay_removed'))
+            and all(h[k] is False and n[k] is False for k in FLAGS), 'Original independently qualified full model required')
+    old_source(rt, h['source_binding'], ENTRY, HELPERS)
+    rights = rt.pinned(Path(c['rights']['path']), c['rights']['identity'], 16 << 10)
+    acquired = rt.pinned(Path(c['acquisition']['path']), c['acquisition']['identity'], 16 << 10)
+    require(c['input_is_external_not_challenge'] is True and c['reference_geometry_read'] is False and c['metadata_to_GPU'] is False
+            and c['minimum_native_hand_object_pairs'] == 1 and c['original_frame_index'] == 0
+            and acquired['image_pin'] == c['identity'] and acquired['rights_pin'] == c['rights']['identity']
+            and acquired['publisher_md5_matched'] is True and acquired['local_RGB_transfer'] is False
+            and acquired['reference_geometry_read'] is False and acquired['adoption'] is False
+            and rights['individual_creator_declaration_verified'] is True and rights['image_id'] == acquired['image_id'] == c['image_id']
+            and rights['license'] == c['license'] == 'CC-BY-2.0'
+            and rights['creator_ld_json']['license'] == 'https://creativecommons.org/licenses/by/2.0/'
+            and rights['creator_ld_json']['acquireLicensePage'] == c['creator_page']
+            and rights['creator_ld_json']['author']['name'] == c['creator']
+            and rights['quality_verified'] is False and rights['adoption'] is False, 'Exact external creator grant/acquisition required')
+    frozen = {str(ROOT/prior['path']): prior['report'], str((ROOT/prior['path']).parent/'native.json'): prior['native'],
+              c['rights']['path']: c['rights']['identity'], c['acquisition']['path']: c['acquisition']['identity'], c['path']: c['identity']}
+    exact(rt, Path(c['path']), c['identity'], 16 << 20)
+    return frozen
 
 
 MODEL_REQUIREMENTS = frozenset({
@@ -98,6 +138,9 @@ MODEL_REQUIREMENTS = frozenset({
     'Unambiguous native EMA buffer names required',
     'Registration must not resume or skip native buffers',
     'Exact complete native EMA backup schema required',
+    'Original independently qualified full model required',
+    'Exact external creator grant/acquisition required',
+    'Actual external image with native pairs required',
     'No state remapping/partial checkpoint load allowed',
     'Exactly qualified full native MMCV extension required',
     'No author train API/foreign absolute source imports',
@@ -297,7 +340,7 @@ def native_context(code, revision, p, proof_pin, phase):
     rt, _, acq, runtime = load_helpers(code); deadline = float(os.environ['WR_MODEL_DEADLINE']); runtime.check(deadline)
     require(os.geteuid() == 1000 and os.environ.get('WR_ROOT') == str(ROOT) and {x.name for x in Path('/sys/class/net').iterdir()} == {'lo'}, 'Exact offline unprivileged model container required')
     own = source(rt, code, revision); out = ROOT/p['output']; proof = rt.pinned(out/(phase+'_proof.json'), proof_pin, 2 << 20)
-    require(proof['source_binding'] == own and proof['protocol_identity'] == PROTOCOL_PIN and os.environ.get('WR_IMAGE_ID') == proof['runtime']['image']['Id'], 'Own source/actual image proof differs')
+    require(proof['source_binding'] == own and proof['protocol_identity'] == selected_protocol_pin(p) and os.environ.get('WR_IMAGE_ID') == proof['runtime']['image']['Id'], 'Own source/actual image proof differs')
     cid = out/(phase+'.cid'); s = cid.lstat()
     require(s.st_uid == 0 and stat.S_ISREG(s.st_mode) and s.st_nlink == 1 and re.fullmatch(b'[0-9a-f]{64}\n?', cid.read_bytes()), 'Parent genuine container ID required before imports')
     return rt, acq, runtime, out, proof, deadline
@@ -383,25 +426,44 @@ def gpu_model(code, revision, p, proof_pin):
     def prepare(rgb):
         result = transform(dict(img=np.array(rgb[:, :, ::-1], copy=True)))
         require(set(result) == {'img', 'img_metas'}, 'Native image-only preprocessing required'); return result
-    c = p['procedural_RGB']; y, x = np.indices((c['height'], c['width']), dtype=np.int32)
-    rgb = np.stack(((x*3+y*5)%256, (x*7+y*11)%256, (x*13+y*17)%256), axis=2).astype(np.uint8)
+    external = 'external_RGB' in p
+    if external:
+        from PIL import Image
+        c = p['external_RGB']; exact(rt, Path(c['path']), c['identity'], 16 << 20)
+        with Image.open(c['path']) as image:
+            require(image.format == 'JPEG' and not getattr(image, 'is_animated', False) and image.width*image.height <= 16 << 20,
+                    'Actual external image with native pairs required')
+            rgb = np.asarray(image.convert('RGB'), dtype=np.uint8)
+    else:
+        c = p['procedural_RGB']; y, x = np.indices((c['height'], c['width']), dtype=np.int32)
+        rgb = np.stack(((x*3+y*5)%256, (x*7+y*11)%256, (x*13+y*17)%256), axis=2).astype(np.uint8)
     operations = NativeHOIOperations(prepare, collate, scatter, bbox_cxcywh_to_xyxy, batched_nms, torch, torch.device('cuda:0'))
     result = infer_hoi_detr_frame(model, rgb, c['original_frame_index'], operations); torch.cuda.synchronize(); runtime.check(deadline)
+    if external:
+        require(len(result.hand_object_pairs) >= c['minimum_native_hand_object_pairs'], 'Actual external image with native pairs required')
+        exact(rt, Path(c['path']), c['identity'], 16 << 20)
     arrays = {k: v for k, v in vars(result).items() if isinstance(v, np.ndarray)}
     with (out/'observations.npz').open('xb') as stream: np.savez_compressed(stream, **arrays); stream.flush(); os.fsync(stream.fileno()); os.fchmod(stream.fileno(), 0o444)
     exact(rt, DATA/'weights/epoch_5.pth', p['acquisition']['checkpoint'], 6_000_000_000); check_inventory(rt, root/'source', proof['overlay']['source']); check_inventory(rt, root/'site', proof['overlay']['site']); check_inventory(rt, mmcv_root, proof['runtime']['manifest']['artifacts'])
     require(source(rt, code, revision) == proof['source_binding'], 'Current full source changed after actual model')
     value = dict(stage='hoi_detr_full_native_model', status='pass', source_binding=proof['source_binding'], checkpoint_identity=p['acquisition']['checkpoint'], strict_checkpoint=loaded, checkpoint_buffer_schema=buffer_schema,
-                 versions=versions, configuration=overrides, actual_full_model=True, native_forward_calls=1, procedural_rgb_identity=dict(bytes=rgb.nbytes, sha256=hashlib.sha256(rgb.tobytes()).hexdigest()),
+                 versions=versions, configuration=overrides, actual_full_model=True, native_forward_calls=1, decoded_rgb_identity=dict(bytes=rgb.nbytes, sha256=hashlib.sha256(rgb.tobytes()).hexdigest()),
                  preprocessing='original_LoadImageFromWebcam_BGR_input_then_native_test_pipeline', decoder_queries=1500, original_frame_index=c['original_frame_index'], native_cpu_softNMS=True,
                  hand_object_pairs=len(result.hand_object_pairs), object_target_pairs=len(result.object_target_pairs), observations=rt.identity(out/'observations.npz', 32 << 20),
                  original_source_unchanged=True, checkpoint_rehashed_after=True, overlays_rehashed_after=True, elapsed_seconds=time.monotonic()-proof['started_monotonic'], **{k: False for k in FLAGS})
+    if external:
+        value.update(scope=p['scope'], external_rgb_identity=c['identity'], actual_native_pair_head_executed=True,
+                     original_image_size=result.image_size, retained_role_counts=[int((result.class_ids == i).sum()) for i in range(3)])
+    else:
+        value['procedural_rgb_identity'] = value.pop('decoded_rgb_identity')
     acq.write_receipt(out/'native.json', value, proof['started_monotonic'], deadline); require(value['status'] == 'pass', 'Model receipt late/failure')
 
 
 def container_plan(code, out, revision, p, proof, phase, deadline):
     name = 'world-reward-hoi-model-'+phase+'-'+revision[:12]; cid = out/(phase+'.cid'); image_id = proof['runtime']['image']['Id']; overlay = out/'.overlay'
     mounts = [(code.parent, code.parent, True), (out, out, False)] if phase == 'overlay' else [(code.parent, code.parent, True), (out, out, False), (overlay, overlay, True), (DATA/'weights/epoch_5.pth', DATA/'weights/epoch_5.pth', True)]
+    if phase == 'model' and 'external_RGB' in p:
+        f = Path(p['external_RGB']['path']); mounts.append((f, f, True))
     args = ['docker', 'create', '--name', name, '--cidfile', str(cid), '--label', 'world-reward.job='+ENTRY, '--label', 'world-reward.revision='+revision,
             '--network', 'none', '--read-only', '--user', '1000:1000', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--cpus', str(p['gpu_cpus'] if phase == 'model' else p['cpu_cpus']),
             '--memory', p['gpu_memory'] if phase == 'model' else p['cpu_memory'], '--tmpfs', '/tmp:rw,nosuid,size=2g', '--entrypoint', '/usr/bin/env']
@@ -410,6 +472,7 @@ def container_plan(code, out, revision, p, proof, phase, deadline):
     args += [image_id, '-i', 'PATH=/opt/conda/bin:/usr/local/cuda/bin:/usr/bin:/bin', 'HOME=/tmp', 'PYTHONDONTWRITEBYTECODE=1', 'WR_ROOT='+str(ROOT), 'WR_CODE='+str(code), 'WR_CODE_REVISION='+revision,
              'WR_IMAGE_ID='+image_id, 'WR_MODEL_DEADLINE='+format(deadline, '.17g'), 'OMP_NUM_THREADS=4', 'OPENBLAS_NUM_THREADS=4', 'CUDA_VISIBLE_DEVICES=0' if phase == 'model' else 'CUDA_VISIBLE_DEVICES=-1',
              '/opt/conda/bin/python', '-I', '-B', str(code/HELPERS[0]), '--'+phase, '--proof-bytes', str(proof['pin']['bytes']), '--proof-sha256', proof['pin']['sha256']]
+    if 'external_RGB' in p: args.append('--external-rgb')
     return name, cid, mounts, args
 
 
@@ -436,15 +499,16 @@ def cleanup(runtime, cidfile, name, revision, image_id, deadline):
     require(not runtime.command(['docker', 'ps', '-aq', '--no-trunc', '--filter', 'id='+cid], deadline), 'Own CID survived cleanup'); runtime.absent(name, deadline); cidfile.chmod(0o444)
 
 
-def run(code, revision, *, opener=None):
+def run(code, revision, *, opener=None, external_rgb=False):
     import fcntl
-    started = time.monotonic(); rt, mp, acq, runtime = load_helpers(code); own = source(rt, code, revision); p = protocol(rt, code); deadline = started+p['budget_seconds']
+    started = time.monotonic(); rt, mp, acq, runtime = load_helpers(code); own = source(rt, code, revision); p = protocol(rt, code, external_rgb=external_rgb); deadline = started+p['budget_seconds']
     require(sys.platform == 'linux' and os.geteuid() == 0 and os.uname().nodename == 'world-reward-ncc-h100-02' and os.environ.get('WR_ROOT') == str(ROOT), 'Exact Azure root host required')
     qualified = authenticate_runtime(rt, runtime, p, deadline); acquired, manifest = authenticate_acquisition(rt, acq, p)
+    external_frozen = authenticate_external_rgb(rt, p) if external_rgb else {}
     out = rt.canonical(ROOT/p['output']); require(not out.exists() and out.parent.is_dir(), 'Fresh model qualification namespace required'); out.mkdir(mode=0o755); os.chown(out, 1000, 1000)
     s = out.lstat(); own_inode = (s.st_dev, s.st_ino, s.st_uid); overlay = out/'.overlay'; overlay.mkdir(mode=0o755); os.chown(overlay, 1000, 1000); s = overlay.lstat(); overlay_inode = (s.st_dev, s.st_ino, s.st_uid)
-    proof = dict(source_binding=own, protocol_identity=PROTOCOL_PIN, runtime=qualified, acquisition=dict(report_identity=acquired['report_identity'], source_manifest_identity=acquired['source_manifest_identity'], source_binding=acquired['source_binding']), started_monotonic=started)
-    report = dict(stage='hoi_detr_model_qualification', status='fail', phase='preflight', producer_revision=revision, source_binding=own, protocol_identity=PROTOCOL_PIN,
+    proof = dict(source_binding=own, protocol_identity=selected_protocol_pin(p), runtime=qualified, acquisition=dict(report_identity=acquired['report_identity'], source_manifest_identity=acquired['source_manifest_identity'], source_binding=acquired['source_binding']), started_monotonic=started)
+    report = dict(stage='hoi_detr_image_probe' if external_rgb else 'hoi_detr_model_qualification', scope=p['scope'], status='fail', phase='preflight', producer_revision=revision, source_binding=own, protocol_identity=selected_protocol_pin(p),
                   runtime_report_identity=qualified['report_identity'], acquisition_report_identity=acquired['report_identity'], actual_model_qualified=False, source_rehashed_after=False, inputs_rehashed_after=False,
                   image_unchanged=False, owned_containers_removed=False, owned_overlay_removed=False, **{k: False for k in FLAGS})
     containers = []; lock_fd = None; failure = None; owned, dirs = [], set()
@@ -503,6 +567,7 @@ def run(code, revision, *, opener=None):
             for path, pin in qualified['frozen'].items(): exact(rt, Path(path), pin, 2 << 20)
             old_source(rt, acquired['source_binding'], acq.JOB, acq.HELPERS)
             old_source(rt, qualified['report']['source_binding'], runtime.ENTRY, runtime.HELPERS)
+            for path, pin in external_frozen.items(): exact(rt, Path(path), pin, 16 << 20)
             if (out/'FairScale.LICENSE').exists(): exact(rt, out/'FairScale.LICENSE', row_pin(p['fairscale']['publisher_license']), 64 << 10)
             report['inputs_rehashed_after'] = True; report['source_rehashed_after'] = source(rt, code, revision) == own; report['image_unchanged'] = runtime.image(qualified['image']['Id'], grace) == qualified['image']
             runtime.remove_owned_folder(rt, overlay, overlay_inode, out); report['owned_overlay_removed'] = True
@@ -531,8 +596,9 @@ def run(code, revision, *, opener=None):
 
 def main():
     parser = argparse.ArgumentParser(allow_abbrev=False); group = parser.add_mutually_exclusive_group(); group.add_argument('--overlay', action='store_true'); group.add_argument('--model', action='store_true')
+    parser.add_argument('--external-rgb', action='store_true')
     parser.add_argument('--proof-bytes', type=int); parser.add_argument('--proof-sha256'); args = parser.parse_args()
-    code = Path(os.environ['WR_CODE']); revision = os.environ['WR_CODE_REVISION']; rt, _, acq, _ = load_helpers(code); p = protocol(rt, code)
+    code = Path(os.environ['WR_CODE']); revision = os.environ['WR_CODE_REVISION']; rt, _, acq, _ = load_helpers(code); p = protocol(rt, code, external_rgb=args.external_rgb)
     if args.overlay or args.model:
         require(type(args.proof_bytes) is int and args.proof_bytes > 0 and re.fullmatch('[0-9a-f]{64}', args.proof_sha256 or ''), 'Independent native proof pin required')
         phase = 'overlay' if args.overlay else 'model'
@@ -545,7 +611,7 @@ def main():
                 acq.write_receipt(out/name, dict(stage='hoi_detr_'+phase, status='fail', error_type=type(exc).__name__, requirement=failure_requirement(exc, runtime), phase='native_execution', **{k: False for k in FLAGS}), time.monotonic(), float(os.environ['WR_MODEL_DEADLINE']))
             raise
     else:
-        value = run(code, revision); print(json.dumps({k: value[k] for k in ('stage', 'status', 'phase', 'elapsed_seconds')}))
+        value = run(code, revision, external_rgb=args.external_rgb); print(json.dumps({k: value[k] for k in ('stage', 'status', 'phase', 'elapsed_seconds')}))
 
 
 if __name__ == '__main__':
