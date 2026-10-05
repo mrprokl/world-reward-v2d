@@ -10727,3 +10727,21 @@ selector was tested. All prediction arrays/media remain on Azure.
 e91798b signed-DEB transport correction dispatched once as masa-sm90-build-v2
 with unchanged original full-source compile/budgets/ABI. Actual VM02PID473756
 active, no compiler receipt at observation; all earlier failures stay closed.
+
+EP19 fixed-shape native surface pose independently ARTIFACT PASS1906.324533s,
+all443 original frames. Original producer66bfceb;341 Git source files,
+full-input BEFORE/AFTER proof, saved hashes/readonly seals and actual owned
+process/cgroup/CID-name absence verified. A collected systemd unit supplies
+no known exit status and is not used as proof. Report22516136B/
+1b647ee931aa37ed6dc98d915753041618b5e29f8700721860eddc514f022dfe;
+NPZ86450B/f9d26115bd26ce52e95f652c6d05991c1076543ac5b2c6093e0bd0d380b1d41a;
+GLB74296B/0935643f0d4e2f6b78aefc672605d66d742a2186a9284a8a1040abb71516b7e8.
+Proof263091B/e25e4aa14436f0481f8a43cea00f27431f48d5285f208ad201cf72dc57fc1922.
+No interaction-quality or actor-selection improvement follows. EP20/22 remain
+active at observation. EP23/16 final audits stopped on observer-only missing
+WR_CODE/wild_export-key assumptions; no producer failure is inferred.
+
+MASA signed-DEB CPU v2 actual native log reaches toolchain_probe, sm90_probe
+and full_original_build: transitive ATen/Python11 and native SM90 test compiled,
+full original package compilation still running. This is progress, not final
+wheel/CPU-child/GPU-operator/model or ownership qualification.
