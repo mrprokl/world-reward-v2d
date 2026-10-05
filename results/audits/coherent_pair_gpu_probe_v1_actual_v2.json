@@ -1,0 +1,35 @@
+{
+  "adoption": false,
+  "audit_elapsed_seconds": 0.10285965603543445,
+  "audit_error_family": "ValueError",
+  "audit_failure_stage": "full_original_git_source_before",
+  "corrected_transport_target": {
+    "resource_group": "WORLD-REWARD-RESEARCH",
+    "vm_name": "world-reward-ncc-h100-02"
+  },
+  "fit_executed": false,
+  "fixtures_rerun": false,
+  "fullbank_verified": false,
+  "gpu_used": false,
+  "models_loaded": false,
+  "observer_numeric_execution": false,
+  "observer_sha256": "09ff71f6b37923aa2906fc17291133975bcd1eb6eee51b4503c16ae8124f1209",
+  "prior_target_error_record": "results/audits/coherent_pair_gpu_probe_v1_actual.json",
+  "producer_revision": "a48aaec27772ffd0cb1a0e9e9660d2da84560186",
+  "quality_verified": false,
+  "references_read": false,
+  "rgb_read": false,
+  "saved_only": true,
+  "schema": "world_reward.coherent_pair_gpu_probe_independent_actual.v1",
+  "status": "inconclusive",
+  "transport_cli_exit": 0,
+  "unit": "world-reward-coherent-pair-gpu-probe-v1.service",
+  "unit_state": {
+    "ActiveState": "failed",
+    "ExecMainStatus": "1",
+    "LoadState": "loaded",
+    "MainPID": "0",
+    "Result": "exit-code",
+    "SubState": "failed"
+  }
+}
