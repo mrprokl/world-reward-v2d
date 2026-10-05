@@ -10941,3 +10941,14 @@ surface source; ACK only. RAM~327GB/load1=1.27, one existing GPU container.
 Historical CPU wrapper lacks Docker CPU/memory caps; **only17**, no concurrent19.
 Detailed compact manifest: results/audits/coverage_17_19_20_handoff.json.
 275current profile/transport/native-contract tests PASS0.51s.
+
+
+Six-bank replica first execution93ad4ef CLOSEDFAIL0.498399s before any upload:
+VM01's managed identity had only Reader on runtime-transfers (Contributor on
+qa-previews), unlike VM02's runtime-transfers Contributor. Exact original263
+files/source and26,388,480B archive independently authenticated; no inference,
+no local media. Receipt1410B SHA59acce6d28af7f1c5793f0fc8c82f2dc930043c138eebd6a9f9793d1fcddad90
+remains failed. A narrowly scoped temporary VM01 container Contributor grant
+was requested for Azure-only export; remove only that newly created assignment
+after verified import/cleanup. Existing Reader/other assignments unchanged.
+No storage keys, public access or SAS workaround. New namespace required for retry.
