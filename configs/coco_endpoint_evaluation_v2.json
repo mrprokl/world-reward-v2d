@@ -1,0 +1,45 @@
+{
+  "schema": "world_reward.coco_endpoint_evaluation.v2",
+  "slots": 64,
+  "development_slots": 32,
+  "reserved_slots": 32,
+  "minimum_acquired_development_images_before_reference_access": 24,
+  "primary_iou": 0.5,
+  "object_budgets": [
+    32,
+    128,
+    3600
+  ],
+  "primary_object_budget": 128,
+  "person_gate": 0.7,
+  "object_gate": 0.7,
+  "missing_slot_recall": 0.0,
+  "budget_seconds": 180,
+  "memory_bytes": 6442450944,
+  "image_id": "sha256:fd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252",
+  "quality_verified": false,
+  "ownership_verified": false,
+  "adoption": false,
+  "helper_pins": {
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "src/world_reward/endpoint_proposal_recall.py": {
+      "bytes": 6938,
+      "sha256": "23e1054ab2f5454e89ff41dcdfd860b0f70175af105d14e40f2690620549c984"
+    },
+    "src/world_reward/proposal_bbox_recall.py": {
+      "bytes": 6157,
+      "sha256": "25c83a1b436bc0db425852a5315c5bb03a75d622702ec66942d10ea566aeff56"
+    },
+    "src/world_reward/proposal_recall.py": {
+      "bytes": 9485,
+      "sha256": "19de52f9ee6dc01481dbb11e6cfa5743d9bafda68895f465670f7d2f82702a09"
+    },
+    "src/world_reward/owlv2_object_observations.py": {
+      "bytes": 8748,
+      "sha256": "8587489a860b44a74bc0149c67960128b6b12aa1e4d51bc07e0e52103da5b888"
+    }
+  }
+}

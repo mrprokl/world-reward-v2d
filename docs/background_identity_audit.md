@@ -371,3 +371,26 @@ posthash PASS1.425606s. No checkpoint decode/GPU/model/data or quality claim.
 The lossless objectness→generic-candidate bridge retains all3600IDs/FP32 logits,
 zero/padded/duplicate boxes and source fingerprints without ranking or filtering;
 111 related fixturesPASS.69s. It does not certify object or owner identity.
+
+
+## Fresh complete endpoint experiment — execution update
+
+The unchanged person-specific GDI recipe and image-only OWL recipe executed
+once on64 freshly frozen COCO photos,32 DEV+32 RESERVED. Historical240 OI slots
+and32 closed COCO slots are excluded before fresh selection; the new photos
+remain potentially overlapping with pretrained model training. All11.30MB
+original JPEGs stay Azure-side; no local RGB/render transfer. Census/acquisition
+independent byte/metadata audits PASS; no previous study was reopened.
+
+Actual native execution33.8373s, host39.2775s: one GDI+one OWL load,64 calls each,
+all900 raw GDI queries and3600 OWL patches per photo retained. Saved64-bank CPU
+independent audit PASS4.5162s: 17 fields/NPZ, native NMS replay, exact square-pad
+inverse, wheel RECORD/runtime/source/assets/inputs/seals rechecked.481 retained
+person proposals are a census, **not481 correct actors**. Producer7b557290140d;
+see `results/audits/rgb_endpoint_bank_v2_actual.json` for exact pins.
+
+Endpoint **recall evaluation remains pending**. Its preregistered conjunction
+is P recall≥.70 AND objectness O@128 recall≥.70, one-to-one matching IoU≥.5,
+fixed32-image macro, no compensation or best-budget rescue. Only after DEV
+passes may a separate CPU phase mount RESERVED references. Even both PASS would
+establish candidate coverage, not foreground ownership, contact or3D accuracy.
