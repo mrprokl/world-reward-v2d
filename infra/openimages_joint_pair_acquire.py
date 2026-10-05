@@ -74,13 +74,13 @@ def photo_identity(url):
 
 
 def excluded_photo_identity(url):
-    """Metadata identity only: Flickr set navigation never creates a new photo.
+    """Metadata identity only: Flickr route variants never create a new photo.
 
-    This accepts the original publisher's /in/set-... suffix for EXCLUSION,
-    never for a creator request or acquisition URL. New image rights still
+    Accept publisher /in/set-... and direct /account/photoID routes for
+    disjointness only, never for a creator request or acquisition URL. Rights
     require the unchanged exact HTTPS landing page and no redirects.
     """
-    match = re.fullmatch(r'https://www\.flickr\.com/photos/[^/?#]+/([0-9]+)(?:/in/set-[0-9]+)?/?', url)
+    match = re.fullmatch(r'https://www\.flickr\.com/(?:photos/)?[^/?#]+/([0-9]+)(?:/in/set-[0-9]+)?/?', url)
     rt.require(match is not None, 'Exact publisher Flickr exclusion identity required')
     return match.group(1)
 
@@ -126,7 +126,7 @@ def select_cohort(records, excluded, *, slots=64, dev=32):
         if not row['OriginalMD5'] or not row['AuthorProfileURL']:
             continue
         digest = md5_identity(row['OriginalMD5']); author = profile_identity(row['AuthorProfileURL'])
-        photo = photo_identity(row['OriginalLandingURL']); url = row['OriginalURL']
+        photo = excluded_photo_identity(row['OriginalLandingURL']); url = row['OriginalURL']
         if (row['ImageID'] in excluded['ids'] or digest in excluded['md5'] or url in excluded['url']
                 or photo in excluded['photo'] or author in authors or digest in hashes or photo in photos or url in urls):
             continue

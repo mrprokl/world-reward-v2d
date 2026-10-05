@@ -107,6 +107,17 @@ def test_old_flickr_set_navigation_still_excludes_exact_photo_without_request_al
         acq.excluded_photo_identity('https://www.flickr.com.evil/photos/a/300/in/set-123')
 
 
+def test_direct_publisher_route_is_metadata_identity_not_acquisition_alias():
+    row = metadata(200)
+    row['OriginalLandingURL'] = 'https://www.flickr.com/author200/300/'
+    assert acq.excluded_photo_identity(row['OriginalLandingURL']) == '300'
+    with pytest.raises(ValueError):
+        acq.photo_identity(row['OriginalLandingURL'])
+    rows = [dict(image_id=row['ImageID'], eligible=True, publisher_metadata=row), *census(2)]
+    chosen = acq.select_cohort(rows, empty_exclusions(), slots=3, dev=1)
+    assert row['ImageID'] in {r['publisher_metadata']['ImageID'] for r in chosen}
+
+
 @pytest.mark.parametrize('change', ['empty_author', 'empty_md5', 'ineligible'])
 def test_unusable_selection_does_not_fetch_or_replace(change):
     rows = census(3)

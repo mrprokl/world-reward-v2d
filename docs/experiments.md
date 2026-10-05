@@ -11037,3 +11037,19 @@ No image/prediction/metric read, sample/params unchanged.64focusedtestsPASS0.10s
 new regression explicitly forbids set-suffix acquisition URL. New unit/revision
 required for retry; old failedunit/log/source untouched. No researcher intervention
 on any image label or challenge episode.
+
+Actual19CPUprepare now ACTIVE native443T, proof249227B SHA
+4032329adfd4adc15af955814f6e9a316072fff0d140e715771dcb4a8f9ba083;
+matchedB47Docker PID2112071 confirms4e9NanoCPUs/68719476736Bmemory/256PIDs,
+noGPU DeviceRequests and3threadenv=4. Original17 remainsactive. Neither has final
+native/host receipt yet. Fresh64acquisition retry dispatchedcac708b2e7146f6d6faa702f9f09f8ab0b34c0a8,
+newunitjoint-pair-acquire-v2; originalfailednamespace/source untouched.
+
+Second acquisitioncac708b CLOSEDpreflightFAIL beforecohort/output/HTTP: one of
+270prospective records has publisher direct Flickr `/account/photoID/` URL,
+not `/photos/account/photoID/`. General metadata photoidentity now recognizes
+both variants for exact disjointness only. The ranked64 sample is unchanged by
+accessibility: this variant can remain a selected failed-rights slot; creator
+requests still require strict original `/photos/` HTTPS and no redirects.
+No alias request/fallback or substitution introduced.65focusedtestsPASS.
+Both preflightfailures occurred before sample freeze or any original-image read.
