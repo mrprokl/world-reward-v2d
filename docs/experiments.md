@@ -10044,3 +10044,16 @@ PASS0.09s cover original scales, duplicated query slots, empty native banks,
 full raw finite checks before filtering, mutation/errors and noAMP/TF32. This
 does not qualify real weights/imports/preprocessing/operators or semantic links;
 those actual Azure gates must run separately before use on any video.
+
+
+a68d9ef original MMCV native-operator gate actual CLOSED FAIL8.025526s
+at cpu_native_full_extension_build, before compiler/pip or any GPU/model/RGB.
+Full original source and minimal three wheels acquired/authenticated on Azure;
+child compile receipt fails native_execution/ValueError. Host7446B/
+7e1cf81a08676c37bc833c34d96055ff372086fe583b46eeb74f662f9f70f08a;
+compile463B/68fb858208034aed61e0d23ddb8c5395485497d413d5f6272eb99e48153aede0.
+Original source/input/base posthash and owned-container/scratch cleanup pass;
+no surviving GPU apps or owned containers. No native compatibility/quality claim.
+203 combined tiny tests PASS1.70s had qualified code contracts only; an
+independent read-only CPU assertion diagnostic will identify the real boundary
+failure before any fresh technical repair. Preserve this failed namespace/unit.
