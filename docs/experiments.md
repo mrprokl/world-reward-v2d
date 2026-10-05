@@ -10189,3 +10189,19 @@ of ALL1796fields, with no swap/update/resume/key deletion. Forward keeps origina
 non-EMA fields as the author's image-only init_detector route. Algorithm/model
 math unchanged; no benchmark-driven weight selection. CPU diagnostic did not
 load values into a model or execute GPU/inference; old strict rejection retained.
+
+b957147 whole-model v4 actual COMPLETE PASS45.292458s, including original native
+model/strict safe checkpoint load/proceduralRGB forward39.330329s. All1796
+fields are loaded (898 original plus898 native EMA backups), zero discarded,
+no EMA swap/update, no AMP/TF32. Host2967B/
+65eb67cf953a698e4c5decada37a2c051d3af23e34967610d7a40fca9413c3e5;
+native3572B/51c30b02ba9127b3a6208e6e4f2ce77469f2e6434188742ed00d72b54bdd3dcb;
+overlay2846B/8a3a80d367ccc46d40469998071311e74c980548c1e8464485af66c13eed9887.
+Saved original1500-query evidence1467466B/
+cde69df94195c9ecd3155598a61229ff48b9c406e767f3fa6bca5f1df3ccc726
+remains Azure-only. Procedural RGB produces zero surviving H→F/F→S pairs:
+this does NOT yet qualify real InteractionHead execution or semantic relation
+quality. Independent root audit authenticates full current/historical source,
+all original source/checkpoint bytes, exact runtime/image, saved evidence,
+readonly sealing and completed cleanup; no GPU apps remain. Historicalv1–3
+FAILs are preserved. No challenge RGB/private reference/quality/adoption claim.

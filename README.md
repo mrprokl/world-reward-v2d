@@ -27,6 +27,15 @@ not manual episode reassignment or another downstream fit of the wrong pair.
   this bare bank as qualified identity evidence. Learned relational observations
   are the next separate hypothesis; actor/contact/3D accuracy remain unverified.
 
+- **Learned relationship runtime:** original HOI-DETR/MMCV CUDA operators and
+  the full detector now pass independent H100 execution audits. All1796 native
+  checkpoint fields load strictly; one procedural image forward completes in
+  the45.29s host gate. No surviving relation pair on that procedural image,
+  hence no real pair-head or semantic-quality qualification yet. Next: a fresh
+  lawful attribution control on the same automatic proposals, not tuning the
+  rejected HO-Cap cohort or challenge episodes. Benchmark rights/training
+  overlap and submission eligibility remain separate unresolved gates.
+
 - **New generic operators:** [surface identity/LOD](docs/surface_lod_protocol.md)
   separates lawful open surfaces from our optional closed-solid backend; no
   historical failure is relabeled. Under-budget identity and
