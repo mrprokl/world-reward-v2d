@@ -1,0 +1,87 @@
+{
+  "Azure_RC_calls": 1,
+  "FIT_performed": false,
+  "GPU_used": false,
+  "HTTP_used": false,
+  "NPZ_values_interpreted": false,
+  "RGB_decoded": false,
+  "RGB_transferred": false,
+  "adopted": false,
+  "audit_elapsed_seconds": 3.2806280250079,
+  "audit_status": "partial",
+  "azure_runcommand_terminal": true,
+  "current_archive_xz": {
+    "bytes": 306368,
+    "sha256": "85bb317dddf5b8593d8b5cb6699d8f1c2aad4755e7f1cdb40ef1df9e2916e3a9"
+  },
+  "current_source_closure_sha256": "5a887a03a8a790d07321e67814e0495a04da33bb130e293516c004da8c41536e",
+  "error_stage": "current_host_native_proof",
+  "error_type": "ValueError",
+  "host_elapsed_seconds": 7.208750985038932,
+  "host_error_types": {},
+  "host_status": "pass",
+  "metrics_recomputed": false,
+  "models_loaded": false,
+  "native_error_types": {},
+  "native_phase": "complete",
+  "native_rerun": false,
+  "native_status": "pass",
+  "observed_unit_exit": null,
+  "observer_command_identity": {
+    "bytes": 30437,
+    "sha256": "5f524fa2150c732cf3f55a907b6713eeccd32017236e2da2dcc4c2e9dd9032d9"
+  },
+  "observer_mechanical_repairs": 0,
+  "observer_source_identity": {
+    "bytes": 15735,
+    "sha256": "b1d1d88521cbddb3b4aa98d0624e0eb7d905ccaf7bb211eda7050930abfed02e"
+  },
+  "original_Git_files": {
+    "bank": 316,
+    "build": 58,
+    "census": 300,
+    "current": 336,
+    "kernel": 60,
+    "owl": 283,
+    "owl_assets": 273,
+    "prepare": 303
+  },
+  "output_identities": {
+    ".container.cid": {
+      "bytes": 64,
+      "sha256": "0573522efbeab5818fce05ffe00ce9495d2596c07d2d10eca659739493a9eec8"
+    },
+    "host.json": {
+      "bytes": 7251,
+      "sha256": "39ba9fc3d923662e697b27f379c144ef389f5317394ece3f116f78110ce260c9"
+    },
+    "native.json": {
+      "bytes": 6961,
+      "sha256": "f9363e9d9c01d28a10316da5263be66daa23363836c56017d9689d1bc3fd2119"
+    },
+    "proof.json": {
+      "bytes": 323205,
+      "sha256": "1dd1e980db77711dae672196bd116b73eb2ad1f985db5ddf4de4205e39fdb37d"
+    }
+  },
+  "ownership_verified": false,
+  "partial_outputs_rehashed_after": true,
+  "partial_sources_rehashed_after": true,
+  "producer_driver_absent": true,
+  "producer_revision": "d2811caa98f3b3333d8ba4032ad755311e6f391a",
+  "quality_verified": false,
+  "references_decoded": false,
+  "saved_only": true,
+  "schema": "world_reward.vcoco_pilot_pair_capacity_saved_audit.v1",
+  "scope_limitation": "Independent saved-only provenance/publication and declared DEV scalar audit, not metric recomputation. No reference or NPZ values/RGB decoded, model/GPU/network/replay. Source-bound technical PASS separate from fixed8 scientific capacity; collected unit historical exit explicitly unavailable.",
+  "transport_exit_status": 0,
+  "unit_exit_independently_available": false,
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  }
+}

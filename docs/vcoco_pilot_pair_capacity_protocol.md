@@ -50,3 +50,24 @@ Driver34515 bytes/SHA256
 `b8bb22698a9c2a15f91ba8013f448a948e483de1ee95e570c0d159c31a7c3761`.
 No concrete source blocker found; only actual execution can qualify the
 producer/consumer boundary and proposal gate.
+
+## Actual saved execution and decision
+
+Producerd2811caa98f3b3333d8ba4032ad755311e6f391a executes host7.208751s,
+native1.299358s, technical PASS. All16 original17-array banks validated before
+8DEV references. Fixed8 macro localized-positive-pair proposal recall0.916667
+passes0.7; person0.9375/object1.0. DEV declares17 localized positive pairs and
+48 person proposals. Continuous-IoU matching uses full same-image context;
+this is not official AP or correct target selection. No RESERVED references
+opened, DWPose/HOI/FIT executed, or selector/ownership/3D gain measured.
+
+Independent saved-only observerV1 is preserved PARTIAL: serializing original
+int mapping keys and parsed JSON string keys with sorted keys orders10 versus2
+differently. One observer comparison uses the genuine JSON roundtrip instead,
+without changing the producer/evaluator/metrics. Authored roundtrip16 and five
+key/value/slot/reference/source tamper controls pass; repaired observerV2
+PASS5.857283s verifies complete source/proof/inputs/runtime/output seals and
+CID/name/producer absence before/after. It does not recompute metrics or open
+reference/NPZ values. Collected systemd historical exit is UNAVAILABLE, not0.
+See both concise actual audits in results/audits. Capacity authorizes only
+consideration of separately frozen observations, never RESERVED/quality/FIT.

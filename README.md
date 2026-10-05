@@ -31,10 +31,19 @@ VM01 execution profile now passes sealed tiny GPU arithmetic checks in7.24s
 The new full-bank score/VJP control also passes: all1,843,200 procedural routes,
 28,800 native rows and14,400 grouped rows agree with CPU FP64; host84.79s,
 peak GPU reservation644MB. This is measured arithmetic cost, not an objective,
-optimizer, FIT or selection-quality result. Fresh V-COCO/COCO2014 metadata and
-its exclusion-safe role census pass independent audits:199 eligible VAL photos
-and362 TEST, after432 historical photo exclusions. Next is a separately frozen
-8DEV/8reserved unfitted pilot; no RGB, learned selector or accuracy result yet.
+optimizer, FIT or selection-quality result. The full objective/FD subcontrols
+now pass (72 prescribed calls); the complete control remains FAIL on a strict
+SciPy metadata gate, with a verified general empty-file ABI repair undergoing
+one fresh unchanged technical control. Fresh V-COCO/COCO2014 metadata and its
+exclusion-safe role census pass independent audits:199 eligible VAL photos
+and362 TEST, after432 historical photo exclusions. The separately frozen16-photo
+pilot is fully acquired on Azure and complete GDI/OWL banks are sealed. Its
+DEV-only fixed8 joint positive-pair proposal ceiling passes91.67% at continuous
+IoU0.5 (gate70%; person93.75%, object100%). All16 banks were validated before
+8DEV references; RESERVED semantics stay unopened. This is candidate coverage,
+not learned actor selection, anatomical ownership, unseen pretraining or a
+CARI4D/leaderboard gain. Next: separately frozen person-attached pose and
+relational observations, then legal fresh FIT/calibration and held-out quality.
 The first strict VG/COCO-linked reference census
 completes but yields0 eligible photos: this path is closed without RGB, relaxed
 joins or retries. Fresh external validation remains necessary.
