@@ -9560,3 +9560,45 @@ authenticated before/after; no model, network, GPU, fit or output adoption.
 Native30s/host75s inclusive, stdin explicitly forwarded to offline CPU container.
 Root32tinyPASS0.27s (manufactured arrays/AST only). Actual certificate remains
 unexecuted; original authored six-scene failure is never reopened or promoted.
+
+Actual saved-only694dcee diagnostic completed0.067511s, original full28-column
+gate INCONCLUSIVE (rank25/aug26); no membership/nonmembership inferred from it.
+Independent current215-entry closure65a68031161d943307910f8e390601de88f385afdd0cdef61c0eb272f72b1036
+and all five original files rehashed unchanged. Log3180B/b998975a82ab440b7476c93307246ad56a4611cb79a6fce6782b8c19f7ab27ed.
+Separate saved-only structural census0.180568s finds exactly zero PCA coefficient
+columns0,1,2. Removing ONLY these identically zero columns preserves the exact
+affine image; remaining25 columns rank25/aug26 certify rational zero68 outside
+that image. No fit, SVD, threshold or prime search. This does NOT rule out an
+FP32-rounded zero, a tolerance-compatible approximation or other valid scales.
+All seven fixed scale coordinates examined: eye136:138 mean0/zero component;
+hip147/148,knee151,ankle152 each has ONE nonzero coefficient. Thus a distinct
+scene-independent minimum-norm reference may be evaluated analytically before
+any new cohort, with literal all68 bounds and subsequent nativeFP32 expansion.
+The zero-reference SAM bridge is not presumed compatible; direct JIT forward
+qualification stays valid. No old failed cohort is retuned/reopened.
+
+Full399 EP26native CPUprepare c1c101a completed2635.369099s, but originalhost
+FAIL2647.783298s retains exact old Dockernewline reader failure. Native17527B/
+92bc81aca12f1b95eefeaf87a39814d143daba0e4847609d0006b8956b63d314;
+host578B/9ccc3f69d5b6b87b0284049084b5cf07dfed09f90935ca8dc55376ce606f04ba;
+proof225249B/89e25ab32707e1837c9e68d6ac945350f97008de97aaaa92e07477fcdb239bc1.
+Independent saved-native attestation PASS (distinctscope, originalHOSTFAILnot
+relabelled): full309-entry sourcebf8a56a2a4508b5f22c57163eb14f13cf8557ffbda901f97bb79fbe409844fa0,
+oldhost completepostledger executedreadonly, allinputs/source/15outputs rehashed,
+exactCID absent and originalreader rejects its singleLF. CPU savedGLB/F32
+399poses preserve2068vertices/4096faces/14components, actualroundtrip2.596142453e-7m.
+No model/solver/GPU/re-render, no changes to preparedbytes. Subsequent inputpins
+must retain c1nativeproducer, not claim attestor produced predictions.
+
+Fresh direct-MHR gradient component adds one explicit caller mode, not a new
+optimizer backend: centre2^-5 on four already-authenticatednamedarticulations,
+all16±perturbations frozenbeforedecode at steps2^-8/2^-10; exactly2F32forwards,
+oneVJP to inputonly, fullvertices+skeletonposition fixedlinearprobe/F64reduction.
+Both directional gates atol1e-5m/unit+rtol1e-2 fixed beforeexecution. Identity,
+expression/scales/weights/inputs/metadata unchanged; no root/70/quaternion/full
+Jacobian/contact/accuracy claim. Root280tinyPASS20.53s incl transportregression;
+actualMHR autograd remains unexecuted. Defaultnamed mode/oldreceipts unaffected.
+Limited source-only scale-reference primitive proposes each distinctone-sparse
+equality coefficient once viaF64ratio→F32, others0, neverQP/search/clamp. CPU
+boundsdiagnostic retains failures and explicitly cannot qualify CUDAexpansion;
+realhipdepth scalarF32case +2^-37 fails literalzero, no neighbor/epsilonrescue.

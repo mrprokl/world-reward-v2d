@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
-# Source closure: /infra/mhr_direct_qualify.py /infra/mhr_direct_bridge.py
+# Source closure: /infra/mhr_direct_qualify.py /infra/mhr_direct_bridge.py /infra/mhr_direct_gradients.py
 set -euo pipefail
-(( $#==0 )) || exit 2
+ARGS=();export WR_MHR_DIRECT_CONTROL=named
+if (( $#==1 )) && [[ "$1" == --gradients ]];then ARGS=(--gradients);export WR_MHR_DIRECT_CONTROL=gradients
+elif (( $#!=0 ));then exit 2;fi
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 [[ "$(uname -s)" == Linux && "$(id -u)" == 0 && "$ROOT" == /srv/scenesmith/world-reward \
  && "$REV" =~ ^[0-9a-f]{40}$ && "$CODE" == "$ROOT/jobs/$REV/run_mhr_direct_qualify/code" ]] || exit 2
 export DOCKER_HOST="unix://$ROOT/docker.sock" PYTHONDONTWRITEBYTECODE=1
 IMAGE=sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7
-OUT="$ROOT/results/mhr-direct-qualify-$REV";CONTROL="$ROOT/results/mhr-direct-control-$REV"
-NAME="wr-mhr-direct-$REV";LOCK="$ROOT/jobs/.world-reward-h100.lock"
+STEM=mhr-direct-;NAME="wr-mhr-direct-$REV"
+if [[ "$WR_MHR_DIRECT_CONTROL" == gradients ]];then STEM=mhr-direct-gradients-;NAME="wr-mhr-direct-gradients-$REV";fi
+OUT="$ROOT/results/${STEM}qualify-$REV";CONTROL="$ROOT/results/${STEM}control-$REV"
+LOCK="$ROOT/jobs/.world-reward-h100.lock"
 host() {
  timeout --signal=TERM --kill-after=1s 30s python3 -I -B - "$ROOT" "$CODE" "$REV" "$@" <<'PYHOST'
 import json,os,sys
@@ -23,7 +27,7 @@ if mode=='before':
  control.mkdir(mode=0o755)
  q.write_receipt(control/'proof.json',proof,lambda:None)
  print('\n'.join(map(str,q.mounts(proof,code))))
-elif mode=='cleanup':q.cleanup(control,'wr-mhr-direct-'+revision,revision)
+elif mode=='cleanup':q.cleanup(control,q.container_name(revision),revision)
 elif mode=='seal':q.seal(root,code,revision,int(sys.argv[5]),sys.argv[6]=='1')
 else:raise ValueError('Explicit host control mode required')
 PYHOST
@@ -63,8 +67,8 @@ timeout --signal=TERM --kill-after=5s 123s docker run --rm --name "$NAME" --cidf
  --security-opt no-new-privileges --cpus 4 --memory 16g --user "$(id -u scenesmith):$(id -g scenesmith)" \
  --tmpfs /tmp:rw,nosuid,nodev,size=128m --entrypoint python \
  --env "WR_ROOT=$ROOT" --env "WR_CODE=$CODE" --env "WR_CODE_REVISION=$REV" --env "WR_IMAGE_ID=$IMAGE" \
- --env WR_MHR_DIRECT_LEASE=fd9 \
+ --env WR_MHR_DIRECT_LEASE=fd9 --env "WR_MHR_DIRECT_CONTROL=$WR_MHR_DIRECT_CONTROL" \
  --env "PYTHONPATH=$CODE/infra" --env PYTHONDONTWRITEBYTECODE=1 --env CUBLAS_WORKSPACE_CONFIG=:4096:8 \
  --env OMP_NUM_THREADS=4 --env OPENBLAS_NUM_THREADS=4 --env MKL_NUM_THREADS=4 --env HOME=/tmp \
  "${MOUNTS[@]}" --mount "type=bind,src=$CONTROL/proof.json,dst=$CONTROL/proof.json,readonly" \
- --mount "type=bind,src=$OUT,dst=$OUT" "$IMAGE" "$CODE/infra/mhr_direct_qualify.py"
+ --mount "type=bind,src=$OUT,dst=$OUT" "$IMAGE" "$CODE/infra/mhr_direct_qualify.py" "${ARGS[@]}"

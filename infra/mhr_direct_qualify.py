@@ -37,17 +37,41 @@ def bridge_module():
     return bridge
 
 
+def control_mode():
+    mode=os.environ.get('WR_MHR_DIRECT_CONTROL','named')
+    runtime().require(mode in ('named','gradients'),'Explicit direct component mode required')
+    return mode
+
+
+def component_module():
+    if control_mode()=='named':return bridge_module()
+    import mhr_direct_gradients as gradients
+    runtime().require(Path(gradients.__file__).resolve()==Path(__file__).parent/'mhr_direct_gradients.py',
+        'Actual immutable gradient component required')
+    return gradients
+
+
+def container_name(revision):
+    return 'wr-mhr-direct-'+('gradients-'if control_mode()=='gradients'else'')+revision
+
+
 def namespaces(root, revision):
-    return root/'results'/('mhr-direct-qualify-'+revision), root/'results'/('mhr-direct-control-'+revision)
+    stem='mhr-direct-gradients-'if control_mode()=='gradients'else'mhr-direct-'
+    return root/'results'/(stem+'qualify-'+revision), root/'results'/(stem+'control-'+revision)
+
+
+def source_helpers():
+    return (*HELPERS,'infra/mhr_direct_gradients.py')if control_mode()=='gradients'else HELPERS
+
 
 
 def host_proof(root, code, revision):
     rt=runtime();bridge=bridge_module()
     rt.require(Path(__file__).resolve()==code/HELPERS[0], 'Actual current entrypoint required')
-    before=rt.source(root,code,revision,ENTRY,HELPERS)
+    before=rt.source(root,code,revision,ENTRY,source_helpers())
     release=bridge.authenticate_release(root,code,rt)  # Must precede any JIT load.
     bridge.recheck_release(release,root,rt)
-    rt.require(before==rt.source(root,code,revision,ENTRY,HELPERS),'Current complete source changed')
+    rt.require(before==rt.source(root,code,revision,ENTRY,source_helpers()),'Current complete source changed')
     return dict(source=before, release_source=release['source'],
         release_report_identity=release['release_report_identity'],
         frozen={str(p):pin for p,pin in release['frozen'].items()},
@@ -62,7 +86,7 @@ def mounts(proof, code):
 
 
 def execute_control(proof, torch, bridge, check, *, event=lambda _:None):
-    """No dtype conversion, repeat decode, gradients or downstream inference."""
+    """One authenticated load and explicit component; no dtype conversion/retry."""
     check()
     with torch.jit.optimized_execution(False):
         event('model_load_attempts')
@@ -101,14 +125,14 @@ def write_receipt(path, record, check, *, maximum=1<<20, seal_parent=False):
 
 
 def native(root, code, revision, image):
-    rt=runtime();out,control=namespaces(root,revision);started=time.monotonic()
+    rt=runtime();mode=control_mode();out,control=namespaces(root,revision);started=time.monotonic()
     check=lambda:rt.require(time.monotonic()-started<=BUDGET,'Inclusive direct control deadline exhausted')
     rt.require(sys.platform=='linux' and os.geteuid()==1000 and image==IMAGE
         and os.environ.get('WR_MHR_DIRECT_LEASE')=='fd9'
         and {p.name for p in Path('/sys/class/net').iterdir()}=={'lo'},'Exact offline leased native runtime required')
     rt.canonical(out);rt.require(out.is_dir() and not tuple(out.iterdir())
         and out.stat().st_uid==1000 and stat.S_IMODE(out.stat().st_mode)==0o755,'Owned empty native output required')
-    record=dict(stage='mhr_direct_qualify_native_v1',status='fail',phase='authentication',producer_revision=revision,
+    record=dict(stage='mhr_direct_gradients_native_v1'if mode=='gradients'else'mhr_direct_qualify_native_v1',status='fail',phase='authentication',producer_revision=revision,
         image_id=image,budget_seconds=BUDGET,control_attempts=0,control_returns=0,model_load_attempts=0,model_load_returns=0,
         source_release_model_rehashed_after=False,models_loaded=False,SAM_checkpoint_used=False,
         dataset_read=False,private_values_read=False,gradients_verified=False,calibration_verified=False,
@@ -135,8 +159,8 @@ def native(root, code, revision, image):
         def event(key):
             record[key]+=1
             if key=='model_load_returns':record['models_loaded']=True
-        result=execute_control(proof,torch,bridge_module(),check,event=event)
-        record.update(component=result,phase='posthash')
+        result=execute_control(proof,torch,component_module(),check,event=event)
+        record.update(component=result,phase='posthash',gradients_verified=mode=='gradients')
         rt.require(host_proof(root,code,revision)==proof,'Complete source/release/model changed')
         check();record.update(status='pass',phase='complete',source_release_model_rehashed_after=True)
     except BaseException as error:
@@ -186,20 +210,20 @@ def cleanup(control, name, revision):
 
 
 def seal(root, code, revision, status, cleanup_verified):
-    rt=runtime();out,control=namespaces(root,revision);failure=None;proof=None;rehashed=False;absence=False
+    rt=runtime();mode=control_mode();out,control=namespaces(root,revision);failure=None;proof=None;rehashed=False;absence=False
     try:
         before=rt.strict((control/'proof.json').read_bytes());proof=host_proof(root,code,revision)
         rt.require(proof==before,'Original complete source/release/model changed')
         rehashed=True
         rt.require(cleanup_verified,'Owned cleanup not verified')
-        cleanup(control,'wr-mhr-direct-'+revision,revision)  # Independent final CID absence.
+        cleanup(control,container_name(revision),revision)  # Independent final CID absence.
         absence=True
         record=rt.pinned(out/'native.json',rt.identity(out/'native.json',1<<20),1<<20)
-        wanted=dict(stage='mhr_direct_qualify_native_v1',status='pass',phase='complete',producer_revision=revision,
+        wanted=dict(stage='mhr_direct_gradients_native_v1'if mode=='gradients'else'mhr_direct_qualify_native_v1',status='pass',phase='complete',producer_revision=revision,
             image_id=IMAGE,budget_seconds=120,control_attempts=1,control_returns=1,
             model_load_attempts=1,model_load_returns=1,
             source_release_model_rehashed_after=True,models_loaded=True,SAM_checkpoint_used=False,dataset_read=False,
-            private_values_read=False,gradients_verified=False,calibration_verified=False,
+            private_values_read=False,gradients_verified=mode=='gradients',calibration_verified=False,
             native_end_to_end_qualified=False,repeatability_verified=False,reconstruction_accuracy_verified=False,adoption=False,
             jit_optimized_execution=False,execution_dtype='float32',deterministic_algorithms=True,TF32=False,seed=0)
         rt.require(status==0 and all(type(record.get(k))is type(v)and record[k]==v for k,v in wanted.items())
@@ -211,12 +235,28 @@ def seal(root, code, revision, status, cleanup_verified):
             parameter_limit_hard_enforcement_claimed=False,supplied_live_model_load_authenticated_by_this_function=False,
             SAM_checkpoint_used=False,keypoint70_bridge_qualified=False,render_calls=0,tracker_calls=0,optimizer_calls=0,
             contact_verified=False,RGB_only_reconstruction_verified=False,quality_verified=False,adoption=False)
-        rt.require(all(type(component.get(k))is type(v)and component[k]==v for k,v in expected.items())
-            and component['frame_index']==list(range(9))and len(component['controls'])==4 and len(component['named_rows'])==9,
-            'Complete unchanged bridge component required')
+        if mode=='gradients':
+            expected=dict(stage='mhr_direct_directional_autograd_component_v1',status='pass',
+                native_forward_calls=2,decoded_frames=17,vjp_calls=1,forward_dtype='float32',
+                scalar_reduction_dtype='float64',apply_correctives=True,native_inputs_unchanged=True,
+                constant_identity_expression_scale=True,weights_version_unchanged=True,weight_gradients_none=True,
+                metadata_rehashed_after=True,root_gradients_qualified=False,full_jacobian_qualified=False,
+                keypoint70_bridge_qualified=False,quaternion_gradients_qualified=False,render_calls=0,
+                tracker_calls=0,optimizer_calls=0,SAM_checkpoint_used=False,contact_verified=False,
+                quality_verified=False,backend_adoption=False)
+            rt.require(component['parameters']==list(component_module().PARAMETERS)
+                and component['centre']==2**-5 and component['finite_difference_steps']==[2**-8,2**-10]
+                and component['directional_atol_m_per_unit']==1e-5 and component['directional_rtol']==1e-2
+                and len(component['comparisons'])==8 and len(component['material_support_motion'])==4,
+                'Complete predeclared directional component required')
+        else:
+            rt.require(component['frame_index']==list(range(9))and len(component['controls'])==4
+                and len(component['named_rows'])==9,'Complete original named component required')
+        rt.require(all(type(component.get(k))is type(v)and component[k]==v for k,v in expected.items()),
+            'Complete unchanged explicit component required')
         rt.require({p.name for p in out.iterdir()}=={'native.json'},'No generated geometry/predictions retained')
     except BaseException as error:failure=error
-    host=dict(stage='mhr_direct_qualify_host_v1',status='fail'if failure else'pass',producer_revision=revision,
+    host=dict(stage='mhr_direct_gradients_host_v1'if mode=='gradients'else'mhr_direct_qualify_host_v1',status='fail'if failure else'pass',producer_revision=revision,
         original_exit_status=status,owned_container_absence_verified=absence,
         source_release_model_rehashed_after=rehashed,adoption=False,
         native_report_identity=rt.identity(out/'native.json',1<<20)if(out/'native.json').exists()else None)
@@ -236,7 +276,10 @@ def seal(root, code, revision, status, cleanup_verified):
 
 
 def main():
-    argparse.ArgumentParser(description=__doc__,allow_abbrev=False).parse_args()
+    parser=argparse.ArgumentParser(description=__doc__,allow_abbrev=False)
+    parser.add_argument('--gradients',action='store_true')
+    args=parser.parse_args()
+    runtime().require(args.gradients==(control_mode()=='gradients'),'Native/host explicit component mode differs')
     root=Path(os.environ['WR_ROOT']);code=Path(os.environ['WR_CODE']);revision=os.environ['WR_CODE_REVISION']
     runtime().require(root==Path('/srv/scenesmith/world-reward'),'Exact Azure root required')
     native(root,code,revision,os.environ['WR_IMAGE_ID'])

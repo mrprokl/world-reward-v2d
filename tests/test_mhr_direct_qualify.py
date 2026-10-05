@@ -201,3 +201,29 @@ def test_write_postseal_failure_demotes_pass_under_restrictive_umask(tmp_path):
             q.write_receipt(directory/'report.json',record,fail_after_seal,seal_parent=True)
     finally:os.umask(previous)
     assert json.loads((directory/'report.json').read_text())['status']=='fail'
+
+
+def test_explicit_gradient_mode_keeps_named_scope_and_namespace_separate(monkeypatch,tmp_path):
+    revision='a'*40
+    monkeypatch.delenv('WR_MHR_DIRECT_CONTROL',raising=False)
+    assert q.control_mode()=='named' and q.component_module() is q.bridge_module()
+    assert q.container_name(revision)=='wr-mhr-direct-'+revision
+    assert q.namespaces(tmp_path,revision)[0].name=='mhr-direct-qualify-'+revision
+    assert 'infra/mhr_direct_gradients.py' not in q.source_helpers()
+    monkeypatch.setenv('WR_MHR_DIRECT_CONTROL','gradients')
+    assert q.component_module().__file__.endswith('/infra/mhr_direct_gradients.py')
+    assert q.container_name(revision)=='wr-mhr-direct-gradients-'+revision
+    assert q.namespaces(tmp_path,revision)[0].name=='mhr-direct-gradients-qualify-'+revision
+    assert 'infra/mhr_direct_gradients.py' in q.source_helpers()
+    monkeypatch.setenv('WR_MHR_DIRECT_CONTROL','unknown')
+    with pytest.raises(ValueError):q.control_mode()
+
+
+def test_gradient_wrapper_mode_is_explicit_and_forwarded_without_new_gpu_path():
+    source=(ROOT/'infra/run_mhr_direct_qualify.sh').read_text()
+    assert 'ARGS=();export WR_MHR_DIRECT_CONTROL=named' in source
+    assert '[[ "$1" == --gradients ]]' in source
+    assert 'elif (( $#!=0 ));then exit 2;fi' in source
+    assert '--env "WR_MHR_DIRECT_CONTROL=$WR_MHR_DIRECT_CONTROL"' in source
+    assert '"$CODE/infra/mhr_direct_qualify.py" "${ARGS[@]}"' in source
+    assert source.count('docker run')==1
