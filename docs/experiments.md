@@ -10520,3 +10520,16 @@ not changed artifacts or runtime reruns. Data-free native qualifier now records
 only fixed sub-gates and allowlisted first exception classes, never exception
 text/arguments; core math/config/runtime AST stays unchanged. Parent135 combined
 tiny tests PASS2.69s. Real H100/checkpoint qualification is a separate fresh job.
+
+603272b fifth preregistered native-coverage surface proposal EP20 COMPLETE PASS
+299.424800s/full549source frames, original one-QSlim route/six components.
+Host1433122B/924d0eb2e087eed7697b00dc60fce7b56017034f085da59a78637bbe8ada1dfe;
+native1305817B/0c0c8ad89f948ab1bdecbbb6298fe2cb07f3e6664b7656bca66094dab2c63a0b.
+Independent original native validation, complete producer source/qualification/
+549-frame inputs/runtime, all outputs/posthashes and owned CID/scratch absence
+PASS. Fifteen original leaf/sixteen helper pins5976B/
+1a5c5a618c36dba3d2fc9d56f4230a3d97689914e1d351d61245e2afb522ea19
+frozen for the unchanged full-index native pose consumer. First read-only audit
+left EP17 in one validation argument; correcting only that observer to EP20
+passes, without proposal rerun or artifact changes. No geometry repair, frame
+deletion, full trajectory, refinement/packing or reconstruction accuracy claim.
