@@ -389,3 +389,17 @@ def test_old_v1_configuration_and_wrapper_bytes_preserved():
         assert p.pin((root/name).read_bytes())==cfg['reused_helper_pins'][name]
     assert cfg['reused_helper_pins'][p.V1_CONFIG]==dict(bytes=4877,sha256='28e82c5607a7453b376991c67fd1926149a70808ba002a5891d801b50506a5cb')
     assert cfg['reused_helper_pins'][p.V1_HELPERS[1]]==dict(bytes=758,sha256='451351b52cdb5f872bf0beece1e02a2afcc0f0e0c1c0447e3ba3e674fef9eada')
+
+
+def test_opt_in_metadata_record_sink_same_counts_no_reference_values(monkeypatch):
+    row=metadata(1000);iid=row['ImageID']
+    triplet=dict(ImageID=iid,RelationshipLabel='holds',LabelName1='p',LabelName2='o')
+    data=dict(triplets=[triplet],relations=[triplet],boxes=[],metadata=[row])
+    monkeypatch.setattr(p.census,'csv_rows',lambda path:iter(data[path]))
+    monkeypatch.setattr(p.census,'image_census',lambda *a:dict(unscorable_positive_pairs=1,metadata_eligible=True))
+    cfg=dict(human_classes=['p'],body_part_classes=[]); sink=[]
+    default=p.collect({k:k for k in data},cfg,empty(),lambda:None)
+    exported=p.collect({k:k for k in data},cfg,empty(),lambda:None,records_out=sink)
+    assert default==exported and sink==[dict(image_id=iid,publisher_metadata=row,eligible=True)]
+    assert set(sink[0])=={'image_id','publisher_metadata','eligible'}
+    with pytest.raises(ValueError,match='Empty opt-in'):p.collect({k:k for k in data},cfg,empty(),lambda:None,records_out=[{}])

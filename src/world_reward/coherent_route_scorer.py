@@ -2,12 +2,15 @@
 
 All person/side/object slots survive. A and B use the same supported complete
 routes; only B adds that route's original logit margin before max over routes.
-Unsupported active features are not imputed. With no usable HOI route the base
+The default raw-linear model never imputes unsupported active features. The
+explicit masked model uses zero contributions plus numerical-availability
+indicators, requiring positive source-box anchors independently of weights.
+With no usable HOI route the base
 score remains, with route support explicitly false: absence is never OFF.
 No learning, calibration, physical-ID fusion, thresholds or model I/O occurs.
 """
 from collections.abc import Mapping
-from dataclasses import dataclass, fields, is_dataclass
+from dataclasses import dataclass, field as dataclass_field, fields, is_dataclass
 import hashlib
 import json
 from types import MappingProxyType
@@ -84,6 +87,27 @@ class CoherentRouteLinear:
 
 
 @dataclass(frozen=True, eq=False)
+class CoherentRouteMaskedLinear(CoherentRouteLinear):
+    """Opt-in masked values and availability, not visibility or ownership.
+
+    Caller-supplied scale division may be folded into the value weights. This
+    module neither fits nor centers features. Raw features/NaNs remain intact;
+    missing values contribute zero, not a claimed zero geometric distance.
+    """
+    base_availability_weights: np.ndarray = dataclass_field(kw_only=True)
+    tuple_availability_weights: np.ndarray = dataclass_field(kw_only=True)
+    bridge_availability_weights: np.ndarray = dataclass_field(kw_only=True)
+
+    def __post_init__(self):
+        super().__post_init__()
+        for name, count in (("base_availability_weights", len(BASE_NAMES)),
+                            ("tuple_availability_weights", len(TUPLE_NAMES)),
+                            ("bridge_availability_weights", len(BRIDGE_NAMES))):
+            value = _array(getattr(self, name), (count,))
+            object.__setattr__(self, name, _sealed(value.astype(np.float64)))
+
+
+@dataclass(frozen=True, eq=False)
 class CoherentRouteScores:
     original_frame_index: int
     image_size: tuple[int, int]
@@ -95,7 +119,7 @@ class CoherentRouteScores:
     base_scores: np.ndarray                 # [person,2,object], unsupported=NaN
     scores_a: np.ndarray
     scores_b: np.ndarray
-    supported: np.ndarray                  # active base-feature support
+    supported: np.ndarray                  # raw active-feature or opt-in structural box support
     route_supported: np.ndarray            # at least one common usable native route
     native_pair_slots: np.ndarray          # no deduplication or physical-ID claim
     native_detection_slots: np.ndarray
@@ -204,35 +228,95 @@ def _linear(values, supported, weights):
     return score, good
 
 
+def _masked_linear(values, supported, weights, availability_weights):
+    score = np.zeros(values.shape[:-1], np.float64)
+    for column in range(values.shape[-1]):
+        if weights[column] != 0:
+            score += np.where(supported[..., column], values[..., column], 0.) * weights[column]
+        if availability_weights[column] != 0:
+            score += supported[..., column] * availability_weights[column]
+    _require(np.isfinite(score).all(), "Finite masked linear score required; no overflow repair")
+    return score
+
+
+def _positive_boxes(boxes):
+    return (boxes[..., 2] > boxes[..., 0]) & (boxes[..., 3] > boxes[..., 1])
+
+
+def _masked_base_support(e, n, o):
+    person = e.arrays['person_boxes_original_xyxy']
+    objects = e.arrays['object_boxes_original_xyxy']
+    positive = _positive_boxes(objects)
+    _require(np.array_equal(positive, e.arrays['object_box_positive_area']), "Original object positive-area flag differs")
+    if o:
+        rows = person.reshape(n, 2, o, 4)
+        _require(np.array_equal(rows, np.broadcast_to(rows[:, :1, :1], rows.shape)), "Original person boxes must agree across slots")
+    return (_positive_boxes(person) & positive).reshape(n, 2, o)
+
+
+def _masked_route_support(e, n, o, k):
+    h = e.hoi_evidence; boxes = _array(h.arrays['hoi_boxes_original_xyxy'], (n*2*k, 2, 4))
+    flags = _array(h.arrays['hoi_box_positive_area'], (n*2*k, 2), kind="bool")
+    positive = _positive_boxes(boxes)
+    _require(np.array_equal(positive, flags), "Original HOI positive-area flags differ")
+    rows = boxes.reshape(n*2, k, 2, 4)
+    _require(np.array_equal(rows, np.broadcast_to(rows[:1], rows.shape)), "Original HOI source boxes must agree across persons/sides")
+    persons = _array(h.arrays['person_boxes_original_xyxy'], (n*2*k, 4))
+    if o:
+        _require(np.array_equal(persons.reshape(n, 2, k, 4),
+            np.broadcast_to(e.arrays['person_boxes_original_xyxy'].reshape(n, 2, o, 4)[:, :, :1], (n, 2, k, 4))),
+            "Original tuple/person source boxes differ")
+    return positive.all(axis=-1).reshape(n, 2, k)
+
+
 def score_coherent_routes(evidence, model, *, object_block_size=128):
     """Return both arms, retaining all P×2×O; workspace is P×2×K×block.
 
     Score = base + max_k(tuple_k + bridge_k,o [+ B logit_k]). Max applies
     only after assembling each coherent route, never to individual features.
-    Active-weight availability is required; both arms additionally require the
+    Raw-linear active-weight availability is required; the explicit masked type
+    instead uses fixed original person/object and native hand/direct-box anchors.
+    Missing anatomy permits a box proxy, not an ownership claim. Both arms require the
     native margin's numerical support. A missing route leaves base, not OFF.
     Evidence fingerprints establish byte stability, not source authentication.
     """
-    _require(type(evidence) is InteractionCandidateEvidence and type(model) is CoherentRouteLinear
+    _require(type(evidence) is InteractionCandidateEvidence and type(model) in (CoherentRouteLinear, CoherentRouteMaskedLinear)
              and type(object_block_size) is int and object_block_size > 0,
              "Caller-supplied linear model and positive object block size required")
     before, parameters = _fingerprint(evidence), _fingerprint(model)
     n, o, k = _validate(evidence)
+    masked = type(model) is CoherentRouteMaskedLinear
+    route_anchors = _masked_route_support(evidence, n, o, k) if masked and n and k else None
     with np.errstate(over="raise", invalid="raise"):
-        base, good = _linear(evidence.features.reshape(n, 2, o, len(BASE_NAMES)),
-                             evidence.feature_supported.reshape(n, 2, o, len(BASE_NAMES)), model.base_weights)
+        values = evidence.features.reshape(n, 2, o, len(BASE_NAMES))
+        supported = evidence.feature_supported.reshape(n, 2, o, len(BASE_NAMES))
+        if masked:
+            base = _masked_linear(values, supported, model.base_weights, model.base_availability_weights)
+            good = _masked_base_support(evidence, n, o)
+        else:
+            base, good = _linear(values, supported, model.base_weights)
         base += model.bias
         _require(np.isfinite(base).all(), "Finite base score required")
         a, b, route_ok = base.copy(), base.copy(), np.zeros(base.shape, bool)
         if k and n and o:
             h = evidence.hoi_evidence
             x, ok = h.features.reshape(n, 2, k, len(HOI_NAMES)), h.feature_supported.reshape(n, 2, k, len(HOI_NAMES))
-            local, local_ok = _linear(x[..., TUPLE_COLUMNS], ok[..., TUPLE_COLUMNS], model.tuple_weights)
+            if masked:
+                local = _masked_linear(x[..., TUPLE_COLUMNS], ok[..., TUPLE_COLUMNS],
+                                       model.tuple_weights, model.tuple_availability_weights)
+                local_ok = route_anchors.copy()
+            else:
+                local, local_ok = _linear(x[..., TUPLE_COLUMNS], ok[..., TUPLE_COLUMNS], model.tuple_weights)
             local_ok &= ok[..., LOGIT_COLUMN]
             margin = np.where(ok[..., LOGIT_COLUMN], x[..., LOGIT_COLUMN], 0.) * model.logit_weight
             _require(np.isfinite(margin).all(), "Finite route logit contribution required")
-            bridge, bridge_ok = _linear(evidence.route_features.reshape(k, o, len(BRIDGE_NAMES)),
-                                        evidence.route_supported.reshape(k, o, len(BRIDGE_NAMES)), model.bridge_weights)
+            rv = evidence.route_features.reshape(k, o, len(BRIDGE_NAMES))
+            rs = evidence.route_supported.reshape(k, o, len(BRIDGE_NAMES))
+            if masked:
+                bridge = _masked_linear(rv, rs, model.bridge_weights, model.bridge_availability_weights)
+                bridge_ok = np.ones((k, o), bool)  # Native direct/target anchors checked independently above and in base.
+            else:
+                bridge, bridge_ok = _linear(rv, rs, model.bridge_weights)
             for start in range(0, o, object_block_size):
                 end = min(o, start+object_block_size)
                 usable = local_ok[..., None] & bridge_ok[None, None, :, start:end] & good[:, :, None, start:end]

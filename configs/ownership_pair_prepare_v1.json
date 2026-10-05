@@ -1,0 +1,270 @@
+{
+  "schema": "world_reward.ownership_pair_prepare.v1",
+  "output": "/srv/world-reward-data/ownership_pair_v1",
+  "hash_namespace": "world_reward.ownership_pair_v1/",
+  "slots": 96,
+  "fit": 32,
+  "cal": 16,
+  "reserved": 48,
+  "select_seconds": 180,
+  "acquire_seconds": 300,
+  "workers": 4,
+  "request_timeout": 15,
+  "max_image_bytes": 16777216,
+  "max_decoded_pixels": 16777216,
+  "max_creator_page_bytes": 2097152,
+  "max_total_image_bytes": 1610612736,
+  "minimum_acquired": {
+    "FIT": 24,
+    "CAL": 12,
+    "RESERVED": 36
+  },
+  "retry_count": 0,
+  "no_replacements": true,
+  "files": {
+    "boxes": {
+      "readonly": false,
+      "path": "/srv/scenesmith/world-reward/results/openimages-holds-evaluate-v1/boxes.csv",
+      "pin": {
+        "bytes": 77484237,
+        "sha256": "fe22e579b9453875601576859d14ef3304058165de139c66b725e599202bd7b1"
+      }
+    },
+    "relations": {
+      "readonly": false,
+      "path": "/srv/scenesmith/world-reward/results/openimages-holds-evaluate-v1/relations.csv",
+      "pin": {
+        "bytes": 9308608,
+        "sha256": "418a1e22a6da1fd2fdcffb53cb92fdc796cc41d7ca0c3311cfd298f1639c9ef6"
+      }
+    },
+    "triplets": {
+      "readonly": false,
+      "path": "/srv/scenesmith/world-reward/results/openimages-holds-evaluate-v1/triplets.csv",
+      "pin": {
+        "bytes": 37869,
+        "sha256": "c53e939aef2b72512026ab2d944b9356481c08e647a4086f00b17237d558d38e"
+      }
+    },
+    "metadata": {
+      "readonly": false,
+      "path": "/srv/world-reward-data/openimages_holds_census_v1/metadata.csv",
+      "pin": {
+        "bytes": 45227339,
+        "sha256": "de55c6b8cbda32a79f4a20f28572d54e9c49d527a4006725675764074a51a36d"
+      }
+    }
+  },
+  "historical": [
+    {
+      "name": "oi16",
+      "path": "/srv/world-reward-data/openimages_holds_census_v1/census_v2.json",
+      "readonly": false,
+      "pin": {
+        "bytes": 10130,
+        "sha256": "b4333ea57bb408b0eafdbc5eee51d2b3ee3e6e963ef9ec269178bbd45480ff4a"
+      }
+    },
+    {
+      "name": "oi128",
+      "path": "/srv/world-reward-data/openimages_holds_census_fresh128_v1/census.json",
+      "readonly": false,
+      "pin": {
+        "bytes": 76839,
+        "sha256": "bf576b143bf8304981eb8dddfa64726945262d79c24cff07601f14e20a4fd452"
+      }
+    },
+    {
+      "name": "oi64",
+      "path": "/srv/scenesmith/world-reward/results/openimages-joint-pair-selection-v1/cohort.json",
+      "readonly": true,
+      "pin": {
+        "bytes": 31043,
+        "sha256": "441bdc57e101cb4e8291ca6bbebc554ca397619e2a892469d9e410a16359a456"
+      }
+    },
+    {
+      "name": "oi32",
+      "path": "/srv/scenesmith/world-reward/results/proposal-external-census-v1/cohort.json",
+      "readonly": true,
+      "pin": {
+        "bytes": 18076,
+        "sha256": "4db28db7b8c9beb0ce58e574e8f012f05c86ef7447ff056a269d4b04cd74ed33"
+      }
+    },
+    {
+      "name": "coco32",
+      "readonly": true,
+      "path": "/srv/world-reward-data/coco_proposal_v1/metadata/cohort.json",
+      "pin": {
+        "bytes": 24029,
+        "sha256": "c78f2e100cd0c724f3b8873a3256299a7074c473ecb93c960dec509941994e67"
+      }
+    },
+    {
+      "name": "coco64",
+      "readonly": true,
+      "path": "/srv/world-reward-data/coco_endpoint_v2/metadata/cohort.json",
+      "pin": {
+        "bytes": 41315,
+        "sha256": "5b2e6e99f3979f02586b7aa67ccef74a913f836bdc2b7314bcf94d06777562c6"
+      }
+    }
+  ],
+  "human_classes": [
+    "/m/01g317",
+    "/m/04yx4",
+    "/m/03bt1vf",
+    "/m/01bl7v",
+    "/m/05r655"
+  ],
+  "body_part_classes": [
+    "/m/014sv8",
+    "/m/015h_t",
+    "/m/0283dt1",
+    "/m/02p0tk3",
+    "/m/031n1",
+    "/m/035r7c",
+    "/m/039xj_",
+    "/m/03q69",
+    "/m/04hgtk",
+    "/m/0dzct",
+    "/m/0dzf4",
+    "/m/0k0pj",
+    "/m/0k65p"
+  ],
+  "identity_policy": "reject_count_unknown_metadata_source_identity",
+  "original_census": {
+    "path": "/srv/scenesmith/world-reward/results/ownership-pair-census-v2/report.json",
+    "pin": {
+      "bytes": 8286,
+      "sha256": "dbcdd0e99b93805746317d6f626b110f500d2f2fc9162a7aa20ba870e87049ad"
+    },
+    "producer_revision": "8d7b438d0ec2d27868756e20721fb70f15e5d147",
+    "source_files": 291,
+    "source_archive_sha256": "222320664910e59a311afa383148d2687a178498dd631a0d292e6b7c9df85518",
+    "source_closure_sha256": "0b63255b4d7ed2627e9a65d09075acd8807597c0ec2f09559db87c2eaa0ae82d",
+    "configuration_identity": {
+      "bytes": 5932,
+      "sha256": "50b871ac0c70e8dda74f02101e542f573b1eecfc62be41ac968f648135dc1b1b"
+    },
+    "driver_identity": {
+      "bytes": 21196,
+      "sha256": "eef737b290c10aa3c38943c73facfccbcb8ca6fc440dbd28f7330de8417f89d6"
+    },
+    "counts": {
+      "eligible_after_all_exclusions": 139,
+      "excluded_author_profiles": 229,
+      "excluded_coco_ids": 96,
+      "excluded_known_md5": 240,
+      "excluded_oi_ids": 240,
+      "excluded_unique_photos": 336,
+      "geometry_orientation_eligible_images": 139,
+      "historical_missing_md5": 96,
+      "historical_unknown_author_slots": 96,
+      "independent_slots_lower_bound": 132,
+      "inspected_historical_slots": 336,
+      "invalid_metadata_identity_images": 5,
+      "metadata_identity_eligible_images": 604,
+      "metadata_inventory_identity": {
+        "bytes": 22230,
+        "sha256": "62e9e0879b7b06b70136bd90e9880f761ae0b7923ad33e8a15beabec8bc1092f"
+      },
+      "new_relation_images": 801,
+      "source_authors": 132,
+      "unique_md5": 139,
+      "unique_photos": 139,
+      "unscorable_positive_pairs": 45
+    }
+  },
+  "coco_acquisitions": [
+    {
+      "path": "/srv/world-reward-data/coco_proposal_v1/eval_private/manifest.json",
+      "pin": {
+        "bytes": 37509,
+        "sha256": "6f3346be5a0ccb065084226ad6cdaa2423dd0d460427d43823b9635f57141ae6"
+      },
+      "producer_revision": "4657c8b45f733a1043c5a8af2f5b9d6ac027196a",
+      "source_closure_sha256": "bb8b44dc033c0bea7231ce767d0ce4e178c43be242b24ecfa99cfc9e17cc4670",
+      "source_entries": 273
+    },
+    {
+      "path": "/srv/world-reward-data/coco_endpoint_v2/eval_private/manifest.json",
+      "pin": {
+        "bytes": 72806,
+        "sha256": "53de338a0c23409e12afa2a24b39538ff9873d40fc18c2d142b512790bf5ae10"
+      },
+      "producer_revision": "7b557290140dc97c839590c31155fbaf50e442a8",
+      "source_closure_sha256": "9fe7065484ddefa479b85d9c01e5afdfaa5d53510d7a10a3c57215eb558ddcb2",
+      "source_entries": 285
+    }
+  ],
+  "reused_helper_pins": {
+    "infra/ownership_pair_census.py": {
+      "bytes": 21421,
+      "sha256": "efe14dccc9a6612f3cd15d5ea8778d055fe8ce40fbd4c1c3450aac857ed4293e"
+    },
+    "infra/mediapipe_cpu_runtime_verify.py": {
+      "bytes": 23559,
+      "sha256": "936ad97c5ffca3b7f86e3462a600a247b6fa540d9b669e748892ff45e12aedf2"
+    },
+    "infra/openimages_joint_pair_census.py": {
+      "bytes": 9799,
+      "sha256": "251da609bd87d40b5f63a06977ec2c1587c2019193c99a1650861baa32074ac9"
+    },
+    "infra/openimages_joint_pair_acquire.py": {
+      "bytes": 23252,
+      "sha256": "ab0cac6d8a66550b8898a6add435fe92bc2546cbb7536723d4de3b8d8597ad49"
+    },
+    "infra/coco_proposal_prepare.py": {
+      "bytes": 24704,
+      "sha256": "ee9ec3ddd540ec485ef6bbe5812dda5f98760e9633cd3c11fdc49dbde2f66574"
+    },
+    "infra/coco_endpoint_prepare.py": {
+      "bytes": 25395,
+      "sha256": "2b80a5d4df4982acb2e44387ecffb39f1cf4fa07681e406c930d6d4aa6ea9c31"
+    },
+    "infra/run_coco_proposal_prepare.sh": {
+      "bytes": 780,
+      "sha256": "4de0f57eb778386811b22571b5695446e7dbc30145b8615bdb3585bfd56376c3"
+    },
+    "infra/run_coco_endpoint_prepare.sh": {
+      "bytes": 910,
+      "sha256": "6d5b883b6619f794ea451ae8b1492915fdb80538a44ff9f8f084e9da51ef4aea"
+    },
+    "configs/coco_proposal_v1.json": {
+      "bytes": 2663,
+      "sha256": "982675264ba9009468c1c3e40569c3f68f8b3f188d30487759a2bde77dd0e811"
+    },
+    "configs/coco_endpoint_v2.json": {
+      "bytes": 4235,
+      "sha256": "eaea660286ea7570c9245c692d16ec203b660506cf5fcc550a77a3112103329a"
+    },
+    "configs/ownership_pair_census_v1.json": {
+      "bytes": 4877,
+      "sha256": "28e82c5607a7453b376991c67fd1926149a70808ba002a5891d801b50506a5cb"
+    },
+    "configs/ownership_pair_census_v2.json": {
+      "bytes": 5932,
+      "sha256": "50b871ac0c70e8dda74f02101e542f573b1eecfc62be41ac968f648135dc1b1b"
+    },
+    "infra/run_ownership_pair_census.sh": {
+      "bytes": 758,
+      "sha256": "451351b52cdb5f872bf0beece1e02a2afcc0f0e0c1c0447e3ba3e674fef9eada"
+    },
+    "infra/run_ownership_pair_census_v2.sh": {
+      "bytes": 792,
+      "sha256": "124aaca1b621e0a8fa37f0ea156802629b8264d5b2b1d73658edeac7b963e538"
+    },
+    "configs/proposal_external_census_v1.json": {
+      "bytes": 3994,
+      "sha256": "3be296f6a65a14d84e094971fbc6eee8aa8c1d4b39dfe38b47f907614ca6dbbf"
+    }
+  },
+  "limitations": {
+    "coco_author_identity": "UNKNOWN_no_creator_disjointness_claim",
+    "pretraining_overlap": "OpenImages_dataset_overlap_known_exact_photo_unknown",
+    "scope": "positive_person_object_not_side_OFF_contact_temporal_or_3D",
+    "native_availability_gate": "not_quality_or_adoption"
+  }
+}

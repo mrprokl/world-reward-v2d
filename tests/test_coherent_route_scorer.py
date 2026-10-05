@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 import world_reward.coherent_route_scorer as module
-from world_reward.coherent_route_scorer import CoherentRouteLinear, score_coherent_routes
+from world_reward.coherent_route_scorer import CoherentRouteLinear, CoherentRouteMaskedLinear, score_coherent_routes
 from world_reward.hoi_detr_observations import HOIDetrObservations
 from world_reward.interaction_candidate_evidence import GenericObjectObservations, build_interaction_candidate_evidence
 from world_reward.person_pose_observations import PersonPoseObservations
@@ -280,3 +280,143 @@ def test_no_io_training_thresholds_or_private_labels():
     assert not {'open', 'exec', 'eval', 'fit', 'select_interacting_actor'} & calls
     imports = {n.module for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)}
     assert not any(x and ('torch' in x or 'identity_calibration' in x) for x in imports)
+
+
+def masked(*, base=None, local=None, bridge=None, ba=None, ta=None, ra=None, logit=0., bias=0.):
+    raw = weights(base=base, local=local, bridge=bridge, logit=logit, bias=bias)
+    return CoherentRouteMaskedLinear(raw.base_weights, raw.tuple_weights, raw.bridge_weights, raw.logit_weight, raw.bias,
+        base_availability_weights=np.zeros(10) if ba is None else np.asarray(ba),
+        tuple_availability_weights=np.zeros(14) if ta is None else np.asarray(ta),
+        bridge_availability_weights=np.zeros(2) if ra is None else np.asarray(ra))
+
+
+def missing_anatomy(n=1):
+    p = person(n); scores = p.raw_scores.copy(); scores[:, [9, 91, 10, 112]] = 0.
+    return replace(p, raw_scores=scores)
+
+
+def test_masked_missing_root_preserves_box_proxy_rawstrict_unchanged():
+    p = person(1); scores = p.raw_scores.copy(); scores[:, 91] = 0.; p = replace(p, raw_scores=scores)
+    e = build_interaction_candidate_evidence(p, objects(), hoi()); before = module._fingerprint(e)
+    w = np.zeros(10); w[2] = -2.; beta = np.zeros(10); beta[2] = 3.
+    raw = score_coherent_routes(e, weights(base=w))
+    m = score_coherent_routes(e, masked(base=w, ba=beta))
+    assert np.isnan(raw.scores_a[0, 0]).all() and not raw.supported[0, 0].any()
+    assert m.supported.all() and np.isfinite(m.scores_a).all()
+    np.testing.assert_array_equal(m.base_scores[0, 0], 0.)
+    expected = e.features.reshape(1, 2, 3, 10)[0, 1, :, 2]*-2.+3.
+    np.testing.assert_array_equal(m.base_scores[0, 1], expected)
+    assert module._fingerprint(e) == before and np.isnan(e.features[:, 2]).any()
+
+
+def test_masked_all_missing_anatomy_retains_anchored_proxy_not_anatomic_owner():
+    e = build_interaction_candidate_evidence(missing_anatomy(), objects(), hoi())
+    m = masked(base=np.ones(10), local=np.ones(14), bridge=np.ones(2), ba=np.ones(10),ta=np.ones(14),ra=np.ones(2),logit=.2)
+    r = score_coherent_routes(e,m)
+    assert r.supported.all() and r.route_supported.all() and np.isfinite(r.scores_b).all()
+    assert not e.anatomical_ownership_verified and not hasattr(r,'owner')
+
+
+@pytest.mark.parametrize('anchor',['person','object'])
+def test_masked_no_positive_base_anchor_unsupported_even_large_availability_bias(anchor):
+    p, o = person(1), objects()
+    if anchor == 'object':
+        boxes=o.boxes_original_xyxy.copy(); boxes[:, 2]=boxes[:, 0]
+        o=replace(o,boxes_original_xyxy=boxes)
+    e=build_interaction_candidate_evidence(p,o,hoi())
+    if anchor == 'person':
+        arrays=dict(e.arrays); arrays['person_boxes_original_xyxy']=arrays['person_boxes_original_xyxy'].copy()
+        arrays['person_boxes_original_xyxy'][:, 2]=arrays['person_boxes_original_xyxy'][:, 0]
+        e=replace(e,arrays=MappingProxyType(arrays),hoi_evidence=None,hoi_routes=MappingProxyType({}),
+            route_features=np.empty((0,2)),route_supported=np.empty((0,2),bool),
+            source_observation_references=e.source_observation_references[:2],scope=MappingProxyType(dict(e.scope,hoi_native_pairs=0)))
+    r=score_coherent_routes(e,masked(ba=np.full(10,100.),ta=np.full(14,100.),ra=np.full(2,100.),bias=1000.,logit=10.))
+    assert not r.supported.any() and not r.route_supported.any() and np.isnan(r.scores_a).all() and np.isnan(r.scores_b).all()
+
+
+@pytest.mark.parametrize('role',[0,1])
+def test_masked_zero_area_native_hand_or_direct_box_cannot_form_bias_only_route(role):
+    h=hoi(); boxes=h.boxes_original_xyxy.copy(); boxes[role,2]=boxes[role,0]; h=replace(h,boxes_original_xyxy=boxes)
+    e=build_interaction_candidate_evidence(missing_anatomy(),objects(),h)
+    r=score_coherent_routes(e,masked(ba=np.ones(10),ta=np.ones(14)*100,ra=np.ones(2)*100,logit=10.))
+    assert r.supported.all() and not r.route_supported.any()
+    np.testing.assert_array_equal(r.scores_a,r.base_scores);np.testing.assert_array_equal(r.scores_b,r.base_scores)
+
+
+def test_masked_structural_support_independent_of_all_coefficients_and_same_arms():
+    e=build_interaction_candidate_evidence(missing_anatomy(),objects(),hoi())
+    a=score_coherent_routes(e,masked()); b=score_coherent_routes(e,masked(base=np.arange(10.),local=np.arange(14.),
+        bridge=np.arange(2.),ba=np.arange(10.),ta=np.arange(14.),ra=np.arange(2.),logit=-3.,bias=7.))
+    np.testing.assert_array_equal(a.supported,b.supported);np.testing.assert_array_equal(a.route_supported,b.route_supported)
+    assert a.route_supported.all()
+
+
+def test_masked_zero_logit_exact_arm_parity_and_absent_hoi_no_fake_off():
+    for h in (None,hoi(copies=2)):
+        e=build_interaction_candidate_evidence(missing_anatomy(),objects(),h)
+        r=score_coherent_routes(e,masked(base=np.arange(10.),local=np.arange(14.),bridge=[2.,-1.],ba=np.arange(10.),
+            ta=np.arange(14.),ra=[3.,-2.],logit=0.))
+        np.testing.assert_array_equal(r.scores_a,r.scores_b)
+        if h is None:np.testing.assert_array_equal(r.scores_a,r.base_scores);assert not r.route_supported.any()
+
+
+def test_masked_zero_availability_matches_raw_on_fully_available_same_anchors():
+    e=evidence(h=hoi()); rng=np.random.default_rng(5)
+    params=dict(base=rng.normal(size=10),local=rng.normal(size=14),bridge=rng.normal(size=2),logit=.4,bias=3.)
+    a=score_coherent_routes(e,weights(**params));b=score_coherent_routes(e,masked(**params))
+    for key in ('base_scores','scores_a','scores_b','supported','route_supported'):
+        np.testing.assert_array_equal(getattr(a,key),getattr(b,key))
+
+
+def test_masked_dense_block_equivalence_all3600_and_original_duplicates():
+    p=missing_anatomy(2);o=objects(3600);m=masked(base=np.arange(10.),local=np.arange(14.),bridge=[1.,-2.],
+        ba=np.arange(10.),ta=np.arange(14.),ra=[2.,-1.],logit=.3)
+    e=build_interaction_candidate_evidence(p,o,hoi());a=score_coherent_routes(e,m,object_block_size=3600)
+    for block in (1,7,128,4000):
+        b=score_coherent_routes(e,m,object_block_size=block)
+        for key in ('scores_a','scores_b','supported','route_supported'):np.testing.assert_array_equal(getattr(a,key),getattr(b,key))
+    duplicate=score_coherent_routes(build_interaction_candidate_evidence(p,o,hoi(copies=2)),m)
+    np.testing.assert_array_equal(a.scores_b,duplicate.scores_b)
+    oo=replace(o,object_ids=o.object_ids+('copy',),boxes_original_xyxy=np.concatenate((o.boxes_original_xyxy,o.boxes_original_xyxy[:1])),
+        raw_scores=np.r_[o.raw_scores,o.raw_scores[0]])
+    b=score_coherent_routes(build_interaction_candidate_evidence(p,oo,hoi()),m)
+    np.testing.assert_array_equal(a.scores_b,b.scores_b[:,:,:3600]);np.testing.assert_array_equal(b.scores_b[:,:,0],b.scores_b[:,:,-1])
+
+
+def test_masked_person_object_permutation_and_no_visibility_filter():
+    p,o=missing_anatomy(2),objects();boxes=o.boxes_original_xyxy.copy();boxes[0]=[-30.,-20.,-10.,-5.]
+    o=replace(o,boxes_original_xyxy=boxes);order=[2,0,1]
+    pp=replace(p,person_ids=p.person_ids[::-1],boxes_original_xyxy=p.boxes_original_xyxy[::-1],detector_scores=p.detector_scores[::-1],
+        keypoints_original_xy=p.keypoints_original_xy[::-1],raw_scores=p.raw_scores[::-1])
+    oo=replace(o,object_ids=tuple(o.object_ids[i] for i in order),boxes_original_xyxy=o.boxes_original_xyxy[order],raw_scores=o.raw_scores[order])
+    m=masked(base=np.arange(10.),local=np.arange(14.),bridge=[1.,-2.],ba=np.arange(10.),ta=np.arange(14.),ra=[1.,2.],logit=.4)
+    a=score_coherent_routes(build_interaction_candidate_evidence(p,o,hoi()),m)
+    b=score_coherent_routes(build_interaction_candidate_evidence(pp,oo,hoi()),m)
+    np.testing.assert_array_equal(a.scores_b[::-1,:,order],b.scores_b)
+    assert a.supported[:,:,0].all()  # finite positive off-grid object remains, not claimed visible
+
+
+@pytest.mark.parametrize('n,o',[(0,0),(0,3),(2,0)])
+def test_masked_empty_banks_keep_original_slots_and_unavailable_identity_flags(n,o):
+    e=evidence(n,o,hoi()); r=score_coherent_routes(e,masked(ba=np.ones(10),ta=np.ones(14),ra=np.ones(2)))
+    assert r.scores_a.shape==(n,2,o) and not r.supported.size and r.native_pair_slots.shape==(1,)
+
+
+def test_masked_anchors_validate_original_flag_box_coherence_without_repair():
+    e=evidence(h=hoi());arrays=dict(e.arrays);arrays['object_box_positive_area']=~arrays['object_box_positive_area']
+    with pytest.raises(ValueError,match='positive-area'):score_coherent_routes(replace(e,arrays=MappingProxyType(arrays)),masked())
+    h=e.hoi_evidence;arrays=dict(h.arrays);arrays['hoi_box_positive_area']=~arrays['hoi_box_positive_area']
+    with pytest.raises(ValueError,match='positive-area'):score_coherent_routes(replace(e,hoi_evidence=replace(h,arrays=MappingProxyType(arrays))),masked())
+
+
+@pytest.mark.parametrize('name,n',[('base_availability_weights',10),('tuple_availability_weights',14),('bridge_availability_weights',2)])
+def test_masked_availability_coefficients_are_finite_copied_and_sealed(name,n):
+    params=dict(base_availability_weights=np.zeros(10),tuple_availability_weights=np.zeros(14),bridge_availability_weights=np.zeros(2))
+    values=np.arange(n,dtype=np.float64);params[name]=values
+    m=CoherentRouteMaskedLinear(np.zeros(10),np.zeros(14),np.zeros(2),0.,**params);values[:]=999.
+    np.testing.assert_array_equal(getattr(m,name),np.arange(n));assert not getattr(m,name).flags.writeable
+    with pytest.raises(ValueError):getattr(m,name).flags.writeable=True
+    params[name]=np.full(n,np.nan)
+    with pytest.raises(ValueError):CoherentRouteMaskedLinear(np.zeros(10),np.zeros(14),np.zeros(2),0.,**params)
+    params[name]=np.zeros(n+1)
+    with pytest.raises(ValueError):CoherentRouteMaskedLinear(np.zeros(10),np.zeros(14),np.zeros(2),0.,**params)

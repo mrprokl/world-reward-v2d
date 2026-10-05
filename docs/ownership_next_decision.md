@@ -293,3 +293,22 @@ candidate optimization procedure, **not an adopted recipe or convergence
 certificate**. Validate gradients away from ties, directional derivatives at
 ties, alpha0 parity, missing observations and full-bank/block/alias invariance
 on tiny authored tests before fixing its iteration count/step/L2/support rules.
+
+### Implemented masked numerical opt-in, not a learned owner
+
+`CoherentRouteMaskedLinear` now supplies separately sealed finite availability
+coefficients alongside the existing value weights. Caller scale division may
+be folded into weights; no FIT statistics, imputed joints, visibility or
+probability are added. Support is fixed independently of learned coefficients:
+positive original person/object boxes for the base, positive native hand/direct
+boxes and finite original margin for a route. Off-grid boxes remain diagnostics;
+missing anatomy can yield only the declared box proxy. Missing/invalid HOI leaves
+the identical base in both arms; no anchor remains NaN even with large biases.
+Route geometry and B margin still combine before reduction, retaining all slots.
+
+273 parent tiny tests PASS1.35s, including68 dedicated controls, missing-root
+falsification, coefficient-independent support, exact alpha0/old fully-supported
+parity,3600-object block/permutation/duplicate invariance and unchanged50 raw
+controls. The raw-linear default stays strict; no parameter has been learned,
+no native dataset inferred and no selector adopted from these authored tests.
+The separate access/population freeze is in `ownership_pair_protocol.md`.

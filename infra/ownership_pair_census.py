@@ -125,7 +125,9 @@ def _capacity(records, excluded):
                 independent_slots_lower_bound=lower_bound, metadata_inventory_identity=pin(encode(available)))
 
 
-def collect(paths, cfg, excluded, check):
+def collect(paths, cfg, excluded, check, *, records_out=None):
+    if records_out is not None:
+        rt.require(type(records_out) is list and not records_out, 'Empty opt-in metadata record sink required')
     human, parts = set(cfg['human_classes']), set(cfg['body_part_classes'])
     triplets = set()
     for r in census.csv_rows(paths['triplets']):
@@ -169,6 +171,7 @@ def collect(paths, cfg, excluded, check):
                   geometry_orientation_eligible_images=sum(r['eligible'] for r in records),
                   unscorable_positive_pairs=unresolved)
     if reject_invalid: counts['invalid_metadata_identity_images'] = invalid_identity
+    if records_out is not None: records_out.extend(records)
     return counts
 
 
