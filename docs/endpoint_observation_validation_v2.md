@@ -58,9 +58,12 @@ reusable runtime evidence, not validation of its inadequate object proposals.
 OWL assets V2 genuinely acquired and independently byte-audited the four public
 assets. Parent reports actual native qualifier PASS 7.5842s and host PASS 10.8145s:
 one load, three image embeddings, three objectness and three box calls, all 3600
-patches per procedural image. Its independent saved-only audit is still pending
-at release. Before photos, bind that actual receipt and completed independent
-proof; do not substitute mock tests or metadata readiness for qualification.
+patches per procedural image. Independent saved-only CPU audit subsequently PASS
+2.6248s: all four original Git/XZ closures, exact saved FP32 banks/square inverse,
+and installed source/wheel RECORD identities rechecked before/after, no new model
+or GPU call. See `results/audits/owlv2_native_qualification_v1_actual.json`. This
+qualifies execution, not endpoint accuracy or ownership; bind the actual receipts
+and proof before photos, never substitute mock tests or metadata readiness.
 
 Use original [Google OWLv2 checkpoint/card at
 57beb61adb5abda3de4a9796bc35ae60bc4b9802](https://huggingface.co/google/owlv2-base-patch16-ensemble/tree/57beb61adb5abda3de4a9796bc35ae60bc4b9802).
