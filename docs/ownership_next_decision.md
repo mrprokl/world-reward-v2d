@@ -124,3 +124,30 @@ FIT-only learner must explicitly define these before any held-out reference.
 found zero-bank ABI corrections,3600-object block equivalence, permutation and
 duplicate invariance, and falsification of an impossible mixed route. No real
 data, trained selector, temporal improvement or leaderboard gain follows.
+
+## Reference fallback after MMHOI schema closure
+
+The complete MMHOI inventory and primary supplement still do not establish
+numerical body mapping or bbox/camera alignment. Do not spend inference on
+invented hand/OFF references. A fresh **OpenImages annotated-holds pair** study
+can test the narrower correct-person+object retrieval on the now-qualified
+person+OWL bank, without those missing anatomical semantics. This is a distinct
+protocol, not a rescue of any closed GDI/objectness/endpoint cohort.
+
+Before choosing records, exclude all240 historical OI slots (16+128+64+32),
+all32closed COCO and64endpoint slots, including unavailable RGB. Join Flickr
+photo/URL/MD5 identities across datasets; author disjointness only where actual
+publisher profiles exist. COCO authors remain UNKNOWN. Extend the explicit
+208-slot helper rather than accidentally omit the later32 OI or64COCO slots.
+Freeze a new metadata-feasibility gate and FIT/CAL/RESERVED counts before HTTP;
+then original creator/photo grants, fixed acquisition and no replacements.
+
+Unlabelled sides remain latent, scored as **complete** routes before reduction.
+Positive-set listwise fitting is incomplete supervision: it implicitly competes
+against unknown alternatives, not true negatives/OFF. Exact automatic aliases
+must not multiply loss mass; no geometry establishes physical identity.
+Standardization and geometry parameters are FIT-only; an isolated B relational
+coefficient is learned with the same fixed geometry/bank/support. Declare the
+optimizer, stopping rule and CAL use before references, retain all3600objects,
+misses/unresolved positives and abstentions. No fulltuple, task, temporal3D or
+challenge improvement follows from such a positive-only static study.

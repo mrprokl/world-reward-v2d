@@ -1791,3 +1791,38 @@ assets. Fail fast on installation: use this architecture as a research insight,
 not another unavailable stack. MMHOI's individually accessible published
 person–target CSVs warrant a separate metadata gate (see
 `mmhoi_ownership_reference_audit.md`), not direct adoption or a full3D claim.
+
+### October5 — an executable person–object action head, not a SOTA claim
+
+An independent bounded audit compares two actually released image-only HOI
+detectors, not unavailable2026 code. **GEN-VLKT-S/R50 (CVPR2022)** is the lower-cost
+conditional candidate; it does not supersede the already-qualified HOI-DETR
+without a useful discriminating study. [Source191fc74e](https://github.com/YueLiao/gen-vlkt/tree/191fc74e967d6965e9ae7b3a5d423db501f38c79),
+2024-03-31, has explicit MIT LICENSE1065B/SHA
+f77f64d76ff2bc6053db2d0e0e8b3adb08f4206eee0f9002a6011915467a96e8.
+`models/gen_vlkt.py`22695B/SHA
+f1dd61f61f4b5718432b9e1cc66680bedcc6b9f7955e45e90845a7a3b93a89c7.
+Original HICO and VCOCO checkpoint links resolve by HEAD to169,684,993B and
+169,013,583B; no bytes acquired, publisher SHA or separate weight grant/card
+established. MIT source alone is not final weight eligibility.
+
+Native forward117–171 returns64 paired subject/object CXCYWH slots and all
+600HICO plus81object logits. These slots are query identities, not persistent
+people/objects and not our exhaustive person×OWL3600bank. Postprocessor418–459
+retains paired boxes but already argmaxes the object class; preserve raw heads
+instead. Its benchmark evaluator further weights object scores, truncates100
+triplets and NMSes them: do not use that as an exhaustive owner selector.
+Source action evidence is not hand/contact/taskequivalence.
+
+The classifier constructor88–115 calls separate OpenAI CLIPViT-B/32 and deletes
+it after initialization. Preflight must preserve that original construction,
+qualify strict safe state loading and original800/max1333 preprocessing on the
+actual runtime; Torch1.7.1 author compatibility is not inferred. HICO/VCOCO/DETR/
+CLIP pretraining is known in broad terms; exact challenge/FORM overlap remains
+unknown, no challenge-matched assets are acquired to investigate it.
+
+[HOICLIPee4db062](https://github.com/Artanic30/HOICLIP/tree/ee4db062097410abdd20fa96d40d26aaca1f19da),
+CVPR2023, has actual1,111,929,643B checkpoint HEAD but **no LICENSE in its complete
+Git tree**, plus separate CLIP/verb assets. Do not inherit MIT from predecessor
+GEN-VLKT. Defer rather than install a new unqualified stack. Neither method is
+claimed SOTA September2026, externally validated here, or superior to CARI4D.
