@@ -25,3 +25,17 @@ one concise sealed report on Azure. A PASS establishes selected-member release
 identity/notice equality, not training independence, challenge eligibility,
 SAM metadata provenance substitution, legal clearance for the full pipeline or
 reconstruction quality. No secrets, datasets, Torch, GPU or installation.
+
+## Actual selected-member proof (2026-10-05)
+
+Producer`c41620005e8e9167529045d3cae072baa8b79c8c`: PASS5.701784s.
+Receipt10250B/SHA256`3318d6e3f93bf2c00100fbf61d3f5a3e23278d4486fd16bc47b5e82f8901399b`.
+Exactly the two selected streams were decoded (696121606B), with primary
+licence equality and standalone model byte identity;0inactive streams or model
+copies/loads. Whole archive, original source/model/v1FAIL/diagnostic postchecks
+and owned archive cleanup pass. Five bounded text/receipt files sealed on Azure.
+This preserves SAM provenance and leaves competition/overlap eligibility open.
+An independent saved-receipt/source/asset audit subsequently passed without
+opening the ZIP or loading a model. Exact five-file identities are retained in
+`configs/mhr_official_release_selected_qualification_pins.json`; release metadata
+is the selected acquisition's actual metadata, not substituted from old v1.

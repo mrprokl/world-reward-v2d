@@ -9319,3 +9319,33 @@ required. Selected696121606Bcap, wholearchiveSHA and selectedstreamCRCs/SHAs;
 noinactivepayload/modelcopy/load/SAMrelabel/eligibilityclaim. Root189tinytests
 PASS1.40s (oneexpectedduplicate-ZIP warning), syntax/defaulttail/v1inventory
 AST/diffchecksPASS. Newv2 runtime not yet executed.
+
+Actual selected-MHRc416200 PASS5.701784s,10250B3318d6e3…01399b. Exactly
+LICENSE.txt+standaloneJIT streams696121606B; primaryApache equality/modelbyte
+identity/wholeZIP/source/existingmodel/oldFAIL/diagnosticprepostPASS,0inactive
+streams/modelcopies/loads. FiveboundedtextreceiptssealedAzure; noSAMprovenance
+relabel/sourceeligibility/overlap/qualityclaim.
+Separate authoredsavedmetadata diagnosis identifies4nativehead scale_mean
+entries vs zero modelbounds, not anglecontrols: idx147/148/151/152. NoTorch,
+model import, decode or recipe replay; same originalmetadata hashes unchanged.
+Closedcohort staysFAIL; source-bound semanticmean/limit audit would be a distinct
+question, not permission to zero coordinates until nativecontrols pass.
+
+Independent selected-MHR savedproofPASS: exactfivefiles/modes/sealednamespace,
+completeoriginalsource+previousFAIL+inventory+existingmodelprepost verified.
+NoZIP/model/nativeexecution. ExactmetadataSHA9f77ca15…71eb59 differsfromoldv1
+metadata; actualselectedidentitiesretainedwithoutsubstitution.
+
+Prospective surface consumer integration reuses original proposal/ICP-Viterbi/
+nativeprepare/sharedstage profile, adds no model or poseweight. Frozen fresh
+two-open-component/seven-vertex/96-frame control, scale0.5, identity0QEM,
+originalrawA/nativefix_rigid(A)/savedF32poses/allcanonicalvertices, six negatives.
+Native600s/host700s/cleanup30s, no challengeinput/HDF5/HOIaccuracy/adoption.
+HistoricalsurfaceHOSTFAILs preserved. Nativecontrolnotexecutedyet.
+Root final tracked-closure integration186PASS2SKIP2.61s; sourceclosure292/
+305/297files for production-control/objectpose/prepare; shellsyntax/diff and
+originalsolidfunction/fullTICP-loop AST exactPASS. Independentaudit caught
+realGLB POSITIONF32 promotion/nativeTrimesh operandorder, reportcanonicalcounts
+(including orphan=v0), fullT and pre-reservation report ancestry; corrected
+before any nativecontrol. Agentprofile918PASS2SKIP, finalpreparemount184PASS;
+these overlap unitcoverage and are not added as independent scientificevidence.

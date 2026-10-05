@@ -1,6 +1,8 @@
 """Run wrappers against tiny fake shell commands, never Docker/Azure or media."""
 
 import importlib.util
+import hashlib
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -311,3 +313,100 @@ def test_invalid_bundle_routing_rejected_before_docker(fake_shell, args):
 def test_bundle_routing_converter_only(fake_shell, mode):
     _, run, _, log, _ = fake_shell
     assert run(mode, "--bundle-source", "refined").returncode == 2 and not log.exists()
+
+
+@pytest.mark.parametrize('profile',['solid','surface'])
+@pytest.mark.parametrize('episode',[0,15,29])
+def test_explicit_geometry_profile_routes_its_own_pose_report(fake_shell,profile,episode):
+    env,run,report,log,_=fake_shell
+    if profile=='surface':
+        # Numerical/source authentication is tested separately below; no old snapshot is executed.
+        spy=Path(env['PATH'].split(os.pathsep)[0])/'python3'
+        spy.write_text('#!/usr/bin/env bash\ncat >/dev/null\n'+''.join('printf "%s\\n" '+repr(str(Path(env['WR_ROOT'])/'jobs'/('b'*40)/entry))+'\n' for entry in ('run_object_budget_solid','run_surface_qslim_qualify','run_surface_identity_qualify')))
+        spy.chmod(0o755)
+    report('prepare',episode,stage='object_pose_full_'+profile)
+    result=run('prepare','--episode',str(episode),'--mesh-source',profile)
+    assert result.returncode==0,result.stderr
+    assert docker_arguments(log)[-4:]==['--episode',str(episode),'--mesh-source',profile]
+    if profile=='surface':
+        args=docker_arguments(log)
+        for entry in ('run_object_budget_solid','run_surface_qslim_qualify','run_surface_identity_qualify'):
+            parent=Path(env['WR_ROOT'])/'jobs'/('b'*40)/entry
+            assert f'type=bind,src={parent},dst={parent},readonly' in args
+        assert f'type=bind,src={env["WR_ROOT"]}/jobs,dst={env["WR_ROOT"]}/jobs,readonly' not in args
+    else:
+        assert not any('/jobs/' in arg for arg in docker_arguments(log))
+    assert not Path(env['FAKE_CTL_LOG']).exists()
+
+
+@pytest.mark.parametrize('profile',['solid','surface'])
+def test_geometry_profile_never_falls_back_to_default_report(fake_shell,profile):
+    _,run,report,log,_=fake_shell;report('prepare',29)
+    result=run('prepare','--episode','29','--mesh-source',profile)
+    assert result.returncode!=0 and 'object_pose_full_'+profile in result.stderr and not log.exists()
+
+
+@pytest.mark.parametrize('mode',['forward','converter','adapter'])
+def test_geometry_profile_prepare_only(fake_shell,mode):
+    _,run,_,log,_=fake_shell
+    assert run(mode,'--mesh-source','surface').returncode==2 and not log.exists()
+
+
+def test_surface_has_no_solid_query_requalification_alias(fake_shell):
+    _,run,_,log,_=fake_shell
+    assert run('prepare','--mesh-source','surface','--query-requalification').returncode==2 and not log.exists()
+
+
+@pytest.fixture
+def surface_prepare_history(tmp_path):
+    """Only authored tiny source/receipt metadata; never an actual model/native invocation."""
+    import sys
+    spec=importlib.util.spec_from_file_location('surface_prepare_test_rt',ROOT/'infra/mediapipe_cpu_runtime_verify.py')
+    rt=importlib.util.module_from_spec(spec);spec.loader.exec_module(rt)
+    root=tmp_path/'runtime';revision='a'*40;code=root/'jobs'/revision/'run_cari_prepare/code';code.mkdir(parents=True)
+    def write(p,b):
+        p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b);p.chmod(0o444)
+        return dict(bytes=len(b),sha256=hashlib.sha256(b).hexdigest())
+    def record(p,v):return write(p,json.dumps(v,sort_keys=True).encode())
+    def seal(p):
+        for child in sorted((p,*p.rglob('*')),key=lambda x:len(x.parts),reverse=True):
+            if child.is_dir():child.chmod(0o555)
+    def markers(c,r):write(c.parent/'revision',(r+'\n').encode());write(c.parent/'source-sha256',('f'*64+'\n').encode())
+    for n in ('mediapipe_cpu_runtime_verify.py','run_cari_prepare.sh','cari_wrapper_common.sh'):
+        write(code/'infra'/n,(ROOT/'infra'/n).read_bytes())
+    markers(code,revision)
+    old=[];identities=[]
+    for r,entry in zip(('b'*40,'c'*40,'d'*40),('run_object_budget_solid','run_surface_qslim_qualify','run_surface_identity_qualify')):
+        c=root/'jobs'/r/entry/'code';write(c/'infra/original.cpp',b'// Immutable source text, never executed.\n');markers(c,r);seal(c)
+        binding=rt.source(root,c,r,entry,())
+        p=(root/'outputs/episode_000009'/('object_budget_surface_'+r)/'report.json' if not old else root/'results'/('surface-qslim-qualify-'if len(old)==1 else'surface-identity-qualify-')/r/'native.json')
+        # The published result directories concatenate the revision into their name.
+        if old:p=root/'results'/(('surface-qslim-qualify-'if len(old)==1 else'surface-identity-qualify-')+r)/'native.json'
+        identities.append(record(p,dict(source_binding=binding)if not old else dict(source_proof=dict(source_binding=binding))))
+        old.append(c.parent)
+    record(code/'configs/surface_mesh_000009_pins.json',dict(schema='world_reward.surface_mesh_pins.v1',episode_index=9,input_sha256='e'*64,metric_scale_baked_once=1,report=dict(**identities[0],producer_revision='b'*40),files={},source_helpers={}))
+    record(code/'configs/surface_qslim_qualification_pins.json',dict(schema='world_reward.surface_qslim_qualification_pins.v1',producer_revision='c'*40,native=identities[1]))
+    record(code/'configs/surface_identity_qualification_pins.json',dict(schema='world_reward.surface_identity_qualification_pins.v1',producer_revision='d'*40,native=identities[2]))
+    seal(code)
+    source=(ROOT/'infra/run_cari_prepare.sh').read_text().split("<<'PYSURFACE'\n",1)[1].split('\nPYSURFACE',1)[0]
+    def call():return subprocess.run([sys.executable,'-I','-B','-',str(root),str(code),revision,'9'],input=source,text=True,capture_output=True,timeout=10)
+    return call,old,code
+
+
+def test_surface_prepare_authenticates_exact_three_source_only_parents(surface_prepare_history):
+    call,parents,_=surface_prepare_history;result=call()
+    assert result.returncode==0,result.stderr
+    assert result.stdout.splitlines()==list(map(str,parents))
+
+
+@pytest.mark.parametrize('fault',['source_mutation','extra_parent_entry','wrong_revision','receipt_mutation','source_binary'])
+def test_surface_prepare_rejects_changed_or_foreign_historical_proof(surface_prepare_history,fault):
+    call,parents,code=surface_prepare_history
+    if fault=='extra_parent_entry':p=parents[0]/'foreign';p.write_bytes(b'not source')
+    elif fault=='wrong_revision':
+        p=parents[0]/'revision';p.chmod(0o644);p.write_text('e'*40+'\n');p.chmod(0o444)
+    elif fault=='receipt_mutation':
+        p=code/'configs/surface_qslim_qualification_pins.json';p.chmod(0o644);v=json.loads(p.read_text());v['native']['sha256']='0'*64;p.write_text(json.dumps(v));p.chmod(0o444)
+    else:
+        p=parents[0]/'code/infra/original.cpp';p.chmod(0o644);p.write_bytes(b'ELF\0binary'if fault=='source_binary'else b'changed oldsource');p.chmod(0o444)
+    result=call();assert result.returncode!=0 and result.stdout==''

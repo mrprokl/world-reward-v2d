@@ -159,12 +159,12 @@ def _bounded_number(value,maximum,label):
 
 
 def _public_source_paths(spec, source_profile="default"):
-    """Exact fifteen identities; solid substitutes only the pose receipt."""
-    if type(source_profile) is not str or source_profile not in ("default", "solid"):
-        raise ValueError("Exact default or solid public source profile required")
+    """Exact fifteen identities; explicit profiles substitute only pose receipt."""
+    if type(source_profile) is not str or source_profile not in ("default", "solid", "surface"):
+        raise ValueError("Exact default, solid or surface public source profile required")
     base=f"outputs/episode_{spec['episode_index']:06d}"
     export=base+f"/cari_inputs/export/episode_{spec['episode_index']:06d}"
-    pose="object_pose_full_solid" if source_profile=="solid" else "object_pose_full"
+    pose="object_pose_full" if source_profile=="default" else "object_pose_full_"+source_profile
     return {
         base+"/cari_inputs/aligned_depth.h5",base+"/cari_inputs/own_object_poses.pkl",
         base+"/body_full/cari_adapter/canonical_initializer.pkl",base+"/cari_inputs/report.json",
@@ -204,7 +204,7 @@ def _validate_export_receipt(report,spec,files):
     for key in ("input_pins","refined_pins"):_receipt(report.get(key))
     original=report.get("source_files")
     if type(original) is not dict or not any(set(original)==_public_source_paths(spec,profile)
-                                           for profile in ("default","solid")):
+                                           for profile in ("default","solid","surface")):
         raise ValueError("Exact fifteen original public source identities required")
     for row in original.values():_receipt(row)
     mesh=f"outputs/episode_{spec['episode_index']:06d}/cari_inputs/export/episode_{spec['episode_index']:06d}/object_mesh/output_aligned.glb"

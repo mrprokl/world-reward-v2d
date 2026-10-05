@@ -96,9 +96,33 @@ def test_inventory_solid_profile_is_explicit_not_self_selected(gate,tmp_path,mon
     with pytest.raises((ValueError,FileNotFoundError)):gate.inventory(root,code,spec,"c"*40,source)
 
 
+def test_inventory_surface_v3_is_report_only_and_requires_native_binding(gate,tmp_path,monkeypatch):
+    root,code,spec,records=actual_fixture(gate,tmp_path,29,97)
+    paths=gate.inputs.relative_paths(spec);old=gate.inputs.dependency_paths(spec)
+    deps=gate.inputs.dependency_paths(spec,object_source='surface');destination=root/deps['object']
+    destination.parent.mkdir();(root/old['object']).rename(destination)
+    native=dict(committed_pins_sha256='1'*64,producer_report_sha256='2'*64,cpu_native_report_sha256='3'*64,
+        source_domain='surface',metric_scale_baked_once=.25,geometry_operations_applied=False)
+    records['object'].update(mesh_source='surface',topology_budget=native);write(destination,records['object'])
+    proof=dict(native,metric_glb={'synthetic':'metric'},native_aligned_glb={'synthetic':'aligned'},
+        source_rehashed_after=True,files={'synthetic_only':{'sha256':'4'*64,'bytes':4}})
+    report=records['inputs'];report.update(object_source='surface',surface_geometry_validation=proof,
+        object_pose_source=dict(report=deps['object'],geometry_and_poses=str(destination.with_name('geometry_and_poses.npz').relative_to(root)),geometry_and_poses_sha256='a'*64),
+        input_report_sha256={role:gate.identity(root/name)['sha256'] for role,name in deps.items()})
+    write(root/paths['input_report'],report)
+    monkeypatch.setattr(gate.inputs,'verify_public_inputs',lambda *_:pytest.fail('No payloads decoded by inventory'))
+    pins=gate.inventory(root,code,spec,'c'*40,report['script_sha256'],object_source='surface')
+    assert pins['schema']=='world-reward-cari-clip-input-pins-v3' and pins['object_source']=='surface'
+    assert len(pins['source_files'])==15 and old['object'] not in pins['source_files']
+    with pytest.raises((ValueError,FileNotFoundError)):gate.inventory(root,code,spec,'c'*40,report['script_sha256'])
+    report['surface_geometry_validation']['source_rehashed_after']=False;write(root/paths['input_report'],report)
+    with pytest.raises(ValueError):gate.inventory(root,code,spec,'c'*40,report['script_sha256'],object_source='surface')
+
+
 def test_optional_source_cli_defaults_legacy_and_rejects_duplicates_or_paths(gate):
     assert gate.parser().parse_args(controls()).object_source is None
     assert gate.parser().parse_args(controls()+["--object-source","solid"]).object_source=="solid"
+    assert gate.parser().parse_args(controls()+["--object-source","surface"]).object_source=="surface"
     for suffix in (["--object-source","../solid"],["--object-source","solid","--object-source","solid"]):
         with pytest.raises(SystemExit):gate.parser().parse_args(controls()+suffix)
 

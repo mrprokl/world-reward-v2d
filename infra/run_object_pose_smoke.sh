@@ -12,21 +12,23 @@ for arg in "$@";do
 done
 if (( QUERY_REQUALIFICATION )) && [[ " ${*} " != *solid* ]];then exit 2;fi
 # Source closure: /infra/mediapipe_cpu_runtime_verify.py /infra/object_pose_smoke.py
-# Solid alone uses a narrow inert import closure, distinct from full host provenance.
-if [[ " ${*} " == *solid* ]];then
- [[ ( $# == 5 || ( $# == 6 && "$6" == --query-requalification ) ) && "$1" == --episode && "$2" =~ ^(0|[1-9]|[12][0-9])$ && "$3" == --full-video && "$4" == --mesh-source && "$5" == solid ]] || exit 2
- EPISODE="$2";REV="${WR_CODE_REVISION:?}"
+# Explicit qualified profiles use a narrow inert closure, not host provenance.
+if [[ " ${*} " == *solid* || " ${*} " == *surface* ]];then
+ [[ ( $# == 5 || ( $# == 6 && "$5" == solid && "$6" == --query-requalification ) ) && "$1" == --episode && "$2" =~ ^(0|[1-9]|[12][0-9])$ && "$3" == --full-video && "$4" == --mesh-source && ( "$5" == solid || "$5" == surface ) ]] || exit 2
+ EPISODE="$2";PROFILE="$5";REV="${WR_CODE_REVISION:?}"
  [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ && "$CODE" == "$ROOT/jobs/$REV/run_object_pose_smoke/code" && "$(uname -s)" == Linux ]] || exit 2
  printf -v PADDED '%06d' "$EPISODE"
- OUT="$ROOT/outputs/episode_$PADDED/object_pose_full_solid";CONTROL="$ROOT/results/object-pose-solid-$PADDED-$REV"
+ OUT="$ROOT/outputs/episode_$PADDED/object_pose_full_$PROFILE";CONTROL="$ROOT/results/object-pose-$PROFILE-$PADDED-$REV"
  LOCK="$ROOT/jobs/.world-reward-h100.lock";IMAGE=sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7
- NAME="wr-object-pose-solid-$PADDED-$REV";BEFORE='';LOCK_BEFORE='';OPEN=0;OWNED=0;POST_VERIFIED=0;PROOF_SHA=''
+ NAME="wr-object-pose-$PROFILE-$PADDED-$REV";BEFORE='';LOCK_BEFORE='';OPEN=0;OWNED=0;POST_VERIFIED=0;PROOF_SHA=''
  host() {
-  timeout --signal=TERM --kill-after=5s 300s python3 -I -B - "$ROOT" "$CODE" "$REV" "$EPISODE" "$CONTROL" "$OUT" "$LOCK" "$1" "${BASH_SOURCE[0]}" "$QUERY_REQUALIFICATION" <<'PYSOLID'
+  timeout --signal=TERM --kill-after=5s 300s python3 -I -B - "$ROOT" "$CODE" "$REV" "$EPISODE" "$CONTROL" "$OUT" "$LOCK" "$1" "${BASH_SOURCE[0]}" "$QUERY_REQUALIFICATION" "$PROFILE" <<'PYSOLID'
 import ast,hashlib,json,os,re,stat,sys
 from pathlib import Path
-if len(sys.argv)not in(10,11):raise ValueError('Exact host query arguments required')
-root,code,rev,episode,control,out,lock,mode,entry=sys.argv[1:10];query_profile=sys.argv[10]if len(sys.argv)==11 else'0';root,code,control,out,lock,entry=map(Path,(root,code,control,out,lock,entry));episode=int(episode)
+if len(sys.argv)not in(10,11,12):raise ValueError('Exact host query arguments required')
+root,code,rev,episode,control,out,lock,mode,entry=sys.argv[1:10];query_profile=sys.argv[10]if len(sys.argv)>=11 else'0';root,code,control,out,lock,entry=map(Path,(root,code,control,out,lock,entry));episode=int(episode)
+profile=sys.argv[11]if len(sys.argv)==12 else'solid'
+if profile not in('solid','surface')or profile=='surface'and query_profile!='0':raise ValueError('Explicit fixed geometry profile required')
 if query_profile not in ('0','1'):raise ValueError('Explicit query profile required')
 query_requalification=query_profile=='1'
 if os.getuid()!=0 or entry!=code/'infra/run_object_pose_smoke.sh':raise ValueError('Original root-owned Linux wrapper required')
@@ -42,13 +44,28 @@ source=rt.source(root,code,rev,'run_object_pose_smoke',('infra/run_object_pose_s
 def raw(p,maximum=32<<20,empty=False):return rt.identity(p,maximum,readonly=False,empty=empty)
 def read(p):return rt.strict(Path(p).read_bytes())
 def same(p,pin):rt.require(raw(p,32<<30)==pin,'Pinned input changed')
-base=root/f'outputs/episode_{episode:06d}';pinpath=code/f'configs/solid_mesh_{episode:06d}_pins.json';pin=rt.identity(pinpath);pins=read(pinpath)
-rt.require(set(pins)=={'schema','episode_index','input_sha256','metric_scale_baked_once','report','files','source_helpers'} and pins['schema']=='world_reward.solid_mesh_pins.v1' and type(pins['episode_index'])is int and pins['episode_index']==episode,'Actual solid pins required')
-producer=pins['report'];qfile='configs/solid_chart_v2_balanced_qualification_pins.json'if query_requalification else'configs/solid_chart_v2_qualification_pins.json';q=read(code/qfile)
+base=root/f'outputs/episode_{episode:06d}';pinpath=code/f'configs/{profile}_mesh_{episode:06d}_pins.json';pin=rt.identity(pinpath);pins=read(pinpath)
+rt.require(set(pins)=={'schema','episode_index','input_sha256','metric_scale_baked_once','report','files','source_helpers'} and pins['schema']==f'world_reward.{profile}_mesh_pins.v1' and type(pins['episode_index'])is int and pins['episode_index']==episode,'Actual selected geometry pins required')
+producer=pins['report'];qfile='configs/surface_qslim_qualification_pins.json'if profile=='surface'else'configs/solid_chart_v2_balanced_qualification_pins.json'if query_requalification else'configs/solid_chart_v2_qualification_pins.json';q=read(code/qfile)
 rt.require(re.fullmatch('[0-9a-f]{40}',producer['producer_revision']) and re.fullmatch('[0-9a-f]{40}',q['producer_revision']),'Exact original producer revisions required')
-proposal=base/(('object_budget_solid_balanced_'if query_requalification else'object_budget_solid_')+producer['producer_revision']);qualification=root/'results'/(('solid-chart-v2-query-requalify-'if query_requalification else'solid-chart-v2-qualify-')+q['producer_revision'])
+proposal=base/(('object_budget_surface_'if profile=='surface'else'object_budget_solid_balanced_'if query_requalification else'object_budget_solid_')+producer['producer_revision']);qualification=root/'results'/(('surface-qslim-qualify-'if profile=='surface'else'solid-chart-v2-query-requalify-'if query_requalification else'solid-chart-v2-qualify-')+q['producer_revision'])
 expected={proposal/n for n in ('report.json','native.json','geometry.npz','object_fixed_canonical.glb')}|{base/'object_grounded'/n for n in ('report.json','object.glb','transform.json','intrinsics.json')}|{base/'scale_smoke/report.json',qualification/'report.json',qualification/'native.json'}
-rt.require(set(pins['files'])=={str(p.relative_to(root))for p in expected},'Exactly eleven canonical solid artifacts required')
+historical=[]
+if profile=='surface':
+ ip=read(code/'configs/surface_identity_qualification_pins.json');rt.require(re.fullmatch('[0-9a-f]{40}',ip['producer_revision'])and q['independent_audit_path']=='results/surface-qslim-independent-v2/report.json','Fixed original surface qualification paths required')
+ expected.update({proposal/'candidate_geometry.npz',proposal/'mapping.json',root/'results'/('surface-identity-qualify-'+ip['producer_revision'])/'native.json',root/q['independent_audit_path']})
+ # These three text-only closures prove provenance; never on native sys.path.
+ for revision,entrypoint in((producer['producer_revision'],'run_object_budget_solid'),(q['producer_revision'],'run_surface_qslim_qualify'),(ip['producer_revision'],'run_surface_identity_qualify')):
+  parent=root/'jobs'/revision/entrypoint;rt.canonical(parent)
+  rt.require({p.name for p in parent.iterdir()}=={'code','revision','source-sha256'},'Exact historical source-only parent required')
+  oldsource=rt.source(root,parent/'code',revision,entrypoint,())
+  rt.require(all(p.suffix in('.py','.sh','.cpp','.hpp','.h','.json','.toml')or p.name.startswith('Dockerfile')for p in(parent/'code').rglob('*')if p.is_file()),'No binary/asset in historical proof closure')
+  if entrypoint!='run_object_budget_solid':
+   bound=read(qualification/'native.json')['source_proof']['source_binding']if entrypoint=='run_surface_qslim_qualify'else read(root/'results'/('surface-identity-qualify-'+revision)/'native.json')['source_proof']['source_binding']
+  else:bound=read(proposal/'report.json')['source_binding']
+  rt.require(all(oldsource[k]==bound[k]for k in('producer_revision','markers','entries','closure_sha256')),'Original hash-only proof source changed')
+  historical.append((parent,oldsource))
+rt.require(set(pins['files'])=={str(p.relative_to(root))for p in expected},'Exact canonical selected geometry artifacts required')
 inputs={str(p):raw(p)for p in expected}
 for name,value in pins['files'].items():same(root/name,value)
 rt.require(inputs[str(proposal/'report.json')]=={k:producer[k]for k in ('bytes','sha256')},'Independent producer report differs')
@@ -72,10 +89,10 @@ for directory in directories[:3]:
  for p in sorted(directory.iterdir()):inputs[str(p)]=raw(p,1<<30)
 for r in dr['frames']:rt.require(inputs[str(depth/f"{r['frame_index']:06d}.npz")]['sha256']==r['output_sha256'],'Original depth artifact differs')
 for p in leaves:inputs[str(p)]=raw(p)
-configs=[pinpath,code/qfile,code/'configs/solid_chart_v2_build_pins.json',code/'configs/certified_solid_qualification_pins.json']
+configs=[pinpath,code/qfile,*([code/'configs/surface_qslim_build_pins.json',code/'configs/surface_identity_qualification_pins.json']if profile=='surface'else[code/'configs/solid_chart_v2_build_pins.json',code/'configs/certified_solid_qualification_pins.json'])]
 if query_requalification:configs.append(code/'configs/certified_solid_balanced_qualification_pins.json')
 # GPU closure follows imports, not unrelated provenance literals in inert helpers.
-paths=set(configs);pending=[code/'infra/object_pose_smoke.py',code/'infra/solid_geometry_loader.py',*(code/n for n in pins['source_helpers'])]
+paths=set(configs);pending=[code/'infra/object_pose_smoke.py',code/f'infra/{profile}_geometry_loader.py',*(code/n for n in pins['source_helpers'])]
 def module(name):return next((p for p in (code/'src'/Path(name.replace('.','/')).with_suffix('.py'),code/'src'/Path(name.replace('.','/'))/'__init__.py',code/'infra'/(name.split('.')[0]+'.py'))if p.is_file()),None)
 while pending:
  p=pending.pop()
@@ -90,14 +107,16 @@ while pending:
    if dep is not None:pending.append(dep)
 for name,value in pins['source_helpers'].items():rt.require(rt.identity(code/name,empty=True)==value,'Actual reused math source differs')
 paths.add(code/'src/world_reward/__init__.py')
-rt.require(not any(p.parent==code/'infra'and p.suffix=='.py'and p.name.startswith(('certified_solid','object_budget_solid','mesh_serialization_compile','oriented_solid_compiler','mesh_conditioned_cache','solid_chart_v2'))for p in paths),'No solver/model/qualification driver mounted')
+rt.require(not any(p.parent==code/'infra'and p.suffix=='.py'and p.name.startswith(('certified_solid','object_budget_solid','mesh_serialization_compile','oriented_solid_compiler','mesh_conditioned_cache','solid_chart_v2','surface_qslim','surface_identity_qualify','continuous_surface_gate'))for p in paths),'No solver/model/qualification driver mounted')
 paths.update(code.parent/n for n in('revision','source-sha256'))
 official=root/'vendor/v2d_submission_kit/v2dlb/mesh_budget.py';rt.require(raw(official)==dict(bytes=2031,sha256='42ab8ab35f37b806fb1465eadd96abe43eaac04575da47a4855d08eefe6167b0'),'Actual unmodified official helper required');leaves.append(official)
 init=official.with_name('__init__.py')
 if init.exists():leaves.append(init)
 for p in leaves:inputs[str(p)]=raw(p,empty=p==init)
 mounts=sorted({str(p)for p in paths}|{str(p)for p in directories}|{str(p)for p in expected if not p.is_relative_to(proposal)and not p.is_relative_to(qualification)}|{str(p)for p in leaves}|{str(meta),str(video)})
-proof=dict(source=source,inputs=inputs,selected_source={str(p):rt.identity(p,empty=True)for p in paths},solid_pins_identity=pin,total_frames=total,video_sha256=pins['input_sha256'],mounts=mounts)
+if historical:mounts=sorted(set(mounts)|{str(parent)for parent,_ in historical})
+proof=dict(source=source,inputs=inputs,selected_source={str(p):rt.identity(p,empty=True)for p in paths},**{profile+'_pins_identity':pin},total_frames=total,video_sha256=pins['input_sha256'],mounts=mounts)
+if historical:proof['hash_only_historical_sources']={str(parent):bound for parent,bound in historical}
 if query_requalification:proof['query_requalification']=read(proposal/'report.json')['query_requalification']
 if mode=='before':
  rt.require(not out.exists()and not out.is_symlink()and not control.exists()and not control.is_symlink(),'Fresh output/control only');control.mkdir(mode=0o755);(control/'proof.json').write_text(json.dumps(proof,sort_keys=True));(control/'proof.json').chmod(0o444)
@@ -105,7 +124,7 @@ elif mode in('after','complete'):
  rt.require(proof==read(control/'proof.json'),'Post-run source/inputs changed')
  if mode=='complete':
   rt.require({p.name for p in out.iterdir()}=={'report.json','geometry_and_poses.npz','object_fixed_canonical.glb'},'Exactly three fullT native outputs required');r=read(out/'report.json')
-  fields=dict(stage='fixed_scale_full_object_pose_initializer',status='pass',episode_index=episode,input_sha256=pins['input_sha256'],mesh_source='solid',execution_verified=True,original_frame_coverage_verified=True,fixed_shape=True,ground_truth_used=False,hand_labeled_test=False,oracle_modes=[],challenge_performance_verified=False)
+  fields=dict(stage='fixed_scale_full_object_pose_initializer',status='pass',episode_index=episode,input_sha256=pins['input_sha256'],mesh_source=profile,execution_verified=True,original_frame_coverage_verified=True,fixed_shape=True,ground_truth_used=False,hand_labeled_test=False,oracle_modes=[],challenge_performance_verified=False)
   rt.require(all(type(r.get(k))is type(v)and r[k]==v for k,v in fields.items())and[r0['frame_index']for r0 in r['frames']]==list(range(total))and len(r['temporal_selection']['candidate_indices'])==total,'Complete original native pose proof required')
   rt.require(raw(out/'geometry_and_poses.npz',1<<30)['sha256']==r['geometry_and_poses_sha256']and raw(out/'object_fixed_canonical.glb')['sha256']==r['fixed_canonical_mesh_sha256']==inputs[str(proposal/'object_fixed_canonical.glb')]['sha256'],'Frozen original geometry/pose artifacts differ')
   rt.require(r['topology_budget']['committed_pins_sha256']==pin['sha256']and r['script_sha256']==proof['selected_source'][str(code/'infra/object_pose_smoke.py')]['sha256'],'Native pinned source differs')

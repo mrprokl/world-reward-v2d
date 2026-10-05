@@ -77,8 +77,10 @@ for role in roles:
   keys={'schema','clip_spec','input_report','source_files'}
   if type(pin)is not dict or not(set(pin)==keys and pin.get('schema')=='world-reward-cari-clip-input-pins-v1' or
       set(pin)==keys|{'object_source'} and pin.get('schema')=='world-reward-cari-clip-input-pins-v2' and
-      type(pin.get('object_source'))is str and pin['object_source']=='solid'):
-   raise ValueError('Exact legacy v1 or solid-only v2 input pin schema required')
+      type(pin.get('object_source'))is str and pin['object_source']=='solid' or
+      set(pin)==keys|{'object_source'} and pin.get('schema')=='world-reward-cari-clip-input-pins-v3' and
+      type(pin.get('object_source'))is str and pin['object_source']=='surface'):
+   raise ValueError('Exact legacy v1, solid-only v2 or surface-only v3 input pin schema required')
  elif type(pin)is not dict or set(pin)!={'schema','clip_spec',role,role+'_files'} or pin['schema']!=f'world-reward-cari-shared-{role}-pins-v1':
   raise ValueError('Exact required committed stage pin schema required')
  value=pin['clip_spec']

@@ -35,8 +35,8 @@ wr_parse_cari_arguments() {
         fi
         WR_BUNDLE_SOURCE="$2"; bundle_seen=1; shift 2 ;;
       --mesh-source)
-        if [[ "$mode" != prepare ]] || (( mesh_seen || $# < 2 )) || [[ "$2" != default && "$2" != solid ]]; then
-          echo 'Require one prepare-only --mesh-source default|solid' >&2; return 2
+        if [[ "$mode" != prepare ]] || (( mesh_seen || $# < 2 )) || [[ "$2" != default && "$2" != solid && "$2" != surface ]]; then
+          echo 'Require one prepare-only --mesh-source default|solid|surface' >&2; return 2
         fi
         WR_MESH_SOURCE="$2"; mesh_seen=1; shift 2 ;;
       --query-requalification)
@@ -108,7 +108,7 @@ wr_cari_dependency() {
   local mode="$1" stage
   printf -v WR_EPISODE_PADDED '%06d' "$WR_EPISODE"
   case "$mode" in
-    prepare) if [[ "$WR_MESH_SOURCE" == solid ]]; then stage=object_pose_full_solid; else stage=object_pose_full; fi ;;
+    prepare) if [[ "$WR_MESH_SOURCE" == default ]]; then stage=object_pose_full; else stage="object_pose_full_$WR_MESH_SOURCE"; fi ;;
     forward) if (( WR_KERNEL_ONLY )); then stage=body_full; else stage=cari_inputs; fi ;;
     converter) if [[ "$WR_BUNDLE_SOURCE" == forward ]]; then stage=cari_forward; else stage=cari_refined; fi ;;
     refine) stage=cari_forward ;;

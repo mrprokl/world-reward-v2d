@@ -266,14 +266,15 @@ def test_export_original_source_path_schema_matches_existing_public_contract(gat
     assert gate._public_source_paths(asdict(spec))==public.source_paths(spec)
 
 
-def test_solid_public_profile_substitutes_only_one_of_fifteen_paths(gate):
+@pytest.mark.parametrize('profile',['solid','surface'])
+def test_solid_public_profile_substitutes_only_one_of_fifteen_paths(gate,profile):
     spec=dict(episode_index=29,total_frames=673,camera_name="front_stereo_camera_left",height=1152,width=1536)
-    default=gate._public_source_paths(spec);solid=gate._public_source_paths(spec,"solid")
+    default=gate._public_source_paths(spec);solid=gate._public_source_paths(spec,profile)
     base="outputs/episode_000029/"
     assert gate._public_source_paths(spec,"default")==default
     assert len(default)==len(solid)==15 and len(default&solid)==14
     assert default-solid=={base+"object_pose_full/report.json"}
-    assert solid-default=={base+"object_pose_full_solid/report.json"}
+    assert solid-default=={base+f"object_pose_full_{profile}/report.json"}
 
 
 @pytest.mark.parametrize("profile",[None,True,0,[],{},"","volume","conditioned","solid/../default","SOLID"])
@@ -283,11 +284,12 @@ def test_public_source_profile_is_a_bounded_enum(gate,profile):
 
 
 @pytest.mark.parametrize("episode,count",[(0,96),(15,501),(29,673)])
-def test_solid_export_inventory_uses_exact_fifteen_sources_without_new_claim_fields(gate,tmp_path,episode,count):
+@pytest.mark.parametrize('profile',['solid','surface'])
+def test_solid_export_inventory_uses_exact_fifteen_sources_without_new_claim_fields(gate,tmp_path,episode,count,profile):
     root,directory,report=fixture(gate,tmp_path,"export",episode,count)
     original_fields=set(report);base=f"outputs/episode_{episode:06d}/"
-    report["source_files"][base+"object_pose_full_solid/report.json"]=report["source_files"].pop(base+"object_pose_full/report.json")
-    assert set(report["source_files"])==gate._public_source_paths(report["clip_spec"],"solid")
+    report["source_files"][base+f"object_pose_full_{profile}/report.json"]=report["source_files"].pop(base+"object_pose_full/report.json")
+    assert set(report["source_files"])==gate._public_source_paths(report["clip_spec"],profile)
     write(directory/"report.json",report)
     before={p.name:(p.stat().st_mode,p.read_bytes())for p in directory.iterdir()}
     pins=gate.inventory(root,episode,"export","a"*40,"b"*64)

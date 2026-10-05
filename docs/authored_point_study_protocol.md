@@ -10,6 +10,14 @@ The loaded rig metadata and failed receipts remain sealed on Azure; no angle,
 scale, bounds, source, cohort or gate is retuned and this cohort stays closed.
 No future full-render/Boots/A/B scope is authorized by this result.
 
+A separate read-only NPZ/JSON metadata diagnostic (no Torch/model/decode)
+identifies four native PCA-mean scale coordinates against fixed zero bounds:
+`scale_hip_height`0.0079719713, `scale_hip_depth`−0.0001074657,
+`scale_knee_knock`0.0000343030 and `scale_ankle_height`3.7254e−10.
+The six named articulation controls are not the offending coordinates. This
+is a mean/bound semantic incompatibility in this strict recipe gate, not a
+verified illegal motion. No zeroing/clipping or closed-cohort replay follows.
+
 This is a **new synthetic component study**, not RGB-only HOI reconstruction,
 challenge validation, a grasp certificate, or a rerun of a closed cohort. The
 frozen JSON declares six new T24 scenes (two development, four reserved), 144

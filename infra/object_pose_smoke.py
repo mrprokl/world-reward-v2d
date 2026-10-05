@@ -33,7 +33,7 @@ def _argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
     parser.add_argument("--full-video", action="store_true")
-    parser.add_argument("--mesh-source", choices=('default','volume','conditioned','solid'), default='default')
+    parser.add_argument("--mesh-source", choices=('default','volume','conditioned','solid','surface'), default='default')
     parser.add_argument('--query-requalification', action=_QueryFlag, nargs=0, default=False)
     return parser
 
@@ -64,6 +64,28 @@ def _load_solid_mesh(root, episode, input_sha, object_report_path, alignment_pat
     return vertices, faces, active_indices, geometry_cleanup, qualified_glb, topology_budget
 
 
+def _load_surface_mesh(root, episode, input_sha, object_report_path, alignment_path, scale, output, fixed_mesh_path):
+    """Inert independently pinned surface; no CPU solver in the GPU process."""
+    from surface_geometry_loader import load, identity, strict_json
+    import shutil
+    pin_path = Path(__file__).resolve().parent.parent / 'configs' / f'surface_mesh_{episode:06d}_pins.json'
+    pin = identity(pin_path)
+    values = load(root, episode, input_sha, sha256(object_report_path), sha256(alignment_path),
+                  scale, pins=strict_json(pin_path.read_bytes()))
+    if identity(pin_path) != pin:
+        raise ValueError('Committed surface pins changed during loading')
+    vertices, faces, active, cleanup, canonical, receipt = values
+    receipt['committed_pins_sha256'] = pin['sha256']
+    original = identity(canonical)
+    if not _solid_output_reserved(output):
+        output.mkdir(exist_ok=False)
+    shutil.copyfile(canonical, fixed_mesh_path)
+    if (sha256(fixed_mesh_path) != original['sha256'] or identity(canonical) != original
+            or identity(pin_path) != pin):
+        raise ValueError('Canonical surface changed during Azure-only copying')
+    return vertices, faces, active, cleanup, canonical, receipt
+
+
 def _solid_output_reserved(output):
     """One empty, wrapper-owned output; never resume a prediction directory."""
     import stat
@@ -86,8 +108,8 @@ def main() -> None:
     args = _argument_parser().parse_args()
     if args.query_requalification and args.mesh_source != 'solid':
         raise ValueError('Query requalification is solid-only')
-    if args.mesh_source == 'solid' and not args.full_video:
-        raise ValueError('Solid geometry requires the complete original video')
+    if args.mesh_source in ('solid','surface') and not args.full_video:
+        raise ValueError('Qualified geometry requires the complete original video')
     root = Path(os.environ.get("WR_ROOT", "/srv/scenesmith/world-reward"))
     inputs = _validate_inputs(root, episode_index=args.episode)
     import numpy as np
@@ -98,11 +120,11 @@ def main() -> None:
     output = base / ("object_pose_full" if args.full_video else "object_pose_smoke")
     if args.mesh_source=='conditioned':
         output = output.with_name(output.name+'_conditioned')
-    elif args.mesh_source=='solid':
-        output = output.with_name(output.name+'_solid')
-    if os.environ.get('WR_POSE_OUTPUT_RESERVED') is not None and args.mesh_source!='solid':
-        raise ValueError('Output reservation is solid-only')
-    reserved=_solid_output_reserved(output) if args.mesh_source=='solid' else False
+    elif args.mesh_source in ('solid','surface'):
+        output = output.with_name(output.name+'_'+args.mesh_source)
+    if os.environ.get('WR_POSE_OUTPUT_RESERVED') is not None and args.mesh_source not in ('solid','surface'):
+        raise ValueError('Output reservation requires a qualified representation')
+    reserved=_solid_output_reserved(output) if args.mesh_source in ('solid','surface') else False
     if not reserved and (output.exists() or output.is_symlink()):
         raise RuntimeError("Frozen object pose smoke already exists")
     object_dir = base / "object_grounded"
@@ -187,6 +209,9 @@ def main() -> None:
         shutil.copyfile(qualified_glb,fixed_mesh_path)  # canonical only; metric vertices already scaled by CPU
         if sha256(fixed_mesh_path) != source_identity['sha256'] or identity(qualified_glb) != source_identity:
             raise ValueError('Conditioned canonical GLB changed during remote-only copying')
+    elif args.mesh_source=='surface':
+        vertices,faces,active_indices,geometry_cleanup,qualified_glb,topology_budget=_load_surface_mesh(
+            root,args.episode,inputs['video_sha256'],object_report_path,alignment_path,float(scale[0]),output,fixed_mesh_path)
     elif args.mesh_source=='solid':
         vertices,faces,active_indices,geometry_cleanup,qualified_glb,topology_budget=_load_solid_mesh(
             root,args.episode,inputs['video_sha256'],object_report_path,alignment_path,float(scale[0]),output,fixed_mesh_path,
@@ -208,16 +233,23 @@ def main() -> None:
     inactive[active_indices] = False
     if args.mesh_source=='conditioned' and np.any(faces[inactive] != 0):
         raise ValueError('Conditioned route only permits original all-zero official padding')
-    if args.mesh_source=='solid' and np.any(faces[inactive] != 0):
+    if args.mesh_source in ('solid','surface') and np.any(faces[inactive] != 0):
         raise ValueError('Solid route only permits original all-zero official padding')
     faces = faces.copy()
     faces[inactive] = 0
-    if args.mesh_source in ('volume','conditioned','solid'):
+    if args.mesh_source=='surface':
+        from world_reward.surface_pose_geometry import compact_surface
+        cv,cf,checked_active,_=compact_surface(vertices,faces,
+            canonical_vertex_count=topology_budget['canonical_vertices_count'],
+            canonical_face_count=topology_budget['canonical_faces_count'])
+        if not np.array_equal(checked_active,active_indices):raise ValueError('Original surface face indices changed')
+        mesh=trimesh.Trimesh(cv,cf,process=False)
+    elif args.mesh_source in ('volume','conditioned','solid'):
         ids,inverse=np.unique(faces[active_indices],return_inverse=True)
         mesh=trimesh.Trimesh(vertices[ids],inverse.reshape(-1,3),process=False)
     else:
         mesh = trimesh.Trimesh(vertices, faces[active_indices], process=True)
-    if not mesh.is_watertight or not mesh.is_winding_consistent or mesh.volume <= 0:
+    if args.mesh_source!='surface' and (not mesh.is_watertight or not mesh.is_winding_consistent or mesh.volume <= 0):
         raise RuntimeError("Official-budget geometry lost closed oriented volume; do not use for PEN")
     sampled, _ = trimesh.sample.sample_surface(mesh, 8192, seed=0)
     pointmaps = {record["frame_index"]: record for record in alignment["pointmaps"]}

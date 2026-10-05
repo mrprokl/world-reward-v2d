@@ -1,0 +1,31 @@
+{
+  "schema": "world_reward.mhr_official_release_selected_qualification_pins.v1",
+  "producer_revision": "c41620005e8e9167529045d3cae072baa8b79c8c",
+  "source_files": 204,
+  "source_archive_sha256": "08193cf5e78ff2f96ab62715ed139a8c627bb6b96297c1b53738522cbfe9f7a7",
+  "protocol_sha256": "ad418f042446148f22ec4f4d20b3fd8ec1ff2541d4d9e577c1382e5339adb3cb",
+  "report_path": "results/mhr-official-release-license-v2/report.json",
+  "files": {
+    "report.json": {"bytes": 10250, "sha256": "3318d6e3f93bf2c00100fbf61d3f5a3e23278d4486fd16bc47b5e82f8901399b"},
+    "release-metadata.json": {"bytes": 3438, "sha256": "9f77ca15ac56546cba6448032ad41d8519cbf1ade2d4f5380952692cdc71eb59"},
+    "asset-notice-0.txt": {"bytes": 11358, "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"},
+    "primary-LICENSE": {"bytes": 11358, "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"},
+    "primary-README.md": {"bytes": 7753, "sha256": "b907f4ff885cbb1ee6e51fe150dfcc2d15704838a9047430a2196216afe58712"}
+  },
+  "status": "pass",
+  "elapsed_seconds": 5.701784297008999,
+  "selected_members_decoded": 2,
+  "selected_expanded_bytes": 696121606,
+  "inactive_payloads_opened": 0,
+  "asset_license_matches_primary_exactly": true,
+  "existing_standalone_model_byte_identical": true,
+  "original_source_model_failure_inventory_rehashed_after": true,
+  "owned_archive_removed": true,
+  "independent_saved_receipts_audit": true,
+  "models_copied_or_loaded": false,
+  "gpu_used": false,
+  "sam_provenance_relabelled": false,
+  "competition_eligibility_verified": false,
+  "training_overlap_verified": false,
+  "adoption": false
+}

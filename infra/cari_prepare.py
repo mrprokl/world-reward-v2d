@@ -49,7 +49,7 @@ class _QueryFlag(argparse.Action):
 def _argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
-    parser.add_argument("--mesh-source", choices=("default", "solid"), default="default")
+    parser.add_argument("--mesh-source", choices=("default", "solid", "surface"), default="default")
     parser.add_argument('--query-requalification', action=_QueryFlag, nargs=0, default=False)
     return parser
 
@@ -324,6 +324,85 @@ def _solid_camera_roundtrip(source, rotations, translations, saved_poses, native
     return error
 
 
+def _surface_preflight(root, episode, inputs, report, pose_path, np):
+    """Authenticated surface and full poses, before reserving prepared inputs."""
+    from surface_geometry_loader import load, identity, strict_json, recheck, preflight_geometry_and_poses, SOURCE_HELPERS
+    code=Path(__file__).resolve().parent.parent
+    base=root/f'outputs/episode_{episode:06d}'
+    pinpath=code/'configs'/f'surface_mesh_{episode:06d}_pins.json'
+    pin=identity(pinpath);pins=strict_json(pinpath.read_bytes())
+    objectpath=base/'object_grounded/report.json';alignment=base/'scale_smoke/report.json'
+    transformpath=base/'object_grounded/transform.json'
+    scale=np.asarray(strict_json(transformpath.read_bytes())['scale'],np.float64)
+    if scale.shape!=(3,) or not np.isfinite(scale).all() or np.any(scale<=0) or not np.allclose(scale,scale[0],atol=0,rtol=1e-5):
+        raise ValueError('One original positive object scale is required; no averaging')
+    v,f,active,_,canonical,receipt=load(root,episode,inputs['video_sha256'],sha256(objectpath),
+        sha256(alignment),float(scale[0]),pins=pins)
+    if pose_path!=base/'object_pose_full_surface/geometry_and_poses.npz':
+        raise ValueError('Canonical surface full-trajectory path required')
+    parent=pose_path.parent;copy=parent/'object_fixed_canonical.glb';reportpath=parent/'report.json'
+    if parent.resolve()!=parent or parent.stat().st_mode&0o777!=0o555 or {p.name for p in parent.iterdir()}!={'report.json','geometry_and_poses.npz','object_fixed_canonical.glb'}:
+        raise ValueError('Exact sealed surface pose namespace required')
+    ledger={p:identity(p,readonly=p in (pinpath,pose_path,copy,reportpath,canonical)) for p in
+        (pinpath,pose_path,copy,reportpath,canonical,objectpath,alignment,transformpath)}
+    wanted=dict(mesh_source='surface',execution_verified=True,original_frame_coverage_verified=True,fixed_shape=True,
+        object_report_sha256=ledger[objectpath]['sha256'],geometry_and_poses_sha256=ledger[pose_path]['sha256'],
+        fixed_canonical_mesh_sha256=ledger[canonical]['sha256'])
+    if any(type(report.get(k)) is not type(value) or report[k]!=value for k,value in wanted.items()) or strict_json(reportpath.read_bytes())!=report or ledger[copy]!=ledger[canonical] or ledger[pinpath]!=pin:
+        raise ValueError('Surface full pose provenance or canonical copy differs')
+    if report.get('topology_budget',{}).get('committed_pins_sha256')!=pin['sha256']:
+        raise ValueError('Surface pose committed pins differ')
+    for key in ('producer_report_sha256','cpu_native_report_sha256','source_domain','metric_scale_baked_once',
+            'geometry_operations_applied','canonical_vertices_count','canonical_faces_count'):
+        if type(report['topology_budget'].get(key)) is not type(receipt[key]) or report['topology_budget'][key]!=receipt[key]:
+            raise ValueError('Surface pose and inert CPU proposal differ')
+    values=preflight_geometry_and_poses(pose_path,expected_v=v,expected_f=f,expected_episode=episode,
+        expected_scale=1.,topology_budget=receipt)
+    pv,pf,pa,r,t,compact,topology,_=values
+    if (r.shape != (inputs['total_frames'],3,3) or t.shape != (inputs['total_frames'],3)
+            or not np.array_equal(pa,active)):
+        raise ValueError('Surface original full timeline or meaningful face indices changed')
+    helpers={*SOURCE_HELPERS,'infra/cari_prepare.py','infra/cari_wrapper_common.sh','infra/run_cari_prepare.sh'}
+    ledger.update({code/n:identity(code/n) for n in helpers})
+    recheck(ledger)
+    return pv,pf,pa,r,t,compact,topology,ledger
+
+
+def _surface_serialized_mesh(path, source, trimesh, np, native_load, transform=None):
+    """Same original scene/FP32 math, with surface rather than solid predicates."""
+    from world_reward.surface_pose_geometry import serialized_mesh
+    from mesh_precision_diagnostic import raw_glb
+    from object_budget_endpoint import _load_mesh
+    local,world,records=raw_glb(path)
+    if len(local)!=1:raise ValueError('Canonical surface must have one original primitive')
+    if local[0][0].dtype!=np.float32 or local[0][1].dtype!=np.int64:
+        raise ValueError('Original GLB POSITION F32 and complete I64 indices required')
+    if transform is None:
+        if not all(r['node_transform_identity'] for r in records):raise ValueError('Metric surface contains a hidden scene transform')
+        transform=np.eye(4)
+    raw,effective=_solid_scene_matrix(trimesh.load(path,force='scene',process=False),transform,trimesh,np)
+    loaded_v,loaded_f=_load_mesh(path);nv,nf=native_load(path)
+    native_v,native_f,proof=serialized_mesh(*source,local_vertices=local[0][0].astype(np.float64),local_faces=local[0][1],
+        raw_world_triangles=world,loaded_vertices=loaded_v,loaded_faces=loaded_f,native_vertices=nv,native_faces=nf,
+        raw_matrix=raw,effective_matrix=effective,projected_matrix=trimesh.transformations.fix_rigid(transform,max_deviance=1e-5))
+    return proof,(native_v,native_f)
+
+
+def _surface_saved_poses(saved, names, aligned_poses, pose_sha, matrix, np):
+    """Verify the actual serialized payload, not merely the pre-save array."""
+    metadata={'source':'World_Reward_fixed_scale_depth_ICP_Viterbi_not_FoundationPose',
+        'ground_truth_used':False,'hand_labeled_test':False,'oracle_modes':[],
+        'source_pose_sha256':pose_sha,'mesh_frame_change':matrix.tolist()}
+    if (type(saved) is not dict or set(saved)!={'frames','obj_pose_world','metadata'}
+            or saved['frames']!=names or type(saved['obj_pose_world']) is not np.ndarray
+            or saved['obj_pose_world'].dtype!=np.float32
+            or saved['obj_pose_world'].shape!=aligned_poses.shape
+            or saved['obj_pose_world'].tobytes()!=aligned_poses.astype(np.float32).tobytes()
+            or saved['metadata']!=metadata):
+        raise ValueError('Saved surface full timeline, F32 poses or provenance metadata changed')
+    return saved['obj_pose_world']
+
+
 def main():
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux container with network none")
@@ -354,8 +433,8 @@ def main():
     report_paths = {"body": base / "body_full/report.json", "depth": base / "depth_full/report.json",
                     "object": base / "object_pose_full/report.json", "alignment": base / "scale_smoke/report.json",
                     "adapter": base / "body_full/cari_adapter/report.json"}
-    if args.mesh_source == 'solid':
-        report_paths['object'] = base / 'object_pose_full_solid/report.json'
+    if args.mesh_source in ('solid','surface'):
+        report_paths['object'] = base / ('object_pose_full_'+args.mesh_source) / 'report.json'
     for key, path in report_paths.items():
         record = json.loads(path.read_text())
         if type(record.get("episode_index", args.episode)) is not int or record.get("episode_index", args.episode) != args.episode:
@@ -383,8 +462,8 @@ def main():
     if sha256(adapter_path) != reports["adapter"]["canonical_initializer_sha256"]:
         raise RuntimeError("Canonical human initializer changed")
     pose_path = base / "object_pose_full/geometry_and_poses.npz"
-    if args.mesh_source == 'solid':
-        pose_path = base / 'object_pose_full_solid/geometry_and_poses.npz'
+    if args.mesh_source in ('solid','surface'):
+        pose_path = base / ('object_pose_full_'+args.mesh_source) / 'geometry_and_poses.npz'
     if sha256(pose_path) != reports["object"]["geometry_and_poses_sha256"]:
         raise RuntimeError("Frozen object geometry/poses changed")
     count = inputs["total_frames"]
@@ -395,6 +474,19 @@ def main():
     for key, records in (("body", body_frames), ("depth", depth_frames), ("object", object_frames)):
         if len(records) != len(reports[key]["frames"]) or sorted(records) != list(range(count)):
             raise RuntimeError(f"{key} lacks exact full original-frame coverage")
+    if args.mesh_source == 'surface':
+        from surface_geometry_loader import identity as surface_identity, recheck as surface_recheck
+        vertices, faces, active, rotations, translations, surface_compact, surface_topology, surface_ledger = _surface_preflight(
+            root,args.episode,inputs,reports['object'],pose_path,np)
+        surface_native_load, native_source_ledger = _solid_native_sources(native_root,trimesh,np)
+        surface_ledger.update(native_source_ledger)
+        native_pins={'prep/prepare_mhr_wild_export.py':{'bytes':13145,'sha256':'b465516cc96a8c5472aec995cff12e32a9d033c7c5157a6a601b96e332e45f4f'},
+            'prep/mhr_export_utils.py':{'bytes':25383,'sha256':'a9f499dad2f73eb7b8c526f33c94a785cc9468423760afcf6e5ced46d2f49e3b'}}
+        for name,pin in native_pins.items():
+            path=native_root/name
+            if surface_identity(path,readonly=False)!=pin:
+                raise ValueError('Original native surface alignment/export source differs')
+            surface_ledger[path]=pin
     if args.mesh_source == 'solid':
         vertices, faces, active, rotations, translations, solid_compact, solid_topology, solid_ledger = _solid_preflight(
             root, args.episode, inputs, reports['object'], pose_path, np,
@@ -409,7 +501,7 @@ def main():
             solid_ledger[path] = pin
         solid_native_load, native_source_ledger = _solid_native_sources(native_root, trimesh, np)
         solid_ledger.update(native_source_ledger)
-    else:
+    elif args.mesh_source != 'surface':
         with np.load(pose_path, allow_pickle=False) as arrays:
             vertices, faces = arrays["vertices"].copy(), arrays["faces"].copy()
             rotations, translations = arrays["rotation"].copy(), arrays["translation"].copy()
@@ -420,7 +512,15 @@ def main():
             or not np.allclose(rotations @ rotations.swapaxes(-1, -2), np.eye(3), atol=1e-5, rtol=0)
             or not np.allclose(np.linalg.det(rotations), 1, atol=1e-5, rtol=0)):
         raise RuntimeError("Full object trajectory must contain proper finite rigid poses")
-    if args.mesh_source == 'solid':
+    if args.mesh_source == 'surface':
+        surface_ledger.update({p:surface_identity(p,readonly=False) for p in (*report_paths.values(),adapter_path)})
+        from surface_geometry_loader import strict_json as surface_json
+        if any(surface_json(path.read_bytes())!=reports[key]
+                or surface_identity(path,readonly=False)!=surface_ledger[path] for key,path in report_paths.items()):
+            raise ValueError('Surface initializer reports changed before output reservation')
+        surface_recheck(surface_ledger)
+        metric_mesh=trimesh.Trimesh(*surface_compact,process=False)
+    elif args.mesh_source == 'solid':
         for path in (*report_paths.values(), adapter_path):
             solid_ledger[path] = solid_identity(path, readonly=False)
         if any(sha256(report_paths[key]) != solid_ledger[report_paths[key]]['sha256'] or
@@ -430,7 +530,7 @@ def main():
     else:
         active, _ = normalize_degenerate_faces(vertices, faces)
         metric_mesh = trimesh.Trimesh(vertices, faces[active], process=True)
-    if not metric_mesh.is_watertight or not metric_mesh.is_winding_consistent or metric_mesh.volume <= 0:
+    if args.mesh_source!='surface' and (not metric_mesh.is_watertight or not metric_mesh.is_winding_consistent or metric_mesh.volume <= 0):
         raise RuntimeError("Packed fixed geometry must remain closed and correctly oriented")
     output.mkdir(exist_ok=False)
     started = time.perf_counter()
@@ -450,7 +550,10 @@ def main():
         raise RuntimeError("Native video alias differs from original Track 1 bytes")
     metric_path = output / "object_metric.glb"
     metric_mesh.export(metric_path)
-    if args.mesh_source == 'solid':
+    if args.mesh_source == 'surface':
+        surface_metric_proof,_=_surface_serialized_mesh(metric_path,surface_compact,trimesh,np,surface_native_load)
+        surface_metric_identity=surface_identity(metric_path,readonly=False)
+    elif args.mesh_source == 'solid':
         metric_proof, _ = _solid_serialized_mesh(metric_path, solid_compact, solid_topology, trimesh, np, solid_native_load)
         metric_identity = solid_identity(metric_path, readonly=False)
     focal = float(np.hypot(1152, 1536))
@@ -498,6 +601,14 @@ def main():
             raise ValueError('Native solid export must retain the canonical prepared aligned-GLB route')
         aligned_proof, native_aligned_mesh = _solid_serialized_mesh(
             aligned_path, solid_compact, solid_topology, trimesh, np, solid_native_load, A)
+    if args.mesh_source == 'surface':
+        if not np.array_equal(A.astype(np.float32).astype(np.float64),A) or not np.array_equal(A[3],[0.,0.,0.,1.]):
+            raise ValueError('Native surface alignment must retain actual F32 affine metadata')
+        aligned_path=output/'export'/sequence/'object_mesh/output_aligned.glb'
+        if metadata.get('object_mesh_file')!=str(aligned_path) or export_seq!=aligned_path.parent.parent:
+            raise ValueError('Native surface export changed its canonical aligned-GLB route')
+        surface_aligned_proof,surface_native_aligned=_surface_serialized_mesh(
+            aligned_path,surface_compact,trimesh,np,surface_native_load,A)
     object_poses_path = output / "own_object_poses.pkl"
     joblib.dump({"frames": names, "obj_pose_world": aligned_poses.astype(np.float32),
                  "metadata": {"source": "World_Reward_fixed_scale_depth_ICP_Viterbi_not_FoundationPose",
@@ -514,6 +625,12 @@ def main():
             raise ValueError('Saved native full-timeline solid poses/metadata changed')
         aligned_proof['represented_mesh_pose_frame_roundtrip_max_error_m'] = _solid_camera_roundtrip(
             solid_compact, rotations, translations, saved_object_poses['obj_pose_world'], native_aligned_mesh, np)
+    if args.mesh_source == 'surface':
+        from world_reward.surface_pose_geometry import camera_roundtrip
+        saved=joblib.load(object_poses_path)
+        _surface_saved_poses(saved,names,aligned_poses,sha256(pose_path),A,np)
+        surface_aligned_proof['represented_mesh_pose_frame_roundtrip_max_error_m']=camera_roundtrip(
+            *surface_compact,rotations,translations,saved['obj_pose_world'],*surface_native_aligned)
     aligned_depth_path = output / "aligned_depth.h5"
     scale = reports["alignment"]["depth_alignment"]["shared_scale"]
     identity = {"depth_backend": "moge2", "depth_model_id": MOGE2_MODEL_ID, "depth_model_revision": MOGE2_MODEL_REVISION,
@@ -603,6 +720,24 @@ def main():
             'local_coordinates_or_topology_repaired': False,
             'native_rigidprojection_used': aligned_proof['native_rigidprojection_used'],
             'metric_scale_applied_again': False}
+    if args.mesh_source == 'surface':
+        surface_recheck(surface_ledger)
+        _pinned_checkout(vendor,UPSTREAM_REVISION)
+        if (surface_identity(metric_path,readonly=False)!=surface_metric_identity
+                or metadata.get('source_object_mesh')!={'path':str(metric_path.resolve()),
+                    'size':metric_path.stat().st_size,'mtime_ns':metric_path.stat().st_mtime_ns}):
+            raise ValueError('Native surface metric GLB changed during preparation')
+        final_metric,_=_surface_serialized_mesh(metric_path,surface_compact,trimesh,np,surface_native_load)
+        final_aligned,_=_surface_serialized_mesh(aligned_path,surface_compact,trimesh,np,surface_native_load,A)
+        if final_metric!=surface_metric_proof or any(final_aligned[k]!=surface_aligned_proof[k] for k in final_aligned):
+            raise ValueError('Surface geometry changed after preparation')
+        result['object_source']='surface'
+        result['object_pose_source']=dict(report=str(report_paths['object'].relative_to(root)),
+            geometry_and_poses=str(pose_path.relative_to(root)),geometry_and_poses_sha256=sha256(pose_path))
+        fields=('committed_pins_sha256','producer_report_sha256','cpu_native_report_sha256','source_domain','metric_scale_baked_once','geometry_operations_applied')
+        result['surface_geometry_validation']={k:reports['object']['topology_budget'][k] for k in fields}
+        result['surface_geometry_validation'].update(metric_glb=surface_metric_proof,native_aligned_glb=surface_aligned_proof,
+            source_rehashed_after=True,files={str(p):pin for p,pin in surface_ledger.items()})
     (output / "report.json").write_text(json.dumps(result, indent=2) + "\n")
     # Transient combined masks are redundant after verified native export.
     masks_path.unlink()

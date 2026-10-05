@@ -20,7 +20,17 @@ def pin(p):return dict(bytes=p.stat().st_size,sha256=hashlib.sha256(p.read_bytes
 
 
 @pytest.fixture
-def runtime(tmp_path):
+def runtime_factory(tmp_path):
+ def create(profile='solid'):
+  return _runtime(tmp_path/profile,profile)
+ return create
+
+
+@pytest.fixture
+def runtime(runtime_factory):return runtime_factory()
+
+
+def _runtime(tmp_path,profile):
  root=tmp_path/'root';rev='a'*40;code=root/'jobs'/rev/'run_object_pose_smoke/code';code.mkdir(parents=True)
  base=root/'outputs/episode_000009';base.mkdir(parents=True)
  def write(p,value):
@@ -32,10 +42,20 @@ def runtime(tmp_path):
   for p in(REPO/folder).glob('*'):
    if p.is_file()and p.suffix in('.py','.hpp'):write(code/p.relative_to(REPO),p.read_bytes())
  write(code/'infra/run_object_pose_smoke.sh',WRAPPER.read_bytes())
- proposal=base/('object_budget_solid_'+'c'*40);qualification=root/'results'/('solid-chart-v2-qualify-'+'d'*40)
+ proposal=base/('object_budget_'+profile+'_'+'c'*40);qualification=root/'results'/(('surface-qslim-qualify-'if profile=='surface'else'solid-chart-v2-qualify-')+'d'*40)
  originals=[base/'object_grounded'/n for n in('report.json','object.glb','transform.json','intrinsics.json')]+[base/'scale_smoke/report.json']
  artifacts=[proposal/n for n in('report.json','native.json','geometry.npz','object_fixed_canonical.glb')]+originals+[qualification/n for n in('report.json','native.json')]
+ if profile=='surface':artifacts+=[proposal/'candidate_geometry.npz',proposal/'mapping.json',root/'results'/('surface-identity-qualify-'+'e'*40)/'native.json',root/'results/surface-qslim-independent-v2/report.json']
  for p in artifacts:write(p,b'explicit synthetic artifact, not qualified geometry')
+ if profile=='surface':
+  import importlib.util
+  rspec=importlib.util.spec_from_file_location('test_hist_rt',REPO/'infra/mediapipe_cpu_runtime_verify.py');rt=importlib.util.module_from_spec(rspec);rspec.loader.exec_module(rt)
+  for revision,entrypoint,receipt in(('c'*40,'run_object_budget_solid',proposal/'report.json'),('d'*40,'run_surface_qslim_qualify',qualification/'native.json'),('e'*40,'run_surface_identity_qualify',root/'results'/('surface-identity-qualify-'+'e'*40)/'native.json')):
+   old=root/'jobs'/revision/entrypoint/'code';write(old/'infra/original.cpp',b'// historical source, never executed\n')
+   for n,val in(('revision',revision),('source-sha256','f'*64)):write(old.parent/n,(val+'\n').encode()).chmod(0o444)
+   for p in(old,*old.rglob('*')):p.chmod(0o555 if p.is_dir()else 0o444)
+   source=rt.source(root,old,revision,entrypoint,())
+   write(receipt,{'source_binding':source}if entrypoint=='run_object_budget_solid'else{'source_proof':{'source_binding':source}})
  for directory in(proposal,qualification):
   for p in directory.iterdir():p.chmod(0o444)
   directory.chmod(0o555)
@@ -54,16 +74,22 @@ def runtime(tmp_path):
  write(base/'body_full/report.json',dict(shared,stage='sam3d_body_full_video_initializer',frames=[dict(frame_index=i)for i in range(3)]))
  for name in('body_smoke','depth_smoke'):write(base/name/'report.json',dict(synthetic=True))
  import importlib.util
- spec=importlib.util.spec_from_file_location('synthetic_solid_loader_schema',REPO/'infra/solid_geometry_loader.py');loader=importlib.util.module_from_spec(spec);spec.loader.exec_module(loader)
+ spec=importlib.util.spec_from_file_location('synthetic_selected_loader_schema',REPO/f'infra/{profile}_geometry_loader.py');loader=importlib.util.module_from_spec(spec)
+ sys.path.insert(0,str(REPO/'infra'));spec.loader.exec_module(loader)
  helpers={name:pin(code/name)for name in loader.SOURCE_HELPERS}
  pins=dict(schema=loader.SCHEMA,episode_index=9,input_sha256=pin(video)['sha256'],metric_scale_baked_once=.375,report=dict(pin(proposal/'report.json'),producer_revision='c'*40,script_sha256='e'*64),files={str(p.relative_to(root)):pin(p)for p in artifacts},source_helpers=helpers)
- pinpath=write(code/'configs/solid_mesh_000009_pins.json',pins)
- write(code/'configs/solid_chart_v2_qualification_pins.json',dict(producer_revision='d'*40))
- for name in('solid_chart_v2_build_pins','certified_solid_qualification_pins'):write(code/f'configs/{name}.json',dict(synthetic=True))
+ pinpath=write(code/f'configs/{profile}_mesh_000009_pins.json',pins)
+ if profile=='surface':
+  write(code/'configs/surface_qslim_qualification_pins.json',dict(producer_revision='d'*40,independent_audit_path='results/surface-qslim-independent-v2/report.json'))
+  write(code/'configs/surface_identity_qualification_pins.json',dict(producer_revision='e'*40))
+  write(code/'configs/surface_qslim_build_pins.json',dict(synthetic=True))
+ else:
+  write(code/'configs/solid_chart_v2_qualification_pins.json',dict(producer_revision='d'*40))
+  for name in('solid_chart_v2_build_pins','certified_solid_qualification_pins'):write(code/f'configs/{name}.json',dict(synthetic=True))
  official=write(root/'vendor/v2d_submission_kit/v2dlb/mesh_budget.py',b'original placeholder fixture official helper')
  write(official.with_name('__init__.py'),b'')
  for p in(code,*code.rglob('*')):p.chmod(0o555 if p.is_dir()else 0o444)
- control=root/'results'/f'object-pose-solid-000009-{rev}';out=base/'object_pose_full_solid';lock=root/'jobs/.world-reward-h100.lock'
+ control=root/'results'/f'object-pose-{profile}-000009-{rev}';out=base/f'object_pose_full_{profile}';lock=root/'jobs/.world-reward-h100.lock'
  # Only the manufactured root and known official fixture hash are substituted.
  host=HOST.replace("dict(bytes=2031,sha256='42ab8ab35f37b806fb1465eadd96abe43eaac04575da47a4855d08eefe6167b0')",repr(pin(official)))
  host=host.replace('if os.getuid()!=0 or entry!=', 'if entry!=')
@@ -71,12 +97,12 @@ def runtime(tmp_path):
  def call(mode):
   env=dict(os.environ)
   if(control/'proof.json').exists():env['WR_POSE_PROOF_SHA256']=pin(control/'proof.json')['sha256']
-  return subprocess.run(['rtk','proxy',sys.executable,'-I','-B','-',*args,mode,str(code/'infra/run_object_pose_smoke.sh')],input=host,text=True,capture_output=True,timeout=10,env=env)
+  return subprocess.run(['rtk','proxy',sys.executable,'-I','-B','-',*args,mode,str(code/'infra/run_object_pose_smoke.sh'),'0',profile],input=host,text=True,capture_output=True,timeout=10,env=env)
  def complete():
   out.mkdir();write(out/'geometry_and_poses.npz',b'actual payload checked in tracker, fixture bytes only')
   write(out/'object_fixed_canonical.glb',(proposal/'object_fixed_canonical.glb').read_bytes())
   proof=json.loads((control/'proof.json').read_text())
-  record=dict(shared,stage='fixed_scale_full_object_pose_initializer',mesh_source='solid',execution_verified=True,original_frame_coverage_verified=True,fixed_shape=True,challenge_performance_verified=False,frames=[dict(frame_index=i)for i in range(3)],temporal_selection=dict(candidate_indices=[0,1,2]),geometry_and_poses_sha256=pin(out/'geometry_and_poses.npz')['sha256'],fixed_canonical_mesh_sha256=pin(out/'object_fixed_canonical.glb')['sha256'],topology_budget=dict(committed_pins_sha256=pin(pinpath)['sha256']),script_sha256=proof['selected_source'][str(code/'infra/object_pose_smoke.py')]['sha256'])
+  record=dict(shared,stage='fixed_scale_full_object_pose_initializer',mesh_source=profile,execution_verified=True,original_frame_coverage_verified=True,fixed_shape=True,challenge_performance_verified=False,frames=[dict(frame_index=i)for i in range(3)],temporal_selection=dict(candidate_indices=[0,1,2]),geometry_and_poses_sha256=pin(out/'geometry_and_poses.npz')['sha256'],fixed_canonical_mesh_sha256=pin(out/'object_fixed_canonical.glb')['sha256'],topology_budget=dict(committed_pins_sha256=pin(pinpath)['sha256']),script_sha256=proof['selected_source'][str(code/'infra/object_pose_smoke.py')]['sha256'])
   write(out/'report.json',record)
  return dict(root=root,code=code,rev=rev,base=base,out=out,control=control,lock=lock,call=call,complete=complete,pins=pinpath,video=video,proposal=proposal,qualification=qualification,official=official)
 
@@ -94,6 +120,40 @@ def test_real_host_source_import_closure_and_fullt_freeze(runtime):
  runtime['complete']();after=runtime['call']('complete');assert after.returncode==0,after.stderr
  assert after.stdout==before.stdout and runtime['out'].stat().st_mode&0o777==0o555
  assert all(p.stat().st_mode&0o777==0o444 for p in runtime['out'].iterdir())
+
+
+def test_surface_host_exact15_sources_narrow_gpu_and_complete_proof(runtime_factory):
+ r=runtime_factory('surface');before=r['call']('before');assert before.returncode==0,before.stderr
+ mounts=r['call']('mounts');assert mounts.returncode==0,mounts.stderr
+ rows=mounts.stdout.splitlines();proof=json.loads((r['control']/'proof.json').read_text())
+ assert 'surface_pins_identity' in proof and 'solid_pins_identity' not in proof
+ assert str(r['code']/'infra/surface_geometry_loader.py') in rows
+ assert str(r['code']/'infra/object_budget_solid.py') not in rows and not any(p.endswith('surface_qslim')for p in rows)
+ assert str(r['proposal']) in rows and str(r['qualification']) in rows
+ assert str(r['root']/'results/surface-qslim-independent-v2/report.json') in rows
+ historical=proof['hash_only_historical_sources'];assert len(historical)==3
+ assert set(historical)<=set(rows) and all(Path(p).parent.parent==r['root']/'jobs'for p in historical)
+ assert not any(str(r['root']/'jobs')==p for p in rows)
+ assert all('/validation/'not in p and '/weights/'not in p for p in rows)
+ r['complete']();after=r['call']('complete');assert after.returncode==0,after.stderr
+ assert after.stdout==before.stdout and r['out'].name=='object_pose_full_surface' and r['out'].stat().st_mode&0o777==0o555
+
+
+@pytest.mark.parametrize('fault',['missingpin','missingcandidate','extraartifact','wrongprofile','qualificationpath','historical_binary','historical_mutation'])
+def test_surface_host_fail_closed_before_native_output(runtime_factory,fault):
+ r=runtime_factory('surface');p=r['pins'];p.chmod(0o644);v=json.loads(p.read_text())
+ if fault=='missingpin':p.parent.chmod(0o755);p.unlink();p.parent.chmod(0o555)
+ elif fault=='missingcandidate':v['files'].pop(str((r['proposal']/'candidate_geometry.npz').relative_to(r['root'])))
+ elif fault=='extraartifact':v['files']['results/foreign.json']=dict(bytes=1,sha256='f'*64)
+ elif fault=='wrongprofile':v['schema']='world_reward.solid_mesh_pins.v1'
+ elif fault=='qualificationpath':
+  q=r['code']/'configs/surface_qslim_qualification_pins.json';q.chmod(0o644);x=json.loads(q.read_text());x['independent_audit_path']='results/foreign/report.json';q.write_text(json.dumps(x));q.chmod(0o444)
+ elif fault=='historical_binary':
+  old=r['root']/'jobs'/('c'*40)/'run_object_budget_solid/code';old.chmod(0o755);(old/'binary').write_bytes(b'ELF not source');(old/'binary').chmod(0o444);old.chmod(0o555)
+ else:
+  p0=r['root']/'jobs'/('c'*40)/'run_object_budget_solid/code/infra/original.cpp';p0.chmod(0o644);p0.write_bytes(b'changed original');p0.chmod(0o444)
+ if fault!='missingpin':p.write_text(json.dumps(v));p.chmod(0o444)
+ result=r['call']('before');assert result.returncode!=0 and not r['out'].exists() and not r['control'].exists()
 
 
 @pytest.mark.parametrize('fault',['missingpin','extraartifact','videohash','fullframes','directoryextra','sourcewritable','binaryinqualification','preexistingout'])
@@ -157,7 +217,7 @@ def shell_runtime(tmp_path):
  bindir=tmp_path/'bin';bindir.mkdir();log=tmp_path/'calls.jsonl';control=root/'results'/f'object-pose-solid-000009-{rev}'
  def spy(name,body):
   p=bindir/name;p.write_text('#!'+sys.executable+'\nimport json,os,pathlib,sys\nwith open(os.environ["FAKE_LOG"],"a")as h:h.write(json.dumps([pathlib.Path(sys.argv[0]).name,*sys.argv[1:]])+"\\n")\n'+body);p.chmod(0o755);return p
- host=spy('host',r'''mode=sys.argv[1];root=pathlib.Path(os.environ['WR_ROOT']);rev=os.environ['WR_CODE_REVISION'];control=root/'results'/('object-pose-solid-000009-'+rev)
+ host=spy('host',r'''mode=sys.argv[1];root=pathlib.Path(os.environ['WR_ROOT']);rev=os.environ['WR_CODE_REVISION'];profile=os.environ.get('FAKE_GEOMETRY_PROFILE','solid');control=root/'results'/('object-pose-'+profile+'-000009-'+rev)
 if mode=='before':
  control.mkdir(parents=True);(control/'proof.json').write_text('{}')
 if mode=='lock':
@@ -190,7 +250,7 @@ else:raise AssertionError(args)
  env=dict(PATH=str(bindir)+':'+os.environ['PATH'],WR_ROOT=str(root),WR_CODE=str(code),WR_CODE_REVISION=rev,FAKE_HOST=str(host),FAKE_LOG=str(log),HOME=str(tmp_path))
  def run(args=None):return subprocess.run(['rtk','proxy','bash',str(path),*(args if args is not None else ['--episode','9','--full-video','--mesh-source','solid'])],capture_output=True,text=True,env=env,timeout=10)
  def calls():return[json.loads(row)for row in log.read_text().splitlines()]if log.exists()else[]
- return dict(run=run,calls=calls,env=env,out=base/'object_pose_full_solid',lock=lock)
+ return dict(run=run,calls=calls,env=env,out=base/'object_pose_full_solid',base=base,lock=lock)
 
 
 def test_shell_exact_native_arguments_resources_fd9_and_unchanged_lock(shell_runtime):
@@ -204,6 +264,17 @@ def test_shell_exact_native_arguments_resources_fd9_and_unchanged_lock(shell_run
  assert next(i for i,r in enumerate(calls)if r[0]=='flock')<next(i for i,r in enumerate(calls)if r[0]=='nvidia-smi')<calls.index(native)
 
 
+def test_surface_shell_same_gpu_policy_unique_output_and_no_query_alias(shell_runtime):
+ shell_runtime['env']['FAKE_GEOMETRY_PROFILE']='surface'
+ result=shell_runtime['run'](['--episode','9','--full-video','--mesh-source','surface'])
+ assert result.returncode==0,result.stderr
+ native=next(r for r in shell_runtime['calls']()if r[:2]==['docker','run'])
+ assert native[-5:]==['--episode','9','--full-video','--mesh-source','surface']
+ assert (shell_runtime['base']/'object_pose_full_surface').exists() and not shell_runtime['out'].exists()
+ assert 'wr-object-pose-surface-000009-'+'a'*40 in native
+ assert shell_runtime['lock'].read_text()=='unchanged original lock'
+
+
 @pytest.mark.parametrize('fault,value',[('FAKE_FLOCK','1'),('FAKE_APPS','234'),('FAKE_GPU_ERROR','1'),('FAKE_IMAGE','sha256:wrong'),('FAKE_EXISTING','foreign-cid')])
 def test_shell_gate_failures_never_reserve_or_infer(shell_runtime,fault,value):
  shell_runtime['env'][fault]=value;result=shell_runtime['run']();assert result.returncode!=0
@@ -211,6 +282,6 @@ def test_shell_gate_failures_never_reserve_or_infer(shell_runtime,fault,value):
  assert not any(r[:2]==['docker','rm']for r in shell_runtime['calls']())
 
 
-@pytest.mark.parametrize('args',[['--mesh-source','solid'],['--episode','09','--full-video','--mesh-source','solid'],['--episode','30','--full-video','--mesh-source','solid'],['--episode','9','--full-video','--mesh-source','solid','--full-video'],['--episode','9','--mesh-source','solid'],['--episode','9','--full-video','--mesh-source=solid']])
+@pytest.mark.parametrize('args',[['--mesh-source','solid'],['--episode','09','--full-video','--mesh-source','solid'],['--episode','30','--full-video','--mesh-source','solid'],['--episode','9','--full-video','--mesh-source','solid','--full-video'],['--episode','9','--mesh-source','solid'],['--episode','9','--full-video','--mesh-source=solid'],['--mesh-source','surface'],['--episode','9','--full-video','--mesh-source','surface','--query-requalification'],['--episode','9','--full-video','--mesh-source=surface']])
 def test_solid_malformed_arguments_fail_before_external_tools(shell_runtime,args):
  assert shell_runtime['run'](args).returncode==2 and not shell_runtime['calls']()

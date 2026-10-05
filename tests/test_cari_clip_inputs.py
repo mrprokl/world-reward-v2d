@@ -160,6 +160,74 @@ def solid_fixture(gate, root, spec):
     return solid_pins(gate, root, spec)
 
 
+def surface_pins(gate, root, spec):
+    paths=gate.relative_paths(spec);deps=gate.dependency_paths(spec,object_source="surface")
+    row=json.loads((root/paths['input_report']).read_text())
+    row['input_report_sha256']={role:gate.identity(root/name)['sha256'] for role,name in deps.items()}
+    write_json(root/paths['input_report'],row)
+    return dict(schema='world-reward-cari-clip-input-pins-v3',object_source='surface',clip_spec=asdict(spec),
+        input_report=gate.identity(root/paths['input_report'])|{key:row[key] for key in ('producer_revision','script_sha256')},
+        source_files={name:gate.identity(root/name) for name in gate.source_paths(spec,object_source='surface')})
+
+
+def surface_fixture(gate,root,spec):
+    fixture(gate,root,spec)
+    old=root/gate.dependency_paths(spec)['object'];new=root/gate.dependency_paths(spec,object_source='surface')['object']
+    new.parent.mkdir();old.rename(new)
+    proof=dict(committed_pins_sha256='1'*64,producer_report_sha256='2'*64,cpu_native_report_sha256='3'*64,
+        source_domain='surface',metric_scale_baked_once=.83,geometry_operations_applied=False)
+    obj=json.loads(new.read_text());obj.update(mesh_source='surface',topology_budget=proof);write_json(new,obj)
+    path=root/gate.relative_paths(spec)['input_report'];row=json.loads(path.read_text())
+    prepared=dict(proof,metric_glb={'synthetic':'metric'},native_aligned_glb={'synthetic':'aligned'},
+        source_rehashed_after=True,files={'synthetic_metadata_only':{'sha256':'4'*64,'bytes':4}})
+    row.update(object_source='surface',surface_geometry_validation=prepared,object_pose_source=dict(
+        report=str(new.relative_to(root)),geometry_and_poses=str(new.with_name('geometry_and_poses.npz').relative_to(root)),
+        geometry_and_poses_sha256=obj['geometry_and_poses_sha256']))
+    write_json(path,row);return surface_pins(gate,root,spec)
+
+
+def test_surface_profile_selects_one_dependency_with_strict_independent_v3(gate,tmp_path):
+    spec=gate.PublicClipSpec(29,97,'front',2,4);fixture(gate,tmp_path,spec)
+    old=tmp_path/gate.dependency_paths(spec)['object'];new=tmp_path/gate.dependency_paths(spec,object_source='surface')['object']
+    new.parent.mkdir();old.rename(new)
+    pins=surface_pins(gate,tmp_path,spec);gate.validate_pins(spec,pins)
+    assert gate.source_profile(pins)=='surface' and len(pins['source_files'])==15 and len(asdict(spec))==5
+    assert set(pins['source_files'])-gate.source_paths(spec)=={'outputs/episode_000029/object_pose_full_surface/report.json'}
+    for version,profile in [('v2','surface'),('v3','solid'),('v3','default'),('v1','surface')]:
+        bad=copy.deepcopy(pins);bad.update(schema='world-reward-cari-clip-input-pins-'+version,object_source=profile)
+        with pytest.raises(ValueError):gate.validate_pins(spec,bad)
+
+
+def test_surface_actual_native_proof_required_without_payload_math(gate,tmp_path,monkeypatch):
+    spec=gate.PublicClipSpec(29,97,'front',2,4);pins=surface_fixture(gate,tmp_path,spec)
+    monkeypatch.setattr(np,'load',lambda *_a,**_k:pytest.fail('Source profile must not decode geometry'))
+    result=gate.verify_public_inputs(tmp_path,spec,pins)
+    assert len(result['source_files'])==15 and gate.validate_reports(tmp_path,spec,pins)['object']['mesh_source']=='surface'
+    assert result['poses']['frames']==[f'{i:06d}' for i in range(97)]
+
+
+@pytest.mark.parametrize('fault',['missing','sha','extra','operations','domain','gauge','nan','boolscale','producer','posepath','solidv2','posthash','files','empty_metric'])
+def test_surface_proof_fail_closed(gate,tmp_path,fault):
+    spec=gate.PublicClipSpec(29,96,'front',2,4);pins=surface_fixture(gate,tmp_path,spec)
+    path=tmp_path/gate.relative_paths(spec)['input_report'];row=json.loads(path.read_text())
+    if fault=='missing':row.pop('surface_geometry_validation')
+    elif fault=='sha':row['surface_geometry_validation']['committed_pins_sha256']='f'*64
+    elif fault=='extra':row['surface_geometry_validation']['unused']=False
+    elif fault=='operations':row['surface_geometry_validation']['geometry_operations_applied']=0
+    elif fault=='domain':row['surface_geometry_validation']['source_domain']='solid'
+    elif fault=='posthash':row['surface_geometry_validation']['source_rehashed_after']=False
+    elif fault=='files':row['surface_geometry_validation']['files']={'fake':{'sha256':'4'*64,'bytes':True}}
+    elif fault=='empty_metric':row['surface_geometry_validation']['metric_glb']={}
+    elif fault in ('gauge','nan','boolscale'):row['surface_geometry_validation']['metric_scale_baked_once']={'gauge':.5,'nan':float('nan'),'boolscale':True}[fault]
+    elif fault=='producer':
+        p=tmp_path/gate.dependency_paths(spec,object_source='surface')['object'];obj=json.loads(p.read_text())
+        obj['topology_budget'].pop('cpu_native_report_sha256');write_json(p,obj)
+    elif fault=='posepath':row['object_pose_source']['report']=gate.dependency_paths(spec,object_source='solid')['object']
+    else:pins.update(schema='world-reward-cari-clip-input-pins-v2',object_source='surface')
+    if fault!='solidv2':write_json(path,row);pins=surface_pins(gate,tmp_path,spec)
+    with pytest.raises(ValueError):gate.verify_public_inputs(tmp_path,spec,pins)
+
+
 def test_solid_profile_exactly_one_substitution_and_unchanged_five_field_spec(gate, tmp_path, monkeypatch):
     spec = gate.PublicClipSpec(9, 97, "front", 2, 4)
     pins = solid_fixture(gate, tmp_path, spec); before = copy.deepcopy(pins)

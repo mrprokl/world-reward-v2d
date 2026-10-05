@@ -1,0 +1,132 @@
+{
+  "schema": "world_reward.surface_consumer_control_protocol.v1",
+  "scope": "fresh_authored_surface_serialization_pose_and_official_budget_operator_integration_not_full_HDF5_CARI_route_or_accuracy",
+  "frames": 96,
+  "source": {
+    "vertices": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0.25,
+        0,
+        0
+      ],
+      [
+        0.25,
+        0.1875,
+        0.03125
+      ],
+      [
+        0,
+        0.1875,
+        0
+      ],
+      [
+        0.5,
+        0,
+        0
+      ],
+      [
+        0.515625,
+        0,
+        0
+      ],
+      [
+        0.5,
+        0.015625,
+        0
+      ]
+    ],
+    "faces": [
+      [
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        2,
+        3
+      ],
+      [
+        4,
+        5,
+        6
+      ]
+    ],
+    "dtype_vertices": "float32",
+    "dtype_faces": "int64",
+    "components": 2,
+    "boundary_loops": 2,
+    "unused_vertices": 0
+  },
+  "method": "under_both4096_identity_no_QEM",
+  "metric_scale_baked_once": 0.5,
+  "camera": {
+    "K": [
+      [
+        800,
+        0,
+        320
+      ],
+      [
+        0,
+        800,
+        240
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "image_size": [
+      480,
+      640
+    ]
+  },
+  "poses": {
+    "frame_index": "int64_arange96",
+    "rotation": "Rz(.10*sin(2*pi*t/95))",
+    "translation": "[.01*sin(2*pi*t/95),.005*sin(4*pi*t/95),3+.01*sin(pi*t/95)]",
+    "native_export_transform": "one_source_recorded_rigid_A_Ry(.20)_translation[.03,-.02,.01]_storedF32",
+    "inverse_pose_transform": "originalposes@invA_then_F32_exactnativefix_rigid_math"
+  },
+  "mandatory": [
+    "all_original_material_triangles_and_tiny_component_survive",
+    "original_component_boundary_signatures",
+    "native_raw_F32_copy_and_real_loader",
+    "same_native_scene_graph_rigid_projection_source",
+    "metric_geometry_prefix_authoritative_not_official_packer_row_order",
+    "unmodified_official_budget_preserves_exact_meaningful_surface",
+    "all96_original_savedF32_pose_camera_vertices_roundtrip_le1e-5m",
+    "source_assets_runtime_preposthash",
+    "retainedcompactreceipts_only_Azure_scratch_media_removed"
+  ],
+  "negative_controls": [
+    "drop_tiny_component",
+    "flip_original_triangle",
+    "nonzero_padding",
+    "wrong_profile_or_pin",
+    "drop_final_frame",
+    "alter_saved_pose"
+  ],
+  "budgets_seconds": {
+    "native_inclusive": 600,
+    "host_inclusive": 700,
+    "owned_cleanup_grace": 30
+  },
+  "QEM_calls": 0,
+  "models_loaded": false,
+  "GPU_used": false,
+  "challenge_inputs_used": false,
+  "body_or_contact_qualified": false,
+  "full_HDF5_route_qualified": false,
+  "whole_Parquet_qualified": false,
+  "accuracy_verified": false,
+  "adoption": false,
+  "failure_policy": "whole_control_closed_FAIL_no_reposition_rescale_reorder_recipe_or_gate_retune"
+}

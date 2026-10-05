@@ -81,6 +81,17 @@ Root289tests PASS ; la mesure est de disponibilité/représentation, pas de qual
 
 ### Next integration gate, not a new model stack
 
+The [surface consumer seam](surface_consumer_protocol.md) is an explicit domain
+of the existing pipeline, not an alternate estimator: canonical identity/QSlim
+proposal, inert byte-bound reader, unchanged fullT ICP/Viterbi, same native
+preparation and five-input shared-stage profile. Only the universal object-solid
+gate is inappropriate for this domain; human/contact routines remain unchanged.
+Complete original canonical rows (including orphans) and faces are retained;
+official packer permutation is validated as surface equivalence, not prescribed
+as canonical ordering. Raw nodeA, native rigid-projectedB and savedF32 fullT
+poses are distinct audited representations. A frozen fresh96-frame operator
+control precedes any new episode; no actual native control/accuracy claim yet.
+
 The useful seam is `joint_point_native_qualify.numerical_control`: allocate
 mask quantiles on the actual native-loaded F32 mesh using the original PNG,
 inferred K/depth and constructor's frame0 object state. Freeze face IDs and

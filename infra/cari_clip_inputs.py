@@ -85,8 +85,8 @@ def relative_paths(spec):
 
 
 def _object_source(value):
-    if type(value) is not str or value not in {"default", "solid"}:
-        raise ValueError("Only the fixed default or solid object source is permitted")
+    if type(value) is not str or value not in {"default", "solid", "surface"}:
+        raise ValueError("Only the fixed default, solid or surface object source is permitted")
     return value
 
 
@@ -101,12 +101,17 @@ def source_profile(pins):
             and pins.get("schema") == "world-reward-cari-clip-input-pins-v2"
             and type(pins["object_source"]) is str and pins["object_source"] == "solid"):
         return "solid"
-    raise ValueError("Exact v1 legacy or v2 solid-only public input pin schema required")
+    if (set(pins) == keys | {"object_source"}
+            and pins.get("schema") == "world-reward-cari-clip-input-pins-v3"
+            and type(pins["object_source"]) is str and pins["object_source"] == "surface"):
+        return "surface"
+    raise ValueError("Exact v1 legacy, v2 solid-only or v3 surface-only public input pin schema required")
 
 
 def dependency_paths(spec, *, object_source="default"):
     base = "outputs/" + _spec(spec).sequence
-    object_directory = "object_pose_full" if _object_source(object_source) == "default" else "object_pose_full_solid"
+    object_source = _object_source(object_source)
+    object_directory = "object_pose_full" if object_source == "default" else "object_pose_full_" + object_source
     return {"body": base + "/body_full/report.json", "depth": base + "/depth_full/report.json",
             "object": base + "/" + object_directory + "/report.json", "alignment": base + "/scale_smoke/report.json",
             "adapter": base + "/body_full/cari_adapter/report.json"}
@@ -231,6 +236,36 @@ def validate_reports(root, spec, pins):
                 or set(report["object_pose_source"]) != set(expected_source)
                 or records["object"].get("mesh_source") != "solid"):
             raise ValueError("Pinned solid source/report/pose SHA must agree with the preparation")
+    elif object_source == "surface":
+        expected_source=dict(report=deps['object'],
+            geometry_and_poses='outputs/'+spec.sequence+'/object_pose_full_surface/geometry_and_poses.npz',
+            geometry_and_poses_sha256=source_pose)
+        if (report.get('object_source')!='surface' or type(report.get('object_pose_source')) is not dict
+                or report['object_pose_source']!=expected_source or records['object'].get('mesh_source')!='surface'):
+            raise ValueError('Pinned surface source/report/pose SHA must agree with preparation')
+        proof=report.get('surface_geometry_validation');native=records['object'].get('topology_budget')
+        keys={'committed_pins_sha256','producer_report_sha256','cpu_native_report_sha256','source_domain',
+              'metric_scale_baked_once','geometry_operations_applied'}
+        extras={'metric_glb','native_aligned_glb','files','source_rehashed_after'}
+        if type(proof) is not dict or set(proof)!=keys|extras or type(native) is not dict:
+            raise ValueError('Exact actual native surface geometry proof required')
+        if (proof['source_rehashed_after'] is not True or type(proof['metric_glb']) is not dict
+                or not proof['metric_glb'] or type(proof['native_aligned_glb']) is not dict or not proof['native_aligned_glb']
+                or type(proof['files']) is not dict or not 0<len(proof['files'])<=64):
+            raise ValueError('Actual metric/aligned surface representation and frozen input ledger required')
+        for name,row in proof['files'].items():
+            if type(name) is not str or not 0<len(name)<=1024:
+                raise ValueError('Bounded explicit surface provenance name required')
+            _receipt(row)
+        for key in ('committed_pins_sha256','producer_report_sha256','cpu_native_report_sha256'):
+            if type(proof[key]) is not str or not re.fullmatch('[0-9a-f]{64}',proof[key]) or proof[key]!=native.get(key):
+                raise ValueError('Surface producer/pin/native byte binding differs')
+        import math
+        scale=proof['metric_scale_baked_once']
+        if (proof['source_domain']!='surface' or proof['geometry_operations_applied'] is not False
+                or type(scale) not in (int,float) or not math.isfinite(scale) or scale<=0
+                or any(type(native.get(k)) is not type(proof[k]) or native[k]!=proof[k] for k in keys)):
+            raise ValueError('Native surface geometry must retain the original metric gauge without operations')
     elif report.get("object_source", "default") != "default" or "object_pose_source" in report:
         raise ValueError("Legacy pins cannot select a different object source")
     validation = report.get("depth_validation", {})

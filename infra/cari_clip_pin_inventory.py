@@ -149,6 +149,8 @@ def inventory(root,code,spec,producer_revision,producer_script_sha256,*,producer
         source_files=observed)
     if object_source == "solid":
         pins.update(schema="world-reward-cari-clip-input-pins-v2",object_source="solid")
+    elif object_source == "surface":
+        pins.update(schema="world-reward-cari-clip-input-pins-v3",object_source="surface")
     inputs.validate_pins(spec,pins)
     # Preparse all six reports strictly only AFTER every source payload hash.
     records={"inputs":_strict_json((root/paths["input_report"]).read_text())}
@@ -176,7 +178,7 @@ def parser():
         result.add_argument("--"+name,required=True,action=Once)
     result.add_argument("--producer-code", action=Once, default=None,
         help="Independently authenticated readonly original producer directory; hash only, never execute")
-    result.add_argument("--object-source",choices=("default","solid"),action=Once,default=None,
+    result.add_argument("--object-source",choices=("default","solid","surface"),action=Once,default=None,
         help="Explicit fixed source profile; never inferred from an input report")
     return result
 
