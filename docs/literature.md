@@ -1565,6 +1565,20 @@ patch must be exact, non-numerical and confined to a separate runtime copy.
 No actual build/operator/checkpoint/inference qualification follows from this
 primary-source compatibility audit.
 
+Further relational-validation audit finds no newly cleared commercial-contest
+benchmark. FineBio@cb8d16ef13c7c9901418c13bcbaa50a3bdf3a2c3 raw COCO images
+contain left_triplets/right_triplets (hand→manipulated→affected annotation IDs,
+-1 explicit absent), valid/test FPV splits. The Sept10 agreement requires signed
+access and separate commercial rights; repository license is not a data grant.
+Never reuse its skipping loader or nearest-offset evaluator for our attribution.
+VISOR manual in_contact_object IDs/null/inconclusive/exhaustivity are stronger
+than movement pseudo-labels, but its CC-BY-NC4 data remain deferred. EgoHOS has
+eight hand/direct/indirect roles; MIT software does not clear its YouTube test
+images. Sparse-image triplets cannot certify stationary/release temporal behavior.
+Continue operator qualification independently; freeze new lawful relational
+controls before opening their private labels, without recycling the closed
+HO-Cap cohort or hand-labeling challenge records.
+
 ### October5 — checkpoint-free articulation seam, still prospective
 
 Independent primary audit favors direct named native controls into the selected
