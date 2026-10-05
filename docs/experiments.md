@@ -9553,3 +9553,10 @@ nonmembership, every other outcome INCONCLUSIVE (never membershipPASS).
 No rounded subtraction, fit, threshold, prime sweep, source/head/model load.
 Root28tinyPASS0.06s incl subnormals/Fraction crosschecks/singularmodprime/alias;
 authentic stored metadata CPU-only diagnostic required before bridge decision.
+
+Bounded saved-only scale-span caller now frozen: five original sealed files,
+complete original245-entry/current source closures and literal NPZ fingerprint
+authenticated before/after; no model, network, GPU, fit or output adoption.
+Native30s/host75s inclusive, stdin explicitly forwarded to offline CPU container.
+Root32tinyPASS0.27s (manufactured arrays/AST only). Actual certificate remains
+unexecuted; original authored six-scene failure is never reopened or promoted.
