@@ -19,6 +19,10 @@ ROOT = Path('/srv/scenesmith/world-reward')
 ENTRY = 'run_coherent_pair_gpu_probe'
 IMAGE = 'sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7'
 RESULT = 'results/coherent-pair-gpu-probe-v1'
+PROFILE, HOST, SCHEMA = 'v1', 'world-reward-ncc-h100-02', 'world_reward.coherent_pair_gpu_probe.v1'
+PROFILES = {'v1': (ENTRY,RESULT,HOST,SCHEMA,'infra/run_coherent_pair_gpu_probe.sh'),
+    'v2': ('run_coherent_pair_gpu_probe_v2','results/coherent-pair-gpu-probe-v2','scenesmith-ncc-h100-01',
+        'world_reward.coherent_pair_gpu_probe.v2','infra/run_coherent_pair_gpu_probe_v2.sh')}
 BUDGET, MEMORY, RTOL, ATOL, STEP, FD_TOL = 1200, 6*1024**3, 1e-12, 1e-12, 1e-6, 1e-7
 CASES = ((3,3,2,'complete'), (3,3,3,'aliases'), (2,3,2,'missing'), (2,2,0,'no_hoi'),
          (1,2,0,'unsupported'), (0,2,2,'empty_persons'), (2,0,2,'empty_objects'), (0,0,0,'empty'))
@@ -42,13 +46,21 @@ FLOAT_FIELDS = ('native_scores_a','native_scores_b','scores_a','scores_b',
 BOOL_FIELDS = ('native_supported','native_route_supported','supported')
 
 
+def select_profile(name):
+    """Explicit frozen host/namespace only; v1 math/gates are never relaxed."""
+    global PROFILE,ENTRY,RESULT,HOST,SCHEMA,HELPERS
+    if name not in PROFILES:raise ValueError('Exact frozen probe profile required')
+    ENTRY,RESULT,HOST,SCHEMA,wrapper=PROFILES[name];PROFILE=name
+    HELPERS=('infra/coherent_pair_gpu_probe.py',wrapper,*REUSED)
+
+
 def runtime(code):
     spec = importlib.util.spec_from_file_location('wr_gpu_probe_runtime',code/'infra/mediapipe_cpu_runtime_verify.py')
     module = importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
 
 
 def manifest():
-    return dict(schema='world_reward.coherent_pair_gpu_probe.v1',cases=[dict(persons=n,objects=o,hand_copies=k,
+    return dict(schema=SCHEMA,cases=[dict(persons=n,objects=o,hand_copies=k,
         native_pairs=k*k,variant=v) for n,o,k,v in CASES],image_id=IMAGE,budget_seconds=BUDGET,
         torch_memory_bytes=MEMORY,docker_host_memory_bytes=MEMORY,temperature=.8125,alphas=[0.,.3125],
         theta=[(-1 if i%2 else 1)*(i+1)/64. for i in range(17)],scales=[(i+3)/8. for i in range(12)],
@@ -384,7 +396,7 @@ def host(code,rev):
         for path in leaves(code):argv+=['--mount',f'type=bind,src={path},dst={path},readonly']
         argv+=['--mount',f'type=bind,src={out},dst={out}',IMAGE,'-i','PATH=/opt/conda/bin:/usr/local/bin:/usr/bin:/bin','HOME=/tmp',
             'PYTHONDONTWRITEBYTECODE=1','WR_IMAGE_ID='+IMAGE,'CUBLAS_WORKSPACE_CONFIG=:4096:8','OMP_NUM_THREADS=4','MKL_NUM_THREADS=4',
-            'python','-I','-B',str(code/HELPERS[0]),'native',str(code),rev,str(out),str(pin['bytes']),pin['sha256'],str(deadline)]
+            'python','-I','-B',str(code/HELPERS[0]),'--profile',PROFILE,'native',str(code),rev,str(out),str(pin['bytes']),pin['sha256'],str(deadline)]
         r=subprocess.run(argv,capture_output=True,timeout=max(.001,deadline-time.monotonic()),check=False)
         report.update(native_exit_code=r.returncode,diagnostics={k:dict(bytes=len(v),sha256=hashlib.sha256(v).hexdigest()) for k,v in (('stdout',r.stdout),('stderr',r.stderr))})
         rt.require(len(r.stdout)<=32768 and len(r.stderr)<=32768,'Bounded native diagnostic required')
@@ -408,10 +420,10 @@ def host(code,rev):
 
 
 def main():
-    p=argparse.ArgumentParser(allow_abbrev=False);p.add_argument('mode',choices=('host','native'));p.add_argument('code');p.add_argument('revision');p.add_argument('native_args',nargs='*');a=p.parse_args();code=Path(a.code)
+    p=argparse.ArgumentParser(allow_abbrev=False);p.add_argument('--profile',choices=('v1','v2'),default='v1');p.add_argument('mode',choices=('host','native'));p.add_argument('code');p.add_argument('revision');p.add_argument('native_args',nargs='*');a=p.parse_args();select_profile(a.profile);code=Path(a.code)
     if not re.fullmatch('[0-9a-f]{40}',a.revision) or code!=ROOT/'jobs'/a.revision/ENTRY/'code' or Path(__file__).resolve()!=code/HELPERS[0]:raise ValueError('Exact immutable probe source required')
     if a.mode=='host':
-        if a.native_args or sys.platform!='linux' or os.geteuid()!=0 or os.uname().nodename!='world-reward-ncc-h100-02' or os.environ.get('DOCKER_HOST')!='unix://'+str(ROOT)+'/docker.sock':raise ValueError('Actual VM02 root GPU host required')
+        if a.native_args or sys.platform!='linux' or os.geteuid()!=0 or os.uname().nodename!=HOST or os.environ.get('DOCKER_HOST')!='unix://'+str(ROOT)+'/docker.sock':raise ValueError('Actual frozen profile root GPU host required')
         lock=ROOT/'jobs/.world-reward-h100.lock';fd=os.fstat(9);node=lock.lstat()
         if lock.is_symlink() or not stat.S_ISREG(node.st_mode) or (fd.st_dev,fd.st_ino)!=(node.st_dev,node.st_ino):raise ValueError('Actual FD9 GPU lease required')
         result=host(code,a.revision)

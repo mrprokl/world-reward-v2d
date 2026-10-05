@@ -231,3 +231,40 @@ def test_wrapper_static_syntax_lease_and_no_local_torch_execution():
     text=wrapper.read_text();assert 'exec 9>>' in text and 'flock --nonblock 9' in text
     assert '1215s' in text and 'nvidia-smi --query-compute-apps=pid' in text and '-I -B' in text
     assert 'docker.sock' in text and 'set +x' in text
+
+
+def test_explicit_profiles_change_only_host_namespace_and_schema():
+    original=m.manifest();pins=dict(m.REUSED)
+    try:
+        m.select_profile('v2');new=m.manifest()
+        assert m.ENTRY=='run_coherent_pair_gpu_probe_v2' and m.RESULT=='results/coherent-pair-gpu-probe-v2'
+        assert m.HOST=='scenesmith-ncc-h100-01' and m.HELPERS[1]=='infra/run_coherent_pair_gpu_probe_v2.sh'
+        assert new['schema']=='world_reward.coherent_pair_gpu_probe.v2'
+        assert {k:v for k,v in original.items() if k!='schema'}=={k:v for k,v in new.items() if k!='schema'}
+        assert m.REUSED==pins and m.IMAGE=='sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7'
+        with pytest.raises(ValueError):m.select_profile('vm02_fallback')
+    finally:m.select_profile('v1')
+    assert m.HOST=='world-reward-ncc-h100-02' and m.manifest()==original
+
+
+@pytest.mark.parametrize('profile,wrong_host',[('v1','scenesmith-ncc-h100-01'),('v2','world-reward-ncc-h100-02')])
+def test_each_profile_rejects_wrong_actual_host_before_any_model_or_control(tmp_path,monkeypatch,profile,wrong_host):
+    root=tmp_path/'root';rev='e'*40;entry=m.PROFILES[profile][0];code=root/'jobs'/rev/entry/'code'
+    monkeypatch.setattr(m,'ROOT',root);monkeypatch.setattr(m,'__file__',str(code/m.HELPERS[0]))
+    monkeypatch.setattr(m.sys,'argv',['probe','--profile',profile,'host',str(code),rev])
+    monkeypatch.setattr(m.sys,'platform','linux');monkeypatch.setattr(m.os,'geteuid',lambda:0)
+    monkeypatch.setattr(m.os,'uname',lambda:SimpleNamespace(nodename=wrong_host))
+    monkeypatch.setenv('DOCKER_HOST','unix://'+str(root)+'/docker.sock')
+    monkeypatch.setattr(m,'host',lambda *_:pytest.fail('wrong host launched'))
+    try:
+        with pytest.raises(ValueError,match='frozen profile root GPU host'):m.main()
+    finally:m.select_profile('v1')
+
+
+def test_v2_wrapper_is_explicit_and_v1_wrapper_not_relaxed():
+    v1=(REPO/'infra/run_coherent_pair_gpu_probe.sh').read_text()
+    v2=REPO/'infra/run_coherent_pair_gpu_probe_v2.sh';text=v2.read_text()
+    subprocess.run(['bash','-n',str(v2)],check=True,capture_output=True)
+    assert '--profile v2 host' in text and 'scenesmith-ncc-h100-01' in text
+    assert 'run_coherent_pair_gpu_probe_v2/code' in text and 'exec 9>>' in text and '1215s' in text
+    assert '--profile' not in v1 and 'world-reward-ncc-h100-02' in v1
