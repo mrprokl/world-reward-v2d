@@ -246,3 +246,32 @@ runtime/output cleanup before-after. This qualifies evidence transport, not
 correct anatomy, ownership, temporal coverage, calibration, adoption or accuracy.
 Never turn these challenge diagnostics into manually chosen targets/fit labels.
 The next scientific gate remains an independently labeled legal external cohort.
+
+## Complete generic bank, distinct validation question
+
+Actual six-frame native diagnostic has14persons and106person/side/HOI tuples;
+its first frame has zero HOI pairs. This is genuine missing relation evidence,
+not evidence that no person/object interacts. The new pure
+`interaction_candidate_evidence` seam therefore keeps every supplied automatic
+person × side × generic-object proposal **independently of HOI**. All native
+HOI-pair × generic-object routes remain a separate, unfiltered bridge. Duplicate
+proposals, raw dtypes/order, missing/off-grid joints stay explicit. OFF/no-contact
+and UNKNOWN/abstention are distinct future hypotheses, neither fabricated from
+an empty detector bank. This is tested numerical plumbing, not deployed scoring.
+
+For initial validation, separate three targets: static annotated relation
+retrieval; anatomical hand ownership/full tuple; unique task-relevant clip pair.
+SingleQuery predicts many interactions per person, not the last of these.
+Open Images positive `holds` endpoints can test the first with automatic **both
+P and O** endpoints; they cannot calibrate OFF or provide reliable absent-pair
+negatives. Our old evaluator's reference-person containment is not automatic
+owner validation. Old pilots remain closed; a new,144-ID-disjoint metadata
+census qualifies crowded records before any new RGB/predictions.
+
+Preferred small learned component after lawful external annotations are frozen:
+grouped target scorer with standardized FIT-only numerical observations and
+availability indicators; balance image/person/side, not number of duplicate
+routes. Reuse solver mathematics, not the private YCB label/weighting contract.
+Explicit no-contact labels are necessary to train OFF; positive-only observations
+must never be relabeled as exhaustive negatives. No component is adopted until
+actual external retrieval/ownership and full-T reconstruction checks support it.
