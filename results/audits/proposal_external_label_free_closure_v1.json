@@ -1,0 +1,35 @@
+{
+  "schema": "world_reward.proposal_external_capacity_label_free.v1",
+  "status": "INCONCLUSIVE_CLOSED",
+  "producer_revision": "924e206749e86f17e02e053b03ffcddc625b0910",
+  "selected_slots": 32,
+  "acquired": 0,
+  "missing": 32,
+  "acquired_development": 0,
+  "minimum_development_before_reference_access": 12,
+  "original_rgb_bytes": 0,
+  "manifest": {
+    "bytes": 50347,
+    "sha256": "4b25ddec987c1950d0f50380c64424026afb0b2dbd6df27bf37ef3e537c1e4bc"
+  },
+  "public_manifest": {
+    "bytes": 64,
+    "sha256": "f47df2a2ba2ebedba04b5074fda26f1fc90e3663f79bf35ea24d5ccecaf24638"
+  },
+  "transport_status": "pass",
+  "failure_types": {
+    "HTTPError": 26,
+    "ValueError": 6
+  },
+  "actual_failure_phases_not_yet_verified": false,
+  "reference_boxes_read": false,
+  "additional_inference_or_tuning": false,
+  "ownership_verified": false,
+  "quality_verified": false,
+  "adoption": false,
+  "independent_full_source_and_input_audit_pending": true,
+  "failure_phases": {
+    "creator_rights": 12,
+    "original_rgb": 20
+  }
+}

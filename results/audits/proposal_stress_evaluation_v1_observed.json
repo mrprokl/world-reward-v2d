@@ -1,0 +1,148 @@
+{
+  "schema": "world_reward.proposal_stress_evaluation_observed.v1",
+  "status": "pass",
+  "producer_revision": "dd232ffbeec4726e5fb60034b16f318b68f32596",
+  "report": {
+    "bytes": 12167,
+    "sha256": "65b75b9a8766c0bc66e13a69ecce35673c63770b89802573981c749df0d54146"
+  },
+  "all": {
+    "images": 32,
+    "native_masks": 544,
+    "native_generate_seconds": 33.39505902695237,
+    "zero_visible_instances": 0,
+    "recalls": {
+      "0.5": {
+        "human": {
+          "eligible_instances": 80,
+          "macro_image_one_to_one_recall": 0.9479166666666667,
+          "macro_image_recall": 0.9479166666666667,
+          "micro_instance_one_to_one_recall": 0.95,
+          "micro_instance_recall": 0.95,
+          "supported_images": 32
+        },
+        "object": {
+          "eligible_instances": 128,
+          "macro_image_one_to_one_recall": 0.9453125,
+          "macro_image_recall": 0.9453125,
+          "micro_instance_one_to_one_recall": 0.9453125,
+          "micro_instance_recall": 0.9453125,
+          "supported_images": 32
+        }
+      },
+      "0.75": {
+        "human": {
+          "eligible_instances": 80,
+          "macro_image_one_to_one_recall": 0.8541666666666666,
+          "macro_image_recall": 0.8541666666666666,
+          "micro_instance_one_to_one_recall": 0.8375,
+          "micro_instance_recall": 0.8375,
+          "supported_images": 32
+        },
+        "object": {
+          "eligible_instances": 128,
+          "macro_image_one_to_one_recall": 0.90625,
+          "macro_image_recall": 0.90625,
+          "micro_instance_one_to_one_recall": 0.90625,
+          "micro_instance_recall": 0.90625,
+          "supported_images": 32
+        }
+      }
+    }
+  },
+  "splits": {
+    "DEV": {
+      "images": 16,
+      "native_masks": 272,
+      "native_generate_seconds": 16.80221685298602,
+      "zero_visible_instances": 0,
+      "recalls": {
+        "0.5": {
+          "human": {
+            "eligible_instances": 40,
+            "macro_image_one_to_one_recall": 0.9791666666666666,
+            "macro_image_recall": 0.9791666666666666,
+            "micro_instance_one_to_one_recall": 0.975,
+            "micro_instance_recall": 0.975,
+            "supported_images": 16
+          },
+          "object": {
+            "eligible_instances": 64,
+            "macro_image_one_to_one_recall": 0.9375,
+            "macro_image_recall": 0.9375,
+            "micro_instance_one_to_one_recall": 0.9375,
+            "micro_instance_recall": 0.9375,
+            "supported_images": 16
+          }
+        },
+        "0.75": {
+          "human": {
+            "eligible_instances": 40,
+            "macro_image_one_to_one_recall": 0.9166666666666666,
+            "macro_image_recall": 0.9166666666666666,
+            "micro_instance_one_to_one_recall": 0.9,
+            "micro_instance_recall": 0.9,
+            "supported_images": 16
+          },
+          "object": {
+            "eligible_instances": 64,
+            "macro_image_one_to_one_recall": 0.875,
+            "macro_image_recall": 0.875,
+            "micro_instance_one_to_one_recall": 0.875,
+            "micro_instance_recall": 0.875,
+            "supported_images": 16
+          }
+        }
+      }
+    },
+    "reserved": {
+      "images": 16,
+      "native_masks": 272,
+      "native_generate_seconds": 16.592842173966346,
+      "zero_visible_instances": 0,
+      "recalls": {
+        "0.5": {
+          "human": {
+            "eligible_instances": 40,
+            "macro_image_one_to_one_recall": 0.9166666666666667,
+            "macro_image_recall": 0.9166666666666667,
+            "micro_instance_one_to_one_recall": 0.925,
+            "micro_instance_recall": 0.925,
+            "supported_images": 16
+          },
+          "object": {
+            "eligible_instances": 64,
+            "macro_image_one_to_one_recall": 0.953125,
+            "macro_image_recall": 0.953125,
+            "micro_instance_one_to_one_recall": 0.953125,
+            "micro_instance_recall": 0.953125,
+            "supported_images": 16
+          }
+        },
+        "0.75": {
+          "human": {
+            "eligible_instances": 40,
+            "macro_image_one_to_one_recall": 0.7916666666666667,
+            "macro_image_recall": 0.7916666666666667,
+            "micro_instance_one_to_one_recall": 0.775,
+            "micro_instance_recall": 0.775,
+            "supported_images": 16
+          },
+          "object": {
+            "eligible_instances": 64,
+            "macro_image_one_to_one_recall": 0.9375,
+            "macro_image_recall": 0.9375,
+            "micro_instance_one_to_one_recall": 0.9375,
+            "micro_instance_recall": 0.9375,
+            "supported_images": 16
+          }
+        }
+      }
+    }
+  },
+  "source_predictions_references_rehashed_after": true,
+  "quality_verified": false,
+  "ownership_verified": false,
+  "adoption": false,
+  "independent_source_and_metric_audit_pending": true
+}

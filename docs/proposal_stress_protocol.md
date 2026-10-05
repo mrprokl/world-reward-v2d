@@ -98,3 +98,24 @@ real-world or challenge generalization.
 All media/models remain on Azure. Asset/source ancestry is checked, but external
 model licensing/overlap eligibility is **not newly established** by this renderer.
 No Azure run has occurred as part of implementation/testing this protocol.
+
+## Actual manufacture and blind native bank
+
+Frozen producer d7e1f8d rendered all32RGB in11.859999s on Azure, one native
+MHR model load/one80-pose forward. Independent complete Git/source/model and
+public RGB/opaque private-file hashes pass; no reference values were parsed
+in that audit. Manifest6494B SHA c8faacc4487d2e3f4172c666334465321fd6bbc16a4660687629a604942834ce.
+Native region v1 failed before model/AMG because two dispatch markers were not
+mounted; that receipt stays unchanged. Corrected fresh v2 producer15a6bde
+completed one native SAM2.1 load/32AMG calls/32RGB in39.394046s, retaining
+21478656B of native masks on Azure. Source/defaults/RGB unchanged; no truth
+or quality-directed retry. Independent bank and metric audits remain pending.
+
+Actual fixed saved-only evaluation dd232ff completes all32images/544native
+masks. At IoU.5, micro visible-instance recall is76/80humans=95% and
+121/128objects=94.53125%; image-macro recall94.7917%/94.53125%. DEV/reserved
+remain distinct, no method fitted or changed between them; reserved was opened
+once for this already-frozen method. This is visible procedural mask recall,
+not real generalization or ownership. Independent unpacked-IoU/source audit is
+pending; do not tune/rescore these reserved references for another model arm.
+214combined tiny producer/evaluator tests PASS0.37s, not a model-quality result.

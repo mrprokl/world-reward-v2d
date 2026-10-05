@@ -117,3 +117,15 @@ no duplicate or re-encoding. Public`rgb_proposal_inputs.v1` contains acquired RG
 only and exactly six fields per image; no original ID/author/split/relations.
 Missing slots remain solely in the private manifest, not fake images. No GT,
 model, GPU, reference geometry or scientific success is implied by acquisition.
+
+## Actual metadata and label-free closure
+
+New census producer d1de716 qualifies175candidate records/164new author profiles
+after all208ID and197historical profile exclusions; freezes32slots. Actual
+3.274094s. Independent complete source/Git and7input before/after hashes plus
+exact metadata selection replay pass. New acquisition924e206 completes4.102033s
+with0RGB/32missing (26HTTPError,6ValueError;12creator-rights and20original-RGB failures); no model or reference boxes
+opened. This fails the predeclared>=12acquiredDEV gate and closes the study
+INCONCLUSIVE before further inference/labels. No URL substitution, retry,
+resampling, new query or cohort rescue. Transport PASS is not dataset usability
+or a quality result. Full acquisition source/input audit remains pending.
