@@ -80,11 +80,18 @@ not manual episode reassignment or another downstream fit of the wrong pair.
   frozen before each next stage; no prediction is inferred from dispatch ACKs.
   EP26 preserves the original open surface and all399 frames through the complete
   independently audited chain; its earlier host preparation failure stays separate.
-- **Coverage continuation:** the existing qualified open-surface route now
-  passes EP16's CPU proposal in163.92s (2052V/4096F/two components), with full
-  source/runtime/input/output audit and frozen consumer pins. Original topology
-  failure remains separate. Full360-frame pose and remaining native chain are
-  still required; complete coverage remains14/30, not an accuracy result.
+- **Coverage continuation:** the existing qualified open-surface route passes
+  independently audited CPU proposals for EP16,17,19,20; EP18's nonmanifold
+  source remains CLOSED FAIL. EP16's full360-frame fixed-shape pose passes in
+  2443.18s; its separate CPU input assembly and remaining native chain are not
+  yet certified. EP17 pose is live; EP19/20 are independently pinned consumers.
+  Original topology failures remain separate. Complete coverage remains14/30,
+  not an accuracy result. Lightweight QA openly shows EP8/9 wrong background
+  identity; engineering packing success does not resolve that scientific defect.
+- **Temporal research:** MASA's isolated author-runtime build passes independent
+  source/52-wheel/CPU-import/image/cleanup checks. The separately frozen native
+  H100 operator/strict-checkpoint/full-bank contract still needs actual outcome.
+  Appearance persistence is not physical ownership or a validated HOI gain.
 - **Geometry compiler:** exact F32/weld predicate controls pass, but the frozen
   real-collapse comparison **fails** on the thin cavity: both original and new
   native queues exhaust before the budget. Capsule control not executed; no
