@@ -10950,7 +10950,7 @@ files/source and26,388,480B archive independently authenticated; no inference,
 no local media. Receipt1410B SHA59acce6d28af7f1c5793f0fc8c82f2dc930043c138eebd6a9f9793d1fcddad90
 remains failed. A narrowly scoped temporary VM01 container Contributor grant
 was requested for Azure-only export; remove only that newly created assignment
-after verified import/cleanup. Existing Reader/other assignments unchanged.
+after successful export, before import. Existing Reader/other assignments unchanged.
 No storage keys, public access or SAS workaround. New namespace required for retry.
 
 
@@ -10961,3 +10961,33 @@ assignment deleted, originalReader remains. Prior failed receipt unchanged.
 Compact identities: results/audits/person_bank_replica_v1.json.
 HOI six-bank job dispatched from same7b41e93 immutable source; **ACK/result pending**.
 No native/ownership/accuracy success inferred from a successful byte replica.
+
+
+Six-bank native job7b41e93 actual terminal host PASS/complete49.109799s, native
+PASS42.945401s; one1796-state model load/six native forwards. Report7392B
+SHA215de04388c91d7b16839b45564fdab0d740e634eaae7a5b5a844f3b22ef754f,
+native7970B SHA12ace609f237f8e41778a9f4b6257441eac6913a1ab2bb68e32f3972388ff912.
+All14person observations retained; native hand-object pair counts0/2/5/6/4/6,
+Cartesian tuple counts0/12/30/24/16/24=106. Genuine first-frame empty preserved.
+Sources/inputs cleanup checks true; independent complete byte/tuple audit is
+under way. This demonstrates real joint evidence, not correct ownership,
+external validation, adoption, final submission coverage or leaderboard gain.
+VM01separate17CPU/22pose active and23pose/16forward queued; no new completed
+receipts observed in latest compact census. Existing jobs never restarted.
+
+
+Final independent saved-bank audit PASS9.637880s:257Git files/262source entries,
+original runtime/acquisition/checkpoint/person-source/input bindings before-after,
+29readonly evidence files, original model/overlay CIDs and owned CPUauditCID absent
+in the same explicit Docker daemon. CPU-only2CPU/2GiB replay recomputed every
+person/HOI/tuple array:258byte checks exact, six banks, **106total tuples**.
+All15feature columns finite on these six banks; numerical support is not visibility
+or ownership accuracy. No model/GPU rerun, GT, selection or threshold tuning.
+Three initial observer failures used the default Docker daemon instead of the
+owned socket; subsequent observer total check mistakenly expected126 rather than
+sum(0,12,30,24,16,24)=106. Both observation defects corrected, historical attempts
+recorded; producer native receipts never overwritten/reinterpreted. Public/user
+total corrected to106. Compact final proof: results/audits/hoi_person_bank_v1_actual.json.
+Disposable local observer scripts removed after final audit; no heavy artifact
+arrived locally. External validation still requires a signed EgoExo grant and
+a real sealed two-person/two-object cohort. No verified win/first place/submission.

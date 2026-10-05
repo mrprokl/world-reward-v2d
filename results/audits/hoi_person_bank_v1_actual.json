@@ -1,0 +1,243 @@
+{
+  "actual_host_status": "pass",
+  "actual_native_status": "pass",
+  "adoption": false,
+  "audit_attempts": [
+    {
+      "elapsed_seconds": 4.519848908006679,
+      "error_type": "AssertionError",
+      "stage": "cpu_complete_tuple_replay",
+      "status": "fail"
+    },
+    {
+      "audit_line": 16,
+      "elapsed_seconds": 4.533594368986087,
+      "error_type": "AssertionError",
+      "stage": "cpu_complete_tuple_replay",
+      "status": "fail"
+    },
+    {
+      "elapsed_seconds": 4.534162779978942,
+      "error_type": "RuntimeError",
+      "rc": 1,
+      "reason": "observer_wrong_default_Docker_daemon_no_image_not_producer_defect",
+      "stage": "cpu_docker_create",
+      "status": "fail",
+      "stderr_bytes": 115,
+      "stdout_bytes": 0
+    },
+    {
+      "status": "fail",
+      "stage": "cpu_tuple_final_total_control",
+      "reason": "observer_arithmetic_sum_126_incorrect_actual_sum_106",
+      "elapsed_seconds": 5.28683162300149
+    },
+    {
+      "status": "fail",
+      "stage": "cpu_array_reconstruction_and_tuple_replay",
+      "reason": "observer_final_total_assertion",
+      "elapsed_seconds": 5.140232233010465
+    }
+  ],
+  "benchmark_isolation_executed": false,
+  "cpu_containers_created": 3,
+  "cpu_tuple_model_or_gpu_execution": false,
+  "declared_total_tuples": 106,
+  "declared_tuple_rows": [
+    0,
+    12,
+    30,
+    24,
+    16,
+    24
+  ],
+  "full_current_git_files": 257,
+  "full_current_source_entries": 262,
+  "gpu_used": false,
+  "host": {
+    "bytes": 7392,
+    "sha256": "215de04388c91d7b16839b45564fdab0d740e634eaae7a5b5a844f3b22ef754f"
+  },
+  "host_elapsed_seconds": 49.10979910902097,
+  "independent_checks_completed": [
+    "actual_current_commit_full_file_map_and_markers",
+    "host_native_receipt_pins_and_source_binding",
+    "strict_checkpoint_1796_no_ema_swap",
+    "host_posthash_cleanup_claims_true",
+    "native_full_six_bank_zero_pair_preservation",
+    "readonly_complete_output_inventory",
+    "original_runtime_acquisition_bank_full_byte_and_source_proofs",
+    "original_owned_CID_absence_same_explicit_Docker_socket",
+    "258_array_byte_recomputations",
+    "final_current_original_source_input_runtime_bank_posthash"
+  ],
+  "independent_final_posthash_completed": true,
+  "independent_tuple_replay_completed": true,
+  "models_loaded": false,
+  "native": {
+    "bytes": 7970,
+    "sha256": "12ace609f237f8e41778a9f4b6257441eac6913a1ab2bb68e32f3972388ff912"
+  },
+  "native_elapsed_seconds": 42.94540050701471,
+  "native_pairs": [
+    0,
+    2,
+    5,
+    6,
+    4,
+    6
+  ],
+  "new_predictions": false,
+  "observer_error": "Docker command subprocess inherited default daemon; producer runtime helpers used unix:///srv/scenesmith/world-reward/docker.sock",
+  "original_cid_absence_independently_checked": true,
+  "ownership_verified": false,
+  "persons": [
+    2,
+    3,
+    3,
+    2,
+    2,
+    2
+  ],
+  "private_truth_read": false,
+  "producer_revision": "7b41e93aef258fd7ea89cc79dc9e5053d0762bf6",
+  "quality_verified": false,
+  "runtime_inspected_image_id": "sha256:5fa124a3c7c92c0482b6be0d1477f43da2d246d550411170e01a8f9d4fb8523a",
+  "runtime_inspected_image_resolution_failure_proven": false,
+  "schema": "world_reward.hoi_person_bank_saved_integrity_audit.v1",
+  "scope": "saved_byte_provenance_and_complete_tuple_integrity_not_quality",
+  "sealed_file_mode": "0444",
+  "sealed_output_mode": "0555",
+  "selection_performed": false,
+  "source_archive_sha256": "eb6990586df79b59b20eb28e628b1a15871aded161fa1b195978635eaf837a1c",
+  "source_closure_sha256": "a7274ef913ea0705bef7115d830ea076b4141933af22eebb09fd426e3f716843",
+  "status": "pass",
+  "corrected_final_audit": {
+    "audit_elapsed_seconds": 9.637879535002867,
+    "cpu_container_absent": true,
+    "cpu_image": "sha256:5fa124a3c7c92c0482b6be0d1477f43da2d246d550411170e01a8f9d4fb8523a",
+    "cpu_replay": {
+      "array_checks": 258,
+      "banks": 6,
+      "feature_names": [
+        "body_wrist_to_hand_box_over_image_diagonal",
+        "body_wrist_to_hand_center_over_image_diagonal",
+        "hand_root_to_hand_box_over_image_diagonal",
+        "hand_root_to_hand_center_over_image_diagonal",
+        "body_wrist_hand_root_distance_over_image_diagonal",
+        "hand_person_intersection_over_hand_box_area",
+        "hand_person_box_iou",
+        "hoi_raw_logit_1_minus_0",
+        "body_wrist_raw_score",
+        "hand_root_raw_score",
+        "person_detector_raw_score",
+        "hoi_hand_raw_score",
+        "hoi_direct_object_raw_score",
+        "hoi_hand_decayed_score",
+        "hoi_direct_object_decayed_score"
+      ],
+      "finite_counts": [
+        106,
+        106,
+        106,
+        106,
+        106,
+        106,
+        106,
+        106,
+        106,
+        106,
+        106,
+        106,
+        106,
+        106,
+        106
+      ],
+      "gpu_used": false,
+      "max": [
+        0.2054584965927628,
+        0.2104934361795725,
+        0.20364703398709383,
+        0.20866803656813768,
+        0.015327609387169271,
+        1.0,
+        0.021536405221066483,
+        4.8302388191223145,
+        0.9969140887260437,
+        0.9532257914543152,
+        0.7481821775436401,
+        0.796674370765686,
+        0.720197856426239,
+        0.796674370765686,
+        0.720197856426239
+      ],
+      "min": [
+        0.0,
+        0.0015189021467394604,
+        0.0,
+        0.0008207510420625015,
+        0.0002986228324766682,
+        0.0,
+        0.0,
+        -5.1974217891693115,
+        0.28264206647872925,
+        0.09729567170143127,
+        0.5487780570983887,
+        0.3182447552680969,
+        0.41939955949783325,
+        0.3182447552680969,
+        0.41939955949783325
+      ],
+      "model_loaded": false,
+      "native_pairs": [
+        0,
+        2,
+        5,
+        6,
+        4,
+        6
+      ],
+      "ownership_verified": false,
+      "status": "pass",
+      "total_tuples": 106,
+      "tuple_rows": [
+        0,
+        12,
+        30,
+        24,
+        16,
+        24
+      ]
+    },
+    "full_git_source_match": true,
+    "gpu_used": false,
+    "host": {
+      "bytes": 7392,
+      "sha256": "215de04388c91d7b16839b45564fdab0d740e634eaae7a5b5a844f3b22ef754f"
+    },
+    "host_elapsed_seconds": 49.10979910902097,
+    "models_loaded": false,
+    "native": {
+      "bytes": 7970,
+      "sha256": "12ace609f237f8e41778a9f4b6257441eac6913a1ab2bb68e32f3972388ff912"
+    },
+    "native_elapsed_seconds": 42.94540050701471,
+    "original_cids_absent": true,
+    "original_inputs_runtime_banks_posthash": true,
+    "ownership_verified": false,
+    "producer_revision": "7b41e93aef258fd7ea89cc79dc9e5053d0762bf6",
+    "quality_verified": false,
+    "scope": "saved_original_all_bank_byte_and_tuple_integrity_not_quality",
+    "sealed_inventory_files": 29,
+    "source_files": 257,
+    "source_posthash": true,
+    "status": "pass",
+    "units": []
+  },
+  "cpu_tuple_recomputation_executed": true,
+  "observer_errors_corrected": [
+    "wrong_default_Docker_socket",
+    "incorrect_126_sum_actual_106"
+  ],
+  "actual_total_tuples": 106
+}

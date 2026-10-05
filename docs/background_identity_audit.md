@@ -40,7 +40,7 @@ no hand reassignment, private prompt, parameter tuning or historical overwrite.
 |---|---|---|
 | [DAM4SAM, CVPR2025](https://arxiv.org/html/2411.17576v2), [cutoff code](https://github.com/jovanavidenovic/dam4sam/blob/aad389b85c224bd408da8923e8fcb96410cf7e30/dam4sam_tracker.py#L121-L168) | Distractor-aware recent/anchor memory after an initial bbox/mask. | Which initial person/object is task-relevant. SAM2.1 is a separate release, not DAM4SAM. |
 | [SAM3.1, March27,2026](https://github.com/facebookresearch/sam3/blob/2345a4ad109ac29c569da749c91d84f10dc08c40/RELEASE_SAM3p1.md) | Separate concept instances and multiplexed multiobject memory; lower bank execution cost. | Manipulation ownership. Never union its instances as the CARI helper does. Author speed/benchmark claims are not our measurements. |
-| [MASA, CVPR2024](https://arxiv.org/html/2406.04221v1) | Appearance correspondence across a complete automatic proposal bank. | Person–hand ownership or physical interaction. Our pre-checkpoint CUDA failure remains closed pending an isolated original-source build. |
+| [MASA, CVPR2024](https://arxiv.org/html/2406.04221v1) | Appearance correspondence across a complete automatic proposal bank. | Person–hand ownership or physical interaction. Original SM90 operators now pass; secure full-checkpoint decoding fails, so appearance adoption is deferred. |
 | [HOI-DETR, June2026](https://arxiv.org/html/2606.17384v1), section3.3 | Explicit learned hand→direct-object→tool-target links. | Hand-to-body owner, left/right slots, temporal identity or calibrated contact. Our128-image proxy study is closed INCONCLUSIVE, not adopted. |
 | [SingleQuery-BHOI, September10,2026](https://arxiv.org/html/2609.12155v1), sections3,5,6.3 | One person query attaches body pose and both hands; a hand-to-entity relation matrix has off/self/other targets. | Published executable/checkpoint availability, robust crowded-video reconstruction, or correct Track1 predictions. |
 
@@ -233,3 +233,16 @@ depends on purpose/use. Rights and multiperson/ownership coverage remain unresol
 EgoExo is not among the declared DWPose COCO-WholeBody/UBody or HOI-DETR
 COCO/Hands23 corpora, but unverified backbone/teacher overlap remains unknown.
 **Gates:** signed grant; actual eligible sealed cohort; overlap audit. No validation PASS.
+
+
+### Actual complete native joint-bank integrity, October5
+
+Fresh explicit Track1 diagnostic7b41e93 loads the same full1796-state HOI model
+and performs six original forwards (native42.945401s/host49.109799s). Pairs
+0/2/5/6/4/6 join the14original person observations into0/12/30/24/16/24=106
+unselected person/side/hand/object hypotheses. First empty bank preserved.
+Independent CPU-only replay checks258arrays byte-exact and full source/inputs/
+runtime/output cleanup before-after. This qualifies evidence transport, not
+correct anatomy, ownership, temporal coverage, calibration, adoption or accuracy.
+Never turn these challenge diagnostics into manually chosen targets/fit labels.
+The next scientific gate remains an independently labeled legal external cohort.
