@@ -19,8 +19,6 @@ import time
 sys.path[:0] = [str(Path(__file__).resolve().parent), str(Path(__file__).resolve().parents[1]/'src')]
 import mediapipe_cpu_runtime_verify as rt
 import rgb_endpoint_bank as bank
-from world_reward.owlv2_object_observations import Owlv2ObjectObservations
-from world_reward.endpoint_proposal_recall import evaluate_endpoint_proposals, aggregate_endpoint_fixed_slots
 
 ROOT = rt.ROOT
 DATA = Path('/srv/world-reward-data/coco_endpoint_v2')
@@ -175,6 +173,7 @@ def validate_npz(path, row):
     """Whole native arrays, no missing-row repair or predictor invocation."""
     import numpy as np
     import zipfile
+    from world_reward.owlv2_object_observations import Owlv2ObjectObservations
     with zipfile.ZipFile(path) as archive:
         entries = archive.infolist()
         rt.require(len(entries) == len(ARRAY_NAMES) and {x.filename for x in entries} == {n+'.npy' for n in ARRAY_NAMES}
@@ -262,6 +261,7 @@ def approved_dev(pin, binding):
 
 
 def evaluate(phase, binding, banks, load_reference):
+    from world_reward.endpoint_proposal_recall import evaluate_endpoint_proposals, aggregate_endpoint_fixed_slots
     values = binding['values']; rows = values['cohort']['records']; mapping = binding['mapping']
     chosen = rows[:32] if phase == 'dev' else rows[32:]
     categories = {c['id']: c['name'] for c in values['cohort']['categories']}; results = []; per_image = []

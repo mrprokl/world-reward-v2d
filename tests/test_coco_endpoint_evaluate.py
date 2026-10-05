@@ -12,6 +12,7 @@ import numpy as np
 import pytest
 
 import coco_endpoint_evaluate as p
+from world_reward.owlv2_object_observations import Owlv2ObjectObservations
 
 
 def seal(path, raw):
@@ -70,7 +71,7 @@ def observation():
     b = np.zeros((3600, 4), dtype=np.float32)
     b[0] = [.35, .05, .1, .1]; b[1] = [.5, .05, .1, .1]
     corners = np.concatenate((b[:, :2]-b[:, 2:]/np.float32(2), b[:, :2]+b[:, 2:]/np.float32(2)), axis=1)*np.float32(20)
-    return p.Owlv2ObjectObservations(0, (16, 20), (60, 60), np.arange(3600, dtype=np.int64),
+    return Owlv2ObjectObservations(0, (16, 20), (60, 60), np.arange(3600, dtype=np.int64),
         b, np.arange(3600, 0, -1, dtype=np.float32), corners)
 
 
@@ -399,10 +400,19 @@ def test_cli_independent_allornone_phase_pins_and_native_boundary():
 def test_isolated_native_leaf_import_no_models_or_metadata_import(tmp_path):
     root = Path(__file__).resolve().parents[1]; code = tmp_path/'code'
     for name in set(p.NATIVE_FILES): seal(code/name, (root/name).read_bytes())
-    script = ("import importlib.util,sys; spec=importlib.util.spec_from_file_location('endpoint_cpu',sys.argv[1]); "
-        "m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m); "
-        "assert 'torch' not in sys.modules and 'transformers' not in sys.modules and 'coco_endpoint_prepare' not in sys.modules; "
-        "assert len(m.ARRAY_NAMES)==17; print('isolated-native-import-pass')")
+    script = '''import importlib.abc, importlib.util, sys
+class NoNumPy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname == 'numpy' or fullname.startswith('numpy.'):
+            raise ModuleNotFoundError('NumPy deliberately unavailable to stdlib host')
+sys.meta_path.insert(0, NoNumPy())
+spec = importlib.util.spec_from_file_location('endpoint_cpu', sys.argv[1])
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+assert not {'numpy', 'torch', 'transformers', 'coco_endpoint_prepare'} & sys.modules.keys()
+assert len(m.ARRAY_NAMES) == 17
+print('isolated-native-import-pass')
+'''
     result = subprocess.run([sys.executable, '-I', '-B', '-c', script, str(code/'infra/coco_endpoint_evaluate.py')],
         capture_output=True, text=True, check=False, timeout=10)
     assert result.returncode == 0, result.stderr
