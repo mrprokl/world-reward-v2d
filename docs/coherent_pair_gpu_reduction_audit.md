@@ -74,3 +74,18 @@ agreement. **1200 s and 95 GiB are suggested future limits, not frozen or
 achieved gates.** Keep theta/tau/alpha and any numerical tolerances explicit;
 do not relax a failed frozen probe. This is computational feasibility only,
 not ownership accuracy, model adoption, or a verified win over CARI4D.
+
+## Source prototype, no Torch execution yet
+
+`coherent_pair_packed_torch` implements lazy runtime preparation, width-one
+CSR reductions, stable inverse component CSR/VJP and complete native/group
+outputs. Host evidence is authenticated once; owned device snapshots and
+output tensors remain **mutable**, not immutable evidence. No autograd/FIT.
+
+15 source-only AST tests pass ; root224 combined tiny tests PASS2.36s without
+importing Torch. Independent1776B NumPy layout check verifies inverse-CSR
+duplicate components, target holes/empty layouts and17-column VJP mapping
+(maximum arithmetic difference1.11e-16). Source/layout audit finds no concrete
+blocker. This does **not** execute `segment_reduce` or certify CUDA ABI,
+determinism, CPU/GPU agreement, full-bank time/memory or scientific quality.
+First frozen native tiny GPU control remains required before full-bank/FIT.
