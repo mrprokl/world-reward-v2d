@@ -10875,3 +10875,24 @@ that guard explains the collector stop, NOT the model weights_decode failure.
 No pickle payload was read/executed and no GPU/model ran. A prospective static
 opcode inspection can use a16MiB memory ceiling plus bounded opcodecount/time;
 this changes audit resource scope, not inference security or scientific gates.
+
+New16MiB-ceiling static-opcode audit PASS0.411360s: original data.pkl15980997B/
+f6e017cfc17be441eda290348f90372096f28db286445de45d2bec8d241eaea1, protocol2,
+26809opcodes. Canonical globals include Torch tensor/storage rebuilds plus
+MMEngine HistoryBuffer, NumPy reconstruct/ndarray/dtype/scalar, codecs encode
+and builtin getattr. This demonstrates non-tensor pickle content; it is
+compatible with a weights-only loader failure, but does not identify its actual
+exception/global or verify top-level state layout. No globals were invoked,
+no pickle executed, no model/GPU ran and checkpoint stat/hash remained unchanged.
+Next design must retain the original strict state_dict/tensor policy and
+security, not broadallowlist these globals or use weights_only=False.
+
+Parent484 combined evidence/display/nativequalifier/fullCARI tiny checks
+PASS7.37s. Actual3Dcoverage/nativeoperator passes remain engineering evidence,
+not external actor/ownership correctness or a verified leaderboard gain.
+
+EP23 originalfull surface pose dispatched once from6a5c69e,350 immutable
+sourcefiles; ACK only, queued behind EP20/22 by original exclusive GPUlock.
+EP16 fullforward uses existing queued stagewrapper with after-gpu-lock,
+unchanged native fullwindow schedule and freshly frozen independently audited
+inputs. No second frontend, per-episode targetprompt or new predictionalgorithm.
