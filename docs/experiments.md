@@ -9961,3 +9961,21 @@ only0555/0755 envelopes with the same exact three entries and full readonly
 code/marker authentication.71 tiny saved-audit/tracker tests PASS0.68s, including
 real transport modes and0777 rejection. No original artifact chmod, GPU rerun,
 private-reference access, scientific-policy change or audit success inferred.
+
+d6e9c8d explicit evaluator opt-in preserves original HOSTFAIL and accepts only
+a separately pinned successful saved-only audit; default HOSTPASS path is not
+bypassed. Both complete native predictions are authenticated before any private
+path. Independent review and193 integrated tiny tests PASS1.51s; all eight frozen
+numerical/label-mapping/decision functions are source-byte-identical toba50330
+(492cd6e872c4d70b8c80f908c8eb34d46cbdc697fc97fd76491448ec03254d8b).
+No real evaluation has run while the new independent audit is not PASS.
+
+HOI-DETR acquisition-only route freezes pre-cutoff native source1b36729 and
+author checkpoint2d737cb,5,855,053,598B publisher-LFS hash4708fd0d. Complete Git
+tree includes2639 blobs/32,009,009B and three authenticated link texts, never
+materialized; only code/notices survive. Source MIT, upstream notice pins and
+author MIT card precede checkpoint bytes.80 tiny acquisition tests PASS1.47s
+and independent contract review; launch/source/license/download/posthash/sealing
+share900s budget with late receipt demotion. All acquisition stays on Azure.
+No actual download, runtime compatibility, model execution, full-stack rights,
+training-overlap clearance or scientific quality is claimed at this stage.

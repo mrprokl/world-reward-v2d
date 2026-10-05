@@ -1,0 +1,160 @@
+{
+  "schema": "world_reward.hoi_detr_acquisition.v1",
+  "stage": "source_model_acquisition_only",
+  "data_root": "/srv/world-reward-data/hoi_detr_v1",
+  "report": "results/hoi-detr-acquire-v1.json",
+  "cutoff": "2026-09-30",
+  "budget_seconds": 900,
+  "cleanup_grace_seconds": 60,
+  "outer_seconds": 960,
+  "minimum_free_bytes": 17179869184,
+  "maximum_total_bytes": 6200000000,
+  "maximum_manifest_bytes": 2097152,
+  "source": {
+    "repository": "AhmadDarKhalil/HOI-DETR",
+    "revision": "1b367292f3833afd64a204bd4d9d84519541d035",
+    "commit_date": "2026-06-29T19:14:57Z",
+    "git_root_tree_sha1": "e93a418345712fc6c011bfcc84bdddc90f496a70",
+    "url": "https://codeload.github.com/AhmadDarKhalil/HOI-DETR/tar.gz/1b367292f3833afd64a204bd4d9d84519541d035",
+    "archive_prefix": "HOI-DETR-1b367292f3833afd64a204bd4d9d84519541d035",
+    "archive_sha256_basis": "measured_only_not_independent",
+    "blob_count": 2639,
+    "expanded_bytes": 32009009,
+    "maximum_archive_bytes": 134217728,
+    "maximum_expanded_bytes": 134217728,
+    "maximum_member_bytes": 16777216,
+    "maximum_retained_file_bytes": 500000,
+    "maximum_blobs": 5000,
+    "maximum_tar_entries": 10000,
+    "symlinks": {
+      "mmdet/.mim/configs": {
+        "target": "../../configs",
+        "bytes": 13,
+        "git_blob_sha1": "5992d109cbbe3360c4afb3bfbc50a633ae97993b"
+      },
+      "mmdet/.mim/demo": {
+        "target": "../../demo",
+        "bytes": 10,
+        "git_blob_sha1": "bf71256cd314b9949bba2b5a8182dcb3b53702f5"
+      },
+      "mmdet/.mim/tools": {
+        "target": "../../tools",
+        "bytes": 11,
+        "git_blob_sha1": "31941e941dcc86b0c1236dcb9acb0577018ad91c"
+      }
+    },
+    "required_source_pins": {
+      "LICENSE.txt": {
+        "bytes": 1074,
+        "sha256": "5ee2c0225f66bf9f22815adbd5166fc5a2819c43ca643e6c8b6a05bf46ba0754"
+      },
+      "README.md": {
+        "bytes": 14272,
+        "sha256": "1958cdc9f71d1d55793762bb8b9d2aa0d891c711adbb6127945efb929f945933"
+      },
+      "INSTALL_HOPPER.md": {
+        "bytes": 6008,
+        "sha256": "71b8243c83d2bb150d14d73b90cf33bb9b79cef2e15dc4b4bd9bbcc0b7bc5c8b"
+      },
+      "docker/Dockerfile": {
+        "bytes": 1358,
+        "sha256": "d8bc40622f778373301d2b20ca82ce78c197e41274c4b756cd2e89f77ff840ca"
+      },
+      "demo/helpers.py": {
+        "bytes": 20441,
+        "sha256": "fa91535e09a2a55cee270ef239403a5a41a512e0d0d049135edb407fe4779420"
+      },
+      "projects/configs/co_dino_vit/co_dino_5scale_vit_large_coco_with_relation_only_all_losses_custom.py": {
+        "bytes": 19637,
+        "sha256": "018acf8bc176daf671959466726d928486977e5e43cc7bf03b4ce509ba6c00d9"
+      },
+      "mmdet/apis/inference.py": {
+        "bytes": 8688,
+        "sha256": "4d12477d43d0a5cc7794504ef44a123abeb250239ee5744315c466eb855db6ea"
+      }
+    },
+    "required_retained_files": [
+      "setup.py",
+      "setup.cfg",
+      "requirements.txt",
+      "mmdet/__init__.py",
+      "demo/helpers.py",
+      "demo/configs.py",
+      "demo/predictions_io.py",
+      "demo/demo.py",
+      "demo/demo_video.py",
+      "requirements/runtime.txt"
+    ],
+    "retention_rule": "all py in mmdet/projects/configs/demo/tools; requirements txt; docker build text; root setup/readme/install/git attributes; all original license/notice/copying text anywhere; no symlinks/media/data/weights/cache"
+  },
+  "assets": [
+    {
+      "file": "notices/mmdetection-v2.25.3-LICENSE",
+      "url": "https://raw.githubusercontent.com/open-mmlab/mmdetection/v2.25.3/LICENSE",
+      "bytes": 11398,
+      "sha256": "874b8b2e6f12306a1ff7812c068a0dbf880418b8ac1f7190382bd6c6da9f23a1",
+      "hash_basis": "independently_pinned_primary_notice"
+    },
+    {
+      "file": "notices/mmcv-v1.7.2-LICENSE",
+      "url": "https://raw.githubusercontent.com/open-mmlab/mmcv/v1.7.2/LICENSE",
+      "bytes": 11413,
+      "sha256": "866d999d3ca92d2c5dc9b0afc941c5fac6529e2d180fc638274f91f7fce161d7",
+      "hash_basis": "independently_pinned_primary_notice"
+    },
+    {
+      "file": "notices/co-detr-LICENSE",
+      "url": "https://raw.githubusercontent.com/Sense-X/Co-DETR/main/LICENSE",
+      "bytes": 1072,
+      "sha256": "73873d580b3060451c5eba350c62f4fd182a531efe1d94af677613bcb19cc8a5",
+      "hash_basis": "independently_pinned_primary_notice_bytes_mutable_url_not_commit_pin"
+    },
+    {
+      "file": "weights/README.md",
+      "url": "https://huggingface.co/ahmaddarkhalil/hoi-detr/raw/2d737cbf189a1b61c2e8e86cfd03df5acba56f52/README.md",
+      "bytes": 24,
+      "sha256": "d8d7a46d41a1a37fe4f0a5f637bf55c649310185329127d8a2204632e480be17",
+      "hash_basis": "independently_pinned_author_model_card"
+    },
+    {
+      "file": "weights/epoch_5.pth",
+      "url": "https://huggingface.co/ahmaddarkhalil/hoi-detr/resolve/2d737cbf189a1b61c2e8e86cfd03df5acba56f52/epoch_5.pth",
+      "bytes": 5855053598,
+      "sha256": "4708fd0ddc5c3d386bad67c31152de58676840b911f6d01219e0092a603277d3",
+      "hash_basis": "independently_pinned_publisher_lfs_sha256"
+    }
+  ],
+  "checkpoint": {
+    "repository": "ahmaddarkhalil/hoi-detr",
+    "revision": "2d737cbf189a1b61c2e8e86cfd03df5acba56f52",
+    "revision_date": "2026-08-06",
+    "first_weight_commit": "5d4404a4c6a2fe30a0be6c6275569af0643ed14d",
+    "first_weight_date": "2026-04-23",
+    "model_card_license": "mit",
+    "checkpoint_composition": "not_decoded_unknown"
+  },
+  "scope": {
+    "models_loaded": false,
+    "model_nodes_decoded": false,
+    "upstream_code_executed": false,
+    "packages_installed": false,
+    "native_extensions_built": false,
+    "gpu_used": false,
+    "dataset_read": false,
+    "challenge_inputs_used": false,
+    "private_values_read": false,
+    "quality_verified": false,
+    "stage_adoption": false,
+    "license_eligibility_verified": false,
+    "training_overlap_verified": false,
+    "challenge_overlap_verified": false,
+    "training_overlap_status": "unknown_author_claim_not_independent_weight_audit"
+  },
+  "future_runtime": {
+    "torch_2_5_1_cu124_h100_qualified": false,
+    "existing_images_modified": false,
+    "native_configuration_modified": false,
+    "checkpoint_decoded": false,
+    "required_next_gate": "separate native MMCV ops/model inference qualification; no datasets instantiated"
+  }
+}
