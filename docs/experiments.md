@@ -9447,3 +9447,27 @@ model/GPU calls or historicalfailure relabel; disposable source/QEM files remove
 Azure-only retained candidate6.3MB/mapping53.1MB are reproducibility artifacts,
 not local data or a measured CARI4D improvement. Freeze15artifact leaves and16
 current consumer helpers before the same full399-frame ICP/Viterbi handoff.
+
+Actual first surfacefullpose8b909ca hostpreflightFAIL before output/control/
+container/GPU: fifteen-artifact hashing imposed32MiB on the original mapping
+53130311B. Independent read-only diagnosis reproduced exactly this one failing
+path; all15pins/full317-entry originalsource unchanged, log700B
+c6c953733714a043b31e640fe2a9625c1a4acf9145a151fd4ca4c04f916949bd.
+Audit found the same implicit32MiB restriction in the inert native surface
+reader and posthash. Technical correction reuses producer256MiB capacity only
+for the exact revision-bound surface mapping role in pin/initial/final hashes.
+The other14roles and historicalsolid reader keep32MiB. Same original bytes,
+canonical paths/modes/nlink/inode checks, geometry/gates/fullT/costs/budgets;
+only the current surface-reader helper pin changes. Tiny stat/callback spies
+exercise the >32MiB path without any large local test artifact. OriginalFAIL
+retained; a distinct fresh consumer revision/unit is required.
+Independent integration audit found no remaining cap/provenance blocker;
+133PASS1SKIP16.24s focused tests. Expanded tests caught a separate obsolete
+test assumption: complete shared-stage archive no longer fits laptop inline
+256KB, while bounded GitHub descriptor is the actual production transport.
+Test now verifies complete descriptor coverage/size and retains the inline
+overflow rejection; no transport budget/runtime/closure change.
+Expanded integration880PASS1SKIP48.13s with uniquely owned test temporary root;
+simultaneous default pytest fixtures had collided with disposable-directory
+cleanup, not a source regression. Retain no failed fixture noise. Wrapper diff
+is exactly one role-cap line; historical solid bytes and all15artifact pins exact.

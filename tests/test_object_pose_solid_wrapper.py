@@ -139,6 +139,37 @@ def test_surface_host_exact15_sources_narrow_gpu_and_complete_proof(runtime_fact
  assert after.stdout==before.stdout and r['out'].name=='object_pose_full_surface' and r['out'].stat().st_mode&0o777==0o555
 
 
+def test_surface_host_mapping_hash_capacity_only_and_rechecked(runtime_factory):
+ # A six-byte artifact declares a large stat size in a CPU spy; no 53MB local file.
+ r=runtime_factory('surface');p=r['proposal']/'mapping.json';calls=r['root']/'capacity-calls.jsonl'
+ helper=r['code']/'infra/mediapipe_cpu_runtime_verify.py';helper.chmod(0o644)
+ spy='''\n_original_identity=identity
+def identity(path,maximum=1_000_000_000,**kwargs):
+ p=Path(path)
+ if p==Path(%r):
+  with Path(%r).open('a')as stream:stream.write(str(maximum)+'\\n')
+  require(maximum>=53130311,'Complete original mapping exceeds invented cap')
+ return _original_identity(path,maximum,**kwargs)
+'''%(str(p),str(calls))
+ helper.write_text(helper.read_text()+spy);helper.chmod(0o444)
+ before=r['call']('before');assert before.returncode==0,before.stderr
+ after=r['call']('after');assert after.returncode==0,after.stderr
+ limits=[int(x)for x in calls.read_text().splitlines()]
+ assert limits.count(256<<20)==2 and all(x>=(256<<20)for x in limits)
+
+
+def test_surface_host_nonmapping_artifacts_keep_original_cap(runtime_factory):
+ r=runtime_factory('surface');p=r['proposal']/'candidate_geometry.npz'
+ helper=r['code']/'infra/mediapipe_cpu_runtime_verify.py';helper.chmod(0o644)
+ helper.write_text(helper.read_text()+'''\n_original_identity=identity
+def identity(path,maximum=1_000_000_000,**kwargs):
+ if Path(path)==Path(%r):require(maximum>32<<20,'Original other-role cap remains')
+ return _original_identity(path,maximum,**kwargs)
+'''%str(p));helper.chmod(0o444)
+ result=r['call']('before');assert result.returncode!=0 and 'Original other-role cap remains'in result.stderr
+ assert not r['control'].exists() and not r['out'].exists()
+
+
 @pytest.mark.parametrize('fault',['missingpin','missingcandidate','extraartifact','wrongprofile','qualificationpath','historical_binary','historical_mutation'])
 def test_surface_host_fail_closed_before_native_output(runtime_factory,fault):
  r=runtime_factory('surface');p=r['pins'];p.chmod(0o644);v=json.loads(p.read_text())

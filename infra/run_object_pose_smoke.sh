@@ -66,7 +66,7 @@ if profile=='surface':
   rt.require(all(oldsource[k]==bound[k]for k in('producer_revision','markers','entries','closure_sha256')),'Original hash-only proof source changed')
   historical.append((parent,oldsource))
 rt.require(set(pins['files'])=={str(p.relative_to(root))for p in expected},'Exact canonical selected geometry artifacts required')
-inputs={str(p):raw(p)for p in expected}
+inputs={str(p):raw(p,256<<20 if profile=='surface'and p==proposal/'mapping.json'else 32<<20)for p in expected}
 for name,value in pins['files'].items():same(root/name,value)
 rt.require(inputs[str(proposal/'report.json')]=={k:producer[k]for k in ('bytes','sha256')},'Independent producer report differs')
 for directory in(proposal,qualification):

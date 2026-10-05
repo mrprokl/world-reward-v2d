@@ -101,8 +101,8 @@
       "sha256": "131a97dd593c1feba2da34f6a3348af6d3040b00a3bea1c1c7cc0ce4516fcce1"
     },
     "infra/surface_geometry_loader.py": {
-      "bytes": 26643,
-      "sha256": "8237d45bc4c8405d5aebf99f80e344d21f9fe68121a54edb12ff8145adce29ec"
+      "bytes": 28238,
+      "sha256": "2fb45e96f17cc8d35621f73567ad3466e173c41eb153aa5c5a72f1328cc0e1a1"
     },
     "src/world_reward/contracts.py": {
       "bytes": 3451,

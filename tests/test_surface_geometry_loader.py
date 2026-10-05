@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+import stat
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -166,6 +168,53 @@ def test_paths_exact15_no_arbitrary_namespace():
     assert paths['object']=='outputs/episode_000009/object_grounded/report.json'
     for e,q,p,i in ((True,'a'*40,'b'*40,'c'*40),(30,'a'*40,'b'*40,'c'*40),(9,'../x','b'*40,'c'*40)):
         with pytest.raises(ValueError):loader.paths(e,q,p,i)
+
+
+def test_large_mapping_role_only_no_large_local_fixture(tmp_path,monkeypatch):
+    """Manufactured stat size exercises limits; stored fixture remains six bytes."""
+    p=tmp_path/'outputs/episode_000026'/('object_budget_surface_'+'a'*40)/'mapping.json'
+    p.parent.mkdir(parents=True);p.write_bytes(b'ledger');p.chmod(0o444)
+    original=Path.lstat;size=[(32<<20)+1]
+    def declared_stat(path):
+        info=original(path)
+        if path!=p:return info
+        fields=('st_dev','st_ino','st_mode','st_nlink','st_uid','st_gid','st_mtime_ns','st_ctime_ns')
+        return SimpleNamespace(**{k:getattr(info,k)for k in fields},st_size=size[0])
+    monkeypatch.setattr(Path,'lstat',declared_stat)
+    pin=loader.identity(p)
+    assert pin==dict(bytes=size[0],sha256=hashlib.sha256(b'ledger').hexdigest())
+    loader.recheck({p:pin})
+    size[0]=loader.MAPPING_MAX_BYTES+1
+    with pytest.raises(ValueError,match='Bounded'):loader.identity(p)
+    size[0]=(32<<20)+1;p.chmod(0o644)
+    with pytest.raises(ValueError):loader.identity(p)
+    p.chmod(0o444);link=p.with_name('alias');link.hardlink_to(p)
+    with pytest.raises(ValueError):loader.identity(p)
+
+
+@pytest.mark.parametrize('relative',[
+    'outputs/episode_000026/object_budget_surface_'+ 'a'*40+'/candidate_geometry.npz',
+    'outputs/episode_000026/object_budget_solid_'+ 'a'*40+'/mapping.json',
+    'outputs/episode_000030/object_budget_surface_'+ 'a'*40+'/mapping.json',
+    'outputs/episode_000026/object_budget_surface_main/mapping.json',
+    'data/episode_000026/object_budget_surface_'+ 'a'*40+'/mapping.json',
+])
+def test_mapping_capacity_never_applies_to_other_roles(tmp_path,monkeypatch,relative):
+    p=tmp_path/relative;calls=[]
+    monkeypatch.setattr(loader,'_solid_identity',lambda path,**kw:calls.append((path,kw))or {'original':True})
+    assert loader.identity(p)=={'original':True} and calls==[(p,dict(readonly=True))]
+
+
+def test_exact_fifteen_pin_validation_uses_producer_capacity_only_for_mapping(tmp_path,monkeypatch):
+    root,code,pins,e,s,osh,ash,names=receipt_fixture(tmp_path,monkeypatch)
+    calls=[];original=loader._pin
+    def check(pin,maximum=32<<20):
+        calls.append((pin,maximum));return original(pin,maximum)
+    monkeypatch.setattr(loader,'_pin',check)
+    loader.verify_pinned_artifacts(root,pins,e,'d'*64,osh,ash,s)
+    assert calls[1:16]==[(pin,loader.MAPPING_MAX_BYTES if name==names['mapping']else 32<<20)
+        for name,pin in pins['files'].items()]
+    assert sum(maximum==loader.MAPPING_MAX_BYTES for _,maximum in calls)==1
 
 
 def test_missing_independentpins_fails_before_payload(tmp_path,monkeypatch):

@@ -161,7 +161,7 @@ exec({source!r},{{}})
     assert len(result.stdout.splitlines())==15
 
 
-def test_complete_actual_archive_closure_under_control_cap():
+def test_complete_actual_archive_closure_bounded_github_transport():
     s=importlib.util.spec_from_file_location("consumer_bundle",ROOT/"infra/azure_job.py")
     launcher=importlib.util.module_from_spec(s);s.loader.exec_module(launcher)
     files={str(p.relative_to(ROOT)):p.read_bytes() for base in ("infra","src","configs") for p in (ROOT/base).rglob("*") if p.is_file() and "__pycache__" not in p.parts}
@@ -173,5 +173,15 @@ def test_complete_actual_archive_closure_under_control_cap():
     with tarfile.open(fileobj=stream,mode="w") as archive:
         for name in selected:
             entry=tarfile.TarInfo(name);entry.size=len(files[name]);entry.mode=0o444;archive.addfile(entry,io.BytesIO(files[name]))
-    encoded,_=launcher.encoded_runtime_archive(stream.getvalue())
-    assert len(encoded)<=launcher.MAX_CODE_CONTROL_BYTES
+    # Production fetches public code on Azure; do not trim its complete closure
+    # or enlarge laptop inline transport merely because the repository grows.
+    import base64,hashlib,lzma
+    archive=stream.getvalue();compressed=lzma.compress(archive,preset=6)
+    descriptor=launcher.github_archive_descriptor(archive,'a'*40,hashlib.sha256(compressed).hexdigest())
+    assert {r['path']for r in descriptor['files']}==set(selected)
+    assert len(json.dumps(descriptor,separators=(',',':')).encode())<=launcher.MAX_CODE_CONTROL_BYTES
+    if len(base64.b64encode(compressed))>launcher.MAX_CODE_CONTROL_BYTES:
+        with pytest.raises(RuntimeError,match='256KB'):launcher.encoded_runtime_archive(archive)
+    else:
+        encoded,_=launcher.encoded_runtime_archive(archive)
+        assert len(encoded)<=launcher.MAX_CODE_CONTROL_BYTES

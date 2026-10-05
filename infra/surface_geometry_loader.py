@@ -10,10 +10,11 @@ import hashlib
 import importlib
 import json
 from pathlib import Path
+import re
 import stat
 
 import numpy as np
-from solid_geometry_loader import identity, strict_json, require, _hex, _pin, _fields
+from solid_geometry_loader import identity as _solid_identity, strict_json, require, _hex, _pin, _fields
 
 CODE = Path(__file__).resolve().parent.parent
 SCHEMA = 'world_reward.surface_mesh_pins.v1'
@@ -30,6 +31,33 @@ SOURCE_HELPERS = ('infra/surface_geometry_loader.py', 'infra/solid_geometry_load
     'infra/mesh_precision_diagnostic.py', 'infra/object_budget_endpoint.py',
     'infra/body_smoke.py', 'src/world_reward/data.py')
 OUTPUTS = ('object_fixed_canonical.glb', 'geometry.npz', 'candidate_geometry.npz', 'mapping.json')
+MAPPING_MAX_BYTES = 256 << 20  # Same bounded ledger capacity as its CPU producer.
+
+
+def _mapping_role(path):
+    path=Path(path)
+    return (path.name=='mapping.json' and path.parent.parent.parent.name=='outputs'
+        and re.fullmatch(r'episode_0000(?:0[0-9]|1[0-9]|2[0-9])',path.parent.parent.name) is not None
+        and re.fullmatch(r'object_budget_surface_[0-9a-f]{40}',path.parent.name) is not None)
+
+
+def identity(path, *, readonly=True):
+    """Original 32MiB identities, except the complete revision-bound surface ledger."""
+    path=Path(path)
+    if not _mapping_role(path):return _solid_identity(path,readonly=readonly)
+    require(path.is_absolute() and path.resolve()==path and not any(p.is_symlink() for p in(path,*path.parents)),
+        'Canonical original surface mapping required')
+    before=path.lstat()
+    require(stat.S_ISREG(before.st_mode) and before.st_nlink==1 and 0<before.st_size<=MAPPING_MAX_BYTES
+        and (not readonly or not before.st_mode&0o222),'Bounded single-link original surface mapping required')
+    digest=hashlib.sha256()
+    with path.open('rb')as stream:
+        for block in iter(lambda:stream.read(1<<20),b''):digest.update(block)
+    after=path.lstat()
+    require(all(getattr(before,k)==getattr(after,k)for k in
+        ('st_dev','st_ino','st_size','st_mode','st_nlink','st_uid','st_gid','st_mtime_ns','st_ctime_ns')),
+        'Original surface mapping changed while hashing')
+    return dict(bytes=before.st_size,sha256=digest.hexdigest())
 
 
 def recheck(ledger):
@@ -134,7 +162,7 @@ def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha
     configs,first,q,b = _configs(); names=paths(episode,q['producer_revision'],producer['producer_revision'],first['producer_revision'])
     require(set(pins['files']) == set(names.values()) and q['independent_audit_path'] == names['qualification_audit'],
             'Exact fifteen surface/source/qualification artifacts required')
-    for pin in pins['files'].values(): _pin(pin)
+    for name,pin in pins['files'].items(): _pin(pin,maximum=MAPPING_MAX_BYTES if name==names['mapping'] else 32<<20)
     ro = {names[k] for k in ('report','native','geometry','glb','candidate','mapping','phase1_native','qualification_native','qualification_audit')}
     before = {n:identity(root/n,readonly=n in ro) for n in names.values()}
     require(before == pins['files'] and before[names['report']] == {k:producer[k] for k in ('bytes','sha256')}
