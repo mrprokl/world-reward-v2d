@@ -25,6 +25,8 @@ inferred automatically; no hand-labeling of challenge records.
   profile without changing pose weights. Its fresh96-frame native operator
   control stops in historical-receipt preflight before any native geometry;
   its technical reader fix preserves the old failure and all numerical gates.
+  The separate corrected native control passes all96 poses/six negatives in
+  3.561s, with an independent saved-proof audit and no QEM. No quality claim.
   EP21 real native point qualification stops before optimization (<8 queries);
   no replay, positive-weight fit or accuracy gain. EP09 full415 preparation,
   forward,301-update refinement and directexport pass independent source/full-

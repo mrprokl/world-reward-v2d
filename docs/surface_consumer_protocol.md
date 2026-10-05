@@ -50,3 +50,12 @@ native byte identity intact. Read-only diagnosis proves all source-proof keys
 and original receipt pins unchanged. The technical reader correction checks
 the actual null, separate native identity/pins and independent audit; no
 qualification failure is relabeled, nor any recipe or geometry criterion changed.
+
+The separate reader-corrected producer `dd8ea040fb9cd57bda950ddb4d3e5e3f94af386f`
+passes: host3.560780s/native1.834708s, original two open components/seven vertices/
+three faces, one official budget operation, zeroQEM, all96 poses and six negatives.
+Camera-space represented roundtrip maximum1.223075e-7m. Independent saved-file
+audit authenticates full source/runtime/qualification/receipts and exact owned
+CID absence; all disposable geometry removed. Qualification pins record actual
+four-file sealed Azure namespace. This is operator integration only: no
+human/contact/HDF5/Parquet or accuracy/adoption claim.

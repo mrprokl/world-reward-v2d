@@ -9358,3 +9358,12 @@ bytes/status/sourceproof unchanged, independentreadonlyproofconfirms allsource
 keys exact. Log1591B SHAe4f7186fa1afb10cd09931ff324b7d5d7cef9a6ad6c0b5ab90dc4ed9b057f3ea.
 Technical-only correction authenticates actualnull+native_identity+separatepins;
 freshrevision/unit required, no numericalgates/recipe/sourcequalificationchange.
+
+Actual new reader-corrected dd8ea04 surfacecontrolPASS host3.560780s/native1.834708s,
+7V/3F/2opencomponents,0QEM/1officialbudget,all96savedF32poses/sixnegatives,
+camera-space maxerror1.223075e-7m. Native33260B4267b97b…033bb5/host54663B
+aa889a09…5fc43f; 292sourcefiles/XZ0a1e0443…68b5f6. IndependentsavedproofPASS
+fullsource/runtime/historicalFAIL lineage/fourfiles0555-0444/exactCIDabsence;
+no geometryreplay. Scratchremoved; nochallenge/model/GPU/HDF5/HOIaccuracy/adoption.
+Unitcollectednot-found is notcompletionproof; actual immutablecomplete receipts
+and nativeproof establish this scoped result. Originalb780ebfFAIL retained.
