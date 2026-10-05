@@ -31,8 +31,11 @@ repaired, and the old failure stays immutable. Independent rederivation passes.
 All96 historical COCO original-byte identities are now excluded. A fresh96-slot
 cohort (32 FIT/16 CAL/48 RESERVED) is frozen in a new SHA order before HTTP;
 an independent saved-only audit reproduces selection and full source/input pins.
-Individual creator rights/original acquisition is the next separate gate, not
-accuracy or an ownership result.
+The subsequent single original acquisition is **closed INCONCLUSIVE**:
+68/96 (FIT23/CAL10/RESERVED35), below the frozen24/12/36 availability gates.
+Independent integrity checks pass, not quality. No bank inference, fitting,
+resampling or retries on this closed study. Generic caller work stays dormant;
+data-free cost checks and a separately justified reference search continue.
 See [next ownership decision](docs/ownership_next_decision.md). No manual labels
 or episode-specific rescue are used.
 

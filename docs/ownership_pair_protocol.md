@@ -141,7 +141,26 @@ saved-only validation PASS3.806669157s reproduces the scalar annotation binding,
 before/after. Its first observer failed mechanically before new geometry; that
 1398B partial is preserved, with one corrected observer attempt explicitly
 recorded. The producer/cohort was not rerun or changed. Individual rights and
-original acquisition remain subsequent gates.
+original acquisition was then executed once and is **CLOSED INCONCLUSIVE**.
+
+Actual acquisition171.640938564s, terminal failed/failed/ExecMainStatus1,
+MainPID0:68/96 originals acquired, **FIT23/CAL10/RESERVED35**, below the frozen
+24/12/36 gates. Missing28 slots are not replaced. Failures:12 creator HTTP,
+11 creator-declaration rejects, four original-RGB value rejects and one original
+HTTP failure. The96-slot ledger62025B/SHA
+`ae0701546825725d5b665b38af9dd3ca09c3f41365befae12cd5af9609dc93fd`
+and public projection13949B/SHA
+`de121a211ea9b189bcc5a1d15bb6f12eea56244496c37d5f063eaba81c7e57e7`
+are sealed. Independent saved-only integrity PASS1.267131985s checks all96
+slots,73 creator JSON declarations,68 byte-exact JPEG originals/header and
+all source/input/output states. Original RGB137607214B remains Azure; no RGB
+was decoded or transferred locally. Raw creator HTML is not archived, so this
+is a saved declaration audit, not new account authentication.
+
+No bank inference, FIT, CAL, RESERVED evaluation or smaller/resampled cohort is
+allowed on this closed study. The generic six-field bank caller is dormant;
+data-free cost qualification may continue independently. A new reference source
+needs a separately justified population/protocol, not an availability rescue.
 
 The separate pure learner prototype at
 `e318fd9` has23 dedicated numerical tests and255 parent combined checks
