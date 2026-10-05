@@ -10856,3 +10856,22 @@ producer-input comparison is stillpartial; do notpromote newpose configyet.
 Six-bank tiny preview finalfiles/pixels/predictionhashes and actual CID/name
 absence PASS; private Azure Blob95135B transferred under exact ETag solely for
 user-authorized QA. Colors are per-image detection slots, never actor labels.
+
+EP23 final scalar supplement PASS: exact native/host equality and original
+inputbinding, five current source SHA/bytes equal producer-bound values. Actual
+552frames/video4b132f8e/scale0.7398347854614258 freeze the15-leaf surface pose
+config. Earlier partialcollector was a metadata guard, not an estimation
+failure. Existing fullproposal audit remains unchanged; no QEM or pose replay.
+Tiny preview blob deleted with exactETag by VM01 managedidentity; local
+identity could read but notdelete, no keys/SAS fallback or permissionchange.
+MASA static checkpoint audit remains INCONCLUSIVE at a ZIPinventory guard
+before opcode parsing; fullcheckpoint/sourcehashes verified, no cause inferred
+or opaque globals executed. A metadata-only census will identify the guard.
+
+Actual metadata-only MASA checkpoint census authenticates528391980B/082670: ZIP
+711members/528258109expanded bytes, no encryption/duplicates/path violations.
+Its single data.pkl is15980997B, above the predeclared4MiB static-audit bound;
+that guard explains the collector stop, NOT the model weights_decode failure.
+No pickle payload was read/executed and no GPU/model ran. A prospective static
+opcode inspection can use a16MiB memory ceiling plus bounded opcodecount/time;
+this changes audit resource scope, not inference security or scientific gates.
