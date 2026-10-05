@@ -1,0 +1,39 @@
+{
+  "schema": "world_reward.person_bank_replica_summary.v1",
+  "producer_revision": "7b41e93aef258fd7ea89cc79dc9e5053d0762bf6",
+  "original_person_producer_revision": "5e4255d192a657bec3428806ded272f457804a01",
+  "artifact_only": true,
+  "model_execution": false,
+  "quality_verified": false,
+  "local_media_transferred": false,
+  "archive": {
+    "bytes": 26388480,
+    "sha256": "0698c90d834c020ed0024f31cda84cee4a42aae4b10aa064e0c9276f8fbbf404"
+  },
+  "files": 263,
+  "export": {
+    "status": "pass",
+    "elapsed_seconds": 1.4375992339919321,
+    "receipt": {
+      "bytes": 3445,
+      "sha256": "ef9a97786c890bbed06f0738033b337dbeb47cce4fa85f9b80af1221eb0fadb2"
+    }
+  },
+  "import": {
+    "status": "pass",
+    "elapsed_seconds": 0.9817900820053183,
+    "receipt": {
+      "bytes": 3515,
+      "sha256": "cc53e02170eb1ff7ba19d47ae96b82e0d06c300caafc24c5f14947bae27de900"
+    }
+  },
+  "source_files_banks_RGB_unchanged": true,
+  "owned_archives_and_staging_removed": true,
+  "private_transfer_blob_removed": true,
+  "temporary_VM01_role_removed": true,
+  "original_VM01_reader_preserved": true,
+  "prior_failed_export_receipt_unchanged": {
+    "bytes": 1410,
+    "sha256": "59acce6d28af7f1c5793f0fc8c82f2dc930043c138eebd6a9f9793d1fcddad90"
+  }
+}

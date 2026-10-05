@@ -10952,3 +10952,12 @@ remains failed. A narrowly scoped temporary VM01 container Contributor grant
 was requested for Azure-only export; remove only that newly created assignment
 after verified import/cleanup. Existing Reader/other assignments unchanged.
 No storage keys, public access or SAS workaround. New namespace required for retry.
+
+
+Replica retry7b41e93 actual export PASS1.437599s/import PASS0.981790s;263files,
+26,388,480B archive0698c90d…fbbf404, full original source/6banks/2RGB unchanged.
+Both own archives/staging and private blob removed; temporaryVM01Contributor
+assignment deleted, originalReader remains. Prior failed receipt unchanged.
+Compact identities: results/audits/person_bank_replica_v1.json.
+HOI six-bank job dispatched from same7b41e93 immutable source; **ACK/result pending**.
+No native/ownership/accuracy success inferred from a successful byte replica.
