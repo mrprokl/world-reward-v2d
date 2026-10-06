@@ -89,3 +89,16 @@ full public mounts and strict fixed folds. These are not actual Azure cost resul
 
 Independent frozen-worker68 PASS12.89s and read-only host/source audit READY;
 no concrete runtime/source blocker found. Real GPU arithmetic/cost remains unrun.
+
+## Actual dispatch, no terminal qualification yet
+
+Producerfcb091478e13bdfe8b55654f49bf936aae2dd126 was dispatched once through
+GitHub-only code transport:419 files/424 entries, source closure
+`c235e1a45377e2bf1c9eb8abf07ae894c91d081229f596bc5deaae9dc5d3df93`,
+XZ489940 bytes/SHA`59167be401d602d864a965a95071e3c4b47046e2e7feaf25cd49bada9640f8cb`.
+All23 numerical source leaves are individually mounted; current host helpers112.
+Azure ACK verifies dispatch only. First independent saved observer waited320s
+and returned RUNNING: original driver still present, unit active, no sealed
+report. Its provisional ExecMainStatus0 is not completion evidence. No q.authenticate
+or numerical decode was attempted by this observer. Preserve this snapshot;
+no producer retry or partial-result adoption. Later terminal audit remains due.
