@@ -74,6 +74,14 @@ uses the unchanged singleton marginal objective with regularization0, ordered
 loss/VJP sum divided by fixed N, then ridge **once**. All missing/no-positive/
 no-alternative statuses remain; no renormalization over informative images.
 
+CV identity rule is new and prospective, not inherited from the original48
+freeze: sort the32 authenticated opaque FIT IDs by SHA256 of the UTF-8 string
+`world_reward.vcoco_selector_cv_v1/` plus opaque ID (ties lexicographic ID), then
+assign sorted index modulo4. Exactly eight images per fold; no role/availability/
+score dependence. Host verifies original FIT membership and opaque mappings;
+native receives only slot, opaque ID and fold. Freeze the manifest hash before
+references, and never reseed/reassign after results.
+
 Proposed deterministic analytic-GPU L-BFGS-B: one zero initialization, A
 unbounded/B[0,infinity), maxiter200/maxfun500/maxls20/maxcor10,
 ftol1e-12/gtol1e-6. Require all12 CV fits and two final fits finite/successful,
