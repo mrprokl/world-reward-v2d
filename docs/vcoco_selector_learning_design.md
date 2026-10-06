@@ -131,6 +131,16 @@ stationarity failure closes.61 dedicated PASS0.10s, independent61 PASS0.11s,
 167 combined PASS0.32s/root167 PASS0.33s. Only tiny manufactured callbacks were
 used; this does not qualify the actual SciPy runtime or a fitted selector.
 
+The generic caller-fixed CV orchestration utility is source-qualified, not FIT:
+66 dedicated/233 combined PASS0.44s, root233 PASS0.40s; independent66 PASS0.10s
+and256 RAM-only unequal-fold/caller-order properties. All declared fold/lambda
+combinations are required, held losses weight each fixed image equally, exact
+ties choose stronger lambda and one final full fit is called. Missing/NaN losses,
+callback errors or borrowed-input drift close INCONCLUSIVE; no failed lambda
+is skipped. CV metadata/loss arrays are sealed, but opaque model artifact
+integrity and source/runtime/reference alignment remain the caller's obligation.
+No SciPy, GPU, references or actual selector were used by these controls.
+
 Operational adequacy proposal: at least six informative images per FIT fold
 with a jointly covered positive and a competing automatic candidate, and at
 least24 FIT images with useful nonconstant relation derivative for B. These are
