@@ -64,3 +64,17 @@ Publisher CC-BY2 photo metadata, creator UNKNOWN, inherited repository notices
 and COCO/V-COCO model-exposure caveats remain. No author independence, challenge
 leakage clearance, full negative/OFF labels, anatomical ownership, contact,
 temporal/3D truth, official AP, model quality or CARI4D superiority is claimed.
+
+## Actual count-only capacity
+
+The sole caller atb9270d55a3ed10c28e080e019107cedb18e63fd1 completes native
+PASS831.470576s:195 TRAIN and191 VAL distinct eligible photos;386 private
+identity rows. The independent saved-only audit verifies all six complete Git
+closures, original41 input/asset entries, all16 pilot reference hashes only,
+448 exclusions, sealed report/inventory and before/after byte/mode identities.
+Report57524B/SHA703e0e34… and inventory24991B/SHAea7503e6… remain on Azure.
+The local3069-byte audit records full pins and scope. No replay, pixel decode,
+role re-evaluation, selection, fitting, calibration or predictor occurs in this
+observer. The collected historical systemd exit is explicitly unavailable, not
+inferred from not-found. Capacity passes the unchanged32/16 gate and permits a
+separate prospective metadata freeze; it is not a trained selector or accuracy.

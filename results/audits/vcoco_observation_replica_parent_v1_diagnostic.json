@@ -1,0 +1,85 @@
+{
+  "azure_cli_exit": 0,
+  "components": [
+    {
+      "directory": true,
+      "exists": true,
+      "gid": 0,
+      "lexists": true,
+      "mode": "0o755",
+      "nlink": 19,
+      "path": "/",
+      "resolved_equal": true,
+      "symlink": false,
+      "uid": 0
+    },
+    {
+      "directory": true,
+      "exists": true,
+      "gid": 0,
+      "lexists": true,
+      "mode": "0o755",
+      "nlink": 3,
+      "path": "/srv",
+      "resolved_equal": true,
+      "symlink": false,
+      "uid": 0
+    },
+    {
+      "exists": false,
+      "lexists": false,
+      "path": "/srv/world-reward-data",
+      "resolved_equal": true,
+      "symlink": false
+    },
+    {
+      "exists": false,
+      "lexists": false,
+      "path": "/srv/world-reward-data/vcoco_observation_replica_v1",
+      "resolved_equal": true,
+      "symlink": false
+    }
+  ],
+  "limitations": [
+    "renameat2 symbol presence is not an executed atomic-install qualification",
+    "original import FAIL remains unchanged; no directory or data was created"
+  ],
+  "metadata_only": true,
+  "no_blob_or_archive_read": true,
+  "no_directory_created": true,
+  "no_model_or_import_replay": true,
+  "no_rename_called": true,
+  "observer_seconds": 0.18416452402016148,
+  "observer_source_sha256": "297acd0222baa0dae81a1a30a5ce81c23540e1cb2db5871156f4c4d642bf8567",
+  "original_elapsed_seconds": 0.5756366139976308,
+  "original_error_type": "ValueError",
+  "original_report": {
+    "bytes": 4969,
+    "sha256": "877d595c1e91ec937270553595c40e6d8cb782269dd5f62b2eeddbf9de775ee1"
+  },
+  "original_status": "fail",
+  "parent_canonical": true,
+  "parent_is_dir": false,
+  "parent_metadata_unchanged": true,
+  "phase": "source_receipt_metadata_post",
+  "platform": {
+    "libc": [
+      "glibc",
+      "2.35"
+    ],
+    "python": [
+      3,
+      10,
+      12
+    ],
+    "system": "Linux"
+  },
+  "producer_revision": "7c11662f98cf6f3db28909dce147473f1ab3bd0c",
+  "renameat2_symbol_available": true,
+  "schema": "world_reward.vcoco_observation_replica_parent_diagnostic.v1",
+  "source_and_receipt_unchanged": true,
+  "source_entries": 327,
+  "source_files": 322,
+  "status": "pass",
+  "vm01_released": true
+}

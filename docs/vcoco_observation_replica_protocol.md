@@ -69,3 +69,17 @@ and before/after identities. Saved audit v2 is PASS; archive SHA is explicitly
 the sealed source-bound stream-writer declaration, not a Blob GET/rebuild.
 The final receipt-only retrieval is separate bounded metadata, not a repeated
 export. Import and anatomical observations remain unexecuted at this decision.
+
+## Actual import failure and metadata-only cause
+
+The original7c11662 import fails ValueError0.575637s after complete archive
+verification and before staging/installation. The original4969-byte FAIL,
+manifest5166B and export receipt5638B remain sealed and unchanged; no destination
+or staging exists and no conditional Blob DELETE occurs. Both saved-only import
+audits preserve the failure, rather than calling receipt integrity import PASS.
+A separate2159-byte metadata-only diagnostic verifies `/srv/world-reward-data`
+is absent on VM01 while `/` and `/srv` are canonical root755. This explains the
+unchanged installer's parent-directory prerequisite. No mkdir, rename, Blob GET,
+model or replay took place. A narrowly qualified private-parent bootstrap and a
+fresh revision of the unchanged importer may repair this general infrastructure
+condition; scientific inputs and all37 archive members must remain identical.

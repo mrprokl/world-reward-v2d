@@ -1,0 +1,86 @@
+{
+  "Azure_RC_calls": 1,
+  "FIT_performed": false,
+  "GPU_used": false,
+  "HTTP_used": false,
+  "JPEG_bytes_hashed": true,
+  "RGB_decoded": false,
+  "TRAIN_distinct_photos": 195,
+  "VAL_distinct_photos": 191,
+  "actual_scope": "Count-only capacity confirmed195TRAIN/191VAL photos from sealed identity inventory; no selection, predictions, calibration or fitting.",
+  "actual_state": "SEALED_COUNT_ONLY_CAPACITY_PASS",
+  "adopted": false,
+  "all_input_and_asset_bytes_modes_before_after": true,
+  "all_output_bytes_modes_before_after": true,
+  "audit_elapsed_seconds": 604.9039298539865,
+  "audit_status": "pass",
+  "azure_cli_exit": 0,
+  "azure_runcommand_terminal": true,
+  "capacity_gate_passed": true,
+  "census_input_count": 23,
+  "census_rerun": false,
+  "current_archive_xz": {
+    "bytes": 240316,
+    "sha256": "12ae45bb1895da7dc0b312f7e2ec9ed226688233b2eac8a44deb1e1a7f770503"
+  },
+  "current_source_closure_sha256": "eb0dfc966a2a8dba1b249358d5152a23e16b42ff58eab1d66112551b74aebf76",
+  "decision": "CAPACITY_METADATA_ONLY_NO_SELECTION",
+  "full_original_Git_before": true,
+  "full_source_and_markers_before_after": true,
+  "geometry_references_decoded": false,
+  "historical_photos_excluded": 448,
+  "host_elapsed_seconds": 831.4705763880047,
+  "identity_inventory_schema_verified": true,
+  "inventory_identity": {
+    "bytes": 24991,
+    "sha256": "ea7503e6e2e09cc6b4536ce12bfed9ad73698488ebc50b22db0fcfe8276fbd70"
+  },
+  "inventory_rows": 386,
+  "models_loaded": false,
+  "native_status": "pass",
+  "observed_unit_exit": null,
+  "observer_command_identity": {
+    "bytes": 27670,
+    "sha256": "ec899cefefb77ba37929659d24631abc01e85dde175378439aaa7c806527c295"
+  },
+  "observer_mechanical_repairs": 0,
+  "observer_source_identity": {
+    "bytes": 32480,
+    "sha256": "fe55615e3e0abcbbaac71ee04304856be2cf99bc2b1d6c71de4b20718aa196ed"
+  },
+  "original_Git_files": {
+    "census": 300,
+    "coco": 268,
+    "current": 308,
+    "metadata": 292,
+    "ownership": 296,
+    "prepare": 303
+  },
+  "original_asset_input_entries": 41,
+  "original_population_gate": {
+    "train": 32,
+    "val": 16
+  },
+  "peak_rss_bytes": 184229888,
+  "pilot_reference_values_hash_only": true,
+  "producer_driver_absent": true,
+  "producer_revision": "b9270d55a3ed10c28e080e019107cedb18e63fd1",
+  "report_identity": {
+    "bytes": 57524,
+    "sha256": "703e0e341d3ceb8c44d40f5a90823299719ade1559c36945bc6f8d92120ffee0"
+  },
+  "role_values_decoded": false,
+  "saved_only": true,
+  "schema": "world_reward.vcoco_fit_cal_census_saved_audit.v1",
+  "scope_limitation": "Saved count-only receipt/source integrity, private identities only; no role/geometry re-evaluation or selection. Collected systemd exit unavailable, not inferred. Photo independence does not certify creator independence, unseen training, ownership or quality.",
+  "selection_rerun": false,
+  "unit_exit_independently_available": false,
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  }
+}
