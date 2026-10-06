@@ -96,6 +96,16 @@ and independently requeried. No write privilege/Blob data operation; historical
 HTTP cause remains unknown. Publisher now rejects changed500/400/inodes after
 callback;22 dedicated65combined tests PASS0.28s. Original source unchanged.
 
+Fresh48 acquisition is separately source-qualified: explicit current-entry
+authentication reconstructs original8cf input proof without mutating profiles
+or replaying selection/census; images/licenses catalogue only, full original
+EOF/CRC/SHA checks,48 single S3 requests, all48 unique originals required.
+Public six-key opaque RGB metadata and private provenance remain separate;
+no role values/RGB decode/model/FIT. Author186 controls PASS1.76s, root236
+PASS1.97s, all fixtures removed. Independent101 PASS0.42s authenticates complete
+old312/317 archive/closure/XZ and current unchanged helper bytes. One immutable
+acquisition is qualified; availability/selector quality is not inferred from tests.
+
 - 2026-10-02 R01 (synthetic only): multi-hypothesis SO(3)/translation Viterbi with
   image confidence and explicit true mesh symmetries implemented. Generated
   occlusion scene: greedy mean translation error 0.342857 m, selected path 0 m.
