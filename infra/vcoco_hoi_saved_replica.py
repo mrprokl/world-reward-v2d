@@ -35,6 +35,9 @@ PUBLISHER = dict(bytes=5861, sha256='9fd62223432ac591b22bab23f916dcd47d9c67264eb
 BUDGET, MAXIMUM, MAX_MANIFEST = 180, 32 << 20, 256 << 10
 NAMES = {*PINS, *(f'image_{i:06d}.npz' for i in range(16))}
 DECLARATION = dict(producer_revision=REV, files=344, entries=349, closure_sha256=CLOSURE, source_XZ_sha256=XZ)
+CURRENT_EXECUTABLES = frozenset(('infra/run_coco_endpoint_prepare.sh',
+    'infra/run_keypoint_rgb_dwpose.sh', 'infra/run_rgb_endpoint_bank.sh'))
+SENDER_EXECUTABLES = frozenset(('infra/run_coco_endpoint_prepare.sh', 'infra/run_rgb_endpoint_bank.sh'))
 HELPERS = tuple(dict.fromkeys(('infra/vcoco_hoi_saved_replica.py', 'infra/run_vcoco_hoi_saved_replica.sh',
     'infra/sealed_callback_publication.py', *hoi.HELPERS, *pose.HELPERS)))
 encode, pin, snapshot, error = public.encode, public.pin, public.snapshot, public.bank.error
@@ -50,14 +53,24 @@ def private_directory(path, mode, names=None):
         and (names is None or {p.name for p in path.iterdir()} == set(names)), 'Exact root-private namespace required')
 
 
+def source_modes(code, executables):
+    """Exact executable leaves from frozen Git archives, never chmod source."""
+    rt.canonical(code)
+    rt.require(all((code/name).is_file() for name in executables), 'Every original executable source leaf required')
+    for p in (code, *code.rglob('*'), code.parent/'revision', code.parent/'source-sha256'):
+        rt.canonical(p); s = p.lstat()
+        mode = 0o555 if stat.S_ISDIR(s.st_mode) or p in {code/name for name in executables} else 0o444
+        rt.require(s.st_uid == s.st_gid == 0 and stat.S_IMODE(s.st_mode) == mode
+            and (stat.S_ISDIR(s.st_mode) or stat.S_ISREG(s.st_mode) and s.st_nlink == 1),
+            'Exact immutable Git modes, regular leaves and root owner required')
+
+
 def source(code, revision):
     value = rt.source(ROOT, code, revision, ENTRY, HELPERS)
     rt.require(Path(__file__).resolve() == code/HELPERS[0] and Path(hoi.__file__).resolve() == code/'infra/vcoco_hoi_observations.py'
         and Path(pose.__file__).resolve() == code/'infra/vcoco_person_pose_observations.py'
         and value['helpers']['infra/sealed_callback_publication.py'] == PUBLISHER, 'Actual unchanged imported helper origins required')
-    for p in (code, *code.rglob('*'), code.parent/'revision', code.parent/'source-sha256'):
-        s = p.lstat(); mode = 0o555 if p.is_dir() or p == code/'infra/run_rgb_endpoint_bank.sh' else 0o444
-        rt.require(s.st_uid == s.st_gid == 0 and stat.S_IMODE(s.st_mode) == mode, 'Exact immutable Git modes/owner required')
+    source_modes(code, CURRENT_EXECUTABLES)
     return dict(binding=value, states=public.bank.source_state(code), markers={n: snapshot(code.parent/n) for n in ('revision', 'source-sha256')})
 
 
@@ -112,8 +125,7 @@ def sender_inputs(code, binding, deadline):
     rt.require(sb['entries'] == 349 and sb['closure_sha256'] == CLOSURE and sum(p.is_file() for p in old.rglob('*')) == 344
         and (old.parent/'source-sha256').read_bytes() == (XZ+'\n').encode()
         and all(binding['helpers'][n] == sb['helpers'][n] for n in hoi.HELPERS), 'Whole original344-file source/unchanged helpers required')
-    for p in (old, *old.rglob('*'), old.parent/'revision', old.parent/'source-sha256'):
-        s = p.lstat(); rt.require(s.st_uid == s.st_gid == 0 and stat.S_IMODE(s.st_mode) == (0o555 if p.is_dir() or p == old/'infra/run_rgb_endpoint_bank.sh' else 0o444), 'Original exact readonly Git modes required')
+    source_modes(old, SENDER_EXECUTABLES)
     _, _, original = public.export_inputs(code, binding)
     images = public.bank.public_inputs(public.PUBLIC, 16)['images']
     banks = rt.pinned(public.bank.OUTPUT/'native.json', public.PINS['native.json'], 256 << 10)['images']

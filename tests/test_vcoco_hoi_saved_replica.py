@@ -210,6 +210,51 @@ def test_stdlib_only_and_frozen_source_count():
     assert len(v.NAMES)==19 and v.DECLARATION['files']==344 and v.DECLARATION['entries']==349
 
 
+@pytest.mark.parametrize('revision,script,executables', [
+    ('5191c27f6820825116ffea4207f3f7cb5876a142', 'infra/run_vcoco_hoi_saved_replica.sh', v.CURRENT_EXECUTABLES),
+    (v.REV, 'infra/run_vcoco_hoi_observations.sh', v.SENDER_EXECUTABLES),
+])
+def test_real_frozen_git_archives_have_exact_executable_leaves(revision, script, executables):
+    import subprocess
+    import azure_job
+    raw = subprocess.check_output(['rtk', 'proxy', 'git', 'archive', '--format=tar', revision,
+                                   'infra', 'src', 'configs', 'pyproject.toml'])
+    frozen, _ = azure_job.runtime_archive(raw, script)
+    with tarfile.open(fileobj=io.BytesIO(frozen)) as archive:
+        assert {row.name for row in archive if row.mode & 0o111} == executables
+
+
+@pytest.mark.parametrize('fault', [None, 'extra_exec', 'missing_exec', 'writable', 'symlink', 'hardlink'])
+def test_exact_git_modes_reject_drift_without_repair(tmp_path, monkeypatch, fault):
+    code = tmp_path/'code'; code.mkdir(); (code/'infra').mkdir()
+    for name in v.CURRENT_EXECUTABLES:
+        leaf=code/name; leaf.write_bytes(b'authored source\n'); leaf.chmod(0o555)
+    regular=code/'infra/regular.py'; regular.write_bytes(b'authored\n'); regular.chmod(0o444)
+    for name in ('revision','source-sha256'):
+        leaf=tmp_path/name; leaf.write_bytes(b'authored marker\n'); leaf.chmod(0o444)
+    target=code/'infra/run_keypoint_rgb_dwpose.sh'
+    if fault=='extra_exec': regular.chmod(0o555)
+    elif fault=='missing_exec': target.chmod(0o444)
+    elif fault=='writable': regular.chmod(0o644)
+    elif fault=='symlink': target.unlink(); target.symlink_to(regular)
+    elif fault=='hardlink': os=__import__('os'); os.link(regular, code/'infra/alias.py')
+    for folder in (code/'infra',code):folder.chmod(0o555)
+    original=Path.lstat
+    def root_stat(path):
+        s=original(path)
+        class RootStat:
+            st_uid=st_gid=0
+            def __getattr__(self,name):return getattr(s,name)
+        return RootStat()
+    monkeypatch.setattr(Path,'lstat',root_stat)
+    try:
+        if fault is None:v.source_modes(code,v.CURRENT_EXECUTABLES)
+        else:
+            with pytest.raises(ValueError):v.source_modes(code,v.CURRENT_EXECUTABLES)
+    finally:
+        code.chmod(0o700); (code/'infra').chmod(0o700)
+
+
 def run_import_fixture(monkeypatch, tmp_path, *, delete_failure=False):
     code=tmp_path/'code'; code.mkdir(); monkeypatch.setattr(v,'ROOT',tmp_path)
     monkeypatch.setattr(v.sys,'platform','linux');monkeypatch.setattr(v.os,'geteuid',lambda:0)

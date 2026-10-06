@@ -185,6 +185,26 @@ input/source/assets/runtime/output postchecks and sameFD sealed late-FAIL
 publication. No old global/ENTRY override. Owned fixtures removed. One frozen
 execution is now qualified; no actual48 banks, learned selector or quality yet.
 
+SavedHOI export5191 is observed technicalFAIL0.112840347s, receipt1028/
+e66e753706b2a66171534a74f43e2c827cbf53e09de40466477229428d5d996b,
+only400report/500directory, source_inputsfalse and pre/postValueError. Initial
+observer276-byte PARTIAL remains separate. Read-only diagnostics and exactGit
+archives prove wrong executable-mode declaration: current361 source has three
+555 scripts, sender344 two, not onlyRGB. Genericrt.sourcePASS, originalwrapper
+sourceValueError, currenttwo/senderone mode mismatches. No Blob/model call in
+diagnostics, no archive/ETag/PASS inferred. Preserve originalFAIL; exact two
+frozen executable sets are the sole repair in a new committed technical unit,
+same180inclusive budget and unchanged numerical/scientific contracts.
+
+Repair qualification: root211 combined join/transport controls PASS2.00s,
+eight new exactGit/mode controls and independent source-only review confirm
+only two immutable executable-mode declarations changed. Separately genuine
+saved16 join caller has author239 PASS1.31s (41 dedicated), independent133
+PASS1.25s, exact366 host closure/ten native files and olddf7 347/352/XZ qualified.
+All48NPZ/752 raw arrays before first math, no private refs/RGB/models/native
+helper mounts; fullCartesian support/NaNs preserved. Owned fixtures removed.
+No actualimport/join/selector yet; one new technicalexport is source-qualified.
+
 - 2026-10-02 R01 (synthetic only): multi-hypothesis SO(3)/translation Viterbi with
   image confidence and explicit true mesh symmetries implemented. Generated
   occlusion scene: greedy mean translation error 0.342857 m, selected path 0 m.

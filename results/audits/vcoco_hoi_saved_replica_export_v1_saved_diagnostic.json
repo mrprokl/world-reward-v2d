@@ -1,0 +1,36 @@
+{
+  "schema": "world_reward.vcoco_hoi_export_saved_preflight_diagnostic.v1",
+  "status": "fail_observed",
+  "producer_revision": "5191c27f6820825116ffea4207f3f7cb5876a142",
+  "receipt_identity": {
+    "bytes": 1028,
+    "sha256": "e66e753706b2a66171534a74f43e2c827cbf53e09de40466477229428d5d996b"
+  },
+  "receipt_mode": "0400",
+  "directory_mode": "0500",
+  "inventory": ["report.json"],
+  "declared_elapsed_seconds": 0.11284034699201584,
+  "declared_error_type": "ValueError",
+  "declared_post_error_type": "ValueError",
+  "declared_source_inputs_rehashed_after": false,
+  "declared_outputs_sealed": true,
+  "generic_source_gate": "pass",
+  "export_source_gate": "ValueError",
+  "current_executable_leaves": [
+    "infra/run_coco_endpoint_prepare.sh",
+    "infra/run_keypoint_rgb_dwpose.sh",
+    "infra/run_rgb_endpoint_bank.sh"
+  ],
+  "current_original_gate_mode_mismatches": 2,
+  "sender_executable_leaves": [
+    "infra/run_coco_endpoint_prepare.sh",
+    "infra/run_rgb_endpoint_bank.sh"
+  ],
+  "sender_original_gate_mode_mismatches": 1,
+  "diagnostic_Blob_calls": false,
+  "diagnostic_model_calls": false,
+  "archive_or_ETag_verified": false,
+  "full_independent_source_output_audit": false,
+  "collected_unit_exit_status": "unavailable",
+  "decision": "Preserve old FAIL; repair exact Git executable mode declarations only in a fresh committed technical namespace. No inference, selection or scientific gate changed."
+}

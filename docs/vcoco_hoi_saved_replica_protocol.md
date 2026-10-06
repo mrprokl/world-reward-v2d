@@ -1,8 +1,8 @@
 # V-COCO16 — copie aveugle des observations HOI natives
 
-**Prospectif, non exécuté.** Deux unités CPU distinctes, export VM02 puis import
+**Premier export technique FAIL ; import non exécuté.** Deux unités CPU distinctes, export VM02 puis import
 VM01. Limite inclusive de 180 s par unité (195 s externe), stdlib seule, mémoire
-256 MiB. Aucun modèle, GPU, décodage JPEG/NPZ, référence, apprentissage ou sélection.
+1 GiB host. Aucun modèle, GPU, décodage JPEG/NPZ, référence, apprentissage ou sélection.
 
 ## Population et provenance
 
@@ -58,3 +58,25 @@ removed. Root wrapper supplies exact Azure host/source/environment,1GiB address
 space and195s outer failure grace around180s inclusive technical work. This is
 source qualification only; no export/import, actual archive or new join exists
 yet, and no prediction-quality claim follows.
+
+## Défaillance technique observée et réparation bornée
+
+L'export `5191c27f6820825116ffea4207f3f7cb5876a142` conserve son FAIL original :
+reçu1028B SHA256 `e66e753706b2a66171534a74f43e2c827cbf53e09de40466477229428d5d996b`,
+0.112840347s, ValueError préflight/post, répertoire500 contenant seulement le
+reçu400. Aucun artifact/ETag/PASS vérifié. Le premier observer était PARTIAL
+sans marqueur ; il reste séparé du diagnostic de ce vrai FAIL.
+
+Un diagnostic read-only et les archives Git exactes montrent le défaut : le
+contrôle générique source passe, mais le wrapper attendait seulement RGB en555.
+La closure courante contient trois scripts555 (COCO prepare, DWPose keypoint,
+RGB endpoint) ; le senderfc3 en contient deux (COCO prepare, RGB endpoint).
+Les autres fichiers sont444 et les répertoires555. Réparation unique : deux
+ensembles figés exacts, mêmes owner/root/canonical/single-link/source SHA, sans
+chmod ni mutation des sources historiques. Nouvelle révision et nouvelle unité,
+même180s : pas de relance dans l'ancienne namespace ni changement de gates.
+Cette correction n'établit pas la disponibilité du transfert ou sa qualité.
+Root211 combined join/transport controls PASS2.00s, including eight new genuine
+Git-mode/permission controls; independent source audit confirms only source-mode
+paths changed. AST/shell PASS, owned fixtures removed. The original5191 FAIL
+is not rewritten; one new frozen export is technically qualified, not executed.
