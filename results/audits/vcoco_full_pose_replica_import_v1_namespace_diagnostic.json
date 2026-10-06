@@ -1,0 +1,34 @@
+{
+  "Blob_operations_performed": false,
+  "NumPy_imported": false,
+  "azure_control_cli_exit_status": 0,
+  "current_source_and_saved_leaves_prepost_verified": true,
+  "decision": "Keep original FAIL and shared parent untouched; qualify a separate root-private replica namespace before one fresh source import.",
+  "destination_exists": false,
+  "destination_symlink": false,
+  "elapsed_seconds": 0.39235336403362453,
+  "failed_receipt_preserved": true,
+  "failed_report": {
+    "bytes": 12094,
+    "sha256": "8c56b1e1b74e5063692b7ba3d5cee60c9386119fc4ef2c5a664a35f978d662a5"
+  },
+  "incoming_archive_pin_equal": true,
+  "incoming_manifest_pin_equal": true,
+  "incoming_pose_pins_equal": true,
+  "models_loaded": false,
+  "observer_script_sha256": "a26714f20b1f967481bef325de794bfc1ab680e03ae32ccfebfefee4dd6b393a",
+  "original_export_receipt_gate": "PASS",
+  "original_parent_gate": "FAIL",
+  "parent_state": {
+    "canonical": true,
+    "gid": 1000,
+    "is_directory": true,
+    "is_symlink": false,
+    "mode": "0o755",
+    "uid": 1000
+  },
+  "producer_revision": "be9087a031f3755f3947276a2cb3bb5f8dcb0fd7",
+  "saved_export_control_present": true,
+  "schema": "world_reward.vcoco_pose_import_receipt_gate_diagnostic.v1",
+  "status": "PASS"
+}

@@ -16,6 +16,12 @@ download/install. This is a technical transport failure, not a failed or
 successful background-selection experiment; no joined evidence or FIT follows
 from it. The immutable FAIL is recorded separately in
 [`vcoco_full_pose_replica_import_v1_actual.json`](../results/audits/vcoco_full_pose_replica_import_v1_actual.json).
+The read-only diagnostic identifies a deployment namespace mismatch: the shared
+data parent belongs to uid/gid1000 at0755, while the receiver requires root700.
+The authentic export and all incoming pins pass; no payload/scientific change
+is justified. Preserve that parent and qualify a separate private replica
+namespace before a fresh import; see
+[`vcoco_full_pose_replica_import_v1_namespace_diagnostic.json`](../results/audits/vcoco_full_pose_replica_import_v1_namespace_diagnostic.json).
 
 ## Two shortcuts are verified, not solutions
 
