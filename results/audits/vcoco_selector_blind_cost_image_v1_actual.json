@@ -1,0 +1,17 @@
+{
+  "schema": "world_reward.vcoco_selector_blind_cost_image_saved_audit.v1",
+  "status": "CLOSED_OBSERVER_SYNTAX_ERROR",
+  "observer_exception_type": "SyntaxError",
+  "observer_source_line": 73,
+  "local_compile_exit": 1,
+  "Azure_CLI_exit": 0,
+  "metadata_read": false,
+  "archive_read_or_hashed": false,
+  "Blob_operations_performed": false,
+  "Docker_job_started": false,
+  "models_loaded": false,
+  "production_image_qualification": false,
+  "orchestration_defect": "compile_nonzero_was_not_checked_before_az",
+  "source_SHA256_basis": "agent_RAM_script",
+  "preserved_observer_source_bytes": 6680
+}

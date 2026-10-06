@@ -1,0 +1,91 @@
+# Blind complete32 cost profile — frozen before FIT role values
+
+Purpose: qualify feasibility and actual device arithmetic, not learn a selector
+or measure background-rejection accuracy. Same48 external observations, original
+FIT32/CAL16 identity freeze; no photo replacement, reseeding, K caps or pruning.
+
+## Inputs and isolation
+
+Authenticate full saved0907 join (396 files/401 entries) and all three actual
+report/native/proof pins, original endpoint/HOI/pose lineage and144 raw NPZ
+identities. Saved46-array summary is checked against a fresh reconstruction
+from original47 arrays; no second model inference. Host separately authenticates
+original cohort and projects only opaque slots0–31/IDs/folds. Original native
+IDs, private lineage, RGB and role values never enter the numerical container.
+
+CV folds are newly fixed by SHA256(`world_reward.vcoco_selector_cv_v1/` + opaque
+ID), sorted by digest then ID; sorted index modulo4. Membership/manifest hashes
+are saved before any future FIT role values. They do not depend on observations.
+
+Only individually whitelisted numerical source files, source markers, public
+proof and144 raw NPZ paths are mounted. Container is root because original NPZ
+leaves are root400: network none, read-only rootfs, caps dropped, no-new-privileges,
+64GiB CPU/cgroup memory with no swap, four CPUs and one H100. Original paths,
+UIDs and permissions are not changed to make inference possible.
+
+## Predeclared work and closure
+
+One inclusive3600s host budget (native reserves30s for post-verification/sealing),
+64GiB CPU and GPU allocator caps; image-streamed GPU chosen before timing. First
+prevalidate all144 banks and reconstruct/check48 summaries, retain all32 FIT
+PairRouteBanks to run original `fit_scales(tuple32)` and measure their retained
+CPU cost. Release those banks, then reconstruct complete images in fixed order
+and prepare full cache/packed CSR/device inverse CSR without dropping candidates.
+
+Controls: theta zero17 and normalized(1..17); alpha0/1; tau1; two deterministic
+repeats. Measure full supported-group log-partition and analytic VJP, not a fake
+positive-set objective. Require full CPU-packed/device score/support/VJP parity
+within rtol=atol1e-12, exact repeats and alpha0 shared A/B buffers, source/cache/
+packed/device snapshots before/after. Empty support stays undefined, not a
+successful FIT loss or removed record. CPU preparation, sort/copy workspace,
+upload/synchronization, numerical checks and teardown are counted separately.
+RSS/cgroup and Torch allocated/reserved peaks are measured, not inferred from
+route-table estimates. Estimates above a cap are not proof of impossibility.
+
+Authenticate current7eb ordered44 layers against exact historical export/import
+and OCI-index→amd64-config graph. The read-only actual image audit pins three
+legacy600/644 **writable** JSONs: retain their ownership/modes, hash and compare
+inode/state before/after; never describe them as sealed. No archive rehash/load
+or old GPU-smoke inheritance. Fresh native Python3.11/NumPy1.26.3/Torch2.5.1+cu124 versions, image anchoring,
+SciPy1.16.3 full RECORD census and FP64 deterministic operators are required
+within this job. No claim of complete Torch/NumPy RECORD validation is made.
+TF32 disabled, CUBLAS workspace4096:8. Historical package readiness is not a new
+runtime qualification.
+
+Any timeout/OOM/drift/parity/namespace/runtime failure closes this exact profile.
+Preserve FAIL and report its phase; no quieter parameter change, smaller input,
+CPU/GPU fallback or scientific retry. Independent saved audit follows terminal
+execution; Azure dispatch ACK and a collected systemd default0 are not PASS.
+
+## What this cannot establish
+
+No FIT/CAL references, learned weights, positive masks, optimizer, model reload,
+challenge inputs or selected foreground exist in this profile. A successful
+cost result is not background rejection, ownership truth, temporal stability,
+3D interaction quality or a win over CARI4D. Freeze actual FIT execution limits
+separately after blind timing and before reading FIT role values.
+
+The first image observer had a locally detected SyntaxError; its closed v1 is
+retained. Corrected v2 only read graph metadata and verified current image;
+no numerical/data/job rerun. See the two concise image saved audits.
+
+## Source qualification (not yet actual blind-cost execution)
+
+The saved-input and partition seams are separately tested and public atff398e6;
+this profile requires its own native and independent terminal audit. Image
+metadata v2 passed in0.039s without packages, media, data or GPU operators.
+The historical JSONs are explicitly writable, not new immutable source inputs.
+The first observer syntax failure is retained separately; no data/job ran then.
+
+Native worker source qualification:68 dedicated PASS12.65s and173 combined
+PASS12.69s, manufactured NumPy/fake-Torch transports only. No actual photo bank
+or Torch GPU was used locally. Memory.current is sampled; memory.peak is recorded
+when available, explicitly null otherwise. All actual data remain Azure-only.
+
+Host62 manufactured controls PASS0.44s; root235 host/native/partition/device-AST
+controls PASS13.54s. Isolated controls cover same-FD failure publication, empty
+owned native receipt, CID aliases/foreign ownership, tuple/list canonicalization,
+full public mounts and strict fixed folds. These are not actual Azure cost results.
+
+Independent frozen-worker68 PASS12.89s and read-only host/source audit READY;
+no concrete runtime/source blocker found. Real GPU arithmetic/cost remains unrun.

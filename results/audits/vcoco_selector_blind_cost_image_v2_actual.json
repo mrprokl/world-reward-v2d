@@ -1,0 +1,90 @@
+{
+  "Blob_operations_performed": false,
+  "Docker_job_started": false,
+  "GPU_native_operator_or_FP64_qualification_verified": false,
+  "GPU_qualification_inherited": false,
+  "NumPy_imported": false,
+  "RGB_private_data_read": false,
+  "archive_read_or_hashed": false,
+  "audit_elapsed_seconds": 0.038946,
+  "config_id": "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3",
+  "export_archive_SHA_basis": "unchanged_saved_graph_and_export_receipts_not_archive_rehashed",
+  "graph_binding_verified": true,
+  "historical_CUDA_smoke_claim_only": true,
+  "historical_import_producer_revision": "43d7c4f8fd77f32b9a701b6fac2ba274994d231a",
+  "historical_metadata_all_readonly": false,
+  "historical_receipts_prepost_verified": true,
+  "live_graph_prepost_verified": true,
+  "live_image_projection": {
+    "bytes": 3410,
+    "sha256": "0a124dfe18f345da5d31e8b6246fed3711b43f83e5d2253d70b3d357a858bb09"
+  },
+  "metadata_states": {
+    "cuda-smoke-v2.txt": {
+      "device": 2049,
+      "gid": 0,
+      "inode": 543020,
+      "mode": "0644",
+      "nlink": 1,
+      "uid": 0
+    },
+    "export.json": {
+      "device": 2049,
+      "gid": 1000,
+      "inode": 524022,
+      "mode": "0600",
+      "nlink": 1,
+      "uid": 1000
+    },
+    "image-identity-v2.json": {
+      "device": 2049,
+      "gid": 0,
+      "inode": 543009,
+      "mode": "0644",
+      "nlink": 1,
+      "uid": 0
+    },
+    "import.json": {
+      "device": 2049,
+      "gid": 0,
+      "inode": 527030,
+      "mode": "0644",
+      "nlink": 1,
+      "uid": 0
+    }
+  },
+  "models_loaded": false,
+  "ordered_rootfs": {
+    "bytes": 3257,
+    "sha256": "da87abb5c72c967c6e97ebb41380402fb08394623ff0d08418016ac2ded9aefd"
+  },
+  "pins": {
+    "cuda-smoke-v2.txt": {
+      "bytes": 203,
+      "sha256": "60e1d408df8b8fc6c05c36ff5548f76f2a7c855935af835b3afa4835021ca152"
+    },
+    "export.json": {
+      "bytes": 647,
+      "sha256": "2bcb3c0e11ecacc6cd6051447380760eda20266a7dfe17420c47e41a2a196d8b"
+    },
+    "image-identity-v2.json": {
+      "bytes": 3778,
+      "sha256": "9bf4d946b2ad116c57c2fb88cdb37f92535df5b3238a069deec1a592cffb80af"
+    },
+    "import.json": {
+      "bytes": 4272,
+      "sha256": "c98fb4ec995f2cbaecaeabecb0e1b35a5192e6a828efb5710f599197fd67b549"
+    }
+  },
+  "platform_manifest_id": "sha256:de690d04d890f7eaf301babee01e6224bf874d41d06615cba9efd20f8596aea2",
+  "recorded_import_PASS_verified": true,
+  "rootfs_layers": 44,
+  "runtime_packages_imported": false,
+  "schema": "world_reward.vcoco_selector_blind_cost_image_saved_audit.v2",
+  "sealed_image_tar_sha256": "203af62c8c03931919acd2fab28b1fa53a802be73d0f04d99febf60c26321b4e",
+  "source_OCI_index_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "stage": "complete",
+  "status": "PASS_METADATA_GRAPH_ONLY",
+  "future_consumer_must_rehash_writable_historical_receipts": true,
+  "historical_receipts_sealed": false
+}
