@@ -549,3 +549,24 @@ No new import is needed or permitted into the occupied namespace. A separate
 technical completion must preserve that failure and qualify exact-ETag cleanup.
 The source-only blind17/11/19-array join now preserves every person/side/object
 route and all raw banks; actual DWPose remains pending, never fabricated.
+## October6 — actual all-person anatomy, not learned foreground selection
+
+The16-image pilot now has genuine DWPose observations attached to **all94**
+retained automatic person proposals:133 raw points/person, no largest-person
+filter or manual reassignment. Original full endpoint17 and pose11 fields share
+IDs/boxes/scores/grid; all1500 HOI queries/image and165 raw relation pairs are
+also saved. Independent producer/source/hash/seal audits qualify those banks,
+not the correctness of their wrists, owners or relationships.
+
+A separate48-photo FIT32/CAL16 corpus is actually acquired and independently
+verified after448 historical/pilot photo exclusions. It does not reuse the
+pilot's closed decisions or count withheld references as training data. Fresh
+blind48 banks must freeze before FIT roles; all people, both sides,3600 object
+patches and native relation routes remain. Learned selection, background error
+rates, once-only CAL and final independent/full-T validation are still pending.
+
+The proper target is a **coherent person–side–object hypothesis**, then temporal
+identity preservation. A stable track of a wrong person/object is not success;
+an empty relation bank is UNKNOWN evidence, not automatic no-contact. Published
+V-COCO roles do not resolve anatomical hand ownership or a unique task target
+when several interactions coexist. No CARI4D or leaderboard gain is claimed.

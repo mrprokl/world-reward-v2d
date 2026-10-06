@@ -1,0 +1,103 @@
+{
+  "Azure_RC_calls": 2,
+  "CAL_evaluated": false,
+  "FIT_performed": false,
+  "GPU_used": false,
+  "HTTP_used": false,
+  "JPEG_bytes_hashed": true,
+  "RGB_decoded": false,
+  "actual_state": "SEALED_FULL48_ACQUISITION_PASS",
+  "adopted": false,
+  "all48_acquired_required": true,
+  "all_input_and_asset_bytes_modes_before_after": true,
+  "all_output_bytes_modes_before_after": true,
+  "audit_elapsed_seconds": 143.63665883097565,
+  "audit_status": "pass",
+  "availability_gate_passed": true,
+  "azure_cli_exit": 0,
+  "azure_runcommand_terminal": true,
+  "census_rerun": false,
+  "counts": {
+    "acquired": 48,
+    "acquired_CAL": 16,
+    "acquired_FIT": 32,
+    "missing": 0,
+    "slots": 48
+  },
+  "current_archive_xz": {
+    "bytes": 248288,
+    "sha256": "567424d0eef72e5e6edfab82e7054aaddf01864d942d9d1f8446a4a859113d29"
+  },
+  "current_source_closure_sha256": "f8c01005b0c2ba5d055784753d9cb8d903d1b1a6f02a5a3c483665f0ddee3b6b",
+  "decision": "READY_FULL48_PENDING_BLIND_BANKS",
+  "duplicate_new_bytes": false,
+  "full_original_Git_before": true,
+  "full_source_and_markers_before_after": true,
+  "geometry_references_decoded": false,
+  "host_elapsed_seconds": 393.93225547799375,
+  "native_status": "pass",
+  "observed_unit_exit": null,
+  "observer_command_identity": {
+    "bytes": 28560,
+    "sha256": "64e996339e1c8a7354dfea514b0ac6631d3c12b2919e945ef63cc1459aa790c6"
+  },
+  "observer_mechanical_repairs": 1,
+  "observer_repair": "POSIX RunShellScript set-eu only; saved-only Python payload unchanged",
+  "observer_repaired_RC_calls": 1,
+  "observer_source_identity": {
+    "bytes": 33887,
+    "sha256": "4f8076df664fe12ac8c2d93e47f4ea46f4d4accb7edf8aa4bf6d705338dec339"
+  },
+  "original_Git_files": {
+    "census": 300,
+    "coco": 268,
+    "current": 316,
+    "freeze": 312,
+    "metadata": 292,
+    "ownership": 296,
+    "population": 308,
+    "prepare": 303
+  },
+  "original_asset_input_entries": 41,
+  "original_freeze_report_identity": {
+    "bytes": 63579,
+    "sha256": "22b2830a1973fe61a1c2ad626cb077fd58f6def5cd89557f027db59e10026ebc"
+  },
+  "peak_rss_bytes": 47767552,
+  "pilot_reference_values_hash_only": true,
+  "prior_observer_partial_identity": {
+    "bytes": 1355,
+    "sha256": "05e69f71ce4b81a3d76f8a46af469ed6032626d8712f87d11546729aca179905"
+  },
+  "private_identity_cohort_pin": {
+    "bytes": 10151,
+    "sha256": "5af18ab329bd6dfc113013787c340ff6aeb6f161e7e4b8d7b1d777061fc83f51"
+  },
+  "producer_driver_absent": true,
+  "producer_revision": "d938e7c40c4fd90353fbe92ebd2970303a639b9b",
+  "public_file_count": 49,
+  "public_manifest_identity": {
+    "bytes": 9754,
+    "sha256": "e98657edc8e081ed5b101edf22cdbb490b77bf36384e8952eff49f82d0c7b93c"
+  },
+  "public_six_key_boundary": true,
+  "records_complete": true,
+  "report_identity": {
+    "bytes": 133045,
+    "sha256": "900596ae02a7b6fc60a79353f03517689fc8f540c1842b9ae3421df1114bf2c0"
+  },
+  "role_values_decoded": false,
+  "saved_only": true,
+  "schema": "world_reward.vcoco_fit_cal_acquire_saved_audit.v1",
+  "scope_limitation": "Saved acquisition/source integrity only; collected systemd exit unavailable, not inferred. No pixel/role/reference decode, selection, inference, FIT/CAL or producer retry. Availability is not role/ownership/generalization/eligibility quality.",
+  "selection_rerun": false,
+  "unit_exit_independently_available": false,
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  }
+}

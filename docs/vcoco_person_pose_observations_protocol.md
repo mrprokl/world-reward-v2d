@@ -1,8 +1,29 @@
-# All-retained-person V-COCO DWPose observations — prospective
+# All-retained-person V-COCO DWPose observations
 
-No execution, fitting or observation quality claim. Dispatch only after the
-separately validated DEV proposal-capacity PASS and independently verified
-VM01 replica import; all original16 JPEGs/endpoint NPZs remain frozen.
+Actual technical execution PASS; no fitting or observation-quality claim.
+The separately validated DEV proposal capacity and explicit verified replica
+completion qualify its input lineage; the original import FAILs remain FAIL.
+All original16 JPEGs/endpoint NPZs remain frozen.
+
+## Actual complete person-attached observations
+
+Producer `df7db36998df454d022ff8f593b8d59036c6d771` passes11.265053s host:
+one native session,16 images,94 retained people/crops,133 raw points/person,
+16 complete11-array NPZs (348780B). Host receipt46297B/SHA256
+`a0b15782e968f0a43f52d6b94ff66464ef6f5074c415838615db7b2fa2722492`,
+native98052B/SHA256
+`a316d77b2183f3c356ccedd1fc4bf536f0fd86f7d11959ec5fb895c2d2d7e7b1`,
+proof87620B/SHA256
+`27f95644b5975659f7c263eea9e855016b6e8a78adabb9ca78e3e39b308f1f84`.
+
+Independent saved-only audit2560B/SHA256
+`f2640a072b8e59979d8ce7e90df3904e940b66a93ab0525c256b8f8d20ce996a`
+verifies complete producer metadata/file SHA,347-file source, original completion
+and FAIL lineage, all36 replica files,21 assets, B47 and output modes/state
+before/after, and exact CID/name absence. It does **not** independently decode
+the176 numerical arrays or rerun pose/RGB/model inference. Collected systemd exit
+is unavailable. Anatomy, ownership, contact, learned selection and quality remain
+unvalidated; full-bank coverage is not background rejection accuracy.
 
 One immutable B47 CPU container, one original ONNX session, all retained person
 IDs/boxes/raw detection scores in original order, original frame0. No new

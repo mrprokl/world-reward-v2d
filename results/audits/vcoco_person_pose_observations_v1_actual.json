@@ -1,0 +1,72 @@
+{
+  "CID_identity": {
+    "bytes": 64,
+    "sha256": "aeb9c295f2c694edd0947294012ba41a26a4b169f63993ee9d57f4d1e2fdb961"
+  },
+  "adoption": false,
+  "all_original_PIDs_boxes_scores_native133_ABI_verified": true,
+  "all_sources_completion_old_FAIL_36_assets_image_output_pins_prepost": true,
+  "asset_files": 21,
+  "azure_cli_exit": 0,
+  "complete_producer_metadata_and_whole_file_SHA_verified": true,
+  "completion_pin": {
+    "bytes": 106667,
+    "sha256": "9c8b31d86cf0d5b8a066030758f850de4f6a6bd9323799197dea0aa511a0344f"
+  },
+  "elapsed_seconds": 11.265053074981552,
+  "exact_CID_and_name_absent": true,
+  "host_status": "pass",
+  "image_id": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "images": 16,
+  "installed_replica_bytes": 20712157,
+  "installed_replica_files": 36,
+  "literal_native_helpers": 41,
+  "models_loaded": 1,
+  "native_arrays_not_independently_decoded": true,
+  "native_crop_calls": 94,
+  "native_identity": {
+    "bytes": 98052,
+    "sha256": "a316d77b2183f3c356ccedd1fc4bf536f0fd86f7d11959ec5fb895c2d2d7e7b1"
+  },
+  "native_raw_points_per_person": 133,
+  "native_status": "pass",
+  "no_RGB_NPZ_decode_model_inference_Blob_replay": true,
+  "observer_seconds": 2.890205917006824,
+  "observer_source_sha256": "b229031abfbad67d4c0d61335a655a303b1a4b53f8024acc852041bb5aa49742",
+  "optional_errors": {
+    "cleanup_error_type": "absent",
+    "error_type": "absent",
+    "post_error_type": "absent",
+    "publication_error_type": "absent"
+  },
+  "original_source_live_receiver_binding": "39774007d9125caf955cba49bf93702dc323777b",
+  "owned_driver_absent": true,
+  "ownership_verified": false,
+  "persons": 94,
+  "pose_arrays": 176,
+  "pose_npz_bytes": 348780,
+  "producer_revision": "df7db36998df454d022ff8f593b8d59036c6d771",
+  "proof_identity": {
+    "bytes": 87620,
+    "sha256": "27f95644b5975659f7c263eea9e855016b6e8a78adabb9ca78e3e39b308f1f84"
+  },
+  "quality_verified": false,
+  "receipt_identity": {
+    "bytes": 46297,
+    "sha256": "a0b15782e968f0a43f52d6b94ff66464ef6f5074c415838615db7b2fa2722492"
+  },
+  "schema": "world_reward.vcoco_person_pose_saved_audit.v1",
+  "source_XZ_sha256": "fa9fb811b359963e159f0fd30e6acfe34b6fa73d7be8518c50b4f1560c630613",
+  "source_closure_sha256": "ae1b70b2fb2caa62432382ae001de65bf74ea25356bea0286c26f9351fc52de1",
+  "source_entries": 352,
+  "source_files": 347,
+  "stage": "complete",
+  "status": "pass",
+  "unit": {
+    "active": "inactive",
+    "exit": "UNAVAILABLE_COLLECTED",
+    "exit_confirmed": false,
+    "load": "not-found"
+  },
+  "vm01_released": true
+}

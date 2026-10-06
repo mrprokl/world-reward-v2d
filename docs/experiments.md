@@ -133,6 +133,39 @@ Author124 PASS0.33s, independent81 PASS0.27s, root349 PASS1.32s; fixtures clean.
 One full16/all94 expected person CPU inference is qualified; no actual pose,
 anatomical ownership, FIT or score inferred from source controls.
 
+Fresh48 acquisition actuald938e7c PASS393.932255s:32FIT/16CAL, zero missing
+or duplicate bytes; all48 originals retained, no subset/reseed/retry. Public
+inputs/manifest.json9754/e98657edc8e081ed5b101edf22cdbb490b77bf36384e8952eff49f82d0c7b93c;
+private acquisition/report133045/900596ae02a7b6fc60a79353f03517689fc8f540c1842b9ae3421df1114bf2c0.
+Saved-only audit3517/8cc5c5184dc866e4ecc8ea44ba67e749a2001ff174056786a66bd8de040af132
+PASS143.636659s authenticates eight full sources/41 inputs/assets, all48 JPEG
+SHA/MD5/header grids and seals before/after. Observer wrapper-only POSIX repair
+preserves first1355-byte partial; no producer replay/pixel/role decode/model/FIT.
+Collected unit exit unavailable. Availability does not establish selector quality.
+
+ActualDWPose df7db36 PASS11.265053s host, one session/16images/all94retained
+people/crops/native133points:16full11-array banks348780B. Host46297/
+a0b15782e968f0a43f52d6b94ff66464ef6f5074c415838615db7b2fa2722492;
+native98052/a316d77b2183f3c356ccedd1fc4bf536f0fd86f7d11959ec5fb895c2d2d7e7b1;
+proof87620/27f95644b5975659f7c263eea9e855016b6e8a78adabb9ca78e3e39b308f1f84.
+Independent saved-only audit2560/f2640a072b8e59979d8ce7e90df3904e940b66a93ab0525c256b8f8d20ce996a
+PASS2.890206s checks full347-file source, completion/oldFAILs/36replica files,
+21assets/B47/outputs modes and SHA before/after, exact CID/name absence. Arrays
+not independently redecoded; historical collectedunitexit unavailable. Real
+person-attached anatomy observations now exist, not anatomy/ownership validation.
+Next whole-bank join and fresh48 blind banks remain separate from learning.
+
+Explicit fresh48 acquisition-input seam119LOC/source-only preserves current
+helper origins and reconstructs the old d938 proof by deep-copy, replacing
+only its current-source/three marker states. Returns opaque RGB only; all48
+byte/header/MD5/rights metadata and namespaces checked without pixels/roles.
+Author93 related PASS0.77s/root132 PASS0.90s. Separate endpoint seam151LOC uses
+unchanged original bank_arrays/save_bank for every48slot, full900/3600/17array
+ABI, allbefore-forward input authentication and failure-visible partial banks.
+Author120 PASS0.77s/root128 PASS0.85s; isolated initialpytest collection lacked
+sourcepaths, corrected without changing source. Owned fixtures removed. These
+enable clean explicit runners, not new native banks/learned background rejection.
+
 - 2026-10-02 R01 (synthetic only): multi-hypothesis SO(3)/translation Viterbi with
   image confidence and explicit true mesh symmetries implemented. Generated
   occlusion scene: greedy mean translation error 0.342857 m, selected path 0 m.

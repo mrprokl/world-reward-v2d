@@ -1,8 +1,28 @@
 # Fresh V-COCO FIT32/CAL16 original-image acquisition v1
 
-**Prospective source-only protocol; no acquisition or model result yet.** This is
+**Actual acquisition PASS; blind observation banks and learning remain pending.** This is
 access/integrity qualification, not role retrieval, anatomical ownership, contact,
 held-out generalization or a victory over CARI4D. No challenge input is consulted.
+
+## Actual execution and independent saved audit
+
+Producer `d938e7c40c4fd90353fbe92ebd2970303a639b9b` acquires all48 originals
+(32FIT/16CAL), with zero missing or duplicate-byte records, in393.932255s.
+The public `inputs/manifest.json` is9754B/SHA256
+`e98657edc8e081ed5b101edf22cdbb490b77bf36384e8952eff49f82d0c7b93c`;
+the private `acquisition/report.json` is133045B/SHA256
+`900596ae02a7b6fc60a79353f03517689fc8f540c1842b9ae3421df1114bf2c0`.
+All49 public leaves are sealed400 under500; the private parent remains700.
+
+Independent saved-only audit `vcoco_fit_cal_acquire_v1_actual_v2.json`
+(3517B/SHA256 `8cc5c5184dc866e4ecc8ea44ba67e749a2001ff174056786a66bd8de040af132`)
+passes143.636659s: eight whole Git closures,41 prior inputs/assets, all48 JPEG
+SHA/MD5/header grids and full source/namespace states verified before/after.
+No pixels, role/reference values, model, producer replay, FIT or CAL are read/run
+by that observer. The first observer's POSIX-shell failure remains preserved;
+the sole repair changes only `set -euo pipefail` to `set -eu`, not its Python
+payload. The collected systemd unit's historical exit is **unavailable**, never
+inferred from default `ExecMainStatus=0`. Availability is not prediction quality.
 
 ## Immutable identity boundary
 
