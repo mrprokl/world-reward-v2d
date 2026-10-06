@@ -166,6 +166,15 @@ Author120 PASS0.77s/root128 PASS0.85s; isolated initialpytest collection lacked
 sourcepaths, corrected without changing source. Owned fixtures removed. These
 enable clean explicit runners, not new native banks/learned background rejection.
 
+Prospective Azure-only savedHOI replica is source-qualified: same original16
+full19-array NPZs+three sealed producer receipts, noRGB/model/reference transfer.
+Originalfc3 source344/349 and endpoint association authenticated by sender;
+receiver explicitly does not claim live sender source/runtime. Strict20-member
+USTAR32MiB whole/member pins before exclusive700/500/400 install; old producer
+unchanged. One ETagDELETE202 afterseal with finally posthash and stage-aware
+publisher. Author122related PASS0.35s/root151 PASS0.40s, fixtures removed;
+180inclusive/195outer wrapper1GiBhost. No actualexport/import/native join yet.
+
 - 2026-10-02 R01 (synthetic only): multi-hypothesis SO(3)/translation Viterbi with
   image confidence and explicit true mesh symmetries implemented. Generated
   occlusion scene: greedy mean translation error 0.342857 m, selected path 0 m.
