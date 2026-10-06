@@ -91,3 +91,11 @@ Independent source/receipt preservation audit confirms323-file/328-entry
 current Git closure, old FAIL and bootstrap pins, no archive/staging/driver.
 It does not certify replica installation or qualify DWPose. A separate bounded
 saved-only diagnostic, not an automatic import replay, must locate the cause.
+
+Diagnostic correction: the first observer's `other` is its default for an
+absent `error_type`, not a verified literal producer cause or pre-installation
+failure. The initial metadata diagnostic is preserved PARTIAL after its own
+optional-field KeyError. The original publisher can demote PASS after work via
+posthash, cleanup or publication flags without an initial `error_type`. A single
+explicit observer repair will inspect those saved flags and actual destination
+bytes without Blob access, import replay or relabeling the original FAIL.

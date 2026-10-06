@@ -1,0 +1,14 @@
+{
+  "azure_cli_exit": 0,
+  "no_Blob_RGB_NPZ_model_GPU_rename": true,
+  "observer_error_type": "KeyError",
+  "observer_seconds": 0.2678714980138466,
+  "observer_source_sha256": "10e481aecad60d047dc2e82b398bc2ff9993c4117c014d057d85631fa1ebe432",
+  "ownership_verified": false,
+  "producer_revision": "39774007d9125caf955cba49bf93702dc323777b",
+  "quality_verified": false,
+  "schema": "world_reward.vcoco_observation_replica_failure_diagnostic.v2",
+  "source_and_receipts_prepost": false,
+  "status": "partial",
+  "vm01_released": true
+}
