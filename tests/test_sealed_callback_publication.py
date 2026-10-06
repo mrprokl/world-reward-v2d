@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import stat
 import time
+from types import SimpleNamespace
 
 import pytest
 
@@ -154,3 +155,70 @@ def test_injected_error_classifier_cannot_serialize_exception_text(tmp_path):
     call(out, r, owner, options, lambda: (_ for _ in ()).throw(RuntimeError('SECRET_TOKEN_URL')))
     assert saved(out)['publication_error_type'] == 'other'
     assert b'SECRET' not in (out/'report.json').read_bytes()
+
+
+def test_callback_unseals_directory_fails_cleanup_verify_without_mode_repair(tmp_path):
+    out, r, owner, options = fixture(tmp_path); receipt_inode = []
+    def callback():
+        assert stat.S_IMODE(out.stat().st_mode) == 0o500
+        receipt_inode.append(snapshot(out/'report.json')[:2]); out.chmod(0o700)
+    call(out, r, owner, options, callback)
+    assert saved(out) == r and r['status'] == 'fail' and r['publication_failed'] is True
+    assert r['publication_failure_stage'] == 'cleanup_verify'
+    assert r['blob_cleanup_verified'] is True
+    assert receipt_inode == [snapshot(out/'report.json')[:2]]
+    assert stat.S_IMODE(out.stat().st_mode) == 0o700
+
+
+def test_unsealed_namespace_is_detected_before_callback(tmp_path):
+    out, r, owner, options = fixture(tmp_path); events = []
+    def unseal(path):
+        sync(path)
+        if path == out:out.chmod(0o700)
+    options['sync'] = unseal
+    call(out, r, owner, options, lambda: events.append(True))
+    assert r['status'] == 'fail' and r['publication_failure_stage'] == 'sealed_verify'
+    assert not events and stat.S_IMODE(out.stat().st_mode) == 0o700
+
+
+@pytest.mark.parametrize('name', ['metadata.json', 'report.json'])
+def test_callback_changes_leaf_mode_fails_without_repair(tmp_path, name):
+    out, r, owner, options = fixture(tmp_path)
+    call(out, r, owner, options, lambda: (out/name).chmod(0o440))
+    assert saved(out)['status'] == 'fail' and r['publication_failure_stage'] == 'cleanup_verify'
+    assert stat.S_IMODE((out/name).stat().st_mode) == 0o440
+
+
+def test_callback_replaces_equal_bytes_leaf_fails_original_inode_check(tmp_path):
+    out, r, owner, options = fixture(tmp_path); leaf = out/'metadata.json'; original = leaf.read_bytes()
+    inode = snapshot(leaf)[:2]
+    def callback():
+        out.chmod(0o700); leaf.rename(tmp_path/'retired.json')
+        leaf.write_bytes(original); leaf.chmod(0o400); out.chmod(0o500)
+    call(out, r, owner, options, callback)
+    assert leaf.read_bytes() == original and snapshot(leaf)[:2] != inode
+    assert saved(out)['status'] == 'fail' and r['publication_failure_stage'] == 'cleanup_verify'
+
+
+def test_callback_changes_leaf_uid_fails_before_rehash(tmp_path, monkeypatch):
+    out, r, owner, options = fixture(tmp_path); original_lstat = Path.lstat; changed = []
+    def lstat(path, *args, **kwargs):
+        s = original_lstat(path, *args, **kwargs)
+        if changed and path == out/'metadata.json':
+            return SimpleNamespace(**{name:getattr(s, name) for name in
+                ('st_dev', 'st_ino', 'st_mode', 'st_gid', 'st_nlink')}, st_uid=s.st_uid+1)
+        return s
+    monkeypatch.setattr(Path, 'lstat', lstat)
+    call(out, r, owner, options, lambda: changed.append(True))
+    assert saved(out)['status'] == 'fail' and r['publication_failure_stage'] == 'cleanup_verify'
+
+
+def test_foreign_directory_after_callback_never_updates_foreign_receipt(tmp_path):
+    out, r, owner, options = fixture(tmp_path); retired = tmp_path/'retired'
+    def callback():
+        out.rename(retired); out.mkdir(mode=0o700)
+        (out/'report.json').write_bytes(b'FOREIGN_KEEP')
+    with pytest.raises(ValueError, match='Foreign receipt namespace'):
+        call(out, r, owner, options, callback)
+    assert (out/'report.json').read_bytes() == b'FOREIGN_KEEP'
+    assert json.loads((retired/'report.json').read_bytes())['blob_cleanup_verified'] is False

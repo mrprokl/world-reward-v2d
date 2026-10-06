@@ -1,0 +1,23 @@
+{
+  "schema": "world_reward.vcoco_replica_cleanup_rbac.v1",
+  "status": "verified_control_plane",
+  "date": "2026-10-06",
+  "vm": "scenesmith-ncc-h100-01",
+  "principal_id": "12b912e0-9a3d-42b0-b333-407f6f6d0e54",
+  "scope": "/subscriptions/936d001a-f85c-45f5-857e-2aace1672ec0/resourceGroups/WORLD-REWARD-RESEARCH/providers/Microsoft.Storage/storageAccounts/stworldrewardresearch26/blobServices/default/containers/runtime-transfers",
+  "previous_role": "Storage Blob Data Reader",
+  "new_role": "World Reward Runtime Transfer Delete",
+  "new_role_id": "2e6072ef-5635-4b77-aa54-3d9671360793",
+  "new_role_data_actions": [
+    "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete"
+  ],
+  "new_role_management_actions": [],
+  "new_role_write_permission": false,
+  "definition_and_exact_assignment_independently_requeried": true,
+  "permissions_broadened_outside_runtime_container": false,
+  "Blob_data_requests": 0,
+  "historical_publication_or_HTTP_cause": "unavailable_not_inferred_from_current_RBAC",
+  "control_only_validation_repairs": "Azure permission rows add null condition fields; validate intended fields and null conditions, not exact API object keys.",
+  "automatic_data_or_cleanup_replay": false,
+  "quality_verified": false
+}

@@ -30,15 +30,21 @@ def publish(out, report, deadline, started, owner, allowed, after_seal=None, *,
     require((s.st_dev, s.st_ino, s.st_uid) == owner and s.st_nlink >= 2
             and stat.S_ISDIR(s.st_mode) and stat.S_IMODE(s.st_mode) == 0o700
             and {p.name for p in out.iterdir()} == set(allowed), 'Foreign receipt namespace')
+    directory_gid = s.st_gid
     stage = 'namespace'
     with (out/'report.json').open('x+b') as stream:
         os.fchmod(stream.fileno(), 0o400)
         opened = os.fstat(stream.fileno())
 
         def original_file():
+            directory = out.lstat()
+            require(stat.S_ISDIR(directory.st_mode)
+                    and (directory.st_dev, directory.st_ino, directory.st_uid) == owner
+                    and directory.st_gid == directory_gid, 'Foreign receipt namespace')
             now = (out/'report.json').lstat()
             require(stat.S_ISREG(now.st_mode) and now.st_nlink == 1
-                    and (now.st_dev, now.st_ino) == (opened.st_dev, opened.st_ino),
+                    and (now.st_dev, now.st_ino, now.st_uid, now.st_gid)
+                    == (opened.st_dev, opened.st_ino, opened.st_uid, opened.st_gid),
                     'Foreign report inode rejected')
 
         def update():
@@ -47,6 +53,21 @@ def publish(out, report, deadline, started, owner, allowed, after_seal=None, *,
             stream.flush(); os.fsync(stream.fileno())
 
         def verify(leaves):
+            directory = out.lstat()
+            require(stat.S_ISDIR(directory.st_mode) and directory.st_nlink >= 2
+                    and (directory.st_dev, directory.st_ino, directory.st_uid) == owner
+                    and directory.st_gid == directory_gid
+                    and stat.S_IMODE(directory.st_mode) == 0o500,
+                    'Sealed publication namespace changed')
+            original_file()
+            for name, before in leaf_stats.items():
+                now = (out/name).lstat()
+                require(stat.S_ISREG(now.st_mode) and now.st_nlink == 1
+                        and stat.S_IMODE(now.st_mode) == 0o400
+                        and now.st_uid == opened.st_uid
+                        and (now.st_dev, now.st_ino, now.st_uid, now.st_gid)
+                        == (before.st_dev, before.st_ino, before.st_uid, before.st_gid),
+                        'Owned immutable receipt leaf changed')
             raw = encode(report)
             expected = dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
             require(identity(out/'report.json', report_maximum) == expected
@@ -58,11 +79,14 @@ def publish(out, report, deadline, started, owner, allowed, after_seal=None, *,
         try:
             s = out.lstat()
             require((s.st_dev, s.st_ino, s.st_uid) == owner and s.st_nlink >= 2
+                    and stat.S_ISDIR(s.st_mode) and s.st_gid == directory_gid
                     and stat.S_IMODE(s.st_mode) == 0o700
                     and {p.name for p in out.iterdir()} == set(allowed)|{'report.json'}, 'Foreign receipt namespace')
+            leaf_stats = {p.name: p.lstat() for p in out.iterdir()}
             leaves = {p.name: identity(p, maximum) for p in out.iterdir() if p.name != 'report.json'}
-            require(all(stat.S_IMODE(p.lstat().st_mode) == 0o400 and p.lstat().st_uid == opened.st_uid
-                        for p in out.iterdir()), 'Owned immutable receipt leaves')
+            require(all(stat.S_ISREG(s.st_mode) and s.st_nlink == 1
+                        and stat.S_IMODE(s.st_mode) == 0o400 and s.st_uid == opened.st_uid
+                        for s in leaf_stats.values()), 'Owned immutable receipt leaves')
             stage = 'sealing'
             out.chmod(0o500); sync(out); sync(out.parent)
             report.update(outputs_sealed=True, elapsed_seconds=time.monotonic()-started); update()

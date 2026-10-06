@@ -83,6 +83,19 @@ pose substitution or ownership claim. Author209 related PASS0.54s, independent
 Actual DWPose, fresh acquisition, FIT and once-only CAL remain separate. No
 background rejection accuracy, final Parquet/submission or CARI4D win established.
 
+Prospective installed-replica completion is a separate technical phase, not
+another import: whole original397/7c/bootstrap sources/FAILs and all36 bytes
+before/after, one exact saved-ETag DELETE only after sealing,202 required,
+failure/posthash/late-publication closure. Root124 controls PASS0.57s, author104
+PASS0.37s; independent51 PASS0.11s verifies exact whole prior archives and all
+unchanged original helper bytes. This authorizes one new CPU completion, not an
+import. No execution or cleanup result inferred before independent saved audit.
+Control-plane preflight identifies current VM01 runtime-container Reader-only
+permission; custom blob/delete-only role scoped to that container is assigned
+and independently requeried. No write privilege/Blob data operation; historical
+HTTP cause remains unknown. Publisher now rejects changed500/400/inodes after
+callback;22 dedicated65combined tests PASS0.28s. Original source unchanged.
+
 - 2026-10-02 R01 (synthetic only): multi-hypothesis SO(3)/translation Viterbi with
   image confidence and explicit true mesh symmetries implemented. Generated
   occlusion scene: greedy mean translation error 0.342857 m, selected path 0 m.
