@@ -1,0 +1,63 @@
+{
+  "azure_cli_exit": 0,
+  "bootstrap_driver_absent": true,
+  "destination_and_stage_absent": true,
+  "diagnostic_identity": {
+    "bytes": 2159,
+    "sha256": "5db587939b68a8e3955039c3cf68e6dd391e29d1cdfa100ab3a9ba7c93941fa0"
+  },
+  "diagnostic_saved_declaration_not_live": true,
+  "elapsed_seconds": 0.4385349809890613,
+  "no_import_Blob_RGB_model_GPU": true,
+  "observer_seconds": 0.6211223889840767,
+  "observer_source_sha256": "2d664600dcd065bc5aa5f6bd59c84fb036eab276e0f1da4461d19e4637e943fc",
+  "old_FAIL3_pins_prepost": {
+    "export-receipt.json": {
+      "bytes": 5638,
+      "sha256": "cc7874d9c9fd21a6137f48066d7edfe8290af962eed5f8db4e9faff6a35591e3"
+    },
+    "manifest.json": {
+      "bytes": 5166,
+      "sha256": "7c0786e64de612080c01cf4699a63fafaf3b70f9ac6a9b70fc77e4d8d9b40174"
+    },
+    "report.json": {
+      "bytes": 4969,
+      "sha256": "877d595c1e91ec937270553595c40e6d8cb782269dd5f62b2eeddbf9de775ee1"
+    }
+  },
+  "ownership_verified": false,
+  "parent_created": true,
+  "parent_empty": true,
+  "parent_inode": [
+    2065,
+    265398
+  ],
+  "parent_mode": "0o700",
+  "producer_revision": "f90b5b1afdf1557dabd375ebedd996413acddeff",
+  "quality_verified": false,
+  "receipt_identity": {
+    "bytes": 10156,
+    "sha256": "2390636311f1ff4eaa619de6027362d0f301eabc1ffa427cc0716e7067a605d9"
+  },
+  "schema": "world_reward.vcoco_replica_parent_bootstrap_saved_audit.v1",
+  "source_Git_modes_markers_prepost": true,
+  "source_XZ": [
+    "efcabf91c1a05f996b0b91b44fa304052906cc18de42792b72e0857c2a1796e9",
+    "d5dd6eec412311579a51a3b550d745d19afea8a02a843d7f6feedf5a2ef76a5e"
+  ],
+  "source_entries": [
+    330,
+    327
+  ],
+  "source_files": [
+    325,
+    322
+  ],
+  "status": "pass",
+  "unit": {
+    "active": "inactive",
+    "confirmed": false,
+    "exit": "UNAVAILABLE_COLLECTED"
+  },
+  "vm01_released": true
+}

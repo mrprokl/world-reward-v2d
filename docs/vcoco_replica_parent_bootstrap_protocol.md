@@ -39,3 +39,18 @@ Final driver7408B/SHA53f3c89ebe16df8e00f6ec8d1407da39296a3ca94d8fd8d77fe4506e694
 This freeze authorizes one metadata-only VM01 bootstrap. Actual successful
 sealed verification remains mandatory before the unchanged importer can run in
 a fresh revision with the original exported bytes.
+
+## Actual prerequisite repair
+
+The solef90b5b1afdf1557dabd375ebedd996413acddeff bootstrap completes PASS
+0.438535s. Independent saved-only verification authenticates complete current
+325-file/330-entry and original322-file/327-entry Git closures before/after,
+all three original FAIL files, source-mirrored diagnostic, and actual private
+parent root700/empty identity. Sealed receipt10156B/SHA23906363… stays Azure;
+local1837-byte audit records full pins and honest unavailable collected exit.
+No destination, staging, importer, Blob request or model exists in this run.
+The original7c11662 FAIL remains unchanged. This actual PASS authorizes **one
+fresh-revision technical import** using the unchanged original entry/source,
+original export7c11662, archive20756480B/SHA52fec428…, manifest5166B/SHA7c0786e6…
+and export receipt5638B/SHAcc7874d9…. No new export, data subset, scientific
+threshold or image replacement is authorized. Import remains unexecuted here.
