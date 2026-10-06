@@ -55,6 +55,14 @@ cost. No resident/streamed switch after an OOM. The packed constructor currently
 materializes and sorts all supported route incidences within an image; it is
 not internally paged. Exceeding the memory/cost envelope closes that profile,
 not permission to prune people, objects, pairs or replace photos.
+This is GPU image streaming, not a claim of fully streamed CPU preparation:
+`fit_scales(tuple32)` retains all32 evidence banks, and each `PairCache` also
+retains its source bank and authenticated factor/template copies. Measure that
+resident base before packing. Full supported-route references satisfy
+R<=2*P*O*max(K,1); packed native/group CSR plus device inverse CSR add substantial
+storage and sort workspace. A conservative estimate above64GiB is not proof
+of impossibility; record estimates separately and enforce actual memory/cost
+bounds, without selecting a smaller population.
 
 Without role values, measure the complete supported-group log-partition and
 analytic VJP for A and B, not a fictitious FIT positive-set loss. No manufactured
