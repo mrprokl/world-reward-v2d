@@ -115,3 +115,44 @@ runtime closure and14-file native whitelist checked; the real returned model
 tuple and saved17-array ABI remain unchanged. Owned fixtures removed. This is
 authorization for one frozen full48 execution, not an actual run or quality
 result. Native acquisition/context/publisher imports remain explicitly absent.
+
+
+## Actual frozen full48 execution and saved-only audit
+
+Producer `6837a74a36a29c7c0cc79dfecfb98fc03d569a3f` completed the first
+full48 run on VM02: native PASS33.506921294s, host PASS39.288586729s,
+authenticated native exit0. One GDI and one OWL load yielded48 calls to each
+person/image-embedding/objectness/box path. All48 original slots retain the
+complete900 GDI queries and3600 OWL patches;331 retained person rows aggregate.
+Every row's retained IDs/count/order and0≤retained≤postprocessed≤900 contract
+was checked. Per-image counts were not exported in the compact audit.
+
+A single independent saved-only RunCommand completed7.554724s without models,
+GPU operators, RGB decoding, NumPy array interpretation, role/reference values,
+selection replay, FIT or CAL. It authenticated complete340-file/345-entry Git
+bytes, translated modes and original XZ marker301068 bytes,
+SHA256`a9c86bf2b00e48450b6a84e866987e8068e3bde726909f1446953534579cd47c`.
+It reconstructed the actual acquisition context once, authenticated live original
+qualification/image/assets, checked all48 public JPEG hashes and all48 NPZ ZIP
+member inventories17 each (816 array metadata records), then rehashed current
+source/public/assets/qualification,87 proof-named artifact paths and all52 output
+leaves. It did not independently repeat the full acquisition context or installed
+package probe at the end; producer posthash declarations are authenticated
+receipt evidence, not an additional observer measurement. No numerical arrays
+were re-evaluated. All52 output leaves total53,340,539 bytes; this is **not** an
+NPZ-only byte total. Exact saved CID/name and producer process were absent.
+The collected systemd unit's historical exit is explicitly **UNAVAILABLE**,
+not fabricated0; native exit0 comes from the authenticated host receipt.
+
+Receipt pins:
+- host280261 bytes, SHA256`0ff65853cc5ecec8060b7206d3cfe3960923c8b2ebef8b11eda3eae8ed75da62`;
+- native177044 bytes, SHA256`83cb64b09e026332481fb5227b618acd036edff1d220257c7c3a97470280fe56`;
+- proof12350 bytes, SHA256`71f296fc005ffb12191bef5d98dfd7864bce30b7925e7be08d573b60b75df1c3`;
+- independent audit3370 bytes, SHA256`bc6dcc3e977dd8b028cb96d51375e921f951831988cdf73f72c90bf2d9f82f57`
+  at `results/audits/vcoco_fit_cal_endpoint_observations_v1_actual.json`.
+
+Optional metadata-only availability found B47 absent and the original
+`weights/dwpose_native_v1` directory/ONNX leaf absent on VM02. This is not a
+runtime/asset qualification, nor evidence about other DWPose namespaces.
+These results qualify complete blind endpoint engineering only: no accuracy,
+contact/anatomical ownership, parameter fit, CAL result or model adoption claim.

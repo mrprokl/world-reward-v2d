@@ -205,6 +205,22 @@ All48NPZ/752 raw arrays before first math, no private refs/RGB/models/native
 helper mounts; fullCartesian support/NaNs preserved. Owned fixtures removed.
 No actualimport/join/selector yet; one new technicalexport is source-qualified.
 
+Actual fresh48 endpoint6837a74 independently PASS: host39.288586729s,
+native33.506921294s,331 retained people,48 full17-array banks; all52 output
+leaves (48NPZ plus host/native/proof/CID) total53,340,539B;
+900 rawGDI/3600OWL per image, all48 fixed slots and816 metadata arrays preserved.
+Host280261/0ff65853cc5ecec8060b7206d3cfe3960923c8b2ebef8b11eda3eae8ed75da62;
+native177044/83cb64b09e026332481fb5227b618acd036edff1d220257c7c3a97470280fe56;
+proof12350/71f296fc005ffb12191bef5d98dfd7864bce30b7925e7be08d573b60b75df1c3.
+Saved-only observer authenticates all52 leaves, current340/345 source, original
+acquisition/public inputs/live qualification/assets prepost and exact CID/name/
+process absence; no installed-package reprobe, array/RGB decode or inference
+replay. Producer runtime-posthash declaration authenticated, native exit0 verified,
+historical collectedunitexit unavailable. VM02B47/DWPose assets absent (mere
+availability, not model qualification), so fresh48 CPU anatomy requires an
+Azure-only input transfer to existing VM01, not a substituted runtime. No FIT,
+CAL, actor/ownership selection, adoption or leaderboard improvement follows.
+
 - 2026-10-02 R01 (synthetic only): multi-hypothesis SO(3)/translation Viterbi with
   image confidence and explicit true mesh symmetries implemented. Generated
   occlusion scene: greedy mean translation error 0.342857 m, selected path 0 m.
