@@ -82,6 +82,15 @@ score dependence. Host verifies original FIT membership and opaque mappings;
 native receives only slot, opaque ID and fold. Freeze the manifest hash before
 references, and never reseed/reassign after results.
 
+The ordered streaming objective adapter is source-qualified, not FIT: it
+consumes genuine singleton score/mask rows through the unchanged objective,
+checks exact ID order/exhaustion and uniform temperature/device, returns owned
+CPU FP64 summaries, preserves all coverage statuses and adds ridge once.
+54 dedicated /194 combined controls PASS0.87s; root194 PASS0.95s; independent
+153 controls PASS0.63s plus194 randomized tiny tuple/stream comparisons within
+1e-12. Original scorer/objective untouched; no actual Torch/GPU/reference values
+were consulted. Native device cost/parity and caller provenance remain separate.
+
 Proposed deterministic analytic-GPU L-BFGS-B: one zero initialization, A
 unbounded/B[0,infinity), maxiter200/maxfun500/maxls20/maxcor10,
 ftol1e-12/gtol1e-6. Require all12 CV fits and two final fits finite/successful,
