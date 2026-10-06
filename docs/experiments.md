@@ -175,6 +175,16 @@ unchanged. One ETagDELETE202 afterseal with finally posthash and stage-aware
 publisher. Author122related PASS0.35s/root151 PASS0.40s, fixtures removed;
 180inclusive/195outer wrapper1GiBhost. No actualexport/import/native join yet.
 
+Explicit full48 endpoint caller is source-qualified without new model math:
+author160 related controls PASS6.44s (32 dedicated), independent115 PASS5.35s,
+root137 PASS5.87s; AST/shell/340-file closure/14-file native whitelist verified.
+Actual acquisition is authenticated host-only; native has six-key48 RGB inputs,
+the original qualified GDI/OWL two-model tuple, full900/3600 and17-array banks.
+Fresh namespace,600inclusive/615outer, immutable image, GPU ownership/cleanup,
+input/source/assets/runtime/output postchecks and sameFD sealed late-FAIL
+publication. No old global/ENTRY override. Owned fixtures removed. One frozen
+execution is now qualified; no actual48 banks, learned selector or quality yet.
+
 - 2026-10-02 R01 (synthetic only): multi-hypothesis SO(3)/translation Viterbi with
   image confidence and explicit true mesh symmetries implemented. Generated
   occlusion scene: greedy mean translation error 0.342857 m, selected path 0 m.

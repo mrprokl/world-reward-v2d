@@ -71,3 +71,47 @@ dedicated tests. The initial isolated pytest invocation lacked explicit source
 paths and failed collection; the corrected invocation supplies `infra/src`, not
 modified import/model behavior. All owned fixtures are removed. No native model
 execution or FIT follows from this seam qualification.
+
+## Standalone explicit full48 caller (source-only)
+
+`vcoco_fit_cal_endpoint_run.py` adds one maintained caller, not another legacy
+profile or model implementation. Host mode has no arguments. The wrapper binds
+the new `run_vcoco_fit_cal_endpoint_observations` source namespace, root VM02,
+an8GiB host address-space cap, and615s outer timeout. The shared600s clock starts
+before authentication;20s is reserved within it for native cleanup. GPU execution
+is network-none,64GiB/4CPU/256PIDs, with512MiB scratch and the unchanged immutable
+`sha256:fd26863fd69d8fa1bb0bcc137bc7ddbee18fd5955484dcba672404a73326e252` image.
+There is no install, image fallback, old dispatcher or global mutation.
+
+The host lazily calls `authenticate_actual_acquisition` and live original
+configuration/qualifications. Original acquisition receipts and all historical
+source/input evidence remain host-only. A separate native proof contains only
+the whole current source binding, exact individual native helper pins, model
+assets, qualified runtime identity, public manifest pin,48 count and fixed model
+profile. Acquisition/context/role modules and the publisher are not imported or
+mounted in native. Every native JPEG and its six-field manifest authenticates
+before the two original model loads and all48 forwards.
+
+Native reopens every saved17-array bank for structural, slot, dtype and byte
+checks, releases the returned model tuple in finally, and rehashes source,
+dispatch markers, assets, installed sources/RECORD and all public inputs even
+on failure. Completed records survive partial failures; counters name completed
+image calls, not unobserved work during an interrupted image. A partial result
+never meets the complete48 host predicate. No retry or replacement follows.
+
+The new output is `results/vcoco-fit-cal-endpoint-observations-v1`. Host checks
+saved output bytes before/after cleanup, the exact CID/name/image/label ownership,
+actual final absence and idle GPU, then uses the existing phase-aware publisher:
+same receipt FD,400 leaves/500 directory,2MiB receipt,16MiB individual NPZ and
+768MiB total. Any posthash, cleanup, sealing or deadline exception demotes PASS;
+failure diagnostics retain only fixed safe exception classes. A lock FD closes
+even if publication itself fails. Whole source and private acquisition evidence
+are recorded only in the host receipt; no FIT/CAL, capacity, selection, contact,
+ownership, challenge-overlap or quality conclusion is asserted.
+
+Caller source qualification: author160 related controls PASS6.44s (32 dedicated),
+independent115 PASS5.35s, root137 PASS5.87s. AST, shell syntax, complete340-file
+runtime closure and14-file native whitelist checked; the real returned model
+tuple and saved17-array ABI remain unchanged. Owned fixtures removed. This is
+authorization for one frozen full48 execution, not an actual run or quality
+result. Native acquisition/context/publisher imports remain explicitly absent.
