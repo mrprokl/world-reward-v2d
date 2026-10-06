@@ -146,3 +146,7 @@ filesystem absence, not an observer Blob request. Collected unit exit is
 unavailable. Original failed receipt unchanged; no numerical array replay,
 model run, FIT or ownership-quality result. Compact saved audit:
 `results/audits/vcoco_full_pose_replica_import_v2_actual.json`.
+After that completed transfer, the task-created VM01 container-only write
+assignment was removed and its absence requeried. All prior VM01 assignments
+and the custom role definition remain untouched; no data-plane operation or
+credential persistence. See `results/audits/vcoco_full_pose_transfer_write_revoked.json`.

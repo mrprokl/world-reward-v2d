@@ -1,0 +1,11 @@
+{
+  "credentials_persisted": false,
+  "custom_role_definition_preserved": true,
+  "data_plane_request_performed": false,
+  "existing_VM01_assignments_preserved": true,
+  "reason": "Completed sole pose export/import; no further sender Blob write needed.",
+  "removed_assignment": "21ff71e5-9991-4d09-bea9-89ec6cb06369",
+  "removed_permission": "VM01 container-only blobs/write",
+  "schema": "world_reward.pose_transfer_rbac_cleanup.v1",
+  "status": "control_plane_verified"
+}
