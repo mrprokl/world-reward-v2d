@@ -359,6 +359,6 @@ def test_source_only_no_host_numpy_torch_or_profile_mutation():
 
 def test_wrapper_bound_own_entry_and_shell_syntax():
     wrapper = Path(v.__file__).with_name('run_vcoco_full_public_replica.sh'); text = wrapper.read_text()
-    assert 'ulimit -v 1048576' in text and '315s env -i' in text and 'python3 -I -B' in text
+    assert 'ulimit -v 8388608' in text and '315s env -i' in text and 'python3 -I -B' in text
     assert 'run_vcoco_full_public_replica/code' in text and 'docker' not in text and 'gpus' not in text
     assert subprocess.run(['bash', '-n', str(wrapper)], capture_output=True).returncode == 0

@@ -33,7 +33,7 @@ zero padding/tail, streamed member SHA, maximum128MiB including TAR overhead.
 
 ## Execution, failure and installation
 
-One300s inclusive attempt per export/import,315s shell outer cap,1GiB host virtual
+One300s inclusive attempt per export/import,315s shell outer cap,8GiB host virtual
 memory limit. VM02 export / VM01 import are verified through existing private
 Azure metadata mechanics. Managed-identity tokens stay in RAM. One immutable
 BlockWriter commit uses a fresh revision-scoped Blob; no alternate URL, retry,
@@ -70,6 +70,30 @@ Native DWPose/HOI consumers must reopen and numerically verify all17 endpoint
 arrays before the first model callback. Byte identity here does not qualify
 native execution, ownership, relation accuracy, external generalization or
 submission eligibility. Actual run and independent audit are pending.
+
+## Actual v1 failure and envelope-only repair
+
+Producer `984e419dd21727f8ba32b37f6ed741af909206b8` closed FAIL in1.3023s
+at sender/ValueError; no qualified archive or ETag exists. Its sealed receipt
+8334B/SHA256`eb32cbe957ae9b08f2e9f754799a34b09c649c579b49ddbdb4d4e4e9cbd9a0be`
+and namespace remain unchanged. An uncapped saved-only sender diagnostic passed,
+so that first diagnostic did not establish a historical cause.
+
+A separate exact-envelope diagnostic reproduced the lifecycle gate failure:
+sender line141 → endpoint.command line63; readonly Docker CID/name checks
+returned exit2 under1GiB virtual address space and exit0 with empty output under
+8GiB. Source, original RGB/endpoint bytes and failed receipt rehashed unchanged.
+The CID stderr matched a fixed out-of-memory classification, not arbitrary
+exception text. This establishes a current Go/Docker virtual-memory defect;
+historical stderr was not captured and is not asserted bit-identical.
+See the three compact `vcoco_full_public_replica_export_v1*` audits under results.
+
+Only the wrapper address-space cap and its assertion change; data, sender gates,
+300s deadline, payload and scientific settings are untouched. A new immutable
+producer/fresh namespace is required. This is a technical repair, not a scientific
+retry, data subset or relabeling of FAIL. Import and full48 pose remain pending.
+Repair controls:83 transfer/publication tests PASS0.76s with the repository's
+explicit `infra:src` test import path; shell syntax and whitespace PASS.
 
 Qualification:61 dedicated controls PASS0.57s; independent83 including publisher
 controls PASS0.53s; root127 transfer/pose/core controls PASS1.03s. Original6837

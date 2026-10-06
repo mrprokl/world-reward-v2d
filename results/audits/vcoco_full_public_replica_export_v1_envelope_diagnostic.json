@@ -1,0 +1,112 @@
+{
+  "Blob_operations_performed": false,
+  "RGB_NPZ_decoded": false,
+  "azure_run_command_exit_status": 0,
+  "diagnostic_elapsed_seconds": 2.059082,
+  "docker_ps_probes": [
+    {
+      "exit_status": 2,
+      "memory_cap_KiB": 1048576,
+      "probe": "CID",
+      "stderr": {
+        "bytes": 7280,
+        "public_literal_categories": [
+          "out_of_memory"
+        ],
+        "sha256": "f6795dd32ac804441cc5fb3f1832f54790c6bb5e59f2c32831bbe4515eea6d0c"
+      },
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "exit_status": 2,
+      "memory_cap_KiB": 1048576,
+      "probe": "name",
+      "stderr": {
+        "bytes": 39228,
+        "public_literal_categories": [],
+        "sha256": "6b72cb029e08e8ed400d6a0a767d116119cef3485573280dfdfb008ce2bff739"
+      },
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "exit_status": 0,
+      "memory_cap_KiB": 8388608,
+      "probe": "CID",
+      "stderr": {
+        "bytes": 0,
+        "public_literal_categories": [],
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "exit_status": 0,
+      "memory_cap_KiB": 8388608,
+      "probe": "name",
+      "stderr": {
+        "bytes": 0,
+        "public_literal_categories": [],
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "envelope_failure_reproduced": true,
+  "full_sources_and_original_public_bytes_prepost_verified": true,
+  "historical_failure_exact_stderr_verified": false,
+  "historical_native_failure_preserved": true,
+  "minimum_observed_cause": "Docker CLI lifecycle query fails under 1GiB virtual-address-space cap; same read-only queries succeed under 8GiB.",
+  "models_loaded": false,
+  "observer_script_sha256": "25ed63d8a617caf4fa10f2de542321d979f37be2ad137148c94c6747e4a84610",
+  "producer_replayed": false,
+  "producer_revision": "984e419dd21727f8ba32b37f6ed741af909206b8",
+  "reference_metadata_read": false,
+  "report": {
+    "bytes": 8334,
+    "sha256": "eb32cbe957ae9b08f2e9f754799a34b09c649c579b49ddbdb4d4e4e9cbd9a0be"
+  },
+  "schema": "world_reward.vcoco_full_public_replica_envelope_diagnostic.v1",
+  "sender": {
+    "exception_type": "ValueError",
+    "memory_cap_KiB": 1048576,
+    "require_literals": [
+      "Bounded lifecycle command failed"
+    ],
+    "stage": "sender",
+    "status": "sender_fail",
+    "trace_locations": [
+      {
+        "file": "<stdin>",
+        "function": "<module>",
+        "line": 15
+      },
+      {
+        "file": "vcoco_full_public_replica.py",
+        "function": "sender_inputs",
+        "line": 141
+      },
+      {
+        "file": "vcoco_fit_cal_endpoint_run.py",
+        "function": "command",
+        "line": 63
+      },
+      {
+        "file": "mediapipe_cpu_runtime_verify.py",
+        "function": "require",
+        "line": 31
+      }
+    ]
+  },
+  "sender_stderr": {
+    "bytes": 0,
+    "public_literal_categories": [],
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "sender_subprocess_exit": 0,
+  "stage": "complete",
+  "status": "PASS_DIAGNOSTIC"
+}

@@ -1,0 +1,37 @@
+{
+  "Blob_operations_performed": false,
+  "RGB_NPZ_decoded": false,
+  "all_original_public_and_endpoint_bytes_prepost_verified": true,
+  "azure_run_command_exit_status": 0,
+  "diagnostic_elapsed_seconds": 1.445446,
+  "failed_namespace_unchanged": true,
+  "full_current_and_old_source_prepost_verified": true,
+  "historical_failure_cause_verified": false,
+  "historical_failure_not_reproduced": true,
+  "mismatched_helper_pins": {},
+  "models_loaded": false,
+  "observer_script_sha256": "14616ae5bc00b6b91b31aa93795ad820eed85a3af0a53fbc5323cbe1aaa431eb",
+  "original_native_status": "fail",
+  "producer_replayed": false,
+  "producer_revision": "984e419dd21727f8ba32b37f6ed741af909206b8",
+  "quality_verified": false,
+  "reference_metadata_read": false,
+  "report": {
+    "bytes": 8334,
+    "sha256": "eb32cbe957ae9b08f2e9f754799a34b09c649c579b49ddbdb4d4e4e9cbd9a0be"
+  },
+  "schema": "world_reward.vcoco_full_public_replica_sender_saved_diagnostic.v1",
+  "sender_result": "unexpected_success",
+  "source_gate_facts": {
+    "expected_entries": 345,
+    "original_XZ_marker_matches": true,
+    "original_closure_matches": true,
+    "original_entries": 345,
+    "original_equals_host": true,
+    "original_equals_proof": true,
+    "original_file_count": 340,
+    "unchanged_helper_mismatches": []
+  },
+  "stage": "complete",
+  "status": "PASS_DIAGNOSTIC"
+}

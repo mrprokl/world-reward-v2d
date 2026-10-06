@@ -1,0 +1,48 @@
+{
+  "Blob_operations_performed": false,
+  "RGB_NPZ_decoded": false,
+  "adoption": false,
+  "archive_removed": true,
+  "audit_elapsed_seconds": 0.519021,
+  "azure_run_command_exit_status": 0,
+  "blob_cleanup_verified": false,
+  "current_source": {
+    "closure_sha256": "8352bb96a78eb4e8681e6a7da65864347ac5cd0e4646b790106d385e023b2d4a",
+    "entries": 350,
+    "files": 345,
+    "source_XZ_sha256": "60ac2d55d02e23cd7aab1ddc26224688547ebccecacd38e43181996cb21cc34e"
+  },
+  "current_source_prepost_verified": true,
+  "elapsed_seconds": 1.3023275830200873,
+  "error_type": "ValueError",
+  "failure_stage": "sender",
+  "models_loaded": false,
+  "observer_script_sha256": "4b871ce69c32ed3c456d5590b16afe9f15cc724b5cd0a9fc206ca341b4a0c5b0",
+  "outputs_sealed": true,
+  "ownership_verified": false,
+  "phase": "export",
+  "post_error_type": "ValueError",
+  "post_failure_stage": "post",
+  "producer_process_absent": true,
+  "producer_revision": "984e419dd21727f8ba32b37f6ed741af909206b8",
+  "quality_verified": false,
+  "reference_metadata_read": false,
+  "report": {
+    "bytes": 8334,
+    "sha256": "eb32cbe957ae9b08f2e9f754799a34b09c649c579b49ddbdb4d4e4e9cbd9a0be"
+  },
+  "saved_native_status": "fail",
+  "schema": "world_reward.vcoco_full_public_replica_export_saved_audit.v1",
+  "source_inputs_rehashed_after": false,
+  "stage": "complete",
+  "status": "VERIFIED_NATIVE_FAIL",
+  "unit": {
+    "ActiveState": "failed",
+    "ExecMainStatus": "1",
+    "LoadState": "loaded",
+    "MainPID": "0",
+    "Result": "exit-code",
+    "SubState": "failed",
+    "exit_verification": "LIVE_UNIT_METADATA"
+  }
+}
