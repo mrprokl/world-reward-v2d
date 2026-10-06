@@ -14,6 +14,8 @@ import time
 
 sys.path[:0]=[str(Path(__file__).resolve().parent),str(Path(__file__).resolve().parents[1]/'src')]
 import vcoco_observation_replica as replica
+import vcoco_replica_completion as completion
+import sealed_callback_publication as publication
 import dwpose_acquire as acquisition
 import dwpose_wheel_audit as notices
 rt,ROOT=replica.rt,replica.ROOT
@@ -30,7 +32,7 @@ FROZEN={'infra/dwpose_smoke.py':dict(bytes=28479,sha256='ea0beb43dd698261a5b2acc
  'infra/coco_endpoint_evaluate.py':dict(bytes=38477,sha256='f1bf582b704b06891efbda4f13d643c214379e92a997b38506e7d33b13085685')}
 NATIVE_FILES=tuple(dict.fromkeys(('infra/vcoco_person_pose_observations.py','infra/coco_endpoint_evaluate.py',
  'infra/dwpose_smoke.py','infra/run_dwpose_smoke.sh','infra/keypoint_rgb_dwpose.py','infra/dwpose_acquire.py','infra/dwpose_wheel_audit.py',
- 'src/world_reward/person_pose_observations.py',*replica.HELPERS)))
+ 'src/world_reward/person_pose_observations.py',*replica.HELPERS,*completion.HELPERS)))
 HELPERS=(*NATIVE_FILES,'infra/run_vcoco_person_pose_observations.sh')
 encode,error=replica.encode,replica.bank.error
 
@@ -40,7 +42,9 @@ def source(code,revision):
     rt.require(Path(__file__).resolve()==code/'infra/vcoco_person_pose_observations.py'
         and Path(replica.__file__).resolve()==code/'infra/vcoco_observation_replica.py'
         and Path(acquisition.__file__).resolve()==code/'infra/dwpose_acquire.py'
-        and Path(notices.__file__).resolve()==code/'infra/dwpose_wheel_audit.py','Actual unchanged helper origins required')
+        and Path(notices.__file__).resolve()==code/'infra/dwpose_wheel_audit.py'
+        and Path(completion.__file__).resolve()==code/'infra/vcoco_replica_completion.py'
+        and Path(publication.__file__).resolve()==code/'infra/sealed_callback_publication.py','Actual unchanged helper origins required')
     rt.require(all(proof['helpers'][n]==p for n,p in FROZEN.items()),'Frozen qualified numerical helper changed')
     return dict(source=proof,states=replica.bank.source_state(code),markers={n:replica.snapshot(code.parent/n)for n in ('revision','source-sha256')})
 
@@ -94,6 +98,14 @@ def replica_inputs(code,replica_revision,pins):
     return dict(manifest=manifest,images=public['images'],banks=native['images'],files=paths,
         states={str(p):replica.snapshot(p)for folder in (replica.DEST,receipt_dir)for p in (folder,*sorted(folder.rglob('*')))},
         original_replica_source=oldsource,original_source_states=replica.bank.source_state(old),replica_snapshot=replica_snapshot)
+
+
+def completed_replica_inputs(code,revision,pin):
+    value=completion.authenticate_completion(code,revision,pin);path=completion.OUTPUT/'report.json'
+    rt.require(rt.identity(path,512 << 10)==pin,'Actual completion receipt changed')
+    return dict(value,files={**value['files'],str(path):pin},
+        states={**value['states'],str(completion.OUTPUT):replica.snapshot(completion.OUTPUT),str(path):replica.snapshot(path)},
+        original_source_states=value['original_sources'][completion.IMPORT]['states'])
 
 
 def native_source(code,revision,proof):
@@ -266,28 +278,36 @@ def cleanup(name,revision,deadline):
     rt.require(not command(['docker','ps','-aq','--no-trunc','--filter','name=^/'+name+'$'],deadline),'Owned exactname survives')
 
 
-def dispatch(code,revision,replica_revision,pins):
+def dispatch(code,revision,replica_revision,pins,completion_context=None):
     started=time.monotonic();deadline=started+BUDGET
     def expired(*_):raise TimeoutError('Inclusive host all-person budget')
     previous={s:signal.signal(s,expired)for s in (signal.SIGALRM,signal.SIGTERM,signal.SIGINT)};signal.alarm(BUDGET)
-    try:return dispatch_work(code,revision,replica_revision,pins,started,deadline)
+    try:return dispatch_work(code,revision,replica_revision,pins,started,deadline,completion_context)
     finally:
         signal.alarm(0)
         for s,handler in previous.items():signal.signal(s,handler)
 
 
-def dispatch_work(code,revision,replica_revision,pins,started,deadline):
-    replica.transport.verify_azure_peer('import');before=source(code,revision);inputs=replica_inputs(code,replica_revision,pins);models=assets();image=image_state(deadline)
+def dispatch_work(code,revision,replica_revision,pins,started,deadline,completion_context=None):
+    rt.require(completion_context is None or replica_revision is None and pins=={},'No mixed completion/import context')
+    load_inputs=lambda:completed_replica_inputs(code,*completion_context)if completion_context is not None else replica_inputs(code,replica_revision,pins)
+    replica.transport.verify_azure_peer('import');before=source(code,revision);inputs=load_inputs();models=assets();image=image_state(deadline)
     rt.require(not OUTPUT.exists()and not OUTPUT.is_symlink(),'Fresh all-person observations required');OUTPUT.mkdir(mode=0o700);s=OUTPUT.lstat();owner=(s.st_dev,s.st_ino,s.st_uid)
     report=dict(schema=SCHEMA,stage='vcoco_person_pose_observations_host',status='fail',producer_revision=revision,image_id=IMAGE,
         source_binding=before['source'],source_stat_identity=before['states'],replica_revision=replica_revision,replica_pins=pins,
         ownership_verified=False,quality_verified=False,adoption=False,FIT_performed=False,GPU_used=False,reference_metadata_read=False,
         owned_cleanup_verified=False,source_inputs_assets_rehashed_after=False)
+    lineage=dict(input_mode='completed_replica'if completion_context is not None else'original_import',
+        completion_revision=completion_context[0]if completion_context is not None else None,
+        completion_identity=completion_context[1]if completion_context is not None else None,
+        completion_source=inputs['completion_source']if completion_context is not None else None)
+    report.update(lineage)
     name='world-reward-vcoco-person-pose-'+revision[:12]
     try:
         rt.require(not command(['docker','ps','-aq','--no-trunc','--filter','name=^/'+name+'$'],deadline),'Occupied owned CPU name')
         proof=dict(source=before['source'],replica_pins=pins,original_replica_source=inputs['original_replica_source'],
             images=inputs['images'],banks=inputs['banks'],files={**inputs['files'],**models['files']},image_id=IMAGE)
+        proof.update(lineage)
         proof_pin=replica.bank.write(OUTPUT/'proof.json',proof)
         mounts=[code/n for n in NATIVE_FILES]+[code.parent/n for n in ('revision','source-sha256')]+[Path(n)for n in proof['files']]
         cmd=['docker','run','--rm','--name',name,'--cidfile',str(OUTPUT/'.container.cid'),
@@ -313,7 +333,7 @@ def dispatch_work(code,revision,replica_revision,pins,started,deadline):
         try:cleanup(name,revision,min(deadline+15,time.monotonic()+10));report['owned_cleanup_verified']=True
         except BaseException as exc:report.update(status='fail',cleanup_error_type=error(exc))
         try:
-            rt.require(source(code,revision)==before and replica_inputs(code,replica_revision,pins)==inputs and assets()==models
+            rt.require(source(code,revision)==before and load_inputs()==inputs and assets()==models
                 and image_state(deadline)==image,'Original source/replica/assets/image changed');report['source_inputs_assets_rehashed_after']=True
             if 'images'in report:validate_native(native,proof,revision,proof_pin)
         except BaseException as exc:report.update(status='fail',post_error_type=error(exc))
@@ -321,29 +341,39 @@ def dispatch_work(code,revision,replica_revision,pins,started,deadline):
         allowed={'proof.json','native.json'}|({'.container.cid'}if(OUTPUT/'.container.cid').exists()else set())|{f'image_{i:06d}.npz'for i in range(16)if(OUTPUT/f'image_{i:06d}.npz').exists()}
         rt.require({p.name for p in OUTPUT.iterdir()}<=allowed,'Foreign observation outputs')
         allowed={p.name for p in OUTPUT.iterdir()}
-        replica.publish(OUTPUT,report,deadline,started,owner,allowed)
+        publication.publish(OUTPUT,report,deadline,started,owner,allowed,
+            encode=encode,identity=rt.identity,snapshot=replica.snapshot,require=rt.require,
+            check=replica.check,sync=replica.sync,error=error,report_maximum=2 << 20)
     return report
 
 
 def arguments(argv):
     p=argparse.ArgumentParser(description=__doc__,allow_abbrev=False);p.add_argument('--native',action='store_true')
     p.add_argument('--replica-revision');p.add_argument('--proof-bytes',type=int);p.add_argument('--proof-sha256');p.add_argument('--deadline',type=float);p.add_argument('--code');p.add_argument('--revision')
+    p.add_argument('--completion-revision');p.add_argument('--completion-bytes',type=int);p.add_argument('--completion-sha256')
     for n in ('import','manifest','export'):p.add_argument('--'+n+'-bytes',type=int);p.add_argument('--'+n+'-sha256')
-    a=p.parse_args(argv)
+    a=p.parse_args(argv);a.completion_context=None
+    completion_keys=('completion_revision','completion_bytes','completion_sha256')
+    original_keys=('replica_revision','import_bytes','import_sha256','manifest_bytes','manifest_sha256','export_bytes','export_sha256')
     if a.native:
-        rt.require(all(getattr(a,k)is None for k in ('replica_revision','import_bytes','import_sha256','manifest_bytes','manifest_sha256','export_bytes','export_sha256')),
+        rt.require(all(getattr(a,k)is None for k in (*original_keys,*completion_keys)),
             'Native cannot accept alternate input pins')
         rt.require(type(a.deadline)is float and math.isfinite(a.deadline)and type(a.code)is str and re.fullmatch('[0-9a-f]{40}',str(a.revision)), 'Explicit native origin/deadline')
         a.proof_pin=replica.fixed_pin(dict(bytes=a.proof_bytes,sha256=a.proof_sha256),2 << 20)
     else:
         rt.require(all(getattr(a,k)is None for k in ('proof_bytes','proof_sha256','deadline','code','revision')), 'Host cannot override native origin')
-        rt.require(re.fullmatch('[0-9a-f]{40}',str(a.replica_revision)), 'Actual imported producer revision required')
-        a.pins={n:replica.fixed_pin(dict(bytes=getattr(a,n+'_bytes'),sha256=getattr(a,n+'_sha256')),256 << 10)for n in ('import','manifest','export')}
+        if any(getattr(a,k)is not None for k in completion_keys):
+            rt.require(all(getattr(a,k)is None for k in original_keys)and re.fullmatch('[0-9a-f]{40}',str(a.completion_revision)),
+                'Completion and original import inputs are mutually exclusive')
+            a.completion_context=(a.completion_revision,replica.fixed_pin(dict(bytes=a.completion_bytes,sha256=a.completion_sha256),512 << 10));a.pins={}
+        else:
+            rt.require(re.fullmatch('[0-9a-f]{40}',str(a.replica_revision)), 'Actual imported producer revision required')
+            a.pins={n:replica.fixed_pin(dict(bytes=getattr(a,n+'_bytes'),sha256=getattr(a,n+'_sha256')),256 << 10)for n in ('import','manifest','export')}
     return a
 
 
 if __name__=='__main__':
     a=arguments(sys.argv[1:]);rt.require(sys.platform=='linux'and os.geteuid()==0,'Azure rootCPU-only caller')
     result=cpu(Path(a.code),a.revision,a.proof_pin,a.deadline)if a.native else dispatch(Path(os.environ.get('WR_CODE','/invalid')),
-        os.environ.get('WR_CODE_REVISION',''),a.replica_revision,a.pins)
+        os.environ.get('WR_CODE_REVISION',''),a.replica_revision,a.pins,a.completion_context)
     print(encode({k:result[k]for k in ('stage','status')}).decode(),end='');raise SystemExit(0 if result['status']=='pass'else 1)

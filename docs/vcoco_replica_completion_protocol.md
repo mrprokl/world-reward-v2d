@@ -69,3 +69,15 @@ the runtime-transfers container. A custom role adds only blob/delete there,
 with no write or management actions. Definition and exact assignment were
 requeried. This current permission defect does not identify the unrecorded
 historical exception. No Blob data request was performed by that RBAC audit.
+
+## Actual independent saved verification
+
+Producer `21ac084f9bc83a7d7ec10dc726fcb1611ebae00c` passes in2.4868735s. Report
+106667/`9c8b31d86cf0d5b8a066030758f850de4f6a6bd9323799197dea0aa511a0344f`.
+Audit2727/`afe48fffde786ec63f7c0ff37417569f3150228a69a6c8851c831e29b177432a`
+checks complete current329/334 source/XZ/markers, three original sources/FAILs,
+bootstrap/diagnostic and all36 installed20,712,157B/modes/inodes before/after.
+The sealed producer declares exactly one If-Match DELETE202 and full cleanup;
+the observer makes no Blob data request or replay. All publication errors absent.
+Collected systemd exit is unavailable, not inferred. This new completion PASS
+qualifies its consumer lineage, never relabels either old native import FAIL.

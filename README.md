@@ -58,10 +58,13 @@ passes independent saved verification; the original FAIL and exact exported
 bytes are preserved. The fresh unchanged import installed all36 exact files,
 but remains FAIL after sealing/publication or Blob cleanup. A saved-only audit
 verifies the full installed20.7MB and unchanged modes; the exact exception is
-unavailable. Do not reimport into the occupied namespace or claim cleanup PASS.
-A separate bounded technical completion is being source-qualified. The blind
+unavailable. Do not reimport into the occupied namespace. A separate bounded
+technical completion now passes independent saved-only verification in2.49s:
+all36 original files and one exact-ETag cleanup; both import FAILs stay intact. The blind
 endpoint/pose/HOI join passes263 tiny controls without choosing, fusing or
 dropping candidates; actual all-person DWPose and learned selection remain pending.
+Fresh48 original acquisition is separately dispatched on VM02 after independent
+review; no acquired corpus, model or success is inferred from dispatch ACK.
 The first strict VG/COCO-linked reference census
 completes but yields0 eligible photos: this path is closed without RGB, relaxed
 joins or retries. Fresh external validation remains necessary.

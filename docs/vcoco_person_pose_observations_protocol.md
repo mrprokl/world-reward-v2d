@@ -45,3 +45,42 @@ one-session call lifecycle, input/array shapes and host signal restoration were
 checked without real inference. Independent review caught and fixed host
 SIGALRM/TERM/INT cleanup before freeze; numerical gates remain unchanged.
 Actual import pins must pass before any dispatch. No anatomical accuracy follows.
+
+## Explicit completed-replica input mode (pose integration is source-only)
+
+The original `replica_inputs` remains unchanged and requires its original import
+PASS. Alternatively, host arguments `--completion-revision`, `--completion-bytes`
+and `--completion-sha256` must appear together, with none of the original import,
+manifest or export arguments. Native children accept neither input argument set.
+`completed_replica_inputs` requires the separate completion's sealed PASS via
+`authenticate_completion`, including its whole original source, both preserved
+import FAILs, bootstrap, manifest/export evidence and all36 installed file hashes.
+It then binds the actual completion receipt's pin and inode/mode state. No failed
+import is relabeled PASS, no fallback to the old input gate exists and no pending
+receipt is fabricated. No new acquisition, Blob operation or completion execution
+occurs in the pose caller.
+
+Host and native proof separately record `input_mode`, completion revision/pin and
+source, retaining the original FAILED import source binding. The same explicit
+input loader reauthenticates before and after the CPU run. Required unchanged
+completion helper files are individually read-only mounted; this does not mount
+original source namespaces or read reference values. The host uses the separate
+phase-aware sealed publisher directly, without replacing any old module global.
+CPU inference, all16 banks/all94 expected persons, original133-point ABI and
+600/615-second resource/numerical gates are unchanged. Source-only authored
+controls do not establish completion PASS or actual pose execution.
+
+The separate completion now has an independently audited actual PASS receipt:
+106667 bytes, SHA256
+`9c8b31d86cf0d5b8a066030758f850de4f6a6bd9323799197dea0aa511a0344f`.
+This is only installed-byte/cleanup evidence, not DWPose or interaction quality.
+Dispatch must also provide its exact full producer revision; the CLI does not
+infer authority from this documentation or accept a missing/unsealed receipt.
+
+New input-lineage source qualification: author124 related tests PASS0.33s,
+independent81 PASS0.27s, root349 PASS1.32s. Nine original functions, including
+CPU/observe/native validation/assets and the original import gate, are byte-
+identical.41 native helper mounts and42 host helpers form a complete static
+closure. AST, shell and real completion CLI pins pass; fixtures removed.
+Driver31890/`eb3265bc9d420b8da37bafad74d5e8671e499af4a64ec3677d676f9440825c62`.
+This authorizes one all-person CPU observation run, not a selector or FIT.

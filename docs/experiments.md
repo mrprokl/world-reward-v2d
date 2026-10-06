@@ -106,6 +106,33 @@ PASS1.97s, all fixtures removed. Independent101 PASS0.42s authenticates complete
 old312/317 archive/closure/XZ and current unchanged helper bytes. One immutable
 acquisition is qualified; availability/selector quality is not inferred from tests.
 
+Actual separatecompletion21ac084 PASS2.4868735s, report106667/
+9c8b31d86cf0d5b8a066030758f850de4f6a6bd9323799197dea0aa511a0344f.
+Independent saved audit2727/afe48fffde786ec63f7c0ff37417569f3150228a69a6c8851c831e29b177432a
+verifies329/334 currentGit+3original whole sources, originalFAIL receipts and
+all36 installed bytes/modes/inodes before/after. New sealed receipt declares
+one exactETag DELETE202, full sourcepost/cleanup, no publication error. No
+observerBlob call/inference/import/replay. Collected unit exit unavailable;
+do not infer fromdefault0. Both original importFAILs remain unchanged. This
+enables a distinct strict DWPose input lineage, not owner/selector accuracy.
+
+First saved-only fresh48 acquisition observer stops before Python or any input
+read: RunShellScript uses /bin/sh, which rejects `set -euo pipefail`. Partial
+1355/05e69f71ce4b81a3d76f8a46af469ed6032626d8712f87d11546729aca179905
+is preserved; no producer/availability result inferred. One metadata-observer
+wrapper-only repair to `set -eu` is authorized in a separate audit namespace,
+without acquisition/native/selection replay or any gate change.
+
+Explicit completed-replica DWPose integration source-qualified: original nine
+functions byte-identical, including CPU/observe/native validation and strict
+original import gate. New input mode authenticates actual completion106667/
+9c8b31d86cf0d5b8a066030758f850de4f6a6bd9323799197dea0aa511a0344f,
+preservesFAILED397 binding and records distinct completion proof/identity;
+no oldFAIL relabel/fallback/globaloverride.41native/42hosthelpers mounted.
+Author124 PASS0.33s, independent81 PASS0.27s, root349 PASS1.32s; fixtures clean.
+One full16/all94 expected person CPU inference is qualified; no actual pose,
+anatomical ownership, FIT or score inferred from source controls.
+
 - 2026-10-02 R01 (synthetic only): multi-hypothesis SO(3)/translation Viterbi with
   image confidence and explicit true mesh symmetries implemented. Generated
   occlusion scene: greedy mean translation error 0.342857 m, selected path 0 m.

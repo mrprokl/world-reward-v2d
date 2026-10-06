@@ -1,0 +1,36 @@
+{
+  "Azure_RC_calls": 1,
+  "CAL_evaluated": false,
+  "FIT_performed": false,
+  "GPU_used": false,
+  "HTTP_used": false,
+  "RGB_decoded": false,
+  "actual_state": "OBSERVER_SHELL_PREFLIGHT_FAILED_NO_PYTHON",
+  "adopted": false,
+  "audit_status": "partial",
+  "azure_cli_exit": 0,
+  "azure_runcommand_terminal": true,
+  "census_rerun": false,
+  "counts": null,
+  "error_type": "IllegalOption_pipefail",
+  "failed_gate": "RunShellScript_posix_shell_preflight",
+  "geometry_references_decoded": false,
+  "native_status": null,
+  "observer_Python_executed": false,
+  "observer_command_identity": {
+    "bytes": 28570,
+    "sha256": "444d6ee58c638b392c74415408572ecf644f90bb4dfb5beec49ac5521db13198"
+  },
+  "observer_mechanical_repairs": 0,
+  "observer_source_identity": {
+    "bytes": 33887,
+    "sha256": "4f8076df664fe12ac8c2d93e47f4ea46f4d4accb7edf8aa4bf6d705338dec339"
+  },
+  "producer_revision": "d938e7c40c4fd90353fbe92ebd2970303a639b9b",
+  "role_values_decoded": false,
+  "saved_only": true,
+  "schema": "world_reward.vcoco_fit_cal_acquire_saved_audit.v1",
+  "scope_limitation": "Azure RunShellScript uses POSIX /bin/sh; set -o pipefail rejected before observer Python/source checks. CLI exit0 is not audit PASS. No conclusion on original acquisition; no producer was replayed.",
+  "selection_rerun": false,
+  "source_or_input_checks_executed": false
+}

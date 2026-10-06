@@ -62,3 +62,9 @@ and independent39 dedicated PASS0.06s. All owned fixtures were removed. Final
 `a1300cabfa410c2d1b74723cb073a59664f6f0462d68260db890ce91cb55ab1e`.
 No actual selected identity corpus, acquisition or learned model follows from
 this release; a separately source-bound Azure caller must execute the freeze.
+
+Subsequent execution: immutable8cf55c2 freeze now passes independent saved-only
+verification48 identities/32FIT16CAL. See `vcoco_fit_cal_freeze_protocol.md` for
+the exact63579-byte report and10151-byte cohort pins. This pure source release
+itself is not an execution claim. The separately reviewed acquisition is now
+dispatched at d938e7c; actual availability remains pending, no FIT performed.

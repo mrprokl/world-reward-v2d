@@ -171,7 +171,8 @@ def test_arguments_require_real_import_pins():
     with pytest.raises(ValueError):p.arguments(['--native','--code','/absolute','--revision','1'*40,'--deadline','nan'])
 
 
-def test_host_dispatch_complete_binding_mounts_and_seal(monkeypatch,tmp_path):
+@pytest.mark.parametrize('completed',[False,True])
+def test_host_dispatch_complete_binding_mounts_and_seal(monkeypatch,tmp_path,completed):
     root=tmp_path/'root';(root/'results').mkdir(parents=True);output=root/'results/pose';monkeypatch.setattr(p,'ROOT',root);monkeypatch.setattr(p,'OUTPUT',output)
     code=tmp_path/'code';code.mkdir();native_files=('infra/vcoco_person_pose_observations.py',)
     monkeypatch.setattr(p,'NATIVE_FILES',native_files)
@@ -180,7 +181,15 @@ def test_host_dispatch_complete_binding_mounts_and_seal(monkeypatch,tmp_path):
     for n in ('revision','source-sha256'):(code.parent/n).write_bytes(b'authored marker');(code.parent/n).chmod(0o400)
     before=dict(source={'authored':True},states='fixed')
     monkeypatch.setattr(p,'source',lambda *a:before);monkeypatch.setattr(p.replica.transport,'verify_azure_peer',lambda _:None)
-    monkeypatch.setattr(p,'replica_inputs',lambda *a:dict(images=[],banks=[],files={},original_replica_source={}))
+    origin={'saved_status':'fail'if completed else'pass'};inputs=dict(images=[],banks=[],files={},original_replica_source=origin)
+    completion_context=None
+    if completed:
+        completion_dir=tmp_path/'completion';completion_dir.mkdir();receipt=completion_dir/'report.json'
+        receipt.write_bytes(b'authored sealed completion');receipt.chmod(0o400)
+        completion_context=('3'*40,p.rt.identity(receipt));inputs.update(files={str(receipt):completion_context[1]},completion_source={'qualified_completion':True})
+        monkeypatch.setattr(p,'completed_replica_inputs',lambda *a:inputs)
+        monkeypatch.setattr(p,'replica_inputs',lambda *a:pytest.fail('Original PASS-only loader must not run'))
+    else:monkeypatch.setattr(p,'replica_inputs',lambda *a:inputs)
     monkeypatch.setattr(p,'assets',lambda:dict(files={}));monkeypatch.setattr(p,'image_state',lambda _:dict(image=p.IMAGE))
     monkeypatch.setattr(p,'command',lambda *a:'');monkeypatch.setattr(p,'cleanup',lambda *a:None)
     seen=[]
@@ -191,12 +200,17 @@ def test_host_dispatch_complete_binding_mounts_and_seal(monkeypatch,tmp_path):
         (output/'native.json').write_bytes(p.encode(dict(status='pass',images=[],persons=0)));(output/'native.json').chmod(0o400)
         return SimpleNamespace(returncode=0)
     monkeypatch.setattr(p.subprocess,'run',launch);monkeypatch.setattr(p,'validate_native',lambda *a:None)
-    result=p.dispatch(code,'1'*40,'2'*40,{})
+    result=p.dispatch(code,'1'*40,None if completed else'2'*40,{},completion_context)
     saved=p.rt.strict((output/'report.json').read_bytes());assert result==saved and saved['status']=='pass'
     assert saved['source_inputs_assets_rehashed_after']is saved['owned_cleanup_verified']is True
     assert output.stat().st_mode&0o777==0o500
     assert all(x.stat().st_mode&0o777==0o400 for x in output.iterdir())
     assert not any('reference' in str(x)for x in seen)
+    proof=p.rt.strict((output/'proof.json').read_bytes())
+    assert proof['original_replica_source']==origin
+    assert proof['input_mode']==saved['input_mode']==('completed_replica'if completed else'original_import')
+    assert proof['completion_identity']==saved['completion_identity']==(completion_context[1]if completed else None)
+    if completed:assert f'type=bind,src={receipt},dst={receipt},readonly'in seen
 
 
 def test_fake_cpu_original_session_overlay_and_all16(monkeypatch,tmp_path):
@@ -272,3 +286,52 @@ def test_host_deadline_signal_installed_and_restored(monkeypatch):
     monkeypatch.setattr(p,'dispatch_work',work)
     with pytest.raises(TimeoutError):p.dispatch(Path('/source'),'1'*40,'2'*40,{})
     assert all(signal.getsignal(s)==v for s,v in before.items())
+
+
+def test_completed_inputs_preserve_failed_lineage_and_authenticate_real_pin_state(monkeypatch,tmp_path):
+    folder=tmp_path/'completion';folder.mkdir();receipt=folder/'report.json';receipt.write_bytes(b'authored');receipt.chmod(0o400)
+    monkeypatch.setattr(p.completion,'OUTPUT',folder);pin=p.rt.identity(receipt);calls=[]
+    failed={'actual_status':'fail'};value=dict(images=[],banks=[],files={},states={},manifest={'original':True},
+        original_replica_source=failed,original_sources={p.completion.IMPORT:{'states':'old-failed-source'}},
+        completion_source={'new_status':'pass'},completion_identity=pin)
+    original=copy.deepcopy(value)
+    def auth(code,revision,identity):calls.append((code,revision,identity));return value
+    monkeypatch.setattr(p.completion,'authenticate_completion',auth)
+    monkeypatch.setattr(p,'replica_inputs',lambda *a:pytest.fail('Old loader unchanged, never fallback'))
+    result=p.completed_replica_inputs(tmp_path,'3'*40,pin)
+    assert calls==[(tmp_path,'3'*40,pin)] and value==original
+    assert result['original_replica_source']==failed and result['original_source_states']=='old-failed-source'
+    assert result['files'][str(receipt)]==pin and result['states'][str(receipt)]==p.replica.snapshot(receipt)
+    receipt.chmod(0o600);receipt.write_bytes(b'changed');receipt.chmod(0o400)
+    with pytest.raises(ValueError):p.completed_replica_inputs(tmp_path,'3'*40,pin)
+
+
+@pytest.mark.parametrize('fault',['revision','bytes','sha','import','native','native_partial'])
+def test_completion_cli_mutually_exclusive_all_or_none_and_native_forbidden(fault):
+    args=['--completion-revision','3'*40,'--completion-bytes','10','--completion-sha256','a'*64]
+    good=p.arguments(args);assert good.pins=={}and good.replica_revision is None
+    assert good.completion_context==('3'*40,dict(bytes=10,sha256='a'*64))
+    if fault in('revision','bytes','sha'):
+        at={'revision':0,'bytes':2,'sha':4}[fault];del args[at:at+2]
+    elif fault=='import':args+=['--replica-revision','2'*40]
+    else:
+        args+=['--native','--code','/absolute','--revision','1'*40,'--deadline','10','--proof-bytes','10','--proof-sha256','b'*64]
+        if fault=='native_partial':args=args[2:]
+    with pytest.raises(ValueError):p.arguments(args)
+
+
+def test_completion_false_claim_has_no_original_fallback_or_model(monkeypatch,tmp_path):
+    monkeypatch.setattr(p.replica.transport,'verify_azure_peer',lambda _:None)
+    monkeypatch.setattr(p,'source',lambda *a:{'authored':True})
+    monkeypatch.setattr(p,'completed_replica_inputs',lambda *a:(_ for _ in ()).throw(ValueError('Unsealed completion')))
+    monkeypatch.setattr(p,'replica_inputs',lambda *a:pytest.fail('No legacy fallback'))
+    monkeypatch.setattr(p,'assets',lambda:pytest.fail('No model asset gate after invalid completion'))
+    with pytest.raises(ValueError):p.dispatch(tmp_path,'1'*40,None,{},('3'*40,dict(bytes=10,sha256='a'*64)))
+
+
+def test_completion_helpers_whitelisted_and_old_globals_not_overridden():
+    assert set(p.completion.HELPERS)<=set(p.NATIVE_FILES)
+    assert p.publication.__file__.endswith('/infra/sealed_callback_publication.py')
+    source=Path(p.__file__).read_text()
+    assert 'replica.publish('not in source and 'publication.publish('in source
+    assert 'completion.run('not in source and 'completion.authenticate_completion('in source

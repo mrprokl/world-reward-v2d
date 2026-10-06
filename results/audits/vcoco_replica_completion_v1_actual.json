@@ -1,0 +1,80 @@
+{
+  "DELETE_result_saved_producer_declaration_only": true,
+  "adoption": false,
+  "all36_installed_original_bytes_modes_prepost": true,
+  "all4_sources_and_original_fail_inputs_prepost": true,
+  "azure_cli_exit": 0,
+  "bootstrap_pin": {
+    "bytes": 10156,
+    "sha256": "2390636311f1ff4eaa619de6027362d0f301eabc1ffa427cc0716e7067a605d9"
+  },
+  "delete_attempts": 1,
+  "diagnostic_pin": {
+    "bytes": 3473,
+    "sha256": "3110dc383ea38bfdf7d141cd5e69374fb4d9fb7052bf4eeac8b311f3f17b5358"
+  },
+  "elapsed_seconds": 2.4868734999909066,
+  "failed_import_pin": {
+    "bytes": 5781,
+    "sha256": "19441e4e8569ae766ece49547fb6137a691fe51e6265e6427de44a9d0de3f7a0"
+  },
+  "installed_bytes": 20712157,
+  "installed_files": 36,
+  "installed_inodes_modes_all36_preverified": true,
+  "native_status": "pass",
+  "no_Blob_methods_RGB_NPZ_decode_import_model_GPU": true,
+  "no_completion_replay": true,
+  "observer_seconds": 1.1742934770300053,
+  "observer_source_sha256": "b0685d71fb4b0d5410973bd17aedb91a3791a6b803ed6e85b052ddef30641845",
+  "old3_sources_entries": {
+    "39774007d9125caf955cba49bf93702dc323777b": 328,
+    "7c11662f98cf6f3db28909dce147473f1ab3bd0c": 327,
+    "f90b5b1afdf1557dabd375ebedd996413acddeff": 330
+  },
+  "old_failed_pin": {
+    "bytes": 4969,
+    "sha256": "877d595c1e91ec937270553595c40e6d8cb782269dd5f62b2eeddbf9de775ee1"
+  },
+  "optional_errors": {
+    "error_type": "absent",
+    "post_error_type": "absent",
+    "publication_error_type": "absent",
+    "publication_failure_stage": "absent"
+  },
+  "ownership_verified": false,
+  "producer_revision": "21ac084f9bc83a7d7ec10dc726fcb1611ebae00c",
+  "quality_verified": false,
+  "receipt_identity": {
+    "bytes": 106667,
+    "sha256": "9c8b31d86cf0d5b8a066030758f850de4f6a6bd9323799197dea0aa511a0344f"
+  },
+  "saved_flags": {
+    "GPU_used": false,
+    "RGB_NPZ_decoded": false,
+    "adoption": false,
+    "blob_cleanup_verified": true,
+    "import_replayed": false,
+    "model_execution": false,
+    "outputs_sealed": true,
+    "ownership_verified": false,
+    "quality_verified": false,
+    "reference_metadata_read": false,
+    "single_etag_DELETE_202": true,
+    "source_inputs_rehashed_after": true
+  },
+  "schema": "world_reward.vcoco_replica_completion_saved_audit.v1",
+  "sealed_completion_400_500_verified": true,
+  "source_XZ_sha256": "6b3b8e464bdd31ccb13fa3530ce532877a5aa8eaae32f54cbcb04493520b5741",
+  "source_closure_sha256": "d3f58092e35cd151695bc163b8273ae96a668ca8cb23e25d446c01c0103ddf20",
+  "source_entries": 334,
+  "source_files": 329,
+  "stage": "complete",
+  "status": "pass",
+  "unit": {
+    "active": "inactive",
+    "exit": "UNAVAILABLE_COLLECTED",
+    "exit_confirmed": false,
+    "load": "not-found"
+  },
+  "vm01_released": true
+}
