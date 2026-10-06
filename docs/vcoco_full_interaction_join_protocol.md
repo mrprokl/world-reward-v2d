@@ -17,7 +17,7 @@ checked before and after. No old run, model loader or mutable profile is used.
 Installed model/runtime qualification remains a historical receipt declaration.
 
 Pose comes only from a separately completed public pose replica at
-`/srv/world-reward-data/vcoco_full_pose_replica_v1`. Actual original pose
+`/srv/world-reward-public-replicas/vcoco_full_pose_replica_v1`. Actual original pose
 host/native/proof byte pins plus the replica revision/receipt pin are mandatory
 CLI arguments. The receiver validates its own complete source, import/export
 receipts, all49 public leaves, unchanged original11-array rows and one exact
@@ -94,3 +94,32 @@ Input47 and output46 array counts are distinct. Owned aggregate-output overflow
 seals FAIL under unchanged caps; foreign inode/mode/name still rejects without
 repair. Numerical helper31a206 remains byte-identical. Owned fixtures removed.
 No actual joined banks, selector FIT, CAL or quality adoption follows from this.
+
+## Private receiver context qualification
+
+Technical source `1f1453daae8343dc8a077b918e93f7fe7c36e467` changes only the
+pose-replica helper's fixed private destination/bootstrap and its import stage
+diagnostics. The first import's shared0755/UID1000 data parent remains untouched;
+it is not repaired or accepted. The new private parent must be root700 beneath
+verified root-owned non-group/world-writable `/srv` ancestors. Receiver reads
+use verify-only checks: no mkdir, fsync or recreation.
+
+Join driver remains40426B/SHA256
+`60ed38310984be004e0f9f7d0bceea714dd499cfba5a1be48d764842a39e3f10`;
+the10-leaf numerical worker, algorithm, caps and deadlines do not change. The
+new host receiver helper is34189B/SHA256
+`481c8af2ea7d8724217fb8c55a4c8840825939d54bcd23d0135f1651664eb741`.
+All required historical endpoint6837 and HOIa451 helper bytes remain exact;
+the pose-replica helper is outside those historical equality lists. The join
+uses the current receiver's destination/projection path and mandatory actual
+import revision/receipt plus independent original pose three-pins. It cannot
+reuse an old-context join snapshot or infer success from the new import ACK.
+
+For the join entry at1f1453, independently reconstructed Git runtime closure is
+396 files/401 entries,96 helpers/four original executable leaves, SHA256
+`0cde8fc590e1d2ae9974da034e89f6b34f967bc10d1ba71c0b94bcd4a2a0724a`.
+Exact XZ6 is434956B/SHA256
+`f98d0ea1256056f3464f0222dc8c3e1a2a0088c626da0bb78c4f3fffeca712e5`.
+138 join/receiver controls PASS1.70s; owned fixtures removed. These source
+checks do not claim a completed import or joined evidence, and the next frozen
+caller must record its own exact full-source closure/markers.
