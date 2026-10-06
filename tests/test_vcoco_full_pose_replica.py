@@ -221,6 +221,11 @@ def test_cli_all_independent_pose_pins_and_duplicate_no_fallback():
 def lifecycle(monkeypatch,tmp_path):
     root = tmp_path/'root'; (root/'results').mkdir(parents=True); data = tmp_path/'data'; data.mkdir(mode=0o700)
     monkeypatch.setattr(v,'ROOT',root); monkeypatch.setattr(v,'DEST',data/'replica'); monkeypatch.setattr(v,'private_directory',local_private)
+    parent_identity=(1,2,stat.S_IFDIR|0o700,0,0)
+    def parent(deadline,*,expected=None,verify_only=False):
+        local_private(data,0o700); assert expected is None or expected==parent_identity
+        return parent_identity
+    monkeypatch.setattr(v,'bootstrap_parent',parent)
     m,p,payload = fixture(); originals = tmp_path/'originals'; originals.mkdir(); paths = {}
     for i,(n,raw) in enumerate(payload.items()):
         if n == 'public-pose.json': continue
@@ -415,3 +420,119 @@ def test_wrapper_own_namespace_bounds_and_bash_syntax():
     path=Path(v.__file__).with_name('run_vcoco_full_pose_replica.sh'); source=path.read_text()
     assert v.ENTRY in source and '315s' in source and 'ulimit -v 8388608' in source and 'env -i' in source and 'python3 -I -B' in source
     subprocess.run(['bash','-n',str(path)],check=True)
+
+
+def anchored_fixture(monkeypatch,tmp_path):
+    anchor=tmp_path/'srv'; anchor.mkdir(mode=0o755)
+    parent=anchor/'world-reward-public-replicas'; destination=parent/'vcoco_full_pose_replica_v1'
+    monkeypatch.setattr(v,'ANCHOR',anchor);monkeypatch.setattr(v,'PRIVATE_PARENT',parent);monkeypatch.setattr(v,'DEST',destination)
+    real_lstat=Path.lstat; real_fstat=v.os.fstat; ancestors={anchor,*anchor.parents}
+    def root_view(s,ancestor=False):
+        fields={n:getattr(s,n)for n in dir(s)if n.startswith('st_')}
+        fields.update(st_uid=0,st_gid=0)
+        if ancestor: fields['st_mode'] &= ~0o022
+        return SimpleNamespace(**fields)
+    def lstat(path):
+        s=real_lstat(path)
+        return root_view(s,path in ancestors)if path in ancestors or path==parent else s
+    monkeypatch.setattr(Path,'lstat',lstat)
+    monkeypatch.setattr(v.os,'fstat',lambda fd:root_view(real_fstat(fd)))
+    return anchor,parent,destination,real_lstat,lstat
+
+
+def test_bootstrap_exclusive_fixed_root700_then_accept_same_inode(monkeypatch,tmp_path):
+    anchor,parent,dest,real_lstat,_=anchored_fixture(monkeypatch,tmp_path)
+    before=real_lstat(anchor); value=v.bootstrap_parent(time.monotonic()+10)
+    assert not dest.exists() and stat.S_IMODE(real_lstat(parent).st_mode)==0o700
+    assert v.bootstrap_parent(time.monotonic()+10,expected=value)==value
+    assert (real_lstat(anchor).st_dev,real_lstat(anchor).st_ino,real_lstat(anchor).st_mode)==(before.st_dev,before.st_ino,before.st_mode)
+    public_parent=tmp_path/'shared-data';public_parent.mkdir(mode=0o755)
+    monkeypatch.setattr(v,'PRIVATE_PARENT',public_parent);monkeypatch.setattr(v,'DEST',public_parent/'vcoco_full_pose_replica_v1')
+    with pytest.raises(ValueError):v.bootstrap_parent(time.monotonic()+10)
+    assert stat.S_IMODE(public_parent.stat().st_mode)==0o755
+
+
+def test_receiver_parent_verify_only_never_creates_fsyncs_or_repairs(monkeypatch,tmp_path):
+    _,parent,_,_,_=anchored_fixture(monkeypatch,tmp_path)
+    with pytest.raises(ValueError):v.bootstrap_parent(time.monotonic()+10,verify_only=True)
+    assert not parent.exists()
+    value=v.bootstrap_parent(time.monotonic()+10)
+    monkeypatch.setattr(v.os,'mkdir',lambda *a,**k:pytest.fail('read-only verifier creates namespace'))
+    monkeypatch.setattr(v.os,'fsync',lambda *a:pytest.fail('read-only verifier fsyncs'))
+    assert v.bootstrap_parent(time.monotonic()+10,expected=value,verify_only=True)==value
+    parent.rename(parent.with_name('original'));assert not parent.exists()
+    with pytest.raises(ValueError):v.bootstrap_parent(time.monotonic()+10,expected=value,verify_only=True)
+    assert not parent.exists()
+
+
+@pytest.mark.parametrize('fault',['ancestor_owner','ancestor_writable','parent_owner','parent_group','parent_mode','parent_symlink','ancestor_symlink','mkdir_race','path_change','expected_inode'])
+def test_bootstrap_rejects_foreign_and_races_without_repair(monkeypatch,tmp_path,fault):
+    anchor,parent,dest,real_lstat,view=anchored_fixture(monkeypatch,tmp_path)
+    expected=None
+    if fault.startswith('parent_'):
+        if fault=='parent_symlink':parent.symlink_to(anchor,target_is_directory=True)
+        else:parent.mkdir(mode=0o755 if fault=='parent_mode'else 0o700)
+    if fault=='ancestor_symlink':
+        other=tmp_path/'other';other.mkdir();anchor.rmdir();anchor.symlink_to(other,target_is_directory=True)
+    def drift(path):
+        s=view(path)
+        if (fault=='ancestor_owner'and path==anchor)or(fault=='parent_owner'and path==parent):s.st_uid=99
+        if fault=='ancestor_writable'and path==anchor:s.st_mode|=0o020
+        if fault=='parent_group'and path==parent:s.st_gid=99
+        return s
+    monkeypatch.setattr(Path,'lstat',drift)
+    if fault=='mkdir_race':
+        real_mkdir=v.os.mkdir
+        def race(path,mode=0o777,*,dir_fd=None):
+            real_mkdir(path,mode,dir_fd=dir_fd);raise FileExistsError('authored competing namespace')
+        monkeypatch.setattr(v.os,'mkdir',race)
+    if fault=='path_change':
+        real_fsync=v.os.fsync;changed=False
+        def change(fd):
+            nonlocal changed
+            real_fsync(fd)
+            if not changed:
+                changed=True;parent.rename(anchor/'original-owned-parent');parent.mkdir(mode=0o700)
+        monkeypatch.setattr(v.os,'fsync',change)
+    if fault=='expected_inode':
+        expected=v.bootstrap_parent(time.monotonic()+10)
+        parent.rename(anchor/'original-owned-parent');parent.mkdir(mode=0o700)
+    with pytest.raises((ValueError,FileExistsError,OSError)):
+        v.bootstrap_parent(time.monotonic()+10,expected=expected)
+    assert not dest.exists()
+    if fault=='parent_mode':assert stat.S_IMODE(real_lstat(parent).st_mode)==0o755
+    if fault in('parent_symlink','ancestor_symlink'):assert real_lstat(parent if fault=='parent_symlink'else anchor).st_mode&stat.S_IFLNK
+    if fault in('mkdir_race','path_change','expected_inode'):assert parent.exists()
+
+
+@pytest.mark.parametrize('failure_stage',['receipt_decode','incoming_pins','control_write','namespace'])
+def test_import_subgate_failure_retains_control_without_get_delete_or_retry(monkeypatch,tmp_path,failure_stage):
+    state,args=export_import(monkeypatch,tmp_path);root,_,_,calls,_,_,_=state
+    if failure_stage=='receipt_decode':args.export_receipt_base64='!'
+    elif failure_stage=='incoming_pins':args.archive_pin=v.pin(b'not-original')
+    elif failure_stage=='control_write':
+        original=v.control_write
+        def fail(out,name,raw,allowed):
+            original(out,name,raw,allowed);raise OSError('authored control-fsync failure')
+        monkeypatch.setattr(v,'control_write',fail)
+    else:
+        monkeypatch.setattr(v,'bootstrap_parent',lambda *a,**k:(_ for _ in()).throw(ValueError('authored foreign namespace')))
+    before=len(calls);report=v.run(args,tmp_path/'code',S)
+    assert report['status']=='fail'and report['failure_stage']==failure_stage and report['outputs_sealed']
+    assert not v.DEST.exists()and not calls[before:]and report['delete_attempts']==0
+    out=root/f'results/vcoco-full-pose-replica-import-{S}'
+    assert (out/'export-receipt.json').exists()is(failure_stage in('control_write','namespace'))
+    assert v.rt.strict((out/'report.json').read_bytes())==report
+
+
+def test_repair_changes_only_namespace_run_and_keeps_original_export_schema_helpers():
+    original=subprocess.check_output(['rtk','proxy','git','show','be9087a031f3755f3947276a2cb3bb5f8dcb0fd7:infra/vcoco_full_pose_replica.py'])
+    old=ast.parse(original);new=ast.parse(Path(v.__file__).read_bytes())
+    functions=lambda tree:{n.name:ast.dump(n,include_attributes=False)for n in tree.body if isinstance(n,ast.FunctionDef)}
+    left,right=functions(old),functions(new)
+    assert set(right)-set(left)=={'bootstrap_parent'}
+    assert all(right[name]==node for name,node in left.items()if name not in('run','authenticate_receiver'))
+    values=lambda tree:{n.targets[0].id:ast.dump(n.value,include_attributes=False)for n in tree.body
+        if isinstance(n,ast.Assign)and len(n.targets)==1 and isinstance(n.targets[0],ast.Name)}
+    a,b=values(old),values(new)
+    assert all(a[n]==b[n]for n in('SCHEMA','PUBLIC_SCHEMA','POSE_REV','DECLARATION','NAMES','ROW_KEYS','HELPERS','FLAGS'))

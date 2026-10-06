@@ -43,8 +43,13 @@ One fresh namespace, 300 s inclusive / 315 s outer, 8 GiB host virtual-memory
 limit, archive ≤128 MiB, each original NPZ ≤2 MiB and control ≤256 KiB; no retry,
 replacement, truncation or population change. Original byte hashes and strict
 regular/link/path/header/padding/tail checks precede Linux `renameat2` NOREPLACE.
-The parent must already be canonical root-owned mode700. Destination is
-`/srv/world-reward-data/vcoco_full_pose_replica_v1`: root700, banks500, leaves400.
+The fixed receiver parent is `/srv/world-reward-public-replicas`, bootstrapped
+exclusively0700 only when absent beneath canonical root-owned, non-group/world-
+writable `/srv` ancestors. Existing parents must already be exactroot700;
+symlink, owner/mode or inode races are rejected without chmod/chown/removal.
+Destination is `/srv/world-reward-public-replicas/vcoco_full_pose_replica_v1`:
+root700, banks500, leaves400. A bootstrap failure may retain only its newly
+created empty0700 parent; it is never a reason to repair or retry foreign data.
 Only prospectively tracked owned partial files can be removed; foreign paths
 are never repaired or deleted. Archive scratch is removed, not retained.
 After the technical receipt is sealed500/400, exactly one If-Match ETag DELETE
@@ -101,3 +106,29 @@ Archive SHA/ETag are saved producer streaming/HEAD evidence, not an observer
 Blob read. Collected unit exit unavailable; installed receiver bytes still must
 pass their separate import. No numerical replay, RGB transfer, FIT or quality
 claim. Heavy payload stays Azure; local control receives only bounded receipts.
+
+## Prospective import namespace repair
+
+The first `be9087` import failed before download: shared
+`/srv/world-reward-data` was0755/UID1000 and correctly rejected by the private
+parent gate. It remains failed; the shared data parent is never modified.
+Only the new import destination/bootstrap and bounded import subgate names
+change. Schema, all49 payloads/50 USTAR members, original export receipt,
+archive/manifest pins, native pose declarations and mandatory three pins remain
+unchanged, allowing the separate new importer to consume the existing export.
+Receipt decode/validation, incoming pins, control write and namespace are
+distinct failure stages before any GET. Parent FD/inode/owner/mode checks run
+again in postchecks and before/after the single sealed If-Match DELETE. The
+receiver API returns the new absolute projection path; callers still require
+their independently pinned actual import revision/receipt. This source repair
+does not claim a completed import, replay a model or change any numerical gate.
+The receiver API checks the same parent/ancestor/inode invariants in explicit
+verify-only mode before/after: no mkdir, fsync or recreation is performed.
+
+Namespace repair controls:86 dedicated /176 combined PASS1.83s; independent108
+replica/publication controls PASS0.82s; root185 return/join/pose/metadata controls
+PASS2.74s. Exact378-file/77-helper closure and unchanged original pose376 source
+verified; same authentic12244-byte export receipt passes locally without NumPy.
+This remains source qualification. A fresh importer source and actual sealed
+receipt are required; the historical87a705 join must be released with the new
+receiver helper bytes before dispatch, not aliased to the old source context.

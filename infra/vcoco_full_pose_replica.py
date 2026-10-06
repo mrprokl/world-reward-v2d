@@ -23,7 +23,9 @@ sync, private_directory, tree_state = shared.sync, shared.private_directory, sha
 ENTRY = 'run_vcoco_full_pose_replica'
 SCHEMA = 'world_reward.vcoco_full_pose_replica.v1'
 PUBLIC_SCHEMA = 'world_reward.public_person_pose_reference.v1'
-DEST = Path('/srv/world-reward-data/vcoco_full_pose_replica_v1')
+ANCHOR = Path('/srv')
+PRIVATE_PARENT = ANCHOR/'world-reward-public-replicas'
+DEST = PRIVATE_PARENT/'vcoco_full_pose_replica_v1'
 POSE_REV = 'e2d8b5afa9eeaa8d0988cd527ff2e47e2d4e31b4'
 DECLARATION = dict(producer_revision=POSE_REV, files=376, entries=381,
     closure_sha256='bc549f0a3841891f9990096e98a51561dbaa18fc398a7336add689f807171aea',
@@ -34,9 +36,45 @@ ROW_KEYS = frozenset(('image_id', 'original_slot', 'acquired_ordinal', 'original
     'file', 'identity', 'arrays', 'endpoint_bank_identity', 'source_person_ids', 'owl_patches', 'person_ids', 'persons'))
 HELPERS = tuple(dict.fromkeys(('infra/vcoco_full_pose_replica.py', 'infra/run_vcoco_full_pose_replica.sh',
     *shared.HELPERS, *pose.helpers())))
-STAGES = ('source','peer','blob','sender','projection','pack','commit','head','receipt','download','archive','install','post','publication')
+STAGES = ('source','peer','blob','sender','projection','pack','commit','head','receipt_decode','receipt_validate',
+    'incoming_pins','control_write','namespace','download','archive','install','post','publication')
 FLAGS = ('models_loaded', 'GPU_used', 'reference_metadata_read', 'RGB_NPZ_decoded', 'quality_verified', 'ownership_verified', 'adoption')
 fixed_pin = shared.fixed_pin
+
+
+def bootstrap_parent(deadline, *, expected=None, verify_only=False):
+    """Create only the fixed0700 parent; never repair/remove any existing path."""
+    check(deadline)
+    rt.require(PRIVATE_PARENT == ANCHOR/'world-reward-public-replicas'
+        and DEST == PRIVATE_PARENT/'vcoco_full_pose_replica_v1' and type(verify_only) is bool, 'Only fixed anchored receiver namespace')
+    def identity(s): return (s.st_dev,s.st_ino,s.st_mode,s.st_uid,s.st_gid)
+    ancestors = {}
+    for path in (ANCHOR,*ANCHOR.parents):
+        s = rt.canonical(path).lstat()
+        rt.require(stat.S_ISDIR(s.st_mode) and s.st_uid == s.st_gid == 0 and not s.st_mode & 0o022,
+            'Canonical root-owned non-group/world-writable ancestors')
+        ancestors[path] = identity(s)
+    rt.canonical(PRIVATE_PARENT); flags = os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW
+    anchor_fd = os.open(ANCHOR,flags); parent_fd = None
+    try:
+        rt.require(identity(os.fstat(anchor_fd)) == ancestors[ANCHOR], 'Original anchor inode')
+        try: parent_fd = os.open(PRIVATE_PARENT.name,flags,dir_fd=anchor_fd)
+        except FileNotFoundError:
+            rt.require(expected is None and not verify_only, 'Original private parent disappeared')
+            os.mkdir(PRIVATE_PARENT.name,mode=0o700,dir_fd=anchor_fd)
+            parent_fd = os.open(PRIVATE_PARENT.name,flags,dir_fd=anchor_fd)
+        value = identity(os.fstat(parent_fd))
+        rt.require(stat.S_ISDIR(value[2]) and stat.S_IMODE(value[2]) == 0o700 and value[3] == value[4] == 0
+            and (expected is None or value == expected), 'Exact original root0700 private parent')
+        if not verify_only: os.fsync(parent_fd); os.fsync(anchor_fd)
+        check(deadline)
+        rt.require(identity(rt.canonical(PRIVATE_PARENT).lstat()) == value
+            and all(identity(rt.canonical(path).lstat()) == before for path,before in ancestors.items()),
+            'Private parent/ancestor inode or owner/mode race')
+        return value
+    finally:
+        if parent_fd is not None: os.close(parent_fd)
+        os.close(anchor_fd)
 
 
 def source(code, revision):
@@ -229,6 +267,7 @@ def export_receipt(raw, expected, revision):
 
 def authenticate_receiver(code, replica_revision, receipt_pin):
     """HOST ONLY; caller compares original pose pins. No sender is read on VM02."""
+    parent_before = bootstrap_parent(time.monotonic()+10,verify_only=True)
     old = ROOT/'jobs'/replica_revision/ENTRY/'code'; binding = rt.source(ROOT, old, replica_revision, ENTRY, HELPERS)
     rt.require(all(rt.identity(code/n, 2 << 20, empty=True) == p for n,p in binding['helpers'].items()), 'Original receiver helper bytes')
     out = ROOT/f'results/vcoco-full-pose-replica-import-{replica_revision}'; private_directory(out, 0o500, {'report.json','manifest.json','export-receipt.json'})
@@ -247,7 +286,9 @@ def authenticate_receiver(code, replica_revision, receipt_pin):
         and report['pose_receipt_pins'] == export['pose_receipt_pins'] == manifest['pose_receipt_pins'], 'Original independent export/payload bindings')
     value = installed(manifest); technical = {str(out/'report.json'): receipt_pin, str(out/'manifest.json'): report['manifest_identity'], str(out/'export-receipt.json'): ep}
     rt.require({n: rt.identity(n, MAX_CONTROL) for n in technical} == technical and tree_state(out) == before
-        and installed(manifest) == value and rt.source(ROOT, old, replica_revision, ENTRY, HELPERS) == binding, 'Complete receiver source/files unchanged')
+        and installed(manifest) == value and rt.source(ROOT, old, replica_revision, ENTRY, HELPERS) == binding
+        and bootstrap_parent(time.monotonic()+10,expected=parent_before,verify_only=True) == parent_before,
+        'Complete receiver source/files/private parent unchanged')
     return dict(rows=value['projection']['rows'], projection_path=str(DEST/'public-pose.json'), projection_identity=manifest['files']['public-pose.json'],
         files={**value['files'], **technical}, states={**value['states'], **before}, import_source=binding, import_identity=receipt_pin,
         original_pose_revision=POSE_REV, pose_receipt_pins=report['pose_receipt_pins'], original_source_declaration=DECLARATION,
@@ -260,7 +301,7 @@ def run(args, code, revision):
     handlers = {s: signal.signal(s, expired) for s in (signal.SIGALRM,signal.SIGTERM,signal.SIGINT)}; signal.setitimer(signal.ITIMER_REAL, BUDGET)
     out = ROOT/f'results/vcoco-full-pose-replica-{args.phase}-{revision}'; rt.canonical(out); rt.require(not out.exists() and not out.is_symlink(), 'Fresh technical namespace')
     out.mkdir(mode=0o700); s = out.lstat(); owner = (s.st_dev,s.st_ino,s.st_uid)
-    before = original = manifest = replica_before = None; archive = out/'archive.tar'; archive_owner = []; allowed = set(); stage = 'source'
+    before = original = manifest = replica_before = parent_before = None; archive = out/'archive.tar'; archive_owner = []; allowed = set(); stage = 'source'
     report = dict(schema=SCHEMA, phase=args.phase, status='fail', producer_revision=revision, original_source_declaration=DECLARATION,
         pose_receipt_pins=args.pose_pins, files=49, budget_seconds=BUDGET, source_inputs_rehashed_after=False, outputs_sealed=False,
         sender_source_live_verified=False, sender_runtime_live_verified=False, delete_attempts=0, single_etag_DELETE_202=False, blob_cleanup_verified=False, **{k:False for k in FLAGS})
@@ -279,14 +320,19 @@ def run(args, code, revision):
                 etag = response.headers.get('ETag',''); rt.require(response.status == 200 and response.headers.get('Content-Length') == str(archive_pin['bytes']) and re.fullmatch(r'"[0-9A-Za-z-]{1,128}"', etag), 'Committed private archive HEAD')
             report.update(archive_identity=archive_pin, manifest_identity=pin(encode(manifest)), blob_etag=etag, sender_source_live_verified=True, sender_runtime_live_verified=True)
         else:
-            stage = 'receipt'; raw = base64.b64decode(args.export_receipt_base64, validate=True); rt.require(base64.b64encode(raw).decode() == args.export_receipt_base64, 'Canonical exact control encoding')
+            stage = 'receipt_decode'; raw = base64.b64decode(args.export_receipt_base64, validate=True); rt.require(base64.b64encode(raw).decode() == args.export_receipt_base64, 'Canonical exact control encoding')
+            stage = 'receipt_validate'
             export = export_receipt(raw, args.export_receipt_pin, export_revision)
+            stage = 'incoming_pins'
             rt.require(export['archive_identity'] == args.archive_pin and export['manifest_identity'] == args.manifest_pin and export['pose_receipt_pins'] == args.pose_pins, 'All independent incoming pins')
-            control_write(out,'export-receipt.json',raw,allowed); private_directory(DEST.parent, 0o700); rt.require(not DEST.exists() and not DEST.is_symlink(), 'Never replace receiver data')
+            stage = 'control_write'; control_write(out,'export-receipt.json',raw,allowed)
+            stage = 'namespace'; parent_before = bootstrap_parent(deadline)
+            rt.require(not DEST.exists() and not DEST.is_symlink(), 'Never replace receiver data')
             stage = 'download'; transport.download(blob, shared.OwnedDownload(archive, archive_owner), args.archive_pin); archive.chmod(0o400)
             stage = 'archive'; manifest, table = verify_archive(archive, args.archive_pin, args.manifest_pin, export_revision, deadline)
             rt.require(manifest['pose_receipt_pins'] == args.pose_pins, 'Same independently pinned native pose source')
             control_write(out,'manifest.json',encode(manifest),allowed); stage = 'install'
+            rt.require(bootstrap_parent(deadline,expected=parent_before) == parent_before, 'Original private parent before install')
             install(archive, DEST.parent/(DEST.name+'.stage-'+revision), manifest, table, deadline); replica_before = installed(manifest)
             report.update(export_revision=export_revision, archive_identity=args.archive_pin, manifest_identity=args.manifest_pin,
                 export_receipt_identity=args.export_receipt_pin, blob_etag=export['blob_etag'], replica_directory=str(DEST))
@@ -299,7 +345,10 @@ def run(args, code, revision):
                 again, _, files, proof = sender_inputs(code, before['binding'], args.pose_pins, deadline)
                 rt.require(original is not None and proof == original and files == manifest['files'] and pin(encode(again)) == files['public-pose.json']
                     and rt.identity(out/'public-pose.json', MAX_CONTROL) == files['public-pose.json'], 'Whole original pose/public bytes unchanged')
-            else: rt.require(replica_before is not None and installed(manifest) == replica_before, 'All installed pose bytes unchanged')
+            else:
+                rt.require(parent_before is not None and bootstrap_parent(deadline,expected=parent_before) == parent_before,
+                    'Original receiver private parent unchanged')
+                rt.require(replica_before is not None and installed(manifest) == replica_before, 'All installed pose bytes unchanged')
             report['source_inputs_rehashed_after'] = True; check(deadline)
         except BaseException as exc: report.update(status='fail', post_error_type=error(exc), post_failure_stage='post')
         if archive.exists():
@@ -308,13 +357,15 @@ def run(args, code, revision):
             except BaseException as exc: report.update(status='fail', cleanup_error_type=error(exc)); allowed.add('archive.tar')
         report['archive_removed'] = not archive.exists()
         def finish():
-            check(deadline); rt.require(installed(manifest) == replica_before and source(code, revision) == before, 'Sealed pose/source beforeDELETE')
+            check(deadline); rt.require(bootstrap_parent(deadline,expected=parent_before) == parent_before
+                and installed(manifest) == replica_before and source(code, revision) == before, 'Sealed pose/source beforeDELETE')
             report['delete_attempts'] += 1
             try:
                 with blob.request('DELETE', headers={'If-Match': report['blob_etag']}) as response: rt.require(response.status == 202, 'One exact ETag DELETE202')
                 report['single_etag_DELETE_202'] = True
             finally:
-                rt.require(installed(manifest) == replica_before and source(code, revision) == before, 'Full pose/source afterDELETE even failure'); check(deadline)
+                rt.require(bootstrap_parent(deadline,expected=parent_before) == parent_before
+                    and installed(manifest) == replica_before and source(code, revision) == before, 'Full pose/source afterDELETE even failure'); check(deadline)
         try:
             publication.publish(out, report, deadline, started, owner, allowed, finish if args.phase == 'import' else None,
                 encode=encode, identity=rt.identity, snapshot=snapshot, require=rt.require, check=check, sync=sync, error=error, maximum=MAXIMUM, report_maximum=MAX_CONTROL)
