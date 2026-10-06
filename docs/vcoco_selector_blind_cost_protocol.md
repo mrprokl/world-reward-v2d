@@ -102,3 +102,12 @@ and returned RUNNING: original driver still present, unit active, no sealed
 report. Its provisional ExecMainStatus0 is not completion evidence. No q.authenticate
 or numerical decode was attempted by this observer. Preserve this snapshot;
 no producer retry or partial-result adoption. Later terminal audit remains due.
+
+Source-only cost audit distinguishes qualification from future FIT: a completed
+profile entails128 CPU oracle scores,256 GPU scores,192 CPU/384 GPU partitions,
+512 full-result device-to-host copies,80 reconstructions,384 raw NPZ loads,
+160 discarded zero-coefficient hard-max validations and96 scale factor sorts.
+These are source counts, not observed timings or proof of a bottleneck. The30s
+post reserve is not guaranteed sufficient for repeated full authentication,
+hashing, cleanup and publication; the inclusive cap still closes on overrun.
+No active-run limit, candidate population or computation is changed.
