@@ -107,6 +107,15 @@ line-search failure, stationarity failure or cap closes the recipe; do not
 substitute another lambda, relax tolerances or prolong a failed scientific run.
 Nonconvex latent-positive loss has no global optimum guarantee.
 
+The generic bounded analytic solver utility is separately source-qualified:
+caller supplies every limit and injects `minimize`/deadline callbacks; no recipe
+defaults, SciPy import, optimizer restart or best-iterate rescue. Initial,
+minimizer and independent final evaluations share one hard cap; final parameter
+mutation, unsuccessful status, iteration overrun, loss increase or projected
+stationarity failure closes.61 dedicated PASS0.10s, independent61 PASS0.11s,
+167 combined PASS0.32s/root167 PASS0.33s. Only tiny manufactured callbacks were
+used; this does not qualify the actual SciPy runtime or a fitted selector.
+
 Operational adequacy proposal: at least six informative images per FIT fold
 with a jointly covered positive and a competing automatic candidate, and at
 least24 FIT images with useful nonconstant relation derivative for B. These are
