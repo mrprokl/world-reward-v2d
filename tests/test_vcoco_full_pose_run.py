@@ -15,6 +15,18 @@ import vcoco_full_pose_run as p
 ROOT=Path(__file__).resolve().parents[1]
 
 
+def test_host_asset_context_full_leaf_parity_and_metadata_only_boundary():
+    import inspect
+    text=inspect.getsource(p.asset_context)
+    assert "rt.identity(old/n,2<<20,empty=True)" in text
+    assert "binding['helpers'][n]" not in text
+    assert 'metadata.metadata_delegate(code)' in text
+    assert 'import dwpose_smoke' not in text and 'import keypoint_rgb_dwpose' not in text
+    assert p.OUTPUT.name=='vcoco-full-person-pose-v2'
+    assert 'infra/dwpose_metadata_context.py' in p.helpers()
+    assert 'infra/dwpose_metadata_context.py' not in p.NATIVE_FILES
+
+
 def pinned_runtime(tmp_path):
     code=tmp_path/'code';(code/'infra').mkdir(parents=True)
     leaf=code/'infra/dwpose_smoke.py';leaf.write_bytes((ROOT/'infra/dwpose_smoke.py').read_bytes());leaf.chmod(0o400)

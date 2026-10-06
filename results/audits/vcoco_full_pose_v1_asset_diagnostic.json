@@ -1,0 +1,12 @@
+{
+  "azure_run_command_exit_status": 0,
+  "full_postchecks_not_serialized": true,
+  "missing_binding_helper_keys": [
+    "infra/run_keypoint_rgb_dwpose.sh"
+  ],
+  "observer_script_sha256": "205913257bfe8104875de6745d3871cf2c2f2ff1b29599b62feedb60c255beb2",
+  "producer_failure_remains_closed": true,
+  "producer_revision": "5c67b6a3a89529b45badef7014c2ebe5de18347a",
+  "stage": "output_bound",
+  "status": "PARTIAL"
+}

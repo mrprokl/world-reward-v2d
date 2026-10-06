@@ -79,3 +79,31 @@ Source qualification:30 dedicated controls and138 related controls PASS20.81s;
 root127 transfer/pose/core controls PASS1.03s. AST and shell syntax PASS;
 all exact owned authored fixtures removed. No real ORT/model inference follows
 from these tests; original full48 import receipt remains an execution gate.
+
+## Actual v1 fail and general technical repair
+
+Original `5c67b6a3a89529b45badef7014c2ebe5de18347a` closed FAIL in1.3332s at
+assets/KeyError before any native proof, container or pose inference. Host receipt
+18415B/SHA256`77f7918895edacd1b9f352f25d41f92c02bc094505c15203d910ab7fb742e4b6`
+remains sealed/unchanged. Source, failed receipt and101 imported public/technical
+leaves were independently rehashed; compact metadata-only diagnostic confirms
+`infra/run_keypoint_rgb_dwpose.sh` exists with identical original/current bytes,
+but is not a key in the original helper *declaration*. The full347-file/352-entry
+original Git closure already authenticates this leaf. Four native asset pins
+all match; no missing data or model is established.
+
+The repaired host compares each of the same eight leaves against the complete
+authenticated original source, not a falsely extended historical helper map.
+It uses `dwpose_metadata_context.metadata_delegate` to execute only the exact
+source-pinned metadata validators: original smoke/capability modules eagerly
+import NumPy, which is unavailable on the stdlib-only system host. No numerical,
+model or session definition is selected by that seam. Native runtime/preprocess,
+133 joints, every crop/slot/array and all scientific settings stay unchanged.
+The metadata seam is host-only, excluded from the20-file native whitelist.
+
+Future repaired output is fresh `vcoco-full-person-pose-v2`, never overwriting
+v1 FAIL. Source qualification does not authorize a smaller population, fallback,
+reseed, or new accuracy claim. The three compact v1 audits distinguish initial
+FAIL, overlong-output PARTIAL diagnostic and completed compact diagnostic.
+Metadata16 and pose31/root47 combined controls PASS; actual repaired inference
+remains pending against the same original imported public48 receipt.

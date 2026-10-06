@@ -1,0 +1,47 @@
+{
+  "Blob_operations_performed": false,
+  "RGB_NPZ_decoded": false,
+  "audit_elapsed_seconds": 0.451412,
+  "azure_run_command_exit_status": 0,
+  "current_source": {
+    "closure_sha256": "132c52790d783ef4da20d1cca9a455ddc42e6bca5644198e238f94e16bde713d",
+    "entries": 380,
+    "files": 375,
+    "source_XZ_sha256": "3d39fb4d50fa78ef680e6bd078463c1eb71eee719bc76031a594d920d8a05d05"
+  },
+  "current_source_prepost_verified": true,
+  "host": {
+    "elapsed_seconds": 1.3331674479995854,
+    "error_type": "KeyError",
+    "failure_stage": "assets",
+    "outputs_sealed": true,
+    "owned_cleanup_verified": true,
+    "phase": "assets",
+    "source_inputs_assets_runtime_rehashed_after": false,
+    "stage": "public48_person_pose_host",
+    "status": "fail"
+  },
+  "models_loaded": false,
+  "observer_script_sha256": "05f83e5676ccc0a9f4b7605904a84163922ffc3ebb957cd199d1fc1d1ccccb78",
+  "ownership_verified": false,
+  "producer_process_absent": true,
+  "producer_revision": "5c67b6a3a89529b45badef7014c2ebe5de18347a",
+  "quality_verified": false,
+  "reference_metadata_read": false,
+  "report": {
+    "bytes": 18415,
+    "sha256": "77f7918895edacd1b9f352f25d41f92c02bc094505c15203d910ab7fb742e4b6"
+  },
+  "schema": "world_reward.vcoco_full48_pose_saved_audit.v1",
+  "stage": "complete",
+  "status": "VERIFIED_NATIVE_FAIL",
+  "unit": {
+    "ActiveState": "failed",
+    "ExecMainStatus": "1",
+    "LoadState": "loaded",
+    "MainPID": "0",
+    "Result": "exit-code",
+    "SubState": "failed",
+    "exit_verification": "LIVE_UNIT_METADATA"
+  }
+}

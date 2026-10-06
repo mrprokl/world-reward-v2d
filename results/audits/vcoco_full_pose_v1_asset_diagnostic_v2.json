@@ -1,0 +1,36 @@
+{
+  "Blob_ops": false,
+  "NumPy_imported": false,
+  "RGB_NPZ_decoded": false,
+  "all_eight_current_original_hashes_equal": true,
+  "asset_four_match": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "assets_and_notices_prepost": true,
+  "azure_run_command_exit_status": 0,
+  "current375_old347_source_prepost": true,
+  "eight_leaf_identity_aggregate_sha256": "2c31c67cc4d180c85a0a528cb22de19f48cb945857c6ff539408a79c507a8c74",
+  "failed_receipt_preserved": true,
+  "full_leaf_exists": true,
+  "missing_declaration_only": true,
+  "missing_key": "infra/run_keypoint_rgb_dwpose.sh",
+  "missing_leaf_sha256": "9a57a9334de908664dd8e9b385705a71dde4f4770842ba4762da2dcf0a632cff",
+  "model_loaded": false,
+  "numpy_spec_available": false,
+  "observer_script_sha256": "acb484dbf31f080021981f0fc9affb267327b53f8089565085362586cbd82b37",
+  "original_helper_count": 42,
+  "public101_prepost": true,
+  "receipt": {
+    "bytes": 18415,
+    "sha256": "77f7918895edacd1b9f352f25d41f92c02bc094505c15203d910ab7fb742e4b6"
+  },
+  "revision": "5c67b6a3a89529b45badef7014c2ebe5de18347a",
+  "schema": "world_reward.vcoco_full_pose_asset_diagnostic.v2",
+  "seconds": 1.925962,
+  "source_identity_aggregate_sha256": "c4978843da866bd0fbcc991375b7eae605d9415853c083046e4c6254d29cb1e1",
+  "stage": "complete",
+  "status": "PASS_DIAGNOSTIC"
+}

@@ -22,7 +22,7 @@ import vcoco_public_pose_core as core
 
 ROOT=rt.ROOT
 ENTRY='run_vcoco_full_pose_run'
-OUTPUT=ROOT/'results/vcoco-full-person-pose-v1'
+OUTPUT=ROOT/'results/vcoco-full-person-pose-v2'
 DEST=Path('/srv/world-reward-data/vcoco_full_public_replica_v1')
 IMAGE='sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7'
 SCHEMA='world_reward.vcoco_full_person_pose.v1'
@@ -57,7 +57,8 @@ def host_modules():
 
 def helpers():
     transfer,original,_=host_modules()
-    return tuple(dict.fromkeys((*NATIVE_FILES,'infra/run_vcoco_full_pose_run.sh','infra/sealed_callback_publication.py',*transfer.HELPERS,*original.HELPERS)))
+    import dwpose_metadata_context as metadata
+    return tuple(dict.fromkeys((*NATIVE_FILES,'infra/run_vcoco_full_pose_run.sh','infra/sealed_callback_publication.py',*metadata.HELPERS,*transfer.HELPERS,*original.HELPERS)))
 
 
 def state(path):return public._state(path)
@@ -82,14 +83,12 @@ def asset_context(code):
     binding=rt.source(ROOT,old,POSE_REVISION,original.ENTRY,original.HELPERS)
     rt.require(binding['closure_sha256']==POSE_CLOSURE and binding['entries']==352
         and (old.parent/'source-sha256').read_bytes()==(POSE_XZ+'\n').encode()
-        and all(rt.identity(code/n,2<<20,empty=True)==binding['helpers'][n]for n in
+        and all(rt.identity(code/n,2<<20,empty=True)==rt.identity(old/n,2<<20,empty=True)for n in
             ('infra/vcoco_person_pose_observations.py','infra/dwpose_smoke.py','infra/run_dwpose_smoke.sh','infra/dwpose_acquire.py','infra/dwpose_wheel_audit.py',
              'infra/keypoint_rgb_dwpose.py','infra/run_keypoint_rgb_dwpose.sh','src/world_reward/person_pose_observations.py')),
         'Original qualified DWPose helper/source differs')
-    import dwpose_smoke as smoke
-    import keypoint_rgb_dwpose as capability
-    rt.require(Path(smoke.__file__).resolve()==code/'infra/dwpose_smoke.py'
-        and Path(capability.__file__).resolve()==code/'infra/keypoint_rgb_dwpose.py','Original host qualification origins required')
+    import dwpose_metadata_context as metadata
+    smoke,capability=metadata.metadata_delegate(code)
     smoke.source_identity();capability.validate_smoke(ROOT)
     models=original.assets();names=('dw-ll_ucoco_384.onnx','source/onnxpose.py',
         'wheels/onnxruntime-1.30.0-cp311-cp311-manylinux_2_28_x86_64.whl','wheels/flatbuffers-25.12.19-py2.py3-none-any.whl')
