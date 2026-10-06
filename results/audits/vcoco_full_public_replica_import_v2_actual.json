@@ -1,0 +1,81 @@
+{
+  "Blob_operations_performed": false,
+  "DELETE_basis": "saved_producer_success_declaration_no_observer_Blob_request",
+  "NPZ_numeric_arrays_independently_decoded": false,
+  "RGB_NPZ_decoded": false,
+  "adoption": false,
+  "all98_installed_bytes_and_three_receipts_prepost_verified": true,
+  "all_leaves_mode": "0400",
+  "archive": {
+    "bytes": 62228480,
+    "sha256": "92d5107d143dafeaa7e55ae7cb67100e8ba6482b935aa5b60d1f70145ef6e432"
+  },
+  "archive_SHA_basis": "saved_importer_full_byte_hash_and_USTAR_verification_declaration",
+  "archive_body_independently_redecoded": false,
+  "archive_removed": true,
+  "audit_elapsed_seconds": 1.315082,
+  "azure_run_command_exit_status": 0,
+  "blob_cleanup_verified": true,
+  "blob_etag": "\"0x8DF2352C9D4EFD2\"",
+  "current_source": {
+    "closure_sha256": "222099dd40d5115f0c1b865333e42e7ed891771d96b7cfbae3edad91be01dbe2",
+    "entries": 350,
+    "files": 345,
+    "source_XZ_sha256": "f8243103df8d834fd90e8ab9582cdbdc78e28c022328d300e12401b0ea14cd48"
+  },
+  "current_source_prepost_verified": true,
+  "delete_attempts": 1,
+  "elapsed_seconds": 2.8559170800144784,
+  "export_receipt": {
+    "bytes": 8489,
+    "sha256": "8247e76345d88c50b3099392fb92d2fa7de104b06246d7f5d3fa4a7ed9a8a92c"
+  },
+  "installed_public_files": 98,
+  "manifest": {
+    "bytes": 12573,
+    "sha256": "2ef141f4763d6bb44c4450c2a7ef2cea96fd707278c00cf12fc85f13a18eadb1"
+  },
+  "metadata_only_native_arrays_verified": true,
+  "models_loaded": false,
+  "native_array_metadata_rows": 816,
+  "observer_script_sha256": "f00b7fd657909c2e83215d1093b07f84cce517e0c51e20ab88c9d64f11bb62f4",
+  "outputs_sealed": true,
+  "ownership_verified": false,
+  "person_rows": 331,
+  "phase": "import",
+  "producer_process_absent": true,
+  "producer_revision": "5c67b6a3a89529b45badef7014c2ebe5de18347a",
+  "public_banks": 48,
+  "public_images": 48,
+  "public_manifest": {
+    "bytes": 9754,
+    "sha256": "e98657edc8e081ed5b101edf22cdbb490b77bf36384e8952eff49f82d0c7b93c"
+  },
+  "public_projection": {
+    "bytes": 171990,
+    "sha256": "acac670506b6525f1d0e8a163b6d29de8b07927b8b98d7af92bb2a02043e35d9"
+  },
+  "public_subdirectories_mode": "0500",
+  "quality_verified": false,
+  "reference_metadata_read": false,
+  "replica_directory": "/srv/world-reward-data/vcoco_full_public_replica_v1",
+  "replica_mode": "0700",
+  "report": {
+    "bytes": 8748,
+    "sha256": "6c32778305d227d863d561275de569abeb2e5b90836b5fafca40e21f89890f37"
+  },
+  "saved_native_status": "pass",
+  "schema": "world_reward.vcoco_full_public_replica_import_saved_audit.v1",
+  "sender_runtime_live_verified": false,
+  "single_etag_DELETE_202": true,
+  "source_inputs_rehashed_after": true,
+  "source_on_sender_live_verified": false,
+  "stage": "complete",
+  "stage_archive_absence_verified": true,
+  "status": "PASS",
+  "total_verified_leaves": 101,
+  "unit": {
+    "LoadState": "not-found",
+    "exit_verification": "UNAVAILABLE_COLLECTED"
+  }
+}

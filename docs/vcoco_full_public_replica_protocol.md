@@ -119,3 +119,17 @@ The audit does not independently read the Blob; archive SHA/ETag derive from the
 saved producer's streaming hash and HEAD. Collected unit exit is explicitly
 unavailable, not inferred. Receiver must verify the actual downloaded bytes.
 Import, pose, selection and quality remain pending. V1 FAIL is preserved.
+
+## Actual import v2
+
+VM01 producer `5c67b6a3a89529b45badef7014c2ebe5de18347a` completed import
+PASS in2.8559s. The receiver verified the62,228,480-byte archive's full SHA and
+canonical99-member USTAR before installing all98 leaves. Independent saved
+observer rehashed the98 installed leaves plus3 technical receipts before/after,
+including48 banks/816 array descriptors/331 retained people; no numerical replay.
+Actual import receipt8748B/SHA256
+`6c32778305d227d863d561275de569abeb2e5b90836b5fafca40e21f89890f37`.
+Original exact ETag DELETE202/one attempt derives from sealed producer evidence,
+not an observer Blob request. Archive/stage/producer absence verified; collected
+unit exit unavailable. No media/checkpoints crossed the local connection. Full48
+CPU pose is separately dispatched against this pinned receipt, not yet verified.
