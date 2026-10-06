@@ -57,17 +57,24 @@ def solve_zero_start(evaluate, dimension, limits, *, nonnegative=False, checkpoi
     for every coordinate. All checkpoints/metadata/objective failures close;
     no best iterate, restart, fallback, numerical tolerance or budget is chosen.
     """
-    calls = 0; iterations = None
+    calls = 0; iterations = None; failure = None
     def close(reason):
-        raise SolverClosed(reason, calls, iterations) from None
+        nonlocal failure
+        if failure is None:
+            failure = SolverClosed(reason, calls, iterations)
+        raise failure from None
     if (type(limits) is not SolverLimits or type(dimension) is not int or dimension <= 0
             or type(nonnegative) is not bool or not all(map(callable, (evaluate, checkpoint, minimize)))):
         close('invalid_inputs')
     def check():
+        if failure is not None:
+            raise failure from None
         try:
             checkpoint()
         except Exception:
             close('checkpoint_failed')
+        if failure is not None:
+            raise failure from None
     def parameters(x):
         if (type(x) is not np.ndarray or x.dtype != np.float64 or x.shape != (dimension,)
                 or not np.isfinite(x).all() or (nonnegative and (x < 0).any())):

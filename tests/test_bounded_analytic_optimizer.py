@@ -217,6 +217,76 @@ def test_actual_callback_cap_overrules_minimizer_options_and_never_restarts():
     assert starts == [1] and exc.value.evaluations == LIMITS.max_evaluations
 
 
+@pytest.mark.parametrize('kind,reason', [
+    ('parameters', 'invalid_parameters'), ('objective', 'objective_failed'),
+    ('gradient', 'invalid_objective'), ('mutation', 'parameter_mutation'),
+    ('checkpoint', 'checkpoint_failed'),
+])
+def test_caught_callback_failure_is_latched_not_a_successful_old_point(kind, reason):
+    objective_calls = 0; fail_checkpoint = False; swallowed = []; native_calls = []
+    def evaluate(x):
+        nonlocal objective_calls
+        objective_calls += 1
+        if objective_calls == 2:
+            if kind == 'objective': raise RuntimeError('SECRET_SENTINEL')
+            if kind == 'gradient': return 0., np.ones(1)
+            if kind == 'mutation': x[0] = 44.
+        return quadratic(x)
+    def checkpoint():
+        nonlocal fail_checkpoint
+        if fail_checkpoint:
+            fail_checkpoint = False
+            raise TimeoutError('SECRET_SENTINEL')
+    def native(function, start, **kwargs):
+        nonlocal fail_checkpoint
+        native_calls.append(1); fail_checkpoint = kind == 'checkpoint'
+        try:
+            function(np.zeros(3) if kind == 'parameters' else start)
+        except SolverClosed as exc:
+            swallowed.append(exc.reason)
+        return SimpleNamespace(x=np.array([1., 2.]), success=True, nit=1, status=0)
+    with pytest.raises(SolverClosed, match=reason) as exc:
+        solve(evaluate, checkpoint=checkpoint, minimize=native)
+    assert native_calls == [1] and swallowed == [reason]
+    assert exc.value.reason == reason and 'SECRET' not in str(exc.value)
+    assert objective_calls <= 2  # No final verification or retry after the failure.
+
+
+def test_after_caught_failure_no_later_objective_or_checkpoint_callback_is_run():
+    calls = []; checkpoints = []; failures = []
+    def evaluate(x):
+        calls.append(1); return quadratic(x)
+    def native(function, start, **kwargs):
+        for value in (np.zeros(3), np.array([1., 2.]), start):
+            try:
+                function(value)
+            except SolverClosed as exc:
+                failures.append(exc)
+        return SimpleNamespace(x=np.array([1., 2.]), success=True, nit=1, status=0)
+    with pytest.raises(SolverClosed, match='invalid_parameters') as exc:
+        solve(evaluate, checkpoint=lambda: checkpoints.append(1), minimize=native)
+    assert len(calls) == 1 and len(checkpoints) == 4
+    assert len(failures) == 3 and all(x is exc.value for x in failures)
+    assert exc.value.evaluations == 2
+
+
+def test_caught_evaluation_cap_does_not_resume_callbacks_or_final_verification():
+    calls = []; failures = []; limits = replace(LIMITS, max_evaluations=3)
+    def evaluate(x):
+        calls.append(1); return quadratic(x)
+    def native(function, start, **kwargs):
+        for _ in range(6):
+            try:
+                function(start)
+            except SolverClosed as exc:
+                failures.append(exc)
+        return SimpleNamespace(x=np.array([1., 2.]), success=True, nit=1, status=0)
+    with pytest.raises(SolverClosed, match='evaluation_cap') as exc:
+        solve(evaluate, limits=limits, minimize=native)
+    assert len(calls) == exc.value.evaluations == 3 and len(failures) == 4
+    assert all(x is exc.value for x in failures)
+
+
 @pytest.mark.parametrize('change,reason', [
     ({'success': False}, 'solver_unsuccessful'), ({'nit': 6}, 'iteration_cap'),
     ({'nit': -1}, 'invalid_result'), ({'nit': True}, 'invalid_result'),

@@ -141,6 +141,17 @@ is skipped. CV metadata/loss arrays are sealed, but opaque model artifact
 integrity and source/runtime/reference alignment remain the caller's obligation.
 No SciPy, GPU, references or actual selector were used by these controls.
 
+The composed A/B runner now reuses one preparation per fold across all three
+lambdas, releases it before the next fold, refits A once on all32 and fits only
+alpha for B with final A frozen.52 dedicated/292 combined controls PASS1.25s;
+independent120 solver/runner controls PASS0.94s. One tiny manufactured CPU control
+uses local SciPy1.17.1 and14 real solves, not the Azure SciPy1.16.3 runtime or
+actual FIT data. Context provenance, train-only scales and device byte integrity
+remain caller obligations. Independent review exposed an exception-swallowing
+path: the solver now latches the first failed callback, forbids later callbacks
+or final verification, and the runner preserves safe bounded diagnostics.
+No arithmetic, tolerance, initialization or scientific retry changed.
+
 Operational adequacy proposal: at least six informative images per FIT fold
 with a jointly covered positive and a competing automatic candidate, and at
 least24 FIT images with useful nonconstant relation derivative for B. These are

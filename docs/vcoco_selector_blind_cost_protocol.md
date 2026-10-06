@@ -119,6 +119,11 @@ published; provisional container ExitCode0 and systemd ExecMainStatus0 are not
 verdicts. The original job is untouched; no label read or scientific retry.
 The independent post-terminal numerical/cost verdict is still required.
 
+Third saved observer remains RUNNING with the same PID580045 and03:54:39UTC
+start, RSS1764832KiB/current1568894976 bytes; cgroup peak unchanged6315323392.
+No report is sealed, no native phase decoded, no references or replay. These
+three bounded observations establish liveness only, not a numerical verdict.
+
 Prospective efficiency boundary: the current PairCache normal constructor
 independently recomputes caller-supplied template/factors, while its factory
 first computes both. A wrapper alone cannot remove that duplicate work without
@@ -127,3 +132,12 @@ constructor refactor, if needed, must derive all canonical fields once from
 genuine source bank/scales and independently qualify complete equivalence and
 forgery/mutation rejection in a distinct source/runtime namespace. Historical
 producer bytes and the active profile remain unchanged.
+
+Prospective FIT integration also must not repack/reconstruct each of500
+callbacks. Five sequential contexts can reuse genuine CPU packed distributions
+across lambdas and evaluations, but the existing device factory sorts six
+inverse-CSR layouts on every upload. A targeted separation of source-derived
+immutable upload preparation from device copying could reuse those layouts
+without changing the scorer. It needs fresh full equivalence/runtime and
+whole-context memory qualification; no packed disk loader or forged-table
+shortcut exists. This is a source finding, not a measured timing improvement.
