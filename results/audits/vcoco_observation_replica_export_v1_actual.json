@@ -1,0 +1,21 @@
+{
+  "GPU_used": false,
+  "adoption": false,
+  "cli_exit": 0,
+  "error_family": "azure_run_command_stdout_tail_truncation",
+  "independent_audit_complete": false,
+  "media_transferred_or_decoded": false,
+  "models_executed": false,
+  "notes": [
+    "ONEsaved-onlyRunCommandterminal. EncodedJSONcontrol exceeded Azure stdouttail limit; prefix lost. No additionalRunCommand or replay."
+  ],
+  "original_artifacts_modified": false,
+  "original_receipt_status": "UNCONFIRMED_FROM_TRUNCATED_CONTROL",
+  "producer_revision": "7c11662f98cf6f3db28909dce147473f1ab3bd0c",
+  "quality_verified": false,
+  "remote_request_terminal": true,
+  "schema": "world_reward.vcoco_observation_replica_export_saved_audit.v1",
+  "stage": "transport_decode",
+  "status": "inconclusive",
+  "vm02_released": true
+}
