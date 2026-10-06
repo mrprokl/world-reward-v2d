@@ -83,3 +83,11 @@ unchanged installer's parent-directory prerequisite. No mkdir, rename, Blob GET,
 model or replay took place. A narrowly qualified private-parent bootstrap and a
 fresh revision of the unchanged importer may repair this general infrastructure
 condition; scientific inputs and all37 archive members must remain identical.
+
+The separately authorized unchanged-import revision39774007d9125caf955cba49bf93702dc323777b
+also returns sealed technical FAIL0.963365s (`other` error category). The saved
+5781-byte report/SHA19441e4e… and both prior receipts remain unchanged.
+Independent source/receipt preservation audit confirms323-file/328-entry
+current Git closure, old FAIL and bootstrap pins, no archive/staging/driver.
+It does not certify replica installation or qualify DWPose. A separate bounded
+saved-only diagnostic, not an automatic import replay, must locate the cause.

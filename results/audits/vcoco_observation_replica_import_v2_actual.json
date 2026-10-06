@@ -1,0 +1,33 @@
+{
+  "archive_stage_and_exact_driver_absent": true,
+  "azure_cli_exit": 0,
+  "elapsed_seconds": 0.9633648640010506,
+  "error_type": "other",
+  "native_status": "fail",
+  "no_RGB_NPZ_decode_Blob_model_GPU": true,
+  "observer_only": true,
+  "observer_seconds": 0.4591634970274754,
+  "observer_source_sha256": "f44ad5421b3e792471844ad88b7d8dd26c86c8fc233f9ee937d5d85fcfe3226d",
+  "old_FAIL3_and_bootstrap_pins_prepost": true,
+  "original_bank_source_on_receiver_live_verified": false,
+  "ownership_verified": false,
+  "producer_revision": "39774007d9125caf955cba49bf93702dc323777b",
+  "quality_verified": false,
+  "receipt_identity": {
+    "bytes": 5781,
+    "sha256": "19441e4e8569ae766ece49547fb6137a691fe51e6265e6427de44a9d0de3f7a0"
+  },
+  "schema": "world_reward.vcoco_observation_replica_saved_audit.v2",
+  "source_Git_modes_markers_prepost": true,
+  "source_XZ_sha256": "040a11d39ecb3de5f30f16dce7a5df6fc829dbf8f862f19be5094eb762eefc56",
+  "source_closure_sha256": "30076cc99801e1ef70feac7a7104b9e8ae4960c7a5c11d76e484f2c98ab9fa08",
+  "source_entries": 328,
+  "source_files": 323,
+  "status": "native_fail",
+  "unit": {
+    "active": "failed",
+    "exit": "UNAVAILABLE_COLLECTED",
+    "load": "bad-setting"
+  },
+  "vm01_released": true
+}
