@@ -1,0 +1,54 @@
+{
+  "GPU_used": false,
+  "adoption": false,
+  "archive_identity": {
+    "bytes": 20756480,
+    "sha256": "52fec428ad132b85454e5e47a190db700d72fcc4cdad915805af37ee300207ab"
+  },
+  "archive_sha_scope": "source_bound_stream_writer_declaration_no_blob_GET_or_rebuild",
+  "archive_validation_scope": "source-bound sealed stream-writer declaration; no Blob GET or TAR rebuild",
+  "audit_phase": "final_source_payload_posthash",
+  "blob_etag": "\"0x8DF233F0215D067\"",
+  "current_source_entries": 327,
+  "current_source_files": 322,
+  "driver_absent": true,
+  "elapsed_seconds": 1.7058942639851011,
+  "final_initial_control_bytes": 4608,
+  "full_git_sources_verified_before_after": true,
+  "independent_archive_bytes_verified": false,
+  "manifest_identity": {
+    "bytes": 5166,
+    "sha256": "7c0786e64de612080c01cf4699a63fafaf3b70f9ac6a9b70fc77e4d8d9b40174"
+  },
+  "media_transferred_or_decoded": false,
+  "models_executed": false,
+  "observer_seconds": 0.9157039260026067,
+  "original_error_type": null,
+  "original_failure_or_audit_changed": false,
+  "original_post_error_type": null,
+  "original_publication_failed": false,
+  "original_source_entries": 321,
+  "original_source_files": 316,
+  "original_status": "pass",
+  "ownership_verified": false,
+  "payload_files": 36,
+  "producer_revision": "7c11662f98cf6f3db28909dce147473f1ab3bd0c",
+  "public_slots": 16,
+  "quality_verified": false,
+  "receipt_identity": {
+    "bytes": 5638,
+    "sha256": "cc7874d9c9fd21a6137f48066d7edfe8290af962eed5f8db4e9faff6a35591e3"
+  },
+  "receipt_lzma_bytes": 2508,
+  "receipt_transport": "TOO_LARGE_NOT_RETURNED",
+  "schema": "world_reward.vcoco_observation_replica_export_saved_audit.v2",
+  "source_inputs_receipts_rehashed_before_after": true,
+  "status": "pass",
+  "technical_export_integrity_verified": true,
+  "unit": {
+    "active": "inactive",
+    "collected": true,
+    "exit_status": "UNAVAILABLE_COLLECTED"
+  },
+  "vm02_released": true
+}

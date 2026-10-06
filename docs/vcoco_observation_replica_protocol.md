@@ -56,3 +56,16 @@ may expire in Azure; no original or foreign blob is deleted.
 
 Replica integrity is not DWPose qualification, anatomical ownership, prediction
 quality, legal clearance, pretraining independence, selector/FIT or submission.
+
+## Actual export and saved-only verification
+
+Producer7c11662f98cf6f3db28909dce147473f1ab3bd0c exports once on VM02 in
+1.705894s, technical PASS. All36 original payloads stay Azure; archive20756480B,
+manifest5166B, final receipt5638B. The independent first observer's control
+message exceeded Azure's4KiB stdout tail and is preserved INCONCLUSIVE.
+One explicitly authorized metadata-only observer repair verifies both complete
+Git sources (322/327 and316/321), payload hashes, original slots, receipt/seal
+and before/after identities. Saved audit v2 is PASS; archive SHA is explicitly
+the sealed source-bound stream-writer declaration, not a Blob GET/rebuild.
+The final receipt-only retrieval is separate bounded metadata, not a repeated
+export. Import and anatomical observations remain unexecuted at this decision.
