@@ -156,6 +156,41 @@ once after artifact/config freeze, not for tuning, adoption or a final held-out
 victory claim. A new independent temporal/ownership/full-T3D validation remains
 necessary before using the selector to seed reconstruction.
 
+### Pre-label decision clarification, October6
+
+Freeze the advancement safeguard as **macro pairRecall@1**, using the same16
+fixed denominators and tie-neutral one-to-one evaluator as the primary macro
+pairRecall@3. `any_positive_at1` remains a separate diagnostic; they differ for
+multi-positive images. Nonnegative observed mean R@1 difference is not a
+statistical non-inferiority claim. Unlocalizable/invalid reference scope closes
+INCONCLUSIVE; detector misses and unsupported predictions count as failures,
+never exclusions or conditional-only success.
+
+The development advancement gate is strict positive B−A macro R@3 and no
+negative macro R@1 difference, after all frozen qualification, coverage and
+solver gates pass. ADVANCE permits only a separate independent validation;
+it does not establish robust ownership or a leaderboard victory. On a valid,
+informative fixed cohort, nonpositive primary gain or R@1 regression REJECTS
+this incremental-B benefit. An alpha0 solution degenerates to A, not a rescued
+relation gain. Failed qualification/optimization or inadequate references/
+informativeness are INCONCLUSIVE, with the same images retained.
+
+Report all16 paired differences, gains/losses/ties and informative count, final
+alpha, number of rankings changed, FIT relation-derivative variation and common
+coverage ceilings. The exact direction-only sign summary, if reported, is
+descriptive with explicit sampling assumptions, not an alternative adoption
+gate. CAL16 is not powered by the operational six/fold or24-FIT proposals.
+Predeclared diagnostics: all-image pairR@5, any-positive@1, multi-positive images
+and images with at least two automatic people. Unlisted alternatives remain
+UNKNOWN, not certified bystanders. Do not promote a diagnostic subset to a
+replacement primary metric after an unfavorable result.
+
+Actor/object-conditioned diagnostics would require another independently
+qualified evaluator; they are not silently implemented by this pair evaluator.
+The narrow admissible pilot claim concerns retrieval of published V-COCO role
+pairs. Contact, anatomical side, unique task actor, crossings/occlusions and
+shared-frame full-T3D reconstruction remain separate unverified objectives.
+
 Related primary insights already audited: [Ilse2018 MIL](https://proceedings.mlr.press/v80/ilse18a.html),
 [SingleQuery-BHOI September2026](https://arxiv.org/html/2609.12155v1)
 (structured anatomy, published code unavailable), and
