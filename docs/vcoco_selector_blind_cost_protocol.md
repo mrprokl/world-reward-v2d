@@ -111,3 +111,10 @@ These are source counts, not observed timings or proof of a bottleneck. The30s
 post reserve is not guaranteed sufficient for repeated full authentication,
 hashing, cleanup and publication; the inclusive cap still closes on overrun.
 No active-run limit, candidate population or computation is changed.
+
+Second bounded saved observer remains RUNNING after another320s wait. Read-only
+container metadata records RSS3620316KiB, cgroupcurrent3472424960 bytes and
+peak6315323392 bytes versus68719476736-byte cap. No native phase/report was
+published; provisional container ExitCode0 and systemd ExecMainStatus0 are not
+verdicts. The original job is untouched; no label read or scientific retry.
+The independent post-terminal numerical/cost verdict is still required.

@@ -1,0 +1,33 @@
+{
+  "CLI_returncode": 0,
+  "FIT_performed": false,
+  "NumPy_imported": false,
+  "arrays_decoded": false,
+  "original_driver_absent": false,
+  "producer_replayed": false,
+  "producer_revision": "fcb091478e13bdfe8b55654f49bf936aae2dd126",
+  "quality_verified": false,
+  "report_sealed": false,
+  "running_metadata": {
+    "ExitCode": 0,
+    "FinishedAt": "0001-01-01T00:00:00Z",
+    "Pid": 580045,
+    "Running": true,
+    "StartedAt": "2026-10-06T03:54:39.231900529Z",
+    "Status": "running",
+    "memory.current": 3472424960,
+    "memory.max": 68719476736,
+    "memory.peak": 6315323392,
+    "rss_kib": 3620316
+  },
+  "scope": "saved_metadata_hash_provenance_only",
+  "status": "RUNNING",
+  "unit": {
+    "ActiveState": "active",
+    "ExecMainStatus": "0",
+    "LoadState": "loaded",
+    "MainPID": "579631",
+    "Result": "success",
+    "SubState": "running"
+  }
+}
