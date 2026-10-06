@@ -24,8 +24,10 @@ missing relation evidence, not OFF/no-contact or a deleted object bank.
 - A learns17 geometric/availability coefficients without relation logits. B
   freezes A's geometry, scales, support and prior and learns only alpha>=0 on
   native relation margins. Alpha0 must remain the identical A path.
-- FIT-only scale division without centering; constant/all-missing features are
-  inactive. Fix dimensionless tau1 after that scaling, rather than searching a
+- FIT-only scale division without centering; constant/all-missing **12 value
+  dimensions** are inactive. The five explicit availability indicators remain
+  present; they are not disabled by `PairScale.variable`. Fix dimensionless tau1
+  after that scaling, rather than searching a
   temperature on CAL or adopting the manufactured cost-control temperature.
 - Proposed bounded FIT-only four-fold photo-hash CV for lambdaA in{.25,1,4}
   (coefficient prior std2,1,.5). Recompute scales on each24-image training fold.
@@ -43,6 +45,34 @@ Measure the complete **blind real32-image** objective cost/memory first. The
 qualified1,843,200-route one-fixture probe cannot certify real32/P/K costs. Stage
 image-wise/blockwise without pruning and freeze a realistic inclusive runtime,
 allocator and evaluation cap before references. No silent OOM subset or restart.
+
+The next blind cost profile is distinct from the manufactured control: fixed
+FIT32 order and all P/2/O3600/K, CPU64GiB, GPU64GiB (also bounded by the actual
+device capacity),3600s inclusive. Choose **image-streamed GPU** before timing:
+prepare full CPU packed distributions imagewise and upload exactly one complete
+image at a time, including inverse-CSR construction and transfer in the measured
+cost. No resident/streamed switch after an OOM. The packed constructor currently
+materializes and sorts all supported route incidences within an image; it is
+not internally paged. Exceeding the memory/cost envelope closes that profile,
+not permission to prune people, objects, pairs or replace photos.
+
+Without role values, measure the complete supported-group log-partition and
+analytic VJP for A and B, not a fictitious FIT positive-set loss. No manufactured
+positive mask is applied to actual photos. Reconstruct from the original47
+arrays and compare to the saved join fingerprint: the46 saved evidence arrays
+do not yet have an independently validated observation-object loader. The same
+VM02 image7eb is the amd64 config of B47's sealed OCI export, not a rebuilt
+child; authenticate historical graph binding and current ordered44 layers, then
+current Torch/NumPy/SciPy identities and FP64/determinism within this separate
+job. Historical VM01 GPU qualification is not automatically inherited.
+
+After blind timing, freeze the actual FIT execution budget before labels. Five
+scale/preparation contexts are required: four FIT24 folds and final FIT32,
+reusing each fold's preparation across its three lambdas. Held-fold loss uses
+regularization0 and its fixed eight-image denominator. Full-batch image streaming
+uses the unchanged singleton marginal objective with regularization0, ordered
+loss/VJP sum divided by fixed N, then ridge **once**. All missing/no-positive/
+no-alternative statuses remain; no renormalization over informative images.
 
 Proposed deterministic analytic-GPU L-BFGS-B: one zero initialization, A
 unbounded/B[0,infinity), maxiter200/maxfun500/maxls20/maxcor10,
