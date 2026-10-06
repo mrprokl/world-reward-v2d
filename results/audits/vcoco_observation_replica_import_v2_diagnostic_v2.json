@@ -1,0 +1,138 @@
+{
+  "archive_absent": true,
+  "azure_cli_exit": 0,
+  "destination": {
+    "children": [
+      "banks",
+      "inputs"
+    ],
+    "exists": true,
+    "gid": 0,
+    "inode": [
+      2065,
+      265424
+    ],
+    "mode": "0o700",
+    "uid": 0
+  },
+  "elapsed_seconds": 0.9633648640010506,
+  "error_fields": {
+    "cleanup_error_type": "absent",
+    "error_type": "absent",
+    "post_error_type": "absent"
+  },
+  "exact_exception_or_HTTP_cause_unavailable": true,
+  "export_receipt_identity": {
+    "bytes": 5638,
+    "sha256": "cc7874d9c9fd21a6137f48066d7edfe8290af962eed5f8db4e9faff6a35591e3"
+  },
+  "log": {
+    "error_classes": [],
+    "identity": {
+      "bytes": 75,
+      "sha256": "10849e680ee3011621fefa80c25fe4facdab8280fd319e0f41e9ae9781515c8b"
+    },
+    "raw_text_serialized": false,
+    "source_lines": [],
+    "status_rows": [
+      {
+        "files": 36,
+        "outputs_sealed": true,
+        "phase": "import",
+        "status": "fail"
+      }
+    ]
+  },
+  "manifest_identity": {
+    "bytes": 5166,
+    "sha256": "7c0786e64de612080c01cf4699a63fafaf3b70f9ac6a9b70fc77e4d8d9b40174"
+  },
+  "native_failure_preserved": true,
+  "no_Blob_RGB_NPZ_model_GPU_rename": true,
+  "observer_seconds": 0.5295802319888026,
+  "observer_source_sha256": "a3b404d0ffe69b13164eae59ec58adc70e12bbd70263d4b5a17dbf49a3b408ee",
+  "ownership_verified": false,
+  "parent": {
+    "children": [
+      "vcoco_observation_replica_v1"
+    ],
+    "exists": true,
+    "gid": 0,
+    "inode": [
+      2065,
+      265398
+    ],
+    "mode": "0o700",
+    "uid": 0
+  },
+  "producer_revision": "39774007d9125caf955cba49bf93702dc323777b",
+  "quality_verified": false,
+  "receipt_identity": {
+    "bytes": 5781,
+    "sha256": "19441e4e8569ae766ece49547fb6137a691fe51e6265e6427de44a9d0de3f7a0"
+  },
+  "receipt_keys": [
+    "GPU_used",
+    "adoption",
+    "archive_identity",
+    "archive_removed",
+    "blob_cleanup_verified",
+    "blob_etag",
+    "budget_seconds",
+    "elapsed_seconds",
+    "export_receipt_identity",
+    "files",
+    "manifest_identity",
+    "models_loaded",
+    "original_audit_declaration",
+    "original_producer_revision",
+    "original_source_on_receiver_live_verified",
+    "outputs_sealed",
+    "ownership_verified",
+    "phase",
+    "producer_revision",
+    "publication_failed",
+    "quality_verified",
+    "reference_metadata_read",
+    "replica_directory",
+    "schema",
+    "source_binding",
+    "source_inputs_rehashed_after",
+    "source_stat_identity",
+    "status"
+  ],
+  "replica_complete_original_hash_modes": true,
+  "replica_files": 36,
+  "replica_original_bytes": 20712157,
+  "replica_prepost_verified": true,
+  "saved_flags": {
+    "GPU_used": false,
+    "adoption": false,
+    "archive_removed": true,
+    "blob_cleanup_verified": false,
+    "models_loaded": false,
+    "original_source_on_receiver_live_verified": false,
+    "outputs_sealed": true,
+    "ownership_verified": false,
+    "publication_failed": true,
+    "quality_verified": false,
+    "reference_metadata_read": false,
+    "source_inputs_rehashed_after": true
+  },
+  "saved_phase": "import",
+  "saved_status": "fail",
+  "schema": "world_reward.vcoco_observation_replica_failure_diagnostic.v2.2",
+  "source_and_receipts_prepost": true,
+  "stage": "complete",
+  "stages": {
+    "fresh": {
+      "exists": false
+    },
+    "old": {
+      "exists": false
+    }
+  },
+  "status": "pass",
+  "stop_boundary": "FULL36_COMMITTED_THEN_PUBLISH_OR_AFTER_SEAL_BLOB_CLEANUP_FAILED",
+  "vm01_released": true
+}

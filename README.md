@@ -46,7 +46,8 @@ CARI4D/leaderboard gain. Next: separately frozen person-attached pose and
 relational observations, then legal fresh FIT/calibration and held-out quality.
 The new count-only TRAIN/VAL census is independently sealed PASS:195/191 fresh
 eligible photos after448 exclusions,831.47s, no RGB or selector FIT. A separate
-deterministic32-FIT/16-CAL identity freeze is source-qualified, not yet executed.
+deterministic32-FIT/16-CAL identity freeze now passes an independent saved-only
+audit:48 unique original identities,2.30s, no acquisition or FIT.
 All48 originals are required; no availability-selected replacement subset.
 The all16-image native HOI observation run now passes its independent saved-only
 audit: one model,16 forwards, full1500 queries and165 raw H→O pairs,56.82s host.
@@ -54,8 +55,13 @@ This is observation execution, not165 correct interactions or a selector.
 VM01's original public-bank import failed before installation
 because the private data parent was absent. A minimal parent-only bootstrap now
 passes independent saved verification; the original FAIL and exact exported
-bytes are preserved. One fresh unchanged-import revision is authorized before
-the independently source-qualified all-person DWPose observations can run.
+bytes are preserved. The fresh unchanged import installed all36 exact files,
+but remains FAIL after sealing/publication or Blob cleanup. A saved-only audit
+verifies the full installed20.7MB and unchanged modes; the exact exception is
+unavailable. Do not reimport into the occupied namespace or claim cleanup PASS.
+A separate bounded technical completion is being source-qualified. The blind
+endpoint/pose/HOI join passes263 tiny controls without choosing, fusing or
+dropping candidates; actual all-person DWPose and learned selection remain pending.
 The first strict VG/COCO-linked reference census
 completes but yields0 eligible photos: this path is closed without RGB, relaxed
 joins or retries. Fresh external validation remains necessary.

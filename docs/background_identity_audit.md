@@ -536,8 +536,16 @@ with the same exported37-member archive, not another export or chosen images.
 The all-person DWPose caller remains conditional on successful verified import.
 
 The separately executed metadata-only census passes195 TRAIN/191 VAL photos
-after448 historical/pilot exclusions. Source-qualified deterministic32 FIT/16
-CAL selection is a **private identity projection**, not an acquired/trained
-corpus. All48 originals remain required. FIT-only learning, frozen parameters,
+after448 historical/pilot exclusions. Deterministic32 FIT/16 CAL selection now
+passes independent saved verification in2.30s: a **private identity projection**,
+not an acquired/trained corpus. All48 originals remain required. FIT-only learning, frozen parameters,
 single CAL evaluation and a distinct final validation are still necessary;
 positive V-COCO roles alone cannot qualify hand ownership or manipulation.
+
+The fresh VM01 import installed all36 original public-bank files but remains
+native FAIL at publication/after-seal cleanup. Independent diagnosticV2 verifies
+all36 SHA/modes/inodes; absent exception fields prevent a precise cause claim.
+No new import is needed or permitted into the occupied namespace. A separate
+technical completion must preserve that failure and qualify exact-ETag cleanup.
+The source-only blind17/11/19-array join now preserves every person/side/object
+route and all raw banks; actual DWPose remains pending, never fabricated.

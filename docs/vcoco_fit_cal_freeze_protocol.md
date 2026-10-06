@@ -70,3 +70,15 @@ Both reviews accepted unchanged original helpers, source-bound live proof,
 hash-only references and deterministic48 identity publication. This freeze
 authorizes one metadata-only execution on VM02; it does not authorize HTTP,
 model inference, references, fitting or claim that48 images are available.
+
+## Actual saved-only verification
+
+Producer `8cf55c23755975325fe00efb8fa3229392b38475` published the fixed48 identities
+in2.297854s. Report63579/`22b2830a1973fe61a1c2ad626cb077fd58f6def5cd89557f027db59e10026ebc`;
+cohort10151/`5af18ab329bd6dfc113013787c340ff6aeb6f161e7e4b8d7b1d777061fc83f51`.
+Independent saved-only audit2834/`54b04e0dba4ade49b50d392e81d117c2c420eba722f74c5e34250f651f1360df`
+verifies all seven complete source closures,41 original inputs/assets, pilot
+reference hashes/JPEG bytes, exact modes and source/output states before/after.
+No rank-selection replay, role values, RGB decode, HTTP, model or FIT. Collected
+systemd exit is unavailable, not inferred from its default0. Acquisition must
+still authenticate and retrieve all48 originals in a separate frozen phase.

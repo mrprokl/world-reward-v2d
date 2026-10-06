@@ -48,6 +48,41 @@ test; parallelize independent hypotheses only after shared contracts are sound.
 
 ## Results
 
+### October6 — background identity: complete observations before selection
+
+Fresh identity freeze8cf55c2 is independently verified nativePASS2.297854s:
+32FIT/16CAL,48 unique photos, fixed namespace/order and all48 acquisition required.
+Report63579/22b2830a1973fe61a1c2ad626cb077fd58f6def5cd89557f027db59e10026ebc;
+cohort10151/5af18ab329bd6dfc113013787c340ff6aeb6f161e7e4b8d7b1d777061fc83f51.
+Saved-only audit2834/54b04e0dba4ade49b50d392e81d117c2c420eba722f74c5e34250f651f1360df
+checks seven whole source closures,41 inputs/assets, pilot16 reference hashes
+and JPEG SHA/MD5, original states/modes before/after. No rank replay, annotation
+values, HTTP, RGB decode, model or FIT. Collected unit exit unavailable.
+
+Fresh unchanged397 import remains FAIL0.963365s, not reversed. DiagnosticV2
+3473/3110dc383ea38bfdf7d141cd5e69374fb4d9fb7052bf4eeac8b311f3f17b5358
+proves all36 original files20,712,157B installed correctly, private700 root,
+500 directories/400 leaves, full SHA/state before/after. Staging/archive absent.
+Native report5781/19441e4e8569ae766ece49547fb6137a691fe51e6265e6427de44a9d0de3f7a0
+declares publication_failedTrue/blob_cleanupFalse; all three exception fields
+are absent. Tiny independent stubs reproduce identical flags both before any
+callback and inside the callback: no DELETE/HTTP cause inferred. Preserve
+original536-byte partial observer and1240-byte failed-import audit; no reimport.
+New source-only sealed callback publisher records fixed failure stage/safe class
+without raw exception or credentials; old publisher remains byte-identical.
+Author58 tests PASS0.26s, root58 PASS0.27s, fixtures cleaned. Any technical
+completion is separate, bounded and must qualify cleanup, not relabel nativeFAIL.
+
+Blind saved interaction join3 is source-qualified:167LOC/10476B,
+e8333e3180fe009f08bb14201b20919a6bec823164d19c7f21d2124eae56a2a1.
+Real endpoint17/pose11/HOI19 ABI/metadata match; original IDs, grid, indices,
+900GDI/1500HOI/3600OWL values and allP×2×O/P×2×K/K×O routes retained, including
+aliases/empty banks/masked-inf/unsupported anatomy. No scorer/GT/I/O, missing
+pose substitution or ownership claim. Author209 related PASS0.54s, independent
+40 dedicated PASS0.26s, root263 related PASS0.68s; owned fixtures cleaned.
+Actual DWPose, fresh acquisition, FIT and once-only CAL remain separate. No
+background rejection accuracy, final Parquet/submission or CARI4D win established.
+
 - 2026-10-02 R01 (synthetic only): multi-hypothesis SO(3)/translation Viterbi with
   image confidence and explicit true mesh symmetries implemented. Generated
   occlusion scene: greedy mean translation error 0.342857 m, selected path 0 m.

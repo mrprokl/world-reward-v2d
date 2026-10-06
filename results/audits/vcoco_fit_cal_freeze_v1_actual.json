@@ -1,0 +1,82 @@
+{
+  "Azure_RC_calls": 1,
+  "CAL_evaluated": false,
+  "CAL_slots": 16,
+  "FIT_performed": false,
+  "FIT_slots": 32,
+  "GPU_used": false,
+  "HTTP_used": false,
+  "JPEG_bytes_hashed": true,
+  "RGB_decoded": false,
+  "actual_state": "SEALED48_IDENTITY_FREEZE_PASS",
+  "adopted": false,
+  "all48_acquired_required": true,
+  "all_input_and_asset_bytes_modes_before_after": true,
+  "all_output_bytes_modes_before_after": true,
+  "audit_elapsed_seconds": 3.049624537990894,
+  "audit_status": "pass",
+  "azure_cli_exit": 0,
+  "azure_runcommand_terminal": true,
+  "census_rerun": false,
+  "cohort_identity": {
+    "bytes": 10151,
+    "sha256": "5af18ab329bd6dfc113013787c340ff6aeb6f161e7e4b8d7b1d777061fc83f51"
+  },
+  "current_archive_xz": {
+    "bytes": 244436,
+    "sha256": "022bfbb9885e36b68ef8de46ff1b5fdf5a46dabce4f73b6dc6363e248329b593"
+  },
+  "current_source_closure_sha256": "a21b375f4c83e1fe9c49358d09804af8c963f767e409774623e0f3661dd28a3c",
+  "decision": "FROZEN48_IDENTITIES_PENDING_SEPARATE_ACQUISITION",
+  "fixed_slots": 48,
+  "full_original_Git_before": true,
+  "full_source_and_markers_before_after": true,
+  "geometry_references_decoded": false,
+  "host_elapsed_seconds": 2.2978538329480216,
+  "identity_cohort_schema_verified": true,
+  "models_loaded": false,
+  "native_status": "pass",
+  "observed_unit_exit": null,
+  "observer_command_identity": {
+    "bytes": 28457,
+    "sha256": "edafe70f1f813f0fca615a70183337ad38ffbfd49b1dd91d56322ec9fc06eb8a"
+  },
+  "observer_mechanical_repairs": 0,
+  "observer_source_identity": {
+    "bytes": 33935,
+    "sha256": "b572f28580cbd2f36fbc68f6ae30a04d5cf8e02495ce0de5ecf53c83a8ab6913"
+  },
+  "original_Git_files": {
+    "census": 300,
+    "coco": 268,
+    "current": 312,
+    "metadata": 292,
+    "ownership": 296,
+    "population": 308,
+    "prepare": 303
+  },
+  "original_asset_input_entries": 41,
+  "peak_rss_bytes": 39514112,
+  "pilot_reference_values_hash_only": true,
+  "producer_driver_absent": true,
+  "producer_revision": "8cf55c23755975325fe00efb8fa3229392b38475",
+  "report_identity": {
+    "bytes": 63579,
+    "sha256": "22b2830a1973fe61a1c2ad626cb077fd58f6def5cd89557f027db59e10026ebc"
+  },
+  "role_values_decoded": false,
+  "saved_only": true,
+  "schema": "world_reward.vcoco_fit_cal_freeze_saved_audit.v1",
+  "scope_limitation": "Saved identity freeze/source integrity only; no rank-selection replay, reference/role geometry, acquisition, predictor or FIT. Collected systemd exit unavailable, not inferred. Photo independence does not certify author, training, ownership or quality.",
+  "selection_rerun": false,
+  "unique_selected_photos": 48,
+  "unit_exit_independently_available": false,
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  }
+}
