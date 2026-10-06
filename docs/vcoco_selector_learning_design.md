@@ -74,6 +74,21 @@ child; authenticate historical graph binding and current ordered44 layers, then
 current Torch/NumPy/SciPy identities and FP64/determinism within this separate
 job. Historical VM01 GPU qualification is not automatically inherited.
 
+The read-only saved-join input seam is source-qualified:56 dedicated controls
+PASS, independently56 PASS6.09s. It composes unchanged old/new source validators,
+requires all three independent actual join pins, verifies144 original inputs,
+52 saved outputs and47→46 metadata fingerprints twice under a caller deadline.
+Host-only lineage is not mounted in the numerical worker. This is qualification
+of authentication code, not an independent numerical rerun or a quality result.
+
+The label-free partition utility is separately source-qualified:90 dedicated,
+257 combined/root257 PASS0.45s; independent243 controls PASS0.82s plus204 tiny
+oracle cases within1e-12. It uses the existing full native/group ABI, preserves
+alias mass and unsupported NaN, returns undefined logZ for no support, and adds
+back the common derivative when centering the VJP. No extra temperature division
+or positive-mask surrogate is used. Torch tests used manufactured adapters only;
+actual device byte snapshots, numerical parity and runtime cost remain untested.
+
 After blind timing, freeze the actual FIT execution budget before labels. Five
 scale/preparation contexts are required: four FIT24 folds and final FIT32,
 reusing each fold's preparation across its three lambdas. Held-fold loss uses
