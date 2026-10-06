@@ -103,3 +103,19 @@ interfaces, all98-leaf installation, exclusive commit, sameFD failed DELETE and
 owned race/partial cleanup. One root test harness initially inherited macOS
 gid0 while the process gid was20; test-only fixture group binding was corrected,
 not the production root-owned contract. All exact owned fixtures removed.
+
+## Actual export v2
+
+Envelope-only producer `5c67b6a3a89529b45badef7014c2ebe5de18347a` completed
+export PASS in2.6953s. Independent saved audit verifies original/current full
+Git sources,98 public leaves and all816 native array descriptors before/after;
+no RGB/NPZ numerical replay or model load. Actual sealed receipt8489B/SHA256
+`8247e76345d88c50b3099392fb92d2fa7de104b06246d7f5d3fa4a7ed9a8a92c`.
+Declared archive62,228,480B/SHA256
+`92d5107d143dafeaa7e55ae7cb67100e8ba6482b935aa5b60d1f70145ef6e432`,
+manifest12573B/SHA256
+`2ef141f4763d6bb44c4450c2a7ef2cea96fd707278c00cf12fc85f13a18eadb1`.
+The audit does not independently read the Blob; archive SHA/ETag derive from the
+saved producer's streaming hash and HEAD. Collected unit exit is explicitly
+unavailable, not inferred. Receiver must verify the actual downloaded bytes.
+Import, pose, selection and quality remain pending. V1 FAIL is preserved.

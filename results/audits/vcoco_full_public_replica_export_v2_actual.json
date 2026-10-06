@@ -1,0 +1,80 @@
+{
+  "Blob_operations_performed": false,
+  "NPZ_numeric_arrays_independently_decoded": false,
+  "RGB_NPZ_decoded": false,
+  "adoption": false,
+  "all98_public_byte_pins_prepost_verified": true,
+  "archive": {
+    "bytes": 62228480,
+    "sha256": "92d5107d143dafeaa7e55ae7cb67100e8ba6482b935aa5b60d1f70145ef6e432"
+  },
+  "archive_SHA_and_ETag_basis": "saved_producer_stream_and_HEAD_declaration_not_independent_Blob_read",
+  "archive_bytes_independently_verified": false,
+  "archive_removed": true,
+  "audit_elapsed_seconds": 1.469843,
+  "azure_run_command_exit_status": 0,
+  "blob_cleanup_verified": false,
+  "blob_etag": "\"0x8DF2352C9D4EFD2\"",
+  "current_source": {
+    "closure_sha256": "222099dd40d5115f0c1b865333e42e7ed891771d96b7cfbae3edad91be01dbe2",
+    "entries": 350,
+    "files": 345,
+    "source_XZ_sha256": "f8243103df8d834fd90e8ab9582cdbdc78e28c022328d300e12401b0ea14cd48"
+  },
+  "current_source_prepost_verified": true,
+  "elapsed_seconds": 2.6953075890196487,
+  "endpoint_owned_CID_and_name_absence_verified": true,
+  "manifest": {
+    "bytes": 12573,
+    "sha256": "2ef141f4763d6bb44c4450c2a7ef2cea96fd707278c00cf12fc85f13a18eadb1"
+  },
+  "models_loaded": false,
+  "native_arrays": 816,
+  "observer_script_sha256": "4bde2432a4f4af9220fc6b339987a6afee335bd439095343f0fc44efadcbcd28",
+  "original_receipts_and_CID_byte_pins_prepost_verified": true,
+  "original_source": {
+    "closure_sha256": "dff99fe3f87febfed73162c3fc535d8c83ed11d44d1271a4c23564d35e6c1c4c",
+    "entries": 345,
+    "files": 340,
+    "source_XZ_sha256": "a9c86bf2b00e48450b6a84e866987e8068e3bde726909f1446953534579cd47c"
+  },
+  "original_source_prepost_verified": true,
+  "output_names": [
+    "public-reference.json",
+    "report.json"
+  ],
+  "outputs_sealed": true,
+  "ownership_verified": false,
+  "person_rows": 331,
+  "phase": "export",
+  "producer_process_absent": true,
+  "producer_revision": "5c67b6a3a89529b45badef7014c2ebe5de18347a",
+  "public_banks": 48,
+  "public_images": 48,
+  "public_leaves": 98,
+  "public_manifest": {
+    "bytes": 9754,
+    "sha256": "e98657edc8e081ed5b101edf22cdbb490b77bf36384e8952eff49f82d0c7b93c"
+  },
+  "public_projection": {
+    "bytes": 171990,
+    "sha256": "acac670506b6525f1d0e8a163b6d29de8b07927b8b98d7af92bb2a02043e35d9"
+  },
+  "quality_verified": false,
+  "reference_metadata_read": false,
+  "report": {
+    "bytes": 8489,
+    "sha256": "8247e76345d88c50b3099392fb92d2fa7de104b06246d7f5d3fa4a7ed9a8a92c"
+  },
+  "saved_native_status": "pass",
+  "schema": "world_reward.vcoco_full_public_replica_export_saved_audit.v2",
+  "sender_runtime_live_reverified": false,
+  "source_array_metadata_verified": true,
+  "source_inputs_rehashed_after": true,
+  "stage": "complete",
+  "status": "PASS",
+  "unit": {
+    "LoadState": "not-found",
+    "exit_verification": "UNAVAILABLE_COLLECTED"
+  }
+}
