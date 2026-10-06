@@ -1,0 +1,87 @@
+{
+  "Blob_operations_performed": false,
+  "NATIVE_literal_source_files": 20,
+  "RGB_NPZ_decoded": false,
+  "all48_pose_bank_bytes_metadata_prepost_verified": true,
+  "asset_file_count": 21,
+  "audit_elapsed_seconds": 2.456653,
+  "azure_run_command_exit_status": 0,
+  "current_image": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "current_source": {
+    "closure_sha256": "bc549f0a3841891f9990096e98a51561dbaa18fc398a7336add689f807171aea",
+    "entries": 381,
+    "files": 376,
+    "source_XZ_sha256": "d0e6277f951c7b3be3ecf8c89737373b95b12474fc39bccc1f74514ebfca39e4"
+  },
+  "host": {
+    "elapsed_seconds": 29.082000927999616,
+    "outputs_sealed": true,
+    "owned_cleanup_verified": true,
+    "phase": "complete",
+    "source_inputs_assets_runtime_rehashed_after": true,
+    "stage": "public48_person_pose_host",
+    "status": "pass"
+  },
+  "host_source_old_DWPose_source_assets_and_B47_prepost_verified": true,
+  "images": 48,
+  "import_receipt": {
+    "bytes": 8748,
+    "sha256": "6c32778305d227d863d561275de569abeb2e5b90836b5fafca40e21f89890f37"
+  },
+  "joints_per_person": 133,
+  "models_loaded": false,
+  "native": {
+    "elapsed_seconds": 26.316419887996744,
+    "models_released": true,
+    "phase": "complete",
+    "private_prefix_removed": true,
+    "source_inputs_assets_runtime_rehashed_after": true,
+    "stage": "native_public48_person_pose",
+    "status": "pass"
+  },
+  "native_arrays": 528,
+  "native_calls": 331,
+  "native_no_private_metadata": true,
+  "native_report": {
+    "bytes": 341744,
+    "sha256": "d81a5d2db927609daedc1d2f9c97d88ab0fa1a5287ac3901086cb8735296a137"
+  },
+  "numerical_ABI_basis": "source_bound_saved_full_array_metadata_and_native_feed_records_not_independent_NPZ_decode",
+  "observer_script_sha256": "596c0bb7bc2d3e7c67c1b2ea892d1ff058b24d96d20d3ec99a7287e3807c1287",
+  "old_pose_source": {
+    "closure_sha256": "ae1b70b2fb2caa62432382ae001de65bf74ea25356bea0286c26f9351fc52de1",
+    "entries": 352,
+    "files": 347,
+    "source_XZ_sha256": "fa9fb811b359963e159f0fd30e6acfe34b6fa73d7be8518c50b4f1560c630613"
+  },
+  "one_session_released": true,
+  "original_endpoint_person_array_hashes_unchanged": true,
+  "owned_CID_name_absence_verified": true,
+  "ownership_verified": false,
+  "persons": 331,
+  "private_prefix_removed": true,
+  "producer_process_absent": true,
+  "producer_revision": "e2d8b5afa9eeaa8d0988cd527ff2e47e2d4e31b4",
+  "projection": {
+    "bytes": 171990,
+    "sha256": "acac670506b6525f1d0e8a163b6d29de8b07927b8b98d7af92bb2a02043e35d9"
+  },
+  "proof": {
+    "bytes": 4221,
+    "sha256": "45090e658b7980a8056022c3c472453a39e4f7d6cbca86a8530e971b6ab9d023"
+  },
+  "quality_verified": false,
+  "receiver101_leaves_prepost_verified": true,
+  "reference_metadata_read": false,
+  "report": {
+    "bytes": 160633,
+    "sha256": "f4fd034ade378261cc227539dd0f3e331b136a8762ad8f8f67d03d96e8ce3c26"
+  },
+  "schema": "world_reward.vcoco_full48_pose_saved_audit.v2",
+  "stage": "complete",
+  "status": "PASS",
+  "unit": {
+    "LoadState": "not-found",
+    "exit_verification": "UNAVAILABLE_COLLECTED"
+  }
+}

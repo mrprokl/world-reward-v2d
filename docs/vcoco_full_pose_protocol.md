@@ -107,3 +107,22 @@ reseed, or new accuracy claim. The three compact v1 audits distinguish initial
 FAIL, overlong-output PARTIAL diagnostic and completed compact diagnostic.
 Metadata16 and pose31/root47 combined controls PASS; actual repaired inference
 remains pending against the same original imported public48 receipt.
+
+## Actual repaired v2
+
+Producer `e2d8b5afa9eeaa8d0988cd527ff2e47e2d4e31b4` completed full48 PASS:
+331 original retained-person crops,133 joints each, one original CPU session,
+26.3164s native /29.0820s host. Original person IDs/boxes/scores, all48 slots and
+528 array descriptors remain; private prefix/session/CID/name cleanup verified.
+Host160633B/SHA256
+`f4fd034ade378261cc227539dd0f3e331b136a8762ad8f8f67d03d96e8ce3c26`;
+native341744B/SHA256
+`d81a5d2db927609daedc1d2f9c97d88ab0fa1a5287ac3901086cb8735296a137`;
+proof4221B/SHA256
+`45090e658b7980a8056022c3c472453a39e4f7d6cbca86a8530e971b6ab9d023`.
+Independent saved-only audit rehashes full376/381 source, original347/352 source,
+21 assets/notices,101 receiver leaves and all48 saved NPZ before/after. Native
+FP64-list/FP32-SimCC and numerical outputs are source-bound producer evidence,
+not independent observer decoding. No RGB/NPZ/model replay, GT or role references;
+collected unit exit remains unavailable. V1 FAIL stays closed. Complete pose
+observations do not establish hand ownership, background rejection or quality.
