@@ -80,3 +80,20 @@ Root211 combined join/transport controls PASS2.00s, including eight new genuine
 Git-mode/permission controls; independent source audit confirms only source-mode
 paths changed. AST/shell PASS, owned fixtures removed. The original5191 FAIL
 is not rewritten; one new frozen export is technically qualified, not executed.
+
+The separate bf4ff551 export now has an actual sealed FAIL: 1027B,
+SHA256 `3508d0f8e0dbb599ce1cc014cd2857fddfb07898b9e5ccf98469c8f03eed36cb`,
+0.934246879s, ValueError/preflight-post, only report.json. Its opaque observer
+remains PARTIAL, not a native outcome. Root read-only diagnostics of the exact
+bf4 source pass source modes, Azure peer, request-free Blob constructor, whole
+sender inputs, manifest, full offline pack, source and sender post-comparisons.
+Payload25877704B; offline archive25896960B SHA256
+`a8e0c937c39d8eeda506848de5f793d3245f8e927967785fd0079110d86b40d7`.
+An authored request-free BlockWriter also passes. No model/Blob request, export
+receipt, actual remote archive or ETag is established by those diagnostics.
+
+This failure is **not reproduced/located** by the current checks; the original
+receipt lacks a stage. Do not label the mode fix unsuccessful, invent a cause,
+or blindly re-export. Keep this FAIL distinct and audit minimal stage-only
+technical observability. Complete48 observations can proceed on VM02 without
+the old16 replica. See the concise saved diagnostic, not disposable CLI noise.

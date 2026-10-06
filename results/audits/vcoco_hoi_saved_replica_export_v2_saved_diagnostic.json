@@ -1,0 +1,42 @@
+{
+  "archive_or_ETag_verified": false,
+  "collected_unit_exit_status": "unavailable",
+  "decision": "Preserve second native FAIL and separate PARTIAL observer. Read-only current checks do not reproduce it and cannot qualify a transfer or authorize a blind re-export. Add bounded technical observability only after independent audit; full48 research can proceed on VM02 without this old16 replica.",
+  "declared_elapsed_seconds": 0.9342468789545819,
+  "declared_error_type": "ValueError",
+  "declared_outputs_sealed": true,
+  "declared_post_error_type": "ValueError",
+  "declared_source_inputs_rehashed_after": false,
+  "diagnostic_Blob_requests": false,
+  "diagnostic_model_calls": false,
+  "directory_mode": "0500",
+  "full_independent_source_output_audit": false,
+  "inventory": [
+    "report.json"
+  ],
+  "original_failure_location": "unresolved_original_receipt_has_no_stage",
+  "producer_revision": "bf4ff551e4163d08cbd279fccc20ab375c252810",
+  "read_only_diagnostics": {
+    "Azure_peer": "pass",
+    "Blob_constructor_without_request": "pass",
+    "authored_BlockWriter": "pass",
+    "current_source": "pass",
+    "full_offline_pack": "pass",
+    "manifest": "pass",
+    "offline_archive_identity": {
+      "bytes": 25896960,
+      "sha256": "a8e0c937c39d8eeda506848de5f793d3245f8e927967785fd0079110d86b40d7"
+    },
+    "payload_bytes": 25877704,
+    "post_sender": "pass",
+    "post_source": "pass",
+    "whole_sender_inputs": "pass"
+  },
+  "receipt_identity": {
+    "bytes": 1027,
+    "sha256": "3508d0f8e0dbb599ce1cc014cd2857fddfb07898b9e5ccf98469c8f03eed36cb"
+  },
+  "receipt_mode": "0400",
+  "schema": "world_reward.vcoco_hoi_export_saved_diagnostic.v2",
+  "status": "fail_observed"
+}
