@@ -118,3 +118,12 @@ peak6315323392 bytes versus68719476736-byte cap. No native phase/report was
 published; provisional container ExitCode0 and systemd ExecMainStatus0 are not
 verdicts. The original job is untouched; no label read or scientific retry.
 The independent post-terminal numerical/cost verdict is still required.
+
+Prospective efficiency boundary: the current PairCache normal constructor
+independently recomputes caller-supplied template/factors, while its factory
+first computes both. A wrapper alone cannot remove that duplicate work without
+bypassing provenance. No such wrapper is added. A future targeted source-derived
+constructor refactor, if needed, must derive all canonical fields once from
+genuine source bank/scales and independently qualify complete equivalence and
+forgery/mutation rejection in a distinct source/runtime namespace. Historical
+producer bytes and the active profile remain unchanged.
