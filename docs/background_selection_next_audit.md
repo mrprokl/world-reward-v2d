@@ -3,11 +3,19 @@
 Independent source-only checkpoint, 6 October 2026; literature cutoff
 30 September 2026. No real references, predictions or media were inspected.
 **Current evidence: 48 complete endpoint banks / 331 retained people and
-48 complete HOI banks / 1398 native hand→object pairs. Full48 all-person pose,
-fitted selection and demonstrated background rejection remain unverified.**
+48 complete HOI banks / 1398 native hand→object pairs and complete133-joint
+pose observations for all331 retained people. Fitted selection and demonstrated
+background rejection remain unverified.**
 The original HOI model completed48 forwards in52.57s; the saved-only audit is
 [`vcoco_full_hoi_observations_v1_actual.json`](../results/audits/vcoco_full_hoi_observations_v1_actual.json).
 These are complete observations, not1398 correct ownership labels.
+The original pose callable completed331 crops in26.32s; its saved-only audit is
+[`vcoco_full_pose_v2_actual.json`](../results/audits/vcoco_full_pose_v2_actual.json).
+The pose-only Azure export passed, but its first import failed closed before
+download/install. This is a technical transport failure, not a failed or
+successful background-selection experiment; no joined evidence or FIT follows
+from it. The immutable FAIL is recorded separately in
+[`vcoco_full_pose_replica_import_v1_actual.json`](../results/audits/vcoco_full_pose_replica_import_v1_actual.json).
 
 ## Two shortcuts are verified, not solutions
 

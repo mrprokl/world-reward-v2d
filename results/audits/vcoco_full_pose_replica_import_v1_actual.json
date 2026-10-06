@@ -1,0 +1,48 @@
+{
+  "Blob_operations_performed": false,
+  "NumPy_imported": false,
+  "RGB_NPZ_decoded": false,
+  "archive_removed": true,
+  "audit_elapsed_seconds": 0.550322,
+  "azure_run_command_exit_status": 0,
+  "blob_cleanup_verified": false,
+  "current_source": {
+    "closure_sha256": "cb3e65d545ffeee769a4d00afc2fb066c7210a48f3eaaffbeb0785e40b9942d6",
+    "entries": 383,
+    "files": 378,
+    "source_XZ_sha256": "5cc19ff37c04f8b7bf3e40bf35c008229b615a8b4128fbe6728253a1ed5779e2"
+  },
+  "current_source_prepost_verified": true,
+  "elapsed_seconds": 0.4357837889692746,
+  "error_type": "ValueError",
+  "failure_stage": "receipt",
+  "models_loaded": false,
+  "observer_script_sha256": "39ea702fdca7a045380eae3c4236493c61ed515fe7f86dc09ac33532849b3989",
+  "outputs_sealed": true,
+  "ownership_verified": false,
+  "phase": "import",
+  "post_error_type": "ValueError",
+  "post_failure_stage": "post",
+  "producer_process_absent": true,
+  "producer_revision": "be9087a031f3755f3947276a2cb3bb5f8dcb0fd7",
+  "quality_verified": false,
+  "reference_metadata_read": false,
+  "report": {
+    "bytes": 12094,
+    "sha256": "8c56b1e1b74e5063692b7ba3d5cee60c9386119fc4ef2c5a664a35f978d662a5"
+  },
+  "saved_native_status": "fail",
+  "schema": "world_reward.vcoco_full_pose_replica_import_saved_audit.v1",
+  "single_etag_DELETE_202": false,
+  "source_inputs_rehashed_after": false,
+  "stage": "complete",
+  "status": "VERIFIED_NATIVE_FAIL",
+  "unit": {
+    "ActiveState": "failed",
+    "ExecMainStatus": "1",
+    "MainPID": "0",
+    "Result": "exit-code",
+    "SubState": "failed",
+    "exit_verification": "LIVE_UNIT_METADATA"
+  }
+}
