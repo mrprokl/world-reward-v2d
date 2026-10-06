@@ -80,3 +80,22 @@ public bank helper whitelist17. Attempted native calls and completed bank count
 are distinct on failures; fixed technical failure/post stages survive in native
 and host summaries. All exact owned manufactured fixture trees removed. No
 Azure dispatch or inference is implied by these source controls.
+
+## Actual original full48 observation run
+
+Producer a451aa1d28338d5144398a1b6ca1e2877414ce48 now completes actual PASS:
+host59.632419s, model52.572386s,48 attempted forwards/48 saved banks, all1500
+queries and19 arrays per image,1398 raw hand-object pairs/44 object-target pairs.
+NPZ76054280B remain Azure. One strict1796-state original model, no EMA/AMP/TF32.
+Independent saved-only audit17.731154s verifies five full Git closures, original
+inputs/runtime/assets, all58 output file hashes and modes, exact image and owned
+CID/name/process absence before/after. No numerical inference/NPZ replay.
+The collected systemd unit's default0 is explicitly unavailable as an exit proof.
+
+Host receipt190702B SHA256
+`b7acf4153fd33ec43e9b460aaa83f1f457b5995af56bebe3c45375dc0df7f078`;
+model169647B/`d358a40231a98b587f287870eb5011efd8ffeb692cfcea6b0affc5f718b37cdc`.
+Concise actual audit is saved under results/audits. These are complete raw
+observations, **not** verified pair selection/ownership, FIT/CAL performance,
+background rejection, adoption or a CARI4D/leaderboard win. Pose48 and the
+subsequent coherent empirical A/B remain separate required work.
