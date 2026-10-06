@@ -143,3 +143,21 @@ independent71 objective controls PASS. AST of manifest/measure/solve/
 validate_native/publish equals8db0500. Driver38953 bytes/SHA256
 `7049240f015220afb12c0f3718577dbf8250e5ae9a9903e07bbcd4c0fcec74e5`.
 No concrete blocker found; actual native qualification still required.
+
+## Actual V3: technical control PASS, not FIT
+
+Producer19a766f541a4aafd753a13fba6ceabefa0c8a357 completes in88.530290s
+host, native exit0. Both original full-bank objective/CPU-GPU/repeat controls
+and all72 FD calls pass. SciPy1.16.3's2381-row inventory verifies before/after,
+including41 explicitly claimed-empty files and961 nonempty image-cache leaves.
+A converges6iterations/10evaluations, projected gradient3.626e-7; B1/4,
+5.736e-10, both below the unchanged1e-6 gate. Host RSS1,359,556,608B,
+GPU allocation556,495,872B/reservation645,922,816B, all below6GiB.
+
+Independent saved-only auditPASS2.148194s authenticates five whole Git closures,
+both original FAILs, priors, current proof/native/host, image and cleanup
+before/after. Collected historical unit exit is UNAVAILABLE; actual sealed
+host receipt binds native exit0. No observer numerical execution/replay.
+Decision: FULLBANK_OBJECTIVE_OPTIMIZER_CONTROL_PASS_NOT_FIT_QUALITY.
+This establishes a manufactured objective/short-solver control, not real FIT,
+32-image cost, semantic owner/hand accuracy, calibration or CARI4D gain.

@@ -1,0 +1,168 @@
+{
+  "actual_state": "SEALED_OBJECTIVE_SHORT_SOLVER_CONTROL_PASS",
+  "adoption": false,
+  "audit_elapsed_seconds": 2.14819425099995,
+  "azure_runcommand_terminal": true,
+  "cid_absent": true,
+  "closed_failure_provenance_verified": true,
+  "container_name_absent": true,
+  "controls": [
+    {
+      "alpha": 0,
+      "cpu_packed_objective_passed": true,
+      "fd17_and_alpha_passed": true,
+      "repeat_bits_exact": true
+    },
+    {
+      "alpha": 0.3125,
+      "cpu_packed_objective_passed": true,
+      "fd17_and_alpha_passed": true,
+      "repeat_bits_exact": true
+    }
+  ],
+  "counts": [
+    4,
+    3600,
+    64
+  ],
+  "decision": "FULLBANK_OBJECTIVE_OPTIMIZER_CONTROL_PASS_NOT_FIT_QUALITY",
+  "fd_calls": 72,
+  "fit_executed": false,
+  "fixtures_rerun": false,
+  "host_elapsed_seconds": 88.53029043797869,
+  "host_errors": {},
+  "host_identity": {
+    "bytes": 20552,
+    "sha256": "76f80b23d1cec70aad6a13a82193e49afa09afa9cb0862d5ca13f4f4ac58d16f"
+  },
+  "host_phase": null,
+  "host_status": "pass",
+  "image_before_after": true,
+  "image_rootfs_sha256": "5ae610524943c42f72e2fa1ac06a9dbe8fa14bf2d572efd8a57cded6ead3503d",
+  "limitation": "Saved source/receipt integrity only; no numerical replay. Collected unit exit unavailable, never inferred from defaults. Not FIT/ownership/quality qualification.",
+  "max_rss_bytes": 1359556608,
+  "metadata_diagnostic_live_read_claimed": false,
+  "native_errors": {},
+  "native_exit_code": 0,
+  "native_identity": {
+    "bytes": 21668,
+    "sha256": "f51b160fdb8b9838917df5960fedf48bae90f42026db995827b74a8ea43c55fb"
+  },
+  "native_metadata_validation": true,
+  "native_phase": "complete",
+  "native_status": "pass",
+  "observed_unit_exit": null,
+  "observer_command_identity": {
+    "bytes": 118877,
+    "sha256": "bc467add4edd5e369637f90f5322a66f335e12599c5acbee747498975fa7654e"
+  },
+  "observer_gpu_used": false,
+  "observer_numeric_execution": false,
+  "observer_source_identity": {
+    "bytes": 118765,
+    "sha256": "0a353c8001acb108f3bd735ef667e3c51e8ae2e956b7d09e9a0b555514b642de"
+  },
+  "output_identities": {
+    "container.cid": {
+      "bytes": 64,
+      "sha256": "0f320f3f51570891cefa8cb55e2d211e1d97f8e06ca7108c0f94a73e794992ab"
+    },
+    "native.json": {
+      "bytes": 21668,
+      "sha256": "f51b160fdb8b9838917df5960fedf48bae90f42026db995827b74a8ea43c55fb"
+    },
+    "proof.json": {
+      "bytes": 19818,
+      "sha256": "550a9da620b6bca4e4af7011b287aabb4aca9eb4b979cb9e7f8e35c4a751d897"
+    },
+    "report.json": {
+      "bytes": 20552,
+      "sha256": "76f80b23d1cec70aad6a13a82193e49afa09afa9cb0862d5ca13f4f4ac58d16f"
+    }
+  },
+  "output_present": true,
+  "outputs_before_after": true,
+  "outputs_sealed": true,
+  "owner_label_containers_absent": true,
+  "peak_torch_allocated": 556495872,
+  "peak_torch_reserved": 645922816,
+  "prior_before_after": true,
+  "prior_tiny_fullbank_verified": true,
+  "producer_driver_absent": true,
+  "producer_revision": "19a766f541a4aafd753a13fba6ceabefa0c8a357",
+  "quality_verified": false,
+  "route_references": 1843200,
+  "saved_only": true,
+  "schema": "world_reward.coherent_pair_gpu_objective_saved_audit.v3",
+  "scipy_before_after": true,
+  "scipy_claimed_empty_files": 41,
+  "scipy_empty_policy": "explicit_original_record_sha256_empty_and_exact_size0_only",
+  "scipy_entries": 2381,
+  "scipy_record": {
+    "bytes": 196853,
+    "sha256": "c34263ef30380bff9837a2311899667249d27ea73c6a6f226209e762582f38a5"
+  },
+  "scipy_unclaimed_cache_files": 961,
+  "scipy_version": "1.16.3",
+  "solvers": [
+    {
+      "arm": "A",
+      "control_passed": true,
+      "evaluations": 10,
+      "final_loss": 8.85530102384279,
+      "initial_loss": 8.881836305004146,
+      "iterations": 6,
+      "projected_gradient_inf": 3.626364721443648e-07,
+      "status": 0,
+      "success": true
+    },
+    {
+      "arm": "B",
+      "control_passed": true,
+      "evaluations": 4,
+      "final_loss": 8.824727046789903,
+      "initial_loss": 8.824727048364831,
+      "iterations": 1,
+      "projected_gradient_inf": 5.735632259125465e-10,
+      "status": 0,
+      "success": true
+    }
+  ],
+  "source_archive_xz": {
+    "bytes": 258568,
+    "sha256": "08708f7d02e585301dc9523b72f873fd3eb07388b4ca58f5cb032481c17203a6"
+  },
+  "source_before_after": true,
+  "source_closure_sha256": "5a76bafa2336ff9a091d61bdc80b8d1cb53f86cfab4520aa596adfb907cf3d2e",
+  "source_entry_counts": [
+    318,
+    312,
+    307,
+    316,
+    317
+  ],
+  "source_files_counts": [
+    313,
+    307,
+    302,
+    311,
+    312
+  ],
+  "status": "pass",
+  "transport_cli_exit": 0,
+  "transport_target": {
+    "resource_group": "SCENESMITH-H100",
+    "vm_name": "scenesmith-ncc-h100-01"
+  },
+  "unit": "world-reward-coherent-pair-gpu-objective-probe-v3.service",
+  "unit_exit_independently_available": false,
+  "unit_state": {
+    "ActiveState": "inactive",
+    "ExecMainStatus": "0",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "Result": "success",
+    "SubState": "dead"
+  },
+  "v2_metadata_failure_provenance_verified": true
+}

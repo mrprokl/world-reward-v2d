@@ -31,10 +31,10 @@ VM01 execution profile now passes sealed tiny GPU arithmetic checks in7.24s
 The new full-bank score/VJP control also passes: all1,843,200 procedural routes,
 28,800 native rows and14,400 grouped rows agree with CPU FP64; host84.79s,
 peak GPU reservation644MB. This is measured arithmetic cost, not an objective,
-optimizer, FIT or selection-quality result. The full objective/FD subcontrols
-now pass (72 prescribed calls); the complete control remains FAIL on a strict
-SciPy metadata gate, with a verified general empty-file ABI repair undergoing
-one fresh unchanged technical control. Fresh V-COCO/COCO2014 metadata and its
+optimizer, FIT or selection-quality result. The separately frozen objective +
+short-solver technical control now passes in88.53s, after general ABI repairs
+that preserve both original FAILs and every scientific gate. It includes72 FD
+calls and two converged fixed solvers. This is not real selector FIT or quality. Fresh V-COCO/COCO2014 metadata and its
 exclusion-safe role census pass independent audits:199 eligible VAL photos
 and362 TEST, after432 historical photo exclusions. The separately frozen16-photo
 pilot is fully acquired on Azure and complete GDI/OWL banks are sealed. Its
