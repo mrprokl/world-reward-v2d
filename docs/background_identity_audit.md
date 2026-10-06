@@ -496,3 +496,23 @@ is P recall≥.70 AND objectness O@128 recall≥.70, one-to-one matching IoU≥.
 fixed32-image macro, no compensation or best-budget rescue. Only after DEV
 passes may a separate CPU phase mount RESERVED references. Even both PASS would
 establish candidate coverage, not foreground ownership, contact or3D accuracy.
+
+## October6 — actual joint candidate capacity, not ownership
+
+The fresh16-image V-COCO pilot now has sealed original GDI+OWL banks: all900
+raw person queries,94 retained people and all3600 object patches per image.
+All16 full17-array NPZs validate before8DEV references. Fixed8 continuous-IoU0.5
+localized-positive-pair proposal ceiling is0.916667 (predeclared gate0.7),
+person0.9375/object1.0. Independent saved-only producer/proof/runtime/source/
+seal audit passes; RESERVED semantics remain unopened. DEV declares17positive
+pairs/48person proposals. Coverage is adequate for the next observation gate,
+not proof that background distractors are correctly rejected.
+
+Next reuse person-attached native133-point DWPose and full HOI evidence for
+all retained candidates, never top1/nearest-hand filtering. B47/DWPose assets
+are qualified on VM01; inputs/banks are on VM02. A bounded exact private
+Azure-to-Azure public replica is prospective, not an excuse to transfer media
+to the laptop, clone a runtime, read reference metadata in a predictor, or
+infer image parity from similar tags. References8–15 remain sealed; a fresh
+permitted FIT/CAL population is needed before learned selector comparison.
+No anatomy/owner/temporal/3D result or leaderboard improvement is claimed.
