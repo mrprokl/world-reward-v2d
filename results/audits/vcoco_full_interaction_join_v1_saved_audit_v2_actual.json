@@ -1,0 +1,92 @@
+{
+  "Blob_operations_performed": false,
+  "FIT_performed": false,
+  "HOI_producer_revision": "a451aa1d28338d5144398a1b6ca1e2877414ce48",
+  "NumPy_imported": false,
+  "RGB_NPZ_decoded": false,
+  "adoption": false,
+  "all144_original_banks_whole_SHA_verified": true,
+  "all52_saved_outputs_whole_SHA_verified": true,
+  "audit_elapsed_seconds": 5.881777,
+  "current_source": {
+    "closure_sha256": "0cde8fc590e1d2ae9974da034e89f6b34f967bc10d1ba71c0b94bcd4a2a0724a",
+    "entries": 401,
+    "files": 396,
+    "source_XZ_bytes": 434864,
+    "source_XZ_sha256": "1fdc65a28c3265dd2d3a643b8406d23e7b5104670aa7aefb47191de2a596106c"
+  },
+  "current_source_and_all_input_output_bytes_modes_prepost_verified": true,
+  "endpoint_producer_revision": "6837a74a36a29c7c0cc79dfecfb98fc03d569a3f",
+  "evidence_array_metadata_count": 2208,
+  "exact_CID_name_absence_verified": true,
+  "helper_count": 96,
+  "host_elapsed_seconds": 23.880113633000292,
+  "host_report": {
+    "bytes": 1146677,
+    "sha256": "88130d1b4db4f07153360b31292b52ccbafe723248a8368a845f10ea2ac7aa52"
+  },
+  "image_id": "sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3",
+  "image_layer_count": 44,
+  "images": 48,
+  "models_loaded": 0,
+  "native_array_values_independently_decoded": false,
+  "native_pairs": 1398,
+  "native_report": {
+    "bytes": 442232,
+    "sha256": "dcb28399e35dcea15a638b3776286653f51bd5531d4311d5e6731a00f598988e"
+  },
+  "native_source_literal_count": 10,
+  "original_HOI_output_leaves": 58,
+  "original_array_metadata_count": 2256,
+  "original_endpoint_output_leaves": 52,
+  "output_bytes": 961671090,
+  "output_capacity_gate_passed": true,
+  "outputs_sealed": true,
+  "owned_cleanup_verified": true,
+  "ownership_verified": false,
+  "pair_object_rows": 5032800,
+  "person_side_object_rows": 2383200,
+  "person_side_pair_rows": 37710,
+  "persons": 331,
+  "phase": "complete",
+  "pose_import": {
+    "bytes": 12515,
+    "sha256": "d871126667422258066cb461b274d29fa36a513ee71c04b1c23852ab09b6b303"
+  },
+  "pose_receipt_pins": {
+    "native.json": {
+      "bytes": 341744,
+      "sha256": "d81a5d2db927609daedc1d2f9c97d88ab0fa1a5287ac3901086cb8735296a137"
+    },
+    "proof.json": {
+      "bytes": 4221,
+      "sha256": "45090e658b7980a8056022c3c472453a39e4f7d6cbca86a8530e971b6ab9d023"
+    },
+    "report.json": {
+      "bytes": 160633,
+      "sha256": "f4fd034ade378261cc227539dd0f3e331b136a8762ad8f8f67d03d96e8ce3c26"
+    }
+  },
+  "pose_replica_leaves": 52,
+  "producer_process_absent": true,
+  "producer_revision": "0907f3e3042d7a7c2ccafc9b4799f114226ca059",
+  "proof": {
+    "bytes": 509236,
+    "sha256": "de98fa780685234c979caee468a5aca680da4599306f5a2e4d35feb7ce08618e"
+  },
+  "quality_verified": false,
+  "reference_metadata_read": false,
+  "saved_leaf_count": 52,
+  "saved_leaf_inventory_sha256": "da0d5751e57ce740be4cdb9295cb6e5c79e5f0dfb97a489d3e2e80ac5e7c3c8e",
+  "saved_native_status": "pass",
+  "schema": "world_reward.vcoco_full_interaction_join_saved_audit.v2",
+  "selection_performed": false,
+  "source_inputs_image_rehashed_after": true,
+  "source_runtime_on_pose_sender_live_verified": false,
+  "stage": "complete",
+  "status": "PASS",
+  "unit": {
+    "LoadState": "not-found",
+    "exit_verification": "UNAVAILABLE_COLLECTED"
+  }
+}

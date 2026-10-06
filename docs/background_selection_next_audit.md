@@ -24,8 +24,14 @@ namespace before a fresh import; see
 The separately source-qualified private-namespace importer completed in1.323s,
 with all49 public leaves/three receipts rehashed and one declared ETag DELETE202;
 see [`vcoco_full_pose_replica_import_v2_actual.json`](../results/audits/vcoco_full_pose_replica_import_v2_actual.json).
-The old FAIL and shared data parent remain untouched. No model was rerun and no
-joined numerical evidence, FIT or selection quality follows from transport.
+The old FAIL and shared data parent remain untouched; no model was rerun.
+The distinct full48 saved numerical join now completed23.88s, retaining all
+331 people/1398 native pairs and46 evidence arrays per image. Its independent
+saved audit verifies all144 original banks and52 outputs before/after:
+[`vcoco_full_interaction_join_v1_saved_audit_v2_actual.json`](../results/audits/vcoco_full_interaction_join_v1_saved_audit_v2_actual.json).
+This is unselected evidence, not fitted selection or background-rejection
+accuracy. A first observer's tuple/list JSON comparison failed mechanically;
+its PARTIAL is preserved, with no producer rerun or numerical repair.
 
 ## Two shortcuts are verified, not solutions
 

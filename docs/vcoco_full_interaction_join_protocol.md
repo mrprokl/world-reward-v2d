@@ -123,3 +123,30 @@ Exact XZ6 is434956B/SHA256
 138 join/receiver controls PASS1.70s; owned fixtures removed. These source
 checks do not claim a completed import or joined evidence, and the next frozen
 caller must record its own exact full-source closure/markers.
+
+## Actual complete48 saved join
+
+Producer `0907f3e3042d7a7c2ccafc9b4799f114226ca059` completed23.8801s, all48
+images/331 people/1398 native pairs retained. Complete row populations:
+2,383,200 base person-side-object,37,710 local person-side-pair and5,032,800
+pair-object bridge rows. The48 NPZs total961,671,090B, all heavy bytes on Azure.
+There are2208 output array metadata entries (46/image) and2256 original entries
+(47/image). Independent saved-only observer rehashes all144 original banks,
+all52 output leaves, current396/401 source/original lineage and exact7eb44-layer
+metadata before/after, with owned CID/name absent. It does not re-decode native
+numeric arrays. Collected unit exit unavailable; native PASS is receipt-bound.
+
+Actual independently pinned receipts: host1146677B/SHA256
+`88130d1b4db4f07153360b31292b52ccbafe723248a8368a845f10ea2ac7aa52`,
+native442232B/SHA256
+`dcb28399e35dcea15a638b3776286653f51bd5531d4311d5e6731a00f598988e`,
+proof509236B/SHA256
+`de98fa780685234c979caee468a5aca680da4599306f5a2e4d35feb7ce08618e`.
+Exact current XZ434864B/SHA256
+`1fdc65a28c3265dd2d3a643b8406d23e7b5104670aa7aefb47191de2a596106c`.
+The first observer stopped on Python tuple/list equality after JSON; its
+PARTIAL remains unchanged. The separate observer uses canonical encoded JSON,
+without rerunning the join or changing arrays. Actual audit:
+`results/audits/vcoco_full_interaction_join_v1_saved_audit_v2_actual.json`.
+No models, role values, FIT, learned selection, anatomical ownership, quality
+adoption or challenge victory are established by this complete evidence bank.
