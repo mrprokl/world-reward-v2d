@@ -63,7 +63,7 @@ original pose pins exactly. Sender source/runtime live verification is **false**
 on the receiver: the authentic export receipt is a declaration, not a live read
 of absent VM01 files. Only 48 NPZs and sanitized rows may enter a native join;
 technical receipts/private host proofs are never native mounts.
-# Independent source qualification
+## Independent source qualification
 
 Original repaired pose producer e2d8 now has an actual full48 PASS, independently
 recorded in `results/audits/vcoco_full_pose_v2_actual.json`. The transfer still
@@ -74,3 +74,13 @@ Root162 return/metadata/pose/join controls PASS2.42s. Full original376/381 Git
 closure and exact helper parity independently reconstructed; owned fixtures
 removed. This source qualification is not an actual export/import or a quality
 result. VM01 upload permission must be qualified separately before dispatch.
+
+## Deployment permission preflight
+
+Control-plane queries confirm VM01's existing container Reader+Delete roles and
+VM02's existing container Contributor role. One narrowly scoped custom role adds
+only `blobs/write` for VM01 at the existing runtime-transfers container; no
+management action, account key, SAS, public endpoint or broader Contributor role
+was granted. Exact definition/assignment were requeried. The compact RBAC audit
+is `results/audits/vcoco_full_pose_transfer_rbac.json`. No data-plane request or
+credential persistence follows from this preflight. Actual export is separate.
