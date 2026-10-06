@@ -1,0 +1,97 @@
+{
+  "GPU_used": false,
+  "dest_inventory": {
+    "entries": [],
+    "exists": false
+  },
+  "diagnostic_phase": "final_source_receipt_inventory_posthash",
+  "export_receipt_saved": true,
+  "full_current_git_source_verified_before_after": true,
+  "manifest_saved": true,
+  "media_decoded": false,
+  "models_executed": false,
+  "observer_seconds": 0.4375992720015347,
+  "original_fields": {
+    "archive_removed": true,
+    "blob_cleanup_verified": false,
+    "elapsed_seconds": 0.5756366139976308,
+    "error_type": "ValueError",
+    "files": 36,
+    "original_producer_revision": "e1a01f303f533344a10ef0e4eb216c2eb13c9182",
+    "outputs_sealed": true,
+    "phase": "import",
+    "producer_revision": "7c11662f98cf6f3db28909dce147473f1ab3bd0c",
+    "source_inputs_rehashed_after": true,
+    "status": "fail"
+  },
+  "original_import_replayed": false,
+  "original_receipt_identity": {
+    "bytes": 4969,
+    "sha256": "877d595c1e91ec937270553595c40e6d8cb782269dd5f62b2eeddbf9de775ee1"
+  },
+  "out_inventory": {
+    "count": 3,
+    "entries": [
+      {
+        "bytes": 5638,
+        "directory": false,
+        "gid": 0,
+        "mode": "0o400",
+        "name": "export-receipt.json",
+        "uid": 0
+      },
+      {
+        "bytes": 5166,
+        "directory": false,
+        "gid": 0,
+        "mode": "0o400",
+        "name": "manifest.json",
+        "uid": 0
+      },
+      {
+        "bytes": 4969,
+        "directory": false,
+        "gid": 0,
+        "mode": "0o400",
+        "name": "report.json",
+        "uid": 0
+      }
+    ],
+    "exists": true,
+    "gid": 0,
+    "mode": "0o500",
+    "uid": 0
+  },
+  "ownstage_present": false,
+  "producer_revision": "7c11662f98cf6f3db28909dce147473f1ab3bd0c",
+  "receipt_and_inventory_unchanged": true,
+  "reference_values_read": false,
+  "replica_committed": false,
+  "saved_control_pins": {
+    "export-receipt.json": {
+      "bytes": 5638,
+      "sha256": "cc7874d9c9fd21a6137f48066d7edfe8290af962eed5f8db4e9faff6a35591e3"
+    },
+    "manifest.json": {
+      "bytes": 5166,
+      "sha256": "7c0786e64de612080c01cf4699a63fafaf3b70f9ac6a9b70fc77e4d8d9b40174"
+    }
+  },
+  "schema": "world_reward.vcoco_observation_replica_import_failure_diagnostic.v1",
+  "source_entries": 327,
+  "source_files": 322,
+  "stage_inventory": {
+    "entries": [],
+    "exists": false
+  },
+  "status": "pass",
+  "unit": {
+    "ActiveState": "failed",
+    "ExecMainStatus": "1",
+    "LoadState": "bad-setting",
+    "MainPID": "0",
+    "Result": "exit-code",
+    "SubState": "failed"
+  },
+  "vm01_released": true
+}
