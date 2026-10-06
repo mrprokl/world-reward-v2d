@@ -151,6 +151,10 @@ remain caller obligations. Independent review exposed an exception-swallowing
 path: the solver now latches the first failed callback, forbids later callbacks
 or final verification, and the runner preserves safe bounded diagnostics.
 No arithmetic, tolerance, initialization or scientific retry changed.
+Final failure-ledger check preserves the original reason/phase while retaining
+fold, lambda index and completed CV-cell count. Root500 related controls
+PASS1.98s; independent121 solver/runner controls PASS0.97s. These are source
+and tiny-control qualifications only; actual FIT remains unexecuted.
 
 Operational adequacy proposal: at least six informative images per FIT fold
 with a jointly covered positive and a competing automatic candidate, and at

@@ -14,9 +14,10 @@ from .fixed_fold_regularization import FixedFoldClosed, select_fixed_fold_regula
 
 
 class FixedFitClosed(ValueError):
-    def __init__(self, reason, phase, *, evaluations=None, fold=None, lambda_index=None):
+    def __init__(self, reason, phase, *, evaluations=None, fold=None, lambda_index=None, completed=0):
         self.reason, self.phase, self.evaluations = reason, phase, evaluations
         self.fold, self.lambda_index = fold, lambda_index
+        self.completed = completed
         self.status, self.cleanup_failed = 'INCONCLUSIVE', False
         super().__init__(reason)
 @dataclass(frozen=True, eq=False)
@@ -181,6 +182,7 @@ def fit_coherent_pair_ab(record_ids, folds, lambdas, prepare, score_rows, *,
     except FixedFoldClosed as exc:
         failure = pending or FixedFitClosed(exc.reason, 'cross_validation',
             fold=exc.fold, lambda_index=exc.lambda_index)
+        failure.fold, failure.lambda_index, failure.completed = exc.fold, exc.lambda_index, exc.completed
     except FixedFitClosed as exc:
         failure = exc
     except Exception:

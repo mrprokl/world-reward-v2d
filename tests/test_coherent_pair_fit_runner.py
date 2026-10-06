@@ -235,6 +235,21 @@ def test_missing_context_rejects_not_reprepared():
     assert len(count) == 1
 
 
+def test_failed_next_fold_retains_phase_and_complete_cv_progress_without_retry():
+    callbacks = Callbacks(); attempts = []
+    def prepare(ids):
+        attempts.append(ids)
+        if len(attempts) == 2:
+            raise RuntimeError('SECRET_SENTINEL')
+        return callbacks.prepare(ids)
+    with pytest.raises(runner.FixedFitClosed, match='prepare_failed') as exc:
+        run(callbacks, prepare=prepare)
+    assert exc.value.phase == 'prepare' and exc.value.fold == 1
+    assert exc.value.lambda_index == 0 and exc.value.completed == 3
+    assert len(attempts) == 2 and len(callbacks.released) == 1
+    assert len(callbacks.solves) == 3 and 'SECRET' not in repr(vars(exc.value))
+
+
 def test_release_failure_after_successful_b_is_not_promoted_to_pass():
     callbacks = Callbacks()
     def release(context):

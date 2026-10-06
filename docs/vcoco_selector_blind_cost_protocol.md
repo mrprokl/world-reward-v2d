@@ -123,6 +123,9 @@ Third saved observer remains RUNNING with the same PID580045 and03:54:39UTC
 start, RSS1764832KiB/current1568894976 bytes; cgroup peak unchanged6315323392.
 No report is sealed, no native phase decoded, no references or replay. These
 three bounded observations establish liveness only, not a numerical verdict.
+Fourth observer is also RUNNING/nonsealed with the same process; current
+1028739072 bytes and RSS1238608KiB, peak unchanged. No native phase, quality
+or successful-cost inference follows from falling instantaneous memory.
 
 Prospective efficiency boundary: the current PairCache normal constructor
 independently recomputes caller-supplied template/factors, while its factory
