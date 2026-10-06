@@ -1,0 +1,12 @@
+{
+  "azure_cli_exit": 0,
+  "observer_source_sha256": "a327061af041749475e302c0105f715421899fb95d4cab23c9a656edaa6408cf",
+  "sanitized_transport": {
+    "last_error_types": [],
+    "message_bytes": 357
+  },
+  "schema": "world_reward.vcoco_hoi_saved_replica_export_actual_audit.v2",
+  "stage": "transport_marker",
+  "status": "partial",
+  "vm02_released": true
+}

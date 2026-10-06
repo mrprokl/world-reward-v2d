@@ -221,6 +221,18 @@ availability, not model qualification), so fresh48 CPU anatomy requires an
 Azure-only input transfer to existing VM01, not a substituted runtime. No FIT,
 CAL, actor/ownership selection, adoption or leaderboard improvement follows.
 
+Shared public48 anatomy/HOI adapters are separately source-qualified: two
+modules177/148LOC, host old48receipt authentication→strict four-key public
+projection, native17-helper source plus49 RGB/48 endpoint leaves only. No old
+host report/privateacq/grant/split/model receipt mounts. Full17 validation before
+first callback; original pose.observe/infer ABI and HOI1500/allK retained,
+11/19-array exclusive roundtrip, partial/deadline integrity. Author150 controls
+PASS21.89s (37 dedicated), independent37 PASS21.22s, root102 PASS21.40s; AST and
+qualified numerical pins unchanged. Test-only compression repairs disposable
+fixture disk exhaustion, not production data/math; owned fixtures removed.
+No48 anatomy/HOI inference, new runtime/FIT/ownership result follows. Existing
+16-image join rejects48slots and needs a separate explicit cardinality seam.
+
 - 2026-10-02 R01 (synthetic only): multi-hypothesis SO(3)/translation Viterbi with
   image confidence and explicit true mesh symmetries implemented. Generated
   occlusion scene: greedy mean translation error 0.342857 m, selected path 0 m.
