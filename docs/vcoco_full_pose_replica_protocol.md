@@ -132,3 +132,17 @@ verified; same authentic12244-byte export receipt passes locally without NumPy.
 This remains source qualification. A fresh importer source and actual sealed
 receipt are required; the historical87a705 join must be released with the new
 receiver helper bytes before dispatch, not aliased to the old source context.
+
+## Actual distinct private-namespace import
+
+Producer `1f1453daae8343dc8a077b918e93f7fe7c36e467` completed1.3227s. Saved audit
+verifies its whole378/383 source, root-private ancestors, all49 payload leaves
+and three technical receipts before/after; public48 retains331 people/528 array
+descriptors. Actual import receipt12515B/SHA256
+`d871126667422258066cb461b274d29fa36a513ee71c04b1c23852ab09b6b303`.
+The exact original archive/manifest/export pins remain unchanged. One saved
+If-Match DELETE202 and removed archive/stage are verified as declarations and
+filesystem absence, not an observer Blob request. Collected unit exit is
+unavailable. Original failed receipt unchanged; no numerical array replay,
+model run, FIT or ownership-quality result. Compact saved audit:
+`results/audits/vcoco_full_pose_replica_import_v2_actual.json`.

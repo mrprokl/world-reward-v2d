@@ -11,10 +11,9 @@ The original HOI model completed48 forwards in52.57s; the saved-only audit is
 These are complete observations, not1398 correct ownership labels.
 The original pose callable completed331 crops in26.32s; its saved-only audit is
 [`vcoco_full_pose_v2_actual.json`](../results/audits/vcoco_full_pose_v2_actual.json).
-The pose-only Azure export passed, but its first import failed closed before
+The pose-only Azure export passed; its first import failed closed before
 download/install. This is a technical transport failure, not a failed or
-successful background-selection experiment; no joined evidence or FIT follows
-from it. The immutable FAIL is recorded separately in
+successful background-selection experiment. The immutable FAIL is recorded in
 [`vcoco_full_pose_replica_import_v1_actual.json`](../results/audits/vcoco_full_pose_replica_import_v1_actual.json).
 The read-only diagnostic identifies a deployment namespace mismatch: the shared
 data parent belongs to uid/gid1000 at0755, while the receiver requires root700.
@@ -22,6 +21,11 @@ The authentic export and all incoming pins pass; no payload/scientific change
 is justified. Preserve that parent and qualify a separate private replica
 namespace before a fresh import; see
 [`vcoco_full_pose_replica_import_v1_namespace_diagnostic.json`](../results/audits/vcoco_full_pose_replica_import_v1_namespace_diagnostic.json).
+The separately source-qualified private-namespace importer completed in1.323s,
+with all49 public leaves/three receipts rehashed and one declared ETag DELETE202;
+see [`vcoco_full_pose_replica_import_v2_actual.json`](../results/audits/vcoco_full_pose_replica_import_v2_actual.json).
+The old FAIL and shared data parent remain untouched. No model was rerun and no
+joined numerical evidence, FIT or selection quality follows from transport.
 
 ## Two shortcuts are verified, not solutions
 
