@@ -516,3 +516,28 @@ to the laptop, clone a runtime, read reference metadata in a predictor, or
 infer image parity from similar tags. References8–15 remain sealed; a fresh
 permitted FIT/CAL population is needed before learned selector comparison.
 No anatomy/owner/temporal/3D result or leaderboard improvement is claimed.
+
+## Current integration boundary
+
+The source-frozen16-image HOI caller is now dispatched on VM02, after independent
+review caught and fixed a normal-pip wheel-permission precondition before GPU
+work. It keeps every native query/pair, all16 slots and each endpoint-bank
+identity, not a top1 hand/object. Actual execution now passes an independent
+saved-only audit:16 forwards/1500 queries each/165 raw H→O pairs,56.82s host,
+full source/runtime/input/output/cleanup preservation. These are not verified
+owners or contacts. Root287 combined evidence/route/objective/pose/retrieval tiny
+tests PASS1.12s; these mechanics are not background rejection accuracy.
+
+VM01's identical-byte replica import preserves its original FAIL. Metadata
+diagnostic proves the parent absent; the minimal private-parent bootstrap now
+passes independent verification in0.438535s without reading Blob/RGB, importing
+data or invoking models. A single fresh original-import revision is permitted
+with the same exported37-member archive, not another export or chosen images.
+The all-person DWPose caller remains conditional on successful verified import.
+
+The separately executed metadata-only census passes195 TRAIN/191 VAL photos
+after448 historical/pilot exclusions. Source-qualified deterministic32 FIT/16
+CAL selection is a **private identity projection**, not an acquired/trained
+corpus. All48 originals remain required. FIT-only learning, frozen parameters,
+single CAL evaluation and a distinct final validation are still necessary;
+positive V-COCO roles alone cannot qualify hand ownership or manipulation.

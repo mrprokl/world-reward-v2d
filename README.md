@@ -44,6 +44,18 @@ IoU0.5 (gate70%; person93.75%, object100%). All16 banks were validated before
 not learned actor selection, anatomical ownership, unseen pretraining or a
 CARI4D/leaderboard gain. Next: separately frozen person-attached pose and
 relational observations, then legal fresh FIT/calibration and held-out quality.
+The new count-only TRAIN/VAL census is independently sealed PASS:195/191 fresh
+eligible photos after448 exclusions,831.47s, no RGB or selector FIT. A separate
+deterministic32-FIT/16-CAL identity freeze is source-qualified, not yet executed.
+All48 originals are required; no availability-selected replacement subset.
+The all16-image native HOI observation run now passes its independent saved-only
+audit: one model,16 forwards, full1500 queries and165 raw H→O pairs,56.82s host.
+This is observation execution, not165 correct interactions or a selector.
+VM01's original public-bank import failed before installation
+because the private data parent was absent. A minimal parent-only bootstrap now
+passes independent saved verification; the original FAIL and exact exported
+bytes are preserved. One fresh unchanged-import revision is authorized before
+the independently source-qualified all-person DWPose observations can run.
 The first strict VG/COCO-linked reference census
 completes but yields0 eligible photos: this path is closed without RGB, relaxed
 joins or retries. Fresh external validation remains necessary.

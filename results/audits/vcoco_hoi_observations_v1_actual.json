@@ -1,0 +1,148 @@
+{
+  "NPZ_bytes_verified_only": true,
+  "acquisition_report_pin": {
+    "bytes": 4471,
+    "sha256": "b424f6227cefe69a9e112310a226b84cfcd44780f14fa3cf31f71934dad709a3"
+  },
+  "adoption": false,
+  "array_fields_per_image": 19,
+  "audit_elapsed_seconds": 17.62775819300441,
+  "audit_scope": "saved receipts, full source, image and original byte-bound inputs only",
+  "audit_stage": "complete",
+  "complete_images": 16,
+  "current_source_files": 344,
+  "driver_process_absent": true,
+  "exact_CID_name_owner_label_absent": true,
+  "hand_object_pair_counts": [
+    1,
+    12,
+    25,
+    6,
+    3,
+    6,
+    2,
+    4,
+    2,
+    12,
+    9,
+    8,
+    12,
+    12,
+    50,
+    1
+  ],
+  "host_elapsed_seconds": 56.81595445499988,
+  "host_pin": {
+    "bytes": 63341,
+    "sha256": "c92e7282c7b73b1760881f4f709ac5bc6c060b4f1b343dbfe2c07bd14a911f09"
+  },
+  "input_payload_files": 36,
+  "known_receipts": {
+    "model": {
+      "calls": 16,
+      "elapsed_seconds": 50.364381553954445,
+      "error_type": null,
+      "models": 1,
+      "phase": "complete",
+      "pin": {
+        "bytes": 56785,
+        "sha256": "3580f7beb7c3bb97a12eac1b4e18ec83b382271d874f78824782d373226bdc76"
+      },
+      "post_error_type": null,
+      "status": "pass"
+    },
+    "overlay": {
+      "calls": 0,
+      "elapsed_seconds": 22.659644511993974,
+      "error_type": null,
+      "models": 0,
+      "phase": "complete",
+      "pin": {
+        "bytes": 23954,
+        "sha256": "da6f87d6eb92e853ac72ded561a285aeee489d9f0d93d6f72a112bec75b4c300"
+      },
+      "post_error_type": null,
+      "status": "pass"
+    }
+  },
+  "model_proof_pin": {
+    "bytes": 417398,
+    "sha256": "468747fa1b2d0d8885e0b132f0013fa8b7ec86761f73a0a632576b0cb4a8cbf6"
+  },
+  "model_qualification_native_pin": {
+    "bytes": 3572,
+    "sha256": "51c30b02ba9127b3a6208e6e4f2ce77469f2e6434188742ed00d72b54bdd3dcb"
+  },
+  "models_loaded": 0,
+  "native_detection_counts": [
+    2,
+    8,
+    10,
+    5,
+    4,
+    5,
+    3,
+    5,
+    3,
+    7,
+    6,
+    6,
+    7,
+    7,
+    15,
+    2
+  ],
+  "native_pin": {
+    "bytes": 56785,
+    "sha256": "3580f7beb7c3bb97a12eac1b4e18ec83b382271d874f78824782d373226bdc76"
+  },
+  "numerical_replay": false,
+  "object_target_pair_counts": [
+    0,
+    3,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "original_error_fields": {},
+  "original_status": "pass",
+  "outputs_sealed": true,
+  "overlay_proof_pin": {
+    "bytes": 394223,
+    "sha256": "848e0dedb5e6a8c8e1a008bd935d1de6efae320db585f7ac57ddbbd4bdcb5de0"
+  },
+  "owned_scratch_overlay_absent": true,
+  "producer_revision": "fc3c91bd9d156c501ed42abd9e342d1158883047",
+  "quality_verified": false,
+  "raw_queries_per_image": 1500,
+  "reference_values_read": false,
+  "runtime_image": "sha256:5fa124a3c7c92c0482b6be0d1477f43da2d246d550411170e01a8f9d4fb8523a",
+  "runtime_report_pin": {
+    "bytes": 13248,
+    "sha256": "906bf42aaeaf6612586de1b93c4039a5f969233022f346d64ae84a975debb445"
+  },
+  "schema": "world_reward.vcoco_hoi_saved_actual_audit.v1",
+  "source_closures_verified": 5,
+  "source_inputs_outputs_image_rehashed_after": true,
+  "status": "pass",
+  "strict_checkpoint_keys": 1796,
+  "systemd_exit_qualification": "not inferred from collected defaults",
+  "unit": {
+    "ActiveState": "inactive",
+    "LoadState": "not-found",
+    "MainPID": "0",
+    "SubState": "dead",
+    "exit_observation": "UNAVAILABLE_COLLECTED"
+  }
+}

@@ -70,3 +70,19 @@ creator identity, checkpoint training overlap, challenge overlap and competition
 eligibility are not established; no leakage-free, owner/contact, quality or
 adoption claim follows from native execution. This caller is not a selector or a
 training recipe, and does not reopen any closed cohort.
+
+## Actual original-model observation bank
+
+The solefc3c91bd9d156c501ed42abd9e342d1158883047 run completes PASS56.815954s
+host/50.364382s native model phase, one model and16 original forwards. All16
+complete19-array banks retain1500 queries each and165 H→O pairs, with original
+counts/IDs and every empty O→T set preserved. These are predicted relations,
+not165 verified interactions, contacts or owners. No reference values are read.
+Independent saved-only audit PASS17.627758s verifies five complete Git closures,
+original runtime/image, acquisition/model receipts,36 public input files, all
+output byte pins/modes and before/after preservation. Exact CIDs/names/labels
+and driver are absent; owned overlay/scratch are removed. The historical
+collected exit stays unavailable. Host63341B/SHAc92e7282…, model56785B/SHA3580f7be…
+and proof417398B/SHA468747fa… remain Azure; local3428-byte audit keeps full pins.
+NPZ bytes, not a new numerical replay, are independently verified. Selection,
+anatomical correspondence, FIT/CAL and reconstruction quality remain unqualified.
