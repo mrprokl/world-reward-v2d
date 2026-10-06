@@ -84,3 +84,20 @@ management action, account key, SAS, public endpoint or broader Contributor role
 was granted. Exact definition/assignment were requeried. The compact RBAC audit
 is `results/audits/vcoco_full_pose_transfer_rbac.json`. No data-plane request or
 credential persistence follows from this preflight. Actual export is separate.
+
+## Actual pose-only export
+
+Producer `be9087a031f3755f3947276a2cb3bb5f8dcb0fd7` exported all49 leaves in
+3.2855s, no inference or data change. Independent saved audit rehashes current378,
+pose376 and original qualified347 source closures,52 old outputs,101 receiver
+leaves,21 assets/notices and B47 metadata before/after. Public48 pose rows retain
+331 people /528 array descriptors. Export receipt12244B/SHA256
+`7a50df9987fdd891df95f97e5c07139f5db85e28376f1ef1e052dcb526c0127f`;
+declared archive1,392,640B/SHA256
+`b4c067754ec4858f97abcee87e34e6ee782c2809dec9979e582a9a57138c3a61`;
+manifest6747B/SHA256
+`565dbeaba155022ade49bfaa792006a0605ab4a7a330887ab808357dc86fd2e0`.
+Archive SHA/ETag are saved producer streaming/HEAD evidence, not an observer
+Blob read. Collected unit exit unavailable; installed receiver bytes still must
+pass their separate import. No numerical replay, RGB transfer, FIT or quality
+claim. Heavy payload stays Azure; local control receives only bounded receipts.

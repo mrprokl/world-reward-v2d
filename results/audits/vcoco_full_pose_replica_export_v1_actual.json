@@ -1,0 +1,75 @@
+{
+  "Blob_operations_performed": false,
+  "NumPy_imported": false,
+  "RGB_NPZ_decoded": false,
+  "archive": {
+    "bytes": 1392640,
+    "sha256": "b4c067754ec4858f97abcee87e34e6ee782c2809dec9979e582a9a57138c3a61"
+  },
+  "archive_SHA_and_ETag_basis": "saved_producer_stream_and_HEAD_declaration_no_observer_Blob_request",
+  "archive_body_independently_verified": false,
+  "archive_removed": true,
+  "asset21_and_B47_metadata_prepost_verified": true,
+  "audit_elapsed_seconds": 3.370217,
+  "azure_run_command_exit_status": 0,
+  "blob_etag": "\"0x8DF2356C4018F00\"",
+  "current_source": {
+    "closure_sha256": "cb3e65d545ffeee769a4d00afc2fb066c7210a48f3eaaffbeb0785e40b9942d6",
+    "entries": 383,
+    "files": 378,
+    "source_XZ_sha256": "5cc19ff37c04f8b7bf3e40bf35c008229b615a8b4128fbe6728253a1ed5779e2"
+  },
+  "current_source_prepost_verified": true,
+  "elapsed_seconds": 3.2854916809592396,
+  "images": 48,
+  "manifest": {
+    "bytes": 6747,
+    "sha256": "565dbeaba155022ade49bfaa792006a0605ab4a7a330887ab808357dc86fd2e0"
+  },
+  "models_loaded": false,
+  "native_array_metadata": 528,
+  "native_numeric_arrays_independently_decoded": false,
+  "observer_script_sha256": "3fd551b0069cf72756fd3aec72e5a6e1d36ea371845e14bbd0e0927ac3590483",
+  "original52_pose_outputs_and_endpoint_receiver101_prepost_verified": true,
+  "outputs_sealed": true,
+  "ownership_verified": false,
+  "persons": 331,
+  "phase": "export",
+  "pose376_and_qualification347_source_prepost_verified": true,
+  "pose_receipt_pins": {
+    "native.json": {
+      "bytes": 341744,
+      "sha256": "d81a5d2db927609daedc1d2f9c97d88ab0fa1a5287ac3901086cb8735296a137"
+    },
+    "proof.json": {
+      "bytes": 4221,
+      "sha256": "45090e658b7980a8056022c3c472453a39e4f7d6cbca86a8530e971b6ab9d023"
+    },
+    "report.json": {
+      "bytes": 160633,
+      "sha256": "f4fd034ade378261cc227539dd0f3e331b136a8762ad8f8f67d03d96e8ce3c26"
+    }
+  },
+  "producer_process_absent": true,
+  "producer_revision": "be9087a031f3755f3947276a2cb3bb5f8dcb0fd7",
+  "public_payload49_pins_prepost_verified": true,
+  "public_pose_projection": {
+    "bytes": 136043,
+    "sha256": "a2aebe86645210c23802c57be11c8e75d0b107d95f79a9c733f8b968089a2c38"
+  },
+  "quality_verified": false,
+  "reference_metadata_read": false,
+  "report": {
+    "bytes": 12244,
+    "sha256": "7a50df9987fdd891df95f97e5c07139f5db85e28376f1ef1e052dcb526c0127f"
+  },
+  "saved_native_status": "pass",
+  "schema": "world_reward.vcoco_full_pose_replica_export_saved_audit.v1",
+  "source_inputs_rehashed_after": true,
+  "stage": "complete",
+  "status": "PASS",
+  "unit": {
+    "LoadState": "not-found",
+    "exit_verification": "UNAVAILABLE_COLLECTED"
+  }
+}
