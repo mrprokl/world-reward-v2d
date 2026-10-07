@@ -228,3 +228,15 @@ unlabelled-video consistency diagnostics, and human visual QA. Reprojection,
 silhouette fit, apparent smoothness and physical residuals alone cannot certify
 the correct target or 3D truth. Hidden official metric gains remain unknown
 until scoring; do not turn a visual approval into a CARI4D superiority claim.
+
+## FORM-HOI as a future complementary benchmark — 2026-10-07
+
+User decision: retain [FORM-HOI](https://huggingface.co/datasets/nvidia/form-hoi)
+as a possible later progress-measurement resource, not an ultimate ground truth
+or an immediate acquisition/experiment. Its reconstructed, quality-reviewed
+references are imperfect. Before use, verify challenge eligibility and exclude
+challenge-matched sequences/assets; freeze disjoint development/held-out splits.
+Inference receives one RGB view only, never reference poses, meshes, depth or
+source calibration. References remain evaluator-only. Combine its results with
+visual QA and independent evidence; improvement there does not establish an
+official leaderboard gain. No FORM-HOI assets were acquired for this decision.
