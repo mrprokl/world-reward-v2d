@@ -197,3 +197,34 @@ not hand-authored per-episode prompts, nearest-hand rules or an unconditioned
 universal selector.
 Simple automatic grounding/tracking is a valid hypothesis to compare; neither
 this review nor a static role-pair gain establishes its quality/generalization.
+
+## Evaluation-first and visual QA checkpoints — 2026-10-07
+
+User requests concise progress and lightweight visual involvement at meaningful
+decisions. Synthetic benchmarking remains deferred. Do not start another broad
+FIT/component campaign just to accumulate technical PASS counts.
+
+Next useful comparison: frozen existing baseline versus one automatic,
+object/action-conditioned temporal association hypothesis, with identical
+downstream reconstruction and full original timelines. Before execution, declare
+the external development/held-out scope, exact configurations, runtime budget,
+metrics and abandonment rule; existing closed studies stay unchanged. Static
+V-COCO retrieval cannot replace temporal/full-4D reference evaluation.
+
+Show source RGB and automatic masks/instance IDs before expensive reconstruction;
+then paired baseline/candidate mesh overlays and a short timeline excerpt after
+the first complete comparison. Include fixed time-spaced views plus automatically
+flagged failure/uncertainty views; never show only favourable frames. Render on
+Azure; return only authorized low-resolution previews and concise scalars.
+
+Human review identifies failure classes and whether evidence warrants the next
+experiment. On challenge videos it is QA only, not target-ID/box/point/contact
+annotation, episode-specific settings or winner selection based on human test
+predictions. Algorithm changes are global and must be checked on lawful external
+development data; once-opened held-out data cannot be relabelled as fresh test.
+
+Report three distinct evidence levels: reference-backed external quality,
+unlabelled-video consistency diagnostics, and human visual QA. Reprojection,
+silhouette fit, apparent smoothness and physical residuals alone cannot certify
+the correct target or 3D truth. Hidden official metric gains remain unknown
+until scoring; do not turn a visual approval into a CARI4D superiority claim.
