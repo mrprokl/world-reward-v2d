@@ -58,6 +58,10 @@ def worker_command(code, outputs, preview, cfg, episode, script, args, image, na
         'MOMENTUM_ENABLED=0', 'WANDB_MODE=disabled', 'OMP_NUM_THREADS=8', 'MPLBACKEND=Agg',
         'TORCH_HOME='+str(ROOT/('weights/sam3d/torch_home' if image == cfg['object_image'] else 'weights/cari4d/sam3d_body/torch_home')),
         'HF_HOME='+str(ROOT/('weights/sam3d/hf_home' if image == cfg['object_image'] else 'weights/cari4d/hf_home'))]
+    if image == cfg['object_image']:
+        # Preserve the exact native image setting removed by env -i. This
+        # installed image intentionally omits the initializer module.
+        env.append('LIDRA_SKIP_INIT=1')
     return command + ['--entrypoint', '/usr/bin/env', image, '-i', *env,
         '/opt/conda/bin/python', '-B', str(code/script), '--episode', str(episode), *args]
 

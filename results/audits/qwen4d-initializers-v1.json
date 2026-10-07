@@ -1,0 +1,17 @@
+{
+  "source_revision": "816941559b3005af64c004f9561f95b676b7fc80",
+  "scope": "three_frame_geometry_QA_before_full_video_4D",
+  "status": "complete_diagnostic_not_quality_pass",
+  "elapsed_seconds": 142.4965001899982,
+  "episodes": [
+    {"episode": 8, "mask_frames": 634, "body_depth_scale": "pass", "object": "pre_inference_import_fail"},
+    {"episode": 9, "mask_frames": 415, "body_depth_scale": "pass", "object": "pre_inference_import_fail"},
+    {"episode": 26, "mask_frames": 399, "body_depth_scale": "pass", "object": "pre_inference_import_fail"}
+  ],
+  "object_error": "ModuleNotFoundError: sam3d_objects.init",
+  "baseline_untouched": true,
+  "source_rehashed_after": true,
+  "full_4d_candidate": false,
+  "quality_verified": false,
+  "decision": "Preserve all failures. env -i removed the pinned image's native LIDRA_SKIP_INIT=1. Restore exactly that value in a new isolated run, unchanged model/settings."
+}

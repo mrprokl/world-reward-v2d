@@ -136,3 +136,43 @@ def test_mask_overlay_has_no_depth_order_in_overlap_and_does_not_modify_inputs()
     np.testing.assert_array_equal(result[0, 2],
         np.rint(48 + .52*(np.asarray(preview.HUMAN_RGB)+np.asarray(preview.OBJECT_RGB))/2))
     np.testing.assert_array_equal(rgb, 100)
+
+
+def failed_experiment():
+    return dict(schema='world_reward.qwen4d_initializers.v1', status='complete_diagnostic_not_quality_pass',
+        phase='complete', producer_revision=preview.FAILED_PRODUCER, baseline_modified=False,
+        model_math_changed=False, ground_truth_used=False, hand_labeled_test=False, oracle_modes=[],
+        full_4D_run=False, quality_verified=False, source_rehashed_after=True,
+        episodes=[dict(episode=ep, status='fail', phase='object_grounded', error_type='ValueError',
+            stages=[dict(stage=stage, report={'bytes': 123, 'sha256': 'a'*64})
+                for stage in ('body_smoke', 'depth_smoke', 'scale_smoke')]) for ep in (8, 9, 26)])
+
+
+def test_failure_review_is_explicit_and_original_failures_are_not_promoted():
+    import inspect
+    assert inspect.signature(preview.run).parameters['body_only_failure_review'].default is False
+    value = failed_experiment()
+    assert len(preview.failure_review_contract(value, preview.FAILED_PRODUCER)) == 3
+    value['episodes'][0]['status'] = 'pass'
+    with pytest.raises(ValueError):
+        preview.failure_review_contract(value, preview.FAILED_PRODUCER)
+
+
+@pytest.mark.parametrize('field,value', [('status', 'pass'), ('phase', 'running'),
+    ('ground_truth_used', 0), ('full_4D_run', True), ('source_rehashed_after', False)])
+def test_failure_review_rejects_status_reclassification_or_unverified_sources(field, value):
+    report = failed_experiment(); report[field] = value
+    with pytest.raises(ValueError):
+        preview.failure_review_contract(report, preview.FAILED_PRODUCER)
+
+
+def test_failure_review_requires_the_complete_exact_three_clip_boundary():
+    for change in ('episode_order', 'failure_phase', 'error', 'stage_order', 'revision'):
+        report = failed_experiment()
+        if change == 'episode_order': report['episodes'].reverse()
+        if change == 'failure_phase': report['episodes'][0]['phase'] = 'preview'
+        if change == 'error': report['episodes'][0]['error_type'] = 'RuntimeError'
+        if change == 'stage_order': report['episodes'][0]['stages'].reverse()
+        if change == 'revision': report['producer_revision'] = 'b'*40
+        with pytest.raises(ValueError):
+            preview.failure_review_contract(report, preview.FAILED_PRODUCER)

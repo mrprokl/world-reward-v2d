@@ -57,3 +57,12 @@ def test_launcher_has_bounded_no_credentials_environment():
     assert '/usr/bin/env -i' in text and '4500s' in text
     assert 'WR_CODE_REVISION="$REV"' in text
     assert 'set +x' in text
+
+
+def test_objects_retains_native_image_initialization_setting(monkeypatch):
+    monkeypatch.setenv('WR_CODE_REVISION', 'a'*40)
+    monkeypatch.setenv('WR_OUTPUT_PREFIX', 'experiments/qwen4d-v1-'+'a'*40+'/outputs')
+    cfg = json.loads((Path(__file__).resolve().parents[1]/pilot.CONFIG).read_text())
+    args = pilot.worker_command(pilot.ROOT/'code', pilot.ROOT/'experiment/outputs', None,
+        cfg, 8, 'infra/object_smoke.py', (), cfg['object_image'], 'tiny', 'a'*40)
+    assert 'LIDRA_SKIP_INIT=1' in args

@@ -26,6 +26,7 @@ ROOT = Path('/srv/scenesmith/world-reward')
 DATASET = '5f68335f3acc802033d1e80728c1633197521de8'
 MODEL = 'Qwen/Qwen3-VL-8B-Instruct'
 MODEL_REVISION = '0c351dd01ed87e9c1b53cbc748cba10e6187ff3b'
+FAILED_PRODUCER = '816941559b3005af64c004f9561f95b676b7fc80'
 WIDTH, HEIGHT, MAX_JPEG_BYTES = 320, 240, 180_000
 
 
@@ -213,8 +214,30 @@ def load_baseline(root, code, episode, total, camera, sources):
     return target, faces, trajectory
 
 
-def run(root, code, revision, prefix, episode, output):
+def failure_review_contract(report, revision):
+    """The explicit observer does not promote or repair the failed experiment."""
+    expected = dict(schema='world_reward.qwen4d_initializers.v1',
+        status='complete_diagnostic_not_quality_pass', phase='complete', producer_revision=revision,
+        baseline_modified=False, model_math_changed=False, ground_truth_used=False,
+        hand_labeled_test=False, oracle_modes=[], full_4D_run=False, quality_verified=False,
+        source_rehashed_after=True)
+    require(revision == FAILED_PRODUCER
+        and all(type(report.get(k)) is type(v) and report[k] == v for k, v in expected.items()),
+        'Explicit original failed experiment required; no failed-status promotion')
+    rows = report.get('episodes')
+    require(type(rows) is list and len(rows) == 3
+        and [row.get('episode') for row in rows] == [8, 9, 26], 'Exact original failed three-clip population required')
+    for row in rows:
+        require(row.get('status') == 'fail' and row.get('phase') == 'object_grounded'
+            and row.get('error_type') == 'ValueError'
+            and [r.get('stage') for r in row.get('stages', [])] ==
+                ['body_smoke', 'depth_smoke', 'scale_smoke'], 'Original object failure and completed three-stage boundary required')
+    return rows
+
+
+def run(root, code, revision, prefix, episode, output, *, body_only_failure_review=False):
     started = time.perf_counter()
+    require(type(body_only_failure_review) is bool, 'Explicit boolean failure-review mode required')
     root, code, output = map(canonical, (root, code, output))
     base = candidate_base(root, prefix, revision, episode)
     require(output.is_dir() and output.stat().st_uid == os.getuid() and not any(output.iterdir())
@@ -229,6 +252,17 @@ def run(root, code, revision, prefix, episode, output):
     sources.bind(code/'infra/reconstruction_preview.py', maximum=1 << 20)
     sources.bind(code/'infra/camera_render.py', maximum=1 << 20)
     sources.bind(code/'src/world_reward/mesh_geometry.py', maximum=1 << 20)
+    failed_experiment = None
+    if body_only_failure_review:
+        failed_experiment = sources.json(root/'experiments'/f'qwen4d-v1-{revision}'/'report.json')
+        failed_rows = failure_review_contract(failed_experiment, revision)
+        # Preserve the complete original failure boundary, including all three
+        # independent clips, before reading any saved candidate geometry.
+        for row in failed_rows:
+            row_base = candidate_base(root, prefix, revision, row['episode'])
+            sources.bind(row_base/'automatic_masks/report.json', row['masks'])
+            for stage in row['stages']:
+                sources.bind(row_base/stage['stage']/'report.json', stage['report'])
     manifest = sources.json(root/'results/input-manifest.json')
     require((manifest.get('track'), manifest.get('repo_id'), manifest.get('revision')) ==
         ('track_1', 'nvidia/video_to_data_challenge', DATASET), 'Pinned original Track1-only manifest required')
@@ -250,12 +284,23 @@ def run(root, code, revision, prefix, episode, output):
     body_report_path = base/'body_smoke/report.json'
     body = sources.json(body_report_path)
     scale_path = base/'scale_smoke/report.json'; scale = sources.json(scale_path)
-    object_dir = base/'object_grounded'; obj_report = sources.json(object_dir/'report.json')
-    for report, stage in ((mask_report, 'automatic_masks'), (body, 'sam3d_body_three_frame_smoke'),
-            (scale, 'predicted_human_anchored_moge2_pointmaps'), (obj_report, 'sam3d_objects_grounded_fixed_frame')):
+    object_dir = base/'object_grounded'
+    obj_report = None if body_only_failure_review else sources.json(object_dir/'report.json')
+    reports = [(mask_report, 'automatic_masks'), (body, 'sam3d_body_three_frame_smoke'),
+        (scale, 'predicted_human_anchored_moge2_pointmaps')]
+    scripts = [(body, 'body_smoke.py'), (scale, 'scale_smoke.py')]
+    if body_only_failure_review:
+        depth_path = base/'depth_smoke/report.json'; depth = sources.json(depth_path)
+        reports.append((depth, 'monocular_moge2_three_frame'))
+        scripts.append((depth, 'depth_smoke.py'))
+        require(scale.get('depth_report_sha256') == sources.files[depth_path]['sha256'],
+            'Completed scale evidence must retain the original depth producer')
+    else:
+        reports.append((obj_report, 'sam3d_objects_grounded_fixed_frame'))
+        scripts.append((obj_report, 'object_smoke.py'))
+    for report, stage in reports:
         report_contract(report, stage, episode, video_sha)
-    for report, script in ((body, 'body_smoke.py'), (scale, 'scale_smoke.py'),
-            (obj_report, 'object_smoke.py')):
+    for report, script in scripts:
         path = sources.bind(code/'infra'/script, maximum=1 << 20)
         require(report.get('script_sha256') == sources.files[path]['sha256'],
             'Candidate producer code differs from the immutable source')
@@ -275,38 +320,50 @@ def run(root, code, revision, prefix, episode, output):
         and scale.get('frame_indices') == indices
         and scale.get('body_report_sha256') == sources.files[body_report_path]['sha256'],
         'Verified new independent human initialization and shared-scale lineage required')
-    grounding = obj_report.get('pointmap_grounding') or {}
-    require(obj_report.get('frame_index') == 0
-        and obj_report.get('scale_source') == 'already_human_anchored_MoGe2_no_second_scalar'
-        and grounding.get('alignment_report_sha256') == sources.files[scale_path]['sha256']
-        and scale.get('coordinate_frame') == 'OpenCV_x_right_y_down_z_forward'
+    require(scale.get('coordinate_frame') == 'OpenCV_x_right_y_down_z_forward'
         and scale.get('pointmap_scale_application') == 'one_clip_scalar_to_MoGe2_XYZ_already_applied',
-        'One already-human-anchored object gauge; no second scale permitted')
-    require(grounding.get('intrinsics_path') == str(base/'scale_smoke/000000_intrinsics.json')
-        and grounding.get('pointmap_path') == str(base/'scale_smoke/000000.npy'),
-        'Object grounding must use the new candidate namespace, never old target-conditioned assets')
+        'One already-human-anchored gauge; no second scale permitted')
+    if not body_only_failure_review:
+        grounding = obj_report.get('pointmap_grounding') or {}
+        require(obj_report.get('frame_index') == 0
+            and obj_report.get('scale_source') == 'already_human_anchored_MoGe2_no_second_scalar'
+            and grounding.get('alignment_report_sha256') == sources.files[scale_path]['sha256'],
+            'One already-human-anchored object gauge; no second scale permitted')
+        require(grounding.get('intrinsics_path') == str(base/'scale_smoke/000000_intrinsics.json')
+            and grounding.get('pointmap_path') == str(base/'scale_smoke/000000.npy'),
+            'Object grounding must use the new candidate namespace, never old target-conditioned assets')
     prediction = sources.bind(base/'body_smoke/predictions.npz')
     require(sources.files[prediction]['sha256'] == body['predictions_sha256'], 'Verified body prediction bytes differ')
     with np.load(prediction, allow_pickle=False) as data:
         vertices, faces, focals = data['vertices_camera_m'], data['faces'], data['focal_length']
         require(vertices.shape == (3, 18439, 3) and np.array_equal(data['frame_index'], indices),
             'Exact three original-frame body geometries required')
-    for name, key in (('object.glb', 'object_sha256'), ('transform.json', 'transform_sha256'),
-            ('intrinsics.json', 'intrinsics_sha256')):
-        path = sources.bind(object_dir/name)
-        require(sources.files[path]['sha256'] == obj_report[key], 'Verified object artifact bytes differ')
-    transform = sources.json(object_dir/'transform.json')
-    require(transform == obj_report['transform'], 'Stored native object transform differs')
-    intrinsics = sources.json(object_dir/'intrinsics.json')
-    source_intrinsics = sources.json(Path(grounding['intrinsics_path']))
-    require(sources.files[Path(grounding['intrinsics_path'])]['sha256'] == grounding.get('intrinsics_sha256')
-        and intrinsics == source_intrinsics, 'Object must preserve the new grounding camera exactly')
+    mesh, obj_vertices = None, None
+    if body_only_failure_review:
+        pointmaps = [r for r in scale.get('pointmaps', []) if type(r.get('frame_index')) is int and r['frame_index'] == 0]
+        require(len(pointmaps) == 1 and pointmaps[0].get('intrinsics_path') ==
+            str(base/'scale_smoke/000000_intrinsics.json'), 'Original completed first-frame scale intrinsics required')
+        intrinsics_path = Path(pointmaps[0]['intrinsics_path'])
+        intrinsics = sources.json(intrinsics_path)
+        require(sources.files[intrinsics_path]['sha256'] == pointmaps[0].get('intrinsics_sha256'),
+            'Original completed scale intrinsics changed')
+    else:
+        for name, key in (('object.glb', 'object_sha256'), ('transform.json', 'transform_sha256'),
+                ('intrinsics.json', 'intrinsics_sha256')):
+            path = sources.bind(object_dir/name)
+            require(sources.files[path]['sha256'] == obj_report[key], 'Verified object artifact bytes differ')
+        transform = sources.json(object_dir/'transform.json')
+        require(transform == obj_report['transform'], 'Stored native object transform differs')
+        intrinsics = sources.json(object_dir/'intrinsics.json')
+        source_intrinsics = sources.json(Path(grounding['intrinsics_path']))
+        require(sources.files[Path(grounding['intrinsics_path'])]['sha256'] == grounding.get('intrinsics_sha256')
+            and intrinsics == source_intrinsics, 'Object must preserve the new grounding camera exactly')
+        import trimesh
+        mesh = trimesh.load(object_dir/'object.glb', force='mesh', process=False)
+        require(isinstance(mesh, trimesh.Trimesh), 'Unchanged canonical GLB mesh required')
+        obj_vertices = object_camera_vertices(mesh.vertices, transform)
     width, height = 1536, 1152
     camera = shared_camera(focals, scale['human_evidence'], intrinsics, indices, width, height)
-    import trimesh
-    mesh = trimesh.load(object_dir/'object.glb', force='mesh', process=False)
-    require(isinstance(mesh, trimesh.Trimesh), 'Unchanged canonical GLB mesh required')
-    obj_vertices = object_camera_vertices(mesh.vertices, transform)
     baseline, baseline_faces, trajectory = load_baseline(root, code, episode, total, camera, sources)
     display_camera = camera.copy()
     display_camera[0] *= WIDTH/width; display_camera[1] *= HEIGHT/height
@@ -315,9 +372,11 @@ def run(root, code, revision, prefix, episode, output):
     sheet = Image.new('RGB', (WIDTH*3, 84 + (HEIGHT+26)*4), (24, 26, 31))
     draw = ImageDraw.Draw(sheet)
     font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 14)
-    draw.text((8, 6), f'World Reward | episode {episode:02d} | FIRST 3D QA GATE - NOT full 4D / NOT a score', font=font, fill=(235,235,235))
+    heading = 'OBJECT STAGE FAILED - SAVED HUMAN QA ONLY' if body_only_failure_review else 'FIRST 3D QA GATE'
+    draw.text((8, 6), f'World Reward | episode {episode:02d} | {heading} - NOT full 4D / NOT a score', font=font, fill=(235,235,235))
     draw.text((8, 29), 'Cyan: human | Orange: object | Historical full 4D vs NEW frame-independent initializers', font=font, fill=(235,235,235))
-    draw.text((8, 52), 'NEW object: frame 0 ONLY; absent later until rigid tracking. No fitting / no camera realignment.', font=font, fill=(235,235,235))
+    object_note = 'NEW object: unavailable after import failure; NONE rendered. No retry / no prediction repair.' if body_only_failure_review else 'NEW object: frame 0 ONLY; absent later until rigid tracking. No fitting / no camera realignment.'
+    draw.text((8, 52), object_note, font=font, fill=(235,235,235))
     body_frames = body['frames']
     require([r['frame_index'] for r in body_frames] == indices, 'Ordered original body evidence required')
     render_records = []
@@ -334,7 +393,7 @@ def run(root, code, revision, prefix, episode, output):
             rgb_sha = hashlib.sha256(full_rgb.tobytes()).hexdigest()
             require(rgb_sha == body_frames[position]['decoded_rgb_sha256']
                 == scale['human_evidence'][position]['decoded_rgb_sha256'], 'Saved evidence original RGB differs')
-            if index == 0:
+            if index == 0 and not body_only_failure_review:
                 require(rgb_sha == obj_report['decoded_rgb_sha256'], 'Object original RGB differs')
             masks = []
             for object_id in ('0', '1'):
@@ -349,7 +408,7 @@ def run(root, code, revision, prefix, episode, output):
             human_path = mask_dir/f'masks/0/{index:06d}.png'
             require(sources.files[human_path]['sha256'] == body_frames[position]['mask_sha256'],
                 'New human mask differs from body inference')
-            if index == 0:
+            if index == 0 and not body_only_failure_review:
                 require(sources.files[mask_dir/'masks/1/000000.png']['sha256'] == obj_report['mask_sha256'],
                     'New object mask differs from object inference')
             rgb = cv2.resize(full_rgb, (WIDTH, HEIGHT), interpolation=cv2.INTER_AREA)
@@ -359,17 +418,25 @@ def run(root, code, revision, prefix, episode, output):
             new_human_depth, new_human_view = render_depth(vertices[position], faces, display_camera)
             new_obj_depth = np.full((HEIGHT, WIDTH), np.inf)
             new_obj_view = None
-            if index == 0:
+            object_rendered = index == 0 and not body_only_failure_review
+            if object_rendered:
                 new_obj_depth, new_obj_view = render_depth(obj_vertices, mesh.faces, display_camera)
-            images = [(rgb, 'Original RGB'), (mask_overlay(rgb, *masks), 'NEW Qwen3-VL + SAM2 masks'),
+            displayed_object_mask = np.zeros_like(masks[1]) if body_only_failure_review else masks[1]
+            # The failure observer deliberately displays no orange candidate
+            # object, including the mask row. The original object PNG remains
+            # unchanged and hash-checked; this is a human-only display policy.
+            images = [(rgb, 'Original RGB'),
+                (mask_overlay(rgb, masks[0], displayed_object_mask),
+                    'NEW automatic HUMAN mask only' if body_only_failure_review else 'NEW Qwen3-VL + SAM2 masks'),
                 (overlay(rgb, old_human_depth, old_obj_depth), 'Historical full 4D'),
                 (overlay(rgb, new_human_depth, new_obj_depth),
+                    'NEW human - object failed' if body_only_failure_review else
                     'NEW human + object init' if index == 0 else 'NEW human - object untracked')]
             for row, (image, label) in enumerate(images):
                 x, y = position*WIDTH, 84 + row*(HEIGHT+26)
                 draw.text((x+5, y), f'{label} | f{index}', font=font, fill=(235,235,235))
                 sheet.paste(Image.fromarray(image), (x, y+24))
-            render_records.append(dict(frame_index=index, candidate_object_rendered=index == 0,
+            render_records.append(dict(frame_index=index, candidate_object_rendered=object_rendered,
                 historical_human_view=old_human_view, historical_object_view=old_obj_view,
                 candidate_human_view=new_human_view, candidate_object_view=new_obj_view))
     finally:
@@ -388,7 +455,11 @@ def run(root, code, revision, prefix, episode, output):
         fitting=False, model_execution=False, gpu_used=False, metric_evaluation=False,
         full_4d_candidate=False, candidate_accuracy_validated=False,
         candidate_human_identity_clip_constant=False, candidate_object_trajectory_available=False,
-        candidate_object_rendered_frames=[0], geometry_unchanged=True,
+        candidate_object_available=not body_only_failure_review,
+        candidate_object_mask_displayed=not body_only_failure_review,
+        body_only_failure_diagnostic=body_only_failure_review, original_failed_status_preserved=True,
+        candidate_object_rendered_frames=[] if body_only_failure_review else [0], geometry_unchanged=True,
+        original_experiment_status=failed_experiment['status'] if failed_experiment else None,
         original_mask_bytes_independently_pinned=mask_report.get('source_mask_bytes_independently_pinned'),
         camera_realignment=False, exact_shared_camera_verified=True,
         second_object_scale_applied=False, historical_reference_not_controlled_ablation=True,
@@ -409,10 +480,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument('--episode', type=int, choices=(8, 9, 26), required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--body-only-failure-review', action='store_true',
+        help='Explicit saved human QA of the pinned failed object experiment; never an inference retry')
     args = parser.parse_args()
     require(Path(os.environ.get('WR_ROOT', str(ROOT))) == ROOT, 'Original Azure root required')
     report = run(ROOT, Path(os.environ['WR_CODE']), os.environ['WR_CODE_REVISION'],
-        os.environ['WR_OUTPUT_PREFIX'], args.episode, args.output)
+        os.environ['WR_OUTPUT_PREFIX'], args.episode, args.output,
+        body_only_failure_review=args.body_only_failure_review)
     print(json.dumps({k: report[k] for k in ('schema', 'status', 'episode_index', 'image', 'elapsed_seconds')}))
 
 

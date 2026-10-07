@@ -47,3 +47,21 @@ Baseline comparison images, current Qwen images, immutable source, pins, results
 credentials and environments remain untouched. Historical baseline artefacts
 stay read-only until the comparison has consumed them; dependency-bearing
 sources are not deleted merely because the old predictions were wrong.
+
+## Actual first run
+
+`816941559b3005af64c004f9561f95b676b7fc80`: all three clips finish body/depth/scale
+in 142.50 seconds total. Object stage fails before any model inference because
+the installed native image package imports absent `sam3d_objects.init`. All three
+failure records remain unchanged. No full-4D run or geometry quality PASS.
+Saved-only body QA is useful despite this infrastructure failure; display it
+explicitly without any new object mesh. Diagnose the native image environment
+before executing the object stage, rather than changing its source or model.
+
+Runtime diagnosis: the same pinned Objects image declares `LIDRA_SKIP_INIT=1`.
+Its installed initializer module is intentionally absent. The new driver's
+credential-free `env -i` accidentally removed that native setting. Restore
+**exactly the image's existing value**, not a new model/source workaround.
+A separate new immutable run keeps all scientific settings and original
+failures unchanged. Sparse producers are cheap (~40 seconds per clip), so
+recompute the coherent first gate rather than create mixed-provenance adapters.
