@@ -76,3 +76,27 @@ quality certificate. No model/prompt adjustment follows these images.
 Next gate: user visual review of general segmentation/identity defects. If useful,
 freeze a separate lawful external temporal comparison and then an unchanged
 downstream 4D A/B; do not declare adoption or CARI4D superiority from this pilot.
+
+## User visual review and next boundary — 2026-10-07
+
+User accepts the displayed Qwen3-VL+SAM2 results as visually clean. This permits
+progressing past the limited association screen; it supplies no manual target
+IDs/boxes and does not certify unsampled frames, 3D accuracy or generalization.
+Keep model, prompt, sampling, masks and all original frames unchanged.
+
+Next comparison uses the same three known stress clips and the same downstream
+algorithms/settings, with the historical baseline read-only. Regenerate every
+identity-dependent body initializer, human-based scale, object geometry/poses
+and native CARI preparation/forward/refinement/export for the candidate. Reusing
+the old wrong-background body or mesh would invalidate the comparison. Only
+RGB-only raw depth is potentially reusable after independent input/model checks;
+its old human-anchored metric alignment is not.
+
+Read-only root/subagent seam audit finds no valid direct launch yet: producers
+hardcode historical output paths and expect old detector-specific reports/pins.
+The minimal integration is one explicit experiment output namespace plus an
+honest Qwen/SAM2 input adapter; preserve estimator mathematics and original
+provenance rather than overwriting baselines or disguising Qwen as GroundingDINO.
+No new GPU job is launched by this approval record. Freeze the executable 4D
+protocol/budget before that next run, retain all failures and return paired
+lightweight mesh overlays. FORM-HOI evaluation remains deferred.
