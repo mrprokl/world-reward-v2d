@@ -133,3 +133,67 @@ member name/email/affiliation may also be listed. No form submitted, signed-in
 email inferred, affiliation/experience invented or track2/3 selected. Thomas
 Gomez is authorized as the personal name; contact email and truthful affiliation/
 skill-set details remain to confirm if registration is not already completed.
+
+## Target designation re-audit — 2026-10-07
+
+Re-read the current official challenge page, FAQ and Track1 card/metadata, with
+an independent primary-source audit. No media/model/GT acquisition, GPU job,
+reference evaluation or change to a frozen study follows from this review.
+
+Independent exact Track1 text pins at the same HF revision:
+README2814B/`9a0a7cf3faff0c413ef72248f87c4965f46ad75abfd67852870cfe33e187fdd6`,
+episode metadata7597B/`cce105292e2b670f32b49e0504b0ece67b8aa860ea69dc9e728fce97531b53fe`,
+tasks4493B/`1d12b398b55ee9587265fb11f674214f233fd955aeb6acefff09f4c889bd9f23`.
+Root re-read challenge/FAQ through web text; no new raw-byte hash is asserted
+for those pages or the FAQ.
+
+**Track1 is target-conditioned, not unrestricted interaction discovery.** The
+[official Track1 card](https://huggingface.co/datasets/nvidia/video_to_data_challenge/blob/5f68335f3acc802033d1e80728c1633197521de8/track_1/README.md)
+explicitly supplies `object`, `object_prompt` and the original action description
+(resolved from episode/task metadata). These identify what object to track;
+they do not supply its pixel location or designate a human through a person ID.
+The six-key episode metadata has no bbox, mask, point prompt or human identity.
+Source sequence/camera identifiers still do not authorize source calibration,
+other camera views or sequence-matched FORM-HOI acquisition.
+
+The required output is one reconstructed human and the target object's fixed
+geometry and continuous poses per episode, in a shared metric frame. It is not
+an exhaustive reconstruction of every background person/object. Accuracy and
+physical-plausibility metrics score the final reconstruction, not a separate
+detection leaderboard. The official kit remains authoritative for serialization;
+the FAQ requires MHR and continuous object trajectories through occlusion.
+
+**Association is necessary; a separate pre-detection module is not mandated.**
+An implementation may automatically ground the supplied description, infer the
+associated actor over time, then reconstruct, or infer association and geometry
+jointly. Retaining competing proposals is our engineering strategy, not an
+official obligation to reconstruct all of them. Semantic designation must not
+be confused with guaranteed visual-instance disambiguation. If several actors
+and instances equally satisfy the description/action, inspected sources provide
+no explicit actor-ID tie-break: ask organizers, never manually assign test IDs.
+
+The [public task descriptions](https://huggingface.co/datasets/nvidia/video_to_data_challenge/blob/5f68335f3acc802033d1e80728c1633197521de8/track_1/meta/tasks.jsonl)
+include pushing a desk with a foot and sitting/rotating on a stool. A hand-only
+interaction selector therefore cannot represent the complete Track1 objective.
+The action text is conditioning evidence, not a prescribed pose/contact timeline:
+infer the actual motion from RGB rather than synthesizing what the text says.
+
+The old `infra/automatic_masks.py` already consumes the official `object_prompt`
+with the fixed `person.` query; it does **not** consume the action description.
+Its top-object/person-affinity vulnerability remains rejected. The prospective
+generic V-COCO A/B pilot is a limited relation-observation diagnostic, not the
+whole challenge target-selection requirement or an adoption gate for foot/body
+interactions. Do not rewrite its frozen population, metrics or results.
+
+The [V2D CARI4D input workflow](https://github.com/nvidia-isaac/video_to_data/blob/7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80/reconstruction/modules/v2d_cari4d/README.md)
+requires already prepared human/object masks and a mesh; its SAM2 GUI creates
+geometric prompts. Those are baseline implementation inputs, not distributed
+Track1 annotations or a waiver of the existing no-hand-labeling contract.
+
+Decision: scope the next architecture to automatic **video + supplied object
+description + action → target instance/associated actor → full-T 4D HOI**.
+Use a shared task-conditioned mechanism covering hands, feet/body and release,
+not hand-authored per-episode prompts, nearest-hand rules or an unconditioned
+universal selector.
+Simple automatic grounding/tracking is a valid hypothesis to compare; neither
+this review nor a static role-pair gain establishes its quality/generalization.
