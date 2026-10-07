@@ -12,6 +12,7 @@ import time
 
 from body_smoke import EPISODE, TRACK1_EPISODE_COUNT, _pinned_checkout, _validate_inputs
 from world_reward.data import sha256
+from world_reward.artifact_paths import episode_output
 
 
 DINOV2_REVISION = "7764ea0f912e53c92e82eb78a2a1631e92725fc8"
@@ -33,7 +34,7 @@ def main() -> None:
     root = args.root.resolve()
     os.environ.update(HF_HUB_OFFLINE="1", TRANSFORMERS_OFFLINE="1")
     inputs = _validate_inputs(root, episode_index=args.episode)
-    base = root / f"outputs/episode_{args.episode:06d}"
+    base = episode_output(root, args.episode)
     acquisition = json.loads((root / "results/weights-acquisition.json").read_text())
     principal = [r for r in acquisition["assets"] if r["repo_id"] == "facebook/sam-3d-objects"]
     if len(principal) != 1 or principal[0]["revision"] != "2e73555018d2741ccd486e56c24fac41155a1dc6":

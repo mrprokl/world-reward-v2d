@@ -1,0 +1,18 @@
+{
+  "schema": "world_reward.qwen4d_initializers.v1",
+  "episodes": [8, 9, 26],
+  "scope": "three_frame_geometry_QA_before_full_video_4D",
+  "frames": "0,T//2,T-1",
+  "body_inference_type": "body",
+  "object_seed": 0,
+  "object_frame": 0,
+  "body_image": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "object_image": "sha256:eb389b26358c49778a14303b5875c66d887824011388ce9f8666ed7cc1841ce5",
+  "stage_budget_seconds": 900,
+  "pilot_budget_seconds": 4200,
+  "preview_budget_seconds": 180,
+  "preview_bytes_per_episode": 180000,
+  "manual_labels": false,
+  "ground_truth_used": false,
+  "challenge_performance_verified": false
+}

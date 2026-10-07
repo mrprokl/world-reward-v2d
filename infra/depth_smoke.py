@@ -12,6 +12,7 @@ import time
 
 from body_smoke import EPISODE, TRACK1_EPISODE_COUNT, _validate_inputs
 from world_reward.data import sha256
+from world_reward.artifact_paths import episode_output
 from world_reward.pointmap import validate_camera_pointmap
 
 
@@ -36,7 +37,7 @@ def main() -> None:
     path = root / f"weights/cari4d/hf_home/hub/models--Ruicheng--moge-2-vitl-normal/snapshots/{revision}/model.pt"
     if not path.is_file() or not torch.cuda.is_available():
         raise RuntimeError("Pinned local MoGe2/CUDA missing")
-    output = root / f"outputs/episode_{args.episode:06d}" / ("depth_full" if args.full_video else "depth_smoke")
+    output = episode_output(root, args.episode) / ("depth_full" if args.full_video else "depth_smoke")
     output.mkdir(exist_ok=False)
     started = time.perf_counter()
     model = MoGeModel.from_pretrained(str(path)).cuda().eval()

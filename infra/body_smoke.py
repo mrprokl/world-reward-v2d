@@ -20,6 +20,7 @@ import sys
 import time
 
 from world_reward.data import sha256
+from world_reward.artifact_paths import episode_output
 
 
 EPISODE = 15
@@ -128,7 +129,7 @@ def _validate_inputs(root: Path, episode_index: int = EPISODE) -> dict:
     total = matches[0]["length"]
     relative = f"track_1/videos/chunk-000/observation.images.exo_camera/episode_{episode_index:06d}.mp4"
     video, video_hash = _manifest_file(root, manifest, relative)
-    masks_root = root / f"outputs/episode_{episode_index:06d}/automatic_masks"
+    masks_root = episode_output(root, episode_index) / "automatic_masks"
     mask_report_path = masks_root / "report.json"
     mask_report = json.loads(mask_report_path.read_text())
     required = {
@@ -298,7 +299,7 @@ def _run_layout(root: Path, episode_index: int, *, full_video: bool, inference_t
     else:
         directory = "body_full" if full_video else "body_smoke"
         stage = "sam3d_body_full_video_initializer" if full_video else "sam3d_body_three_frame_smoke"
-    return root / f"outputs/episode_{episode_index:06d}" / directory, stage
+    return episode_output(root, episode_index) / directory, stage
 
 
 def _native_forward_from_blocks(head, prediction):

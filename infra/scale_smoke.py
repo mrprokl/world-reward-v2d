@@ -16,6 +16,7 @@ import time
 from body_smoke import EPISODE, TRACK1_EPISODE_COUNT, _validate_inputs
 from camera_render import raster_camera_mesh, silhouette_iou
 from world_reward.data import sha256
+from world_reward.artifact_paths import episode_output
 from world_reward.metric_alignment import fit_shared_depth_scale
 from world_reward.pointmap import validate_camera_pointmap
 
@@ -38,7 +39,7 @@ def main() -> None:
     gate = json.loads(gate_path.read_text())
     if gate["status"] != "pass":
         raise RuntimeError("Analytic CUDA camera/depth gate must pass first")
-    base = root / f"outputs/episode_{args.episode:06d}"
+    base = episode_output(root, args.episode)
     output = base / "scale_smoke"
     if output.exists():
         raise RuntimeError("Frozen alignment output exists; do not overwrite")
