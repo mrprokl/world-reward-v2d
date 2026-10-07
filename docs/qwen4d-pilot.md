@@ -65,3 +65,27 @@ credential-free `env -i` accidentally removed that native setting. Restore
 A separate new immutable run keeps all scientific settings and original
 failures unchanged. Sparse producers are cheap (~40 seconds per clip), so
 recompute the coherent first gate rather than create mixed-provenance adapters.
+
+## Completed coherent first gate
+
+`1ac4b9c2ed71a9e423673c3736332c291d9049f0`: 296.35 seconds total,
+all three clips pass native body/depth/scale/object execution and saved-only
+camera/provenance/render checks. Exactly 414,949 JPEG bytes reach local QA;
+the baseline remains untouched. Technical execution PASS is not quality PASS.
+New body render follows the foreground actor on 8/9 rather than the obvious
+historical background actor. Episode26 remains a useful non-obvious control.
+Three-frame silhouette IoUs and predicted-depth residuals in the concise result
+record are **self-consistency proxies**, not GT validation or leaderboard scores.
+Episode26 has appreciable gauge inconsistency (~9.19% relative residual);
+small-object shape, body contacts/occlusions, and temporal stability remain open.
+
+User reviews the bottom row against original RGB: foreground actor, pose,
+approximate object shape/placement at frame zero. Middle/last candidate object
+is intentionally absent until actual rigid tracking; no static prediction.
+Proceed to full-T coherent identity and interaction only after this QA boundary.
+
+After comparison, remove only the first failed run's disposable binary outputs
+and duplicate PNG streams: 2,926 files/388,155,960 bytes on Azure. Preserve all
+failed source/receipts and an explicit cleanup disposition; the new coherent
+candidate and historical baseline remain intact. Delete the three ephemeral
+preview-transfer blobs after local SHA/byte verification. 426 tiny checks pass.

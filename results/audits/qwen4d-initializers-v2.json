@@ -1,0 +1,62 @@
+{
+  "source_revision": "1ac4b9c2ed71a9e423673c3736332c291d9049f0",
+  "run_report": {"bytes": 5593, "sha256": "40b52ec63ed87f98e4c127cad6ea9c8d7b171c3a000ec2183dfcff5dfe95f222"},
+  "scope": "three_frame_geometry_QA_before_full_video_4D",
+  "status": "complete_initializer_QA_not_quality_pass",
+  "elapsed_seconds": 296.3466966529959,
+  "episodes": [
+    {
+      "episode": 8,
+      "original_mask_frames": 634,
+      "frame_indices": [0, 317, 633],
+      "body_depth_scale_object_native_execution": "pass",
+      "shared_camera_exact": true,
+      "human_mask_render_iou": [0.8448351755844664, 0.8115627037600521, 0.8235891238670695],
+      "shared_predicted_depth_scale": 0.9536254204757844,
+      "predicted_depth_relative_residual": 0.00938042866893473,
+      "preview": {"bytes": 137770, "sha256": "c97632aae85d7fa0a33f96f7fd3e0647b39b1f54bf91d7b7d76e472e9eeb2ab6"}
+    },
+    {
+      "episode": 9,
+      "original_mask_frames": 415,
+      "frame_indices": [0, 207, 414],
+      "body_depth_scale_object_native_execution": "pass",
+      "shared_camera_exact": true,
+      "human_mask_render_iou": [0.8047915902701381, 0.810453312452809, 0.7410892377070506],
+      "shared_predicted_depth_scale": 1.0248164112575808,
+      "predicted_depth_relative_residual": 0.022130912090606924,
+      "preview": {"bytes": 140823, "sha256": "b328d6737b186ce40f7ab401bdbfad6f9929321a5d987241c9ccd84757129137"}
+    },
+    {
+      "episode": 26,
+      "original_mask_frames": 399,
+      "frame_indices": [0, 199, 398],
+      "body_depth_scale_object_native_execution": "pass",
+      "shared_camera_exact": true,
+      "human_mask_render_iou": [0.841449653413837, 0.8696383297976924, 0.8488165680473373],
+      "shared_predicted_depth_scale": 0.8971667985091476,
+      "predicted_depth_relative_residual": 0.09190770582687119,
+      "preview": {"bytes": 136356, "sha256": "a199d00f4a43288db6f7cea80ba056c0934e62125d5fa7e4c4dae224e83aeafe"}
+    }
+  ],
+  "preview_transfer_bytes": 414949,
+  "cleanup": {
+    "local_obsolete_files_removed": 166,
+    "local_obsolete_bytes_removed": 9121802,
+    "azure_failed_run_disposable_files_removed": 2926,
+    "azure_failed_run_disposable_bytes_removed": 388155960,
+    "failed_source_and_receipts_preserved": true,
+    "ephemeral_preview_blobs_removed": 3
+  },
+  "baseline_modified": false,
+  "full_4d_candidate": false,
+  "candidate_object_rendered_frames": [0],
+  "human_identity_clip_constant": false,
+  "ground_truth_used": false,
+  "hand_labeled_test": false,
+  "metric_accuracy_verified": false,
+  "challenge_performance_verified": false,
+  "training_overlap_verified": false,
+  "challenge_overlap_verified": false,
+  "decision": "User visual QA gate before full-T body/rigid motion/native CARI. Correct foreground body replaces obvious historical background target on8/9; depth gauge inconsistency and object details remain unvalidated, especially26."
+}
