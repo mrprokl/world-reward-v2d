@@ -62,3 +62,17 @@ the predeclared180KB cap. This is not a quality failure or PASS; do not rerun
 inference. A separate CPU-only saved-output observer pins original receipts and
 rechecks allowed RGB/metadata, reducing display width to320px under the same
 byte/time cap. It does not alter masks, IDs, boxes or scientific settings.
+
+Saved-only observer `f15e418b5e9394dab6cae7a398b8cba9c30e21b3`
+completes in4.8593s, zero GPU/model calls, original RGB/texts and frozen baseline
+receipts reverified. All three previews show first/middle/last plus the automatic
+maximum relative area-change index (8:324;9:50;26:85). Only298,663B JPEGs cross
+the local connection, independently verified SHA/bytes. Original predictions
+and failed run remain unchanged. First visual QA: EP8/9 no longer highlight the
+obvious background person/object; EP26 looks consistent with baseline. This is
+qualitative screening only, not human-labeled target accuracy or a full-T/3D
+quality certificate. No model/prompt adjustment follows these images.
+
+Next gate: user visual review of general segmentation/identity defects. If useful,
+freeze a separate lawful external temporal comparison and then an unchanged
+downstream 4D A/B; do not declare adoption or CARI4D superiority from this pilot.
