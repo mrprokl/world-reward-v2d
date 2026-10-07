@@ -53,3 +53,12 @@ instead of the repository's existing `jobs/.world-reward-h100.lock`. Preserve
 that FAIL. A new source/run fixes only this runtime path and excludes exception
 messages from receipts (signed publisher URLs); all scientific settings and
 budgets above stay identical.
+
+Actual repaired run `a9419e0332e3c6258a8022e9286eaafb04dce223`:
+three single Qwen calls complete (17.05/16.07/16.19s); whole inference79.85s.
+SAM2 completes all634/415/399 original frames in99.61s with no empty masks.
+The run closes **FAIL at preview** after319.52s because the480px JPEG exceeds
+the predeclared180KB cap. This is not a quality failure or PASS; do not rerun
+inference. A separate CPU-only saved-output observer pins original receipts and
+rechecks allowed RGB/metadata, reducing display width to320px under the same
+byte/time cap. It does not alter masks, IDs, boxes or scientific settings.

@@ -1,0 +1,67 @@
+{
+  "producer_revision": "a9419e0332e3c6258a8022e9286eaafb04dce223",
+  "files": {
+    "inference.json": {
+      "bytes": 9573,
+      "sha256": "ce919f5101aa7203a4a0cb8e55e140e545cd1406fc0f0c6afae542dfe9e5588c"
+    },
+    "report.json": {
+      "bytes": 5917,
+      "sha256": "8ee878da133a56dc8c0aacefe938ec5d26566477f11db7140604e3bce903a64d"
+    },
+    "tracking.json": {
+      "bytes": 476,
+      "sha256": "f793523dcf457ff9af5fd584a5856fe4881fb663b61371167316348e5eb961d1"
+    }
+  },
+  "episodes": [
+    {
+      "episode": 8,
+      "frames": 634,
+      "grounding": {
+        "bytes": 3041,
+        "sha256": "e97d9b0c7ba20c70a18ee305d5030b01dbfa5a8d3e0c9bb0b8b4fc2521831cae"
+      },
+      "tracking": {
+        "bytes": 8297,
+        "sha256": "1039dc71562870b7990fbfe3f0e40aa7c7014eb3a5ee781bb01b8fa225b560a1"
+      },
+      "baseline_report": {
+        "bytes": 10846,
+        "sha256": "f7b36b4b25f240d26cf8dea95cb227d38d3986cc42381a16b5b3a8c3ce9056d5"
+      }
+    },
+    {
+      "episode": 9,
+      "frames": 415,
+      "grounding": {
+        "bytes": 3142,
+        "sha256": "8e49a6f0a07d436a439667f860f72570ad9c228e449c87d070539a8edc111ccb"
+      },
+      "tracking": {
+        "bytes": 5894,
+        "sha256": "6e70fdddda64051befaaafa6411699ce9a5a896543892df4ceb64961320c68cc"
+      },
+      "baseline_report": {
+        "bytes": 12565,
+        "sha256": "a355d0239cc7e54de8da8f50c6f8cb07ab0683f227dd75e303ba35315e00a97a"
+      }
+    },
+    {
+      "episode": 26,
+      "frames": 399,
+      "grounding": {
+        "bytes": 3063,
+        "sha256": "6656e0bed4a1fc3e00aef7d9d75d54d3be9273640422bfc8a6c343e44f0f26da"
+      },
+      "tracking": {
+        "bytes": 5633,
+        "sha256": "8bc3b07958711b7756690f88cea68b91e2506b47b4abe3b41e3586fdd6ab4f4f"
+      },
+      "baseline_report": {
+        "bytes": 9632,
+        "sha256": "4482ef02ca68bf0b112eaa84282c8829d55df5dcedf172be3ce2f3f8d16741f9"
+      }
+    }
+  ]
+}

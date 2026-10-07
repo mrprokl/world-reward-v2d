@@ -257,10 +257,11 @@ def track(code, out):
                                    checkpoint=pin,quality_verified=False))
 
 
-def preview(code, out):
+def preview(code, out, destination=None, width=480):
     import numpy as np
     from PIL import Image, ImageDraw, ImageFont
     cfg = config(code); reports = []
+    destination = out if destination is None else destination
     font = ImageFont.load_default(size=15)
     for item in inputs():
         dest = out/f"episode_{item['episode']:06d}"; ground = strict((dest/'grounding.json').read_bytes())
@@ -276,7 +277,9 @@ def preview(code, out):
             extra = next((r['frame_index'] for r in ground['records'] if r['status'] != 'both_boxes' and r['frame_index'] not in fixed), None)
         if extra is not None: fixed.append(extra)
         images = views(item['video'], item['total'], fixed)
-        width = 480; height = round(images[0].height*width/images[0].width)
+        target = destination/f"episode_{item['episode']:06d}"
+        if destination != out: target.mkdir(mode=0o700)
+        height = round(images[0].height*width/images[0].width)
         sheet = Image.new('RGB', (width*2, 54+len(fixed)*(height+25)), (20,20,20)); draw = ImageDraw.Draw(sheet)
         draw.text((8,5), f"Episode {item['episode']} | person=cyan, object=orange", fill='white', font=font)
         draw.text((8,28), 'Existing baseline', fill='white', font=font)
@@ -296,8 +299,8 @@ def preview(code, out):
         import io
         raw = io.BytesIO(); sheet.save(raw, format='JPEG', quality=68, optimize=True)
         require(len(raw.getvalue()) <= cfg['preview_bytes_per_episode'], 'Preview byte cap exceeded; no heavy transfer')
-        write(dest/'comparison.jpg',raw.getvalue()); reports.append(dict(episode=item['episode'],frames=fixed,preview=identity(dest/'comparison.jpg')))
-    record(out/'previews.json',dict(episodes=reports,manual_labels=False,quality_verified=False))
+        write(target/'comparison.jpg',raw.getvalue()); reports.append(dict(episode=item['episode'],frames=fixed,preview=identity(target/'comparison.jpg')))
+    record(destination/'previews.json',dict(episodes=reports,manual_labels=False,quality_verified=False))
 
 
 def docker(code, out, model_folder, mode, image, seconds):
