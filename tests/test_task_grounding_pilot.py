@@ -30,6 +30,8 @@ def test_source_declares_offline_and_no_retry():
     assert "'--network','none'" in src and 'trust_remote_code=False' in src
     assert 'HF_HUB_OFFLINE=1' in src and 'TRANSFORMERS_OFFLINE=1' in src
     assert 'json.loads(text' not in src  # All response parsing goes through strict transport.
+    assert "root/'jobs/.world-reward-h100.lock'" in src
+    assert "str(exc)" not in src  # Signed publisher redirect URLs must not enter receipts.
 
 
 def test_same_prompt_for_any_lawful_task():

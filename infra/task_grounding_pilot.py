@@ -350,7 +350,7 @@ def run():
     def interrupted(*_): raise TimeoutError('Frozen pilot interrupted')
     signal.signal(signal.SIGTERM,interrupted);signal.signal(signal.SIGINT,interrupted)
     try:
-        with (root/'docker/jobs/.world-reward-h100.lock').open('a') as lock:
+        with (root/'jobs/.world-reward-h100.lock').open('a') as lock:
             fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
             require(not subprocess.check_output(['docker','ps','-q'],text=True).strip(), 'No duplicate GPU jobs')
             for image in (BASE,SAM):
@@ -363,7 +363,7 @@ def run():
             report.update(status='complete_diagnostic_not_quality_pass',phase='complete',
               inference=identity(out/'inference.json'),tracking=identity(out/'tracking.json'),previews=identity(out/'previews.json'))
     except Exception as exc:
-        report['error_type']=type(exc).__name__;report['error']=str(exc)[:220]
+        report['error_type']=type(exc).__name__
     finally:
         try: require(source(root,code,revision,ENTRY,HELPERS)==binding,'Immutable source changed');report['source_rehashed_after']=True
         except Exception: report['status']='fail';report['source_rehashed_after']=False

@@ -45,3 +45,11 @@ must not select/correct challenge target IDs or supply per-clip prompts.
 No expensive 4D rerun until this association screen has been reviewed. Approval
 of masks does not validate 3D or submission metrics. Keep the frozen run and
 its results; change only the general algorithm in a separately declared study.
+
+Technical record: source `7c900724987063f93e8a95af8b880eb0f656c04a`
+closed at preflight in 0.081663455s with `FileNotFoundError`; no acquisition,
+model inference or prediction occurred. Its lock pointed at `docker/jobs`
+instead of the repository's existing `jobs/.world-reward-h100.lock`. Preserve
+that FAIL. A new source/run fixes only this runtime path and excludes exception
+messages from receipts (signed publisher URLs); all scientific settings and
+budgets above stay identical.
