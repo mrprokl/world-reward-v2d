@@ -58,5 +58,5 @@
   "challenge_overlap_verified": false,
   "scope": "detection_pair_selection_full_original_segmentation_not_4D",
   "baseline_revision": "de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba",
-  "sam_producer_revision": "4351c442b3265d28dbecd850ac16028eb52e9361"
+  "sam_producer_revision": "d86ddd3e3b273649992832d3010a4557a4682e70"
 }
