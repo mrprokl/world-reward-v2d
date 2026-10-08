@@ -98,3 +98,23 @@ cache provenance rejection (GT, source calibration, wrong model, changed code,
 gaps, wrong hashes), fixed cohort, honest allowlisted source entry, and preserved
 immutable receipts. It does not test native GPU correctness. Native outputs must
 pass their existing numerical producer gates before any visual is published.
+
+## Native low-cost follow-up identified (not yet adopted)
+
+The pinned native `MHRParityPostOptConfig` already exposes
+`freeze_object_rotation=False`; the current wrapper explicitly freezes it.
+Rotation correction is therefore unavailable in this causal run. An independent
+controlled follow-up is A=current frozen rotation, B=same native optimization
+with rotation unlocked, C=B plus automatic persistent RGB point reprojection.
+B−A and C−B separate mechanisms. No new weights are required for B; C requires
+qualified attachments/tracks and positive-weight gradient/runtime qualification
+of `src/world_reward/joint_point_objective.py`. Its zero-weight delegation gate
+is not evidence that positive-weight joint fitting works.
+
+Native optimizer source: NVIDIA `video_to_data` revision
+`7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80`,
+`reconstruction/modules/v2d_cari4d/lib/cari4d/learning/training/mhr_opt_refineout.py`,
+SHA256 `84e0e818a3bc0935bb30b75fcd82fd7c5e3730ed812864594cd759697ddb406b`.
+Existing declared CoCoNet/BootsTAPIR assets must be rehashed on Azure before reuse.
+Choose/calibrate any new objective on qualified non-challenge data; never force
+static objects or erase real motion to reduce jitter/acceleration proxies.
