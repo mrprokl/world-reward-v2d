@@ -115,3 +115,152 @@ def test_full_original_report_and_frozen_population_are_not_relabelled():
     assert "with (ROOT/'jobs/.world-reward-h100.lock').open('a')" in source
     assert 'unlink(' not in source and 'rmtree(' not in source
     assert "'resample'" not in source
+
+
+def test_capacity_inputs_execute_new_source_but_import_original_pure_geometry_first(monkeypatch, tmp_path):
+    old, new = tmp_path/'original/code', tmp_path/'continuation/code'
+    control = tmp_path/'receipt'; (control/'logs').mkdir(parents=True)
+    captured = []
+    def command(*args):
+        assert args[0] == new and args[-1] == 'c'*40
+        return ['docker', '--entrypoint', 'env', 'original_image', '-i',
+                'PYTHONPATH='+str(new/'src')+':'+str(new/'infra'), 'python', str(new/'infra/cari_prepare.py')]
+    monkeypatch.setattr(resume.subprocess, 'check_output', lambda *a, **k: '')
+    monkeypatch.setattr(resume.subprocess, 'run', lambda *a, **k: SimpleNamespace(returncode=1))
+    monkeypatch.setattr(resume, 'run_process', lambda argv, *a: captured.append(argv) or 0)
+    resume.native(SimpleNamespace(command=command), old, tmp_path/'experiment', {'body_image':'original_image'},
+        {'episode':1}, ('inputs','infra/cari_prepare.py',(),'body_image','inputs',None), control, 100,
+        'c'*40, threading.Lock(), threading.Event(), capacity_code=new)
+    assert f'type=bind,src={old.parent},dst={old.parent},readonly' in captured[0]
+    assert 'PYTHONPATH='+str(old/'src')+':'+str(old/'infra')+':'+str(new/'src')+':'+str(new/'infra') in captured[0]
+    assert str(new/'infra/cari_prepare.py') in captured[0]
+
+
+def shared_fixture(tmp_path, role='prepare'):
+    from full4d_pins import SHARED
+    base = tmp_path/'experiment/outputs/episode_000009'; code = tmp_path/'code'
+    script, stage, filenames = SHARED[role]
+    script_sha = write(code/'infra'/script, b'opaque original source'); (code/'infra'/script).chmod(0o444)
+    directory = base/('cari_shared_'+role+'_v1')
+    report = dict(status='pass', stage=stage, phase='complete', episode_index=9, frames=96,
+        input_track='track_1', ground_truth_used=False, hand_labeled_test=False, oracle_modes=[],
+        producer_revision=resume.OLD, script_sha256=script_sha, original_frame_indices=list(range(96)),
+        source_inputs_assets_rehashed=True, source_helpers_rehashed=True,
+        source_helpers={'infra/'+script:dict(bytes=22,sha256=script_sha)})
+    # Source helper byte count is computed, never fabricated.
+    report['source_helpers']['infra/'+script] = resume.identity(code/'infra'/script)
+    report.update(body_assets={},inference_source_identity={},decoder_identity={})
+    experiment = tmp_path/'experiment'
+    input_path = experiment/'pins/cari_clip_000009_input_pins.json'
+    refined_path = experiment/'pins/cari_clip_000009_shared_refined_pins.json'
+    write(input_path,json.dumps({'source_files':{}}).encode()); input_path.chmod(0o444)
+    preceding = {'refined':dict(sha256='d'*64), 'refined_files':{'refined.pth':dict(sha256='e'*64)}}
+    if role == 'export':
+        write(refined_path,json.dumps(preceding).encode()); refined_path.chmod(0o444)
+        report.update(input_pins=resume.payload_identity(input_path), refined_pins=resume.payload_identity(refined_path),
+            refined_report_sha256='d'*64,refined_bundle_sha256='e'*64,source_files={})
+    files = {}
+    for name in filenames-{'report.json'}:
+        raw = b'opaque synthetic native payload'; write(directory/name, raw); (directory/name).chmod(0o444)
+        files[name] = resume.payload_identity(directory/name)
+    if role == 'export':
+        report.update(output_files=dict(files),aligned_object_mesh_sha256=files['object_aligned.glb']['sha256'])
+    raw = json.dumps(report).encode(); write(directory/'report.json', raw); (directory/'report.json').chmod(0o444)
+    files['report.json'] = resume.payload_identity(directory/'report.json')
+    pin = {role: files['report.json'] | dict(producer_revision=resume.OLD, script_sha256=script_sha),
+           role+'_files':files}
+    pinpath = experiment/'pins'/f'cari_clip_000009_shared_{role}_pins.json'
+    write(pinpath,json.dumps(pin).encode()); pinpath.chmod(0o444)
+    item = dict(episode=9,total=96)
+    return base, experiment, code, item, report, pinpath
+
+
+def stub_shared_native_gates(monkeypatch, experiment):
+    """This fixture tests byte inventories; native lineage has its own tests."""
+    import cari_full_forward as forward
+    import cari_full_refine as refined
+    import cari_full_export as export
+    called = []
+    def gate(role):
+        def validate(root,code,spec,*pins):
+            assert root == resume.ROOT and spec.episode_index == 9 and spec.total_frames == 96
+            called.append(role)
+            return {'report':dict(body_assets={},inference_source_identity={},decoder_identity={})}
+        return validate
+    monkeypatch.setattr(forward,'verify_prepare_artifacts',gate('prepare'))
+    monkeypatch.setattr(forward,'verify_forward_artifacts',gate('forward'))
+    monkeypatch.setattr(refined,'verify_refined_artifacts',gate('refined'))
+    def check_export(report,spec):
+        assert report['phase'] == 'complete' and spec.total_frames == 96
+        called.append('export')
+    monkeypatch.setattr(export,'validate_export_report',check_export)
+    return called
+
+
+@pytest.mark.parametrize('role', ['prepare','forward','refined','export'])
+def test_existing_complete_shared_outputs_are_not_overwritten(tmp_path, role, monkeypatch):
+    base, experiment, code, item, _, _ = shared_fixture(tmp_path, role)
+    called = stub_shared_native_gates(monkeypatch,experiment)
+    evidence = resume.saved_stage(base,role,experiment,code,item)
+    assert evidence['inference_replayed'] is False
+    assert called == (['export','refined'] if role == 'export' else [role])
+
+
+@pytest.mark.parametrize('fault', ['changed_payload','missing_pin','failed_report','extra_output','wrong_producer'])
+def test_existing_shared_outputs_fail_closed_not_deleted(tmp_path, fault, monkeypatch):
+    base, experiment, code, item, report, pinpath = shared_fixture(tmp_path)
+    stub_shared_native_gates(monkeypatch,experiment)
+    directory = base/'cari_shared_prepare_v1'
+    if fault == 'changed_payload':
+        target = directory/'target.npy'; target.chmod(0o644); target.write_bytes(b'changed'); target.chmod(0o444)
+    elif fault == 'missing_pin': pinpath.unlink()
+    elif fault == 'extra_output': (directory/'unexpected').write_bytes(b'foreign')
+    else:
+        if fault == 'failed_report': report['status'] = 'fail'
+        else: report['producer_revision'] = 'd'*40
+        path = directory/'report.json'; path.chmod(0o644); path.write_text(json.dumps(report)); path.chmod(0o444)
+    with pytest.raises((ValueError, FileNotFoundError)):
+        resume.saved_stage(base,'prepare',experiment,code,item)
+    assert directory.is_dir()
+
+
+@pytest.mark.parametrize('fault', [None,'changed_video','short_timeline','missing_source'])
+def test_existing_video_reuse_is_full_t_and_exact_source_bound(tmp_path, monkeypatch, fault):
+    from full4d_pins import SHARED
+    monkeypatch.setattr(resume,'ROOT',tmp_path)
+    experiment = tmp_path/'experiment'; code = tmp_path/'code'
+    base = experiment/'outputs/episode_000009'; directory = experiment/'videos/episode_000009'
+    video = tmp_path/'data/original.mp4'
+    paths = {code/name for name in ('infra/full4d_video.py','infra/camera_render.py',
+        'infra/qwen4d_preview.py','src/world_reward/mesh_geometry.py')} | {
+        experiment/'pins/cari_clip_000009_shared_export_pins.json',tmp_path/'results/input-manifest.json',video} | {
+        base/'cari_shared_export_v1'/name for name in SHARED['export'][2]}
+    sources = {}
+    for path in paths:
+        write(path,b'opaque synthetic saved source'); path.chmod(0o444)
+        sources[str(path)] = resume.payload_identity(path)
+    for suffix in ('mp4','jpg'):
+        path=directory/f'episode_000009.{suffix}'; write(path,b'opaque tiny visual'); path.chmod(0o444)
+    report = dict(schema='world_reward.full4d_video.v1',status='pass',producer_revision=resume.OLD,
+        episode_index=9,frames_encoded=96,original_frames=96,original_frame_indices=list(range(96)),
+        ground_truth_used=False,hand_labeled_test=False,oracle_modes=[],source_rehashed_after=True,
+        model_execution=False,optimizer_execution=False,input_track='track_1',per_frame_alignment=False,
+        per_frame_camera=False,per_frame_centring=False,object_scale_applied_again=False,
+        original_geometry_unchanged=True,sources=sources,
+        video=resume.payload_identity(directory/'episode_000009.mp4'),
+        poster=resume.payload_identity(directory/'episode_000009.jpg'))
+    item = dict(episode=9,total=96,video=str(video),video_pin=sources[str(video)])
+    if fault=='short_timeline': report['original_frame_indices'].pop()
+    if fault=='missing_source': report['sources'].pop(str(video))
+    path=directory/'report.json'; write(path,json.dumps(report).encode()); path.chmod(0o444)
+    if fault=='changed_video':
+        path=directory/'episode_000009.mp4'; path.chmod(0o644); path.write_bytes(b'changed'); path.chmod(0o444)
+    if fault:
+        with pytest.raises(ValueError): resume.saved_stage(base,'video',experiment,code,item)
+    else:
+        assert resume.saved_stage(base,'video',experiment,code,item)['inference_replayed'] is False
+    assert directory.is_dir()
+
+
+def test_missing_previous_scout_receipt_is_not_fabricated(tmp_path):
+    assert resume.previous_continuation(tmp_path) is None

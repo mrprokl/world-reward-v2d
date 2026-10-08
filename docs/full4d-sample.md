@@ -44,5 +44,10 @@ original report and write a separate source-bound continuation receipt.
 Episode 9 scouts inputs through final rendering before new expensive tracking
 on the remaining frozen clips. Then two episode workers share one GPU lease;
 learned stages remain serialized. Focused continuation/preview tests: **87 pass**.
-Known follow-up capacity risk: the historical 32 MiB pose-report consumer may
-reject longer clips; this is not an accuracy failure or reason to resample.
+The historical 32 MiB pose-report consumer would reject longer clips. A named
+64 MiB capacity adapter now accepts only the canonical, sealed full-pose JSON;
+all other roles and geometry/model calculations are unchanged. Exact source
+parity permits only three import/ledger substitutions. New input producers carry
+their real continuation revision; later shared producers remain original.
+Existing PASS native stages/videos are rehashed and reused, never overwritten.
+Focused capacity/reuse checks: **117 pass, 1 skip** (no GPU execution locally).

@@ -28,6 +28,7 @@ from qwen4d_masks import _inventory
 
 ROOT = Path('/srv/scenesmith/world-reward')
 OLD = 'de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba'
+SCOUT_CONTINUATION = '6e72f5b11b89d77f284b2119465b4fb614b306c8'
 ORIGINAL_REPORT = dict(bytes=8613, sha256='d20a4f074c0bf5ffeb2e489a995e66655f5a65773e445638cab46d6b197b1e40')
 EXISTING_PINS = {
     'outputs/episode_000009/object_pose_full_surface/report.json': dict(bytes=21099626, sha256='296862f8fd5697807147bcee59910a25a6c57db824eb6edf7348fc6867b3207b'),
@@ -39,6 +40,7 @@ EXISTING_PINS = {
 ENTRY = 'run_full4d_resume'
 HELPERS = ('infra/full4d_resume.py', 'infra/run_full4d_resume.sh',
            'infra/full4d_sample.py', 'infra/full4d_pins.py', 'infra/qwen4d_masks.py',
+           'infra/full4d_capacity_pin.py', 'infra/surface_pose_report_capacity.py',
            'src/world_reward/artifact_paths.py')
 STAGE_NAMES = {
     'body_smoke': 'sam3d_body_three_frame_smoke',
@@ -65,6 +67,10 @@ def load_original(code):
     for path in original.rglob('*.py'):
         relative = path.relative_to(original)
         if relative.as_posix() == 'infra/full4d_sample.py': continue
+        if relative.as_posix() == 'infra/cari_prepare.py':
+            from surface_pose_report_capacity import verify_preparation_source
+            verify_preparation_source(path, code/relative)
+            continue
         require((code/relative).is_file() and identity(path, 2_000_000, empty=True) ==
                 identity(code/relative, 2_000_000, empty=True),
                 'Continuation must carry identical original numerical helpers')
@@ -135,6 +141,126 @@ def report_pass(base, stage, script, code, item):
     return dict(report=pin, files=len(checks), inference_replayed=False)
 
 
+def saved_stage(base, stage, experiment, code, item, *, capacity_code=None):
+    """Reuse only sealed native stage inventories and their independent pins."""
+    if stage == 'video':
+        directory = experiment/'videos'/f'episode_{item["episode"]:06d}'
+        if not directory.exists(): return None
+        report_pin = payload_identity(directory/'report.json', maximum=4 << 20)
+        report = strict((directory/'report.json').read_bytes())
+        require(report.get('schema') == 'world_reward.full4d_video.v1' and report.get('status') == 'pass'
+                and report.get('producer_revision') == OLD and report.get('episode_index') == item['episode']
+                and report.get('frames_encoded') == item['total'] and report.get('original_frames') == item['total']
+                and report.get('original_frame_indices') == list(range(item['total']))
+                and report.get('ground_truth_used') is False and report.get('hand_labeled_test') is False
+                and report.get('oracle_modes') == [] and report.get('source_rehashed_after') is True
+                and report.get('model_execution') is False and report.get('optimizer_execution') is False
+                and report.get('input_track') == 'track_1'
+                and report.get('per_frame_alignment') is False and report.get('per_frame_camera') is False
+                and report.get('per_frame_centring') is False and report.get('object_scale_applied_again') is False
+                and report.get('original_geometry_unchanged') is True,
+                'Existing video must be complete saved-only original full-T output')
+        require({p.name for p in directory.iterdir()} == {'report.json', f'episode_{item["episode"]:06d}.mp4',
+                 f'episode_{item["episode"]:06d}.jpg'}, 'Exact sealed saved-video inventory required')
+        for suffix, field, limit in (('mp4','video',2_000_000), ('jpg','poster',100_000)):
+            require(payload_identity(directory/f'episode_{item["episode"]:06d}.{suffix}', maximum=limit) == report[field],
+                    'Saved video output changed')
+        for name, pin in report['sources'].items():
+            require(payload_identity(Path(name), readonly=False) == pin, 'Video source chain changed')
+        from full4d_pins import SHARED
+        export_path = base/'cari_shared_export_v1'
+        export_pin = experiment/'pins'/f'cari_clip_{item["episode"]:06d}_shared_export_pins.json'
+        viewer_sources = {code/name for name in ('infra/full4d_video.py', 'infra/camera_render.py',
+            'infra/qwen4d_preview.py', 'src/world_reward/mesh_geometry.py')}
+        expected_sources = viewer_sources | {export_pin, ROOT/'results/input-manifest.json', Path(item['video'])} | {
+            export_path/name for name in SHARED['export'][2]}
+        require(set(report['sources']) == {str(path) for path in expected_sources}
+                and report['sources'].get(item['video']) == item['video_pin']
+                and all(report['sources'][str(path)] == identity(path) for path in viewer_sources),
+                'Exact original viewer, full export and original RGB source inventory required')
+        require(payload_identity(directory/'report.json', maximum=4 << 20) == report_pin, 'Saved video receipt changed')
+        return dict(report=report_pin, inference_replayed=False)
+    directory = base/('cari_inputs' if stage == 'inputs' else 'cari_shared_'+stage+'_v1')
+    if not directory.exists(): return None
+    role = 'input' if stage == 'inputs' else 'shared_'+stage
+    pinpath = experiment/'pins'/f'cari_clip_{item["episode"]:06d}_{role}_pins.json'
+    pin_id = payload_identity(pinpath, maximum=4 << 20)
+    report_id = payload_identity(directory/'report.json', maximum=4 << 20)
+    pin = strict(pinpath.read_bytes()); report = strict((directory/'report.json').read_bytes())
+    producer = pin['input_report'] if stage == 'inputs' else pin[stage]
+    source_code = code
+    if stage == 'inputs' and producer['producer_revision'] != OLD:
+        require(capacity_code is not None and producer['producer_revision'] == os.environ['WR_CODE_REVISION'],
+                'Only explicit capacity producer source may supplement original inputs')
+        source_code = capacity_code
+    require(report.get('status') == 'pass' and report.get('input_track') == 'track_1'
+            and report.get('episode_index') == item['episode'] and report.get('frames') == item['total']
+            and report.get('ground_truth_used') is False and report.get('hand_labeled_test') is False
+            and report.get('oracle_modes') == [] and report.get('producer_revision') == producer['producer_revision']
+            and producer['script_sha256'] == report.get('script_sha256') and
+            report_id == {key:producer[key] for key in ('bytes','sha256')},
+            'Actual sealed passing full-T native producer and pins required')
+    script = 'infra/cari_prepare.py' if stage == 'inputs' else 'infra/cari_'+('shared_prepare' if stage == 'prepare' else 'full_'+('refine' if stage == 'refined' else stage))+'.py'
+    require(identity(source_code/script)['sha256'] == producer['script_sha256'], 'Saved producer source differs')
+    if stage == 'inputs':
+        import cari_clip_inputs as public
+        spec = public.PublicClipSpec(item['episode'],item['total'],'front_stereo_camera_left',1152,1536)
+        public.validate_pins(spec,pin)
+        require(report.get('stage') == 'world_reward_native_cari_inputs' and
+                report.get('input_sha256') == item['video_pin']['sha256'] and
+                report.get('original_frame_coverage_verified') is True and report.get('object_source') == 'surface',
+                'Existing input must retain original interaction/source')
+        for name, proof in pin['source_files'].items():
+            require(payload_identity(ROOT/name) == proof, 'Existing input/source inventory differs')
+        public.validate_reports(ROOT,spec,pin)
+    else:
+        from full4d_pins import SHARED
+        require(producer['producer_revision'] == OLD and report.get('stage') == SHARED[stage][1]
+                and report.get('phase') == 'complete' and report.get('original_frame_indices') == list(range(item['total']))
+                and report.get('source_inputs_assets_rehashed') is True and report.get('source_helpers_rehashed') is True
+                and set(pin[stage+'_files']) == SHARED[stage][2] and
+                {p.name for p in directory.iterdir()} == SHARED[stage][2], 'Exact unchanged native shared stage required')
+        for name, proof in pin[stage+'_files'].items():
+            require(payload_identity(directory/name) == proof, 'Existing shared numerical artifact changed')
+        for name, proof in report['source_helpers'].items():
+            require(identity(code/name) == proof, 'Existing shared helper lineage changed')
+        if stage == 'prepare':
+            import cari_full_forward as forward
+            input_pins = strict((experiment/'pins'/f'cari_clip_{item["episode"]:06d}_input_pins.json').read_bytes())
+            forward.verify_prepare_artifacts(ROOT,code,forward.inputs.PublicClipSpec(
+                item['episode'],item['total'],'front_stereo_camera_left',1152,1536),pin,input_pins)
+        elif stage == 'forward':
+            import cari_full_forward as forward
+            forward.verify_forward_artifacts(ROOT,code,forward.inputs.PublicClipSpec(
+                item['episode'],item['total'],'front_stereo_camera_left',1152,1536),pin)
+        elif stage == 'refined':
+            import cari_full_refine as refined
+            refined.verify_refined_artifacts(ROOT,code,refined.inputs.PublicClipSpec(
+                item['episode'],item['total'],'front_stereo_camera_left',1152,1536),pin)
+        elif stage == 'export':
+            import cari_full_export as export
+            spec = export.public.PublicClipSpec(item['episode'],item['total'],'front_stereo_camera_left',1152,1536)
+            export.validate_export_report(report,spec)
+            refined_path = experiment/'pins'/f'cari_clip_{item["episode"]:06d}_shared_refined_pins.json'
+            refined_pins = strict(refined_path.read_bytes())
+            chain = export.lineage.verify_refined_artifacts(ROOT,code,spec,refined_pins)
+            input_path = experiment/'pins'/f'cari_clip_{item["episode"]:06d}_input_pins.json'
+            input_pins = strict(input_path.read_bytes())
+            require(report.get('output_files') == {n:v for n,v in pin['export_files'].items() if n!='report.json'}
+                    and report.get('refined_pins') == payload_identity(refined_path)
+                    and report.get('input_pins') == payload_identity(input_path)
+                    and report.get('refined_report_sha256') == refined_pins['refined']['sha256']
+                    and report.get('refined_bundle_sha256') == refined_pins['refined_files']['refined.pth']['sha256']
+                    and report.get('source_files') == input_pins['source_files']
+                    and report.get('aligned_object_mesh_sha256') == pin['export_files']['object_aligned.glb']['sha256']
+                    and all(report.get(k) == chain['report'].get(k) for k in
+                            ('body_assets','inference_source_identity','decoder_identity')),
+                    'Saved export must retain the exact refined/input/native decoder lineage')
+    require(payload_identity(directory/'report.json', maximum=4 << 20) == report_id
+            and payload_identity(pinpath, maximum=4 << 20) == pin_id, 'Saved stage receipt/pin changed')
+    return dict(report=report_id, pin=pin_id, inference_replayed=False)
+
+
 def run_process(command, log, seconds, stop=None, *, env=None):
     """Bounded wait; host termination must not silently leave a GPU worker alive."""
     started = time.monotonic()
@@ -153,12 +279,47 @@ def run_process(command, log, seconds, stop=None, *, env=None):
                 os.killpg(process.pid, signal.SIGKILL); process.wait(timeout=10)
 
 
-def native(driver, original, experiment, cfg, item, stage_row, continuation, seconds, owner, model_lock, stop):
+def previous_continuation(experiment):
+    """Preserve the stopped scout's actual status, never relabel its receipt."""
+    path = experiment/'continuations'/SCOUT_CONTINUATION/'report.json'
+    if not path.exists(): return None
+    prior_code = ROOT/'jobs'/SCOUT_CONTINUATION/ENTRY/'code'
+    source(ROOT,prior_code,SCOUT_CONTINUATION,ENTRY,())
+    tree = ast.parse((prior_code/'infra/full4d_resume.py').read_bytes())
+    helper_node = next(n.value for n in tree.body if isinstance(n,ast.Assign)
+        and any(isinstance(t,ast.Name) and t.id=='HELPERS' for t in n.targets))
+    binding = source(ROOT,prior_code,SCOUT_CONTINUATION,ENTRY,ast.literal_eval(helper_node))
+    pin = payload_identity(path,readonly=False,maximum=4 << 20)
+    report = strict(path.read_bytes())
+    require(report.get('source_binding')==binding and report.get('producer_revision')==SCOUT_CONTINUATION
+            and report.get('original_revision')==OLD and report.get('stage')=='full4d_infrastructure_continuation'
+            and report.get('ground_truth_used') is False and report.get('hand_labeled_test') is False
+            and report.get('oracle_modes')==[] and payload_identity(path,readonly=False,maximum=4 << 20)==pin,
+            'Actual unchanged source-bound scout continuation required')
+    return dict(path=str(path),report=pin,source_binding=binding,status=report['status'],
+                episodes=report['episodes'],previous_receipt_modified=False)
+
+
+def native(driver, original, experiment, cfg, item, stage_row, continuation, seconds, owner, model_lock, stop,
+           *, capacity_code=None):
     stage, script, args, image_key, _, _ = stage_row
     image = cfg[image_key]; name = f'wr-resume-{owner[-12:]}-{item["episode"]}-{stage}'
     require(not subprocess.check_output(['docker', 'ps', '-aq', '--filter', 'name=^/'+name+'$'], text=True).strip(),
             'Fresh owned continuation container required')
-    command = driver.command(original, experiment, cfg, item['episode'], stage, script, args, image, name, OLD)
+    input_capacity = stage == 'inputs' and capacity_code is not None
+    worker_code, worker_revision = (capacity_code, owner) if input_capacity else (original, OLD)
+    command = driver.command(worker_code, experiment, cfg, item['episode'], stage, script, args, image, name, worker_revision)
+    if input_capacity:
+        # Surface ancestry still refers to the untouched original full4D source.
+        position = command.index('--entrypoint')
+        command[position:position] = ['--mount', f'type=bind,src={original.parent},dst={original.parent},readonly']
+        # The old frozen surface pin explicitly binds its pure loader's source
+        # origin. Execute the new capacity-only preparation script, but import
+        # unchanged original geometry readers first; only the new capacity
+        # helper falls through to this continuation's source directory.
+        for index, value in enumerate(command):
+            if value.startswith('PYTHONPATH='):
+                command[index] = 'PYTHONPATH='+str(original/'src')+':'+str(original/'infra')+':'+value.removeprefix('PYTHONPATH=')
     lock = nullcontext() if stage == 'object_pose' else model_lock
     wait_started = time.monotonic()
     with lock:
@@ -173,7 +334,7 @@ def native(driver, original, experiment, cfg, item, stage_row, continuation, sec
             found = subprocess.run(['docker', 'inspect', name], capture_output=True, timeout=15, check=False)
             if found.returncode == 0:
                 actual = strict(found.stdout)[0]
-                require(actual['Image'] == image and actual['Config']['Labels'].get('world_reward.full4d.owner') == OLD,
+                require(actual['Image'] == image and actual['Config']['Labels'].get('world_reward.full4d.owner') == worker_revision,
                         'Foreign container may not be removed')
                 subprocess.run(['docker', 'rm', '-f', actual['Id']], stdout=subprocess.DEVNULL,
                                stderr=subprocess.DEVNULL, timeout=20, check=True)
@@ -221,6 +382,7 @@ def run():
         with (ROOT/'jobs/.world-reward-h100.lock').open('a') as lease:
             fcntl.flock(lease, fcntl.LOCK_EX|fcntl.LOCK_NB)
             require(not subprocess.check_output(['docker', 'ps', '-q'], text=True).strip(), 'No duplicate GPU controller')
+            report['previous_continuation'] = previous_continuation(experiment)
             selected = driver.inputs(cfg['episodes'])
             report['episodes'] = [dict(episode=item['episode'], status='pending', stages=[]) for item in selected]
             def episode_worker(pair):
@@ -239,6 +401,8 @@ def run():
                         stage, script, args, _, _, reserved = stage_row
                         seconds(stage_row); row.update(status='running', phase=stage); persist()
                         reuse = report_pass(base, stage, script, original, item) if stage in STAGE_NAMES else None
+                        if stage in {'inputs','prepare','forward','refined','export','video'}:
+                            reuse = saved_stage(base, stage, experiment, original, item, capacity_code=code)
                         if stage == 'surface' and (base/('object_budget_surface_'+OLD)).exists():
                             pinpath = experiment/'pins'/f'surface_mesh_{item["episode"]:06d}_pins.json'
                             pin = strict(pinpath.read_bytes()); reuse = dict(pin=payload_identity(pinpath))
@@ -260,8 +424,11 @@ def run():
                                 driver.surface_pin(ROOT, original, OLD, item['episode'])
                             else:
                                 native(driver, original, experiment, cfg, item, stage_row, continuation,
-                                       seconds(stage_row), revision, model_lock, stop)
-                                if stage == 'inputs': driver.input_pin(ROOT, original, OLD, item['episode'], item['total'])
+                                       seconds(stage_row), revision, model_lock, stop, capacity_code=code)
+                                if stage == 'inputs':
+                                    from full4d_capacity_pin import input_pin
+                                    input_pin(ROOT,code,revision,item['episode'],item['total'],
+                                              original_code=original,original_revision=OLD)
                                 if stage in {'prepare', 'forward', 'refined', 'export'}:
                                     driver.shared_pin(stage, ROOT, original, OLD, item['episode'], item['total'])
                         if stage == 'object_pose':
@@ -291,6 +458,8 @@ def run():
             if row['status'] == 'pending': row['status'] = 'not_run_upstream_scout_failure'
     finally:
         require(payload_identity(failed, readonly=False, maximum=4 << 20) == failed_pin, 'Original failed report changed')
+        if report.get('previous_continuation') is not None:
+            require(previous_continuation(experiment)==report['previous_continuation'], 'Scout continuation receipt changed')
         require(source(ROOT, code, revision, ENTRY, HELPERS) == own and
                 source(ROOT, original, OLD, driver.ENTRY, driver.HELPERS) == binding, 'Original/current source changed')
         report['source_rehashed_after'] = True; persist()

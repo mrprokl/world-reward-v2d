@@ -327,7 +327,8 @@ def _solid_camera_roundtrip(source, rotations, translations, saved_poses, native
 
 def _surface_preflight(root, episode, inputs, report, pose_path, np):
     """Authenticated surface and full poses, before reserving prepared inputs."""
-    from surface_geometry_loader import load, identity, strict_json, recheck, preflight_geometry_and_poses, SOURCE_HELPERS
+    from surface_geometry_loader import load, strict_json, preflight_geometry_and_poses, SOURCE_HELPERS
+    from surface_pose_report_capacity import identity, recheck
     code=Path(__file__).resolve().parent.parent
     base=episode_output(root, episode)
     pinpath=artifact_pin_path(code, episode, "surface_mesh")
@@ -363,7 +364,7 @@ def _surface_preflight(root, episode, inputs, report, pose_path, np):
     if (r.shape != (inputs['total_frames'],3,3) or t.shape != (inputs['total_frames'],3)
             or not np.array_equal(pa,active)):
         raise ValueError('Surface original full timeline or meaningful face indices changed')
-    helpers={*SOURCE_HELPERS,'infra/cari_prepare.py','infra/cari_wrapper_common.sh','infra/run_cari_prepare.sh','src/world_reward/artifact_paths.py'}
+    helpers={*SOURCE_HELPERS,'infra/cari_prepare.py','infra/cari_wrapper_common.sh','infra/run_cari_prepare.sh','src/world_reward/artifact_paths.py','infra/surface_pose_report_capacity.py'}
     ledger.update({code/n:identity(code/n) for n in helpers})
     recheck(ledger)
     return pv,pf,pa,r,t,compact,topology,ledger
@@ -476,7 +477,7 @@ def main():
         if len(records) != len(reports[key]["frames"]) or sorted(records) != list(range(count)):
             raise RuntimeError(f"{key} lacks exact full original-frame coverage")
     if args.mesh_source == 'surface':
-        from surface_geometry_loader import identity as surface_identity, recheck as surface_recheck
+        from surface_pose_report_capacity import identity as surface_identity, recheck as surface_recheck
         vertices, faces, active, rotations, translations, surface_compact, surface_topology, surface_ledger = _surface_preflight(
             root,args.episode,inputs,reports['object'],pose_path,np)
         surface_native_load, native_source_ledger = _solid_native_sources(native_root,trimesh,np)
