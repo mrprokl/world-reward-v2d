@@ -1,0 +1,22 @@
+{
+  "status": "saved_only_partial_diagnostic_not_quality_pass",
+  "date_utc": "2026-10-08",
+  "baseline_producer": "de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba",
+  "new_producer": "052ba1554e9a573d566713a99a61d89a5f27681c",
+  "method_source_sha256": "c91d311d7500a4f8eac693e09142fc982848f88bef30e9f226d0f81044351c31",
+  "cpu_image": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "first_window_frames_inclusive": [0, 59],
+  "fps": 30,
+  "motion_columns": ["first_window_centroid_m_per_frame_median", "first_window_rotation_deg_per_frame_median", "first_window_surface_m_per_frame_median", "full_surface_acceleration_rms_m_s2"],
+  "rows": [
+    {"episode": 9, "branch": "baseline", "frames": 415, "initial": [0.018346, 0.0, 0.018346, 86.618194], "final": [0.009216, 0.643713, 0.012661, 39.278149], "object_extent_inferred_m": [0.720182, 1.095054, 1.326523], "initializer_sha256": "6c2428786cf3d8822868539c8e5c7b2f828fab014cfd24a47ea2f77f5542e54d", "trajectory_sha256": "7a039f7c6793b4206a702df4acdcb9b55499577f65ce42f8f9cf0df6400f99dd"},
+    {"episode": 9, "branch": "new", "frames": 415, "initial": [0.023680, 0.0, 0.023680, 64.846742], "final": [0.008842, 0.606823, 0.011069, 34.151517], "object_extent_inferred_m": [0.722720, 1.081901, 1.305290], "initializer_sha256": "26fec24872a5f767f8421c03230459a782cf221df5b6ade211bba3eb427532e2", "trajectory_sha256": "a4a1e0dbdcc76c46975e13a2bb6fdfc0d3a036eb240b7a093ffc65f9695b70f6"},
+    {"episode": 14, "branch": "baseline", "frames": 442, "initial": [0.040942, 0.0, 0.040942, 91.451168], "final": [0.016357, 5.372057, 0.026761, 85.198332], "object_extent_inferred_m": [0.500932, 0.542574, 0.591026]},
+    {"episode": 14, "branch": "new", "status": "pending_no_frozen_export_at_capture"}
+  ],
+  "source_gate": "Original export/input pins, source SHA receipts, actual payload hashes, readonly canonical single-link files, original full timelines and GT/oracle-off fields verified; rehashed after measurements.",
+  "geometry_policy": "Same exported vertices for initializer/final within each branch. Proper saved source-mesh-to-aligned SE(3), no prediction changes. Different meshes/scales between branches; cross-branch proxies are not accuracy.",
+  "scope": "No RGB video re-read, GT, inference, fitting, local video transfer or GPU. Motion proxies do not establish resting-object labels, correct reconstruction, true metric scale, held-out improvement or leaderboard superiority.",
+  "integration_note": "First CPU audit rejected an incorrect seven-field trajectory schema. Actual native export has eleven fields including pose/scales/shape/expression. Exact schema and shapes corrected; no upstream outputs modified.",
+  "decision": "Frontend alone has not resolved pose instability. Keep causal baseline; separately qualify occlusion recovery and sequence-level pose estimation before adopting changes. Failed clips remain in the frozen four-clip denominator."
+}
