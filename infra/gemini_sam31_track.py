@@ -82,14 +82,23 @@ def prompt_parity(predictor):
     coords = torch.tensor([[[0.1 * size[1], 0.2 * size[0]],
                             [0.7 * size[1], 0.8 * size[0]]]], device='cuda')
     labels = torch.tensor([[2, 3]], dtype=torch.int32, device='cuda')
-    encoded = encoder._embed_points(coords, labels, pad=True)
-    boxed = encoder._embed_boxes(coords.reshape(1, 4))
-    require(encoded.shape[1] == 3 and torch.equal(encoded[:, :2], boxed)
-            and torch.equal(encoded[:, 2], encoder.not_a_point_embed.weight),
+    # Compare identical FP32 batches. In BF16, box embeddings use in-place
+    # addition whereas point embeddings promote the addition to FP32; that
+    # transport proof must not accidentally compare two rounding contracts.
+    # Actual native inference still keeps its unmodified BF16/padded route.
+    with torch.autocast(device_type='cuda', enabled=False):
+        encoded = encoder._embed_points(coords, labels, pad=False)
+        boxed = encoder._embed_boxes(coords.reshape(1, 4))
+    padded = encoder._embed_points(coords, labels, pad=True)
+    require(encoded.shape[1] == 2 and torch.equal(encoded, boxed)
+            and padded.shape[1] == 3
+            and torch.equal(padded[:, 2], encoder.not_a_point_embed.weight),
             'Native box-corner learned embeddings + native padding parity failed')
     return dict(labels=[2, 3], corners_equal_native_box_embeddings=True,
                 native_padding_token_retained=True, upstream_source_modified=False,
-                bare_image_box_token_arrays_identical=False)
+                bare_image_box_token_arrays_identical=False,
+                equal_shape_unpadded_kernel_comparison=True,
+                proof_autocast_disabled=True)
 
 
 def preview(frames, sampled, seed, target, episode, maximum):
@@ -313,5 +322,8 @@ def run():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 4 and sys.argv[1] == '--native': native(Path(sys.argv[2]), Path(sys.argv[3]))
+    if len(sys.argv) == 4 and sys.argv[1] == '--native':
+        import torch
+        with torch.inference_mode():
+            native(Path(sys.argv[2]), Path(sys.argv[3]))
     else: run()

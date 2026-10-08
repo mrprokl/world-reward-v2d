@@ -1,0 +1,11 @@
+{
+  "schema": "world_reward.gemini_sam31.initial_gate.v1",
+  "producer_revision": "7cad945a70c1061dd5bcf39b71fbbec6b4b4b415",
+  "status": "fail_transport_before_inference",
+  "azure_gpu_only": true,
+  "frames_processed": 0,
+  "error": "Native box-corner learned embeddings + native padding parity failed",
+  "source_verified_before_run": true,
+  "baseline_modified": false,
+  "decision": "Diagnose padded/BF16 versus bare box comparison; preserve native tracker and original failed namespace. No scientific-parameter or per-clip adjustment."
+}

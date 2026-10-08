@@ -55,3 +55,42 @@ def test_diagnostics_retain_empty_runs_and_full_adjacency():
     assert result['longest_empty_run'] == 2
     assert result['empty_frames'] == 2
     assert result['quality_verified'] is False and result['interpolation'] is False
+
+
+def test_native_parity_compares_identical_kernel_shapes_and_preserves_padding(monkeypatch):
+    """Manufactured shape-sensitive PE: padded tokens aren't bare box arrays."""
+    import sys
+    from contextlib import nullcontext
+    from types import SimpleNamespace
+    import gemini_sam31_track as adapter
+
+    class Torch:
+        int32 = np.int32
+        @staticmethod
+        def tensor(value, **kwargs): return np.asarray(value)
+        @staticmethod
+        def equal(a, b): return np.array_equal(a, b)
+        @staticmethod
+        def autocast(**kwargs):
+            assert kwargs == dict(device_type='cuda', enabled=False)
+            return nullcontext()
+
+    class Encoder:
+        input_image_size = [10, 10]
+        not_a_point_embed = SimpleNamespace(weight=np.array([[11., 12.]]))
+        def _embed_points(self, coords, labels, pad):
+            corners = coords + np.array([[[2., 2.], [3., 3.]]])
+            if pad:
+                # Different batch shape may produce a last-bit kernel change.
+                corners = corners + 1e-9
+                return np.concatenate((corners, self.not_a_point_embed.weight[None]), axis=1)
+            return corners
+        def _embed_boxes(self, coords):
+            return coords.reshape(1, 2, 2) + np.array([[[2., 2.], [3., 3.]]])
+
+    monkeypatch.setitem(sys.modules, 'torch', Torch)
+    predictor = SimpleNamespace(model=SimpleNamespace(tracker=SimpleNamespace(
+        model=SimpleNamespace(interactive_sam_prompt_encoder=Encoder()))))
+    proof = adapter.prompt_parity(predictor)
+    assert proof['native_padding_token_retained'] is True
+    assert proof['equal_shape_unpadded_kernel_comparison'] is True
