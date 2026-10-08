@@ -46,7 +46,7 @@
   "frontend_config": "configs/gemini_sam31_v1.json",
   "old_baseline_producer": "de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba",
   "reuse_depth_only_if_exact_provenance": true,
-  "frontend_producer_revision": "69869ff6bc8650a301667891ed07fc16b8eab0c5",
+  "frontend_producer_revision": "038916aa17b4ff5fc790bb25f910f02d381a34a1",
   "object_pose_method": "unchanged_rigid_icp_viterbi_causal_frontend_ablation",
   "jitter_fix_claimed": false
 }
