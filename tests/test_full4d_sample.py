@@ -1,4 +1,6 @@
 import json
+import hashlib
+import os
 from pathlib import Path
 import random
 
@@ -86,3 +88,90 @@ def test_surface_consumers_mount_complete_authenticated_original_snapshots_reado
         assert not any(f'src={original},' in mount and not mount.endswith(',readonly') for mount in mounts)
     assert f'type=bind,src={sample.ROOT / "jobs"},dst={sample.ROOT / "jobs"},readonly' not in mounts
     assert all(path.name in ('run_surface_qslim_qualify', 'run_surface_identity_qualify') for path in expected)
+
+
+@pytest.mark.parametrize('field,value', [
+    ('geometry_policy', 'repair_or_drop_object'), ('grounding_config', 'configs/other.json'),
+    ('virtual_floor_only', False), ('pilot_budget_seconds', 999999),
+    ('body_image', 'sha256:' + 'f' * 64), ('scope', 'heldout_verified'),
+    ('challenge_performance_verified', True), ('extra_unfrozen_field', 1),
+])
+def test_immutable_sample_source_protocol_fields_enforced(tmp_path, field, value):
+    (tmp_path/'configs').mkdir()
+    cfg = sample.load_config(CODE)
+    cfg[field] = value
+    (tmp_path/sample.CONFIG).write_text(json.dumps(cfg))
+    with pytest.raises(ValueError, match='Frozen source'):
+        sample.load_config(tmp_path)
+
+
+def pose_fixture(monkeypatch, tmp_path):
+    root = tmp_path/'runtime'
+    code = root/'jobs'/REV/sample.ENTRY/'code'
+    script = code/'infra/object_pose_smoke.py'
+    script.parent.mkdir(parents=True)
+    script.write_bytes(b'# Tiny frozen original pose source\n')
+    script.chmod(0o444)
+    code.chmod(0o555)
+    for name, raw in (('revision', (REV+'\n').encode()), ('source-sha256', ('b'*64+'\n').encode())):
+        (code.parent/name).write_bytes(raw)
+        (code.parent/name).chmod(0o444)
+    monkeypatch.setattr(sample, 'ROOT', root)
+    monkeypatch.setenv('WR_OUTPUT_PREFIX', f'experiments/full4d-v1-{REV}/outputs')
+    monkeypatch.setenv('WR_CODE', str(root/'jobs'/('b'*40)/'current/code'))
+    monkeypatch.setenv('WR_CODE_REVISION', 'b'*40)
+    out = root/f'experiments/full4d-v1-{REV}/outputs/episode_000017/object_pose_full_surface'
+    out.mkdir(parents=True)
+    rows = {}
+    for name in ('geometry_and_poses.npz', 'object_fixed_canonical.glb'):
+        raw = ('opaque existing predicted '+name).encode()
+        (out/name).write_bytes(raw)
+        rows[name] = dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
+    report = dict(stage='fixed_scale_full_object_pose_initializer', status='pass', episode_index=17,
+        input_track='track_1', mesh_source='surface', ground_truth_used=False, hand_labeled_test=False,
+        oracle_modes=[], fixed_shape=True, original_frame_coverage_verified=True, execution_verified=True,
+        script_sha256=hashlib.sha256(script.read_bytes()).hexdigest(),
+        geometry_and_poses_sha256=rows['geometry_and_poses.npz']['sha256'],
+        fixed_canonical_mesh_sha256=rows['object_fixed_canonical.glb']['sha256'],
+        frames=[dict(frame_index=index) for index in range(96)])
+    (out/'report.json').write_text(json.dumps(report))
+    return root, code, out, report
+
+
+def test_pose_seal_original_producer_before_input_no_decode_or_byte_changes(monkeypatch, tmp_path):
+    root, code, out, report = pose_fixture(monkeypatch, tmp_path)
+    before = {p.name:p.read_bytes() for p in out.iterdir()}
+    value = sample.seal_pose(root,17,96,producer_code=code,producer_revision=REV)
+    assert value['producer_revision'] == REV and value['total_frames'] == 96
+    assert value['numeric_payload_decoded'] is False and value['inference_replayed'] is False
+    assert {p.name:p.read_bytes() for p in out.iterdir()} == before
+    assert out.stat().st_mode & 0o777 == 0o555
+    assert all(p.stat().st_mode & 0o777 == 0o444 for p in out.iterdir())
+    # Idempotent metadata sealing does not resume/rewrite any prediction.
+    assert sample.seal_pose(root,17,96,producer_code=code,producer_revision=REV) == value
+
+
+@pytest.mark.parametrize('mutation', ['fail','episode','gt','manual','oracle','script','timeline','meshhash','npzhash','extra','symlink','hardlink','namespace','source_revision'])
+def test_bad_pose_sources_stop_before_any_chmod(monkeypatch,tmp_path,mutation):
+    root, code, out, report = pose_fixture(monkeypatch,tmp_path)
+    if mutation == 'extra': (out/'unowned.txt').write_bytes(b'foreign')
+    elif mutation == 'symlink':
+        (out/'object_fixed_canonical.glb').unlink()
+        (out/'object_fixed_canonical.glb').symlink_to(code/'infra/object_pose_smoke.py')
+    elif mutation == 'hardlink': (tmp_path/'alias').hardlink_to(out/'geometry_and_poses.npz')
+    elif mutation == 'namespace': monkeypatch.setenv('WR_OUTPUT_PREFIX','outputs')
+    elif mutation == 'source_revision': report['producer_revision'] = 'b'*40
+    elif mutation == 'fail': report['status'] = 'fail'
+    elif mutation == 'episode': report['episode_index'] = 2
+    elif mutation == 'gt': report['ground_truth_used'] = True
+    elif mutation == 'manual': report['hand_labeled_test'] = True
+    elif mutation == 'oracle': report['oracle_modes'] = ['oracle']
+    elif mutation == 'script': report['script_sha256'] = 'f'*64
+    elif mutation == 'timeline': report['frames'][10]['frame_index'] = 11
+    elif mutation == 'meshhash': report['fixed_canonical_mesh_sha256'] = 'f'*64
+    elif mutation == 'npzhash': report['geometry_and_poses_sha256'] = 'f'*64
+    (out/'report.json').write_text(json.dumps(report))
+    with pytest.raises(ValueError):
+        sample.seal_pose(root,17,96,producer_code=code,producer_revision=REV)
+    assert (out/'report.json').stat().st_mode & 0o777 == 0o644
+    assert out.stat().st_mode & 0o777 != 0o555

@@ -32,3 +32,17 @@ MP4s ≤2 MB/clip stay remote; only tiny posters/results may be transferred loca
 Human QA gate: inspect target identity, body/hand motion, object shape/orientation,
 contact plausibility, drift, occlusions and inferred scale. Observations guide
 general algorithms, never manual prediction of individual challenge records.
+
+## 2026-10-08 infrastructure continuation
+
+The frozen `de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba` producer completed all
+415 object poses for episode 9 (2,460.6 s), but its input consumer rejected the
+unsealed publication directory. Seal only the three verified files' permissions;
+reuse their exact bytes, source and full timeline. Preserve the interrupted
+original report and write a separate source-bound continuation receipt.
+
+Episode 9 scouts inputs through final rendering before new expensive tracking
+on the remaining frozen clips. Then two episode workers share one GPU lease;
+learned stages remain serialized. Focused continuation/preview tests: **87 pass**.
+Known follow-up capacity risk: the historical 32 MiB pose-report consumer may
+reject longer clips; this is not an accuracy failure or reason to resample.
