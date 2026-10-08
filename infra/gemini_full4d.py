@@ -94,6 +94,27 @@ def _copy(src, dst, pin, maximum=64 << 20):
             'Copy differs or original payload changed')
 
 
+def depth_weight_identity(root, expected_sha):
+    """Use the existing acquisition-bound MoGe2 HF→Xet cache resolver.
+
+    HF file content SHA and Xet storage ID differ. The audited helper validates
+    the acquisition receipt, independent content SHA/size and exact two-link
+    graph. Generic artifact/control paths remain canonical and symlink-free.
+    """
+    from bridge_rgb_anchor_infer import moge_asset, host_moge_chain, MOGE_SHA, MOGE_REV
+    require(type(expected_sha) is str and re.fullmatch('[0-9a-f]{64}', expected_sha),
+            'Exact previously recorded MoGe2 model SHA required')
+    require(expected_sha == MOGE_SHA and DEPTH_MODEL == MOGE_REV,
+            'Depth receipt differs from the independently audited MoGe2 content/revision')
+    chain = host_moge_chain(root)
+    path, acquisition_pin, pin = moge_asset(root)
+    require(host_moge_chain(root) == chain and pin['sha256'] == expected_sha,
+            'Audited MoGe2 snapshot graph/content changed during verification')
+    return dict(canonical_blob=str(path), artifact=pin, snapshot_alias=True,
+                link_graph=chain, acquisition_receipt=acquisition_pin,
+                resolver='bridge_rgb_anchor_infer.moge_asset_and_host_moge_chain')
+
+
 def frontend_adapter(cfg, item, dest):
     revision = cfg['frontend_producer_revision']
     source_code = ROOT/'jobs'/revision/FRONTEND_ENTRY/'code'
@@ -197,9 +218,7 @@ def depth_reuse(root, code, cfg, item, base, stage):
             and type(report.get('frames')) is list
             and [r.get('frame_index') for r in report['frames']] == indices,
             'Complete exact original RGB-only MoGe2 receipt required')
-    weights = root/f'weights/cari4d/hf_home/hub/models--Ruicheng--moge-2-vitl-normal/snapshots/{DEPTH_MODEL}/model.pt'
-    require(identity(weights, 2 << 30, readonly=False)['sha256'] == report['model_sha256'],
-            'Cached depth model differs from current pinned model')
+    model_identity = depth_weight_identity(root, report['model_sha256'])
     expected_names = {'report.json'} | {f'{index:06d}.npz' for index in indices}
     require({p.name for p in directory.iterdir()} == expected_names,
             'Exact full/sparse original depth inventory required')
@@ -215,11 +234,13 @@ def depth_reuse(root, code, cfg, item, base, stage):
     for name, pin in payloads.items():
         _copy(directory/name, dest/name, pin)
     dest.chmod(0o555)
-    require(source(root, original, OLD, 'run_full4d_sample', ('infra/depth_smoke.py',)) == original_binding,
+    require(source(root, original, OLD, 'run_full4d_sample', ('infra/depth_smoke.py',)) == original_binding
+            and depth_weight_identity(root, report['model_sha256']) == model_identity,
             'Original complete source closure changed during depth reuse')
     return dict(producer_revision=OLD, source_directory=str(directory), source_binding=original_binding,
                 files=payloads, report=report_pin, inference_replayed=False,
                 original_report_byte_preserved=True, rgb_only=True,
+                model_identity=model_identity,
                 source_camera_calibration_used=False, ground_truth_used=False)
 
 

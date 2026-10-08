@@ -14,6 +14,7 @@ sys.path[:0] = [str(REPO/'infra'), str(REPO/'src')]
 import gemini_full4d as graph
 import full4d_pins as pins
 import object_budget_solid as surface
+import bridge_rgb_anchor_infer as model_resolver
 
 
 def payload(path, value):
@@ -93,6 +94,8 @@ def test_rgb_only_depth_cache_preserves_original_receipt(monkeypatch, tmp_path, 
     item = dict(episode=9, total=5, video_pin=dict(bytes=100, sha256='b'*64))
     weight = root/f'weights/cari4d/hf_home/hub/models--Ruicheng--moge-2-vitl-normal/snapshots/{graph.DEPTH_MODEL}/model.pt'
     weight_pin = payload(weight, b'manufactured model identity')
+    monkeypatch.setattr(graph, 'depth_weight_identity', lambda root, expected: dict(
+        canonical_blob=str(weight),artifact=weight_pin,snapshot_alias=False))
     rows=[]
     for index in (0,2,4):
         pin = payload(directory/f'{index:06d}.npz', b'manufactured numeric output')
@@ -185,3 +188,41 @@ def test_frontend_requires_exact_automatic_native_lineage_and_copies_pngs(monkey
         assert set(p.name for p in dest.iterdir())==graph.FRONTEND_FILES | {'masks'}
         assert graph._inventory(dest/'masks',3)[:2]==(rows,inventory)
         assert (dest/'report.json').read_bytes()==(directory/'report.json').read_bytes()
+
+
+@pytest.mark.parametrize('mutation', [None, 'outside', 'absolute', 'wrong_digest', 'parent_alias', 'blob_alias', 'contents', 'hardlink', 'acquisition_revision', 'acquisition_cache'])
+def test_depth_model_reuses_audited_two_level_hf_xet_resolver(monkeypatch, tmp_path, mutation):
+    root=tmp_path/'root'; cache=root/'weights/cari4d/hf_home/hub'; repo=cache/'models--Ruicheng--moge-2-vitl-normal'
+    raw=b'tiny known HF model cache byte fixture'; digest=hashlib.sha256(raw).hexdigest(); xet='9f'+'c'*62
+    monkeypatch.setattr(model_resolver,'MOGE_SHA',digest)
+    monkeypatch.setattr(model_resolver,'MOGE_BYTES',len(raw))
+    monkeypatch.setattr(model_resolver,'XET_SHA',xet)
+    blob=cache/'blobs'/xet[:2]/xet; pin=payload(blob,raw)
+    snapshot=repo/'snapshots'/graph.DEPTH_MODEL; snapshot.mkdir(parents=True)
+    alias=snapshot/'model.pt'; target='../../blobs/'+digest
+    repoblob=repo/'blobs'/digest; repoblob.parent.mkdir()
+    repoblob.symlink_to('../../blobs/'+xet[:2]+'/'+xet)
+    acquisition=dict(assets=[dict(repo_id='Ruicheng/moge-2-vitl-normal',revision=graph.DEPTH_MODEL,cache_dir=str(cache))])
+    if mutation=='acquisition_revision': acquisition['assets'][0]['revision']='f'*40
+    elif mutation=='acquisition_cache': acquisition['assets'][0]['cache_dir']=str(tmp_path/'othercache')
+    payload(root/'results/weights-acquisition.json',acquisition)
+    if mutation=='outside':
+        outside=tmp_path/'outside'; payload(outside,raw); target=str(outside)
+    elif mutation=='absolute': target=str(blob)
+    elif mutation=='wrong_digest':
+        payload(repo/'blobs'/('f'*64),raw); target='../../blobs/'+'f'*64
+    elif mutation=='contents': blob.chmod(0o644); blob.write_bytes(b'changed'); blob.chmod(0o444)
+    elif mutation=='hardlink': (cache/'blobs/alias').hardlink_to(blob)
+    elif mutation=='blob_alias':
+        outside=tmp_path/'outside'; payload(outside,raw); blob.unlink(); blob.symlink_to(outside)
+    elif mutation=='parent_alias':
+        (cache/'blobs').rename(cache/'realblobs'); (cache/'blobs').symlink_to(cache/'realblobs',target_is_directory=True)
+    alias.symlink_to(target)
+    if mutation:
+        with pytest.raises(ValueError): graph.depth_weight_identity(root,digest)
+    else:
+        actual=graph.depth_weight_identity(root,digest)
+        assert actual['snapshot_alias'] is True and actual['artifact']==pin
+        assert actual['canonical_blob']==str(blob) and len(actual['link_graph'])==3
+        assert actual['resolver']=='bridge_rgb_anchor_infer.moge_asset_and_host_moge_chain'
+        assert alias.is_symlink() and os.readlink(alias)==target

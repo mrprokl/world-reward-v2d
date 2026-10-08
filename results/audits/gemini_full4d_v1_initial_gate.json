@@ -1,0 +1,20 @@
+{
+  "schema": "world_reward.gemini_full4d.integration.v1",
+  "producer_revision": "24b3aa037b88c3c25b4c75a563e8dfbfe91b672a",
+  "status": "fail_cache_model_path_contract",
+  "episode": 9,
+  "successful_native_stages": [
+    {
+      "stage": "body_smoke",
+      "seconds": 22.94854440598283
+    }
+  ],
+  "failed_stage": "depth_smoke_cache_validation",
+  "elapsed_seconds": 27.175982746994123,
+  "error": "Canonical immutable/control path required",
+  "cause": "MoGe2 HF snapshot resolves via repo SHA alias to audited shared Xet blob; file-content SHA and storage ID differ.",
+  "decision": "Reuse existing acquisition-bound MoGe2 asset+two-link resolver; no generic symlink relaxation, numerical change or baseline overwrite.",
+  "remaining_episodes_not_run": true,
+  "ground_truth_used": false,
+  "quality_verified": false
+}
