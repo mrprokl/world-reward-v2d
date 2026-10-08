@@ -108,10 +108,33 @@ def test_upstream_whitelist_excludes_videos_annotations_and_notebooks():
     assert not runtime.allowed_source(dict(path='examples/example.ipynb',type='blob'))
 
 
+def test_source_acquisition_accepts_regular_executable_git_files(monkeypatch,tmp_path):
+    sizes=[27000]*154+[4184994-27000*154]
+    rows=[dict(path=f'sam3/a{i}.py',type='blob',mode='100755' if i==0 else '100644',
+               size=size,sha=runtime.git_blob(b'x'*size)) for i,size in enumerate(sizes)]
+    tree=dict(sha='publisher-tree',truncated=False,tree=rows)
+    byname={r['path']:r for r in rows}
+    def fetch(url,maximum):
+        if 'api.github' in url:return json.dumps(tree).encode()
+        row=byname['sam3/'+url.rsplit('/sam3/',1)[1]]
+        return b'x'*row['size']
+    monkeypatch.setattr(runtime,'fetch_public',fetch)
+    monkeypatch.setattr(runtime,'verify_git_tree',lambda actual,expected:None)
+    receipts=runtime.acquire_source(tmp_path/'publisher',dict(source_repo='publisher/repo',
+        source_tree='publisher-tree',source_revision='f'*40),float('inf'))
+    assert len(receipts)==155 and receipts[0]['git_mode']=='100755'
+    assert (tmp_path/'publisher/sam3/a0.py').stat().st_mode & 0o777 == 0o444
+    rows[0]['mode']='120000'
+    with pytest.raises(ValueError,match='Only regular publisher source files'):
+        runtime.acquire_source(tmp_path/'bad',dict(source_repo='publisher/repo',source_tree='publisher-tree'),float('inf'))
+
+
 def test_shell_and_docker_do_not_copy_credentials_or_qwen():
     root=Path(__file__).resolve().parents[1]
     docker=(root/'infra/Dockerfile.sam31').read_text()
     assert 'COPY upstream /opt/sam3' in docker
+    assert 'einops==0.8.1 psutil==7.0.0' in docker
+    assert 'import einops, psutil' in docker
     assert 'hf_token' not in docker and 'Qwen' not in docker
     script=(root/'infra/run_sam31_runtime.sh').read_text()
     assert 'set +x' in script and 'run_sam31_runtime/code' in script

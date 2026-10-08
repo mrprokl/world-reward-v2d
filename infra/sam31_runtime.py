@@ -90,14 +90,16 @@ def acquire_source(folder, c, deadline):
     verify_git_tree(tree['tree'], c['source_tree'])
     rows = [r for r in tree['tree'] if allowed_source(r)]
     require(len(rows) == 155 and sum(r['size'] for r in rows) == 4184994, 'Code-only source whitelist differs')
+    require(all(r['mode'] in ('100644', '100755') for r in rows),
+            'Only regular publisher source files permitted')
     folder.mkdir(mode=0o755)
     def one(row):
-        require(time.monotonic() < deadline and row['mode'] == '100644', 'Source acquisition deadline/type differs')
+        require(time.monotonic() < deadline and row['mode'] in ('100644', '100755'), 'Source acquisition deadline/type differs')
         p = folder/row['path']; p.parent.mkdir(parents=True, exist_ok=True)
         raw = fetch_public('https://raw.githubusercontent.com/'+c['source_repo']+'/'+c['source_revision']+'/'+row['path'], row['size'])
         require(len(raw) == row['size'] and git_blob(raw) == row['sha'], 'Pinned publisher source blob differs')
         write(p, raw, mode=0o444)
-        return dict(file=row['path'], git_blob_sha1=row['sha'], **identity(p, 2_000_000))
+        return dict(file=row['path'], git_blob_sha1=row['sha'], git_mode=row['mode'], **identity(p, 2_000_000))
     with ThreadPoolExecutor(max_workers=8) as pool: result = list(pool.map(one, rows))
     require(time.monotonic() < deadline, 'Source posthash deadline exceeded')
     return result

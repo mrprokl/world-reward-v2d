@@ -85,3 +85,9 @@ Primary inspiration, not exact code reproduction:
   GPU inference or model download occurred. Fix general Dockerfile closure,
   test final-batch adapter, and relaunch a fresh namespace with the same frozen
   cohort/settings. This is an infrastructure repair, not a quality ablation.
+- Producerf9dab8ce then failed the source-file-mode guard in1.04s:10 pinned
+  Python files are ordinary executable Git blobs (`100755`), not symlinks.
+  Accept only regular644/755 publisher blobs, retain original Git mode in
+  receipts, and store bytes read-only. No weight/GPU inference occurred.
+  Eager-import audit also found required `einops`/`psutil`; pin and import-check
+  them before GPU execution. Same cohort, models and scientific settings.
