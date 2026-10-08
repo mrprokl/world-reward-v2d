@@ -44,5 +44,6 @@
   "sam_multiplex_count": 16,
   "qualification_prefix_frames": 30,
   "presence_logit_threshold": 0.0,
-  "seed": 20261008
+  "seed": 20261008,
+  "native_state_policy": "one_singleton_per_fixed_id_shared_backbone"
 }

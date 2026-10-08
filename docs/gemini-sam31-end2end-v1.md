@@ -59,3 +59,14 @@ orientation, motion/contact, disappearance/reappearance and scale. Report source
 coverage, empty masks, consistency/flow and stage cost as PROXIES, never trueGT
 accuracy or leaderboard victory. FORM-HOI disjoint insight cohort remains separate
 and not yet scored; no challenge-matched assets are allowed in this experiment.
+
+### Native integration qualification
+
+The first two immutable integration runs failed before full-frame propagation:
+`7cad945` compared padded/BF16 tokens to bare box tokens under different rounding
+contracts; `69869ff` passed the corrected FP32/equal-shape proof but hit native
+multi-object interactive gap-fill (`1` pointer versus `2` mux entries). The
+source-backed instance path uses one singleton tracker state per fixed ID,
+sharing the same image/backbone feature cache. This is not semantic redetection
+or a SAM2 checkpoint fallback. All six automatic boxes and full original frame
+indices are retained; native output accuracy is still unverified.

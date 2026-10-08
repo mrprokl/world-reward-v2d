@@ -63,6 +63,18 @@ def native_masks(ids, logits, object_logits, height: int, width: int):
     return masks, presence
 
 
+def singleton_outputs(outputs, index):
+    """Two publisher PVS states -> fixed-role outputs, no swaps or tail slicing."""
+    if type(outputs) is not list or len(outputs) != 2:
+        raise ValueError("Exactly two native singleton outputs required")
+    for object_id, row in enumerate(outputs):
+        if type(row) not in (list, tuple) or len(row) != 5 or row[0] != index or row[1] != [object_id]:
+            raise ValueError("Original frame and singleton identity must agree exactly")
+        if row[3].shape[0] != 1 or row[4].shape[0] != 1:
+            raise ValueError("Singleton outputs cannot contain extra mask or presence rows")
+    return [0, 1], [row[3] for row in outputs], [row[4] for row in outputs]
+
+
 def temporal_summary(areas, adjacent_ious):
     """Descriptive video-only diagnostics, never an accuracy metric or filter."""
     import numpy as np

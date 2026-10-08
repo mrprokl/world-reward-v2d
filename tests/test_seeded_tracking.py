@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from world_reward.seeded_tracking import corner_prompt, native_masks, seed_rows, temporal_summary
+from world_reward.seeded_tracking import corner_prompt, native_masks, seed_rows, temporal_summary, singleton_outputs
 
 
 def test_original_non_square_corner_codec():
@@ -43,6 +43,22 @@ def test_native_sign_and_absence_not_filled():
     masks, presence = native_masks([0, 1], np.ones((2, 1, 3, 4)), np.array([5, -1]), 3, 4)
     assert masks[0].all() and not masks[1].any()
     assert presence.tolist() == [True, False]
+
+
+def test_native_singletons_share_identity_without_swapping_outputs():
+    rows = [(14, [i], None, np.ones((1, 1, 3, 4)) * i, np.ones((1, 1))) for i in range(2)]
+    ids, masks, scores = singleton_outputs(rows, 14)
+    assert ids == [0, 1] and masks[1].mean() == 1 and len(scores) == 2
+
+
+@pytest.mark.parametrize('kind', ['collision', 'reordered', 'frame', 'extra'])
+def test_singleton_frame_identity_collision_and_row_shape_fail_closed(kind):
+    rows = [(14, [i], None, np.ones((1, 1, 3, 4)), np.ones((1, 1))) for i in range(2)]
+    if kind == 'collision': rows[1] = (14, [0], *rows[1][2:])
+    if kind == 'reordered': rows.reverse()
+    if kind == 'frame': rows[1] = (15, *rows[1][1:])
+    if kind == 'extra': rows[1] = (*rows[1][:3], np.ones((2, 1, 3, 4)), rows[1][4])
+    with pytest.raises(ValueError): singleton_outputs(rows, 14)
 
 
 @pytest.mark.parametrize('ids', [[1, 0], [0, 1, 2], [0, 0], [1]])

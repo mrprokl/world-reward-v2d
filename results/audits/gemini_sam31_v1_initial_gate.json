@@ -7,5 +7,14 @@
   "error": "Native box-corner learned embeddings + native padding parity failed",
   "source_verified_before_run": true,
   "baseline_modified": false,
-  "decision": "Diagnose padded/BF16 versus bare box comparison; preserve native tracker and original failed namespace. No scientific-parameter or per-clip adjustment."
+  "decision": "Diagnose padded/BF16 versus bare box comparison; preserve native tracker and original failed namespace. No scientific-parameter or per-clip adjustment.",
+  "integration_retry": {
+    "producer_revision": "69869ff6bc8650a301667891ed07fc16b8eab0c5",
+    "status": "fail_native_multi_object_reconditioning",
+    "prompt_parity_passed": true,
+    "full_frames_processed": 0,
+    "error": "AssertionError: num_valid_entries=1 != self.total_valid_entries=2",
+    "cause": "Official direct multi-object add_new_points gap-fill dispatches singleton pointer into two-object mux; native high-level instance route uses singleton tracker states.",
+    "decision": "Use official one-tracker-state-per-ID interactive architecture with one shared backbone feature cache; preserve model, source, automatic boxes and every original index."
+  }
 }

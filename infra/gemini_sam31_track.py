@@ -22,7 +22,7 @@ from task_grounding_pilot import ROOT, inputs
 from sam31_runtime import (control, decode_original, verify_runtime_source,
                            verify_checkpoint_coverage, compatible_init)
 from qwen4d_masks import _inventory
-from world_reward.seeded_tracking import seed_rows, native_masks, temporal_summary
+from world_reward.seeded_tracking import seed_rows, native_masks, temporal_summary, singleton_outputs
 
 ENTRY = 'run_gemini_sam31_track'
 CONFIG = 'configs/gemini_sam31_v1.json'
@@ -50,7 +50,8 @@ def settings(code):
     require(c.get('seed_policy', 'all_valid_prefix_boxes_same_ids') == 'all_valid_prefix_boxes_same_ids'
             and c.get('sam_capacity', 2) == 2 and c.get('sam_multiplex_count', 16) == 16
             and c.get('qualification_prefix_frames', 30) == 30
-            and c.get('presence_logit_threshold', 0.0) == 0.0,
+            and c.get('presence_logit_threshold', 0.0) == 0.0
+            and c.get('native_state_policy') == 'one_singleton_per_fixed_id_shared_backbone',
             'Fixed identities / native sign / fail-fast prefix contract required')
     return c, runtime
 
@@ -171,29 +172,44 @@ def native(code, out):
                     and float(video.min()) >= -1.01 and float(video.max()) <= 1.01,
                     'Qualified lossless PIL normalized full-grid transport required')
             tracker = predictor.model.tracker
-            tracker_state = tracker.init_state(video_height=height, video_width=width,
-                                               num_frames=item['total'], cached_features=state['feature_cache'])
+            # Match native add_sam2_new_points: each newly prompted instance
+            # receives a singleton tracker state, while visual features are
+            # shared. The publisher's multi-object gap-fill path produces one
+            # object pointer for a two-entry mux and is not a valid PVS route.
+            tracker_states = [tracker.init_state(video_height=height, video_width=width,
+                num_frames=item['total'], cached_features=state['feature_cache']) for _ in range(2)]
+            require(tracker_states[0] is not tracker_states[1]
+                    and all(s['cached_features'] is state['feature_cache'] for s in tracker_states)
+                    and all(s['obj_ids'] == [] for s in tracker_states),
+                    'Separate native empty PVS states must share only visual feature cache')
             dest = out / f"episode_{item['episode']:06d}" / 'automatic_masks'
             for role in ('0', '1'): (dest / 'masks' / role).mkdir(parents=True, mode=0o755)
             # All six boxes are saved automatic predictions, not manual clicks.
             for seed in seeds:
                 predictor.model._prepare_backbone_feats(state, seed['frame_index'], reverse=False)
-                result = tracker.add_new_points(inference_state=tracker_state, frame_idx=seed['frame_index'],
+                result = tracker.add_new_points(inference_state=tracker_states[seed['object_id']], frame_idx=seed['frame_index'],
                     obj_id=seed['object_id'], points=torch.tensor(seed['points'], dtype=torch.float32),
                     labels=torch.tensor(seed['point_labels'], dtype=torch.int32), clear_old_points=True,
                     rel_coordinates=True, use_prev_mem_frame=False)
                 require(result[0] == seed['frame_index'], 'Native seed frame changed')
                 budget(clip_start)
-            tracker.propagate_in_video_preflight(tracker_state, run_mem_encoder=True)
+            for tracker_state in tracker_states:
+                tracker.propagate_in_video_preflight(tracker_state, run_mem_encoder=True)
             wanted = sorted(set(cfg['frames'] + [item['total'] // 2, item['total'] - 1]))
             sampled = {}; areas = [[], []]; adjacent = [[], []]; previous = None; timeline = []
             for index in range(item['total']):
                 predictor.model._prepare_backbone_feats(state, index, reverse=False)
-                stream = tracker.propagate_in_video(tracker_state, start_frame_idx=index,
-                    max_frame_num_to_track=0, reverse=False, tqdm_disable=True, run_mem_encoder=True)
-                outputs = list(stream)
-                require(len(outputs) == 1 and outputs[0][0] == index, 'Exact full original frame output required')
-                _, ids, _, video_logits, object_logits = outputs[0]
+                outputs = []
+                for object_id, tracker_state in enumerate(tracker_states):
+                    stream = tracker.propagate_in_video(tracker_state, start_frame_idx=index,
+                        max_frame_num_to_track=0, reverse=False, tqdm_disable=True, run_mem_encoder=True)
+                    singleton = list(stream)
+                    require(len(singleton) == 1 and singleton[0][0] == index
+                            and singleton[0][1] == [object_id], 'Exact native singleton original frame identity required')
+                    outputs.append(singleton[0])
+                ids, mask_rows, presence_rows = singleton_outputs(outputs, index)
+                video_logits = torch.cat(mask_rows, dim=0)
+                object_logits = torch.cat(presence_rows, dim=0)
                 masks, presence = native_masks(ids, video_logits.detach().float().cpu().numpy(),
                     object_logits.detach().float().cpu().numpy(), height, width)
                 # Keep both original frames even during native absence/occlusion.
@@ -218,7 +234,7 @@ def native(code, out):
                     print(json.dumps(dict(stage='sam31_prefix', episode=item['episode'], frames=30,
                                           elapsed_seconds=time.monotonic() - clip_start)), flush=True)
                 budget(clip_start)
-            require(tracker_state['obj_ids'] == [0, 1] and all(any(a) for a in areas),
+            require([s['obj_ids'] for s in tracker_states] == [[0], [1]] and all(any(a) for a in areas),
                     'Both fixed native identities must retain actual inferred visibility')
             initial = [s for s in seeds if s['frame_index'] == 0]
             save(dest / 'prompts.json', dict(prompts=[dict(frame_index=0, object_id=s['object_id'],
@@ -244,6 +260,7 @@ def native(code, out):
                 model_revision=runtime['model_revision'], source_revision=runtime['source_revision'],
                 checkpoint=prep['weight'], fixed_native_ids=[0, 1], seed_frames=cfg['frames'],
                 seed_codec='native_PVS_box_corner_tokens_2_3', mask_inventory=inventory,
+                instance_state_policy='native_singleton_PVS_shared_visual_features',
                 diagnostics={str(k): temporal_summary(areas[k], adjacent[k]) for k in range(2)},
                 initial_detection_repeated=False, full_original_grid=True, empty_mask_interpolation=False,
                 object_prompt=item['object_prompt'], action=item['action'], qa=qa,
@@ -252,7 +269,7 @@ def native(code, out):
             results.append(dict(episode_index=item['episode'], status='pass', frames=item['total'],
                 automatic_masks=str(dest.relative_to(out)), report=identity(dest / 'report.json'),
                 diagnostics=report['diagnostics'], qa=qa, elapsed_seconds=report['elapsed_seconds']))
-            del frames, hashes, state, video, tracker_state, sampled, masks, previous, outputs
+            del frames, hashes, state, video, tracker_state, tracker_states, sampled, masks, previous, outputs
             torch.cuda.empty_cache()
             print(json.dumps(dict(stage='sam31_complete', episode=item['episode'], frames=item['total'],
                                   elapsed_seconds=time.monotonic() - started)), flush=True)
