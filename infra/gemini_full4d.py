@@ -43,8 +43,24 @@ HELPERS = ('infra/gemini_full4d.py', 'infra/run_gemini_full4d.sh', CONFIG,
 DATASET = '5f68335f3acc802033d1e80728c1633197521de8'
 OLD = 'de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba'
 DEPTH_MODEL = 'b135031bae30b5ac2ae141a0e68717795ce38340'
+POSE_SOURCE_SHA = 'f0dec3546caa39d8928ebf79907320c78465d540abfae8c3488933db70029f0d'
+ABSENCE_STATUS = 'fail_upstream_pose_unsupported_native_absence'
 DEPTH_FIELDS = {'depth_smoke': ('monocular_moge2_three_frame', False),
                 'depth_full': ('monocular_moge2_full_video', True)}
+
+
+class EmptyObservationUnsupported(ValueError):
+    """Proven zero observations unsupported by the unchanged per-frame solver."""
+    def __init__(self, evidence):
+        self.evidence = evidence
+        self.frame_indices = evidence['frame_indices']
+        super().__init__('Unchanged object pose solver requires visible points at every original frame; '
+                         f'{len(self.frame_indices)} native object masks are empty')
+
+
+def scout_can_continue(status):
+    # Missing scientific observations are not a wiring failure or a new draw.
+    return status.startswith('complete_') or status == ABSENCE_STATUS
 
 
 def config(code):
@@ -132,7 +148,87 @@ def depth_weight_identity(root, expected_sha):
                 resolver='bridge_rgb_anchor_infer.moge_asset_and_host_moge_chain')
 
 
-def frontend_adapter(cfg, item, dest):
+def native_absence_preflight(code, item, directory, report, pins, mask_inventory):
+    """Bound native zero-area observations to the solver's existing hard gate.
+
+    This inspects producer metadata only, before any model or PNG decoding. The
+    SHA-bound native writer computes area from each actually saved binary mask;
+    its independently pinned report's gap counts must agree. Zero mask support
+    implies zero finite positive-depth points, whatever MoGe2 would predict.
+    This is not proof that the physical object is absent or correctly tracked.
+    """
+    tracking, tracking_pin = _json(directory/'tracking.json')
+    grounding, grounding_pin = _json(directory/'grounding.json')
+    require(tracking_pin == pins['tracking.json'] and grounding_pin == pins['grounding.json'],
+            'Original automatic tracking/grounding metadata changed')
+    total = item['total']; indices = list(range(total))
+    require(tracking.get('status') == 'full_T_complete'
+            and type(tracking.get('episode')) is int and tracking['episode'] == item['episode']
+            and type(tracking.get('frames')) is int and tracking['frames'] == total
+            and tracking.get('original_frame_indices') == indices
+            and all(type(index) is int for index in tracking['original_frame_indices'])
+            and tracking.get('interpolation') is False and tracking.get('quality_verified') is False,
+            'Complete unfilled original native tracking timeline required')
+    areas = tracking.get('areas'); records = tracking.get('records')
+    require(type(areas) is dict and set(areas) == {'0', '1'}
+            and all(type(row) is list and len(row) == total
+                    and all(type(area) is int and area >= 0 for area in row) for row in areas.values())
+            and type(records) is list and len(records) == total,
+            'Exact two-role full-T native areas/records required')
+    for index, row in enumerate(records):
+        require(type(row) is dict and type(row.get('frame_index')) is int and row['frame_index'] == index
+                and type(row.get('decoded_rgb_sha256')) is str
+                and re.fullmatch('[0-9a-f]{64}', row['decoded_rgb_sha256'])
+                and type(row.get('native_presence')) is list and len(row['native_presence']) == 2
+                and all(type(value) is bool for value in row['native_presence']),
+                'Original ordered decoded-RGB/checksum/presence records required')
+        for role, visible_key in (('0', 'person_visible'), ('1', 'object_visible')):
+            require(type(row.get(visible_key)) is bool and row[visible_key] == (areas[role][index] > 0),
+                    'Native visibility differs from saved binary-mask area')
+    seeds = grounding.get('records')
+    require(grounding.get('episode') == item['episode'] and grounding.get('total') == total
+            and grounding.get('video_pin') == item['video_pin']
+            and grounding.get('ground_truth_used') is False
+            and grounding.get('hand_labeled_test') is False and grounding.get('manual_points') is False
+            and type(seeds) is list and seeds, 'Original automatic RGB-bound seed metadata required')
+    for seed in seeds:
+        index = seed.get('frame_index') if type(seed) is dict else None
+        require(type(index) is int and 0 <= index < total
+                and seed.get('rgb_sha256') == records[index]['decoded_rgb_sha256'],
+                'Original seed RGB differs from full native tracking record')
+    diagnostics = report.get('diagnostics'); summaries = {}
+    require(type(diagnostics) is dict and set(diagnostics) == {'0', '1'},
+            'Independent native producer gap summaries required')
+    for role, values in areas.items():
+        missing = [index for index, area in enumerate(values) if area == 0]
+        runs = []
+        for index in missing:
+            if runs and index == runs[-1]['last_frame']+1:
+                runs[-1]['last_frame'] = index; runs[-1]['frames'] += 1
+            else:
+                runs.append(dict(first_frame=index, last_frame=index, frames=1))
+        expected = dict(frames=total, visible_frames=total-len(missing), empty_frames=len(missing),
+                        longest_empty_run=max((run['frames'] for run in runs), default=0),
+                        quality_verified=False, interpolation=False)
+        require(type(diagnostics[role]) is dict
+                and all(type(diagnostics[role].get(key)) is type(value)
+                        and diagnostics[role][key] == value for key, value in expected.items()),
+                'Tracking areas differ from independently pinned native gap counts')
+        summaries[role] = dict(frame_indices=missing, runs=runs)
+    pose = identity(code/'infra/object_pose_smoke.py', 2 << 20)
+    require(pose['sha256'] == POSE_SOURCE_SHA,
+            'Absence gate applies only to the unchanged SHA-bound visible-point solver')
+    return dict(stage='native_absence_pose_support_preflight', episode_index=item['episode'],
+                original_frames=total, frame_indices=summaries['1']['frame_indices'],
+                empty_runs=summaries['1']['runs'], tracking=tracking_pin,
+                grounding=grounding_pin, mask_inventory=mask_inventory,
+                frontend_report=pins['report.json'], pose_source=pose,
+                native_producer_areas_bound=True, mask_pixels_independently_decoded=False,
+                finite_depth_cannot_create_mask_support=True, physical_object_absence_claimed=False,
+                quality_verified=False, prediction_filled=False, model_calls=0)
+
+
+def frontend_adapter(cfg, item, dest, *, consumer_code):
     revision = cfg['frontend_producer_revision']
     source_code = ROOT/'jobs'/revision/FRONTEND_ENTRY/'code'
     source_binding = source(ROOT, source_code, revision, FRONTEND_ENTRY, ())
@@ -183,6 +279,15 @@ def frontend_adapter(cfg, item, dest):
     pins = {name: identity(directory/name, 4 << 20, readonly=False) for name in FRONTEND_FILES}
     require(pins['report.json'] == report_pin and pins['prompts.json'] == prompts_pin,
             'Frontend metadata changed')
+    support = native_absence_preflight(consumer_code, item, directory, report, pins, aggregate)
+    if support['frame_indices']:
+        require(_inventory(directory/'masks', item['total'])[:2] == (rows, aggregate)
+                and source(ROOT, source_code, revision, FRONTEND_ENTRY, tuple(host_binding['helpers'])) == source_binding
+                and _json(aggregate_root/'report.json')[1] == host_pin
+                and _json(aggregate_root/'native-report.json')[1] == aggregate_pin,
+                'Original absence evidence or immutable producer lineage changed')
+        raise EmptyObservationUnsupported(support | dict(producer_revision=revision,
+            source_binding=source_binding, aggregate_report=aggregate_pin, host_report=host_pin))
     reserve(dest); reserve(dest/'masks')
     for object_id in ('0', '1'):
         reserve(dest/'masks'/object_id)
@@ -203,6 +308,7 @@ def frontend_adapter(cfg, item, dest):
                 source_binding=source_binding, files=pins, mask_inventory=aggregate,
                 aggregate_report=aggregate_pin,
                 host_report=host_pin,
+                native_pose_support_preflight=support,
                 byte_identical_copy=True, model_calls=0, hand_modified_masks=False,
                 quality_verified=False)
 
@@ -384,7 +490,7 @@ def run():
                 item, row = pair; base = episode_output(ROOT, item['episode']); reserve(base)
                 update(row, status='running', phase='frontend_import')
                 try:
-                    frontend = frontend_adapter(cfg, item, base/'automatic_masks')
+                    frontend = frontend_adapter(cfg, item, base/'automatic_masks', consumer_code=code)
                     update(row, frontend=frontend)
                     for stage_row in STAGES:
                         stage, script, args, _, budget_key, reserved = stage_row
@@ -407,16 +513,23 @@ def run():
                         append(row, dict(stage=stage, reused=False, elapsed_seconds=elapsed))
                     update(row, status='complete_full4d_visual_diagnostic_not_quality_pass', phase='complete',
                         video_report=identity(experiment/'videos'/f'episode_{item["episode"]:06d}'/'report.json', 4 << 20))
+                except EmptyObservationUnsupported as error:
+                    update(row, status=ABSENCE_STATUS, phase='native_absence_preflight',
+                           error_type=type(error).__name__, error=str(error), absence_evidence=error.evidence,
+                           full4d_produced=False, model_calls=0, failed_clip_replaced=False)
                 except Exception as error:
                     update(row, status='fail', error_type=type(error).__name__, error=str(error)[:400])
                 finally: persist()
             # Frozen first clip is the wiring scout; scientific failure is not replaced.
             worker((selected[0], report['episodes'][0]))
-            require(report['episodes'][0]['status'].startswith('complete_'),
+            require(scout_can_continue(report['episodes'][0]['status']),
                     'First frozen full4D scout failed; do not burn remaining GPU hours')
             with ThreadPoolExecutor(max_workers=2) as pool:
                 list(pool.map(worker, zip(selected[1:], report['episodes'][1:])))
             complete = [row['episode'] for row in report['episodes'] if row['status'].startswith('complete_')]
+            report.update(cohort_denominator=len(selected), full4d_completed_count=len(complete),
+                          native_absence_unsupported_count=sum(row['status'] == ABSENCE_STATUS
+                              for row in report['episodes']))
             if len(complete) >= 3:
                 from full4d_publish import publish
                 try: report['private_previews'] = publish(ROOT, revision, complete)

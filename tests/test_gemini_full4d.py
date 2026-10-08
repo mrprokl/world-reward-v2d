@@ -140,7 +140,9 @@ def test_source_import_is_stdlib_only():
     assert result.returncode == 0, result.stderr
 
 
-@pytest.mark.parametrize('mutation', [None, 'native_pin', 'manual_prompt', 'missing_frame', 'producer_script'])
+@pytest.mark.parametrize('mutation', [None, 'native_pin', 'manual_prompt', 'missing_frame', 'producer_script',
+    'empty_object', 'diagnostic_count', 'boolean_area', 'record_index', 'record_rgb', 'visibility',
+    'seed_rgb', 'interpolated', 'pose_source'])
 def test_frontend_requires_exact_automatic_native_lineage_and_copies_pngs(monkeypatch, tmp_path, mutation):
     root=tmp_path/'root'; rev='e'*40
     monkeypatch.setattr(graph, 'ROOT', root)
@@ -150,6 +152,11 @@ def test_frontend_requires_exact_automatic_native_lineage_and_copies_pngs(monkey
     monkeypatch.setattr(graph, 'source', lambda *args: binding)
     source_code=root/'jobs'/rev/graph.FRONTEND_ENTRY/'code'
     script_pin=payload(source_code/'infra/gemini_sam31_track.py', b'# tiny automatic frontend producer fixture\n')
+    consumer_code=tmp_path/'consumer/code'
+    payload(consumer_code/'infra/object_pose_smoke.py', (REPO/'infra/object_pose_smoke.py').read_bytes())
+    if mutation=='pose_source':
+        (consumer_code/'infra/object_pose_smoke.py').chmod(0o644)
+        payload(consumer_code/'infra/object_pose_smoke.py',b'# different pose method\n')
     aggregate_root=root/'results'/('gemini-sam31-'+rev)
     directory=aggregate_root/'episode_000009/automatic_masks'
     for role in ('0','1'):
@@ -159,12 +166,32 @@ def test_frontend_requires_exact_automatic_native_lineage_and_copies_pngs(monkey
     prompts=dict(prompts=[dict(object_id=role,points=None,point_labels=None,mask_path=None) for role in (0,1)])
     if mutation=='manual_prompt': prompts['prompts'][0]['points']=[[0,0]]
     payload(directory/'prompts.json', prompts)
-    for name in graph.FRONTEND_DIAGNOSTICS | {'grounding.json','tracking.json'}:
+    for name in graph.FRONTEND_DIAGNOSTICS:
         payload(directory/name, b'tiny retained metadata fixture')
+    areas={'0':[50,50,50], '1':[40,40,40]}
+    if mutation=='empty_object': areas['1'][1]=0
+    if mutation=='boolean_area': areas['1'][1]=True
+    records=[dict(frame_index=index,decoded_rgb_sha256='c'*64,
+        person_visible=True,object_visible=bool(areas['1'][index]),native_presence=[True,True]) for index in range(3)]
+    if mutation=='record_index': records[-1]['frame_index']=1
+    if mutation=='record_rgb': records[-1]['decoded_rgb_sha256']='not-a-SHA'
+    if mutation=='visibility': records[1]['object_visible']=False
+    tracking=dict(status='full_T_complete',episode=9,frames=3,areas=areas,records=records,
+        original_frame_indices=[0,1,2],interpolation=mutation=='interpolated',quality_verified=False)
+    tracking_pin=payload(directory/'tracking.json',tracking)
+    grounding=dict(episode=9,total=3,video_pin=dict(bytes=10,sha256='b'*64),
+        ground_truth_used=False,hand_labeled_test=False,manual_points=False,
+        records=[dict(frame_index=0,rgb_sha256='c'*64)])
+    if mutation=='seed_rgb': grounding['records'][0]['rgb_sha256']='d'*64
+    payload(directory/'grounding.json',grounding)
+    diagnostics={role:dict(frames=3,visible_frames=sum(n>0 for n in values),
+        empty_frames=sum(n==0 for n in values),longest_empty_run=1 if any(n==0 for n in values) else 0,
+        quality_verified=False,interpolation=False) for role,values in areas.items()}
+    if mutation=='diagnostic_count': diagnostics['1']['empty_frames']=1
     report=dict(stage='automatic_masks',status='pass',episode_index=9,frames=3,
         input_track='track_1',input_sha256='b'*64,ground_truth_used=False,
         hand_labeled_test=False,oracle_modes=[],producer_revision=rev,
-        script_sha256=script_pin['sha256'],mask_inventory=inventory)
+        script_sha256=script_pin['sha256'],mask_inventory=inventory,diagnostics=diagnostics)
     if mutation=='producer_script': report['script_sha256']='f'*64
     report_pin=payload(directory/'report.json',report)
     native=dict(schema='world_reward.gemini_sam31_tracking.v1',status='complete_diagnostic_not_quality_pass',
@@ -179,15 +206,41 @@ def test_frontend_requires_exact_automatic_native_lineage_and_copies_pngs(monkey
     dest=tmp_path/'fresh/masks'; dest.parent.mkdir()
     item=dict(episode=9,total=3,video_pin=dict(bytes=10,sha256='b'*64))
     if mutation:
-        with pytest.raises(ValueError): graph.frontend_adapter(dict(frontend_producer_revision=rev),item,dest)
+        with pytest.raises(ValueError) as failure:
+            graph.frontend_adapter(dict(frontend_producer_revision=rev),item,dest,consumer_code=consumer_code)
         assert not dest.exists()
+        if mutation=='empty_object':
+            assert type(failure.value) is graph.EmptyObservationUnsupported
+            evidence=failure.value.evidence
+            assert failure.value.frame_indices==[1]
+            assert evidence['empty_runs']==[dict(first_frame=1,last_frame=1,frames=1)]
+            assert evidence['tracking']==tracking_pin and evidence['mask_inventory']==inventory
+            assert evidence['pose_source']['sha256']==graph.POSE_SOURCE_SHA
+            assert evidence['physical_object_absence_claimed'] is False
+            assert evidence['prediction_filled'] is False and evidence['model_calls']==0
+            assert evidence['native_producer_areas_bound'] is True
+            assert evidence['mask_pixels_independently_decoded'] is False
     else:
-        receipt=graph.frontend_adapter(dict(frontend_producer_revision=rev),item,dest)
+        receipt=graph.frontend_adapter(dict(frontend_producer_revision=rev),item,dest,consumer_code=consumer_code)
         assert receipt['byte_identical_copy'] and receipt['model_calls']==0
         assert receipt['aggregate_report']==native_pin
         assert set(p.name for p in dest.iterdir())==graph.FRONTEND_FILES | {'masks'}
         assert graph._inventory(dest/'masks',3)[:2]==(rows,inventory)
         assert (dest/'report.json').read_bytes()==(directory/'report.json').read_bytes()
+        assert receipt['native_pose_support_preflight']['frame_indices']==[]
+
+
+@pytest.mark.parametrize('status,wanted', [('complete_full4d_visual_diagnostic_not_quality_pass',True),
+    (graph.ABSENCE_STATUS,True),('fail',False),('pending',False)])
+def test_scientific_absence_continues_frozen_cohort_but_wiring_failure_stops(status,wanted):
+    assert graph.scout_can_continue(status) is wanted
+
+
+def test_absence_contract_preserves_denominator_and_does_not_patch_solver():
+    raw=(REPO/'infra/gemini_full4d.py').read_text()
+    assert "except EmptyObservationUnsupported" in raw and 'cohort_denominator=len(selected)' in raw
+    assert 'failed_clip_replaced=False' in raw and 'full4d_produced=False, model_calls=0' in raw
+    assert hashlib.sha256((REPO/'infra/object_pose_smoke.py').read_bytes()).hexdigest()==graph.POSE_SOURCE_SHA
 
 
 @pytest.mark.parametrize('mutation', [None, 'writable_receipt', 'writable_model', 'receipt_during_read', 'callback_other_path', 'outside', 'absolute', 'wrong_digest', 'parent_alias', 'blob_alias', 'contents', 'hardlink', 'acquisition_revision', 'acquisition_cache'])

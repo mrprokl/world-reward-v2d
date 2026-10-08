@@ -122,3 +122,16 @@ SHA256 `84e0e818a3bc0935bb30b75fcd82fd7c5e3730ed812864594cd759697ddb406b`.
 Existing declared CoCoNet/BootsTAPIR assets must be rehashed on Azure before reuse.
 Choose/calibrate any new objective on qualified non-challenge data; never force
 static objects or erase real motion to reduce jitter/acceleration proxies.
+
+## Fail-fast observation gate for subsequent runs
+
+The first full SAM3.1 run reports 244 empty object-mask frames in episode 1
+and 128 in episode 7. The unchanged per-frame pose initializer requires at
+least 40 inferred visible object points at every frame: a zero mask necessarily
+fails regardless of depth. A later orchestrator revision authenticates the
+original source, full mask inventory, tracking/seed RGB checksums and native
+area/gap summaries before any learned 4D calls. It reports these as unsupported
+native absence, not true physical absence, and retains the four-clip denominator.
+No mask filling or fabricated trajectory is substituted. The source-bound area
+metadata is not claimed to be an independent PNG decode or accuracy score.
+This fail-fast code is not retroactively injected into running immutable jobs.
