@@ -133,7 +133,10 @@ def test_capacity_inputs_execute_new_source_but_import_original_pure_geometry_fi
         'c'*40, threading.Lock(), threading.Event(), capacity_code=new)
     assert f'type=bind,src={old.parent},dst={old.parent},readonly' in captured[0]
     assert 'PYTHONPATH='+str(old/'src')+':'+str(old/'infra')+':'+str(new/'src')+':'+str(new/'infra') in captured[0]
-    assert str(new/'infra/cari_prepare.py') in captured[0]
+    assert '-c' in captured[0]
+    assert 'runpy.run_path(' in captured[0][captured[0].index('-c')+1]
+    assert str(new/'infra/cari_prepare.py') not in captured[0]
+    assert repr(str(new/'infra/cari_prepare.py')) in captured[0][captured[0].index('-c')+1]
 
 
 def shared_fixture(tmp_path, role='prepare'):

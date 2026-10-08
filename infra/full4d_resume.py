@@ -445,6 +445,12 @@ def native(driver, original, experiment, cfg, item, stage_row, continuation, sec
         for index, value in enumerate(command):
             if value.startswith('PYTHONPATH='):
                 command[index] = 'PYTHONPATH='+str(original/'src')+':'+str(original/'infra')+':'+value.removeprefix('PYTHONPATH=')
+        # Executing an absolute .py path would put its NEW infra directory at
+        # sys.path[0], ahead of PYTHONPATH. run_path on a file does not insert
+        # that directory: the explicitly pinned OLD reader origins stay first.
+        script_index = command.index(str(worker_code/script))
+        command[script_index:script_index+1] = ['-c',
+            'import runpy; runpy.run_path('+repr(str(worker_code/script))+', run_name="__main__")']
     lock = nullcontext() if stage == 'object_pose' else model_lock
     wait_started = time.monotonic()
     with lock:
