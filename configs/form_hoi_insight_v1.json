@@ -1,0 +1,225 @@
+{
+  "schema": "world_reward.form_hoi_insight.v1",
+  "scope": "metadata_only_external_insight_admission",
+  "dataset": "nvidia/form-hoi",
+  "dataset_revision": "c63db107e84c7f74bb4929ef643b67b5c8bcc00e",
+  "license": "CC-BY-4.0",
+  "challenge_track1_revision": "5f68335f3acc802033d1e80728c1633197521de8",
+  "native_pipeline_code_revision": "12c36fb129c1a739a383c64f682d8d0a4b7e354d",
+  "selection_seed": "world_reward.form_hoi_insight_v1",
+  "selection_rule": "SHA256(seed/family/first-filename-token), then SHA256(seed/sequence/sequence_id); one sequence from each of first eight conservative provisional families with >=3 members; first four DEV, last four RESERVED",
+  "family_semantics": "Conservative first-filename-token groups, not authoritative object IDs: all single-word object action variants stay together; broad color/category groups can include multiple objects. Official object/person columns absent from archive manifest. No qualified object-heldout claim.",
+  "cohort": [
+    {
+      "sequence_id": "2026-06-03_17-02-20_beige_bin_ground_desk_03",
+      "archive_path": "data/2026-06-03_17-02-20_beige_bin_ground_desk_03.tar",
+      "archive_size": 1093089280,
+      "archive_sha256": "ad48b678a4c3f4d7992312c675ac607fb99b0575df77d4ad209b752984870083",
+      "member_count": 51,
+      "provisional_sequence_family": "beige",
+      "family_metadata_verified_object_id": false,
+      "split": "development",
+      "camera_policy": "front_stereo_camera_left_or_fail_no_substitution",
+      "original_frame_indices": [
+        0,
+        14,
+        29
+      ]
+    },
+    {
+      "sequence_id": "2026-05-22_16-37-56_rolling_luggage_pick_and_place_03",
+      "archive_path": "data/2026-05-22_16-37-56_rolling_luggage_pick_and_place_03.tar",
+      "archive_size": 953518080,
+      "archive_sha256": "924c62a898cd5ade814693a2775514d688013e601f864215ba45a00ad4c3cce8",
+      "member_count": 55,
+      "provisional_sequence_family": "rolling",
+      "family_metadata_verified_object_id": false,
+      "split": "development",
+      "camera_policy": "front_stereo_camera_left_or_fail_no_substitution",
+      "original_frame_indices": [
+        0,
+        14,
+        29
+      ]
+    },
+    {
+      "sequence_id": "2026-03-20_11-52-56_cyan_water_bottle_roll_ground_01",
+      "archive_path": "data/2026-03-20_11-52-56_cyan_water_bottle_roll_ground_01.tar",
+      "archive_size": 639324160,
+      "archive_sha256": "6bf1d7b7d52fe9cd009e7cedcca909983cb0852ad0b4bbc86efcdeb947ecca75",
+      "member_count": 51,
+      "provisional_sequence_family": "cyan",
+      "family_metadata_verified_object_id": false,
+      "split": "development",
+      "camera_policy": "front_stereo_camera_left_or_fail_no_substitution",
+      "original_frame_indices": [
+        0,
+        14,
+        29
+      ]
+    },
+    {
+      "sequence_id": "2026-03-17_16-56-57_soup_can_flip_hand_04",
+      "archive_path": "data/2026-03-17_16-56-57_soup_can_flip_hand_04.tar",
+      "archive_size": 575201280,
+      "archive_sha256": "9dabb5d41b903c1fa60391dec540e0ada1c7487ce560ef48edf9cd65e254b129",
+      "member_count": 55,
+      "provisional_sequence_family": "soup",
+      "family_metadata_verified_object_id": false,
+      "split": "development",
+      "camera_policy": "front_stereo_camera_left_or_fail_no_substitution",
+      "original_frame_indices": [
+        0,
+        14,
+        29
+      ]
+    },
+    {
+      "sequence_id": "2026-06-08_15-00-38_snack_box_squat_05",
+      "archive_path": "data/2026-06-08_15-00-38_snack_box_squat_05.tar",
+      "archive_size": 1107333120,
+      "archive_sha256": "8a3ddf87ac0b452c0fd1514aaadb39ebcf8be17bc69e7fc22881780843d2bdbd",
+      "member_count": 54,
+      "provisional_sequence_family": "snack",
+      "family_metadata_verified_object_id": false,
+      "split": "reserved_unopened",
+      "camera_policy": "front_stereo_camera_left_or_fail_no_substitution",
+      "original_frame_indices": [
+        0,
+        14,
+        29
+      ]
+    },
+    {
+      "sequence_id": "2026-03-17_15-30-58_monitor_slide_away_03",
+      "archive_path": "data/2026-03-17_15-30-58_monitor_slide_away_03.tar",
+      "archive_size": 1431070720,
+      "archive_sha256": "73e59b19e337bc3c784770837a7d07e7cae0630b805af7f3329189cbe469497b",
+      "member_count": 55,
+      "provisional_sequence_family": "monitor",
+      "family_metadata_verified_object_id": false,
+      "split": "reserved_unopened",
+      "camera_policy": "front_stereo_camera_left_or_fail_no_substitution",
+      "original_frame_indices": [
+        0,
+        14,
+        29
+      ]
+    },
+    {
+      "sequence_id": "2026-04-29_10-48-10_woven_basket_right_foot_push_08",
+      "archive_path": "data/2026-04-29_10-48-10_woven_basket_right_foot_push_08.tar",
+      "archive_size": 1111808000,
+      "archive_sha256": "b39973424563eacc248cd6978c86b13825ee28e406f8e859e6d9872989f69082",
+      "member_count": 51,
+      "provisional_sequence_family": "woven",
+      "family_metadata_verified_object_id": false,
+      "split": "reserved_unopened",
+      "camera_policy": "front_stereo_camera_left_or_fail_no_substitution",
+      "original_frame_indices": [
+        0,
+        14,
+        29
+      ]
+    },
+    {
+      "sequence_id": "2026-05-21_15-45-47_guitar_floor_raise_01",
+      "archive_path": "data/2026-05-21_15-45-47_guitar_floor_raise_01.tar",
+      "archive_size": 1053521920,
+      "archive_sha256": "9c407cd395858b6ba9aaadc94f1ff9b905df45d79f4fe542fa03b3167e464a3b",
+      "member_count": 55,
+      "provisional_sequence_family": "guitar",
+      "family_metadata_verified_object_id": false,
+      "split": "reserved_unopened",
+      "camera_policy": "front_stereo_camera_left_or_fail_no_substitution",
+      "original_frame_indices": [
+        0,
+        14,
+        29
+      ]
+    }
+  ],
+  "inference_ready": false,
+  "qualification_gates": {
+    "rgb_content_duplicate_check_passed": false,
+    "native_prompt_and_action_provenance_verified": false,
+    "single_rgb_camera_verified": false,
+    "official_object_group_assignment_verified": false,
+    "reference_artifacts_isolated_from_inference": false,
+    "original_frame_grid_verified": false,
+    "cohort_frozen_before_inference": false
+  },
+  "inference_contract": {
+    "allowed_inputs": [
+      "one original RGB video from front_stereo_camera_left",
+      "native object.prompt from eligible sequence metadata",
+      "native action description from eligible sequence metadata",
+      "original frame indices 0,14,29"
+    ],
+    "forbidden_inputs": [
+      "reference masks or mask-derived bboxes",
+      "reference poses or meshes",
+      "source camera intrinsics/extrinsics",
+      "depth",
+      "other camera images",
+      "ground plane",
+      "symmetry annotations",
+      "quality flags as prediction inputs"
+    ],
+    "no_manual_prompts_or_per_sequence_tuning": true,
+    "no_first30_full_video_tracking": true,
+    "camera_or_native_text_missing": "fail; no manual substitution or invented prompt",
+    "storage_and_compute": "Azure only; local repository contains this tiny protocol and audit, no archives/media/reference arrays"
+  },
+  "evaluator_contract": {
+    "references": "reconstructed multiview pseudo-ground-truth, not verified motion-capture truth",
+    "isolation": "references/masks/calibration mounted only into evaluator after predictions are frozen; never inference",
+    "initial_localization_metrics": [
+      "box IoU to segmentation-derived visible-reference bbox",
+      "visible-reference mask coverage by predicted bbox",
+      "person/object mask IoU",
+      "explicit missing response/abstention rate",
+      "latency and cost"
+    ],
+    "visibility": "empty reference masks scored separately; do not manufacture boxes or treat invisible objects as detection success",
+    "quality_reporting": [
+      "all selected frames",
+      "same frozen frames excluding declared QC-flagged intervals; publish count and flag reasons"
+    ],
+    "qc_caveat": "Human QC and automated Chamfer/containment flags can reflect mask/depth noise, not certain ground-truth error",
+    "reserved_split": "four provisional families stay unopened; official group assignment and split disjointness must be verified before any held-out evaluation",
+    "claim": "external pseudo-GT insight only; neither challenge score nor verified victory over CARI4D"
+  },
+  "sources": {
+    "form_archive_manifest": {
+      "url": "https://huggingface.co/datasets/nvidia/form-hoi/resolve/c63db107e84c7f74bb4929ef643b67b5c8bcc00e/manifest/archives.parquet",
+      "bytes": 272115,
+      "sha256": "856e297f6c4f70a2c9b6041f327598c94c1bd935a1745cdb5056dc2973bd36ef"
+    },
+    "form_dataset_card": {
+      "url": "https://huggingface.co/datasets/nvidia/form-hoi/raw/c63db107e84c7f74bb4929ef643b67b5c8bcc00e/README.md",
+      "bytes": 4772,
+      "sha256": "5463a86d774c9f995f68d0613f7916d13c72f43acc212a8aa5f5a3dac7f233b5"
+    },
+    "form_release_metadata": {
+      "url": "https://huggingface.co/datasets/nvidia/form-hoi/raw/c63db107e84c7f74bb4929ef643b67b5c8bcc00e/manifest/release.json",
+      "bytes": 416,
+      "sha256": "e0eeebe10dc4bfc9ef9f023c614dcdfa2ccc83f93eafbf60351a034820d2e5f0"
+    },
+    "challenge_track1_metadata": {
+      "url": "https://huggingface.co/datasets/nvidia/video_to_data_challenge/raw/5f68335f3acc802033d1e80728c1633197521de8/track_1/meta/episodes_metadata.jsonl",
+      "bytes": 7597,
+      "sha256": "cce105292e2b670f32b49e0504b0ece67b8aa860ea69dc9e728fce97531b53fe"
+    },
+    "challenge_track1_readme": {
+      "url": "https://huggingface.co/datasets/nvidia/video_to_data_challenge/raw/5f68335f3acc802033d1e80728c1633197521de8/track_1/README.md",
+      "bytes": 2814,
+      "sha256": "9a0a7cf3faff0c413ef72248f87c4965f46ad75abfd67852870cfe33e187fdd6"
+    },
+    "nvidia_multiview_pipeline_guide": {
+      "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/12c36fb129c1a739a383c64f682d8d0a4b7e354d/reconstruction/docs/mv_hoi_local_pipeline.md",
+      "bytes": 18938,
+      "sha256": "4d7897f0cdd3e7b260fc1a973bce57bc675768cd9f7568db66d79c5139495d4a"
+    }
+  }
+}

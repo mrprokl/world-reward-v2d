@@ -1,0 +1,88 @@
+{
+  "schema": "world_reward.form_hoi_insight_metadata_audit.v1",
+  "audit_date": "2026-10-08",
+  "dataset_revision": "c63db107e84c7f74bb4929ef643b67b5c8bcc00e",
+  "challenge_track1_revision": "5f68335f3acc802033d1e80728c1633197521de8",
+  "metadata_admission": {
+    "archive_rows": 4135,
+    "challenge_unique_sequences": 30,
+    "exact_sequence_overlap": 0,
+    "recording_timestamp_overlap": 0,
+    "challenge_object_slug_prefix_overlap": 0,
+    "unsupported_sequence_names_excluded": 27,
+    "admitted_archive_rows": 4108,
+    "metadata_admission_passed": true,
+    "content_duplicate_check_passed": false,
+    "training_overlap_verified": false,
+    "quality_verified": false
+  },
+  "cohort_sequence_ids": [
+    "2026-06-03_17-02-20_beige_bin_ground_desk_03",
+    "2026-05-22_16-37-56_rolling_luggage_pick_and_place_03",
+    "2026-03-20_11-52-56_cyan_water_bottle_roll_ground_01",
+    "2026-03-17_16-56-57_soup_can_flip_hand_04",
+    "2026-06-08_15-00-38_snack_box_squat_05",
+    "2026-03-17_15-30-58_monitor_slide_away_03",
+    "2026-04-29_10-48-10_woven_basket_right_foot_push_08",
+    "2026-05-21_15-45-47_guitar_floor_raise_01"
+  ],
+  "actual_heavy_data_acquired": false,
+  "annotations_or_challenge_ground_truth_read": false,
+  "challenge_sequence_matched_assets_read": false,
+  "gpu_jobs_started": false,
+  "actual_rgb_content_duplicate_guard": "PENDING: verify eligible one-view video member SHA/content against Track1 permitted video hashes before inference; exact ID/timestamp/object-name checks alone are not a content proof",
+  "official_object_person_group_assignment": "PENDING: archive manifest has no authoritative object/person columns; filename strata must not be reported as qualified object-heldout split",
+  "native_prompt_action_and_camera_provenance": "PENDING: verify only eligible sequence metadata and one permitted RGB member later on Azure; no handmade label/prompt",
+  "frame_grid_and_eval_reference_readiness": "PENDING: original video length >=30, same original frame IDs, reference/evaluator-only checks",
+  "references_are_pseudo_ground_truth": true,
+  "independent_quality_verified": false,
+  "pretrained_model_training_overlap": "UNKNOWN",
+  "sources": {
+    "form_archive_manifest": {
+      "url": "https://huggingface.co/datasets/nvidia/form-hoi/resolve/c63db107e84c7f74bb4929ef643b67b5c8bcc00e/manifest/archives.parquet",
+      "bytes": 272115,
+      "sha256": "856e297f6c4f70a2c9b6041f327598c94c1bd935a1745cdb5056dc2973bd36ef"
+    },
+    "form_dataset_card": {
+      "url": "https://huggingface.co/datasets/nvidia/form-hoi/raw/c63db107e84c7f74bb4929ef643b67b5c8bcc00e/README.md",
+      "bytes": 4772,
+      "sha256": "5463a86d774c9f995f68d0613f7916d13c72f43acc212a8aa5f5a3dac7f233b5"
+    },
+    "form_release_metadata": {
+      "url": "https://huggingface.co/datasets/nvidia/form-hoi/raw/c63db107e84c7f74bb4929ef643b67b5c8bcc00e/manifest/release.json",
+      "bytes": 416,
+      "sha256": "e0eeebe10dc4bfc9ef9f023c614dcdfa2ccc83f93eafbf60351a034820d2e5f0"
+    },
+    "challenge_track1_metadata": {
+      "url": "https://huggingface.co/datasets/nvidia/video_to_data_challenge/raw/5f68335f3acc802033d1e80728c1633197521de8/track_1/meta/episodes_metadata.jsonl",
+      "bytes": 7597,
+      "sha256": "cce105292e2b670f32b49e0504b0ece67b8aa860ea69dc9e728fce97531b53fe"
+    },
+    "challenge_track1_readme": {
+      "url": "https://huggingface.co/datasets/nvidia/video_to_data_challenge/raw/5f68335f3acc802033d1e80728c1633197521de8/track_1/README.md",
+      "bytes": 2814,
+      "sha256": "9a0a7cf3faff0c413ef72248f87c4965f46ad75abfd67852870cfe33e187fdd6"
+    },
+    "nvidia_multiview_pipeline_guide": {
+      "url": "https://raw.githubusercontent.com/nvidia-isaac/video_to_data/12c36fb129c1a739a383c64f682d8d0a4b7e354d/reconstruction/docs/mv_hoi_local_pipeline.md",
+      "bytes": 18938,
+      "sha256": "4d7897f0cdd3e7b260fc1a973bce57bc675768cd9f7568db66d79c5139495d4a"
+    }
+  },
+  "release_counts": {
+    "archive_bytes": 4503845089280,
+    "archive_count": 4135,
+    "exclusion_rules": [
+      "images/**",
+      "videos_anonymized/**",
+      "videos/*_stereo_camera_right.mp4",
+      "commit.json"
+    ],
+    "generated_at": "2026-09-18T05:46:25.677052+00:00",
+    "layout": "one-uncompressed-tar-per-sequence",
+    "member_bytes": 4503583806979,
+    "member_count": 218519,
+    "schema": "form-hoi-release-v1",
+    "sequence_count": 4135
+  }
+}

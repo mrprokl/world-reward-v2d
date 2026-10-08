@@ -66,3 +66,16 @@ new packer adds mesh quality reporting. Old pinned runtime is not silently
 replaced: re-audit the new kit explicitly before frozen Parquet upload.
 No challenge GT/multiview, sample values, other-track assets or heavy media were
 acquired in this re-audit (only small public sources/metadata in memory).
+
+## Implemented external test admission (not executed image evaluation)
+
+`configs/form_hoi_insight_v1.json` freezes8 deterministically SHA-selected
+sequences,4development and4reserved/unopened provisional filename families.
+Metadata protocol rejects challenge IDs/recording aliases/object prefixes and
+unsafe or annotation-bearing inference packages. 4108/4135 admitted;27 legacy
+names rejected conservatively.18 tiny tests pass. All7 qualification gates
+remain false until eligible Azure extraction establishes original camera/text,
+true grouping, content duplicate guard, reference isolation and frame timeline.
+No fabricated prompts, inferred labels or claim of qualified held-out performance.
+Cohort frozen now in Git before any image inference. Actual annotation-based
+FORM scoring has NOT run yet; it is the next external evaluation task.

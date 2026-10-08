@@ -14,12 +14,12 @@ ENTRY='run_gemini_initial_zoom'
 CONFIG='configs/gemini_initial_v1.json'
 HELPERS=('infra/gemini_initial_zoom.py','infra/run_gemini_initial_zoom.sh',CONFIG)
 
-def native(code,out):
+def native(code,out,config_path=CONFIG):
     import cv2
     import numpy as np
     from PIL import Image,ImageDraw,ImageFont
     require(os.environ.get('CUDA_VISIBLE_DEVICES')=='' and {p.name for p in Path('/sys/class/net').iterdir()}=={'lo'},'Offline CPU saved QA only')
-    c=strict((code/CONFIG).read_bytes());old=ROOT/'results'/('gemini-initial-'+c['saved_producer']);p=old/'native-report.json';pin=identity(p,200000)
+    c=strict((code/config_path).read_bytes());old=ROOT/'results'/('gemini-initial-'+c['saved_producer']);p=old/'native-report.json';pin=identity(p,200000)
     report=strict(p.read_bytes());require(report['status']=='complete_diagnostic_not_quality_pass','Complete saved requests required')
     rows={(r['ep'],r['index']):r for r in report['rows']};require(len(rows)==24,'All saved failures required')
     selected=inputs(c['episodes']);font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',14)
@@ -55,19 +55,19 @@ def native(code,out):
     require(identity(p,200000)==pin and inputs(c['episodes'])==selected,'Saved source changed')
     write(out/'zoom-report.json',(json.dumps(dict(status='complete_saved_only_qa',source_report=pin,quality_verified=False,new_model_calls=0,gpu_used=False,bytes=len(raw)))+'\n').encode(),mode=0o444)
 
-def run():
+def run(entry=ENTRY,helpers=HELPERS,config_path=CONFIG):
     require(sys.platform=='linux' and os.geteuid()==0 and os.uname().nodename=='scenesmith-ncc-h100-01','Azure only')
-    code=canonical(Path(os.environ['WR_CODE']));rev=os.environ['WR_CODE_REVISION'];c=strict((code/CONFIG).read_bytes());binding=source(ROOT,code,rev,ENTRY,HELPERS)
+    code=canonical(Path(os.environ['WR_CODE']));rev=os.environ['WR_CODE_REVISION'];c=strict((code/config_path).read_bytes());binding=source(ROOT,code,rev,entry,helpers)
     out=ROOT/'results'/('gemini-initial-zoom-'+rev);out.mkdir(mode=0o755)
     cmd=['docker','run','--rm','--network','none','--read-only','--cap-drop','ALL','--memory','8g','--cpus','8','--tmpfs','/tmp:rw,nosuid,size=1g']
     mounts=[(code.parent,True),(out,False),(ROOT/'results'/('gemini-initial-'+c['saved_producer']),True),(ROOT/'results/input-manifest.json',True),(ROOT/'data/track_1/meta',True)]
     mounts += [(ROOT/f'data/track_1/videos/chunk-000/observation.images.exo_camera/episode_{ep:06d}.mp4',True) for ep in c['episodes']]
     for p,ro in mounts:cmd+=['--mount',f'type=bind,src={canonical(p)},dst={p}'+(',readonly' if ro else '')]
-    cmd+=['--entrypoint','/usr/bin/env',BASE,'-i','PATH=/opt/conda/bin:/usr/bin:/bin','HOME=/tmp','CUDA_VISIBLE_DEVICES=','PYTHONPATH='+str(code/'src')+':'+str(code/'infra'),'PYTHONDONTWRITEBYTECODE=1','/opt/conda/bin/python','-B',str(code/'infra/gemini_initial_zoom.py'),'--native',str(code),str(out)]
+    cmd+=['--entrypoint','/usr/bin/env',BASE,'-i','PATH=/opt/conda/bin:/usr/bin:/bin','HOME=/tmp','CUDA_VISIBLE_DEVICES=','PYTHONPATH='+str(code/'src')+':'+str(code/'infra'),'PYTHONDONTWRITEBYTECODE=1','/opt/conda/bin/python','-B',str(code/('infra/gemini_retry_review.py' if config_path!=CONFIG else 'infra/gemini_initial_zoom.py')),'--native',str(code),str(out)]
     with (out/'zoom.log').open('xb') as f:require(subprocess.run(cmd,stdout=f,stderr=f,timeout=90).returncode==0,'Saved QA only failed')
     from full4d_publish import PrivatePreviews
     client=PrivatePreviews();client.require_private();row=client.upload(f'full4d-{rev}/episode_002000.jpg',(out/'zoom.jpg').read_bytes(),'image/jpeg',rev);client.head(row['name'],row,row['etag'])
-    require(source(ROOT,code,rev,ENTRY,HELPERS)==binding,'Immutable QA code changed')
+    require(source(ROOT,code,rev,entry,helpers)==binding,'Immutable QA code changed')
     write(out/'published.json',(json.dumps(dict(file=row,new_model_calls=0,source_binding=binding))+'\n').encode(),mode=0o444)
 
 if __name__=='__main__':

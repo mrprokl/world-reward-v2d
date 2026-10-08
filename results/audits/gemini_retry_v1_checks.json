@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-08",
+  "targeted": {
+    "tests": [
+      "test_vertex_retry.py",
+      "test_gemini_localization.py",
+      "test_azure_job.py"
+    ],
+    "passed": 114,
+    "seconds": 0.22
+  },
+  "optional_full_suite": {
+    "status": "interrupted_not_green",
+    "passed_before_stop": 3611,
+    "failed": 3,
+    "errors": 4,
+    "skipped": 1,
+    "reason": "Unrelated historical host fixtures/contract tests and broad suite signal-state interaction; stopped to keep current task short. Not a full repository verification.",
+    "affected_tests": [
+      "test_balanced_solid_native_routes.py:missing_runtime_factory_fixture",
+      "test_cari_clip_pin_inventory.py:host_import_gate",
+      "test_cari_prepare_solid.py:default_numeric_report",
+      "test_cari_prepare_surface_wrapper.py:rm_fail_interrupted_signal_state"
+    ]
+  },
+  "integration_review": "Fake opener: identical request bytes, preserved successes, parse once; all-cohort hash preflight before API.",
+  "targeted_with_form_admission": {
+    "passed": 132,
+    "seconds": 0.3
+  }
+}
