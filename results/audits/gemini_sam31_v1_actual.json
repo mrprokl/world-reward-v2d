@@ -1,0 +1,139 @@
+{
+  "status": "complete_diagnostic_not_quality_pass",
+  "seconds": 442.0286915029865,
+  "frames": 2302,
+  "episodes": [
+    {
+      "episode": 9,
+      "frames": 415,
+      "seconds": 79.96026549709495,
+      "diagnostics": {
+        "0": {
+          "adjacent_mask_iou_median": 0.9688522821468151,
+          "empty_frames": 0,
+          "frames": 415,
+          "interpolation": false,
+          "longest_empty_run": 0,
+          "median_visible_pixels": 26276.0,
+          "quality_verified": false,
+          "visible_frames": 415
+        },
+        "1": {
+          "adjacent_mask_iou_median": 0.9947733554115585,
+          "empty_frames": 0,
+          "frames": 415,
+          "interpolation": false,
+          "longest_empty_run": 0,
+          "median_visible_pixels": 31525.0,
+          "quality_verified": false,
+          "visible_frames": 415
+        }
+      }
+    },
+    {
+      "episode": 1,
+      "frames": 668,
+      "seconds": 121.9122179269325,
+      "diagnostics": {
+        "0": {
+          "adjacent_mask_iou_median": 0.9617003218163171,
+          "empty_frames": 0,
+          "frames": 668,
+          "interpolation": false,
+          "longest_empty_run": 0,
+          "median_visible_pixels": 32795.0,
+          "quality_verified": false,
+          "visible_frames": 668
+        },
+        "1": {
+          "adjacent_mask_iou_median": 0.8940345368916798,
+          "empty_frames": 244,
+          "frames": 668,
+          "interpolation": false,
+          "longest_empty_run": 243,
+          "median_visible_pixels": 4790.0,
+          "quality_verified": false,
+          "visible_frames": 424
+        }
+      }
+    },
+    {
+      "episode": 14,
+      "frames": 442,
+      "seconds": 80.13545073498972,
+      "diagnostics": {
+        "0": {
+          "adjacent_mask_iou_median": 0.9936979948165325,
+          "empty_frames": 0,
+          "frames": 442,
+          "interpolation": false,
+          "longest_empty_run": 0,
+          "median_visible_pixels": 37633.0,
+          "quality_verified": false,
+          "visible_frames": 442
+        },
+        "1": {
+          "adjacent_mask_iou_median": 0.9523076923076923,
+          "empty_frames": 0,
+          "frames": 442,
+          "interpolation": false,
+          "longest_empty_run": 0,
+          "median_visible_pixels": 1329.0,
+          "quality_verified": false,
+          "visible_frames": 442
+        }
+      }
+    },
+    {
+      "episode": 7,
+      "frames": 777,
+      "seconds": 140.8038421800593,
+      "diagnostics": {
+        "0": {
+          "adjacent_mask_iou_median": 0.9584584078361145,
+          "empty_frames": 0,
+          "frames": 777,
+          "interpolation": false,
+          "longest_empty_run": 0,
+          "median_visible_pixels": 42256.0,
+          "quality_verified": false,
+          "visible_frames": 777
+        },
+        "1": {
+          "adjacent_mask_iou_median": 0.9731297709923664,
+          "empty_frames": 128,
+          "frames": 777,
+          "interpolation": false,
+          "longest_empty_run": 128,
+          "median_visible_pixels": 3160.0,
+          "quality_verified": false,
+          "visible_frames": 649
+        }
+      }
+    }
+  ],
+  "quality_verified": false,
+  "native_pin": {
+    "bytes": 23225,
+    "sha256": "6d1dea3a41e004d17bf6134bb74e78a2710f70607d130fdec5f051ed265c7813"
+  },
+  "model_revision": "daa63191845a41281374e725f4c9e51c7a824460",
+  "source_revision": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+  "peak_gpu_bytes": 20346016768,
+  "producer_revision": "b658881079871508c6b3ec14d001dc1299956996",
+  "native_only": true,
+  "baseline_modified": false,
+  "ground_truth_used": false,
+  "local_checks": {
+    "targeted_tests": 152,
+    "passed": true,
+    "native_correctness_not_inferred_from_unit_tests": true
+  },
+  "visual_qa": {
+    "ep9": "correct_target_and_actor_in_five_uniform_context_views; no_background_identity_expansion_observed",
+    "ep14": "correct_small_tabletop_target_in_five_context_views; shape_and_3d_pose_not_validated",
+    "ep1": "initial_ring_target; midclip native absence visible; occlusion_vs_dropout_not_quantified",
+    "heldout_accuracy_verified": false,
+    "automatic_predictions_hand_modified": false
+  }
+}
