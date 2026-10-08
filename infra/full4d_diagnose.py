@@ -131,7 +131,9 @@ def analyse(root, experiment, out, episode):
     native = loaded['forward']
     inputs_report = bound.json(base/'cari_inputs/report.json')
     inputs_path = bound.bind(Path(inputs_report['object_poses']), inputs_report['file_sha256']['object_poses'])
-    inputs_poses = joblib.load(inputs_path)['obj_pose_world']
+    saved_inputs = joblib.load(inputs_path)
+    inputs_poses = saved_inputs['obj_pose_world']
+    _no_oracle(saved_inputs['metadata'])
     poses = dict(initializer_aligned=inputs_poses, forward=native['pr']['pose_abs'],
                  refined=loaded['refined']['pr']['pose_abs'])
     export_poses = np.repeat(np.eye(4)[None], count, axis=0)
@@ -140,8 +142,13 @@ def analyse(root, experiment, out, episode):
     motions = {key: signature_pose(vertices, value, count, floor) for key, value in poses.items()}
     original_motion = object_motion(initializer['vertices'], initializer['rotation'], initializer['translation'],
                                    initializer['frame_index'], 30, plane=[0, -1, 0, floor])
+    A = np.asarray(saved_inputs['metadata']['mesh_frame_change'])
+    aligned_original_vertices = initializer['vertices'] @ A[:3,:3].T + A[:3,3]
+    aligned_original_motion = signature_pose(aligned_original_vertices, inputs_poses, count, floor)
+    # Use identical source vertices on both sides: native GLB loaders may weld
+    # official padding, so equal-vertex RMS from different meshes is not equal.
     require(np.allclose(original_motion['series']['surface_rms_step_m'],
-                        motions['initializer_aligned']['series']['surface_rms_step_m'], atol=1e-5, rtol=1e-4),
+                        aligned_original_motion['series']['surface_rms_step_m'], atol=1e-5, rtol=1e-4),
             'Original/aligned frames must describe same object motion')
     require(np.array_equal(poses['refined'][:, :3], poses['export'][:, :3]), 'Export changed refined object poses')
     active, _ = normalize_degenerate_faces(vertices, final['object_faces'])
@@ -205,7 +212,7 @@ def analyse(root, experiment, out, episode):
             depth_samples.append(dict(frame_index=index,valid_pixels=len(depths),
                 inferred_depth_m=None if not len(depths) else summarize(depths)))
     capture.release()
-    for quality in (72, 60, 48, 36):
+    for quality in (72, 60, 48, 36, 24):
         from io import BytesIO
         buffer = BytesIO(); sheet.save(buffer, format='JPEG', quality=quality, optimize=True)
         if len(buffer.getvalue()) <= MAX_JPEG: break
