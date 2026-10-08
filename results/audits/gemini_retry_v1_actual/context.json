@@ -1,0 +1,382 @@
+{
+  "unit": "Result=success\nActiveState=inactive\nSubState=dead\n",
+  "report": {
+    "status": "complete_diagnostic_not_quality_pass",
+    "producer_revision": "b6f0a89a28c3a1b6214cf043c86a5e376da6ac8e",
+    "elapsed_seconds": 120.35950546211097,
+    "credential_files_removed": true,
+    "baseline_modified": false
+  },
+  "preview": {
+    "bytes": 158923,
+    "episode_index": 2000,
+    "etag": "\"0x8DF2557F4AFD2E1\"",
+    "mime": "image/jpeg",
+    "name": "full4d-b6f0a89a28c3a1b6214cf043c86a5e376da6ac8e/episode_002000.jpg",
+    "sha256": "be84ef5e5c1809f17f0e1486dc7dfa92f500d9f3e4edd5df601a05dec47a9870"
+  },
+  "native": {
+    "status": "complete_diagnostic_not_quality_pass",
+    "elapsed_seconds": 118.93145474104676,
+    "new_api_attempts": 6,
+    "preserved_successful_calls": 20,
+    "original_report_pin": {
+      "bytes": 36932,
+      "sha256": "3edca415018cc2fc1eaccb2c100dd55fe8e09cdf49e66463df9d531a4ec1d33f"
+    }
+  },
+  "status_counts": {
+    "pair_returned": 24
+  },
+  "recovered": [
+    {
+      "attempts": [
+        {
+          "attempt": 1,
+          "delay_seconds": 0.0,
+          "duration_seconds": 13.97202585998457,
+          "error_type": null,
+          "http_status": null,
+          "outcome": "success",
+          "timeout_seconds": 90.0
+        }
+      ],
+      "ep": 14,
+      "finish_reason": "STOP",
+      "frame_index": 14,
+      "height": 1152,
+      "index": 14,
+      "model_version": "gemini-3.5-flash",
+      "object": {
+        "box_2d": [
+          600,
+          431,
+          630,
+          503
+        ],
+        "label": "a black frying pan."
+      },
+      "object_bbox": [
+        662,
+        691,
+        773,
+        726
+      ],
+      "original_attempt": {
+        "failure_type": "TimeoutError",
+        "seconds": 60.04836518596858,
+        "status": "transport_timeout"
+      },
+      "person": {
+        "box_2d": [
+          386,
+          508,
+          784,
+          592
+        ],
+        "label": "the person"
+      },
+      "person_bbox": [
+        780,
+        444,
+        910,
+        904
+      ],
+      "response_id": "LcLHat6WL8fw3PQPoImbkQY",
+      "seconds": 13.9777561200317,
+      "status": "pair_returned",
+      "usage": {
+        "candidatesTokenCount": 108,
+        "candidatesTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 108
+          }
+        ],
+        "promptTokenCount": 1818,
+        "promptTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1064
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 754
+          }
+        ],
+        "thoughtsTokenCount": 99,
+        "totalTokenCount": 2025,
+        "trafficType": "ON_DEMAND"
+      },
+      "width": 1536
+    },
+    {
+      "attempts": [
+        {
+          "attempt": 1,
+          "delay_seconds": 1.0,
+          "duration_seconds": 90.10691275994759,
+          "error_type": "timeout",
+          "http_status": null,
+          "outcome": "transient_error",
+          "timeout_seconds": 90.0
+        },
+        {
+          "attempt": 2,
+          "delay_seconds": 0.0,
+          "duration_seconds": 2.6705183889716864,
+          "error_type": null,
+          "http_status": null,
+          "outcome": "success",
+          "timeout_seconds": 90.0
+        }
+      ],
+      "ep": 28,
+      "finish_reason": "STOP",
+      "frame_index": 29,
+      "height": 1152,
+      "index": 29,
+      "model_version": "gemini-3.5-flash",
+      "object": {
+        "box_2d": [
+          574,
+          370,
+          755,
+          455
+        ],
+        "label": "rolling white laptop desk with cup holder and basket"
+      },
+      "object_bbox": [
+        568,
+        661,
+        699,
+        870
+      ],
+      "original_attempt": {
+        "failure_type": "TimeoutError",
+        "seconds": 60.111283650039695,
+        "status": "transport_timeout"
+      },
+      "person": {
+        "box_2d": [
+          405,
+          529,
+          775,
+          589
+        ],
+        "label": "person"
+      },
+      "person_bbox": [
+        812,
+        466,
+        905,
+        893
+      ],
+      "response_id": "iMLHaoSyNtr31PIP4IW_6QY",
+      "seconds": 93.78203171503264,
+      "status": "pair_returned",
+      "usage": {
+        "candidatesTokenCount": 126,
+        "candidatesTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 126
+          }
+        ],
+        "promptTokenCount": 1794,
+        "promptTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1064
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 730
+          }
+        ],
+        "thoughtsTokenCount": 160,
+        "totalTokenCount": 2080,
+        "trafficType": "ON_DEMAND"
+      },
+      "width": 1536
+    },
+    {
+      "attempts": [
+        {
+          "attempt": 1,
+          "delay_seconds": 1.0,
+          "duration_seconds": 90.1079899710603,
+          "error_type": "timeout",
+          "http_status": null,
+          "outcome": "transient_error",
+          "timeout_seconds": 90.0
+        },
+        {
+          "attempt": 2,
+          "delay_seconds": 0.0,
+          "duration_seconds": 3.908491610083729,
+          "error_type": null,
+          "http_status": null,
+          "outcome": "success",
+          "timeout_seconds": 90.0
+        }
+      ],
+      "ep": 18,
+      "finish_reason": "STOP",
+      "frame_index": 0,
+      "height": 1152,
+      "index": 0,
+      "model_version": "gemini-3.5-flash",
+      "object": {
+        "box_2d": [
+          580,
+          478,
+          603,
+          540
+        ],
+        "label": "white with yellow stipped paint roller with a blue handle."
+      },
+      "object_bbox": [
+        734,
+        668,
+        830,
+        695
+      ],
+      "original_attempt": {
+        "failure_type": "TimeoutError",
+        "seconds": 60.087661300902255,
+        "status": "transport_timeout"
+      },
+      "person": {
+        "box_2d": [
+          360,
+          303,
+          875,
+          388
+        ],
+        "label": "person"
+      },
+      "person_bbox": [
+        465,
+        414,
+        596,
+        1008
+      ],
+      "response_id": "lsLHatLcNIrR1PIPosykqAs",
+      "seconds": 95.02076754509471,
+      "status": "pair_returned",
+      "usage": {
+        "candidatesTokenCount": 89,
+        "candidatesTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 89
+          }
+        ],
+        "promptTokenCount": 1807,
+        "promptTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1064
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 743
+          }
+        ],
+        "thoughtsTokenCount": 245,
+        "totalTokenCount": 2141,
+        "trafficType": "ON_DEMAND"
+      },
+      "width": 1536
+    },
+    {
+      "attempts": [
+        {
+          "attempt": 1,
+          "delay_seconds": 0.0,
+          "duration_seconds": 9.599314666935243,
+          "error_type": null,
+          "http_status": null,
+          "outcome": "success",
+          "timeout_seconds": 90.0
+        }
+      ],
+      "ep": 18,
+      "finish_reason": "STOP",
+      "frame_index": 14,
+      "height": 1152,
+      "index": 14,
+      "model_version": "gemini-3.5-flash",
+      "object": {
+        "box_2d": [
+          580,
+          478,
+          603,
+          538
+        ],
+        "label": "white with yellow stipped paint roller with a blue handle"
+      },
+      "object_bbox": [
+        734,
+        668,
+        827,
+        695
+      ],
+      "original_attempt": {
+        "failure_type": "TimeoutError",
+        "seconds": 60.08219124400057,
+        "status": "transport_timeout"
+      },
+      "person": {
+        "box_2d": [
+          359,
+          303,
+          876,
+          388
+        ],
+        "label": "the person"
+      },
+      "person_bbox": [
+        465,
+        413,
+        596,
+        1010
+      ],
+      "response_id": "i8LHaqD4Idn-1PIPgrqD0AM",
+      "seconds": 9.602730704005808,
+      "status": "pair_returned",
+      "usage": {
+        "candidatesTokenCount": 115,
+        "candidatesTokensDetails": [
+          {
+            "modality": "TEXT",
+            "tokenCount": 115
+          }
+        ],
+        "promptTokenCount": 1809,
+        "promptTokensDetails": [
+          {
+            "modality": "IMAGE",
+            "tokenCount": 1064
+          },
+          {
+            "modality": "TEXT",
+            "tokenCount": 745
+          }
+        ],
+        "thoughtsTokenCount": 230,
+        "totalTokenCount": 2154,
+        "trafficType": "ON_DEMAND"
+      },
+      "width": 1536
+    }
+  ],
+  "log_tail": "",
+  "owned_credentials_exist": false,
+  "quality_verified": false,
+  "valid_boxes_not_accuracy": true,
+  "ground_truth_used": false,
+  "manual_labels": false,
+  "successful_responses_recomputed": false
+}

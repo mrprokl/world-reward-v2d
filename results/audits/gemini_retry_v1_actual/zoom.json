@@ -1,0 +1,24 @@
+{
+  "unit": "Result=success\nActiveState=inactive\nSubState=dead\n",
+  "file": {
+    "name": "full4d-701aecd9406255085269c6d7c68516c3576df541/episode_002000.jpg",
+    "etag": "\"0x8DF2558B5B0872F\"",
+    "mime": "image/jpeg",
+    "bytes": 165981,
+    "sha256": "9dec3684eecacd1d520ca6ad148a1d194238f0b2393ea8e78496bd0fc911c666"
+  },
+  "new_model_calls": 0,
+  "source_revision": "701aecd9406255085269c6d7c68516c3576df541",
+  "zoom_report": {
+    "status": "complete_saved_only_qa",
+    "source_report": {
+      "bytes": 42745,
+      "sha256": "9498a201a8376f0df04951bad9ab451372bb4fdeaee10460f5b0912f00ac0260"
+    },
+    "quality_verified": false,
+    "new_model_calls": 0,
+    "gpu_used": false,
+    "bytes": 165981
+  },
+  "log_tail": ""
+}

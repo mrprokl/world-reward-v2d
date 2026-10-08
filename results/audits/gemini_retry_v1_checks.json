@@ -27,5 +27,10 @@
   "targeted_with_form_admission": {
     "passed": 132,
     "seconds": 0.3
+  },
+  "final_targeted": {
+    "passed": 141,
+    "seconds": 0.21,
+    "integration_ast_tests": 9
   }
 }

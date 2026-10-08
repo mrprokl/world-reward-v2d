@@ -85,3 +85,21 @@ attempts logged as bounded nonsensitive ledgers, no credentials/body in logs.
 
 Source: https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/retry-strategy
 This fixes reliability, not detection accuracy. No new GPU/tracking/4D job.
+
+### Actual recovery result
+
+Immutable producer `b6f0a89a28c3a1b6214cf043c86a5e376da6ac8e`.
+All24 now return schema-valid person/object boxes (NOT an accuracy score).
+20 original successful rows preserved;4 failed requests recovered,6 new API
+attempts total. ep14/frame14 succeeded13.98s;ep18/frame14 succeeded9.60s.
+ep28/frame29 andep18/frame0 again timed out at90s then succeeded after1s
+backoff in2.67s/3.91s. CPU stage118.93s, total120.36s. No invalid-schema,
+safety-block or remaining transport failure in the final24. Original outputs
+and baseline unchanged; all one-shot credential files removed, unit completed.
+Confirmed response token counts cover successful responses only: timed-out
+requests may incur backend billing even if no usage response arrives.
+
+141 targeted tests pass, including9 tests of actual native-call AST integration.
+An optional broad repository suite was interrupted and NOT green (unrelated
+historical fixtures/contracts; concise audit in gemini_retry_v1_checks.json).
+This reliability fix does not establish superiority to Qwen or CARI4D.
