@@ -194,28 +194,32 @@ def infer(code,out):
         model_rehashed_after=True))
 
 
-def preview(code,out):
+def preview(code,out,destination=None,display_widths=(320,)):
     import cv2
     from io import BytesIO
     from PIL import Image,ImageDraw,ImageFont
     from world_reward.task_grounding import fixed_frame_indices
     c=settings(code);inference=strict((out/'inference.json').read_bytes())
+    destination=out if destination is None else destination
+    require(display_widths and all(type(w) is int and 192<=w<=320 and w%4==0 for w in display_widths),
+            'Bounded display-only geometry required')
     require(inference['status']=='complete_diagnostic_not_quality_pass','Complete actual VL outputs required')
     selected=inputs(c['episodes'])
     font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',12)
-    def sheet(ep,records,images,label):
+    def sheet_at_width(ep,records,images,label,main_w):
         # Full RGB miniature plus separate box-derived context inset. No manual crop.
-        tile_w,tile_h=448,270;cols=6 if len(records)==30 else 3;row_count=(len(records)+cols-1)//cols
+        main_h=main_w*3//4;tile_w,tile_h=main_w+128,main_h+30
+        cols=6 if len(records)==30 else 3;row_count=(len(records)+cols-1)//cols
         canvas=Image.new('RGB',(tile_w*cols,50+tile_h*row_count),(24,27,33));draw=ImageDraw.Draw(canvas)
         draw.text((8,7),f'World Reward | ep{ep:02d} | {label} | cyan person / orange object',font=font,fill='white')
         draw.text((8,26),'Independent Qwen8B | literal proposed boxes to SAM | SAM NOT RUN | no manual labels',font=font,fill='white')
         for position,(r,rgb) in enumerate(zip(records,images)):
             x,y=(position%cols)*tile_w,50+(position//cols)*tile_h
-            view=Image.fromarray(cv2.resize(rgb,(320,240),interpolation=cv2.INTER_AREA))
+            view=Image.fromarray(cv2.resize(rgb,(main_w,main_h),interpolation=cv2.INTER_AREA))
             vd=ImageDraw.Draw(view)
             for key,color in (('person_bbox',(40,220,240)),('object_bbox',(255,155,45))):
                 b=r[key]
-                if b is not None:vd.rectangle([b[0]*320/r['width'],b[1]*240/r['height'],b[2]*320/r['width'],b[3]*240/r['height']],outline=color,width=2)
+                if b is not None:vd.rectangle([b[0]*main_w/r['width'],b[1]*main_h/r['height'],b[2]*main_w/r['width'],b[3]*main_h/r['height']],outline=color,width=2)
             canvas.paste(view,(x,y))
             box=r['object_bbox']
             if box is not None:
@@ -226,16 +230,20 @@ def preview(code,out):
                 inset=Image.fromarray(cv2.resize(rgb[top:top+h,left:left+w],(128,96),interpolation=cv2.INTER_AREA))
                 ImageDraw.Draw(inset).rectangle([(box[0]-left)*128/w,(box[1]-top)*96/h,
                     (box[2]-left)*128/w,(box[3]-top)*96/h],outline=(255,155,45),width=2)
-                canvas.paste(inset,(x+320,y))
-            draw.text((x+323,y+100),'Object-box zoom',font=font,fill='white')
-            draw.text((x+323,y+120),'person: '+('box' if r['person_bbox'] is not None else 'NULL'),font=font,fill='white')
-            draw.text((x+323,y+138),'object: '+('box' if box is not None else 'NULL'),font=font,fill='white')
-            draw.text((x+5,y+244),f"frame {r['frame_index']:04d} | {r['frame_index']/30:.2f}s | {r['status']}",font=font,fill='white')
+                canvas.paste(inset,(x+main_w,y))
+            draw.text((x+main_w+3,y+100),'Object-box zoom',font=font,fill='white')
+            draw.text((x+main_w+3,y+120),'person: '+('box' if r['person_bbox'] is not None else 'NULL'),font=font,fill='white')
+            draw.text((x+main_w+3,y+138),'object: '+('box' if box is not None else 'NULL'),font=font,fill='white')
+            draw.text((x+5,y+main_h+4),f"frame {r['frame_index']:04d} | {r['frame_index']/30:.2f}s | {r['status']}",font=font,fill='white')
         for quality in (72,60,48,36,24,16):
             buffer=BytesIO();canvas.save(buffer,format='JPEG',quality=quality,optimize=True);raw=buffer.getvalue()
             if len(raw)<=c['max_jpeg_bytes']:break
-        require(len(raw)<=c['max_jpeg_bytes'],'Tiny sheet limit; never drop frames')
         return raw,quality
+    def sheet(ep,records,images,label):
+        for width in display_widths:
+            raw,quality=sheet_at_width(ep,records,images,label,width)
+            if len(raw)<=c['max_jpeg_bytes']:return raw,quality,width
+        raise ValueError('Tiny sheet limit; never drop frames')
     def one(item):
         ep=item['episode'];dest=out/f'episode_{ep:06d}'
         for name,pin in inference['episodes'][str(ep)].items():require(identity(dest/name)==pin,'Frozen observation bytes changed')
@@ -243,17 +251,19 @@ def preview(code,out):
         records=o['records'];require(h==sam_handoff(records,episode=ep,expected_indices=tuple(o['original_indices'])),'Handoff boxes differ')
         decoded=decode(item);rgb=[__import__('numpy').asarray(r['image']) for r in decoded]
         require([r['rgb_sha256'] for r in decoded]==[r['decoded_rgb_sha256'] for r in records],'Displayed RGB differs from inference')
-        raw,q=sheet(ep,records[:30],rgb[:30],'ALL original frames0..29')
-        write(dest/'first30.jpg',raw,mode=0o444)
+        output=destination/f'episode_{ep:06d}';output.mkdir(mode=0o755,exist_ok=destination==out)
+        raw,q,w=sheet(ep,records[:30],rgb[:30],'ALL original frames0..29')
+        write(output/'first30.jpg',raw,mode=0o444)
         indices=fixed_frame_indices(item['total'],9);where=[o['original_indices'].index(i) for i in indices]
-        raw2,q2=sheet(ep,[records[i] for i in where],[rgb[i] for i in where],'9 uniform full-clip views')
-        write(dest/'fullclip9.jpg',raw2,mode=0o444)
-        return dict(episode_index=ep,first30=identity(dest/'first30.jpg'),fullclip9=identity(dest/'fullclip9.jpg'),
+        raw2,q2,w2=sheet(ep,[records[i] for i in where],[rgb[i] for i in where],'9 uniform full-clip views')
+        write(output/'fullclip9.jpg',raw2,mode=0o444)
+        return dict(episode_index=ep,first30=identity(output/'first30.jpg'),fullclip9=identity(output/'fullclip9.jpg'),
             first30_frame_indices=list(range(30)),fullclip_frame_indices=list(indices),
-            jpeg_quality=q,fullclip_jpeg_quality=q2,display_only_zoom=True,sam_executed=False,quality_verified=False)
+            jpeg_quality=q,fullclip_jpeg_quality=q2,display_rgb_width=w,fullclip_display_rgb_width=w2,
+            display_only_zoom=True,sam_executed=False,quality_verified=False)
     with ThreadPoolExecutor(max_workers=4) as pool:previews=list(pool.map(one,selected))
     require(inputs(c['episodes'])==selected,'Original source changed during QA')
-    save(out/'previews.json',dict(status='complete_saved_only_qa',episodes=previews,gpu_used=False,
+    save(destination/'previews.json',dict(status='complete_saved_only_qa',episodes=previews,gpu_used=False,
         model_calls=0,source_rehashed_after=True,original_frame_indices_preserved=True,quality_verified=False))
 
 

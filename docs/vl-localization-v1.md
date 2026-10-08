@@ -62,3 +62,21 @@ Primary batch instructions:
 [Qwen3-VL](https://github.com/QwenLM/Qwen3-VL#batch-inference),
 [Transformers5.3.0 processor](https://github.com/huggingface/transformers/blob/v5.3.0/src/transformers/models/qwen3_vl/processing_qwen3_vl.py),
 [Qwen original-size coordinates](https://github.com/QwenLM/Qwen3-VL/issues/1486).
+
+## Actual native result and display recovery
+
+Producer `4aa5b0a24cab871ac66529605dd0fb12751f959b` completed152 observations
+in482.39s inclusive, peak19,740,769,280 allocated GPU bytes. Image/token encoding
+matched exactly. Greedy token output differed on5/8 batching controls, so the
+predeclared **global singleton** scheduler was used. No per-image best selection.
+All152 responses parsed;2 object abstentions. These are coverage diagnostics,
+not identity accuracy or a superiority score. Control overhead is included in
+elapsed time; adopted prediction token counts exclude unused control outputs.
+
+The experiment's overall report remains **FAIL in preview**, because two30-frame
+sheets exceeded180kB even at JPEG quality16. Native predictions are complete and
+immutable. Recovery is a new CPU-only namespace with original output read-only,
+SHA-pinned observations/report, no model mount or calls and no GPU. Adapt only
+display context widths256/224/192 while keeping the128x96 object zoom, every
+original frame and every literal prediction. Original failed report and partial
+previews are retained; no scientific rerun or input/prompt/resolution change.

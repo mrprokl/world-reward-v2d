@@ -1,0 +1,14 @@
+{
+  "azure_result_path": "/srv/scenesmith/world-reward/results/vl-localization-4aa5b0a24cab871ac66529605dd0fb12751f959b",
+  "baseline_modified": false,
+  "elapsed_seconds": 491.9308026160579,
+  "error": "Native preview failed; no scientific retry",
+  "ground_truth_used": false,
+  "phase": "preview",
+  "producer_revision": "4aa5b0a24cab871ac66529605dd0fb12751f959b",
+  "quality_verified": false,
+  "report_sha256": "b2612ea9bbebf32e197abbefcf4d501ccdfb17cff670c69cce0cfd719c78ddc1",
+  "sam_executed": false,
+  "source_rehashed_after": true,
+  "status": "fail"
+}
