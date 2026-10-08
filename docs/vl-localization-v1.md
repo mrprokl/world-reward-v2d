@@ -80,3 +80,32 @@ SHA-pinned observations/report, no model mount or calls and no GPU. Adapt only
 display context widths256/224/192 while keeping the128x96 object zoom, every
 original frame and every literal prediction. Original failed report and partial
 previews are retained; no scientific rerun or input/prompt/resolution change.
+
+CPU display producer `a1295ea014e5fe3c82d7639a12ecc449ce56578f` completed in4.00s,
+all4×30 frames plus4×9 uniform full-clip views, width256, no inference/GPU.
+The four requested first30 sheets total670,174B; supplementary context520,527B.
+Tiny images were fetched from private Azure with exact SHA/ETag bindings; source
+videos, models and full renders did not transit the laptop. JPEG quality16/24
+is display-only; zooms help coarse QA but do not establish pixel-accurate truth.
+
+### Decision: do not adopt direct VL coordinates as trusted SAM seeds
+
+Independent root/readonly-agent QA agrees: ep9 coarse localization looks
+plausible, ep1's ring extent is truncated, ep14 often excludes the lower pan
+body, and ep7's early object region covers lower leg/foot with uncertain identity.
+Full-clip views show better coverage when objects are larger/held, but retain
+localization errors and two ep7 nulls. These are qualitative algorithm failures,
+**not manual labels or episode-specific replacement boxes**. Valid JSON/transport
+and varied independent boxes did not make referential grounding reliable. No
+SAM execution, mask/3D comparison, held-out metric or leaderboard victory claim.
+
+Next architecture hypothesis: a detector/segmenter owns candidate geometry;
+VL selects candidate IDs (or abstains), not freely generated coordinates.
+Use clip-level actor/action semantics and appearance/temporal association; avoid
+single nearest-hand or movement-only selection. Evaluate candidate coverage,
+identity errors, overlap, abstention calibration and inclusive cost on legitimate
+external annotated validation before adopting thresholds/model changes. SAM3.1
+is a separate later experiment, after license/provenance/acquisition checks;
+use independent concept detections and detector-guided re-prompting, not only
+propagation from one unquestioned seed. Do not repair the four challenge clips
+with individual box enlargement, offsets or manual labels.

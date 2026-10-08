@@ -1,0 +1,117 @@
+{
+  "azure_result_path": "/srv/scenesmith/world-reward/results/vl-localization-preview-a1295ea014e5fe3c82d7639a12ecc449ce56578f",
+  "batch_control": {
+    "batch_seconds": 4.686831222963519,
+    "encoding_exact": true,
+    "generation_tokens_exact": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ],
+    "singleton_seconds": 23.56032983015757
+  },
+  "elapsed_seconds": 4.002674793940969,
+  "episodes": [
+    {
+      "action": "Walk to the white desk that is lying on its side. Place both hands on it and use them to carefully flip the desk onto the other side.",
+      "distinct_object_boxes": 18,
+      "episode_index": 9,
+      "missing_objects": 0,
+      "object_prompt": "a medium sized white desk."
+    },
+    {
+      "action": "Walk over to the hula hoop on the floor and grasp it with your right hand keeping the hula hoop vertical. Pass your right foot  through the hula hoop and then your head and torso while shifting the hula hoop from your right hand to the left hand. Finally step through the hula hoop using your left leg. Place the hula hoop on the floor.",
+      "distinct_object_boxes": 21,
+      "episode_index": 1,
+      "missing_objects": 0,
+      "object_prompt": "a shiny skinny hula hoop."
+    },
+    {
+      "action": "Pick up the pan from the table using one hand. Take a few steps away from the table. Using your other hand, touch the bottom of the pan with your palm, and make some circular motions to wipe it. Walk back to the table and put the pan down.",
+      "distinct_object_boxes": 13,
+      "episode_index": 14,
+      "missing_objects": 0,
+      "object_prompt": "a black frying pan."
+    },
+    {
+      "action": "Walk over to the iron on the floor and pick up the iron using both hands and rotate the iron as you walk within the bounding area and place it on the ground, step away when complete.",
+      "distinct_object_boxes": 27,
+      "episode_index": 7,
+      "missing_objects": 0,
+      "object_prompt": "An metallic iron with blue accents."
+    }
+  ],
+  "files": [
+    {
+      "bytes": 159587,
+      "episode_index": 9,
+      "etag": "\"0x8DF253F1076767D\"",
+      "mime": "image/jpeg",
+      "name": "full4d-a1295ea014e5fe3c82d7639a12ecc449ce56578f/episode_000009.jpg",
+      "sha256": "5e1ff66eed221ff6862bacaa648b29804cc3410b088bb7fb4e68ef0eee2c1dc3",
+      "view": "first30"
+    },
+    {
+      "bytes": 175379,
+      "episode_index": 1,
+      "etag": "\"0x8DF253F108393F1\"",
+      "mime": "image/jpeg",
+      "name": "full4d-a1295ea014e5fe3c82d7639a12ecc449ce56578f/episode_000001.jpg",
+      "sha256": "a01d225d5a6c1ba114ab5b2b9648859e886daaba3ebcd358ca5133bccce5e455",
+      "view": "first30"
+    },
+    {
+      "bytes": 157161,
+      "episode_index": 14,
+      "etag": "\"0x8DF253F10919BA0\"",
+      "mime": "image/jpeg",
+      "name": "full4d-a1295ea014e5fe3c82d7639a12ecc449ce56578f/episode_000014.jpg",
+      "sha256": "da27e35074acf7c2436dcd5e008f564124367c365c0239be4d7a4f955860b8bc",
+      "view": "first30"
+    },
+    {
+      "bytes": 178047,
+      "episode_index": 7,
+      "etag": "\"0x8DF253F10A03F79\"",
+      "mime": "image/jpeg",
+      "name": "full4d-a1295ea014e5fe3c82d7639a12ecc449ce56578f/episode_000007.jpg",
+      "sha256": "f2de2bd7dd85fe0029578c18e1be92338f5813e3c4da76027602fa80e03174a1",
+      "view": "first30"
+    }
+  ],
+  "gpu_used": false,
+  "inference": {
+    "effective_batch_size": 1,
+    "elapsed_seconds": 482.38742060400546,
+    "invalid_responses": 0,
+    "missing_objects": 2,
+    "model": "Qwen/Qwen3-VL-8B-Instruct",
+    "model_revision": "0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
+    "peak_allocated_gpu_bytes": 19740769280,
+    "requested_images": 152
+  },
+  "inference_producer": "4aa5b0a24cab871ac66529605dd0fb12751f959b",
+  "input_pins": {
+    "bytes": 2848,
+    "sha256": "64df3aa869ed05db53e41b7d0f1c4cd8e7128da5ad42bf39a14286f93fa4a795"
+  },
+  "model_calls": 0,
+  "original_inference_rehashed_after": true,
+  "phase": "complete",
+  "predictions_modified": false,
+  "previews": {
+    "bytes": 2725,
+    "sha256": "74b55331974b55c7e06048f33b3725cb5369dd92df9565e021440f08a9a0657f"
+  },
+  "producer_revision": "a1295ea014e5fe3c82d7639a12ecc449ce56578f",
+  "quality_verified": false,
+  "report_sha256": "1acae0efa1abe12b0bbbdcc73c06db2d3da18db82385bf3f0008f5037850f401",
+  "sam_executed": false,
+  "source_rehashed_after": true,
+  "status": "complete_saved_only_qa"
+}
