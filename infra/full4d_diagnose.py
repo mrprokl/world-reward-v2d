@@ -13,15 +13,7 @@ import subprocess
 import sys
 import time
 
-import numpy as np
-
-from full4d_pins import identity, canonical, _strict, _no_oracle
-from mediapipe_cpu_runtime_verify import source, require
-from reconstruction_preview import raster_depth
-from world_reward.mesh_geometry import normalize_degenerate_faces
-from world_reward.task_grounding import fixed_frame_indices
-from world_reward.timeline import native_window_starts, first_occurrence_ownership
-from world_reward.trajectory_diagnostics import object_motion, mask_geometry, summarize
+from mediapipe_cpu_runtime_verify import source, require, identity, canonical, strict as _strict
 
 ROOT = Path('/srv/scenesmith/world-reward')
 BASELINE = 'de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba'
@@ -56,6 +48,7 @@ def stats(series):
 
 
 def jsonable(value):
+    import numpy as np
     if isinstance(value, np.ndarray): return value.tolist()
     if isinstance(value, np.generic): return value.item()
     if isinstance(value, dict): return {k: jsonable(v) for k, v in value.items()}
@@ -71,15 +64,24 @@ def save(path, value):
 
 
 def signature_pose(vertices, poses, total, floor):
+    import numpy as np
+    from world_reward.trajectory_diagnostics import object_motion
     return object_motion(vertices, poses[:, :3, :3], poses[:, :3, 3],
                          np.arange(total), 30, plane=[0, -1, 0, floor])
 
 
 def analyse(root, experiment, out, episode):
+    import numpy as np
     import cv2
     import joblib
     import torch
     from PIL import Image, ImageDraw, ImageFont
+    from full4d_pins import _no_oracle
+    from reconstruction_preview import raster_depth
+    from world_reward.mesh_geometry import normalize_degenerate_faces
+    from world_reward.task_grounding import fixed_frame_indices
+    from world_reward.timeline import native_window_starts, first_occurrence_ownership
+    from world_reward.trajectory_diagnostics import object_motion, mask_geometry, summarize
     started = time.monotonic()
     base = experiment/'outputs'/f'episode_{episode:06d}'
     bound = Sources()
