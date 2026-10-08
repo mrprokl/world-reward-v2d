@@ -5,7 +5,7 @@ to contain the wrong/bizarre reconstructed object. These are failure reports,
 not manual labels or permission to change individual test predictions.
 Preserve the complete random diagnostic, its failed episode7, and its hashes.
 
-## Established code mechanisms versus unmeasured attribution
+## Mechanisms established by code (before measurement)
 
 - SAM3D Objects generates one mesh from **frame0**, seed0. Qwen/SAM2 may choose
   a later seed, but generation still uses the propagated frame0 mask. Geometry
@@ -69,7 +69,7 @@ release/license audit, not a new model acquisition.
 wrong mesh calls for shape inference; a wrong mask requires general identity
 association. Temporal smoothing must not hide either failure.
 
-- Shape experiment: automatic visibility/coverage/nettement selection of a
+- Shape experiment: automatic visibility/coverage/sharpness selection of a
   bounded set of source frames; generate alternative clip-constant proposals;
   assess unseen-in-fit frames of the **same monocular** video using visible
   contours/depth/appearance. This is self-supervised consistency, not held-out
@@ -90,3 +90,104 @@ mesh or worsens independent3D/contact errors. Reuse frozen upstream artifacts,
 batch independent hypotheses/views on H100; no full pipeline rerun to inspect
 an unchanged result. A future visual improvement is not a verified leaderboard
 gain or permission for per-episode repairs.
+
+
+## Actual saved-only result, 2026-10-08
+
+CPU diagnostic `5adcb031d5d5a09c4b06d962a03c5f1fe6b906cb` completed all
+415/668/442 original frames in about61s of analysis, with zero models, zero
+optimizers and no prediction writes. Offline read-only sources were rehashed.
+The representation-equivalence and exact refined/export equality gates pass
+for all three clips: exported poses and display-only ground are not the source
+of the numeric jitter. Native forward/refinement can still change wrong poses.
+Two earlier diagnostic infrastructure failures remain failures (host scientific
+import, then historical writable frontend/pin-schema assumptions); neither
+changed inference. Numeric settings and population were not retuned.
+
+| Fixed first2s, not a manually labelled static segment | Initializer | Forward | Refined/export | RGB flow median, 320px-wide proxy |
+|---|---:|---:|---:|---:|
+| ep9 centroid step median | 18.35mm/frame | 20.46mm/frame | 9.22mm/frame | 0.005875px/frame |
+| ep14 centroid step median | 40.94mm/frame | 37.69mm/frame | 16.36mm/frame | 0.002232px/frame |
+
+This shows the mismatch already exists before the learned/refinement stages;
+refinement attenuates translation but does not identify the true resting state.
+Flow under the saved mask is not ground truth or proof of static world motion.
+In ep14 the forward network additionally introduces a median5.372deg/frame
+rotation over that same first2s, versus zero initializer rotation; refinement
+freezes rotation exactly, so the error cannot be corrected there. Whole-clip
+medians are not jitter estimates because they include real manipulation.
+The ep9 boundary192 step rises from46.93mm initializer to79.98mm forward then
+68.76mm refined; this alone does not prove window-seam causality.
+
+**ep14 is an upstream identity failure, not just poor shape.** The permitted
+metadata requests a black frying pan picked up from a table. All nine original
+Qwen output records contain exactly the same person and object boxes despite
+the source actor moving. The saved SAM2 mask remains at approximately
+x632..731/y663..695 in every uniform view, while the pan moves with the actor.
+The additional automatic-box viewport shows the true pan **below the original
+Qwen box** at frame0; SAM2 segments background between tripod legs, not the
+pan or tabletop. Thus initialization is wrong already, not merely later drift.
+Its persistent background region is consistent with the supplied wrong seed.
+The multi-image response repetition and wrong frame0 location must be isolated
+from image/coordinate transport; a SAM3 upgrade is a hypothesis, not a diagnosis.
+The code parses raw per-view records without a box-copy fallback, then uses
+only the first joint seed to initialize SAM2. Later Qwen observations never
+correct or independently validate propagation. Therefore a plausible first
+box/nonempty full-T mask was incorrectly treated as sufficient handoff evidence.
+The generated frame0 mesh has extents approximately0.748/0.429/0.649 inferred
+metres and poor initializer silhouette IoU0.156..0.206 across uniform views;
+these are additional uncertain shape/pose diagnostics, not true dimensions.
+Final full-mask IoU0..0.053 is occlusion-confounded, not a calibrated score.
+Replacing SAM3D alone would keep generating/tracking the wrong observations.
+
+**Revised priority:** independently ground per-view observations with one
+unchanged task-conditioned algorithm; first verify original decoded-image and
+encoded image/frame-ID binding (the repeated JSON is an observed failure, not
+proof of a universal Qwen copying mechanism). Use appearance/point correspondence and
+bidirectional instance association to check identity/reacquire through occlusion.
+Do not declare stationary targets wrong from action text, copy manual boxes,
+force motion/contact, or silently accept missing evidence. Assess target
+association separately from pose/shape before spending on a full4D rerun.
+The existing single-call Qwen/SAM2 baseline stays frozen as the A branch.
+Persistent observations and uncertainty-aware global SE(3) pose estimation
+form the separate motion B branch; conditional support comes only after this.
+A shape-anchor experiment is conditional on legitimate identity, not the first
+repair. Earlier rejected multiview/LK tests are not revived or reclassified as
+success; new evidence/operator needs a new preregistered independent gate.
+
+Actual compact result/identity records are in
+`results/audits/full4d_causal_diagnostic_v1_actual.json`, its `_detail` and
+`full4d_causal_grounding14_v1_actual.json`. Tiny original/mask/final-mesh QA
+sheets were generated on Azure; only three SHA-verified JPEGs total462418B crossed
+locally, including the167410B automatic zoom. Its new camera/crop is strictly
+a display viewport: no predictions are refitted, no per-frame evaluation
+alignment and no manual box selection. The CPU focus completes all27views;
+its host publication fails on an unintended NumPy metadata import. One stdlib
+metadata-only continuation reuses exact JPEG bytes (no render/model retry),
+retains the original FAIL/partial file, and records each private PUT/ETag.
+A focused regression fixes host metadata without changing the running scientific
+producer. Full image/focus publication receipts remain distinct. Native inference, masks, depth arrays, meshes and full videos stayed
+remote. Human QA remains REJECT for reconstruction quality, not label creation.
+
+
+### September-eligible ownership mechanisms
+
+[SAM3 v2](https://arxiv.org/html/2511.16719v2), §3/§C.3, separates an independent
+per-frame concept detector from the video tracker: instance association, new
+masklets and detector-guided re-prompting address drift that a one-seed tracker
+cannot detect independently. SAM3.1 release March27,2026 is before the cutoff.
+Text is a simple object noun phrase, not a reliable arbitrary action/relational
+query; keep all instances and associate the actual interaction automatically.
+Derive concepts from permitted metadata/the same general model, never a human
+QA hint. Source/model custom SAM terms and checkpoint overlap remain unaudited
+for adoption. No acquisition or inference is inferred from this literature.
+
+[Qwen3-VL v2](https://arxiv.org/html/2511.21631v2), §3.2.4/§5.7/§5.9, supports
+normalized coordinate grounding and multiple-image/video tasks; those benchmark
+results do not guarantee instance tracking or per-frame visible boxes. The
+minimal causal control is the same9views/question in nine independent
+single-image conversations, batching with native left padding. Prior boxes
+must not leak between queries; explicit missing observations remain missing.
+Compare automatic observations before any mesh regeneration/full4D rerun.
+
+Focused local pure/adapter tests: **225 PASS** (no local inference/render).

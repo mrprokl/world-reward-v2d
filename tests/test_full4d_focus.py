@@ -1,6 +1,6 @@
 """Manufactured boxes only, no local challenge rendering."""
 import pytest
-from full4d_focus import viewport
+from full4d_focus import viewport, save
 
 
 def test_crop_preserves_both_disagreeing_automatic_observations():
@@ -26,3 +26,17 @@ def test_box_on_border_is_not_dropped():
 def test_reject_invalid_automatic_boxes(box):
     with pytest.raises(ValueError):
         viewport((box,),640,480)
+
+
+def test_host_metadata_is_stdlib_only(tmp_path, monkeypatch):
+    import builtins
+    real_import = builtins.__import__
+    def restricted(name, *args, **kwargs):
+        if name == 'numpy':
+            raise AssertionError('Host must not require scientific runtime')
+        return real_import(name, *args, **kwargs)
+    monkeypatch.setattr(builtins, '__import__', restricted)
+    path = tmp_path/'receipt.json'
+    save(path, {'predictions_modified': False, 'bytes': 10})
+    assert path.read_text() == '{"bytes": 10, "predictions_modified": false}\n'
+    assert not path.stat().st_mode & 0o222

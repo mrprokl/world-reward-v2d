@@ -11,12 +11,20 @@ from pathlib import Path
 import subprocess
 import sys
 
-from full4d_diagnose import ROOT, BASELINE, IMAGE, EPISODES, Sources, save
+from full4d_diagnose import ROOT, BASELINE, IMAGE, EPISODES, Sources
 from mediapipe_cpu_runtime_verify import source, canonical, require, identity
 
 DIAGNOSTIC = '5adcb031d5d5a09c4b06d962a03c5f1fe6b906cb'
 ENTRY = 'run_full4d_focus'
 WIDTH, HEIGHT = 320, 240
+
+
+def save(path, value):
+    """Host metadata stays stdlib-only; numerical arrays are never passed here."""
+    with path.open('x') as f:
+        json.dump(value, f, sort_keys=True, allow_nan=False)
+        f.write('\n')
+    path.chmod(0o444)
 
 
 def viewport(boxes, width, height):

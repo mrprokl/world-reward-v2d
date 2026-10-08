@@ -71,4 +71,5 @@ Episode 7 failed during rigid object tracking: insufficient inferred visible
 object points. Preserve the failure and original sample; no fabricated bridge,
 manual labels or replacement clip. Three preview videos total **368,401 B**.
 Private publication uses a separate fixed metadata-corrected CPU publisher;
-original failed publication/status remains unchanged. Human visual QA pending.
+original failed publication/status remains unchanged. Human visual QA REJECT: resting-object jitter and episode14 incorrect initial target/mask.
+See `full4d-causal-audit.md`; execution/fidelity PASS is not quality PASS.
