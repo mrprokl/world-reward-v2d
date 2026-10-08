@@ -1,0 +1,195 @@
+{
+  "baseline_revision": "de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba",
+  "diagnostic_revision": "5adcb031d5d5a09c4b06d962a03c5f1fe6b906cb",
+  "episodes": {
+    "1": {
+      "first_2s_centroid_step_median_m": [
+        0.01263,
+        0.01277,
+        0.00532,
+        0.00532
+      ],
+      "first_2s_rgb_flow_median_px": null,
+      "grounding_seed": {
+        "frame_index": 0,
+        "object_bbox": [
+          576.0,
+          844.4159999999999,
+          768.0,
+          959.616
+        ],
+        "person_bbox": [
+          800.2560000000001,
+          410.11199999999997,
+          930.816,
+          866.304
+        ],
+        "status": "both_boxes"
+      },
+      "object_prompt": "a shiny skinny hula hoop.",
+      "rotation_step_median_deg": [
+        0.20376,
+        2.64623,
+        2.64623,
+        2.64623
+      ],
+      "shape_generation_frame": 0,
+      "surface_acceleration_rms_m_s2": [
+        153.61681,
+        124.98584,
+        112.03528,
+        112.03528
+      ],
+      "surface_step_median_m": [
+        0.04549,
+        0.03559,
+        0.02388,
+        0.02388
+      ],
+      "surface_step_p95_m": [
+        0.26843,
+        0.15446,
+        0.14874,
+        0.14874
+      ],
+      "task": "Walk over to the hula hoop on the floor and grasp it with your right hand keeping the hula hoop vertical. Pass your right foot  through the hula hoop and then your head and torso while shifting the hula hoop from your right hand to the left hand. Finally step through the hula hoop using your left leg. Place the hula hoop on the floor."
+    },
+    "14": {
+      "first_2s_centroid_step_median_m": [
+        0.04094,
+        0.03769,
+        0.01636,
+        0.01636
+      ],
+      "first_2s_rgb_flow_median_px": 0.002232050523161888,
+      "grounding_seed": {
+        "frame_index": 0,
+        "object_bbox": [
+          632.832,
+          667.0079999999999,
+          729.5999999999999,
+          691.1999999999999
+        ],
+        "person_bbox": [
+          800.2560000000001,
+          446.976,
+          932.352,
+          907.7760000000001
+        ],
+        "status": "both_boxes"
+      },
+      "object_prompt": "a black frying pan.",
+      "rotation_step_median_deg": [
+        0.0,
+        5.24807,
+        5.24807,
+        5.24807
+      ],
+      "shape_generation_frame": 0,
+      "surface_acceleration_rms_m_s2": [
+        91.45118,
+        109.90013,
+        85.19833,
+        85.19833
+      ],
+      "surface_step_median_m": [
+        0.03054,
+        0.04491,
+        0.03419,
+        0.03419
+      ],
+      "surface_step_p95_m": [
+        0.12646,
+        0.13577,
+        0.14021,
+        0.14021
+      ],
+      "task": "Pick up the pan from the table using one hand. Take a few steps away from the table. Using your other hand, touch the bottom of the pan with your palm, and make some circular motions to wipe it. Walk back to the table and put the pan down."
+    },
+    "9": {
+      "first_2s_centroid_step_median_m": [
+        0.01835,
+        0.02046,
+        0.00922,
+        0.00922
+      ],
+      "first_2s_rgb_flow_median_px": 0.005874816328287125,
+      "grounding_seed": {
+        "frame_index": 0,
+        "object_bbox": [
+          384.0,
+          660.096,
+          794.1120000000001,
+          941.184
+        ],
+        "person_bbox": [
+          913.92,
+          397.43999999999994,
+          1064.4479999999999,
+          883.5840000000001
+        ],
+        "status": "both_boxes"
+      },
+      "object_prompt": "a medium sized white desk.",
+      "rotation_step_median_deg": [
+        1.1182,
+        1.12761,
+        1.12761,
+        1.12761
+      ],
+      "shape_generation_frame": 0,
+      "surface_acceleration_rms_m_s2": [
+        86.6182,
+        60.02831,
+        39.27815,
+        39.27815
+      ],
+      "surface_step_median_m": [
+        0.02428,
+        0.02582,
+        0.01654,
+        0.01654
+      ],
+      "surface_step_p95_m": [
+        0.14603,
+        0.08411,
+        0.06433,
+        0.06433
+      ],
+      "task": "Walk to the white desk that is lying on its side. Place both hands on it and use them to carefully flip the desk onto the other side."
+    }
+  },
+  "files": [
+    {
+      "bytes": 146624,
+      "episode_index": 9,
+      "etag": "\"0x8DF2537C94A63C1\"",
+      "mime": "image/jpeg",
+      "name": "full4d-5adcb031d5d5a09c4b06d962a03c5f1fe6b906cb/episode_000009.jpg",
+      "sha256": "9ce75be5e7f07fa8cbbd43437f45f85b5848ae7ade9aac5a3fe0f518313b65e1"
+    },
+    {
+      "bytes": 153504,
+      "episode_index": 1,
+      "etag": "\"0x8DF2537C9573320\"",
+      "mime": "image/jpeg",
+      "name": "full4d-5adcb031d5d5a09c4b06d962a03c5f1fe6b906cb/episode_000001.jpg",
+      "sha256": "bef48606011a7c0aa1d80a39eb7dbabce867d8591f52de11f4cc1dc0d5b49001"
+    },
+    {
+      "bytes": 148384,
+      "episode_index": 14,
+      "etag": "\"0x8DF2537C9640282\"",
+      "mime": "image/jpeg",
+      "name": "full4d-5adcb031d5d5a09c4b06d962a03c5f1fe6b906cb/episode_000014.jpg",
+      "sha256": "2438b6a12437f7e6588cfe7bcd5f9fb0ab237238a18d29525e03a388ad388631"
+    }
+  ],
+  "stage_order": [
+    "initializer_aligned",
+    "forward",
+    "refined",
+    "export"
+  ],
+  "status": "complete_diagnostic_not_quality_pass"
+}

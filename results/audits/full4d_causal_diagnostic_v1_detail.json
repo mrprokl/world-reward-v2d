@@ -1,0 +1,189 @@
+{
+  "applied_config_14": {
+    "batch_size": 0,
+    "checkpoint_path": null,
+    "contact_activation_distance_m": 0.05,
+    "device": "cuda",
+    "diagnostics_every": 500,
+    "frame_limit": 0,
+    "frame_start": 0,
+    "freeze_body_internal_translations": true,
+    "freeze_object_rotation": true,
+    "hand_surface_mode": "all_vertices",
+    "hand_surface_spec_path": "/srv/scenesmith/world-reward/weights/cari4d/refinement/mhr_hand_surface_spec.npz",
+    "human_pose_prior_beta": 0.05,
+    "lr": 0.001,
+    "num_steps": 300,
+    "object_surface_samples": 1000,
+    "penetration_bbox_margin_m": 1e-06,
+    "penetration_bbox_rejection": true,
+    "penetration_collision_proxy_path": "/srv/scenesmith/world-reward/weights/cari4d/refinement/mhr_collision_proxy_4000v.npz",
+    "penetration_human_mesh_mode": "proxy_4000",
+    "penetration_point_reduction": "sum",
+    "penetration_start_fraction": 0.6,
+    "penetration_surface_samples": 1000,
+    "random_seed": 0,
+    "report_every": 100,
+    "save_every": 500,
+    "schedule_steps": 450,
+    "symmetric_object": false,
+    "w_contact": 200.0,
+    "w_human_pose_prior": 200.0,
+    "w_object_translation_prior": 100.0,
+    "w_penetration": 2.0,
+    "w_silhouette": 0.002,
+    "w_temporal": 100.0,
+    "warmup_steps": 30
+  },
+  "episode14_first2s_rotation_deg": {
+    "export": 5.372057425610096,
+    "forward": 5.372057425610096,
+    "initializer_aligned": 0.0,
+    "refined": 5.372057425610096
+  },
+  "episode14_views": [
+    {
+      "estimated_depth_median": 12.007055282592773,
+      "final_full_iou_occlusion_confounded": 0.0181,
+      "frame": 0,
+      "initial_iou": 0.1558,
+      "mask_area": 1697,
+      "mask_bbox": [
+        635,
+        663,
+        731,
+        694
+      ]
+    },
+    {
+      "estimated_depth_median": 12.069086074829102,
+      "final_full_iou_occlusion_confounded": 0.0,
+      "frame": 55,
+      "initial_iou": 0.1881,
+      "mask_area": 1693,
+      "mask_bbox": [
+        634,
+        664,
+        728,
+        694
+      ]
+    },
+    {
+      "estimated_depth_median": 11.988273620605469,
+      "final_full_iou_occlusion_confounded": 0.0526,
+      "frame": 110,
+      "initial_iou": 0.186,
+      "mask_area": 1937,
+      "mask_bbox": [
+        633,
+        664,
+        724,
+        694
+      ]
+    },
+    {
+      "estimated_depth_median": 11.959152221679688,
+      "final_full_iou_occlusion_confounded": 0.0452,
+      "frame": 165,
+      "initial_iou": 0.2056,
+      "mask_area": 1916,
+      "mask_bbox": [
+        634,
+        664,
+        729,
+        695
+      ]
+    },
+    {
+      "estimated_depth_median": 11.993917465209961,
+      "final_full_iou_occlusion_confounded": 0.0,
+      "frame": 220,
+      "initial_iou": 0.203,
+      "mask_area": 1939,
+      "mask_bbox": [
+        633,
+        663,
+        726,
+        694
+      ]
+    },
+    {
+      "estimated_depth_median": 11.987773895263672,
+      "final_full_iou_occlusion_confounded": 0.0,
+      "frame": 275,
+      "initial_iou": 0.2058,
+      "mask_area": 1717,
+      "mask_bbox": [
+        634,
+        664,
+        724,
+        694
+      ]
+    },
+    {
+      "estimated_depth_median": 11.963607788085938,
+      "final_full_iou_occlusion_confounded": 0.0,
+      "frame": 330,
+      "initial_iou": 0.2058,
+      "mask_area": 1736,
+      "mask_bbox": [
+        634,
+        664,
+        725,
+        694
+      ]
+    },
+    {
+      "estimated_depth_median": 11.98155689239502,
+      "final_full_iou_occlusion_confounded": 0.0308,
+      "frame": 385,
+      "initial_iou": 0.1871,
+      "mask_area": 1964,
+      "mask_bbox": [
+        632,
+        663,
+        722,
+        694
+      ]
+    },
+    {
+      "estimated_depth_median": 11.878707885742188,
+      "final_full_iou_occlusion_confounded": 0.0466,
+      "frame": 441,
+      "initial_iou": 0.1919,
+      "mask_area": 1938,
+      "mask_bbox": [
+        633,
+        664,
+        726,
+        695
+      ]
+    }
+  ],
+  "episode9_boundaries": {
+    "export": [
+      0.011673828625367411,
+      0.06875668492066657,
+      0.012244102331918267,
+      0.021611057928687536
+    ],
+    "forward": [
+      0.02964701672402167,
+      0.07998243923587436,
+      0.014090955184908646,
+      0.025500626992336062
+    ],
+    "initializer_aligned": [
+      0.012884243022235954,
+      0.0469256388787313,
+      0.016352445185975725,
+      0.016633104453059547
+    ],
+    "refined": [
+      0.011673828625367411,
+      0.06875668492066657,
+      0.012244102331918267,
+      0.021611057928687536
+    ]
+  }
+}
