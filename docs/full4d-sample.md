@@ -51,3 +51,13 @@ parity permits only three import/ledger substitutions. New input producers carry
 their real continuation revision; later shared producers remain original.
 Existing PASS native stages/videos are rehashed and reused, never overwritten.
 Focused capacity/reuse checks: **117 pass, 1 skip** (no GPU execution locally).
+
+The first continuation was stopped after 885 s: single-frame native depth PNG
+encoding had committed only 100/415 frames. Its FAIL receipt remains unchanged.
+Only its 13 unpublished generated input files (587,275,495 B) are eligible for
+cleanup, with a hash inventory recorded first and all upstream PASS bytes
+rechecked. Replace serial submission with ordered native batches of eight plus
+the exact tail; preserve quantization, PNG compression and exhaustive validation.
+Historical R92 supports byte parity/CPU throughput; R96 retains its timeout FAIL.
+This is a new production scheduling implementation, not a reclassified benchmark
+or improved reconstruction claim. Progress distinguishes submitted/committed frames.

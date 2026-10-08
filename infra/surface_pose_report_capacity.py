@@ -70,7 +70,7 @@ def recheck(ledger):
 
 
 def verify_capacity_source(original, candidate):
-    """Exactly three source-only substitutions; no numeric statement may differ."""
+    """Exact capacity/batch scheduling seams; no numeric statement may differ."""
     require(type(original) is bytes and type(candidate) is bytes, 'Explicit immutable source bytes required')
     replacements = (
         (b'    from surface_geometry_loader import load, identity, strict_json, recheck, preflight_geometry_and_poses, SOURCE_HELPERS\n',
@@ -80,13 +80,28 @@ def verify_capacity_source(original, candidate):
          b'        from surface_pose_report_capacity import identity as surface_identity, recheck as surface_recheck\n'),
         (b"    helpers={*SOURCE_HELPERS,'infra/cari_prepare.py','infra/cari_wrapper_common.sh','infra/run_cari_prepare.sh','src/world_reward/artifact_paths.py'}\n",
          b"    helpers={*SOURCE_HELPERS,'infra/cari_prepare.py','infra/cari_wrapper_common.sh','infra/run_cari_prepare.sh','src/world_reward/artifact_paths.py','infra/surface_pose_report_capacity.py'}\n"),
+        (b'    from prep.mhr_depth_h5 import MHRDepthH5Writer, validate_depth_h5, read_metric_depth\n',
+         b'    from prep.mhr_depth_h5 import DepthFrameRecord, MHRDepthH5Writer, validate_depth_h5, read_metric_depth\n'),
+        (b'    sys.path.insert(0, str(native_root))\n',
+         b'    if sha256(native_root / "prep/mhr_depth_h5.py") != "1429760952205d35c87157c05941defa20dc450f2b014441ca7cd5d39b45b0c5":\n        raise RuntimeError("Exact qualified native depth-writer source required")\n    sys.path.insert(0, str(native_root))\n'),
+        (b'                          alignment_input_identity=identity, encoding_workers=8) as writer:\n        for index, name in enumerate(names):\n',
+         b'                          alignment_input_identity=identity, encoding_workers=8) as writer:\n        pending = []\n        for index, name in enumerate(names):\n'),
+        (b'            writer.write_frame(camera_name, index, raw, aligned, scale=scale, shift=0., valid_count=int(valid.sum()))\n',
+         b'            pending.append(DepthFrameRecord(index, raw, aligned, scale, 0., int(valid.sum())))\n            if len(pending) == 8:\n                writer.write_frames(camera_name, pending)\n                pending = []\n'),
+        (b'        writer.mark_complete()\n',
+         b'        if pending:\n            writer.write_frames(camera_name, pending)\n        writer.mark_complete()\n'),
+        (b"    if args.mesh_source == 'solid':\n        _solid_recheck(solid_ledger)\n",
+         b'    result["depth_encoding"] = {"batch_size": 8, "encoding_workers": 8,\n        "native_source_sha256": "1429760952205d35c87157c05941defa20dc450f2b014441ca7cd5d39b45b0c5",\n        "compression_or_quantization_changed": False, "validation_changed": False}\n    if args.mesh_source == \'solid\':\n        _solid_recheck(solid_ledger)\n'),
+        (b'                print(json.dumps({"stage": "cari_prepare_depth", "frames_complete": index + 1}), flush=True)\n',
+         b'                print(json.dumps({"stage": "cari_prepare_depth", "frames_submitted": index + 1, "frames_complete": index + 1 - len(pending)}), flush=True)\n'),
     )
     expected = original
     for old, new in replacements:
         require(expected.count(old) == 1, 'Exact original source seam required')
         expected = expected.replace(old, new, 1)
-    require(candidate == expected, 'Only the explicit metadata capacity imports/ledger may change')
-    return dict(numeric_source_unchanged=True, exact_source_substitutions=3,
+    require(candidate == expected, 'Only explicit capacity, native source receipt and batch scheduling seams may change')
+    return dict(numeric_source_unchanged=True, exact_source_substitutions=len(replacements), depth_batch_size=8,
+                depth_native_source_sha256="1429760952205d35c87157c05941defa20dc450f2b014441ca7cd5d39b45b0c5",
                 original_sha256=hashlib.sha256(original).hexdigest(),
                 candidate_sha256=hashlib.sha256(candidate).hexdigest(),
                 maximum_pose_report_bytes=MAX_POSE_REPORT_BYTES)

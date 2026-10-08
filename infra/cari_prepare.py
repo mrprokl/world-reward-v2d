@@ -422,9 +422,11 @@ def main():
     vendor = root / "vendor/video_to_data"
     _pinned_checkout(vendor, UPSTREAM_REVISION)
     native_root = vendor / "reconstruction/modules/v2d_cari4d/lib/cari4d"
+    if sha256(native_root / "prep/mhr_depth_h5.py") != "1429760952205d35c87157c05941defa20dc450f2b014441ca7cd5d39b45b0c5":
+        raise RuntimeError("Exact qualified native depth-writer source required")
     sys.path.insert(0, str(native_root))
     from prep.prepare_mhr_wild_export import prepare_mhr_wild_export
-    from prep.mhr_depth_h5 import MHRDepthH5Writer, validate_depth_h5, read_metric_depth
+    from prep.mhr_depth_h5 import DepthFrameRecord, MHRDepthH5Writer, validate_depth_h5, read_metric_depth
     from prep.mhr_depth_backend import MOGE2_MODEL_ID, MOGE2_MODEL_REVISION, MOGE2_SOURCE_COMMIT
     from prep.mhr_export_utils import MHR_CAMERA_NAMES, frame_names, read_rgb, read_mask, camera_calibration, load_edex
     base = episode_output(root, args.episode)
@@ -643,6 +645,7 @@ def main():
     camera_name = MHR_CAMERA_NAMES[0]
     with MHRDepthH5Writer(aligned_depth_path, {camera_name: names}, alignment_method="world_reward_shared_predicted_human_scale",
                           alignment_input_identity=identity, encoding_workers=8) as writer:
+        pending = []
         for index, name in enumerate(names):
             path = base / f"depth_full/{name}.npz"
             if sha256(path) != depth_frames[index]["output_sha256"]:
@@ -653,9 +656,14 @@ def main():
             aligned = raw * scale
             if not np.isfinite(aligned).all() or (aligned < 0).any() or (raw > 65.535).any() or (aligned > 65.535).any():
                 raise RuntimeError("Depth encoding would silently saturate uint16 metres-to-mm representation")
-            writer.write_frame(camera_name, index, raw, aligned, scale=scale, shift=0., valid_count=int(valid.sum()))
+            pending.append(DepthFrameRecord(index, raw, aligned, scale, 0., int(valid.sum())))
+            if len(pending) == 8:
+                writer.write_frames(camera_name, pending)
+                pending = []
             if (index + 1) % 50 == 0:
-                print(json.dumps({"stage": "cari_prepare_depth", "frames_complete": index + 1}), flush=True)
+                print(json.dumps({"stage": "cari_prepare_depth", "frames_submitted": index + 1, "frames_complete": index + 1 - len(pending)}), flush=True)
+        if pending:
+            writer.write_frames(camera_name, pending)
         writer.mark_complete()
     depth_validation = validate_depth_h5(aligned_depth_path, expected_cameras=[camera_name], expected_alignment_input_identity=identity,
                                          validation_workers=8)
@@ -702,6 +710,9 @@ def main():
               "file_sha256": {key: sha256(path) for key, path in {"depth_h5": aligned_depth_path, "mhr_init": adapter_path,
                                                                "object_poses": object_poses_path, "wild_export": metadata_path}.items()},
               "elapsed_seconds": time.perf_counter() - started, "script_sha256": sha256(Path(__file__))}
+    result["depth_encoding"] = {"batch_size": 8, "encoding_workers": 8,
+        "native_source_sha256": "1429760952205d35c87157c05941defa20dc450f2b014441ca7cd5d39b45b0c5",
+        "compression_or_quantization_changed": False, "validation_changed": False}
     if args.mesh_source == 'solid':
         _solid_recheck(solid_ledger)
         _pinned_checkout(vendor, UPSTREAM_REVISION)
