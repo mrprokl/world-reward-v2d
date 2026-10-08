@@ -1,0 +1,260 @@
+{
+  "preview_revision": "9650960ea8d51461d0b7a0835ef05d8c03e4eb51",
+  "sam_revision": "d86ddd3e3b273649992832d3010a4557a4682e70",
+  "selection_revision": "a98e9483e64d456216f451dfaf2b1945411c17ab",
+  "sam_seconds": 1447.2514119349653,
+  "qwen_seconds": 163.06752383499406,
+  "preview_seconds": 11.93901656800881,
+  "sam_peak": 35602251264,
+  "qwen_peak": 24558668800,
+  "calls": 9,
+  "tokens": 757,
+  "results": [
+    [
+      9,
+      "selected",
+      "p:1",
+      "o:4",
+      {
+        "object": 205,
+        "person": 415
+      },
+      null
+    ],
+    [
+      1,
+      "selected",
+      "p:1",
+      "o:0",
+      {
+        "object": 235,
+        "person": 668
+      },
+      null
+    ],
+    [
+      14,
+      "selected",
+      "p:0",
+      "o:0",
+      {
+        "object": 403,
+        "person": 442
+      },
+      null
+    ],
+    [
+      7,
+      "abstained",
+      null,
+      null,
+      null,
+      "No matching role candidates; abstain"
+    ],
+    [
+      28,
+      "selected",
+      "p:0",
+      "o:0",
+      {
+        "object": 366,
+        "person": 366
+      },
+      null
+    ],
+    [
+      13,
+      "abstained",
+      null,
+      null,
+      null,
+      "Evidence frames must be shown original indices"
+    ],
+    [
+      3,
+      "selected",
+      "p:0",
+      "o:0",
+      {
+        "object": 592,
+        "person": 592
+      },
+      null
+    ],
+    [
+      11,
+      "selected",
+      "p:0",
+      "o:0",
+      {
+        "object": 877,
+        "person": 877
+      },
+      null
+    ],
+    [
+      18,
+      "abstained",
+      null,
+      null,
+      null,
+      "No matching role candidates; abstain"
+    ],
+    [
+      10,
+      "selected",
+      "p:0",
+      "o:2",
+      {
+        "object": 577,
+        "person": 577
+      },
+      null
+    ],
+    [
+      22,
+      "selected",
+      "p:0",
+      "o:0",
+      {
+        "object": 533,
+        "person": 533
+      },
+      null
+    ],
+    [
+      6,
+      "abstained",
+      null,
+      null,
+      null,
+      "No matching role candidates; abstain"
+    ]
+  ],
+  "files": [
+    [
+      9,
+      172638,
+      "775115782915cc2a3e619a5f7a4685f2592028613b14033cabeb2800f630076b",
+      "\"0x8DF254D51CD4D9D\""
+    ],
+    [
+      1009,
+      148199,
+      "cb2f0c6a6b661fb58f63217db769df2b820e7bf8e7bb49aef3cfabc25bda1c2a",
+      "\"0x8DF254D51DA1CF8\""
+    ],
+    [
+      1,
+      158133,
+      "450c107b68afa6011bf04cf688fc5149c67241aef9d97cb67a1cbd7dc2f364b5",
+      "\"0x8DF254D51E62923\""
+    ],
+    [
+      1001,
+      131638,
+      "a2c31ca4dfe50d0dcc8231313ad39a816d20cda77a78ba2c1ef825d0035ee2f2",
+      "\"0x8DF254D51F3E2C5\""
+    ],
+    [
+      14,
+      141873,
+      "59b42b03a3bb684d76e5c2750c2a941f3e375cf09137232f09f6ad65df2f620f",
+      "\"0x8DF254D52028694\""
+    ],
+    [
+      1014,
+      163782,
+      "0ada3e6dc3160936be4c28a80b7881d6bd0ca2a0a54cdea2c2503579b96bf613",
+      "\"0x8DF254D52112A75\""
+    ],
+    [
+      7,
+      174311,
+      "7b73d959cba968c1190681710a9db5d24854f930b1c5f1e0702ae610d142decc",
+      "\"0x8DF254D521F0B17\""
+    ],
+    [
+      1007,
+      118333,
+      "e8453d592a2b30440f4326bdf39d3e986472bd3706ff2172fbb4b83db56fcfd6",
+      "\"0x8DF254D522C76B0\""
+    ],
+    [
+      28,
+      166669,
+      "8f4f917761368e78a20ce0517f0bd52ee7e013fadbce93cf2f660268fc018a98",
+      "\"0x8DF254D523A0939\""
+    ],
+    [
+      13,
+      176813,
+      "73d4fef1a7d12e963fee936eb3c113519df1ac17cc9cecf00b006fe4b338bc1c",
+      "\"0x8DF254D5253294D\""
+    ],
+    [
+      3,
+      160484,
+      "3054aeb3f48de4a412125964e460f953fc3354bacfc6c5937b4d748820e7e603",
+      "\"0x8DF254D526C4C12\""
+    ],
+    [
+      11,
+      162812,
+      "98d613d267c42d2d05d4e2bf3dfa6400501c4a6a93cc98f9b0c884c09849da04",
+      "\"0x8DF254D5288A978\""
+    ],
+    [
+      18,
+      177123,
+      "010d08c1d6625b3dd3a2e0549efab08622727bc0e4b91d4a7a47bfe675010ab9",
+      "\"0x8DF254D52A1FA2B\""
+    ],
+    [
+      10,
+      164612,
+      "a62443fe8a1aadbab90c2fd94e91d47d0509723271d1ca631dd10ecd5bdf5bfa",
+      "\"0x8DF254D52BFDE07\""
+    ],
+    [
+      22,
+      144800,
+      "4fd476ce15bf051a1b0d07fc827ad848f9dd9ada6f3a1612bdf788a8a0e26e3f",
+      "\"0x8DF254D52D86B7C\""
+    ],
+    [
+      6,
+      175962,
+      "9e6e93cd7b2755005f1610a8be6dca6e915946e98baff61b7d18b399940f4c58",
+      "\"0x8DF254D52EF4B8C\""
+    ],
+    [
+      2000,
+      169193,
+      "111aeb1953b4a0182ddcfaa4491f327fc51d6c671f037bbecda6f5ffaa61d99c",
+      "\"0x8DF254D5306EEAA\""
+    ]
+  ],
+  "scope": "detection_pair_selection_full_original_segmentation_not_4D",
+  "episodes": 12,
+  "original_frames": 7023,
+  "selected_pairs": 8,
+  "abstentions": 4,
+  "semantic_qa": "not_adopted_pending_user_review",
+  "accuracy_verified": false,
+  "heldout_validation": false,
+  "baseline_modified": false,
+  "ground_truth_used": false,
+  "manual_predictions": false,
+  "total_tiny_qa_bytes": 2707375,
+  "visual_findings": [
+    "episode14 now targets visible pan, not background object; intermittent mask absence remains",
+    "episode1 native selected ring ID absent after early interval; temporal identity/coverage insufficient",
+    "episode9 selected native object ID lacks initial/final visible interval; no ID stitching applied"
+  ],
+  "next_general_questions": [
+    "recover proposal recall when official object description yields empty bank",
+    "resolve native track fragmentation automatically using original temporal evidence",
+    "bound structured-output repair inside uncertainty rounds without per-episode prompts"
+  ]
+}

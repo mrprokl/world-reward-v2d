@@ -97,3 +97,24 @@ Primary inspiration, not exact code reproduction:
   whitelisted view must now equal both its native and checkpoint complex base.
   Reuse this pinned immutable runtime/weight in a new result namespace; no new
   model download/build and no scientific parameter changes.
+
+## Actual broad diagnostic result
+
+- SAM producerd86ddd3, selectora98e9483, CPUQA9650960e. Twelveclips,7023
+  original frames, two banks per clip; no candidate capacity drops. Exact64
+  derived RoPE buffer proofs and complete learned-parameter coverage passed.
+- SAM1447.25s (24.12min), Qwen163.07s (9calls/757generated tokens), saved
+  CPUQA/publication11.94s. GPU allocated peaks35.60GB/24.56GB respectively.
+  Preparation reused exact prior image/checkpoint in2.26s with0downloads/builds.
+- Automatic decisions8selected/4abstained. Empty object bank:7/18/6.
+  Qwen invalid evidence-frame indices:13. These remain in the cohort.
+  **8selected is not8correct** and is not a measured accuracy.
+- Visual inspection:14now follows the foreground pan (occasional absence).
+  Native ring ID in1 disappears after its early interval despite later visible
+  ring;9also lacks initial/final selected-ID mask coverage. The no-stitch first
+  protocol deliberately exposes fragmentation. Do not adopt as complete frontend.
+- Pending user qualitative QA. Next general issues: proposal recall, automatic
+  temporal identity continuity, and bounded schema repair. No per-clip prompts,
+  labels, object geometry correction or trajectory fitting added.
+- Tiny SHA/ETag-bound QA17JPEGs total2,707,375bytes transferred locally; all
+  videos, model weights, full banks and rendering stay Azure. Baseline intact.
