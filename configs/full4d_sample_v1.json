@@ -1,0 +1,20 @@
+{
+  "schema": "world_reward.full4d_sample.v1",
+  "scope": "uniform_random_four_clip_full_pipeline_visual_diagnostic_not_heldout_evaluation",
+  "sampling": {"population": 30, "seed": 20261008, "count": 4, "replacement": false},
+  "episodes": [9, 1, 14, 7],
+  "resample_failed_clips": false,
+  "geometry_policy": "fixed_whole_surface_identity_or_qualified_QSlim_no_volume_repair",
+  "grounding_config": "configs/task_grounding_pilot_v1.json",
+  "model_folder": "results/task-grounding-pilot-a9419e0332e3c6258a8022e9286eaafb04dce223/model",
+  "body_image": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "object_image": "sha256:eb389b26358c49778a14303b5875c66d887824011388ce9f8666ed7cc1841ce5",
+  "sam_image": "sha256:53b33bc4b60e0e3e8f83b401775b4701b18eef54408fd585fbe3a5d376c042e1",
+  "pilot_budget_seconds": 28800,
+  "budgets": {"ground": 900, "track": 1800, "sparse": 900, "surface": 740, "body_full": 1800, "depth_full": 1800, "adapter": 600, "object_pose": 7200, "inputs": 1800, "prepare": 650, "forward": 950, "refined": 7250, "export": 650, "video": 900},
+  "native_refinement_steps": 300,
+  "virtual_floor_only": true,
+  "ground_truth_used": false,
+  "manual_labels": false,
+  "challenge_performance_verified": false
+}

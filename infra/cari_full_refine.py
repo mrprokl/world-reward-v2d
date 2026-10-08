@@ -13,6 +13,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from world_reward.artifact_paths import episode_relative, pin_path as artifact_pin_path
 import platform
 import re
 import signal
@@ -36,7 +37,7 @@ BODY_ASSET_RELATIVE = "weights/cari4d/sam3d_body/checkpoints/sam-3d-body-dinov3"
 def output_relative(episode):
     if type(episode) is not int or not 0 <= episode < 30:
         raise ValueError("Explicit Track1 episode integer in 0..29 required")
-    return f"outputs/episode_{episode:06d}/cari_shared_refined_v1"
+    return episode_relative(episode) + "/cari_shared_refined_v1"
 
 
 def parser():
@@ -183,7 +184,7 @@ def validate_refinement_report(report, spec):
 def source_helpers(code):
     names = ("infra/cari_full_refine.py", "infra/run_cari_full_refine.sh", "infra/cari_full_forward.py",
              "infra/run_cari_full_forward.sh", "infra/cari_refine.py", "infra/cari_converter.py",
-             "infra/cari_clip_inputs.py", "infra/cari96_inputs.py", "infra/body_smoke.py")
+             "infra/cari_clip_inputs.py", "src/world_reward/artifact_paths.py", "infra/cari96_inputs.py", "infra/body_smoke.py")
     return {name:identity(code/name) for name in names}
 
 
@@ -231,7 +232,7 @@ def verify_refined_artifacts(root, code, spec, pins, source_code=None):
     """
     import cari_full_forward as forward
     selected = pinned_refined_report(root,spec,pins)
-    fp = code/f"configs/cari_clip_{spec.episode_index:06d}_shared_forward_pins.json"
+    fp = artifact_pin_path(code, spec.episode_index, "shared_forward")
     preceding=(forward.verify_forward_artifacts(root,code,spec,json.loads(identity_and_read(fp)))if source_code is None else
         forward.verify_forward_artifacts(root,code,spec,json.loads(identity_and_read(fp)),source_code=source_code))
     source_code=code if source_code is None else source_code
@@ -257,7 +258,7 @@ def verify_refined_artifacts(root, code, spec, pins, source_code=None):
     if (report.get("source_helpers") != helpers
             or report.get("script_sha256") != helpers["infra/cari_full_refine.py"]["sha256"]):
         raise ValueError("Refinement helper source changed")
-    ownpin=code/f"configs/cari_clip_{spec.episode_index:06d}_shared_refined_pins.json"
+    ownpin=artifact_pin_path(code, spec.episode_index, "shared_refined")
     if json.loads(identity_and_read(ownpin))!=pins:raise ValueError("Explicit refined pins differ from bundled config")
     frozen = {Path(path):row for path,row in preceding["bindings"].items()};frozen.update(selected["bindings"])
     native=root/"vendor/video_to_data/reconstruction/modules/v2d_cari4d/lib/cari4d"
@@ -293,7 +294,7 @@ def identity_and_read(path):
 
 def run(root, out, code, episode, report, persist):
     import cari_full_forward as forward
-    pin = code/f"configs/cari_clip_{episode:06d}_shared_forward_pins.json"
+    pin = artifact_pin_path(code, episode, "shared_forward")
     pin_id=identity(pin);pins=json.loads(pin.read_text());spec=inputs.PublicClipSpec(**pins["clip_spec"])
     if spec.episode_index!=episode:raise ValueError("Explicit episode differs from pinned full clip")
     selected=forward.verify_forward_artifacts(root,code,spec,pins)

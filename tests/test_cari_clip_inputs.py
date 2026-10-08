@@ -297,7 +297,7 @@ def test_actual_wrapper_enumerator_remains_stdlib_only_and_selects_exact_fifteen
     infra = Path(__file__).resolve().parents[1] / "infra"
     fragment = (infra / wrapper).read_text().split("<<'PYPATHS'\n", 1)[1].split("\nPYPATHS", 1)[0]
     argv = ["-", str(pin), str(tmp_path / "unused-prepare-pin.json"), "9"] if wrapper == "run_cari_full_forward.sh" else ["-", str(pin), "9"]
-    program = f"import sys;sys.path.insert(0,{str(infra)!r});sys.argv={argv!r}\n" + fragment
+    program = f"import sys;sys.path[:0]=[{str(infra)!r},{str(infra.parent / 'src')!r}];sys.argv={argv!r}\n" + fragment
     result = subprocess.run([sys.executable, "-I", "-B", "-S", "-c", program], capture_output=True, text=True, timeout=5)
     assert result.returncode == 0, result.stderr
     assert result.stdout.splitlines() == sorted(gate.source_paths(spec, object_source=profile))

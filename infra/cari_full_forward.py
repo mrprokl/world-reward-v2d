@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from world_reward.artifact_paths import episode_relative, pin_path as artifact_pin_path
 import platform
 import re
 import signal
@@ -39,7 +40,7 @@ FORWARD_FILES = {"coconet.pth", "report.json"}
 
 def output_relative(episode):
     prepare.output_relative(episode)  # Exact Python integer, Track1 episode 0..29.
-    return f"outputs/episode_{episode:06d}/cari_shared_forward_v1"
+    return episode_relative(episode) + "/cari_shared_forward_v1"
 
 
 def identity(path, *, immutable=False):
@@ -131,7 +132,7 @@ def verify_prepare_artifacts(root, code, spec, pins, input_pins, source_code=Non
     source_files={name:identity(root/name) for name in input_pins["source_files"]}
     if source_files!=input_pins["source_files"]:raise ValueError("Every original public input SHA/bytes required")
     report=json.loads((directory/"report.json").read_text());validate_prepare_report(report,spec,pins,input_pins)
-    pin_path=code/f"configs/cari_clip_{spec.episode_index:06d}_input_pins.json"
+    pin_path=artifact_pin_path(code, spec.episode_index, "input")
     if (json.loads(pin_path.read_text())!=input_pins or report.get("input_pins")!=identity(pin_path,immutable=True)
             or report.get("source_helpers")!=prepare.source_helpers(source_code)
             or identity(source_code/"infra/cari_shared_prepare.py",immutable=True)["sha256"]!=pins["prepare"]["script_sha256"]):
@@ -429,8 +430,8 @@ def verify_forward_artifacts(root,code,spec,pins,source_code=None):
     directory=root/output_relative(spec.episode_index);files=_frozen_inventory(directory,pins["forward_files"])
     report=json.loads((directory/"report.json").read_text());validate_forward_report(report,spec)
     _expected(report,{k:pins["forward"][k] for k in ("producer_revision","script_sha256")},"Actual forward producer differs")
-    input_path=code/f"configs/cari_clip_{spec.episode_index:06d}_input_pins.json"
-    prepare_path=code/f"configs/cari_clip_{spec.episode_index:06d}_shared_prepare_pins.json"
+    input_path=artifact_pin_path(code, spec.episode_index, "input")
+    prepare_path=artifact_pin_path(code, spec.episode_index, "shared_prepare")
     input_pins=json.loads(input_path.read_text());prepare_pins=json.loads(prepare_path.read_text())
     checked=(verify_prepare_artifacts(root,code,spec,prepare_pins,input_pins)if source_code is None else
         verify_prepare_artifacts(root,code,spec,prepare_pins,input_pins,source_code=source_code))
@@ -478,8 +479,8 @@ def verify_forward_artifacts(root,code,spec,pins,source_code=None):
 
 
 def run(root,out,code,episode,report,persist):
-    input_path=code/f"configs/cari_clip_{episode:06d}_input_pins.json"
-    prepare_path=code/f"configs/cari_clip_{episode:06d}_shared_prepare_pins.json"
+    input_path=artifact_pin_path(code, episode, "input")
+    prepare_path=artifact_pin_path(code, episode, "shared_prepare")
     input_id=identity(input_path,immutable=True);prepare_id=identity(prepare_path,immutable=True)
     input_pins=json.loads(input_path.read_text());pins=json.loads(prepare_path.read_text())
     spec=inputs.PublicClipSpec(**input_pins["clip_spec"])

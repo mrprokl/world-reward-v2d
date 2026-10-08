@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+from world_reward.artifact_paths import episode_output
 import platform
 import pickle
 import sys
@@ -25,7 +26,7 @@ def main():
         raise RuntimeError("Require Azure Linux GPU container with network none")
     args = _argument_parser().parse_args()
     root = Path(os.environ["WR_ROOT"])
-    directory = root / f"outputs/episode_{args.episode:06d}/body_full"
+    directory = episode_output(root, args.episode) / "body_full"
     report_path = directory / "report.json"
     report = json.loads(report_path.read_text())
     # Old frozen reports lack this field; selected path and hashes still bind

@@ -16,6 +16,7 @@ import errno
 import shutil
 import stat
 from pathlib import Path
+from world_reward.artifact_paths import episode_output, pin_path as artifact_pin_path
 import platform
 import sys
 import time
@@ -103,12 +104,12 @@ def _solid_preflight(root, episode, inputs, report, pose_path, np, *, query_requ
     """Independent frozen proposal and full trajectory, before reserving output."""
     from solid_geometry_loader import load, identity, strict_json, SOURCE_HELPERS
     code = Path(__file__).resolve().parent.parent
-    base = root / f'outputs/episode_{episode:06d}'
+    base = episode_output(root, episode)
     if type(query_requalification) is not bool: raise ValueError('Explicit query profile required')
     if pose_path != base/'object_pose_full_solid/geometry_and_poses.npz':
         raise ValueError('Canonical solid pose source required')
     options = dict(query_requalification=True) if query_requalification else {}
-    pin_path = code / 'configs' / f'solid_mesh_{episode:06d}_pins.json'
+    pin_path = artifact_pin_path(code, episode, "solid_mesh")
     pin = identity(pin_path)
     pins = strict_json(pin_path.read_text())
     object_path, alignment_path = base / 'object_grounded/report.json', base / 'scale_smoke/report.json'
@@ -165,7 +166,7 @@ def _solid_preflight(root, episode, inputs, report, pose_path, np, *, query_requ
         raise ValueError("Meaningful solid triangles differ from independently verified padding")
     helpers = {*SOURCE_HELPERS, 'infra/cari_prepare.py', 'infra/solid_geometry_loader.py',
                'infra/mesh_precision_diagnostic.py', 'src/world_reward/mesh_geometry.py',
-               'infra/cari_wrapper_common.sh', 'infra/run_cari_prepare.sh'}
+               'infra/cari_wrapper_common.sh', 'infra/run_cari_prepare.sh', 'src/world_reward/artifact_paths.py'}
     ledger.update({code / name: identity(code / name) for name in helpers})
     _solid_recheck(ledger)
     return v, f, active, r, t, compact, topology, ledger
@@ -328,8 +329,8 @@ def _surface_preflight(root, episode, inputs, report, pose_path, np):
     """Authenticated surface and full poses, before reserving prepared inputs."""
     from surface_geometry_loader import load, identity, strict_json, recheck, preflight_geometry_and_poses, SOURCE_HELPERS
     code=Path(__file__).resolve().parent.parent
-    base=root/f'outputs/episode_{episode:06d}'
-    pinpath=code/'configs'/f'surface_mesh_{episode:06d}_pins.json'
+    base=episode_output(root, episode)
+    pinpath=artifact_pin_path(code, episode, "surface_mesh")
     pin=identity(pinpath);pins=strict_json(pinpath.read_bytes())
     objectpath=base/'object_grounded/report.json';alignment=base/'scale_smoke/report.json'
     transformpath=base/'object_grounded/transform.json'
@@ -362,7 +363,7 @@ def _surface_preflight(root, episode, inputs, report, pose_path, np):
     if (r.shape != (inputs['total_frames'],3,3) or t.shape != (inputs['total_frames'],3)
             or not np.array_equal(pa,active)):
         raise ValueError('Surface original full timeline or meaningful face indices changed')
-    helpers={*SOURCE_HELPERS,'infra/cari_prepare.py','infra/cari_wrapper_common.sh','infra/run_cari_prepare.sh'}
+    helpers={*SOURCE_HELPERS,'infra/cari_prepare.py','infra/cari_wrapper_common.sh','infra/run_cari_prepare.sh','src/world_reward/artifact_paths.py'}
     ledger.update({code/n:identity(code/n) for n in helpers})
     recheck(ledger)
     return pv,pf,pa,r,t,compact,topology,ledger
@@ -425,7 +426,7 @@ def main():
     from prep.mhr_depth_h5 import MHRDepthH5Writer, validate_depth_h5, read_metric_depth
     from prep.mhr_depth_backend import MOGE2_MODEL_ID, MOGE2_MODEL_REVISION, MOGE2_SOURCE_COMMIT
     from prep.mhr_export_utils import MHR_CAMERA_NAMES, frame_names, read_rgb, read_mask, camera_calibration, load_edex
-    base = root / f"outputs/episode_{args.episode:06d}"
+    base = episode_output(root, args.episode)
     output = base / "cari_inputs"
     if output.exists():
         raise RuntimeError("Frozen CARI inputs exist; never overwrite")

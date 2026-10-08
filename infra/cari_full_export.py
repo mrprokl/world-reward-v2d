@@ -12,6 +12,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+from world_reward.artifact_paths import episode_relative, episode_output, pin_path as artifact_pin_path
 import platform
 import re
 import shutil
@@ -44,7 +45,7 @@ TRAJECTORY_KEYS = {"pose", "scales", "shape", "expression", "object_rotation", "
 def output_relative(episode):
     if type(episode) is not int or not 0 <= episode < 30:
         raise ValueError("Explicit Track1 episode integer in 0..29 required")
-    return f"outputs/episode_{episode:06d}/cari_shared_export_v1"
+    return episode_relative(episode) + "/cari_shared_export_v1"
 
 
 def parser():
@@ -245,7 +246,7 @@ def export_geometry(params, poses, vertices, object_faces, K, spec, out, mesh,
 
 def source_helpers(code):
     names = ("infra/cari_full_export.py", "infra/run_cari_full_export.sh", "infra/cari_full_refine.py",
-        "infra/cari_shared_prepare.py", "infra/run_cari_shared_prepare.sh", "infra/cari_clip_inputs.py",
+        "infra/cari_shared_prepare.py", "infra/run_cari_shared_prepare.sh", "infra/cari_clip_inputs.py", "src/world_reward/artifact_paths.py",
         "infra/cari96_prepare.py", "infra/cari96_inputs.py", "infra/cari_refine.py", "infra/cari_converter.py", "infra/body_smoke.py",
         "src/world_reward/shared_identity.py", "src/world_reward/timeline.py", "src/world_reward/data.py",
         "src/world_reward/contracts.py", "src/world_reward/submission.py")
@@ -291,14 +292,14 @@ def validate_export_report(report, spec):
 
 
 def run(root, out, code, episode, report, persist):
-    pins_path = code / f"configs/cari_clip_{episode:06d}_shared_refined_pins.json"
+    pins_path = artifact_pin_path(code, episode, "shared_refined")
     pin_id = lineage.identity(pins_path); pins = json.loads(pins_path.read_text())
     spec = public.PublicClipSpec(**pins["clip_spec"])
     if spec.episode_index != episode:
         raise ValueError("Explicit episode differs from frozen refined clip")
     historical_path=code/f"configs/cari_clip_{episode:06d}_historical_source_pins.json"
     historical=None
-    if historical_path.exists():
+    if "WR_PIN_ROOT" not in os.environ and historical_path.exists():
         from cari_historical_source import verify_historical_source
         historical,historical_proof=verify_historical_source(root,historical_path)
         report["historical_source_binding"]=historical_proof
@@ -307,7 +308,7 @@ def run(root, out, code, episode, report, persist):
         chain=lineage.verify_refined_artifacts(root,code,spec,pins)
     producer = chain["report"]; lineage.validate_refinement_report(producer, spec)
     frozen = {Path(path): row for path, row in chain["bindings"].items()}
-    original_pin = code / f"configs/cari_clip_{episode:06d}_input_pins.json"
+    original_pin = artifact_pin_path(code, episode, "input")
     original_pin_id = lineage.identity(original_pin)
     original = public.verify_public_inputs(root, spec, json.loads(original_pin.read_text()))
     for name, row in original["source_files"].items():
@@ -358,7 +359,7 @@ def run(root, out, code, episode, report, persist):
     if (Path(optimizer.__file__).resolve() != native / lineage.contract.OPTIMIZER_RELATIVE_PATH
             or Path(sys.modules[MHRLayer.__module__].__file__).resolve() != native / "lib_mhr/mhr_layer.py"):
         raise ValueError("Actual unchanged native decoder/mesh-loader source required")
-    source_path = root / f"outputs/episode_{episode:06d}/cari_shared_forward_v1/coconet.pth"
+    source_path = episode_output(root, episode) / "cari_shared_forward_v1/coconet.pth"
     refined_path = chain["directory"] / "refined.pth"
     source = torch.load(source_path, map_location="cpu", weights_only=False)
     refined = torch.load(refined_path, map_location="cpu", weights_only=False)
@@ -427,7 +428,7 @@ def main(argv=None):
     out = root / output_relative(args.episode)
     historical_root = os.environ.get("WR_HISTORICAL_READONLY_ROOT", "0")
     if (platform.system() != "Linux" or root != Path("/srv/scenesmith/world-reward")
-            or historical_root not in ("0", "1") or os.geteuid() != (0 if historical_root == "1" else 1000)
+            or historical_root not in ("0", "1") or historical_root == "1" and "WR_PIN_ROOT" in os.environ or os.geteuid() != (0 if historical_root == "1" else 1000)
             or historical_root == "1" and os.getegid() != 0
             or {path.name for path in Path("/sys/class/net").iterdir()} != {"lo"} or os.environ["WR_IMAGE_ID"] != IMAGE
             or not re.fullmatch(r"[0-9a-f]{40}", revision) or root.resolve() != root.absolute() or code.resolve() != code.absolute()

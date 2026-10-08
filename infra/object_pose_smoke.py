@@ -21,6 +21,7 @@ from world_reward.rigid_alignment import align_observed_points
 from world_reward.mesh_geometry import normalize_degenerate_faces
 from world_reward.mesh_budget import fit_topology_preserving_budget
 from world_reward.pose_selection import select_pose_path
+from world_reward.artifact_paths import episode_output, pin_path as artifact_pin_path
 
 
 class _QueryFlag(argparse.Action):
@@ -68,12 +69,12 @@ def _load_surface_mesh(root, episode, input_sha, object_report_path, alignment_p
     """Inert independently pinned surface; no CPU solver in the GPU process."""
     from surface_geometry_loader import load, identity, strict_json
     import shutil
-    pin_path = Path(__file__).resolve().parent.parent / 'configs' / f'surface_mesh_{episode:06d}_pins.json'
+    pin_path = artifact_pin_path(Path(__file__).resolve().parent.parent, episode, 'surface_mesh')
     pin = identity(pin_path)
     values = load(root, episode, input_sha, sha256(object_report_path), sha256(alignment_path),
                   scale, pins=strict_json(pin_path.read_bytes()))
     if identity(pin_path) != pin:
-        raise ValueError('Committed surface pins changed during loading')
+        raise ValueError('Independent readonly surface pins changed during loading')
     vertices, faces, active, cleanup, canonical, receipt = values
     receipt['committed_pins_sha256'] = pin['sha256']
     original = identity(canonical)
@@ -116,7 +117,7 @@ def main() -> None:
     from PIL import Image
     from scipy.spatial.transform import Rotation
     import trimesh
-    base = root / f"outputs/episode_{args.episode:06d}"
+    base = episode_output(root, args.episode)
     output = base / ("object_pose_full" if args.full_video else "object_pose_smoke")
     if args.mesh_source=='conditioned':
         output = output.with_name(output.name+'_conditioned')

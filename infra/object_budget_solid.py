@@ -34,6 +34,12 @@ def require(ok, reason):
     if not ok: raise ValueError(reason)
 
 
+def episode_directory(episode):
+    """Storage-only namespace; imports happen after source-path initialization."""
+    from world_reward.artifact_paths import episode_output
+    return episode_output(ROOT, episode)
+
+
 def helpers(code):
     require(code.is_absolute() and code.resolve() == code and not any(p.is_symlink() for p in (code, *code.parents)), 'Canonical own source required')
     sys.path[:0] = [str(code/'infra'), str(code/'src')]
@@ -188,7 +194,7 @@ def publish(path, raw, owned):
 
 def input_binding(episode, body, build):
     require(type(episode) is int and 0 <= episode < 30, 'Original Track1 episode0..29 required')
-    inputs = body._validate_inputs(ROOT, episode_index=episode); base = ROOT/f'outputs/episode_{episode:06d}'
+    inputs = body._validate_inputs(ROOT, episode_index=episode); base = episode_directory(episode)
     paths = (ROOT/'results/input-manifest.json', ROOT/'data/track_1/meta/episodes.jsonl', inputs['video'],
         base/'automatic_masks/report.json', base/'automatic_masks/prompts.json',
         *(base/n for n in ('object_grounded/report.json', 'object_grounded/object.glb', 'object_grounded/transform.json',
@@ -538,12 +544,20 @@ def surface_modules(code):
 
 
 def surface_source(code, revision, rt, *, control=False):
+    from world_reward.artifact_paths import output_prefix
     require(Path(__file__).resolve() == code/'infra/object_budget_solid.py' and
         set(p.name for p in code.parent.iterdir()) == {'code', 'revision', 'source-sha256'}, 'Actual immutable dispatcher required')
     names = SURFACE_HELPERS + (SURFACE_REPLAY_HELPERS if control=='surface_replay_v1' else
         (SURFACE_CONTROL, 'src/world_reward/surface_pose_geometry.py') if control else
         (*SURFACE_REPLAY_HELPERS,SURFACE_REPLAY_QUALIFICATION))
-    return rt.source(ROOT, code, revision, ENTRY, names)
+    entry = ENTRY
+    if output_prefix() != 'outputs':
+        require(not control and output_prefix() == 'experiments/full4d-v1-'+revision+'/outputs',
+                'Only the exact fresh full4D production namespace is supported')
+        entry = 'run_full4d_sample'
+        names += ('src/world_reward/artifact_paths.py',)
+    result = rt.source(ROOT, code, revision, entry, names)
+    return result if entry == ENTRY else result | dict(source_entry=entry)
 
 
 def surface_qualification(code, rt, q, *, replay=False):
@@ -717,7 +731,7 @@ def surface_produce(episode, code, binary, work, left, report, rt, q, build, *, 
     if authored is None:
         inputs, sources, scale = endpoint.prerequisites(ROOT, episode)
         report.update(source_hashes=sources, original_grounded_scale=scale, input_sha256=inputs['video_sha256'], phase='raw_source')
-        original=ROOT/f'outputs/episode_{episode:06d}/object_grounded/object.glb'
+        original=episode_directory(episode)/'object_grounded/object.glb'
         authority_path,original_pin=surface_readonly_source(original,work,rt)
         checkpoint('raw_source_decode')
         v, f, report['source_geometry'] = surface_raw_source(authority_path, rt, official, np, trimesh)
@@ -1121,7 +1135,7 @@ def surface_host(episode, code, revision, rt, q, build, body, *, control=False):
     require(image['Id']==SURFACE_IMAGE,'Actual qualified image required')
     name=('wr-surface-replay-control-'if control=='surface_replay_v1'else 'wr-object-budget-surface-'+str(episode).zfill(6)+'-')+revision
     require(not build.run(['docker','ps','-aq','--filter','name=^/'+name+'$'],min(10,left())).strip(),'Preexisting container refused')
-    out=ROOT/'results'/('surface-replay-control-'+revision)if control=='surface_replay_v1'else ROOT/'results'/('object-budget-surface-control-'+revision)if control else ROOT/f'outputs/episode_{episode:06d}'/('object_budget_surface_'+revision)
+    out=ROOT/'results'/('surface-replay-control-'+revision)if control=='surface_replay_v1'else ROOT/'results'/('object-budget-surface-control-'+revision)if control else episode_directory(episode)/('object_budget_surface_'+revision)
     require(rt.canonical(out)==out and not out.exists(),'Fresh surface-only output required')
     out.mkdir(mode=0o755);out.chmod(0o755);work=out/'disposable';work.mkdir(mode=0o700);work.chmod(0o700);os.chown(work,1000,1000)
     owner=work.lstat();cid=out/'.container.cid';published={};report=dict(stage='world_reward_surface_replay_control_host_v1'if control=='surface_replay_v1'else 'world_reward_surface_consumer_control_host_v1'if control else 'world_reward_object_budget_surface_host_v1',status='fail',phase='native',
@@ -1137,6 +1151,7 @@ def surface_host(episode, code, revision, rt, q, build, body, *, control=False):
             '--tmpfs','/tmp:rw,nosuid,nodev,noexec,size=512m',*mounts,'--mount',f'type=bind,src={work},dst={work}',
             '--entrypoint','/usr/bin/env',SURFACE_IMAGE,'-i','PATH=/opt/conda/bin:/usr/local/bin:/usr/bin:/bin','HOME=/tmp',
             'WR_ROOT='+str(ROOT),'WR_CODE='+str(code),'WR_CODE_REVISION='+revision,'WR_CPU_IMAGE_ID='+SURFACE_IMAGE,
+            *[key+'='+os.environ[key] for key in ('WR_OUTPUT_PREFIX','WR_PIN_ROOT') if key in os.environ],
             'CUDA_VISIBLE_DEVICES=-1','OMP_NUM_THREADS=1','OPENBLAS_NUM_THREADS=1','PYTHONDONTWRITEBYTECODE=1',
             'python3','-I','-B',str(code/'infra/object_budget_solid.py')]
         argv+=['--domain','surface','--control','surface_replay_v1'if control=='surface_replay_v1'else 'surface_consumer_v1','--native']if control else ['--episode',str(episode),'--domain','surface','--native']
@@ -1204,7 +1219,7 @@ def surface_main():
         sys.argv[3:5]==['--domain','surface']and sys.argv[5:]in([],['--native']),'Exact surface-only enum/episode required')
     surface_profile(sys.argv[4])
     code,revision=Path(os.environ['WR_CODE']),os.environ['WR_CODE_REVISION'];require(os.environ['WR_ROOT']==str(ROOT),'Fixed root required')
-    runtime=surface_modules(code);episode=int(sys.argv[2]);work=ROOT/f'outputs/episode_{episode:06d}'/('object_budget_surface_'+revision)/'disposable'
+    runtime=surface_modules(code);episode=int(sys.argv[2]);work=episode_directory(episode)/('object_budget_surface_'+revision)/'disposable'
     return surface_native(episode,code,revision,work,*runtime)if sys.argv[5:]else surface_host(episode,code,revision,*runtime)
 
 

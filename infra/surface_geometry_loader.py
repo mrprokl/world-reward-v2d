@@ -15,6 +15,7 @@ import stat
 
 import numpy as np
 from solid_geometry_loader import identity as _solid_identity, strict_json, require, _hex, _pin, _fields
+from world_reward.artifact_paths import episode_relative, output_prefix, pin_path as artifact_pin_path
 
 CODE = Path(__file__).resolve().parent.parent
 SCHEMA = 'world_reward.surface_mesh_pins.v1'
@@ -32,6 +33,12 @@ SOURCE_HELPERS = ('infra/surface_geometry_loader.py', 'infra/solid_geometry_load
     'infra/body_smoke.py', 'src/world_reward/data.py')
 OUTPUTS = ('object_fixed_canonical.glb', 'geometry.npz', 'candidate_geometry.npz', 'mapping.json')
 MAPPING_MAX_BYTES = 256 << 20  # Same bounded ledger capacity as its CPU producer.
+
+
+def source_helpers():
+    """Bind namespace handling for new experiments; legacy pin schema stays exact."""
+    return SOURCE_HELPERS + (() if output_prefix() == 'outputs' else
+                             ('src/world_reward/artifact_paths.py',))
 
 
 def _mapping_role(path):
@@ -81,7 +88,7 @@ def _source_identity(path):
 def paths(episode, qualification_revision, producer_revision, identity_revision=None):
     require(type(episode) is int and 0 <= episode < 30, 'Exact Track1 episode required')
     for revision in (qualification_revision, producer_revision, identity_revision): _hex(revision, 40)
-    base = f'outputs/episode_{episode:06d}'
+    base = episode_relative(episode)
     proposal = base + '/object_budget_surface_' + producer_revision
     q = 'results/surface-qslim-qualify-' + qualification_revision
     return dict(report=proposal+'/report.json', native=proposal+'/native.json',
@@ -153,9 +160,9 @@ def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha
     require(type(pins) is dict and set(pins) == {'schema','episode_index','input_sha256',
         'metric_scale_baked_once','report','files','source_helpers'}, 'Independent exact surface pins required')
     _fields(pins,dict(schema=SCHEMA,episode_index=episode,input_sha256=input_sha,metric_scale_baked_once=scale))
-    pin_path=CODE/f'configs/surface_mesh_{episode:06d}_pins.json'
+    pin_path=artifact_pin_path(CODE,episode,'surface_mesh')
     pin_identity=identity(pin_path)
-    require(strict_json(pin_path.read_bytes())==pins,'Caller pins differ from independent committed proposal pins')
+    require(strict_json(pin_path.read_bytes())==pins,'Caller pins differ from independent readonly proposal pins')
     producer = pins['report']
     require(set(producer) == {'bytes','sha256','producer_revision','script_sha256'}, 'Original producer pin required')
     _pin({k:producer[k] for k in ('bytes','sha256')}); _hex(producer['producer_revision'],40); _hex(producer['script_sha256'])
@@ -169,7 +176,7 @@ def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha
         and before[names['object']]['sha256'] == object_sha and before[names['alignment']]['sha256'] == alignment_sha,
         'Independent bytes must match before interpretation')
     require(stat.S_IMODE((root/names['report']).parent.stat().st_mode) == 0o555, 'Sealed proposal namespace required')
-    require(set(pins['source_helpers']) == set(SOURCE_HELPERS), 'Exact current pure reader helper pins required')
+    require(set(pins['source_helpers']) == set(source_helpers()), 'Exact current pure reader helper pins required')
     ledger = {root/n:pin for n,pin in before.items()} | {CODE/n:pin for n,pin in configs.items()} | {pin_path:pin_identity}
     for n,pin in pins['source_helpers'].items(): _pin(pin); require(identity(CODE/n) == pin,'Current pinned math differs'); ledger[CODE/n]=pin
     records = {k:strict_json((root/names[k]).read_bytes()) for k in
@@ -192,7 +199,14 @@ def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha
     require(host['outputs'] == native['outputs'] == {n:before[names[k]] for n,k in zip(OUTPUTS,('glb','geometry','candidate','mapping'))},
             'All frozen output byte identities differ')
     bound=host['source_binding']; require(bound['helpers'][PROCESSOR]['sha256'] == producer['script_sha256'],'Original script differs')
-    ledger.update(_snapshot(root,producer['producer_revision'],'run_object_budget_solid',bound))
+    entry = bound.get('source_entry', 'run_object_budget_solid')
+    require(entry == ('run_object_budget_solid' if output_prefix() == 'outputs' else 'run_full4d_sample'),
+            'A new experiment may not relabel a legacy surface producer')
+    if entry != 'run_object_budget_solid':
+        require(entry == 'run_full4d_sample' and output_prefix() ==
+                'experiments/full4d-v1-'+producer['producer_revision']+'/outputs',
+                'Exact experiment source entry and matching revision required')
+    ledger.update(_snapshot(root,producer['producer_revision'],entry,bound))
     qualification=host['qualification']
     require(qualification['pins_identity'] == configs[QUALIFICATION] and qualification['native'] == q['native'] == before[names['qualification_native']]
         and qualification['historical_host'] == q['historical_host_report'] == before[names['qualification_host']]
@@ -307,7 +321,7 @@ def load(root,episode,input_sha,object_report_sha,alignment_sha,scale,*,pins=Non
     f=np.frombuffer(f.tobytes(),dtype=f.dtype).reshape(f.shape)
     cleanup=dict(faces=len(f),active_faces=len(active),padding_faces=len(f)-len(active),meaningful_faces_removed=0,normal_repair_performed=False)
     receipt=dict(backend='frozen_surface_identity_qslim',source_domain='surface',
-        committed_pins_sha256=identity(CODE/f'configs/surface_mesh_{episode:06d}_pins.json')['sha256'],
+        committed_pins_sha256=identity(artifact_pin_path(CODE,episode,'surface_mesh'))['sha256'],
         producer_report_sha256=ledger[root/names['report']]['sha256'],cpu_native_report_sha256=ledger[root/names['native']]['sha256'],
         cpu_producer_revision=pins['report']['producer_revision'],cpu_script_sha256=pins['report']['script_sha256'],
         metric_scale_baked_once=scale,metric_scale_already_baked=True,no_cpu_solver_executed=True,

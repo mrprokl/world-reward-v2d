@@ -27,6 +27,7 @@ from mesh_link_gate import mesh_topology, geometry_gates, _array_hash, _write, V
 from mesh_endpoint_gate import (ENDPOINT_PARAMETERS, STAGE as ENDPOINT_STAGE, endpoint_simplify,
                                source_intersections, true_hollow_containment)
 from world_reward.data import sha256
+from world_reward.artifact_paths import episode_output
 
 STAGE = 'world_reward_cpu_object_budget_endpoint'
 BUDGET_HELPER_SHA = '42ab8ab35f37b806fb1465eadd96abe43eaac04575da47a4855d08eefe6167b0'
@@ -113,7 +114,7 @@ def _provenance(record, stage, episode, video_hash):
 def prerequisites(root, episode):
     """Bind source object, grounded transform and selected-video ancestry, no RGB."""
     inputs = _validate_inputs(root, episode_index=episode)
-    base = root / f'outputs/episode_{episode:06d}'
+    base = episode_output(root, episode)
     object_path = regular(root, base / 'object_grounded/report.json')
     alignment_path = regular(root, base / 'scale_smoke/report.json')
     obj, alignment = json.loads(object_path.read_text()), json.loads(alignment_path.read_text())
@@ -205,7 +206,7 @@ def produce(root, episode, report, path):
     _, gate_hashes = experiment_gate(root)
     if sources != report['source_hashes'] or gate_hashes != report['experiment_hashes']:
         raise ValueError('Inputs changed after parent preflight')
-    base = root / f'outputs/episode_{episode:06d}'
+    base = episode_output(root, episode)
     helper = regular(root, root / 'vendor/v2d_submission_kit/v2dlb/mesh_budget.py')
     if sha256(helper) != BUDGET_HELPER_SHA: raise ValueError('Unpinned official budget helper')
     raw = _load_mesh(base / 'object_grounded/object.glb')
@@ -285,7 +286,7 @@ def main():
         raise RuntimeError('Require Linux CPU network-none executor')
     args = _argument_parser().parse_args()
     root = Path(os.environ.get('WR_ROOT', '/srv/scenesmith/world-reward'))
-    output = root / f'outputs/episode_{args.episode:06d}/object_budget_endpoint'
+    output = episode_output(root, args.episode) / 'object_budget_endpoint'
     path = output / 'report.json'
     if args.worker:
         report = json.loads(regular(root, path).read_text()); nonce = os.environ.get('WR_OBJECT_BUDGET_NONCE', '')

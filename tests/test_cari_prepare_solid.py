@@ -103,7 +103,7 @@ def source_case(prepare, tmp_path, monkeypatch):
     pose_dir.chmod(0o555)
     for name in {*loader.SOURCE_HELPERS, 'infra/cari_prepare.py', 'infra/solid_geometry_loader.py',
                  'infra/mesh_precision_diagnostic.py', 'src/world_reward/mesh_geometry.py',
-                 'infra/cari_wrapper_common.sh', 'infra/run_cari_prepare.sh'}:
+                 'infra/cari_wrapper_common.sh', 'infra/run_cari_prepare.sh', 'src/world_reward/artifact_paths.py'}:
         path = code / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(b'fake pure source'); path.chmod(0o444)
     monkeypatch.setattr(prepare, '__file__', str(code / 'infra/cari_prepare.py'))
     calls = []
@@ -325,6 +325,9 @@ def test_camera_roundtrip_never_substitutes_raw_A_positions_for_native_FP32_posi
 def native_sources(prepare, tmp_path, monkeypatch):
     import importlib
     from solid_geometry_loader import identity
+    # The native package is outside the code namespace in production. Keep the
+    # same relationship even when pytest's basetemp lives inside this checkout.
+    monkeypatch.setattr(prepare, '__file__', str(tmp_path / 'code/infra/cari_prepare.py'))
     package = tmp_path / 'trimesh'; native = tmp_path / 'native'; modules = {}; pins = {}
     for name in prepare.SOLID_TRIMESH_SOURCES:
         path = package / name; path.parent.mkdir(parents=True, exist_ok=True)

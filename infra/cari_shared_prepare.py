@@ -14,6 +14,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+from world_reward.artifact_paths import episode_relative, pin_path as artifact_pin_path
 import pickle
 import platform
 import re
@@ -39,7 +40,7 @@ INITIALIZER_KEYS = {*NATIVE_PARAMETER_DIMS, "body_model", "frames", "kids", "met
 def output_relative(episode):
     if type(episode) is not int or not 0 <= episode < 30:
         raise ValueError("Explicit Track1 episode in 0..29 required")
-    return f"outputs/episode_{episode:06d}/cari_shared_prepare_v1"
+    return episode_relative(episode) + "/cari_shared_prepare_v1"
 
 
 def parser():
@@ -237,7 +238,7 @@ def prepare_geometry(original, count, out, native_decode, native_direct, referen
 
 
 def source_helpers(code):
-    names=("infra/cari_shared_prepare.py","infra/run_cari_shared_prepare.sh","infra/cari_clip_inputs.py",
+    names=("infra/cari_shared_prepare.py","infra/run_cari_shared_prepare.sh","infra/cari_clip_inputs.py", "src/world_reward/artifact_paths.py",
            "infra/cari96_prepare.py","infra/run_cari96_prepare.sh","infra/cari96_inputs.py","infra/body_smoke.py",
            "src/world_reward/shared_identity.py","src/world_reward/timeline.py","src/world_reward/data.py")
     if any((code/name).stat().st_mode&0o222 for name in names):
@@ -246,7 +247,7 @@ def source_helpers(code):
 
 
 def run(root,out,code,episode,report,persist):
-    pins_path=code/f"configs/cari_clip_{episode:06d}_input_pins.json"
+    pins_path=artifact_pin_path(code, episode, "input")
     pin_id=inputs.identity(pins_path);pins=json.loads(pins_path.read_text())
     if pins_path.stat().st_mode&0o222:raise ValueError("Immutable externally supplied source input pins required")
     spec=inputs.PublicClipSpec(**pins["clip_spec"])

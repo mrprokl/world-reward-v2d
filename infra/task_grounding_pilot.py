@@ -105,7 +105,16 @@ def acquire(folder, cfg):
                 path.unlink()
 
 
-def inputs():
+def _episode_indices(episodes):
+    require(type(episodes) in (list, tuple) and 0 < len(episodes) <= 30
+            and all(type(episode) is int and 0 <= episode < 30 for episode in episodes)
+            and len(set(episodes)) == len(episodes), 'Unique original Track1 episode indices required')
+    return tuple(episodes)
+
+
+def inputs(episodes=(8, 9, 26)):
+    """Verify only original Track1 records, preserving the explicit sample order."""
+    episodes = _episode_indices(episodes)
     manifest = strict((ROOT/'results/input-manifest.json').read_bytes())
     require((manifest['track'], manifest['repo_id'], manifest['revision']) ==
             ('track_1', 'nvidia/video_to_data_challenge', DATASET_REVISION), 'Allowed original Track1 inputs required')
@@ -120,7 +129,7 @@ def inputs():
         path, pins[name] = file('track_1/meta/' + name)
         metadata[name] = [strict(line) for line in path.read_bytes().splitlines() if line.strip()]
     result = []
-    for episode in (8, 9, 26):
+    for episode in episodes:
         def one(name, key, val):
             rows = [r for r in metadata[name] if type(r.get(key)) is int and r[key] == val]
             require(len(rows) == 1, 'Unique official task/episode required'); return rows[0]
@@ -142,6 +151,39 @@ def inputs():
     return result
 
 
+def _runtime_inputs(code, selected_inputs=None, settings=None):
+    """Reuse frozen grounding settings on an explicit verified-input population.
+
+    Supplied rows must come from ``inputs(episodes)``: this is a schema gate,
+    not a replacement for that function's original file/metadata hash audit.
+    Model settings and generic prompt remain identical to the frozen pilot.
+    """
+    cfg = config(code)
+    if settings is not None:
+        require(type(settings) is dict and json.dumps(settings, sort_keys=True, allow_nan=False) ==
+                json.dumps(cfg, sort_keys=True, allow_nan=False), 'Frozen grounding settings required')
+    rows = inputs() if selected_inputs is None else selected_inputs
+    require(type(rows) in (list, tuple), 'Explicit verified original input rows required')
+    _episode_indices([row.get('episode') if type(row) is dict else None for row in rows])
+    def receipt(value):
+        return (type(value) is dict and set(value) == {'bytes', 'sha256'}
+                and type(value['bytes']) is int and value['bytes'] > 0
+                and type(value['sha256']) is str and len(value['sha256']) == 64
+                and all(c in '0123456789abcdef' for c in value['sha256']))
+    for row in rows:
+        require(set(row) == {'episode', 'total', 'video', 'video_pin', 'object_prompt', 'action', 'metadata_pins'}
+                and type(row['total']) is int and row['total'] >= 9
+                and type(row['video']) is str and row['video'] == str(ROOT / (
+                    f"data/track_1/videos/chunk-000/observation.images.exo_camera/episode_{row['episode']:06d}.mp4"))
+                and receipt(row['video_pin'])
+                and all(type(row[key]) is str and row[key].strip() for key in ('object_prompt', 'action'))
+                and type(row['metadata_pins']) is dict
+                and set(row['metadata_pins']) == {'episodes.jsonl', 'episodes_metadata.jsonl', 'tasks.jsonl'}
+                and all(receipt(pin) for pin in row['metadata_pins'].values()),
+                'Only verified full original Track1 conditioning and provenance allowed')
+    return cfg, list(rows)
+
+
 def views(video, total, indices):
     import cv2
     from PIL import Image
@@ -159,11 +201,12 @@ def views(video, total, indices):
     return images
 
 
-def infer(code, out, model_folder):
+def infer(code, out, model_folder, *, selected_inputs=None, settings=None):
+    cfg, rows = _runtime_inputs(code, selected_inputs, settings)
     import torch
     import transformers
     from transformers import AutoProcessor, Qwen3VLForConditionalGeneration
-    cfg = config(code); started = time.monotonic(); before = verify_model(model_folder, cfg)
+    started = time.monotonic(); before = verify_model(model_folder, cfg)
     require(torch.__version__ == '2.5.1+cu124' and transformers.__version__ == '5.3.0'
             and torch.cuda.is_available(), 'Qualified native Qwen CUDA runtime required')
     torch.manual_seed(cfg['seed']); torch.cuda.manual_seed_all(cfg['seed'])
@@ -174,7 +217,7 @@ def infer(code, out, model_folder):
             'Effective native full-frame processor differs')
     model = Qwen3VLForConditionalGeneration.from_pretrained(model_folder, trust_remote_code=False,
               local_files_only=True, dtype=torch.bfloat16, attn_implementation='sdpa').to('cuda').eval()
-    rows = inputs(); reports = []
+    reports = []
     for item in rows:
         index = item['episode']; dest = out/f'episode_{index:06d}'; dest.mkdir(mode=0o700)
         indices = fixed_frame_indices(item['total'], cfg['views']); images = views(item['video'], item['total'], indices)
@@ -214,12 +257,13 @@ def infer(code, out, model_folder):
            quality_verified=False, training_overlap_verified=False, challenge_overlap_verified=False))
 
 
-def track(code, out):
+def track(code, out, *, selected_inputs=None, settings=None):
+    cfg, rows = _runtime_inputs(code, selected_inputs, settings)
     import torch
     import numpy as np
     from PIL import Image
     from v2d.sam2.lib.video_to_masks import video_to_masks
-    cfg = config(code); started = time.monotonic(); rows = inputs(); reports = []
+    started = time.monotonic(); reports = []
     for name, expected in (('video_to_masks.py','5193404292cfc7e66053e261049e58b76d3484f92ac1124c481f9951cc4907ec'),
                            ('sam2_utils.py','603a9cea368098fd50137ad6bf4c34c81289c042d15ad1bc4a99992f744b2408')):
         require(identity(Path('/workspace/v2d_sam2/lib')/name,100000,readonly=False)['sha256']==expected,

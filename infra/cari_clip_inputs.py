@@ -12,6 +12,7 @@ import copy
 from dataclasses import asdict, dataclass
 import json
 from pathlib import Path
+from world_reward.artifact_paths import episode_relative
 import re
 
 import cari96_inputs as public
@@ -73,7 +74,7 @@ def _spec(spec):
 
 def relative_paths(spec):
     spec = _spec(spec)
-    base = "outputs/" + spec.sequence
+    base = episode_relative(spec.episode_index)
     export = base + "/cari_inputs/export/" + spec.sequence
     return {
         "export_seq": export, "depth_h5": base + "/cari_inputs/aligned_depth.h5",
@@ -109,7 +110,7 @@ def source_profile(pins):
 
 
 def dependency_paths(spec, *, object_source="default"):
-    base = "outputs/" + _spec(spec).sequence
+    base = episode_relative(_spec(spec).episode_index)
     object_source = _object_source(object_source)
     object_directory = "object_pose_full" if object_source == "default" else "object_pose_full_" + object_source
     return {"body": base + "/body_full/report.json", "depth": base + "/depth_full/report.json",
@@ -228,7 +229,7 @@ def validate_reports(root, spec, pins):
         raise ValueError("Original automatic object pose artifact SHA required")
     if object_source == "solid":
         expected_source = dict(report=deps["object"],
-            geometry_and_poses="outputs/" + spec.sequence + "/object_pose_full_solid/geometry_and_poses.npz",
+            geometry_and_poses=episode_relative(spec.episode_index) + "/object_pose_full_solid/geometry_and_poses.npz",
             geometry_and_poses_sha256=source_pose)
         if (type(report.get("object_source")) is not str or report["object_source"] != "solid"
                 or report.get("object_pose_source") != expected_source
@@ -238,7 +239,7 @@ def validate_reports(root, spec, pins):
             raise ValueError("Pinned solid source/report/pose SHA must agree with the preparation")
     elif object_source == "surface":
         expected_source=dict(report=deps['object'],
-            geometry_and_poses='outputs/'+spec.sequence+'/object_pose_full_surface/geometry_and_poses.npz',
+            geometry_and_poses=episode_relative(spec.episode_index)+'/object_pose_full_surface/geometry_and_poses.npz',
             geometry_and_poses_sha256=source_pose)
         if (report.get('object_source')!='surface' or type(report.get('object_pose_source')) is not dict
                 or report['object_pose_source']!=expected_source or records['object'].get('mesh_source')!='surface'):

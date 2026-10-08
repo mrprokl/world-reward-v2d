@@ -264,7 +264,8 @@ def test_unexpected_new_output_during_replay_is_rejected(gate,tmp_path):
 def test_helper_manifest_complete_and_byte_bound_in_readonly_code_snapshot(gate,tmp_path):
     names=("infra/cari_shared_prepare.py","infra/run_cari_shared_prepare.sh","infra/cari_clip_inputs.py",
            "infra/cari96_prepare.py","infra/run_cari96_prepare.sh","infra/cari96_inputs.py","infra/body_smoke.py",
-           "src/world_reward/shared_identity.py","src/world_reward/timeline.py","src/world_reward/data.py")
+           "src/world_reward/shared_identity.py","src/world_reward/timeline.py","src/world_reward/data.py",
+           "src/world_reward/artifact_paths.py")
     for name in names:
         path=tmp_path/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(name);path.chmod(0o444)
     rows=gate.source_helpers(tmp_path)

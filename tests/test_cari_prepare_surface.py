@@ -135,6 +135,7 @@ def test_surface_preflight_uses_independent_canonical_counts(consumers,tmp_path,
         path.chmod(0o444)
     for n in ('cari_prepare.py','cari_wrapper_common.sh','run_cari_prepare.sh'):
         write(code/'infra'/n,b'explicit mocked consumer source for unit test only')
+    write(code/'src/world_reward/artifact_paths.py', b'explicit mocked namespace source for unit test only')
     pinpath=code/'configs/surface_mesh_000026_pins.json';write(pinpath,{'scope':'unit_test'})
     base=root/'outputs/episode_000026'
     write(base/'object_grounded/transform.json',{'scale':[.5,.5,.5]})
