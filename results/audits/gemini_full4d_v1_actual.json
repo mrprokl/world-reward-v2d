@@ -1,0 +1,62 @@
+{
+  "schema": "world_reward.gemini_full4d_actual.v1",
+  "status": "complete_diagnostic_not_quality_pass",
+  "date_utc": "2026-10-08",
+  "numerical_producer_revision": "052ba1554e9a573d566713a99a61d89a5f27681c",
+  "frontend_producer_revision": "b658881079871508c6b3ec14d001dc1299956996",
+  "baseline_preserved": "de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba",
+  "sampling": {"population": 30, "seed": 20261008, "cohort": [9, 1, 14, 7], "resampled": false, "held_out": false},
+  "elapsed_seconds_full4d": 7562.487273034989,
+  "elapsed_seconds_tracking": 442.0286915029865,
+  "complete_count": 2,
+  "failed_count": 2,
+  "episodes": [
+    {"episode": 9, "frames": 415, "status": "complete_full4d", "object_pose_seconds": 2441.6431596820476, "inputs_seconds": 762.2848747950047, "refined_seconds": 293.24418804002926, "video_seconds": 16.54706394695677, "mp4_bytes": 112931, "mp4_sha256": "313f3b46444a6216c8ed53a979ef874f25602eb000e9c9fbaf22f1947a6ae103"},
+    {"episode": 1, "frames": 668, "status": "fail", "phase": "scale_smoke", "cause": "midpoint object mask empty; unchanged scale smoke requires nonempty object observations", "object_empty_frames": 244, "replaced": false},
+    {"episode": 14, "frames": 442, "status": "complete_full4d", "object_pose_seconds": 1895.9878844979685, "inputs_seconds": 819.5411062620115, "refined_seconds": 215.0821264750557, "video_seconds": 17.347314190934412, "mp4_bytes": 78489, "mp4_sha256": "cb2277e64424fc8301b43a4131dafa3bddfb66c1c7ce30cd619e62a9c5219f9a"},
+    {"episode": 7, "frames": 777, "status": "fail", "phase": "scale_smoke", "cause": "midpoint object mask empty; unchanged scale smoke requires nonempty object observations", "object_empty_frames": 128, "replaced": false}
+  ],
+  "private_publication": {
+    "publication_revision": "66faf00d05a37cbd21e92f8f97f34e3c21a1e528",
+    "receipt": {"bytes": 7653, "sha256": "10baa64fb3ce456a39cb6585f159adc3208ca5dee6292099208f705335743d28"},
+    "source_report_snapshot": {"bytes": 137229, "sha256": "93a2b8c13fa82de1978140c275e37bfd462fe20fbc8c1dbee6e2e19985679b43"},
+    "episodes": [9, 14],
+    "all_four_statuses_visible": true,
+    "mp4_total_bytes": 191420,
+    "original_RGB_left_saved_4D_right": true,
+    "private_container": true,
+    "local_video_files": false,
+    "playback": "bounded on-demand loopback; no local predownload or disk cache; valid 3600 seconds per invocation"
+  },
+  "episode14_saved_only_motion": {
+    "method_source_sha256": "c91d311d7500a4f8eac693e09142fc982848f88bef30e9f226d0f81044351c31",
+    "frame_window_inclusive": [0, 59],
+    "fps": 30,
+    "columns": ["window_centroid_step_m_median", "window_rotation_step_deg_median", "window_surface_step_m_median", "full_surface_acceleration_rms_m_s2"],
+    "initial": [0.014358, 0.502583, 0.014391, 477.542814],
+    "final": [0.004244, 0.592853, 0.004512, 69.995518],
+    "object_extent_inferred_m": [0.07544312626123428, 0.21082475781440735, 0.46552732586860657],
+    "initializer": {"bytes": 66852, "sha256": "bd7786abda6e4b710977ed22e5dd7c51767ab3dfe3101d4ea860c9e89a751a52"},
+    "trajectory": {"bytes": 289851, "sha256": "3c8a2fe70aee5c35f11eee1ae8ac0952480dfad254fb4d10a355ffed5b66b761"},
+    "RGB_sha256": "f9f2bed8abe60898aef8f62c245ff03ed32f94b76b079c128e363fdfd4a7e70e",
+    "source_verification": "actual original SHA-bound export/input pins, full timelines, fixed scale, proper saved SE(3), exact native 11-field trajectory, GT/oracle off; canonical readonly single-link payloads rehashed after CPU-only measurement",
+    "limitations": "Same exported mesh within branch only; old/new meshes and scales differ. Input-relative motion proxies are not accuracy or an incentive to freeze actual motion. No RGB reread."
+  },
+  "visual_qa": {
+    "episode9": "actor and large desk retained; gross lift/reorientation shown; reconstructed geometry and contact still uncertain",
+    "episode14": "small pan-like target, not old broad wrong object; frame0, midclip 7.14s and tail inspected; lifted human-object layout plausible; tiny preview cannot certify handle/contact or pose accuracy",
+    "human_prediction_edits": false,
+    "scale_or_ground_calibrated": false,
+    "ground_only_a_fixed_assumed_display_plane": true,
+    "heldout_accuracy_verified": false,
+    "jitter_fixed": false
+  },
+  "checks": {"targeted_tests_passed": 168, "native_success_not_inferred_from_tests": true},
+  "decision": "Keep causal result and baseline. Next isolate automatic occlusion recovery, then persistent RGB/canonical sequence-level pose constraints. Pose and input serialization dominate cost; reuse saved predictions for controlled downstream ablations rather than repeating every learned stage.",
+  "ground_truth_used": false,
+  "manual_test_labels_used": false,
+  "per_frame_alignment": false,
+  "per_frame_scale": false,
+  "heavy_processing_local": false,
+  "leaderboard_superiority_verified": false
+}
