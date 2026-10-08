@@ -153,6 +153,36 @@ def control(args, timeout=30):
 
 def prepare(code, out, revision, binding):
     c, _ = settings(code); start = time.monotonic(); deadline = start+c['prepare_budget_seconds']
+    if 'reuse_runtime' in c:
+        reuse=c['reuse_runtime'];old_revision=reuse['producer_revision']
+        require(re.fullmatch('[0-9a-f]{40}',old_revision) is not None,'Exact prior runtime revision required')
+        old=canonical(ROOT/'results'/('hybrid-pair-'+old_revision)/'runtime')
+        require(identity(old/'prepare-report.json',200_000)==reuse['prepare_pin'],'Pinned prepared runtime receipt differs')
+        prior=strict((old/'prepare-report.json').read_bytes())
+        old_code=ROOT/'jobs'/old_revision/ENTRY/'code'
+        require(prior['status']=='pass' and prior['producer_revision']==old_revision
+                and source(ROOT,old_code,old_revision,ENTRY,HELPERS)==prior['source_binding']
+                and identity(code/'infra/Dockerfile.sam31',2_000_000)==prior['source_binding']['helpers']['infra/Dockerfile.sam31']
+                and prior['source_revision']==c['source_revision'] and prior['source_tree']==c['source_tree']
+                and prior['model_revision']==c['model_revision'] and prior['model']==c['model_repo']
+                and prior['docker_base']==c['docker_base'],'Prepared runtime source/model/Docker binding differs')
+        weight=canonical(Path(prior['weight_file']))
+        require(weight==old/c['weight_file'] and identity(weight,c['weight_bytes'])==prior['weight']
+                ==dict(bytes=c['weight_bytes'],sha256=c['weight_sha256']),'Exact reusable checkpoint required')
+        image=strict(control(['docker','image','inspect',prior['image_id']]))[0]
+        require(image['Id']==prior['image_id'] and image['Os']=='linux' and image['Architecture']=='amd64'
+                and image['Config']['Labels']['world_reward.sam31.revision']==old_revision
+                and image['Config']['Labels']['world_reward.sam31.source']==prior['source_binding']['closure_sha256'],
+                'Exact prior immutable runtime image required')
+        require(identity(old/'requirements-actual.txt')==prior['requirements'],'Actual runtime requirements changed')
+        prep=out/'runtime';prep.mkdir(mode=0o700)
+        write(prep/'requirements-actual.txt',(old/'requirements-actual.txt').read_bytes(),mode=0o444)
+        receipt=dict(prior,producer_revision=revision,source_binding=binding,
+                elapsed_seconds=time.monotonic()-start,reused_runtime=True,
+                runtime_producer_revision=old_revision,prior_prepare_pin=reuse['prepare_pin'],
+                requirements=identity(prep/'requirements-actual.txt'),new_downloads=0,new_builds=0)
+        save(prep/'prepare-report.json',receipt)
+        return receipt
     prep = out/'runtime'; prep.mkdir(mode=0o700); context = prep/'context'; context.mkdir(mode=0o700)
     tag = 'world-reward/sam31:'+revision
     require(subprocess.run(['docker', 'image', 'inspect', tag], capture_output=True).returncode != 0,
@@ -237,17 +267,45 @@ def verify_runtime_source(prep):
 
 
 def verify_checkpoint_coverage(model, weight):
-    """The upstream merged-checkpoint loader is non-strict: require full coverage."""
+    """Require learned coverage; prove only source-generated RoPE views absent.
+
+    Pinned vitdet.py registers ``freqs_cis_real/imag`` as exact views of
+    ``freqs_cis``. The official checkpoint retains the complex base but omits
+    those two derived buffers. No learned tensor or other buffer is exempted.
+    """
     import torch
     checkpoint=torch.load(weight,map_location='cpu',weights_only=True)
     if 'model' in checkpoint and isinstance(checkpoint['model'],dict):checkpoint=checkpoint['model']
     require(not any(k.startswith(('sam3_model.','sam2_predictor.')) for k in checkpoint),
             'Official already-remapped checkpoint keys required')
     native=model.state_dict()
-    require(set(checkpoint)==set(native)
-        and all(tuple(checkpoint[k].shape)==tuple(native[k].shape) for k in native),
-        'Non-strict upstream loader left missing/unexpected model parameters')
-    return dict(checkpoint_parameters=len(checkpoint),model_parameters=len(native),complete_key_shape_coverage=True)
+    learned={name for name,_ in model.named_parameters()}
+    unexpected=set(checkpoint)-set(native);missing=set(native)-set(checkpoint)
+    require(not unexpected and learned <= set(checkpoint)
+        and all(tuple(checkpoint[k].shape)==tuple(native[k].shape) for k in checkpoint),
+        'Non-strict upstream loader left missing learned/unexpected/incorrect-shaped tensors')
+    proofs=[]
+    for name in sorted(missing):
+        match=re.fullmatch(r'(detector\..*\.blocks\.[0-9]+\.attn\.)freqs_cis_(real|imag)',name)
+        require(match is not None and name not in learned,
+                'Checkpoint misses a tensor other than whitelisted derived RoPE buffers')
+        prefix,part=match.groups();base_name=prefix+'freqs_cis'
+        require(base_name in native and base_name in checkpoint,
+                'Derived RoPE proof requires native and checkpoint complex base')
+        base=native[base_name].detach().cpu();saved_base=checkpoint[base_name].detach().cpu()
+        derived=native[name].detach().cpu();view=getattr(base,part);saved_view=getattr(saved_base,part)
+        require(base.is_complex() and saved_base.is_complex()
+            and torch.equal(base,saved_base) and tuple(derived.shape)==tuple(view.shape)
+            and torch.equal(derived,view) and torch.equal(derived,saved_view),
+            'Absent derived RoPE buffer differs from deterministic native/checkpoint base')
+        proofs.append(dict(buffer=name,base=base_name,part=part,
+            native_base_equals_checkpoint=True,derived_equals_native_view=True,
+            derived_equals_checkpoint_view=True))
+    require(missing=={p['buffer'] for p in proofs},'All absent tensors require exact derived-buffer proof')
+    return dict(checkpoint_parameters=len(checkpoint),model_parameters=len(native),
+        learned_parameters=len(learned),complete_learned_key_shape_coverage=True,
+        complete_key_shape_coverage=not missing,unexpected_keys=[],missing_learned_parameters=[],
+        derived_buffer_proofs=proofs,derived_buffer_count=len(proofs))
 
 
 def mask_records(output, height, width):
@@ -398,8 +456,11 @@ def run(code, revision):
                 '--gpus','all','--network','none','--read-only','--user','0:0','--cap-drop','ALL',
                 '--security-opt','no-new-privileges','--memory','64g','--cpus','16','--shm-size','2g',
                 '--tmpfs','/tmp:rw,nosuid,size=2g']
-            for p,ro in [(code.parent,True),(out,False),(ROOT/'results/input-manifest.json',True),
-                         (ROOT/'data/track_1/meta',True)]+[(ROOT/f'data/track_1/videos/chunk-000/observation.images.exo_camera/episode_{ep:06d}.mp4',True) for ep in h['episodes']]:
+            mounts=[(code.parent,True),(out,False),(ROOT/'results/input-manifest.json',True),
+                    (ROOT/'data/track_1/meta',True)]
+            if not Path(prep['weight_file']).is_relative_to(out):mounts.append((Path(prep['weight_file']).parent,True))
+            mounts += [(ROOT/f'data/track_1/videos/chunk-000/observation.images.exo_camera/episode_{ep:06d}.mp4',True) for ep in h['episodes']]
+            for p,ro in mounts:
                 canonical(p);command+=['--mount',f'type=bind,src={p},dst={p}'+(',readonly' if ro else '')]
             command+=['--entrypoint','/usr/bin/env',prep['image_id'],'-i','PATH=/usr/local/bin:/usr/bin:/bin',
                 'HOME=/tmp','PYTHONPATH=/opt/sam3:'+str(code/'src')+':'+str(code/'infra'),

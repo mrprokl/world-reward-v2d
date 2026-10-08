@@ -91,3 +91,9 @@ Primary inspiration, not exact code reproduction:
   receipts, and store bytes read-only. No weight/GPU inference occurred.
   Eager-import audit also found required `einops`/`psutil`; pin and import-check
   them before GPU execution. Same cohort, models and scientific settings.
+- Producer4351c44 runtime preparationPASS327.61s, exact weight/image verified.
+  First GPU checkpoint gate rejected64 absent generated RoPE real/imag buffers
+  before any clip inference. Learned coverage remains mandatory; every absent
+  whitelisted view must now equal both its native and checkpoint complex base.
+  Reuse this pinned immutable runtime/weight in a new result namespace; no new
+  model download/build and no scientific parameter changes.

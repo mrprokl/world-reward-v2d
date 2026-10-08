@@ -23,5 +23,12 @@
   "ground_truth_used": false,
   "quality_verified": false,
   "training_overlap_verified": false,
-  "challenge_overlap_verified": false
+  "challenge_overlap_verified": false,
+  "reuse_runtime": {
+    "producer_revision": "4351c442b3265d28dbecd850ac16028eb52e9361",
+    "prepare_pin": {
+      "bytes": 36407,
+      "sha256": "a3f423e4a2c77860a87849ff7a7a452caa1f89ccb50d1adf2ad1496aa5df8d7d"
+    }
+  }
 }
