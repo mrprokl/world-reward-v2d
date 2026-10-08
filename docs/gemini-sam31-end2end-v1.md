@@ -70,3 +70,33 @@ source-backed instance path uses one singleton tracker state per fixed ID,
 sharing the same image/backbone feature cache. This is not semantic redetection
 or a SAM2 checkpoint fallback. All six automatic boxes and full original frame
 indices are retained; native output accuracy is still unverified.
+
+### Completed tracking and next isolated recovery test
+
+Producer `b658881079871508c6b3ec14d001dc1299956996` completed all 2302 frames
+in 442.03 seconds. Episodes 9/14 have no empty object observations; episodes
+1/7 have 244/128. These counts cannot distinguish true occlusion from dropout.
+The pinned native source keeps all three conditioning frames (attention limit
+four); shared visual-cache eviction does not erase identity memory. Native
+presence logits suppress absent masks. No seed-loss bug was identified.
+
+Do not increase memory limits or fill masks blindly. A future short external
+diagnostic compares current forward tracking with an independent reverse pass
+using the same seeds plus one automatic fixed final-frame anchor. Abstain if
+that anchor is unavailable. Same-state native reverse also recomputes ordinary
+frames; a fresh state is an experimental control, not a replay-bug workaround.
+Maximum two passes and one additional VLM call. Use independent manufactured
+occlusion/distractor scenes, hidden evaluator labels, complete timelines, and
+identity/J&F/reappearance/false-visibility/time gates before adoption. Four scenes
+are a diagnostic, not a generalization claim. Persist raw native presence logits
+for diagnosis, without changing the model threshold.
+
+### Early saved-only 3D inspection
+
+`run_full4d_video_initialization` observes original frame zero from already
+completed body/scale/object stages, in a separate publication namespace. CPU-only
+Azure rendering shows RGB, new masks, and the exact initial human/object geometry
+on an assumed floor. It never fits, modifies, rescales or replaces predictions.
+This is explicitly **initial 3D**, not a complete 4D video or motion validation.
+The numerical job and baseline remain untouched; its proper full-T export/video
+is the later temporal QA deliverable.
