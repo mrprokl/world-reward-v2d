@@ -1,0 +1,30 @@
+{
+  "schema": "world_reward.gemini_initial3d_actual.v1",
+  "status": "pass_saved_initialization_visual_only",
+  "numerical_producer_revision": "052ba1554e9a573d566713a99a61d89a5f27681c",
+  "publication_revision": "e9fc4059fe2dba646db268f9d1a2e12d060a9252",
+  "original_cohort": [9, 1, 14, 7],
+  "rendered_episodes_at_capture": [9],
+  "render_seconds": 5.660791712929495,
+  "source_report": {
+    "bytes": 16256,
+    "sha256": "f7381ee64ec433b63e1a0bf47ba7025d0e9eec261e3e0a24e853c5ccc78482c3"
+  },
+  "jpeg": {
+    "bytes": 43013,
+    "sha256": "aefa3948fbd5893547cf88fc9f5a1356ba67a1cfa1db74da3301b8e7b5fbf614",
+    "name": "full4d-e9fc4059fe2dba646db268f9d1a2e12d060a9252/episode_004009.jpg",
+    "etag": "\"0x8DF2569C602A0D6\""
+  },
+  "visual_qa": "frame0 target desk and actor are present; gross layout plausible; partial single-view geometry still uncertain",
+  "frame_indices_rendered": [0],
+  "full_4D_produced": false,
+  "temporal_quality_verified": false,
+  "ground_truth_used": false,
+  "human_labels_changed": false,
+  "prediction_fitting_performed": false,
+  "gpu_rendering_used": false,
+  "heavy_media_transferred_locally": false,
+  "physical_scale_or_ground_verified": false,
+  "baseline_modified": false
+}
