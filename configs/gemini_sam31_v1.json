@@ -1,0 +1,48 @@
+{
+  "schema": "world_reward.gemini_sam31.v1",
+  "episodes": [
+    9,
+    1,
+    14,
+    7
+  ],
+  "sampling": {
+    "population": 30,
+    "seed": 20261008,
+    "count": 4,
+    "replacement": false,
+    "result": [
+      9,
+      1,
+      14,
+      7
+    ]
+  },
+  "gemini_producer": "b6f0a89a28c3a1b6214cf043c86a5e376da6ac8e",
+  "gemini_native_report": {
+    "bytes": 42745,
+    "sha256": "9498a201a8376f0df04951bad9ab451372bb4fdeaee10460f5b0912f00ac0260"
+  },
+  "frames": [
+    0,
+    14,
+    29
+  ],
+  "sam_runtime_config": "configs/sam31_runtime_v1.json",
+  "runtime_image": "sha256:bb605dfee347a046f84ee89a82d760ce637f644e33243625fdfa61d45efb582b",
+  "sam_episode_budget_seconds": 1200,
+  "sam_budget_seconds": 5400,
+  "max_jpeg_bytes": 180000,
+  "baseline_modified": false,
+  "ground_truth_used": false,
+  "manual_labels": false,
+  "quality_verified": false,
+  "training_overlap_verified": false,
+  "challenge_overlap_verified": false,
+  "seed_policy": "all_valid_prefix_boxes_same_ids",
+  "sam_capacity": 2,
+  "sam_multiplex_count": 16,
+  "qualification_prefix_frames": 30,
+  "presence_logit_threshold": 0.0,
+  "seed": 20261008
+}
