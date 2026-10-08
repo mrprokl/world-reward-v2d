@@ -30,7 +30,9 @@ class Sources:
 
     def bind(self, path, expected=None, maximum=2 << 30):
         path = canonical(path)
-        pin = identity(path, maximum=maximum)
+        # Frontend producers were historically writable and did not seal all
+        # RGB/depth files. Hash-bind and mount them RO; never chmod baseline.
+        pin = identity(path, maximum, readonly=False)
         require(expected is None or pin == expected, 'Saved prediction identity differs')
         require(path not in self.files or self.files[path] == pin, 'Source changed')
         self.files[path] = pin
@@ -40,7 +42,7 @@ class Sources:
         return _strict(self.bind(path, expected, maximum).read_bytes())
 
     def verify(self):
-        require(all(identity(p) == pin for p, pin in self.files.items()), 'Source changed during diagnostic')
+        require(all(identity(p,2 << 30,readonly=False) == pin for p, pin in self.files.items()), 'Source changed during diagnostic')
 
 
 def stats(series):
@@ -132,7 +134,11 @@ def analyse(root, experiment, out, episode):
                 'Native GT/oracle mode forbidden')
     native = loaded['forward']
     inputs_report = bound.json(base/'cari_inputs/report.json')
-    inputs_path = bound.bind(Path(inputs_report['object_poses']), inputs_report['file_sha256']['object_poses'])
+    input_pins = bound.json(experiment/'pins'/f'cari_clip_{episode:06d}_input_pins.json')
+    inputs_path = Path(inputs_report['object_poses'])
+    input_pin = input_pins['source_files'][str(inputs_path.relative_to(root))]
+    require(input_pin['sha256'] == inputs_report['file_sha256']['object_poses'], 'Wrong native pose source')
+    bound.bind(inputs_path, input_pin)
     saved_inputs = joblib.load(inputs_path)
     inputs_poses = saved_inputs['obj_pose_world']
     _no_oracle(saved_inputs['metadata'])
