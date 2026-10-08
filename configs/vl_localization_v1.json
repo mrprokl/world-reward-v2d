@@ -1,0 +1,23 @@
+{
+  "schema": "world_reward.vl_localization.v1",
+  "episodes": [9, 1, 14, 7],
+  "baseline_revision": "de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba",
+  "grounding_config": "configs/task_grounding_pilot_v1.json",
+  "model_folder": "results/task-grounding-pilot-a9419e0332e3c6258a8022e9286eaafb04dce223/model",
+  "scope": "independent_single_image_grounding_ablation_development_visual_qa_not_heldout",
+  "frames": "union_first30_and_nine_uniform_fullclip_views",
+  "batch_size": 8,
+  "control_frames": [0, 29],
+  "encoding_control": "exact_unpadded_tokens_grid_and_processed_pixels",
+  "generation_control": "singleton_vs_batch_exact_trimmed_greedy_tokens",
+  "on_generation_control_difference": "global_singleton_no_best_output_selection",
+  "gpu_budget_seconds": 1800,
+  "preview_budget_seconds": 240,
+  "max_jpeg_bytes": 180000,
+  "sam_executed": false,
+  "manual_labels": false,
+  "ground_truth_used": false,
+  "quality_verified": false,
+  "training_overlap_verified": false,
+  "challenge_overlap_verified": false
+}
