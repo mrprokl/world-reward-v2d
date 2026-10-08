@@ -111,6 +111,7 @@ def native(code,out):
         row['seconds']=time.monotonic()-begin;save(out/f"call_{t['ep']:06d}_{t['index']:06d}.json",row);return row
     with ThreadPoolExecutor(max_workers=c['concurrency']) as pool:rows=list(pool.map(ask,tasks))
     token=None;require(len(rows)==24,'All frozen images, including failures, required')
+    require(time.monotonic()-start<c['budget_seconds'],'Inclusive initial-image stage budget exceeded')
     font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',14)
     overview=Image.new('RGB',(1280,48+228*8),(24,27,33));draw=ImageDraw.Draw(overview)
     draw.text((8,6),'World Reward | INITIAL frames0,14,29 | cyan person / orange object | NO NEW TRACKING',font=font,fill='white')
@@ -166,11 +167,12 @@ def run():
     binding=source(ROOT,code,rev,ENTRY,HELPERS);out=ROOT/'results'/('gemini-initial-'+rev);out.mkdir(mode=0o755)
     key=ROOT/'.secrets/gemini-initial-v1-key.pem';envelope=ROOT/'.secrets/gemini-initial-v1.enc'
     start=time.monotonic();report=dict(status='fail',producer_revision=rev,source_binding=binding)
+    name='wr-gemini-initial-'+rev[:12]
     try:
         require(key.stat().st_mode&0o077==0 and envelope.stat().st_mode&0o077==0,'Private one-shot envelope required')
         r=subprocess.run(['openssl','pkeyutl','-decrypt','-inkey',str(key),'-in',str(envelope),'-pkeyopt','rsa_padding_mode:oaep','-pkeyopt','rsa_oaep_md:sha256'],capture_output=True,timeout=15)
         require(r.returncode==0 and 0<len(r.stdout)<16384,'One-shot OAuth decryption failed')
-        name='wr-gemini-initial-'+rev[:12];cmd=['docker','run','--rm','-i','--name',name,'--network','host','--read-only','--user','0:0','--cap-drop','ALL','--security-opt','no-new-privileges','--memory','8g','--cpus','8','--tmpfs','/tmp:rw,nosuid,size=1g']
+        cmd=['docker','run','--rm','-i','--name',name,'--label','world_reward.gemini_initial.owner='+rev,'--network','host','--read-only','--user','0:0','--cap-drop','ALL','--security-opt','no-new-privileges','--memory','8g','--cpus','8','--tmpfs','/tmp:rw,nosuid,size=1g']
         mounts=[(code.parent,True),(out,False),(ROOT/'results/input-manifest.json',True),(ROOT/'data/track_1/meta',True)]
         mounts += [(ROOT/'results'/(prefix+producer),True) for prefix,producer in (('hybrid-pair-',c['sam_producer']),('hybrid-pair-selection-',c['selection_producer']),('vl-localization-',c['qwen_producer']))]
         mounts += [(ROOT/f'data/track_1/videos/chunk-000/observation.images.exo_camera/episode_{ep:06d}.mp4',True) for ep in c['episodes']]
@@ -189,6 +191,11 @@ def run():
         report.update(status='complete_diagnostic_not_quality_pass',native_report=identity(out/'native-report.json'),files=files)
     except Exception as e:report['error_type']=type(e).__name__
     finally:
+        inspected=subprocess.run(['docker','inspect',name],capture_output=True,timeout=15)
+        if inspected.returncode==0:
+            actual=strict(inspected.stdout)[0]
+            require(actual['Image']==BASE and actual['Config']['Labels'].get('world_reward.gemini_initial.owner')==rev,'Owned CPU cleanup only')
+            subprocess.run(['docker','rm','-f',actual['Id']],capture_output=True,check=True,timeout=20)
         for p in (key,envelope):
             if p.exists():require(p.resolve()==p and p.stat().st_nlink==1,'Owned auth cleanup only');p.unlink()
         require(source(ROOT,code,rev,ENTRY,HELPERS)==binding,'Immutable code changed during run')
