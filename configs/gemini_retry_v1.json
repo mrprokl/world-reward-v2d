@@ -1,0 +1,33 @@
+{
+  "schema": "world_reward.gemini_retry.v1",
+  "saved_producer": "adfad8c6726087617dc9bb01c60828a8d28ce37f",
+  "expected_failed_calls": [
+    [
+      14,
+      14
+    ],
+    [
+      28,
+      29
+    ],
+    [
+      18,
+      0
+    ],
+    [
+      18,
+      14
+    ]
+  ],
+  "max_total_attempts": 3,
+  "attempt_timeout_seconds": 90,
+  "concurrency": 2,
+  "budget_seconds": 420,
+  "initial_delay_seconds": 1,
+  "max_delay_seconds": 30,
+  "request_changes_allowed": false,
+  "retry_successful_responses": false,
+  "ground_truth_used": false,
+  "manual_labels": false,
+  "quality_verified": false
+}

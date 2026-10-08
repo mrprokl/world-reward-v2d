@@ -68,3 +68,20 @@ comparison available for4episodes. No manual box/episode correction or tuning.
 Saved-only CPUzoom producer7b699c5: original box-driven context zooms, all24
 successes/timeouts retained,0additional model calls. Code/tests committed;
 external model overlap remains unknown. Heavy/source images never downloaded.
+
+## Bounded transport recovery — 2026-10-08
+
+The four historical `invalid_response` rows were all TimeoutError at60 seconds,
+not malformed model outputs. Recovery reuses exactly the same RGB/PNG/request
+SHA and only those four calls; the20 successful original responses are retained
+unchanged. Original attempt + at most2 retries (max3 total),90-second socket
+limit,2 concurrent recovery tasks,420-second inclusive stage budget. Retry only
+408/429/500/502/503/504 or proven transient network failures, exponential jitter
+and Retry-After. First technically successful response is interpreted ONCE.
+Never retry valid null/abstention, safety block or malformed response to choose
+better predictions. Explicit invalid_schema/blocked/transport error statuses;
+strict structured JSON schema and coordinate conversion unchanged. All call
+attempts logged as bounded nonsensitive ledgers, no credentials/body in logs.
+
+Source: https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/retry-strategy
+This fixes reliability, not detection accuracy. No new GPU/tracking/4D job.
