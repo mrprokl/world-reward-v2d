@@ -94,7 +94,9 @@ def _context(root, code, revision, episode):
     root, code = canonical(root), canonical(code)
     require(root == ROOT and type(revision) is str and re.fullmatch('[0-9a-f]{40}', revision),
             'Fixed Azure runtime and immutable revision required')
-    require(code == root / 'jobs' / revision / 'run_full4d_sample' / 'code', 'Actual full4D dispatcher source required')
+    entry = code.parent.name
+    require(entry in {'run_full4d_sample', 'run_gemini_full4d'}
+            and code == root / 'jobs' / revision / entry / 'code', 'Actual allowlisted full4D dispatcher source required')
     require(output_prefix() == f'experiments/full4d-v1-{revision}/outputs', 'Exact fresh revision-bound output namespace required')
     base = episode_output(root, episode)
     require(stat.S_ISDIR(code.lstat().st_mode) and not code.stat().st_mode & 0o222,
@@ -205,7 +207,7 @@ def surface_pin(root, code, revision, episode):
             'Complete fresh sealed surface host/native receipt required')
     bound = native.get('source_binding', {})
     script_sha = identity(code / 'infra/object_budget_solid.py')['sha256']
-    require(bound.get('source_entry') == 'run_full4d_sample'
+    require(bound.get('source_entry') == code.parent.name
             and bound.get('producer_revision') == revision
             and bound.get('helpers', {}).get('infra/object_budget_solid.py', {}).get('sha256') == script_sha
             and host.get('source_binding') == host.get('source_binding_after') == native.get('source_binding_after') == bound,

@@ -1,0 +1,187 @@
+"""Tiny host provenance fixtures only; never native model/data correctness."""
+import copy
+import hashlib
+import json
+import os
+from pathlib import Path
+import sys
+from types import SimpleNamespace
+
+import pytest
+
+REPO = Path(__file__).resolve().parents[1]
+sys.path[:0] = [str(REPO/'infra'), str(REPO/'src')]
+import gemini_full4d as graph
+import full4d_pins as pins
+import object_budget_solid as surface
+
+
+def payload(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    raw = json.dumps(value, sort_keys=True).encode() if type(value) is dict else value
+    path.write_bytes(raw); path.chmod(0o444)
+    return dict(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
+
+
+@pytest.mark.parametrize('mutation', ['episodes', 'manual_labels', 'ground_truth_used',
+    'jitter_fix_claimed', 'native_refinement_steps', 'resample_failed_clips', 'frontend_producer_revision'])
+def test_config_refuses_scientific_override(tmp_path, mutation):
+    cfg = json.loads((REPO/graph.CONFIG).read_bytes())
+    cfg['frontend_producer_revision'] = 'e'*40
+    cfg[mutation] = [0, 1, 2, 3] if mutation == 'episodes' else True
+    payload(tmp_path/graph.CONFIG, cfg)
+    payload(tmp_path/'configs/full4d_sample_v1.json', json.loads((REPO/'configs/full4d_sample_v1.json').read_bytes()))
+    with pytest.raises(ValueError): graph.config(tmp_path)
+
+
+def test_config_frozen_random_cohort_and_native_defaults(tmp_path):
+    cfg = json.loads((REPO/graph.CONFIG).read_bytes()); cfg['frontend_producer_revision'] = 'e'*40
+    payload(tmp_path/graph.CONFIG, cfg)
+    payload(tmp_path/'configs/full4d_sample_v1.json', json.loads((REPO/'configs/full4d_sample_v1.json').read_bytes()))
+    assert graph.config(tmp_path)['episodes'] == [9, 1, 14, 7]
+    assert graph.STAGES == __import__('full4d_sample').STAGES
+
+
+@pytest.mark.parametrize('entry', ['run_full4d_sample', 'run_gemini_full4d', 'run_unapproved'])
+def test_pin_context_requires_actual_allowlisted_source(monkeypatch, tmp_path, entry):
+    rev = 'a'*40; root = tmp_path/'root'; code = root/'jobs'/rev/entry/'code'
+    code.mkdir(parents=True); code.chmod(0o555)
+    payload(code.parent/'revision', (rev+'\n').encode()); payload(code.parent/'source-sha256', ('b'*64+'\n').encode())
+    monkeypatch.setattr(pins, 'ROOT', root)
+    monkeypatch.setenv('WR_OUTPUT_PREFIX', f'experiments/full4d-v1-{rev}/outputs')
+    if entry == 'run_unapproved':
+        with pytest.raises(ValueError): pins._context(root, code, rev, 9)
+    else: assert pins._context(root, code, rev, 9)[1] == code
+
+
+@pytest.mark.parametrize('entry', ['run_gemini_full4d', 'run_unapproved'])
+def test_surface_source_honestly_names_new_dispatcher(monkeypatch, tmp_path, entry):
+    rev = 'a'*40; root = tmp_path/'root'; code = root/'jobs'/rev/entry/'code'
+    code.mkdir(parents=True)
+    payload(code.parent/'revision', b'fixture'); payload(code.parent/'source-sha256', b'fixture')
+    monkeypatch.setattr(surface, 'ROOT', root)
+    monkeypatch.setattr(surface, '__file__', str(code/'infra/object_budget_solid.py'))
+    monkeypatch.setenv('WR_OUTPUT_PREFIX', f'experiments/full4d-v1-{rev}/outputs')
+    calls = []; rt = SimpleNamespace(source=lambda *args: calls.append(args) or dict(producer_revision=rev))
+    if entry == 'run_unapproved':
+        with pytest.raises(ValueError): surface.surface_source(code, rev, rt)
+        assert not calls
+    else:
+        result = surface.surface_source(code, rev, rt)
+        assert result['source_entry'] == entry and calls[0][3] == entry
+
+
+def test_exact_copy_is_immutable_and_does_not_overwrite(monkeypatch, tmp_path):
+    src, dst = tmp_path/'source', tmp_path/'new'
+    pin = payload(src, b'tiny numeric cache fixture')
+    monkeypatch.setattr(graph.os, 'chown', lambda *args: None)
+    graph._copy(src, dst, pin)
+    assert src.read_bytes() == dst.read_bytes() and src.stat().st_ino != dst.stat().st_ino
+    with pytest.raises(ValueError): graph._copy(src, dst, pin)
+    with pytest.raises(ValueError): graph._copy(src, tmp_path/'other', pin | {'sha256':'f'*64})
+
+
+@pytest.mark.parametrize('mutation', [None, 'gt', 'model', 'timeline', 'payload', 'source', 'calibration'])
+def test_rgb_only_depth_cache_preserves_original_receipt(monkeypatch, tmp_path, mutation):
+    root = tmp_path/'root'; original = root/'jobs'/graph.OLD/'run_full4d_sample'/'code'
+    code = tmp_path/'newcode'; script = b'# exact unchanged depth numerical producer fixture\n'
+    payload(original/'infra/depth_smoke.py', script); payload(code/'infra/depth_smoke.py', script)
+    monkeypatch.setattr(graph, 'source', lambda *args: dict(closure_sha256='a'*64))
+    monkeypatch.setattr(graph.os, 'chown', lambda *args: None)
+    monkeypatch.setattr(graph, 'reserve', lambda path, **kwargs: path.mkdir())
+    directory = root/'experiments'/('full4d-v1-'+graph.OLD)/'outputs/episode_000009/depth_smoke'
+    item = dict(episode=9, total=5, video_pin=dict(bytes=100, sha256='b'*64))
+    weight = root/f'weights/cari4d/hf_home/hub/models--Ruicheng--moge-2-vitl-normal/snapshots/{graph.DEPTH_MODEL}/model.pt'
+    weight_pin = payload(weight, b'manufactured model identity')
+    rows=[]
+    for index in (0,2,4):
+        pin = payload(directory/f'{index:06d}.npz', b'manufactured numeric output')
+        rows.append(dict(frame_index=index, output_sha256=pin['sha256'], decoded_rgb_sha256='c'*64))
+    report = dict(stage='monocular_moge2_three_frame', status='pass', episode_index=9,
+        input_track='track_1', input_sha256='b'*64, input_dataset_revision=graph.DATASET,
+        total_video_frames=5, model_revision=graph.DEPTH_MODEL,
+        intrinsics_source='RGB_size_only_default_FOV_prior_not_calibration',
+        ground_truth_used=False, hand_labeled_test=False, oracle_modes=[], network='none',
+        script_sha256=hashlib.sha256(script).hexdigest(), model_sha256=weight_pin['sha256'], frames=rows)
+    if mutation == 'gt': report['ground_truth_used'] = True
+    elif mutation == 'model': report['model_revision'] = 'f'*40
+    elif mutation == 'timeline': report['frames'][-1]['frame_index'] = 3
+    elif mutation == 'payload': report['frames'][0]['output_sha256'] = 'f'*64
+    elif mutation == 'source':
+        (code/'infra/depth_smoke.py').chmod(0o644)
+        payload(code/'infra/depth_smoke.py', b'changed numerical helper')
+    elif mutation == 'calibration': report['intrinsics_source'] = 'source_camera_calibration'
+    original_report_pin=payload(directory/'report.json', report)
+    base=tmp_path/'freshbase'; base.mkdir()
+    if mutation:
+        with pytest.raises(ValueError): graph.depth_reuse(root,code,dict(reuse_depth_only_if_exact_provenance=True),item,base,'depth_smoke')
+        assert not (base/'depth_smoke').exists()
+    else:
+        receipt=graph.depth_reuse(root,code,dict(reuse_depth_only_if_exact_provenance=True),item,base,'depth_smoke')
+        assert receipt['report']==original_report_pin and receipt['inference_replayed'] is False
+        assert (directory/'report.json').read_bytes() == (base/'depth_smoke/report.json').read_bytes()
+
+
+def test_downstream_numerical_stage_sources_are_not_patched():
+    # Contract entry metadata is the only change; no learned/model/optimizer constants.
+    assert graph.STAGES[8][2] == ('--full-video', '--mesh-source', 'surface')
+    assert graph.STAGES[-3][0] == 'refined'
+    assert graph.DEPTH_FIELDS.keys() == {'depth_smoke','depth_full'}
+
+
+def test_source_import_is_stdlib_only():
+    import subprocess
+    result = subprocess.run([sys.executable, '-B', '-c',
+        "import sys;sys.path[:0]=['infra','src'];import gemini_full4d;assert 'torch' not in sys.modules;assert 'numpy' not in sys.modules"],
+        cwd=REPO, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.parametrize('mutation', [None, 'native_pin', 'manual_prompt', 'missing_frame', 'producer_script'])
+def test_frontend_requires_exact_automatic_native_lineage_and_copies_pngs(monkeypatch, tmp_path, mutation):
+    root=tmp_path/'root'; rev='e'*40
+    monkeypatch.setattr(graph, 'ROOT', root)
+    monkeypatch.setattr(graph.os, 'chown', lambda *args: None)
+    monkeypatch.setattr(graph, 'reserve', lambda path, **kwargs: path.mkdir())
+    binding=dict(producer_revision=rev, helpers={})
+    monkeypatch.setattr(graph, 'source', lambda *args: binding)
+    source_code=root/'jobs'/rev/graph.FRONTEND_ENTRY/'code'
+    script_pin=payload(source_code/'infra/gemini_sam31_track.py', b'# tiny automatic frontend producer fixture\n')
+    aggregate_root=root/'results'/('gemini-sam31-'+rev)
+    directory=aggregate_root/'episode_000009/automatic_masks'
+    for role in ('0','1'):
+        for index in range(3): payload(directory/f'masks/{role}/{index:06d}.png', b'tiny PNG byte fixture')
+    rows, inventory, raw=graph._inventory(directory/'masks',3)
+    payload(directory/'mask-inventory.json', raw)
+    prompts=dict(prompts=[dict(object_id=role,points=None,point_labels=None,mask_path=None) for role in (0,1)])
+    if mutation=='manual_prompt': prompts['prompts'][0]['points']=[[0,0]]
+    payload(directory/'prompts.json', prompts)
+    for name in graph.FRONTEND_DIAGNOSTICS | {'grounding.json','tracking.json'}:
+        payload(directory/name, b'tiny retained metadata fixture')
+    report=dict(stage='automatic_masks',status='pass',episode_index=9,frames=3,
+        input_track='track_1',input_sha256='b'*64,ground_truth_used=False,
+        hand_labeled_test=False,oracle_modes=[],producer_revision=rev,
+        script_sha256=script_pin['sha256'],mask_inventory=inventory)
+    if mutation=='producer_script': report['script_sha256']='f'*64
+    report_pin=payload(directory/'report.json',report)
+    native=dict(schema='world_reward.gemini_sam31_tracking.v1',status='complete_diagnostic_not_quality_pass',
+        producer_revision=rev,ground_truth_used=False,manual_labels=False,
+        episodes=[dict(episode_index=9,status='pass',frames=3,report=report_pin)])
+    native_pin=payload(aggregate_root/'native-report.json',native)
+    host=dict(status='complete_diagnostic_not_quality_pass',producer_revision=rev,
+        source_binding=binding,native_report=native_pin,ground_truth_used=False)
+    if mutation=='native_pin': host['native_report']=native_pin | dict(sha256='f'*64)
+    payload(aggregate_root/'report.json',host)
+    if mutation=='missing_frame': (directory/'masks/1/000002.png').unlink()
+    dest=tmp_path/'fresh/masks'; dest.parent.mkdir()
+    item=dict(episode=9,total=3,video_pin=dict(bytes=10,sha256='b'*64))
+    if mutation:
+        with pytest.raises(ValueError): graph.frontend_adapter(dict(frontend_producer_revision=rev),item,dest)
+        assert not dest.exists()
+    else:
+        receipt=graph.frontend_adapter(dict(frontend_producer_revision=rev),item,dest)
+        assert receipt['byte_identical_copy'] and receipt['model_calls']==0
+        assert receipt['aggregate_report']==native_pin
+        assert set(p.name for p in dest.iterdir())==graph.FRONTEND_FILES | {'masks'}
+        assert graph._inventory(dest/'masks',3)[:2]==(rows,inventory)
+        assert (dest/'report.json').read_bytes()==(directory/'report.json').read_bytes()
