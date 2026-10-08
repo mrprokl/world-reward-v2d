@@ -79,6 +79,15 @@ def command(code, experiment, cfg, episode, stage, script, args, image, name, re
         '--shm-size', '2g', '--tmpfs', '/tmp:rw,nosuid,size=4g', '--gpus', 'all']
     mounts = [(code.parent, True), (ROOT/'vendor', True), (ROOT/'weights', True),
               (ROOT/'results', True), (ROOT/'data/track_1/meta', True), (experiment/'pins', True)]
+    if not grounding:
+        # The pure surface consumer authenticates these original full source
+        # closures, including their two dispatcher markers. No old predictions,
+        # compiler executable, GPU job or whole jobs directory is mounted.
+        for config_name, entry in (
+                ('configs/surface_qslim_qualification_pins.json','run_surface_qslim_qualify'),
+                ('configs/surface_identity_qualification_pins.json','run_surface_identity_qualify')):
+            producer = strict((code/config_name).read_bytes())['producer_revision']
+            mounts.append((ROOT/'jobs'/producer/entry, True))
     for ep in cfg['episodes']:
         mounts.append((ROOT/f'data/track_1/videos/chunk-000/observation.images.exo_camera/episode_{ep:06d}.mp4', True))
     if grounding:
@@ -195,7 +204,10 @@ def run():
     def remaining(budget):
         left = cfg['pilot_budget_seconds']-(time.monotonic()-started)
         require(left > 0, 'Inclusive pilot deadline reached'); return min(budget,left)
-    def interrupted(*_): raise TimeoutError('Bounded sample interrupted')
+    termination = [False]
+    def interrupted(*_):
+        termination[0] = True
+        raise TimeoutError('Bounded sample interrupted')
     signal.signal(signal.SIGTERM, interrupted); signal.signal(signal.SIGINT, interrupted)
     try:
         with (ROOT/'jobs/.world-reward-h100.lock').open('a') as lock:
@@ -238,6 +250,7 @@ def run():
                         video_report=identity(video))
                 except Exception as error:
                     row.update(status='fail',error_type=type(error).__name__,error=str(error)[:400])
+                    if termination[0]: raise
                     # Preserve the random denominator, never replace/relabel a failed clip.
                 persist()
             report.update(status='complete_diagnostic_not_quality_pass',phase='complete')

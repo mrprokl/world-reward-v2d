@@ -57,3 +57,32 @@ def test_object_native_setting_and_no_manual_prompts(monkeypatch):
     assert 'LIDRA_SKIP_INIT=1' in argv
     assert '--aligned-pointmap' in argv
     assert not any('oracle' in value.lower() for value in argv)
+
+
+@pytest.mark.parametrize('stage,script', [
+    ('object_pose', 'infra/object_pose_smoke.py'),
+    ('inputs', 'infra/cari_prepare.py'),
+])
+def test_surface_consumers_mount_complete_authenticated_original_snapshots_readonly(monkeypatch, stage, script):
+    """A valid proposal still fails before inference if its source ancestry is hidden."""
+    cfg = sample.load_config(CODE)
+    experiment = sample.ROOT / 'experiments' / ('full4d-v1-' + REV)
+    monkeypatch.setenv('WR_OUTPUT_PREFIX', str((experiment / 'outputs').relative_to(sample.ROOT)))
+    monkeypatch.setattr(sample, 'canonical', lambda path: path)
+    argv = sample.command(CODE, experiment, cfg, 9, stage, script,
+                          ('--mesh-source', 'surface'), cfg['body_image'], 'test', REV)
+    mounts = [argv[index + 1] for index, value in enumerate(argv) if value == '--mount']
+    expected = []
+    for config, entry in (
+        ('surface_qslim_qualification_pins.json', 'run_surface_qslim_qualify'),
+        ('surface_identity_qualification_pins.json', 'run_surface_identity_qualify'),
+    ):
+        revision = json.loads((CODE / 'configs' / config).read_text())['producer_revision']
+        original = sample.ROOT / 'jobs' / revision / entry
+        expected.append(original)
+        # Parent includes code AND revision/source-sha256 markers. Source-only
+        # mounts cannot satisfy surface_geometry_loader._snapshot's full census.
+        assert f'type=bind,src={original},dst={original},readonly' in mounts
+        assert not any(f'src={original},' in mount and not mount.endswith(',readonly') for mount in mounts)
+    assert f'type=bind,src={sample.ROOT / "jobs"},dst={sample.ROOT / "jobs"},readonly' not in mounts
+    assert all(path.name in ('run_surface_qslim_qualify', 'run_surface_identity_qualify') for path in expected)
