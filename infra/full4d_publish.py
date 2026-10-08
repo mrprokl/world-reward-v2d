@@ -102,10 +102,10 @@ class PrivatePreviews:
 
     def request(self, method, name=None, data=None, headers=None, *, container_acl=False):
         require(method in {'PUT', 'HEAD', 'GET', 'DELETE'}, 'Restricted preview REST method required')
-        require(container_acl is False or method == 'GET' and name is None,
-            'Only read-only container ACL validation allowed')
+        require(container_acl is False or method == 'HEAD' and name is None,
+            'Only read-only container properties validation allowed')
         if container_acl:
-            url = ENDPOINT+'?restype=container&comp=acl'
+            url = ENDPOINT+'?restype=container'
         else:
             require(type(name) is str and re.fullmatch(
                 r'full4d-[0-9a-f]{40}/(?:episode_[0-9]{6}\.(?:mp4|jpg)|manifest\.json)', name),
@@ -122,7 +122,7 @@ class PrivatePreviews:
             raise RuntimeError('Private preview operation failed') from None
 
     def require_private(self):
-        with self.request('GET', container_acl=True) as response:
+        with self.request('HEAD', container_acl=True) as response:
             require(response.status == 200 and not response.headers.get('x-ms-blob-public-access'),
                 'Existing preview container must remain private')
 
@@ -141,7 +141,7 @@ class PrivatePreviews:
         with self.request('PUT', name, raw, {'x-ms-blob-type': 'BlockBlob', 'If-None-Match': '*',
                 'Content-Type': mime, 'Content-MD5': md5, 'x-ms-blob-content-type': mime,
                 'x-ms-blob-content-disposition': 'inline', 'x-ms-blob-cache-control': 'private, no-store',
-                'x-ms-meta-sha256': pin['sha256'], 'x-ms-meta-worldreward-revision': revision}) as response:
+                'x-ms-meta-sha256': pin['sha256'], 'x-ms-meta-worldreward_revision': revision}) as response:
             require(response.status == 201, 'Exclusive private preview creation required')
             etag = response.headers['ETag']
         return dict(name=name, etag=etag, mime=mime, **pin)

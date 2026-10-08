@@ -99,3 +99,27 @@ def test_nonpreview_endpoint_and_credential_strings_not_accepted():
     for name in ('../other.mp4', 'runtime-transfers/image.tar', 'full4d-'+('a'*40)+'/model.npz',
             'full4d-'+('a'*40)+'/episode_000001.mp4?sig=secret'):
         with pytest.raises(ValueError): client.request('PUT', name)
+
+
+def test_private_properties_need_no_acl_permission_and_metadata_name_is_valid(monkeypatch):
+    from types import SimpleNamespace
+    import re
+    client = publish.PrivatePreviews()
+    monkeypatch.setattr(client, 'authorization', lambda: {})
+    requests = []
+    class Response:
+        status = 200
+        headers = {}
+        def __enter__(self): return self
+        def __exit__(self, *_): pass
+    monkeypatch.setattr(client.opener, 'open', lambda request, **_: requests.append(request) or Response())
+    client.require_private()
+    assert requests[0].method == 'HEAD'
+    assert requests[0].full_url == publish.ENDPOINT+'?restype=container'
+    sent = []
+    response = Response(); response.status = 201; response.headers = {'ETag':'"tiny"'}
+    monkeypatch.setattr(client, 'request', lambda *args, **kwargs: sent.append((args, kwargs)) or response)
+    client.upload('full4d-'+('a'*40)+'/episode_000001.jpg', b'tiny', 'image/jpeg', 'a'*40)
+    headers = sent[0][0][3]
+    assert all(re.fullmatch('[A-Za-z_][A-Za-z0-9_]*', k.removeprefix('x-ms-meta-'))
+               for k in headers if k.startswith('x-ms-meta-'))
