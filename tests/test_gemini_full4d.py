@@ -190,7 +190,7 @@ def test_frontend_requires_exact_automatic_native_lineage_and_copies_pngs(monkey
         assert (dest/'report.json').read_bytes()==(directory/'report.json').read_bytes()
 
 
-@pytest.mark.parametrize('mutation', [None, 'outside', 'absolute', 'wrong_digest', 'parent_alias', 'blob_alias', 'contents', 'hardlink', 'acquisition_revision', 'acquisition_cache'])
+@pytest.mark.parametrize('mutation', [None, 'writable_receipt', 'writable_model', 'receipt_during_read', 'callback_other_path', 'outside', 'absolute', 'wrong_digest', 'parent_alias', 'blob_alias', 'contents', 'hardlink', 'acquisition_revision', 'acquisition_cache'])
 def test_depth_model_reuses_audited_two_level_hf_xet_resolver(monkeypatch, tmp_path, mutation):
     root=tmp_path/'root'; cache=root/'weights/cari4d/hf_home/hub'; repo=cache/'models--Ruicheng--moge-2-vitl-normal'
     raw=b'tiny known HF model cache byte fixture'; digest=hashlib.sha256(raw).hexdigest(); xet='9f'+'c'*62
@@ -205,7 +205,28 @@ def test_depth_model_reuses_audited_two_level_hf_xet_resolver(monkeypatch, tmp_p
     acquisition=dict(assets=[dict(repo_id='Ruicheng/moge-2-vitl-normal',revision=graph.DEPTH_MODEL,cache_dir=str(cache))])
     if mutation=='acquisition_revision': acquisition['assets'][0]['revision']='f'*40
     elif mutation=='acquisition_cache': acquisition['assets'][0]['cache_dir']=str(tmp_path/'othercache')
-    payload(root/'results/weights-acquisition.json',acquisition)
+    receipt=root/'results/weights-acquisition.json'; receipt_pin=payload(receipt,acquisition)
+    if mutation in ('writable_receipt', 'receipt_during_read'):
+        receipt.chmod(0o644)
+    if mutation=='writable_receipt':
+        # Existing bridge callers still reject writable metadata by default.
+        with pytest.raises(ValueError,match='readonly regular artifact'):
+            model_resolver.moge_asset(root)
+    elif mutation=='writable_model': blob.chmod(0o644)
+    elif mutation=='receipt_during_read':
+        original=model_resolver.binding.strict_json
+        def changed_after_decode(raw):
+            decoded=original(raw)
+            receipt.write_text(json.dumps(acquisition | dict(unrelated_metadata=1)))
+            return decoded
+        monkeypatch.setattr(model_resolver.binding,'strict_json',changed_after_decode)
+    elif mutation=='callback_other_path':
+        other=root/'results/not-acquisition.json'; payload(other,acquisition)
+        original=model_resolver.moge_asset
+        def wrong_path(root, *, acquisition_identity=None):
+            acquisition_identity(other,2_000_000)
+            return original(root,acquisition_identity=acquisition_identity)
+        monkeypatch.setattr(model_resolver,'moge_asset',wrong_path)
     if mutation=='outside':
         outside=tmp_path/'outside'; payload(outside,raw); target=str(outside)
     elif mutation=='absolute': target=str(blob)
@@ -218,11 +239,17 @@ def test_depth_model_reuses_audited_two_level_hf_xet_resolver(monkeypatch, tmp_p
     elif mutation=='parent_alias':
         (cache/'blobs').rename(cache/'realblobs'); (cache/'blobs').symlink_to(cache/'realblobs',target_is_directory=True)
     alias.symlink_to(target)
-    if mutation:
+    if mutation not in (None,'writable_receipt'):
         with pytest.raises(ValueError): graph.depth_weight_identity(root,digest)
     else:
         actual=graph.depth_weight_identity(root,digest)
         assert actual['snapshot_alias'] is True and actual['artifact']==pin
         assert actual['canonical_blob']==str(blob) and len(actual['link_graph'])==3
         assert actual['resolver']=='bridge_rgb_anchor_infer.moge_asset_and_host_moge_chain'
+        assert actual['acquisition_receipt']==receipt_pin
+        assert actual['acquisition_metadata_writable'] is (mutation=='writable_receipt')
+        assert actual['acquisition_permission_immutability_claimed'] is False
+        assert actual['model_readonly_verified'] is True
+        assert receipt.stat().st_mode & 0o777 == (0o644 if mutation=='writable_receipt' else 0o444)
+        assert blob.stat().st_mode & 0o777 == 0o444
         assert alias.is_symlink() and os.readlink(alias)==target

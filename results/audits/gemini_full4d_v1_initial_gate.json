@@ -16,5 +16,22 @@
   "decision": "Reuse existing acquisition-bound MoGe2 asset+two-link resolver; no generic symlink relaxation, numerical change or baseline overwrite.",
   "remaining_episodes_not_run": true,
   "ground_truth_used": false,
-  "quality_verified": false
+  "quality_verified": false,
+  "retry": {
+    "producer_revision": "a3520360fd4a1e553ae7bf5ac88cf116a19ad34a",
+    "status": "fail_acquisition_metadata_permission_contract",
+    "episode": 9,
+    "failed_stage": "depth_smoke_cache_validation",
+    "elapsed_seconds": 27.918242754996754,
+    "error": "Bounded readonly regular artifact required",
+    "factual_stats": {
+      "model_mode": "0444",
+      "model_links": 1,
+      "model_bytes": 1323815904,
+      "acquisition_metadata_mode": "0644",
+      "acquisition_metadata_bytes": 1653,
+      "acquisition_links": 1
+    },
+    "decision": "Keep model/source/graph readonly checks. Bind only original canonical acquisition metadata to explicit stable hash/stat policy; no permissions change or numerical retuning."
+  }
 }

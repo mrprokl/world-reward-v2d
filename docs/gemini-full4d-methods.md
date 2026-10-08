@@ -21,6 +21,10 @@ stay in the denominator; no manually labeled prompts or replacement draws.
    actual weight SHA, official source-video SHA, original timeline and every NPZ
    hash match. Original receipts are copied byte-identically; a separate ledger
    identifies the actual old producer. No cache is presented as new inference.
+   The known two-link HF/Xet graph and independently pinned readonly model are
+   verified without modifying the shared cache. Original acquisition metadata
+   may be writable; its sole canonical path, bounded bytes and unchanged stat/
+   hash are checked explicitly, without claiming permission immutability.
 5. Re-estimate one human-anchored depth scalar/shared inferred camera. Run
    SAM3D Objects once from original frame-zero RGB and the new object mask with
    that aligned pointmap. One canonical mesh and one clip-constant scale.

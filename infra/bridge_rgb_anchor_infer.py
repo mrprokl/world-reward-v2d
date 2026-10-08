@@ -42,11 +42,19 @@ def moge_path(root):
     return root/'weights/cari4d/hf_home/hub/blobs'/XET_SHA[:2]/XET_SHA
 
 
-def moge_asset(root):
-    """Actual canonical Xet file, content SHA distinct from its storage name."""
+def moge_asset(root, *, acquisition_identity=None):
+    """Actual Xet content; strict model identity and caller-bound receipt policy.
+
+    The default receipt policy remains readonly. An original acquisition writer
+    may instead supply a path-restricted, stat-stable receipt identity checker;
+    this never changes the checkpoint's canonical/readonly/content checks.
+    """
     receipt_path = root/'results/weights-acquisition.json'
-    receipt = binding.identity(receipt_path,2_000_000)
+    receipt_identity = binding.identity if acquisition_identity is None else acquisition_identity
+    receipt = receipt_identity(receipt_path,2_000_000)
     acquisition = binding.strict_json(receipt_path.read_bytes())
+    require(receipt_identity(receipt_path,2_000_000) == receipt,
+        'Original MoGe2 acquisition receipt changed while read')
     rows = [r for r in acquisition['assets'] if r.get('repo_id') == 'Ruicheng/moge-2-vitl-normal']
     require(len(rows) == 1 and rows[0].get('revision') == MOGE_REV
         and rows[0].get('cache_dir') == str(root/'weights/cari4d/hf_home/hub'), 'Original exact MoGe2 acquisition revision/cache required')

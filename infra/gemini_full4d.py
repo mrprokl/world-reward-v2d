@@ -99,19 +99,36 @@ def depth_weight_identity(root, expected_sha):
 
     HF file content SHA and Xet storage ID differ. The audited helper validates
     the acquisition receipt, independent content SHA/size and exact two-link
-    graph. Generic artifact/control paths remain canonical and symlink-free.
+    graph. Only the original acquisition writer's canonical metadata receipt may
+    be writable: it is hash/stat-checked, not claimed permission-immutable. The
+    actual checkpoint and generic control paths retain their readonly contract.
     """
     from bridge_rgb_anchor_infer import moge_asset, host_moge_chain, MOGE_SHA, MOGE_REV
     require(type(expected_sha) is str and re.fullmatch('[0-9a-f]{64}', expected_sha),
             'Exact previously recorded MoGe2 model SHA required')
     require(expected_sha == MOGE_SHA and DEPTH_MODEL == MOGE_REV,
             'Depth receipt differs from the independently audited MoGe2 content/revision')
+    acquisition_path = canonical(root/'results/weights-acquisition.json')
+    acquisition_stat = acquisition_path.lstat()
+
+    def acquisition_identity(path, maximum):
+        require(canonical(path) == acquisition_path and maximum == 2_000_000,
+                'Only the original canonical acquisition metadata may be writable')
+        return _json(acquisition_path, maximum)[1]
+
     chain = host_moge_chain(root)
-    path, acquisition_pin, pin = moge_asset(root)
+    path, acquisition_pin, pin = moge_asset(root, acquisition_identity=acquisition_identity)
     require(host_moge_chain(root) == chain and pin['sha256'] == expected_sha,
             'Audited MoGe2 snapshot graph/content changed during verification')
+    after = acquisition_path.lstat()
+    require(all(getattr(acquisition_stat, key) == getattr(after, key) for key in
+                ('st_dev', 'st_ino', 'st_mode', 'st_size', 'st_mtime_ns', 'st_ctime_ns')),
+            'Original acquisition metadata changed during model verification')
     return dict(canonical_blob=str(path), artifact=pin, snapshot_alias=True,
                 link_graph=chain, acquisition_receipt=acquisition_pin,
+                acquisition_metadata_writable=bool(acquisition_stat.st_mode & 0o222),
+                acquisition_permission_immutability_claimed=False,
+                model_readonly_verified=True,
                 resolver='bridge_rgb_anchor_infer.moge_asset_and_host_moge_chain')
 
 
