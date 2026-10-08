@@ -48,3 +48,23 @@ Primary documentation (consultedOct8):
 - [Gemini3.5guide](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-3-5-flash)
 - [Vertex images](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/image-understanding)
 - [User Roboflow reference](https://playground.roboflow.com/models/google/gemini-3-5-flash)
+
+## Actual result
+
+Produceradfad8c6 completed24independent API calls,8episodes×frames0/14/29,
+119.65s native/121.00s total stage (excluding first-time research/code/transport
+setup).20valid pair-box responses;4socket/API TimeoutError at60s, not semantic
+schema failures. No retries.20returned is not20correct. Successful-call median
+3.28s;40776total reported tokens. OAuth envelope/private key removed.
+
+Same-frame initial QA: Gemini generally selects the visible foreground person;
+provides initial object proposals even where saved SAM object banks were empty
+(e.g.7/6). This alone does not verify target identity, tight geometry or masks.
+No demonstrated overall superiority over Qwen/SAM. Await user visual QA;
+then test actual VLM-box→SAM image segmentation only, not full-video tracking.
+Saved SAM/Qwen-ID references remain retrospective. Prior Qwen image-only
+comparison available for4episodes. No manual box/episode correction or tuning.
+
+Saved-only CPUzoom producer7b699c5: original box-driven context zooms, all24
+successes/timeouts retained,0additional model calls. Code/tests committed;
+external model overlap remains unknown. Heavy/source images never downloaded.
