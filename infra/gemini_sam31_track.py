@@ -108,7 +108,7 @@ def preview(frames, sampled, seed, target, episode, maximum):
     from PIL import Image, ImageDraw, ImageFont
     wanted = sorted(sampled)
     canvas = Image.new('RGB', (384 * len(wanted), 288), (24, 27, 33))
-    font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 14)
+    font = ImageFont.load_default()  # Bundled PIL font; no unpinned system-font dependency.
     for column, index in enumerate(wanted):
         rgb = np.asarray(frames[index]).copy()
         for role, mask in zip(('person', 'object'), sampled[index]):

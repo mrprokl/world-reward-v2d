@@ -16,5 +16,16 @@
     "error": "AssertionError: num_valid_entries=1 != self.total_valid_entries=2",
     "cause": "Official direct multi-object add_new_points gap-fill dispatches singleton pointer into two-object mux; native high-level instance route uses singleton tracker states.",
     "decision": "Use official one-tracker-state-per-ID interactive architecture with one shared backbone feature cache; preserve model, source, automatic boxes and every original index."
+  },
+  "preview_integration_failure": {
+    "producer_revision": "038916aa17b4ff5fc790bb25f910f02d381a34a1",
+    "status": "fail_preview_resource_after_native_tracking",
+    "episode": 9,
+    "original_frames_generated": 415,
+    "native_prefix30_seconds": 22.849988720961846,
+    "error": "OSError: cannot open resource (system DejaVu font absent in pinned SAM image)",
+    "native_mask_generation_verified": true,
+    "quality_verified": false,
+    "decision": "Use the bundled PIL default font; masks/models/parameters unchanged. Retry all frozen clips in a fresh immutable namespace."
   }
 }
