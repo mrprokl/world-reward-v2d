@@ -3,7 +3,8 @@
 No video is saved, predownloaded, or cached by this process. Each browser range
 is forwarded in64KiB memory chunks to the pinned private blob. The Azure user
 bearer stays in memory; the browser sees only a loopback URL, never a SAS/key.
-Only an explicit tiny publication receipt and3or4 MP4/JPEG pairs are accepted.
+Legacy receipts require3or4 pairs; explicit partial snapshots require1or2 and
+retain all four original cohort statuses. No unfinished clip gets a media URL.
 Playback still consumes the compressed preview bytes across the tether.
 """
 from __future__ import annotations
@@ -26,6 +27,7 @@ import urllib.request
 ENDPOINT = 'https://stworldrewardresearch26.blob.core.windows.net/qa-previews'
 CHUNK, MAX_RECEIPT = 65536, 16384
 MAX_VIDEO, MAX_POSTER, MAX_TTL = 2_000_000, 100_000, 3600
+MAX_PARTIAL_RECEIPT = 64 << 10
 
 
 def require(condition, message):
@@ -78,6 +80,49 @@ def records(receipt, revision):
     require(set(by_name) == {manifest_name} and by_name[manifest_name]['mime'] == 'application/json'
         and by_name[manifest_name]['bytes'] <= MAX_RECEIPT, 'Only original tiny publication manifest may remain')
     return episodes, allowed
+
+
+def partial_records(receipt, revision):
+    """Separate one/two-preview snapshot; legacy 3–4 receipt rules stay intact."""
+    from full4d_publish import partial_receipt_contract
+    episodes, states = partial_receipt_contract(receipt, revision)
+    rows = receipt.get('files')
+    require(type(rows) is list and len(rows) == len(episodes)*2+1, 'Exact partial preview file inventory required')
+    by_name = {}
+    for row in rows:
+        require(type(row) is dict and type(row.get('name')) is str and row['name'] not in by_name
+                and type(row.get('bytes')) is int and 0 < row['bytes'] <= MAX_VIDEO
+                and re.fullmatch('[0-9a-f]{64}', str(row.get('sha256')))
+                and type(row.get('etag')) is str and re.fullmatch(r'"[A-Za-z0-9-]{1,100}"', row['etag']),
+                'Unique bounded exact partial publication identities required')
+        by_name[row['name']] = row
+    allowed = {}
+    for ep in episodes:
+        for ext, mime, limit in (('mp4','video/mp4',MAX_VIDEO), ('jpg','image/jpeg',MAX_POSTER)):
+            name = f'full4d-{revision}/episode_{ep:06d}.{ext}'
+            require(name in by_name and by_name[name].get('mime') == mime
+                    and by_name[name]['bytes'] <= limit and type(by_name[name].get('episode_index')) is int
+                    and by_name[name]['episode_index'] == ep, 'Only actual complete partial publication MP4/JPEG pairs allowed')
+            allowed[f'/episode-{ep}.{ext}'] = by_name.pop(name)
+    manifest = f'full4d-{revision}/manifest.json'
+    require(set(by_name) == {manifest} and by_name[manifest].get('mime') == 'application/json'
+            and by_name[manifest]['bytes'] <= MAX_RECEIPT, 'Only tiny actual partial manifest may remain')
+    return states, allowed
+
+
+def load_partial_receipt(path, revision):
+    path = Path(path)
+    require(path.is_absolute() and path.resolve() == path and not any(p.is_symlink() for p in (path,*path.parents)),
+            'Canonical ordinary tiny partial receipt required')
+    before = path.lstat()
+    require(path.is_file() and before.st_nlink == 1 and 0 < before.st_size <= MAX_PARTIAL_RECEIPT,
+            'Bounded partial metadata only; no local media')
+    raw = path.read_bytes(); after = path.lstat()
+    require(len(raw) == before.st_size and all(getattr(before,key) == getattr(after,key) for key in
+            ('st_dev','st_ino','st_mode','st_nlink','st_size','st_mtime_ns','st_ctime_ns')),
+            'Partial receipt changed during read')
+    states, allowed = partial_records(strict(raw), revision)
+    return states, allowed, hashlib.sha256(raw).hexdigest()
 
 
 def load_receipt(path, revision):
@@ -184,12 +229,21 @@ class AzureReader:
             raise
 
 
-def index_html(episodes):
+def index_html(episodes, *, cohort_statuses=None):
     """Only localhost media resources; tokens never enter the browser document."""
     panes = '\n'.join(f'<section><h2>Épisode {ep:02d}</h2>'
         f'<video controls playsinline preload="none" poster="/episode-{ep}.jpg" '
         f'aria-label="Épisode {ep}: vidéo originale à gauche, reconstruction4D à droite">'
         f'<source src="/episode-{ep}.mp4" type="video/mp4"></video></section>' for ep in episodes)
+    summary = ''
+    if cohort_statuses is not None:
+        labels = dict(complete='4D complète disponible', pending='Non terminé au relevé', failed='Échec / non reconstruit')
+        panes = '\n'.join((f'<section><h2>Épisode {row["episode_index"]:02d} — {labels[row["status"]]}</h2>'
+            + (f'<video controls playsinline preload="none" poster="/episode-{row["episode_index"]}.jpg" '
+               f'aria-label="Épisode {row["episode_index"]}: original à gauche, 4D complète à droite">'
+               f'<source src="/episode-{row["episode_index"]}.mp4" type="video/mp4"></video>'
+               if row['status'] == 'complete' else '') + '</section>') for row in cohort_statuses)
+        summary = f'<p>Livraison partielle : {len(episodes)}/4 reconstructions. États figés au relevé, non actualisés. Qualité non validée.</p>'
     return ('<!doctype html><html lang="fr"><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1">'
         '<title>World Reward — Reconstructions4D</title>'
@@ -199,7 +253,7 @@ def index_html(episodes):
         'gap:24px}video{width:100%;height:auto;display:block}p{line-height:1.5}</style>'
         '<h1>World Reward — Reconstructions4D</h1><p>Original à gauche · reconstruction à droite · '
         'même échelle inférée, non vérifiée · sol virtuel estimé. Lecture à la demande, sans fichier vidéo enregistré.</p>'
-        '<main>'+panes+'</main></html>').encode()
+        +summary+'<main>'+panes+'</main></html>').encode()
 
 
 class Proxy(ThreadingHTTPServer):
@@ -210,8 +264,8 @@ class Proxy(ThreadingHTTPServer):
         pass
 
 
-def handler_factory(episodes, allowed, reader):
-    html = index_html(episodes)
+def handler_factory(episodes, allowed, reader, *, cohort_statuses=None):
+    html = index_html(episodes, cohort_statuses=cohort_statuses)
     class Handler(BaseHTTPRequestHandler):
         protocol_version = 'HTTP/1.1'
 
@@ -298,8 +352,8 @@ def handler_factory(episodes, allowed, reader):
     return Handler
 
 
-def make_server(episodes, allowed, *, reader=None):
-    server = Proxy(('127.0.0.1', 0), handler_factory(episodes, allowed, reader or AzureReader()))
+def make_server(episodes, allowed, *, reader=None, cohort_statuses=None):
+    server = Proxy(('127.0.0.1', 0), handler_factory(episodes, allowed, reader or AzureReader(), cohort_statuses=cohort_statuses))
     server.deadline = time.monotonic()+MAX_TTL
     return server
 
@@ -309,10 +363,16 @@ def main():
     parser.add_argument('--receipt', type=Path, required=True)
     parser.add_argument('--revision', required=True)
     parser.add_argument('--ttl', type=int, default=MAX_TTL)
+    parser.add_argument('--partial', action='store_true')
     args = parser.parse_args()
     require(60 <= args.ttl <= MAX_TTL, 'Bounded60seconds-to1hour viewer lifetime required')
-    episodes, allowed, _ = load_receipt(args.receipt, args.revision)
-    server = make_server(episodes, allowed)
+    states = None
+    if args.partial:
+        states, allowed, _ = load_partial_receipt(args.receipt, args.revision)
+        episodes = [row['episode_index'] for row in states if row['status'] == 'complete']
+    else:
+        episodes, allowed, _ = load_receipt(args.receipt, args.revision)
+    server = make_server(episodes, allowed, cohort_statuses=states)
     server.deadline = time.monotonic()+args.ttl
     timer = threading.Timer(args.ttl, server.shutdown); timer.daemon = True; timer.start()
     # This URL has no credential/query. No request/media/token logging follows.

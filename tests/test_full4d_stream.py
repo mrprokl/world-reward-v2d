@@ -12,6 +12,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'infra'))
 import full4d_stream as stream
+import full4d_publish as publish
 
 
 def receipt():
@@ -147,3 +148,76 @@ def test_foreign_origin_and_post_are_refused_before_remote_read():
         assert reader.opens == [] and reader.heads == []
     finally:
         server.shutdown(); server.server_close(); thread.join(timeout=5)
+
+
+def partial_receipt():
+    value,revision=receipt();numeric='c'*40;pin=dict(bytes=20,sha256='b'*64)
+    value.update(schema=publish.PARTIAL_SCHEMA,publication_source_entry=publish.PUBLISH_ENTRY,
+        numerical_source_entry=publish.NUMERICAL_ENTRY,numerical_producer_revision=numeric,
+        cohort=[9,1,14,7],cohort_denominator=4,statuses_frozen_at_capture=True,live_status_claimed=False,
+        quality_verified=False,challenge_performance_verified=False,heavy_data_uploaded=False,
+        original_source_videos_uploaded=False,source_rehashed_after=True,source_report_snapshot=pin,
+        publication_source_binding=dict(producer_revision=revision,closure_sha256='d'*64,helpers={'source':pin}),
+        numerical_source_binding=dict(producer_revision=numeric,closure_sha256='e'*64,helpers={'source':pin}),episodes=[9],
+        cohort_statuses=[dict(episode_index=ep,original_frames=3,status='complete' if ep==9 else 'failed' if ep==7 else 'pending',
+            producer_status='complete_full4d_visual_diagnostic_not_quality_pass' if ep==9 else 'fail' if ep==7 else 'pending')
+            for ep in [9,1,14,7]],reports=[dict(episode_index=9,original_frames=3,identity=pin,export_report=pin,export_pins=pin)])
+    value['files']=[dict(name=f'full4d-{revision}/episode_000009.{ext}',mime=mime,etag='"0xABC123"',episode_index=9,**pin)
+        for ext,mime in [('mp4','video/mp4'),('jpg','image/jpeg')]]
+    value['files'].append(dict(name=f'full4d-{revision}/manifest.json',mime='application/json',etag='"0xDEF456"',**pin))
+    return value,revision
+
+
+@pytest.mark.parametrize('mutation',['missing','extra','wrong_numeric','wrong_publication','wrong_cohort','wrong_order',
+    'selection','status','source_status','missing_export_pin','tail','numeric_blob','legacy_schema'])
+def test_partial_viewer_rejects_unbound_missing_or_extra_completed_previews(mutation):
+    value,revision=partial_receipt()
+    if mutation=='missing':value['files'].pop(0)
+    elif mutation=='extra':value['files'].append(value['files'][0])
+    elif mutation=='wrong_numeric':value['numerical_source_binding']['producer_revision']='f'*40
+    elif mutation=='wrong_publication':value['producer_revision']='f'*40
+    elif mutation=='wrong_cohort':value['cohort'][1]=2
+    elif mutation=='wrong_order':value['cohort_statuses'].reverse()
+    elif mutation=='selection':value['episodes']=[14]
+    elif mutation=='status':value['cohort_statuses'][1]['status']='complete'
+    elif mutation=='source_status':value['cohort_statuses'][1]['producer_status']='completed_made_up'
+    elif mutation=='missing_export_pin':value['reports'][0].pop('export_pins')
+    elif mutation=='tail':value['reports'][0]['original_frames']=2
+    elif mutation=='numeric_blob':value['files'][0]['name']=value['files'][0]['name'].replace(revision,value['numerical_producer_revision'])
+    elif mutation=='legacy_schema':value['schema']='world_reward.full4d_publish.v1'
+    with pytest.raises(ValueError):stream.partial_records(value,revision)
+
+
+def test_partial_viewer_keeps_four_statuses_one_video_and_no_background_media_reads(tmp_path):
+    value,revision=partial_receipt();states,allowed=stream.partial_records(value,revision)
+    assert len(states)==4 and set(allowed)=={'/episode-9.mp4','/episode-9.jpg'}
+    with pytest.raises(ValueError):stream.records(value,revision)
+    path=tmp_path/'partial.json';path.write_text(json.dumps(value))
+    assert stream.load_partial_receipt(path,revision)[:2]==(states,allowed)
+    reader=Reader();server=stream.make_server([9],allowed,reader=reader,cohort_statuses=states)
+    thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+    base=f'http://127.0.0.1:{server.server_port}'
+    try:
+        with urllib.request.urlopen(base+'/') as response:html=response.read().decode()
+        assert html.count('<video ')==1 and html.count('preload="none"')==1 and html.count('<section>')==4
+        assert '1/4' in html and 'États figés' in html and 'Qualité non validée' in html
+        assert '/episode-1.mp4' not in html and '/episode-7.mp4' not in html and 'autoplay' not in html
+        assert reader.opens==[] and reader.heads==[]
+        with pytest.raises(urllib.error.HTTPError):urllib.request.urlopen(base+'/episode-14.mp4')
+        request=urllib.request.Request(base+'/episode-9.mp4',headers={'Range':'bytes=4-8'})
+        with urllib.request.urlopen(request) as response:
+            assert response.read()==b'45678' and response.headers['Cache-Control']=='no-store, private'
+        assert len(reader.opens)==1 and list(tmp_path.iterdir())==[path]
+    finally:
+        server.shutdown();server.server_close();thread.join(timeout=5)
+
+
+def test_partial_only_metadata_cap64k_supports_large_numeric_source_binding(tmp_path):
+    value,revision=partial_receipt();pin=dict(bytes=2000000,sha256='b'*64)
+    value['numerical_source_binding']['helpers']={f'infra/source_helper_{index:03d}_bounded_original.py':pin for index in range(128)}
+    raw=json.dumps(value).encode()
+    assert stream.MAX_RECEIPT < len(raw) < stream.MAX_PARTIAL_RECEIPT
+    path=tmp_path/'partial.json';path.write_bytes(raw)
+    states,allowed,_=stream.load_partial_receipt(path,revision)
+    assert len(states)==4 and len(allowed)==2
+    assert stream.MAX_RECEIPT==16384 and stream.MAX_PARTIAL_RECEIPT==publish.MAX_PARTIAL_RECEIPT==65536

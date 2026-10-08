@@ -135,3 +135,17 @@ native absence, not true physical absence, and retains the four-clip denominator
 No mask filling or fabricated trajectory is substituted. The source-bound area
 metadata is not claimed to be an independent PNG decode or accuracy score.
 This fail-fast code is not retroactively injected into running immutable jobs.
+
+## Progressive full-video delivery
+
+Legacy publication still requires three/four complete clips. A separate explicit
+partial protocol publishes **all** currently completed one/two clips, derived
+from a snapshot of the same original four-clip numerical report; no caller
+selection and no unfinished clip gets a video. Numeric producer, publisher and
+snapshot hashes are retained separately. Each actual full-T export/render must
+already pass its existing source/geometry/timeline gates. Statuses are frozen at
+capture, not falsely live. Remaining/failed clips stay visible in the denominator.
+Private MP4 previews remain bounded to 2 MB each and stream only on demand,
+without local video files or tokens in browser URLs. Tiny partial metadata has
+an explicit 64 KiB ceiling; the legacy 16 KiB protocol is unchanged. Cleanup is
+restricted to exact original publisher-owned names and conditional ETags.
