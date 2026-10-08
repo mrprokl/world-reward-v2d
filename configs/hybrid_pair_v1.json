@@ -1,0 +1,61 @@
+{
+  "schema": "world_reward.hybrid_pair.v1",
+  "episodes": [
+    9,
+    1,
+    14,
+    7,
+    28,
+    13,
+    3,
+    11,
+    18,
+    10,
+    22,
+    6
+  ],
+  "cohort_selection": {
+    "regression": [
+      9,
+      1,
+      14,
+      7
+    ],
+    "additional": [
+      28,
+      13,
+      3,
+      11,
+      18,
+      10,
+      22,
+      6
+    ],
+    "method": "sha256(world_reward.hybrid_pair_v1/episode6digit),sortdigest,first8remaining",
+    "frozen_before_inference": true,
+    "all_are_development_qa_not_heldout": true
+  },
+  "qwen_model_folder": "results/task-grounding-pilot-a9419e0332e3c6258a8022e9286eaafb04dce223/model",
+  "qwen_model_revision": "0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
+  "sam_capacity": 64,
+  "sam_multiplex_count": 16,
+  "sam_budget_seconds": 3600,
+  "sam_episode_budget_seconds": 600,
+  "qwen_budget_seconds": 1200,
+  "preview_budget_seconds": 300,
+  "evidence_views": 16,
+  "selection_max_rounds": 3,
+  "candidate_page_size": 8,
+  "max_selection_images": 40,
+  "qwen_batch_size": 1,
+  "output_capacity": 1536,
+  "max_jpeg_bytes": 180000,
+  "baseline_modified": false,
+  "ground_truth_used": false,
+  "manual_labels": false,
+  "quality_verified": false,
+  "training_overlap_verified": false,
+  "challenge_overlap_verified": false,
+  "scope": "detection_pair_selection_full_original_segmentation_not_4D",
+  "baseline_revision": "de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba"
+}

@@ -1,0 +1,17 @@
+ARG SAM_BASE
+FROM ${SAM_BASE}
+ARG WR_REVISION
+ARG WR_SOURCE_SHA256
+LABEL world_reward.sam31.revision=$WR_REVISION world_reward.sam31.source=$WR_SOURCE_SHA256
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 PYTHONDONTWRITEBYTECODE=1
+RUN python -m pip install --no-cache-dir torch==2.7.1+cu126 torchvision==0.22.1+cu126 \
+    --index-url https://download.pytorch.org/whl/cu126 --extra-index-url https://pypi.org/simple \
+ && python -m pip install --no-cache-dir \
+    setuptools==80.9.0 timm==1.0.17 numpy==1.26.4 pycocotools==2.0.10 \
+    iopath==0.1.10 ftfy==6.1.1 regex==2024.11.6 tqdm==4.67.1 \
+    Pillow==11.3.0 opencv-python-headless==4.11.0.86 huggingface-hub==0.34.4 \
+ && python -m pip check \
+ && python -m pip freeze --all > /opt/requirements-actual.txt
+COPY upstream /opt/sam3
+ENV PYTHONPATH=/opt/sam3
+WORKDIR /opt/sam3
