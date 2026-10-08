@@ -113,7 +113,7 @@ def test_full_original_report_and_frozen_population_are_not_relabelled():
     assert 'other_workers_only_after_scout_pass=True' in source
     assert 'ThreadPoolExecutor(max_workers=2)' in source
     assert "with (ROOT/'jobs/.world-reward-h100.lock').open('a')" in source
-    assert 'unlink(' not in source and 'rmtree(' not in source
+    assert 'rmtree(' not in source
     assert "'resample'" not in source
 
 
@@ -264,3 +264,107 @@ def test_existing_video_reuse_is_full_t_and_exact_source_bound(tmp_path, monkeyp
 
 def test_missing_previous_scout_receipt_is_not_fabricated(tmp_path):
     assert resume.previous_continuation(tmp_path) is None
+
+
+@pytest.fixture
+def cleanup_case(tmp_path,monkeypatch):
+    monkeypatch.setattr(resume,'ROOT',tmp_path)
+    experiment=tmp_path/'experiments'/('full4d-v1-'+resume.OLD)
+    base=experiment/'outputs/episode_000009'; directory=base/'cari_inputs'
+    paths=['aligned_depth.h5','automatic_masks.h5','episode_000009.0.color.mp4','intrinsics.pkl',
+        'object_metric.glb','own_object_poses.pkl','export/episode_000009/wild_export.json',
+        'export/episode_000009/edex','export/episode_000009/images/front_stereo_camera_left.h5',
+        'export/episode_000009/human_masks/front_stereo_camera_left.h5',
+        'export/episode_000009/object_masks/front_stereo_camera_left.h5',
+        'export/episode_000009/object_mesh/output_aligned.glb']
+    for name in paths: write(directory/name,b'opaque interrupted serialization')
+    paths.append('.aligned_depth.h5.storage-repack.lock')
+    write(directory/paths[-1],b'')
+    monkeypatch.setattr(resume,'INTERRUPTED_INPUT_CENSUS',
+        dict(files=len(paths),bytes=sum((directory/name).stat().st_size for name in paths)))
+    original=tmp_path/'jobs'/resume.OLD/'run_full4d_sample/code'
+    item=dict(episode=9,total=415,video_pin=dict(bytes=1,sha256='a'*64))
+    stopped=experiment/'continuations'/resume.SCOUT_CONTINUATION/'report.json'
+    write(stopped,b'opaque stopped scout receipt')
+    reportpin=resume.payload_identity(stopped,readonly=False)
+    monkeypatch.setattr(resume,'INTERRUPTED_SCOUT_REPORT',reportpin)
+    previous=dict(status='fail',source_rehashed_after=True,report=reportpin,
+        episodes=[dict(episode=9,status='fail',phase='inputs',error='Continuation interrupted')])
+    monkeypatch.setattr(resume,'previous_continuation',lambda _:previous)
+    monkeypatch.setattr(resume.subprocess,'check_output',lambda *a,**k:'')
+    monkeypatch.setattr(resume,'_cleanup_upstream',lambda *a:{'opaque_upstream':'unchanged'})
+    monkeypatch.setattr(resume,'source',lambda *a:{'closure_sha256':'c'*64})
+    # Synthetic ownership view only: production still checks the actual lstat.
+    actual=Path.lstat
+    def own(path):
+        result=actual(path)
+        if not path.is_relative_to(directory): return result
+        return SimpleNamespace(**{key:getattr(result,key) for key in ('st_dev','st_ino','st_size','st_mode',
+            'st_nlink','st_mtime_ns','st_ctime_ns')},st_uid=1000,st_gid=1000)
+    monkeypatch.setattr(Path,'lstat',own)
+    return experiment,base,original,item,previous,paths
+
+
+def test_cleanup_records_inventory_before_removing_only_unfinished_inputs(cleanup_case):
+    experiment,base,original,item,previous,paths=cleanup_case
+    upstream=base/'body_full/cari_adapter/canonical_initializer.pkl'; write(upstream,b'original initializer untouched')
+    recorded=[]
+    def record(evidence):
+        recorded.append(json.loads(json.dumps(evidence)))
+        if len(recorded)==1:
+            assert (base/'cari_inputs/aligned_depth.h5').exists()
+            assert evidence['status']=='recorded_before_removal'
+    result=resume.cleanup_interrupted_inputs(experiment,base,original,item,previous,record)
+    assert not (base/'cari_inputs').exists() and upstream.read_bytes()==b'original initializer untouched'
+    assert result['files']==len(paths) and result['status']=='removed_unpublished_generated_inputs'
+    assert len(result['inventory_sha256'])==64 and len(recorded)==2
+    assert result['original_completed_predictions_removed'] is False
+    assert result['numerical_payload_decoded'] is False
+
+
+@pytest.mark.parametrize('fault',['running','different_phase','different_episode','symlink','hardlink','foreign_file',
+    'worker_alive','empty_payload','newer_output','wrong_interruption'])
+def test_cleanup_refuses_non_interrupted_or_foreign_inputs(cleanup_case,monkeypatch,fault):
+    experiment,base,original,item,previous,_=cleanup_case
+    directory=base/'cari_inputs'
+    if fault=='running': previous['status']='running'
+    elif fault=='different_phase': previous['episodes'][0]['phase']='refined'
+    elif fault=='different_episode': item['episode']=1
+    elif fault=='symlink': (directory/'unknown').symlink_to(directory/'aligned_depth.h5')
+    elif fault=='hardlink':
+        import os
+        os.link(directory/'aligned_depth.h5',directory/'alias')
+    elif fault=='foreign_file': write(directory/'unknown.bin',b'foreign')
+    elif fault=='empty_payload': (directory/'aligned_depth.h5').write_bytes(b'')
+    elif fault=='wrong_interruption': previous['report']={'bytes':1,'sha256':'f'*64}
+    elif fault=='newer_output':
+        import os
+        stopped=experiment/'continuations'/resume.SCOUT_CONTINUATION/'report.json'
+        value=stopped.stat().st_mtime_ns+1_000_000
+        os.utime(directory/'aligned_depth.h5',ns=(value,value))
+    else: monkeypatch.setattr(resume.subprocess,'check_output',lambda *a,**k:'owned worker still alive')
+    if fault=='different_episode':
+        assert resume.cleanup_interrupted_inputs(experiment,base,original,item,previous,lambda _:None) is None
+    else:
+        with pytest.raises(ValueError):
+            resume.cleanup_interrupted_inputs(experiment,base,original,item,previous,lambda _:pytest.fail('no removal receipt'))
+    assert (directory/'aligned_depth.h5').exists()
+
+
+@pytest.mark.parametrize('published',['pin','pass_report'])
+def test_cleanup_never_removes_successful_or_pinned_inputs(cleanup_case,published):
+    experiment,base,original,item,previous,_=cleanup_case
+    if published=='pin': write(experiment/'pins/cari_clip_000009_input_pins.json',b'opaque published pin')
+    else: write(base/'cari_inputs/report.json',b'{"status":"pass"}')
+    assert resume.cleanup_interrupted_inputs(experiment,base,original,item,previous,lambda _:pytest.fail('never cleanup')) is None
+    assert (base/'cari_inputs/aligned_depth.h5').exists()
+
+
+def test_cleanup_stops_if_upstream_changes_after_durable_receipt(cleanup_case,monkeypatch):
+    experiment,base,original,item,previous,_=cleanup_case
+    calls=iter([{'immutable':'before'},{'immutable':'changed'}])
+    monkeypatch.setattr(resume,'_cleanup_upstream',lambda *a:next(calls))
+    recorded=[]
+    with pytest.raises(ValueError,match='Original completed inputs changed'):
+        resume.cleanup_interrupted_inputs(experiment,base,original,item,previous,recorded.append)
+    assert len(recorded)==1 and (base/'cari_inputs/aligned_depth.h5').exists()

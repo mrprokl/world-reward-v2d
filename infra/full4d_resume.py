@@ -10,11 +10,13 @@ import ast
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import nullcontext
 import fcntl
+import hashlib
 import importlib.util
 import json
 import os
 from pathlib import Path
 import signal
+import stat
 import subprocess
 import sys
 import threading
@@ -29,6 +31,9 @@ from qwen4d_masks import _inventory
 ROOT = Path('/srv/scenesmith/world-reward')
 OLD = 'de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba'
 SCOUT_CONTINUATION = '6e72f5b11b89d77f284b2119465b4fb614b306c8'
+INTERRUPTED_SCOUT_REPORT = dict(bytes=7866,
+    sha256='d6c33e3287e5f5b785d2d03d455277d685125eb20f010888c7716a258f47924e')
+INTERRUPTED_INPUT_CENSUS = dict(files=13,bytes=587275495)
 ORIGINAL_REPORT = dict(bytes=8613, sha256='d20a4f074c0bf5ffeb2e489a995e66655f5a65773e445638cab46d6b197b1e40')
 EXISTING_PINS = {
     'outputs/episode_000009/object_pose_full_surface/report.json': dict(bytes=21099626, sha256='296862f8fd5697807147bcee59910a25a6c57db824eb6edf7348fc6867b3207b'),
@@ -297,7 +302,127 @@ def previous_continuation(experiment):
             and report.get('oracle_modes')==[] and payload_identity(path,readonly=False,maximum=4 << 20)==pin,
             'Actual unchanged source-bound scout continuation required')
     return dict(path=str(path),report=pin,source_binding=binding,status=report['status'],
-                episodes=report['episodes'],previous_receipt_modified=False)
+                episodes=report['episodes'],source_rehashed_after=report.get('source_rehashed_after'),
+                previous_receipt_modified=False)
+
+
+def _cleanup_upstream(base,original,item,experiment):
+    """Only hash existing independent PASS receipts and full payload inventories."""
+    evidence={stage:report_pass(base,stage,'infra/'+script,original,item) for stage,script in (
+        ('body_smoke','body_smoke.py'),('depth_smoke','depth_smoke.py'),('scale_smoke','scale_smoke.py'),
+        ('object_grounded','object_smoke.py'),('body_full','body_smoke.py'),('depth_full','depth_smoke.py'),
+        ('adapter','cari_body_adapter_smoke.py'),('object_pose','object_pose_smoke.py'))}
+    require(all(row is not None for row in evidence.values()),'All original upstream PASS producers required')
+    masks=strict((base/'automatic_masks/report.json').read_bytes())
+    require(masks.get('producer_revision')==OLD and masks.get('status')=='pass'
+            and masks.get('input_sha256')==item['video_pin']['sha256'] and masks.get('frames')==item['total']
+            and masks.get('ground_truth_used') is False and masks.get('hand_labeled_test') is False
+            and masks.get('oracle_modes')==[]
+            and masks['mask_inventory']==_inventory(base/'automatic_masks/masks',item['total'])[1],
+            'Original full mask inventory differs')
+    evidence['masks']={name:payload_identity(base/'automatic_masks'/name) for name in ('report.json','prompts.json')}
+    path=experiment/'pins/surface_mesh_000009_pins.json'; pin=strict(path.read_bytes())
+    require(pin['report']['producer_revision']==OLD and pin['episode_index']==9,
+            'Exact original surface proposal producer required')
+    for name,expected in pin['files'].items():
+        require(payload_identity(ROOT/name,readonly=False,maximum=256 << 20)==expected,'Original surface ancestry changed')
+    evidence['surface_pin']=payload_identity(path)
+    return evidence
+
+
+def cleanup_interrupted_inputs(experiment,base,original,item,previous,record):
+    """Purge only the stopped scout's unpublished generated input serialization.
+
+    The bounded byte inventory and upstream evidence are durably recorded first.
+    Nothing outside the exact generated directory is removed, and successful or
+    independently pinned outputs are never eligible for this infrastructure fix.
+    """
+    directory=base/'cari_inputs'
+    if not directory.exists(): return None
+    if item['episode']!=9 or previous is None: return None
+    input_pin=experiment/'pins/cari_clip_000009_input_pins.json'
+    marker=directory/'report.json'
+    if marker.exists(): identity(marker,4 << 20,readonly=False)
+    if input_pin.exists() or input_pin.is_symlink() or (marker.exists() and
+            strict(marker.read_bytes()).get('status')=='pass'):
+        return None  # Normal saved_stage gates verify complete outputs, never clean them.
+    require(canonical(experiment)==ROOT/'experiments'/('full4d-v1-'+OLD)
+            and canonical(base)==experiment/'outputs/episode_000009'
+            and type(item['total']) is int and item['total']>=96
+            and original==ROOT/'jobs'/OLD/'run_full4d_sample'/'code',
+            'Only the exact original interrupted scout serialization is eligible')
+    row=next((r for r in previous['episodes'] if r.get('episode')==9),{})
+    require(previous['status']=='fail' and previous['source_rehashed_after'] is True
+            and previous['report']==INTERRUPTED_SCOUT_REPORT
+            and row.get('status')=='fail' and row.get('phase')=='inputs'
+            and row.get('error')=='Continuation interrupted' and previous_continuation(experiment)==previous,
+            'Exact stopped source-rehashed infrastructure interruption required')
+    stopped_receipt=experiment/'continuations'/SCOUT_CONTINUATION/'report.json'
+    require(payload_identity(stopped_receipt,readonly=False,maximum=4 << 20)==INTERRUPTED_SCOUT_REPORT,
+            'Exact stopped scout report must remain untouched')
+    stopped_mtime=stopped_receipt.stat().st_mtime_ns
+    require(not input_pin.exists() and not input_pin.is_symlink(),
+            'Independently pinned input output must never be cleaned')
+    require(not subprocess.check_output(['docker','ps','-aq'],text=True).strip(),'No Docker worker may survive cleanup')
+    if marker.exists():
+        require(strict(marker.read_bytes()).get('status')!='pass','Successful input output must never be cleaned')
+    # Native ABI outputs only: no arbitrary recursively owned directory.
+    seq='export/episode_000009/'
+    allowed={'report.json','episode_000009.0.color.mp4','object_metric.glb','intrinsics.pkl',
+        'automatic_masks.h5','own_object_poses.pkl','aligned_depth.h5','.aligned_depth.h5.storage-repack.lock',
+        seq+'edex',seq+'wild_export.json',
+        seq+'object_mesh/output_aligned.glb',
+        *(seq+kind+'/front_stereo_camera_left.h5' for kind in ('images','human_masks','object_masks'))}
+    parents={Path('.'),*(parent for name in allowed for parent in Path(name).parents)}
+    inventory={}; states={}; directories=[]; count=0; size=0
+    for path in (directory,*sorted(directory.rglob('*'))):
+        canonical(path); relative=path.relative_to(directory); observed=path.lstat()
+        require(observed.st_uid==1000 and observed.st_gid==1000,'Exact original native worker ownership required')
+        require(observed.st_mtime_ns<=stopped_mtime,
+                'Inputs created after the stopped scout are ineligible for its cleanup')
+        states[path]=tuple(getattr(observed,key) for key in ('st_dev','st_ino','st_size','st_mode','st_nlink',
+            'st_uid','st_gid','st_mtime_ns','st_ctime_ns'))
+        if stat.S_ISDIR(observed.st_mode):
+            require(relative in parents,'Unknown generated input subdirectory; preserve for audit')
+            directories.append(path)
+        else:
+            require(stat.S_ISREG(observed.st_mode) and observed.st_nlink==1 and relative.as_posix() in allowed,
+                    'Only exact generated single-link ordinary input files may be cleaned')
+            proof=identity(path,32 << 30,readonly=False,
+                empty=relative.as_posix()=='.aligned_depth.h5.storage-repack.lock'); count+=1; size+=proof['bytes']
+            inventory[relative.as_posix()]=proof
+        require(count<=16 and len(directories)<=12 and size<=32 << 30,
+                'Bounded original full-T generated serialization inventory required')
+    require(dict(files=count,bytes=size)==INTERRUPTED_INPUT_CENSUS,
+            'Exact audited stopped-scout input census required; never clean later runs')
+    upstream=_cleanup_upstream(base,original,item,experiment)
+    evidence=dict(stage='discard_unpublished_interrupted_input_serialization',status='recorded_before_removal',
+        directory=str(directory),previous_report=previous['report'],files=count,bytes=size,
+        inventory_sha256=hashlib.sha256(json.dumps(inventory,sort_keys=True).encode()).hexdigest(),
+        file_inventory=inventory,upstream_before=upstream,source_binding=source(ROOT,original,OLD,'run_full4d_sample',()),
+        original_completed_predictions_removed=False,numerical_payload_decoded=False,
+        reason='stopped_scout_depth_serialization_exceeds_frozen_stage_budget',
+        runtime_optimization='ordered_eight_worker_depth_encoding_and_validation',
+        scientific_parameters_changed=False,quality_verified=False)
+    record(evidence)  # Caller fsyncs the separate continuation receipt.
+    require(previous_continuation(experiment)==previous and
+            not subprocess.check_output(['docker','ps','-aq'],text=True).strip(),'Stopped scout/worker state changed')
+    require(_cleanup_upstream(base,original,item,experiment)==upstream,'Original completed inputs changed before cleanup')
+    require(set(directory.rglob('*'))==set(states)-{directory},'Generated input inventory changed before cleanup')
+    for path in states:
+        canonical(path); observed=path.lstat()
+        require(tuple(getattr(observed,key) for key in ('st_dev','st_ino','st_size','st_mode','st_nlink',
+            'st_uid','st_gid','st_mtime_ns','st_ctime_ns'))==states[path],'Generated input changed after inventory')
+    require(not input_pin.exists() and not input_pin.is_symlink(),'Input pin appeared after inventory')
+    for name in inventory: (directory/name).unlink()
+    for path in sorted(directories,key=lambda p:len(p.parts),reverse=True): path.rmdir()
+    require(not directory.exists() and _cleanup_upstream(base,original,item,experiment)==upstream
+            and source(ROOT,original,OLD,'run_full4d_sample',())==evidence['source_binding'],
+            'Only generated interrupted inputs may be removed; original upstream must remain unchanged')
+    evidence.update(status='removed_unpublished_generated_inputs',upstream_rehashed_after=True,
+                    original_source_rehashed_after=True)
+    record(evidence)
+    return evidence
 
 
 def native(driver, original, experiment, cfg, item, stage_row, continuation, seconds, owner, model_lock, stop,
@@ -400,6 +525,11 @@ def run():
                     for stage_row in driver.STAGES:
                         stage, script, args, _, _, reserved = stage_row
                         seconds(stage_row); row.update(status='running', phase=stage); persist()
+                        if stage=='inputs':
+                            def cleanup_receipt(evidence):
+                                row['discarded_unpublished_inputs']=evidence; persist()
+                            cleanup_interrupted_inputs(experiment,base,original,item,
+                                report['previous_continuation'],cleanup_receipt)
                         reuse = report_pass(base, stage, script, original, item) if stage in STAGE_NAMES else None
                         if stage in {'inputs','prepare','forward','refined','export','video'}:
                             reuse = saved_stage(base, stage, experiment, original, item, capacity_code=code)
