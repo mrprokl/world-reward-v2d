@@ -61,3 +61,14 @@ the exact tail; preserve quantization, PNG compression and exhaustive validation
 Historical R92 supports byte parity/CPU throughput; R96 retains its timeout FAIL.
 This is a new production scheduling implementation, not a reclassified benchmark
 or improved reconstruction claim. Progress distinguishes submitted/committed frames.
+
+## Completed random diagnostic
+
+Continuation `82c1ae99788d219e3435edfa4d956e46dbdce483` finished in 10,606 s.
+Complete native refinement/export and synchronized videos: episode 9 (415 frames,
+113,614 B), episode 1 (668 frames, 158,697 B), episode 14 (442 frames, 96,090 B).
+Episode 7 failed during rigid object tracking: insufficient inferred visible
+object points. Preserve the failure and original sample; no fabricated bridge,
+manual labels or replacement clip. Three preview videos total **368,401 B**.
+Private publication uses a separate fixed metadata-corrected CPU publisher;
+original failed publication/status remains unchanged. Human visual QA pending.
