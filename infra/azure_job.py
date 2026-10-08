@@ -131,7 +131,7 @@ def runtime_bundle_paths(files: dict[str, bytes], script: str) -> list[str]:
                     package_aliases.update(alias.asname or alias.name for alias in node.names if alias.name == "world_reward")
             for node in ast.walk(tree):
                 if isinstance(node, ast.Constant) and isinstance(node.value, str) and re.fullmatch(
-                    r"infra/[a-z0-9_]+\.(?:py|sh|cpp|hpp|h)|src/world_reward/[a-zA-Z0-9_/]+\.py", node.value,
+                    r"infra/(?:[a-z0-9_]+\.(?:py|sh|cpp|hpp|h)|Dockerfile\.[a-z0-9_]+)|src/world_reward/[a-zA-Z0-9_/]+\.py", node.value,
                 ):
                     # Receipts can name code-relative helpers rather than
                     # sibling filenames. Their complete closure is mandatory.

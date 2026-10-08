@@ -157,7 +157,9 @@ def prepare(code, out, revision, binding):
             'Fresh runtime image tag required')
     source_rows = acquire_source(context/'upstream', c, deadline)
     weight = prep/c['weight_file']; weight_pin = acquire_weight(weight, c, deadline)
-    write(context/'Dockerfile', (code/'infra/Dockerfile.sam31').read_bytes(), mode=0o444)
+    dockerfile=Path(__file__).with_name('Dockerfile.sam31')
+    require(dockerfile == code/'infra/Dockerfile.sam31', 'Frozen sibling Dockerfile required')
+    write(context/'Dockerfile', dockerfile.read_bytes(), mode=0o444)
     with (prep/'build.log').open('xb') as log:
         os.fchmod(log.fileno(), 0o400)
         r = subprocess.run(['docker', 'build', '--network', 'host', '--tag', tag,
@@ -196,6 +198,16 @@ def compatible_init(model, resource_path, *, async_loading_frames=False):
     filtered = {k:v for k,v in kwargs.items() if k in signature.parameters}
     require('resource_path' in filtered, 'Native init resource API absent')
     return model.init_state(**filtered), sorted(set(kwargs)-set(filtered))
+
+
+def full_grid_stream(model, state):
+    """Native one-pass final batch; public base API drops the final-batch flag."""
+    require('is_last_batch' in inspect.signature(model.propagate_in_video).parameters,
+            'Pinned final-batch native API required')
+    for index,output in model.propagate_in_video(inference_state=state,start_frame_idx=0,
+            max_frame_num_to_track=None,reverse=False,is_last_batch=True):
+        state.get('cached_frame_outputs',{}).pop(index,None)
+        yield dict(frame_index=index,outputs=output)
 
 
 def decode_original(item):
@@ -309,9 +321,7 @@ def native(code, out):
                 predictor.handle_request(dict(type='reset_session',session_id=sid))
                 predictor.handle_request(dict(type='add_prompt',session_id=sid,frame_index=0,text=query))
                 expected=0; stage_start=time.monotonic()
-                for response in predictor.handle_stream_request(dict(type='propagate_in_video',session_id=sid,
-                    propagation_direction='forward',start_frame_index=0,max_frame_num_to_track=None,
-                    evict_cached_frame_outputs=True)):
+                for response in full_grid_stream(predictor.model,predictor._all_inference_states[sid]['state']):
                     index=response['frame_index']; require(index == expected, 'Missing/duplicate/reordered original SAM frame')
                     output=response['outputs']; stats=output.get('frame_stats') or {}
                     require('num_obj_dropped' in stats, 'Explicit native capacity diagnostic required')
@@ -352,6 +362,7 @@ def native(code, out):
             torch=torch.__version__,use_fa3=False,compile=False,normalized_pil_loader=True,
             checkpoint_coverage=checkpoint_coverage,
             init_unsupported_argument_filtered=['offload_state_to_cpu'],full_original_frame_grid=True,
+            explicit_native_final_batch=True,cached_outputs_evicted_after_delivery=True,
             source_rehashed_after=True,inputs_rehashed_after=True,weight_rehashed_after=True,
             baseline_modified=False,ground_truth_used=False,manual_labels=False,quality_verified=False,
             training_overlap_verified=False,challenge_overlap_verified=False)

@@ -40,7 +40,8 @@ External checkpoint training/challenge overlap remains unverified.
 Keep native temporal heuristics initially; capacity64, multiplex16, BF16 SDPA,
 no FP8FA3 or compilation. Correct audited source transport defects through a
 general tested adapter, not per-episode adjustments: PIL originalRGB input with
-native normalization, compatible session initialization arguments.
+native normalization, compatible session initialization arguments, and explicit
+native final-batch flushing (the public base wrapper drops `is_last_batch=True`).
 
 Qwen unchanged model revision0c351dd01ed87e9c1b53cbc748cba10e6187ff3b,
 nativeBF16 SDPA/processor resolution/output1536, deterministic greedy. Explicit
@@ -76,3 +77,11 @@ Primary inspiration, not exact code reproduction:
 [AgentRVOS](https://arxiv.org/html/2603.23489v1),
 [InterRVOS](https://arxiv.org/abs/2506.02356),
 [SAM3.1release](https://github.com/facebookresearch/sam3/blob/2345a4ad109ac29c569da749c91d84f10dc08c40/RELEASE_SAM3p1.md).
+
+## Execution decisions
+
+- Initial producer2fffd7 failed before preparation/inference: its immutable
+  transport closure omitted the referenced SAM Dockerfile. No candidate bank,
+  GPU inference or model download occurred. Fix general Dockerfile closure,
+  test final-batch adapter, and relaunch a fresh namespace with the same frozen
+  cohort/settings. This is an infrastructure repair, not a quality ablation.

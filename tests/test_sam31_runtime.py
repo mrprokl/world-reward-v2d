@@ -37,6 +37,19 @@ def test_signature_adapter_preserves_supported_parameters():
     assert out is False and dropped==[]
 
 
+def test_full_native_stream_flushes_final_batch_and_evicts_only_delivered():
+    class Model:
+        def propagate_in_video(self,inference_state,start_frame_idx=None,max_frame_num_to_track=None,
+                               reverse=False,is_last_batch=False):
+            assert start_frame_idx==0 and reverse is False and max_frame_num_to_track is None
+            assert is_last_batch is True
+            for index in range(3):yield index,dict(value=index)
+    state={'cached_frame_outputs':{0:'a',1:'b',2:'c'}}
+    result=list(runtime.full_grid_stream(Model(),state))
+    assert [r['frame_index'] for r in result]==[0,1,2]
+    assert state['cached_frame_outputs']=={}
+
+
 def output(mask):
     masks=np.asarray(mask,dtype=bool)
     return dict(out_obj_ids=np.array([17],dtype=np.int64),out_probs=np.array([.8],dtype=np.float32),
@@ -102,3 +115,19 @@ def test_shell_and_docker_do_not_copy_credentials_or_qwen():
     assert 'hf_token' not in docker and 'Qwen' not in docker
     script=(root/'infra/run_sam31_runtime.sh').read_text()
     assert 'set +x' in script and 'run_sam31_runtime/code' in script
+
+
+def test_native_source_bundle_contains_frozen_dockerfile():
+    from azure_job import runtime_bundle_paths
+    root=Path(__file__).resolve().parents[1]
+    # Manufacture only the direct closure: native scientific imports are image dependencies.
+    files={
+        'infra/run_sam31_runtime.sh':(root/'infra/run_sam31_runtime.sh').read_bytes(),
+        'infra/sam31_runtime.py':(root/'infra/sam31_runtime.py').read_bytes(),
+        'infra/Dockerfile.sam31':(root/'infra/Dockerfile.sam31').read_bytes(),
+        'infra/mediapipe_cpu_runtime_verify.py':b'',
+        'infra/task_grounding_pilot.py':b'',
+        'configs/sam31_runtime_v1.json':b'{}',
+        'configs/hybrid_pair_v1.json':b'{}',
+    }
+    assert 'infra/Dockerfile.sam31' in runtime_bundle_paths(files,'infra/run_sam31_runtime.sh')

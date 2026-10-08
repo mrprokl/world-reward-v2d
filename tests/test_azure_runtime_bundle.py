@@ -191,6 +191,16 @@ def test_code_relative_receipt_helper_includes_complete_closure_and_missing_fail
         launcher.runtime_bundle_paths(source, "infra/run_smoke.sh")
 
 
+def test_code_relative_dockerfile_is_frozen_and_missing_fails():
+    source = files()
+    source["infra/helper.py"] += b"helpers = ('infra/Dockerfile.sam31',)\n"
+    source["infra/Dockerfile.sam31"] = b"FROM pinned-runtime\n"
+    assert "infra/Dockerfile.sam31" in launcher.runtime_bundle_paths(source, "infra/run_smoke.sh")
+    source.pop("infra/Dockerfile.sam31")
+    with pytest.raises(ValueError, match="Literal code-relative source dependency is not committed"):
+        launcher.runtime_bundle_paths(source, "infra/run_smoke.sh")
+
+
 def test_h102_closures_keep_their_actual_producer_provenance_helpers():
     root = Path(__file__).resolve().parents[1]
     source = {str(p.relative_to(root)): p.read_bytes()

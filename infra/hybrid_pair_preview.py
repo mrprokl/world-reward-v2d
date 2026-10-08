@@ -34,6 +34,8 @@ def native(code,out,sam_producer,selection_producer):
     require(summary['status']=='complete_diagnostic_not_quality_pass' and summary['sam_producer']==sam_producer,
             'Actual saved selection cohort required')
     pins={r['episode_index']:r['selection'] for r in summary['episodes']}
+    require(identity(sam/'sam-report.json',20<<20)==summary['sam_report_pin'],
+            'QA must use the same SAM report as saved selection')
     sam_report=strict((sam/'sam-report.json').read_bytes())
     sam_pins={r['episode_index']:{b['role']:b['bank'] for b in r['banks']} for r in sam_report['episodes']}
     require(set(pins)==set(c['episodes']),'No success-only visual subset')
