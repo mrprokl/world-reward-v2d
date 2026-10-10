@@ -1,0 +1,42 @@
+{
+  "schema": "world_reward.contact_memory_real.v1",
+  "episode": 9,
+  "frames": 415,
+  "fps": 30.0,
+  "variants": [
+    "contact_memory"
+  ],
+  "workers": 1,
+  "max_nfev": 300,
+  "max_candidates": 8,
+  "contact_sigma_diameter": 0.02,
+  "temperature_diameter": 0.01,
+  "max_point_triangle_pairs": 1000000000,
+  "development_reference": "published_soft_contact_temporal_memory_and_manufactured_unit_contracts_not_real_calibration",
+  "association": {
+    "distance_sigma_diameter": 0.02,
+    "transition_sigma_diameter": 0.02,
+    "normal_sigma_rad": 1.0471975511965976,
+    "proposal_count": 8,
+    "patch_count": 8,
+    "development_reference": "single_structural_contact_memory_probe_no_challenge_coefficient_selection"
+  },
+  "proposal_source": "independently_pinned_prior_soft_pool_fit_not_ground_truth",
+  "fit_initialization": "original_full_T_pose_priors_not_saved_soft_output",
+  "gates": {
+    "reprojection_ratio_maximum": 1.00000001,
+    "contact_gap_ratio_maximum": 1.00000001,
+    "acceleration_tail_ratio_maximum": 1.00000001,
+    "RGB_motion_increment_ratio_maximum": 1.00000001,
+    "compare_against": [
+      "original",
+      "J1",
+      "soft_pool"
+    ],
+    "convergence_required": true,
+    "scope": "conservative_same_automatic_observation_QA_not_ground_truth_accuracy"
+  },
+  "depth_used": false,
+  "covariance_used": false,
+  "production_adopted": false
+}
