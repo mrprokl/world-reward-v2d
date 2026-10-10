@@ -146,6 +146,19 @@ preflights, and accepts a pinned actual stopped-driver/container attestation
 (7538B SHA58dbd8b26a685de3369dafc6aa4ee5f5d38f82c5abb7cbabf2df6be05594f6a1).
 All-four recovery25b4deb is actually active in first-clip preparation at15:51Z;
 no final fit or reference result is claimed. No original artifact was overwritten.
+Actual first-clip preparation subsequently completed356.133s (33118B
+SHAb942ffee345133cf6d69ebe8e54f8f5d65f6c09acf3271bad4e3f2dc3ffb9ad8),
+then forward72.507s (75060B
+SHAdc7fc440896bb58ed0e83595fbab1f25de82c78c136e21779198525fc3f512c7).
+First native control A completed all301 updates and full96-frame geometry in
+1483.128s, including1462.948s solver;35997B
+SHAcceee4c64319a156fbf0380a5e9bb3fc4c3acc6b61996573e4f3a664c53fbe17.
+Actual initial three updates6.931/4.621/5.884s; scheduled PEN updates181–183
+5.758/4.885/4.907s. Both cost gates pass; peak allocated6.48GB/reserved7.19GB.
+This is execution/cost validation, not accuracy. B is active at16:22Z; all8 finals
+must complete before the quarantined reference is opened. The preparation raster
+prefix does not accelerate native nvdiffrast fitting, and a3.4KB K `.cpu()` stack
+is a CUDA synchronization barrier, not proof that CPU conversion dominates.
 Fifteen bounded actual py-spy stack samples:4 input geometry validations,6
 CPU triangle-AABB extrema/counting,5 raster output validation/synchronization.
 Object prior had not been produced, ruling out native OBB/export as that delay.
