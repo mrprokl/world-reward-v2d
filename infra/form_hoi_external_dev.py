@@ -51,6 +51,15 @@ def source_binding(rt, code, revision):
             (cfg['fps'], cfg['width'], cfg['height']) == (30,1536,1152) and
             cfg['native_camera'] == 'front_stereo_camera_left' and cfg['reserved_acquired'] == 0 and
             cfg['training_overlap_verified'] is False, 'Frozen four-DEV first96 RGB-only contract required')
+    require(cfg['native_semantic_paths']==dict(object_prompt='object.prompt',action='action_desc',
+            object_id='object.id',person_id='person.id',full_frames='frame_count') and
+            cfg['native_metadata']=='hoi_metadata.yaml' and
+            cfg['first_acquisition']['producer_revision']=='658c156c9fcc075e9aa5b659f6cc5e8d5dfd9021' and
+            cfg['alias_guard']['frames_per_video']==96 and
+            cfg['alias_guard']['decoded_format']=='native_rgb24_sha256_no_resize' and
+            cfg['alias_guard']['schema']=='world_reward.track1_rgb_alias_bank.v1' and
+            cfg['challenge_manifest']==dict(bytes=13081,sha256='3df960ce0f594b8f51675b21bb070925de7aa87a583332674eb89b0e90fc6263'),
+            'Frozen original text selectors and permitted challenge RGB guard required')
     return cfg, cohort, source, config_pin
 
 

@@ -15,8 +15,24 @@ fi
 export DOCKER_HOST="unix://$ROOT/docker.sock"
 IMAGE=sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7
 NAME="wr-track1-alias-bank-$REV"
+CIDFILE="$BASE/.container.cid"
+cleanup() {
+ local status=$? cid='' absent=false; trap - EXIT TERM INT
+ if [[ -f "$CIDFILE" && ! -L "$CIDFILE" ]]; then
+  cid="$(cat "$CIDFILE")"; [[ "$cid" =~ ^[0-9a-f]{64}$ ]] || exit 1
+  if [[ -n "$(timeout 20s docker ps -aq --no-trunc --filter "id=$cid")" ]]; then
+   [[ "$(timeout 20s docker inspect "$cid" --format '{{.Image}}|{{.Name}}|{{index .Config.Labels "world_reward.alias_bank.owner"}}')" == "$IMAGE|/$NAME|$REV" ]] || exit 1
+   timeout 20s docker rm -f "$cid" >/dev/null || status=1
+  fi
+  [[ -z "$(timeout 20s docker ps -aq --no-trunc --filter "id=$cid")" ]] && absent=true
+  chmod 444 "$CIDFILE"
+ fi
+ printf '{"process_exit_code":%d,"owned_container_absent":%s}\n' "$status" "$absent" > "$BASE/host-exit.json"
+ chmod 444 "$BASE/host-exit.json"; exit "$status"
+}
+trap cleanup EXIT; trap 'exit 143' TERM; trap 'exit 130' INT
 # No GPU lease is needed: exact RGB decoding only, in parallel with native fit.
-timeout --signal=TERM --kill-after=10s 610s docker run --rm --name "$NAME" \
+timeout --signal=TERM --kill-after=10s 610s docker run --rm --cidfile "$CIDFILE" --name "$NAME" \
  --label "world_reward.alias_bank.owner=$REV" --network none --read-only --cpus 4 --memory 2g \
  --cap-drop ALL --security-opt no-new-privileges --tmpfs /tmp:rw,nosuid,size=64m \
  --mount "type=bind,src=${CODE%/code},dst=${CODE%/code},readonly" \

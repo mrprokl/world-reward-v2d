@@ -67,7 +67,9 @@ def test_pinned_dev_protocol_no_reserved_same_contiguous_grid():
     cohort=json.loads((root/cfg['cohort_protocol']).read_bytes())
     assert len(d.acquisition.cohort(cohort,'acquire_dev'))==4
     assert cfg['contiguous_prefix_frames']==cfg['minimum_length']==96
-    assert cfg['alias_guard']['actual_bank_identity'] is None
+    pin=cfg['alias_guard']['actual_bank_identity']
+    assert pin is None or (set(pin)=={'bytes','sha256'} and isinstance(pin['bytes'],int) and
+                           0<pin['bytes']<=512 << 10 and len(pin['sha256'])==64)
     assert cfg['reserved_acquired']==0 and cfg['training_overlap_verified'] is False
 
 
