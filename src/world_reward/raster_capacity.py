@@ -74,6 +74,26 @@ def _bin_edges(size, other, bin_size):
     return low, high
 
 
+def _triangle_xy_bounds(vertex, faces):
+    """Same finite float32 extrema, without an [F,3,2] reduction temporary.
+
+    Advanced-index gathers own their buffers. Reuse the first gather for the
+    upper bound and reduce the three ORIGINAL corners in their original order;
+    no rounding, coordinate arithmetic, face filtering or vertex mutation. At
+    most three [chunk_faces,2] buffers are live rather than a full triangle
+    gather plus both bounds. Inputs have already passed the public contracts.
+    """
+    high = vertex[faces[:, 0], :2]
+    other = vertex[faces[:, 1], :2]
+    low = np.minimum(high, other)
+    np.maximum(high, other, out=high)
+    del other
+    other = vertex[faces[:, 2], :2]
+    np.minimum(low, other, out=low)
+    np.maximum(high, other, out=high)
+    return low, high
+
+
 def conservative_raster_capacity(vertices_ndc, faces, image_size, *, bin_size=None) -> RasterCapacity:
     """Return safe RasterizationSettings bin_size/M without modifying inputs.
 
@@ -111,8 +131,7 @@ def conservative_raster_capacity(vertices_ndc, faces, image_size, *, bin_size=No
     for b, vertex in enumerate(verts):
         difference = np.zeros(cells, dtype=np.int64)
         for start in range(0, len(indices), _CHUNK_FACES):
-            triangles = vertex[indices[start:start + _CHUNK_FACES], :2]
-            low, high = triangles.min(axis=1), triangles.max(axis=1)
+            low, high = _triangle_xy_bounds(vertex, indices[start:start + _CHUNK_FACES])
             x0 = np.searchsorted(xhigh, low[:, 0], side="left")
             x1 = np.searchsorted(xlow, high[:, 0], side="right")
             y0 = np.searchsorted(yhigh, low[:, 1], side="left")
