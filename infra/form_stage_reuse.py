@@ -251,7 +251,8 @@ def qualify_prepare_prefix(p, code, revision, row, approval):
         'Original failed source/report or prefix approval changed during qualification')
     return dict(approval=dict(path=str(path),pin=pin), original_directory=str(directory),
         original_failed_report=PREPARE_PREFIX_REPORT, original_source_binding=binding,
-        original_public_input=row, decoder_identity=failed['decoder_identity'], body_assets=failed['body_assets'],
+        original_public_input=dict(sequence_id=row['sequence_id'], input=str(row['input']), pin=row['pin']),
+        decoder_identity=failed['decoder_identity'], body_assets=failed['body_assets'],
         inference_source_identity=failed['inference_source_identity'],
         consumed_intermediate_sources=failed['consumed_intermediate_sources'], artifacts=PREPARE_PREFIX_FILES)
 

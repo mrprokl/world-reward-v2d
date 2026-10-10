@@ -117,7 +117,7 @@ def test_wrappers_use_original_predictor_ENTRY_without_parent_GPU_lease():
     assert 'infra/form_hoi_external_cohort.py' in predictor.HELPERS
 
 
-def test_resume_preflight_failure_is_sealed_with_all_four_not_started(tmp_path,monkeypatch):
+def test_resume_preflight_failure_is_sealed_with_all_four_not_started(tmp_path,monkeypatch,capsys):
     code,dev,_,seqs=prepared(tmp_path,monkeypatch); revision='c'*40
     monkeypatch.setattr(predictor,'ROOT',tmp_path);(tmp_path/'results').mkdir()
     monkeypatch.setattr(predictor,'source',lambda *_a:dict(producer_revision=revision))
@@ -128,12 +128,58 @@ def test_resume_preflight_failure_is_sealed_with_all_four_not_started(tmp_path,m
     monkeypatch.setattr(form_stage_reuse,'reuse',broken)
     monkeypatch.setattr(predictor,'driver',lambda *_a:pytest.fail('No inference before admission'))
     stop=dict(path=tmp_path/'results/stop.json',pin=dict(bytes=123,sha256='f'*64))
+    capacity=dict(path=tmp_path/'results/capacity.json',bytes=1,sha256='a'*64)
+    prefix=dict(path=tmp_path/'results/prefix.json',bytes=2,sha256='b'*64)
+    prepare=dict(path=tmp_path/'results/prepare-prefix.json',bytes=3,sha256='c'*64)
+    import raster_prefix_activation
+    monkeypatch.setattr(raster_prefix_activation,'activation',lambda *_a,**_k:None)
+    monkeypatch.setattr(predictor,'config',lambda *_a:dict(body_image='native-pinned-image'))
     with pytest.raises(FileNotFoundError):
         cohort.run(predictor,code,revision,stage='all',dev_revision=dev,reuse_stages_from='d'*40,
-            raster_gate=dict(path='unused',bytes=1,sha256='a'*64),terminal_stop=stop)
+            raster_gate=capacity,raster_prefix=prefix,prepare_prefix=prepare,terminal_stop=stop)
     value=json.loads((tmp_path/'results'/f'form-hoi-external-cohort-{revision}-all.json').read_text())
     assert seen==[stop] and value['status']=='fail' and value['error_type']=='FileNotFoundError'
     assert value['failure_phase']=='preflight' and value['predictions_started'] is False
     assert value['sequence_order']==seqs and all(r['status']=='not_started' for r in value['sequences'])
     assert value['ground_truth_used'] is False and value['private_truth_read'] is False
     assert not (tmp_path/'results'/('form-hoi-external-predict-'+revision)).exists()
+    assert value['raster_runtime_controls']['capacity']==dict(capacity,path=str(capacity['path']))
+    assert value['raster_runtime_controls']['prefix']==dict(prefix,path=str(prefix['path']))
+    assert value['technical_resume_controls']==dict(prepare_prefix=dict(prepare,path=str(prepare['path'])),
+        terminal_stop=dict(stop,path=str(stop['path'])))
+    assert isinstance(capacity['path'],Path) and isinstance(stop['path'],Path)
+    stderr=json.loads(capsys.readouterr().err)
+    assert stderr==dict(status='fail',producer_revision=revision,error_type='FileNotFoundError',failure_phase='preflight')
+
+
+def test_success_receipt_uses_JSON_paths_without_changing_execution_controls(tmp_path,monkeypatch):
+    code,dev,_,seqs=prepared(tmp_path,monkeypatch); revision='d'*40
+    monkeypatch.setattr(predictor,'ROOT',tmp_path);(tmp_path/'results').mkdir()
+    monkeypatch.setattr(predictor,'source',lambda *_a:dict(producer_revision=revision))
+    capacity=dict(path=tmp_path/'capacity.json',bytes=1,sha256='a'*64)
+    prefix=dict(path=tmp_path/'prefix.json',bytes=2,sha256='b'*64)
+    stop=dict(path=tmp_path/'stop.json',pin=dict(bytes=3,sha256='c'*64))
+    prepare=dict(path=tmp_path/'prepare.json',bytes=4,sha256='e'*64)
+    import raster_prefix_activation,form_stage_reuse
+    monkeypatch.setattr(raster_prefix_activation,'activation',lambda path,*_a,**_k:None)
+    monkeypatch.setattr(predictor,'config',lambda *_a:dict(body_image='native-pinned-image'))
+    def reuse(*_a,**kwargs):
+        assert kwargs['stop'] is stop and kwargs['prepare_prefix'] is prepare
+        for sid in seqs:
+            d=tmp_path/'results'/('form-hoi-external-predict-'+revision)/sid/'localize';d.mkdir(parents=True)
+            predictor.save_json(d/'report.json',dict(status='complete',stage='localize',ground_truth_used=False,private_truth_read=False,artifacts={}))
+        return dict(original_localization_proof={},localization_API_calls=0)
+    monkeypatch.setattr(form_stage_reuse,'reuse',reuse)
+    def driver(args):
+        # Metadata-only stage reporting; no models or real stage payloads.
+        for stage in predictor.STAGES[1:]:
+            d=args.out/stage;d.mkdir()
+            predictor.save_json(d/'report.json',dict(status='complete',stage=stage,ground_truth_used=False,private_truth_read=False,artifacts={}))
+    monkeypatch.setattr(predictor,'driver',driver)
+    value=cohort.run(predictor,code,revision,stage='all',dev_revision=dev,reuse_stages_from='f'*40,
+        raster_gate=capacity,raster_prefix=prefix,prepare_prefix=prepare,terminal_stop=stop)
+    sealed=json.loads((tmp_path/'results'/f'form-hoi-external-cohort-{revision}-all.json').read_bytes())
+    assert sealed['status']=='complete' and len(sealed['sequences'])==4
+    assert sealed['technical_resume_controls']['terminal_stop']['path']==str(stop['path'])
+    assert sealed['raster_runtime_controls']['capacity']['path']==str(capacity['path'])
+    assert isinstance(capacity['path'],Path) and all(r['status']=='complete' for r in value['sequences'])

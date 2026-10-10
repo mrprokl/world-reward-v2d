@@ -9,9 +9,15 @@ import json
 from pathlib import Path
 import re
 import stat
+import sys
 from types import SimpleNamespace
 
 DATA = Path('/srv/world-reward-data/form_hoi_external_dev_v1')
+
+
+def control_record(value):
+    """JSON-only receipt projection; execution retains its original Path/pin."""
+    return None if value is None else dict(value, path=str(value['path']))
 
 
 def discover(predictor, code, dev_revision):
@@ -96,8 +102,10 @@ def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_f
         ground_truth_used=False, private_truth_read=False, reserved_acquired=0,
         CPU_localizer_concurrency=4 if stage=='localize' else 1, GPU_clip_concurrency=0 if stage=='localize' else 1,
         sequence_order=[r['sequence_id'] for r in rows], sequences=[], full_4D_accuracy_verified=False)
-    report['raster_runtime_controls'] = dict(capacity=raster_gate, prefix=raster_prefix,
+    report['raster_runtime_controls'] = dict(capacity=control_record(raster_gate), prefix=control_record(raster_prefix),
         original_intermediate_outputs_preserved=True, native_fit_operators_unchanged=True)
+    report['technical_resume_controls'] = dict(prepare_prefix=control_record(prepare_prefix),
+        terminal_stop=control_record(terminal_stop))
     outcomes = {}
     def invoke(row):
         sid = row['sequence_id']; base = predictor.ROOT/'results'/('form-hoi-external-predict-'+revision)/sid
@@ -161,7 +169,10 @@ def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_f
     except Exception as error:
         report['error_type'] = type(error).__name__
         report['failure_phase'] = 'preflight' if not outcomes else 'native_dispatch'
-        report['predictions_started'] = bool(outcomes); raise
+        report['predictions_started'] = bool(outcomes)
+        print(json.dumps(dict(status='fail', producer_revision=revision,
+            error_type=report['error_type'], failure_phase=report['failure_phase'])), file=sys.stderr, flush=True)
+        raise
     finally:
         report['sequences'] = [outcomes.get(r['sequence_id'],dict(sequence_id=r['sequence_id'],status='not_started')) for r in rows]
         predictor.save_json(result,report)
