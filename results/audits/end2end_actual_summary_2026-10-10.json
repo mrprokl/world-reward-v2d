@@ -1,0 +1,37 @@
+{
+  "4D_accuracy_verified": false,
+  "baseline_revision": "052ba1554e9a573d566713a99a61d89a5f27681c",
+  "candidate_adopted": false,
+  "candidate_revision": "ebcee73cc76e036b3c2ec9c32e9a72abc951ad78",
+  "cohort": [
+    9,
+    1,
+    14,
+    7
+  ],
+  "completed": [
+    9,
+    14
+  ],
+  "external_dev": {
+    "completed": 4,
+    "qualified_for_RGB_only_prediction": true,
+    "reference_values_read": false,
+    "report": {
+      "bytes": 7322,
+      "sha256": "90694c8d032f4b3b8eedcd422304cb51510820087d6add4be10e4e20671055dd"
+    },
+    "reserved_opened": false,
+    "revision": "225097082dad29ebbbacb82daa09c71a3ea83bdb"
+  },
+  "metrics_are_proxies": true,
+  "not_reconstructed": [
+    1,
+    7
+  ],
+  "preview_publication": {
+    "bytes": 3124,
+    "sha256": "865c5b4e92f3cb8adfaacb828a6afc8c33e1ed981e4481145c241fde314a58d3"
+  },
+  "schema": "world_reward.end2end_actual_summary.v1"
+}
