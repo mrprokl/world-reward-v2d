@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 import re
 import signal
+import stat
 import sys
 import time
 
@@ -82,6 +83,29 @@ def validate_manifest(value, root=ROOT):
     return base
 
 
+def public_input_identity(path, maximum):
+    """One pinned upstream asset may be owner-writable on its acquisition host.
+
+    Dataset inputs/reports/predictions remain sealed. Only this exact canonical
+    hand asset is admitted through a hash-controlled regular single-link path;
+    no group/world write, no shared chmod, and the container mount stays RO.
+    The same admission and independent pin are checked again after the probe.
+    """
+    path = canonical(path)
+    hand_path = ROOT/'weights/cari4d/refinement/mhr_hand_surface_spec.npz'
+    if path != hand_path:
+        return identity(path, maximum)
+    before = path.lstat()
+    require(stat.S_ISREG(before.st_mode) and before.st_nlink == 1 and not before.st_mode & 0o022,
+            'Pinned hand asset must be single-link regular and not group/world writable')
+    pin = identity(path, maximum, readonly=False)
+    after = path.lstat()
+    require(pin == HAND_SPEC_PIN and all(getattr(before,key)==getattr(after,key) for key in
+        ('st_dev','st_ino','st_mode','st_size','st_mtime_ns','st_ctime_ns','st_nlink','st_uid','st_gid')),
+        'Exclusive authentic hand asset changed while admitted')
+    return pin
+
+
 def load_inputs(manifest_path, manifest_pin):
     require(identity(manifest_path, 32768) == manifest_pin, 'Independent manifest pin mismatch')
     value = strict(Path(manifest_path).read_bytes()); base = validate_manifest(value)
@@ -89,7 +113,7 @@ def load_inputs(manifest_path, manifest_pin):
     reports = {}
     for name in ('input', 'body_report', 'object_report', 'hand_spec'):
         row = value[name]; path = canonical(Path(row['path']))
-        require(identity(path, 1 << 20) == row['pin'], 'Independent input/stage pin mismatch: '+name)
+        require(public_input_identity(path, 1 << 20) == row['pin'], 'Independent input/stage pin mismatch: '+name)
         pins[path] = row['pin']
         if name != 'hand_spec': reports[name] = strict(path.read_bytes())
     public = reports['input']
@@ -314,7 +338,8 @@ def main():
             for side in range(2):
                 row=probe(torch,_C,native_py.point_face_distance,bvh,vertices,faces,human[frame,ids[side]],rotation,translation)
                 report['rows'].append(dict(frame_index=frame,hand_side=side,**row))
-        require(all(identity(path,1<<30)==pin for path,pin in pins.items()),'Pinned public geometry changed during qualification')
+        require(all(public_input_identity(path,1<<30)==pin for path,pin in pins.items()),
+                'Pinned public geometry changed during qualification')
         after=source(ROOT,code,revision,ENTRY,HELPERS);require(after==binding,'Source closure changed')
         passed=len(report['rows'])==6 and all(row['kernel_probe_pass'] for row in report['rows'])
         report.update(status='pass' if passed else 'parity_rejected',source_after=after,

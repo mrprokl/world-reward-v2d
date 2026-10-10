@@ -75,7 +75,8 @@ def test_public_package_uses_actual_total_not_invented_total96(monkeypatch,tmp_p
     pins={manifest_path:dict(bytes=10,sha256='b'*64),**{Path(value[n]['path']):value[n]['pin']
         for n in ('input','body_report','object_report','hand_spec')}}
     monkeypatch.setattr(qa,'canonical',lambda p:Path(p))
-    monkeypatch.setattr(qa,'identity',lambda p,*args:pins.get(Path(p),dict(bytes=10,sha256='b'*64)))
+    monkeypatch.setattr(qa,'identity',lambda p,*args,**kwargs:pins.get(Path(p),dict(bytes=10,sha256='b'*64)))
+    monkeypatch.setattr(qa,'public_input_identity',lambda p,*args:pins.get(Path(p),dict(bytes=10,sha256='b'*64)))
     monkeypatch.setattr(Path,'read_bytes',lambda p:payloads[p])
     result,_,_=qa.load_inputs(manifest_path,pins[manifest_path])
     assert result==value
@@ -88,6 +89,29 @@ def test_report_exclusive_and_readonly(tmp_path):
     out=tmp_path/'report.json';qa.seal_json(out,dict(status='pass'))
     assert not out.stat().st_mode&0o222
     with pytest.raises(ValueError):qa.seal_json(out,dict(status='other'))
+
+
+def test_only_exact_hand_asset_can_be_owner_writable(monkeypatch,tmp_path):
+    monkeypatch.setattr(qa,'ROOT',tmp_path)
+    path=tmp_path/'weights/cari4d/refinement/mhr_hand_surface_spec.npz'
+    path.parent.mkdir(parents=True);path.write_bytes(b'pinned fake asset fixture');path.chmod(0o644)
+    monkeypatch.setattr(qa,'HAND_SPEC_PIN',qa.identity(path,readonly=False))
+    assert qa.public_input_identity(path,100)==qa.HAND_SPEC_PIN
+    assert path.stat().st_mode&0o777==0o644
+    report=tmp_path/'report.json';report.write_text('{}');report.chmod(0o644)
+    with pytest.raises(ValueError):qa.public_input_identity(report,100)
+    for mode in (0o664,0o646):
+        path.chmod(mode)
+        with pytest.raises(ValueError,match='group/world'):qa.public_input_identity(path,100)
+
+
+def test_hand_asset_mutation_or_wrong_pin_still_rejected(monkeypatch,tmp_path):
+    monkeypatch.setattr(qa,'ROOT',tmp_path)
+    path=tmp_path/'weights/cari4d/refinement/mhr_hand_surface_spec.npz'
+    path.parent.mkdir(parents=True);path.write_bytes(b'fixture');path.chmod(0o644)
+    monkeypatch.setattr(qa,'HAND_SPEC_PIN',qa.identity(path,readonly=False))
+    path.write_bytes(b'changed')
+    with pytest.raises(ValueError,match='authentic'):qa.public_input_identity(path,100)
 
 
 def test_qualification_frames_operator_and_no_fit_adoption_contract():
