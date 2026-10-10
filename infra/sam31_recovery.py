@@ -283,14 +283,19 @@ class RgbWitness:
         return identity(target, 64 << 20)
 
 
-def select_preserving_forward(forward, reverse, evidence, policy):
+def select_preserving_forward(forward, reverse, evidence, policy, semantic_anchor=False):
     """Only rescue actual old empty frames; never erase/replace old visibility."""
     from world_reward.occlusion_recovery import fuse_frame
+    require(type(semantic_anchor) is bool, 'Explicit independently authenticated anchor flag required')
     fused = fuse_frame(forward, reverse, evidence, policy)
     if forward.mask.any():
         return forward.mask, 'saved_forward_native', fused
     if fused.source == 'reverse_rgb_recovery':
         return fused.observed_mask, 'reverse_rgb_recovery', fused
+    if (semantic_anchor and reverse is not None and reverse.native_presence and reverse.mask.any()):
+        # Native PVS segmentation needs no ORB texture. Identity corroboration
+        # is not mask-accuracy validation; preserve that distinction explicitly.
+        return reverse.mask, 'reverse_native_semantic_anchor_unverified', fused
     return forward.mask, 'unresolved_native_absence', fused
 
 
@@ -307,7 +312,32 @@ def reverse_anchor(areas, load, evidence, rgb_hashes, tracking_sha, policy):
                 provenance='automatic_saved_native_bbox_and_independent_seed_rgb')
 
 
-def native(code, out):
+def verified_late_anchors(code, revision, selected):
+    """Authenticate an independent automatic two-view Vertex anchor ledger."""
+    require(type(revision) is str and len(revision) == 40
+            and all(c in '0123456789abcdef' for c in revision), 'Exact late-anchor producer required')
+    from sam31_late_anchor_run import ENTRY as entry, HELPERS as helpers
+    directory = ROOT/'results'/('sam31-late-anchor-'+revision)
+    host_pin = identity(directory/'report.json', 200000)
+    host = strict((directory/'report.json').read_bytes())
+    require(host['status'] == 'complete_diagnostic_not_quality_pass'
+            and host['producer_revision'] == revision
+            and host['source_binding'] == source(ROOT,ROOT/'jobs'/revision/entry/'code',revision,entry,helpers)
+            and host['credential_files_removed'] is True, 'Actual immutable late-anchor producer required')
+    pin = identity(directory/'late-anchor.json',200000)
+    require(pin == host['native_report'], 'Late-anchor native report changed')
+    actual = strict((directory/'late-anchor.json').read_bytes())
+    require(actual['ground_truth_used'] is False and actual['manual_labels'] is False
+            and actual['model'] == 'gemini-3.5-flash' and actual['saved_forward_producer'] == 'b658881079871508c6b3ec14d001dc1299956996'
+            and [r['episode_index'] for r in actual['episodes']] == [1,7], 'Same original automatic failed clips required')
+    by_ep = {r['episode_index']:r for r in actual['episodes']}
+    for item in selected:
+        if item['episode'] in by_ep:
+            require(by_ep[item['episode']]['video_pin'] == item['video_pin'], 'Late-anchor RGB source differs')
+    return by_ep, {directory/'report.json':host_pin,directory/'late-anchor.json':pin}
+
+
+def native(code, out, late_revision=None):
     import numpy as np
     from world_reward.occlusion_recovery import RecoveryPolicy, saved_native_candidate
     from PIL import Image
@@ -320,6 +350,9 @@ def native(code, out):
     prep = strict((out / 'runtime.json').read_bytes()); verify_runtime_source(prep)
     weight = Path(prep['weight_file']); require(identity(weight, runtime['weight_bytes']) == prep['weight'], 'Original checkpoint required')
     selected = inputs(cfg['episodes']); old, bound, old_binding = saved_forward(code, cfg, selected)
+    late = {}
+    if late_revision is not None:
+        late, late_bound = verified_late_anchors(code,late_revision,selected); bound.update(late_bound)
     predictor = build_sam3_multiplex_video_predictor(checkpoint_path=str(weight), max_num_objects=2,
         multiplex_count=16, use_fa3=False, use_rope_real=True, compile=False, warm_up=False, async_loading_frames=False)
     coverage = verify_checkpoint_coverage(predictor.model, weight); parity = prompt_parity(predictor)
@@ -357,6 +390,15 @@ def native(code, out):
             evidence = (lambda i: None) if witness is None else witness.evidence
             anchor = None if not missing else reverse_anchor(tracking['areas']['1'], load, evidence, hashes,
                 original['pins']['tracking.json']['sha256'], policy)
+            semantic_anchor = False
+            if anchor is None and missing and ep in late and late[ep]['accepted']:
+                row = late[ep]; index = row['frame_index']
+                require(index == visible[-1] and row['rgb_sha256'] == hashes[index]
+                        and row['saved_forward_tracking_sha256'] == original['pins']['tracking.json']['sha256']
+                        and row['box'] == mask_box(load(index)), 'Corroborated literal late native box differs')
+                anchor = dict(frame_index=index,object_id=1,rgb_sha256=hashes[index],box=row['box'],
+                              provenance='automatic_two_view_vertex_corroborated_native_box')
+                semantic_anchor = True
             if anchor is not None and anchor['frame_index'] in cfg['frames']:
                 anchor = None  # No independent late visibility; preserve full-T instead of aborting.
             state = tracker_state = None
@@ -395,11 +437,11 @@ def native(code, out):
                         max_frame_num_to_track=0, reverse=True, tqdm_disable=True, run_mem_encoder=True))
                     require(len(stream) == 1, 'Exactly one original-frame native reverse output required')
                     reverse, logit_record = native_singleton(stream[0], index, h, w, hashes[index])
-                chosen, choice, fused = select_preserving_forward(forward, reverse, evidence(index), policy)
+                chosen, choice, fused = select_preserving_forward(forward, reverse, evidence(index), policy, semantic_anchor)
                 masks = np.stack((person, chosen))
                 for role in range(2):
                     key = f'{role}/{index:06d}.png'; target = dest / 'masks' / key
-                    if role == 0 or choice != 'reverse_rgb_recovery':
+                    if role == 0 or not choice.startswith('reverse_'):
                         _copy(directory / 'masks' / key, target, original['inventory'][key])
                     else:
                         with target.open('xb') as f:
@@ -413,7 +455,7 @@ def native(code, out):
                 timeline.append(dict(frame_index=index, decoded_rgb_sha256=hashes[index],
                     person_visible=bool(person.any()), object_visible=bool(chosen.any()),
                     native_presence=[tracking['records'][index]['native_presence'][0],
-                                     bool(reverse.native_presence) if choice == 'reverse_rgb_recovery' else forward.native_presence],
+                                     bool(reverse.native_presence) if choice.startswith('reverse_') else forward.native_presence],
                     mask_source=choice))
                 recovery.append(dict(frame_index=index, choice=choice, proposed_state=fused.state,
                     proposed_source=fused.source, native_reverse_evaluated=reverse is not None,
@@ -439,7 +481,7 @@ def native(code, out):
             witness_pin = None if witness is None else witness.persist(dest / 'rgb-witness.npz')
             save(dest / 'recovery.json', dict(schema='world_reward.sam31_recovery_clip.v1',
                 original_frame_indices=list(range(total)), anchor=anchor, records=recovery,
-                recovered_frames=[r['frame_index'] for r in recovery if r['choice'] == 'reverse_rgb_recovery'],
+                recovered_frames=[r['frame_index'] for r in recovery if r['choice'].startswith('reverse_')],
                 unresolved_frames=[r['frame_index'] for r in recovery if r['choice'] == 'unresolved_native_absence'],
                 raw_forward_presence_available=False, saved_forward_native_presence_sign_retained=True,
                 reverse_raw_presence_recorded=True, reverse_mask_logits_retained='native_sign_mask_plus_range_summary',
@@ -449,6 +491,8 @@ def native(code, out):
                 rgb_matched_features=None if witness is None else witness.match_counts,
                 geometry='independent_seed_to_rgb_affine_not_3d_pose', policy=cfg['recovery_gates'],
                 additional_reverse_passes=int(anchor is not None), model_calls=0 if anchor is None else 1,
+                semantic_anchor_producer=late_revision if semantic_anchor else None,
+                semantic_anchor_is_not_mask_accuracy=True,
                 ground_truth_used=False, manual_labels=False, mask_interpolation=False,
                 true_occlusion_inferred=False, quality_verified=False))
             qa = preview(frames, sampled, [], dest / 'qa.jpg', ep, cfg['max_jpeg_bytes'])
@@ -469,7 +513,7 @@ def native(code, out):
             save(dest / 'report.json', report)
             results.append(dict(episode_index=ep, status='pass', frames=total, automatic_masks=str(dest.relative_to(out)),
                 report=identity(dest / 'report.json'), diagnostics=report['diagnostics'], qa=qa,
-                originally_empty_frames=len(missing), recovered_frames=sum(r['choice'] == 'reverse_rgb_recovery' for r in recovery),
+                originally_empty_frames=len(missing), recovered_frames=sum(r['choice'].startswith('reverse_') for r in recovery),
                 reverse_anchor_status='not_needed' if not missing else 'unavailable' if anchor is None else 'available',
                 elapsed_seconds=report['elapsed_seconds']))
             del frames, hashes, witness, sampled, forward_sampled, reverse_sampled, previous, person, object_mask, masks, chosen, forward, reverse
@@ -501,13 +545,14 @@ def native(code, out):
                 owner.bf16_context.__exit__(None, None, None); owner.bf16_context = None
 
 
-def run():
+def run(late_revision=None):
     require(sys.platform == 'linux' and os.geteuid() == 0 and os.uname().nodename == 'scenesmith-ncc-h100-01', 'Azure host only')
     code = canonical(Path(os.environ['WR_CODE'])); revision = os.environ['WR_CODE_REVISION']
     cfg, runtime = settings(code); binding = source(ROOT, code, revision, ENTRY, HELPERS)
     out = ROOT / 'results' / ('sam31-recovery-' + revision); out.mkdir(mode=0o755)
     prep = prepared(code, cfg, runtime); save(out / 'runtime.json', prep)
     saved_forward(code, cfg, inputs(cfg['episodes']))
+    if late_revision is not None: verified_late_anchors(code,late_revision,inputs(cfg['episodes']))
     image = strict(control(['docker', 'image', 'inspect', prep['image_id']]))[0]
     require(image['Id'] == cfg['runtime_image'] and image['Config']['Labels']['world_reward.sam31.revision'] == prep['producer_revision'],
             'Exact previously qualified runtime image required')
@@ -524,6 +569,9 @@ def run():
                   (ROOT / 'results' / ('gemini-sam31-' + cfg['saved_forward_producer']), True),
                   (ROOT / 'jobs' / cfg['saved_forward_producer'] / FORWARD_ENTRY, True)]
         mounts += [(ROOT / f'data/track_1/videos/chunk-000/observation.images.exo_camera/episode_{ep:06d}.mp4', True) for ep in cfg['episodes']]
+        if late_revision is not None:
+            mounts += [(ROOT/'results'/('sam31-late-anchor-'+late_revision),True),
+                       (ROOT/'jobs'/late_revision/'run_sam31_late_anchor',True)]
         for path, readonly in mounts:
             canonical(path); cmd += ['--mount', f'type=bind,src={path},dst={path}' + (',readonly' if readonly else '')]
         cmd += ['--entrypoint', '/usr/bin/env', prep['image_id'], '-i', 'PATH=/usr/local/bin:/usr/bin:/bin',
@@ -531,6 +579,7 @@ def run():
             'PYTHONDONTWRITEBYTECODE=1', 'HF_HUB_OFFLINE=1', 'TRANSFORMERS_OFFLINE=1', 'WANDB_MODE=disabled',
             'OMP_NUM_THREADS=4', 'OPENBLAS_NUM_THREADS=4', 'MKL_NUM_THREADS=4', 'WR_CODE_REVISION=' + revision,
             '/usr/local/bin/python', '-B', str(code / HELPERS[0]), '--native', str(code), str(out)]
+        if late_revision is not None: cmd.append(late_revision)
         try:
             with (out / 'native.log').open('xb') as log:
                 os.fchmod(log.fileno(), 0o400)
@@ -551,7 +600,8 @@ def run():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 4 and sys.argv[1] == '--native':
+    if len(sys.argv) in (4,5) and sys.argv[1] == '--native':
         import torch
-        with torch.inference_mode(): native(Path(sys.argv[2]), Path(sys.argv[3]))
-    else: run()
+        with torch.inference_mode(): native(Path(sys.argv[2]), Path(sys.argv[3]),None if len(sys.argv)==4 else sys.argv[4])
+    elif len(sys.argv) in (1,2): run(None if len(sys.argv)==1 else sys.argv[1])
+    else: raise SystemExit('Only an immutable late-anchor producer is accepted')

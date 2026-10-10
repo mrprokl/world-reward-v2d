@@ -131,6 +131,33 @@ def test_nonempty_reverse_without_identity_is_not_fake_recovery():
     assert not chosen.any() and source == 'unresolved_native_absence'
 
 
+def test_corroborated_native_route_is_literal_and_not_rgb_verified():
+    f = candidate(np.zeros((12,16),bool),visible=False); reverse = candidate(mask(),branch='reverse')
+    chosen, source, fused = runtime.select_preserving_forward(f,reverse,None,policy(),True)
+    assert chosen is reverse.mask and source == 'reverse_native_semantic_anchor_unverified'
+    assert fused.state == 'uncertain'  # Do not call identity confirmation mask accuracy.
+    preserved, source, _ = runtime.select_preserving_forward(candidate(mask()),reverse,None,policy(),True)
+    assert np.array_equal(preserved,mask()) and source == 'saved_forward_native'
+    _, source, _ = runtime.select_preserving_forward(f,reverse,evidence(),policy(),True)
+    assert source == 'reverse_rgb_recovery'
+
+
+@pytest.mark.parametrize('reverse',[None,candidate(mask(),branch='reverse',visible=False),
+                                  candidate(np.zeros((12,16),bool),branch='reverse')])
+def test_corroboration_cannot_override_native_absence(reverse):
+    f = candidate(np.zeros((12,16),bool),visible=False)
+    chosen,source,_ = runtime.select_preserving_forward(f,reverse,None,policy(),True)
+    assert not chosen.any() and source == 'unresolved_native_absence'
+
+
+def test_corroborated_route_keeps_frame_identity_and_explicit_opt_in():
+    f = candidate(np.zeros((12,16),bool),visible=False)
+    with pytest.raises(ValueError):
+        runtime.select_preserving_forward(f,candidate(mask(),index=1,branch='reverse'),None,policy(),True)
+    with pytest.raises(ValueError):
+        runtime.select_preserving_forward(f,None,None,policy(),1)
+
+
 def test_one_latest_visible_anchor_not_search_for_better_result():
     calls = []
     def ev(index): calls.append(index); return None
