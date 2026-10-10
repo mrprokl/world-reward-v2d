@@ -29,6 +29,21 @@ BODY_ABI = MappingProxyType(dict(rotation_control_order='23_SO3_column0_then_col
     source_sha256='6ee1e9ec8b692acf8857e827ed21201a4e8068e84a3cb95e986981e0a7949d23'))
 
 
+class BaselineReferenceFailure(ValueError):
+    """Actual baseline gate failure with bounded numeric evidence, no repair."""
+    def __init__(self, evidence, gaps, object_in_front):
+        active = evidence.activations; violation = gaps-evidence.baseline_gap_m-evidence.config.numerical_slack_m
+        rows = np.argwhere(active & (violation > 0))
+        worst = tuple(rows[np.argmax(violation[tuple(rows.T)])]) if len(rows) else None
+        self.diagnostics = dict(active_witnesses=int(active.sum()), violating_witnesses=len(rows),
+            maximum_violation_m=float(violation[worst]) if worst else 0.,
+            worst_frame=int(worst[0]) if worst else None, worst_side=int(worst[1]) if worst else None,
+            worst_witness_gap_m=float(gaps[worst]) if worst else None,
+            worst_frozen_bound_m=float(evidence.baseline_gap_m[worst]+evidence.config.numerical_slack_m) if worst else None,
+            all_object_vertices_in_front=bool(object_in_front), tolerance_relaxed=False)
+        super().__init__('Actual decoded dynamic A fails frozen contact bounds/positive object depth; no guaranteed fallback')
+
+
 @dataclass(frozen=True)
 class ContinuationProtocol:
     """Frozen generic search/work policy, not fitted contact/RGB weights."""
@@ -191,8 +206,9 @@ def continue_native_contact(a, b, object_a, object_b, evidence, *, decode_native
         raise ValueError('Original full native chronology required')
     geometry = _decode_geometry(decode_native({k: v.copy() for k, v in baseline_params.items()}), count)
     ok, gaps = _contacts(evidence, geometry, baseline_obj)
-    if not ok or not _object_in_front(evidence, baseline_obj):
-        raise ValueError('Actual decoded dynamic A fails frozen contact bounds/positive object depth; no guaranteed fallback')
+    object_in_front = _object_in_front(evidence, baseline_obj)
+    if not ok or not object_in_front:
+        raise BaselineReferenceFailure(evidence, gaps, object_in_front)
     baseline_metrics = evaluate_observations(geometry, baseline_obj.copy())
     baseline_valid, _ = _observation_acceptance(baseline_metrics, baseline_metrics, gates)
     if not baseline_valid: raise ValueError('Required baseline observation metrics unavailable; no fabricated acceptance')

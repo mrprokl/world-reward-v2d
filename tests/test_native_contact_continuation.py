@@ -103,6 +103,20 @@ def test_no_feasible_nonzero_candidate_returns_actual_dynamic_A_no_static_substi
     np.testing.assert_array_equal(result['original_witness_ids'], e.witness_source_indices)
 
 
+def test_baseline_failure_reports_exact_original_worst_witness_without_relaxing_caps():
+    a,b,oa,ob,e = inputs()
+    def decode(p):
+        geometry = make_geometry(p); geometry['human_vertices'][0,0,2] += np.float32(4e-7)
+        return geometry
+    with pytest.raises(core.BaselineReferenceFailure) as caught:
+        core.continue_native_contact(a,b,oa,ob,e,decode_native=decode,
+            evaluate_observations=observations,gates=gates())
+    d = caught.value.diagnostics
+    assert d['violating_witnesses'] == 1 and d['worst_frame'] == d['worst_side'] == 0
+    assert d['maximum_violation_m'] > 0 and not d['tolerance_relaxed']
+    assert d['worst_witness_gap_m'] > d['worst_frozen_bound_m']
+
+
 def test_independent_native_decoder_after_translation_roundoff_and_observation_gates():
     a, b, oa, ob, e = inputs(); counts = {'decode': 0, 'eval': 0, 'place': 0}
     def decoder(p): counts['decode'] += 1; return make_geometry(p)

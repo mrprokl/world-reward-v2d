@@ -85,6 +85,7 @@ def test_failclosed_native_A_replay_keeps_original_A_B_QA_report_no_fabrication(
     monkeypatch.setattr(run.saved, 'saved_B', lambda *_: b)
     monkeypatch.setattr(run.native, 'quality', lambda *_: {})
     monkeypatch.setattr(run, 'layer_factory', lambda *_: SimpleNamespace())
+    monkeypatch.setattr(run, 'decode_geometry', lambda *_: dict(human_vertices=src['human'].copy()))
     def fail(*args, **kw): raise ValueError('Actual decoded dynamic A fails frozen contact bounds')
     monkeypatch.setattr(run, 'continue_native_contact', fail)
     cuda = SimpleNamespace(empty_cache=lambda: None)
@@ -93,6 +94,32 @@ def test_failclosed_native_A_replay_keeps_original_A_B_QA_report_no_fabrication(
     assert (tmp_path/'episode_000009/A_B_QA.json').is_file()
     assert (tmp_path/'episode_000009/report.json').is_file()
     assert not (tmp_path/'episode_000009/target.npy').exists()
+
+
+def test_native_A_reference_uses_same_ids_activity_and_records_original_roundoff_not_tolerance(tmp_path):
+    bank, src, b, _ = tiny(); before, _ = run.frozen_evidence(bank,src,b)
+    native = dict(human_vertices=src['human'].copy()); native['human_vertices'][...,2] += np.float32(4e-7)
+    after, _ = run.frozen_evidence(bank,src,b,native)
+    r = run.witness_reference_receipt(tmp_path,src,before,after,native)
+    assert r['original_bound_violations_from_native_roundoff'] == int(b['activation'].sum())
+    assert not r['tolerance_relaxed'] and not r['original_A_QA_gates_relaxed']
+    assert r['reference_frozen_before_any_B_proposal']
+    assert before.config == after.config and before.config.numerical_slack_m == 1e-7
+    with np.load(tmp_path/'baseline_witness_reference.npz',allow_pickle=False) as v:
+        np.testing.assert_array_equal(v['hand_vertex_ids'],src['QA_witness_ids'])
+        np.testing.assert_array_equal(v['activations'],b['activation'])
+        np.testing.assert_array_equal(v['original_saved_A_gap_m'],before.baseline_gap_m)
+        np.testing.assert_array_equal(v['replayed_native_A_gap_m'],after.baseline_gap_m)
+
+
+def test_predecoded_native_A_only_consumed_for_exact_first_parameters_then_fresh_decoder():
+    a, _, _, _, _ = inputs(angle=0.); geometry = make_geometry(a); calls = []
+    decoder = run.cached_baseline_decoder(a,geometry,lambda p:calls.append(p) or 'fresh')
+    assert decoder(deepcopy(a)) is geometry and calls == []
+    assert decoder(deepcopy(a)) == 'fresh' and len(calls) == 1
+    decoder = run.cached_baseline_decoder(a,geometry,lambda _:None)
+    bad = deepcopy(a); bad['mhr_trans'][0,0] += .1
+    with pytest.raises(ValueError): decoder(bad)
 
 
 def test_wrapper_GPU_lease_no_reference_network_and_pinned_original_native_paths():

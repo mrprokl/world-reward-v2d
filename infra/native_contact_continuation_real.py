@@ -48,16 +48,60 @@ def gates(cfg, bank):
         for metric, key in METRIC_GATE_KEYS.items())
 
 
-def frozen_evidence(bank, src, b):
+def frozen_evidence(bank, src, b, native_A_geometry=None):
     active = b['activation']; identifiers = src['QA_witness_ids']
     original = np.full((*active.shape, 3), np.nan, np.float64)
-    f, side = np.nonzero(active); original[f, side] = src['human'][f, identifiers[f, side]]
+    human = src['human'] if native_A_geometry is None else native_A_geometry['human_vertices']
+    f, side = np.nonzero(active); original[f, side] = human[f, identifiers[f, side]]
     evidence = freeze_contact_witnesses(original, src['QA_hand_ids'], identifiers,
         bank['rotations'], bank['translations'], bank['vertices'], bank['faces'], active,
         bank['frame_index'], config=saved.PLACEMENT,
-        source_reference='independently_pinned_A052_and_B'+saved.B_REVISION,
+        source_reference=('independently_pinned_A052_and_B'+saved.B_REVISION
+            if native_A_geometry is None else 'same_original_A052_native_parameters_redecoded_before_any_B_proposal'),
         witness_selection_reference=saved.WITNESS_DEFINITION, original_selection_is_whole_hand_minimum=False)
     return evidence, freeze_original_branches(evidence, original, bank['translations'])
+
+
+def cached_baseline_decoder(parameters, geometry, decoder):
+    """Consume the exact predecoded native A once; all proposals decode afresh."""
+    reference = {k:v.copy() for k,v in parameters.items()}; pending = [geometry]
+    def decode(p):
+        if pending:
+            if set(p) != set(reference) or not all(saved.same_bytes(p[k],reference[k]) for k in p):
+                raise ValueError('Cached first native A must match exact independently verified baseline parameters')
+            return pending.pop()
+        return decoder(p)
+    return decode
+
+
+def witness_reference_receipt(out, src, before, after, geometry):
+    """Record native-roundoff-only reference change without dropping any IDs."""
+    active = before.activations
+    if (not np.array_equal(active,after.activations) or
+            not np.array_equal(before.witness_source_indices,after.witness_source_indices)):
+        raise ValueError('Native replay reference cannot change original activity or anatomical witness IDs')
+    delta = after.baseline_gap_m-before.baseline_gap_m
+    violations = active & (delta > before.config.numerical_slack_m); rows = np.argwhere(violations)
+    worst = tuple(rows[np.argmax(delta[tuple(rows.T)])]) if len(rows) else None
+    f,s = np.nonzero(active); ids = before.witness_source_indices[f,s]
+    position_delta = np.linalg.norm(geometry['human_vertices'][f,ids].astype(float)-src['human'][f,ids].astype(float),axis=-1)
+    pin = real.seal_file(out/'baseline_witness_reference.npz', lambda stream: np.savez_compressed(stream,
+        original_saved_A_gap_m=before.baseline_gap_m, replayed_native_A_gap_m=after.baseline_gap_m,
+        replay_minus_saved_gap_m=delta, frame_index=before.frame_index, activations=active,
+        hand_vertex_ids=before.witness_source_indices))
+    return dict(schema='world_reward.native_A_witness_reference.v1', artifact=pin,
+        source_reference=after.source_reference, original_saved_A_geometry_unchanged=True,
+        original_native_parameters_byte_unchanged=True, original_ids_and_activations_unchanged=True,
+        active_witnesses=int(active.sum()), original_bound_violations_from_native_roundoff=int(violations.sum()),
+        maximum_gap_increase_m=float(delta[active].max()) if active.any() else None,
+        maximum_absolute_gap_difference_m=float(np.abs(delta[active]).max()) if active.any() else None,
+        maximum_native_witness_position_delta_m=float(position_delta.max()) if len(position_delta) else None,
+        worst_original_violation_frame=int(worst[0]) if worst else None,
+        worst_original_violation_side=int(worst[1]) if worst else None,
+        worst_saved_gap_m=float(before.baseline_gap_m[worst]) if worst else None,
+        worst_replayed_gap_m=float(after.baseline_gap_m[worst]) if worst else None,
+        tolerance_relaxed=False, original_A_QA_gates_relaxed=False,
+        reference_frozen_before_any_B_proposal=True, not_quality_calibration=True)
 
 
 def decode_geometry(torch, layer, params, src, stats):
@@ -164,7 +208,7 @@ def run_episode(episode, out, ledger, b_binding, torch, layer_state):
         saved.preserve_reported_quality(b_metrics, b['report']['metrics'][saved.B_NAME])
         report['metrics'] = {saved.A_NAME: a_metrics, saved.B_NAME: b_metrics}
         report['A_B_QA_pin'] = real.seal_json(out/'A_B_QA.json', dict(metrics=report['metrics'], B_report_pin=saved.B_REPORT_PINS[episode]))
-        evidence, branches = frozen_evidence(bank, src, b)
+        original_evidence, _ = frozen_evidence(bank, src, b)
         report['frozen_observation_gates'] = [asdict(g) for g in gates(b['cfg'], bank)]
         if layer_state.get('layer') is None:
             layer_state['layer'] = layer_factory(torch, ledger, src, out)
@@ -177,13 +221,18 @@ def run_episode(episode, out, ledger, b_binding, torch, layer_state):
             return decode_geometry(torch, layer_state['layer'], p, src, report['native_decode_calls'])
         def observe(g, t): return native.quality(bank, src, g['human_vertices'], g['human_keypoints'],
             bank['rotations'], t, b['evidence'], b['activation'])
+        a_parameters = {k: src['native'][k] for k in NATIVE_PARAMETER_DIMS}
+        native_a = decode(a_parameters)
+        evidence, branches = frozen_evidence(bank, src, b, native_a)
+        report['baseline_witness_reference'] = witness_reference_receipt(out,src,original_evidence,evidence,native_a)
+        decoder = cached_baseline_decoder(a_parameters,native_a,decode)
         def place(p, t, g, e):
             fitted = project_joint_translations_branches(e, g['human_vertices'][:, src['QA_hand_ids']],
                 p['mhr_trans'], t, original_branches=branches)
             return fitted['human_translation_camera'], fitted['object_translation_camera']
-        result = continue_native_contact({k: src['native'][k] for k in NATIVE_PARAMETER_DIMS},
+        result = continue_native_contact(a_parameters,
             {k: b['params'][k] for k in NATIVE_PARAMETER_DIMS}, bank['translations'], b['trajectory']['object_translation'],
-            evidence, decode_native=decode, evaluate_observations=observe, gates=gates(b['cfg'], bank), place_translations=place)
+            evidence, decode_native=decoder, evaluate_observations=observe, gates=gates(b['cfg'], bank), place_translations=place)
         report['continuation'] = {k: v for k, v in result.items() if k not in ('parameters', 'object_translation',
             'geometry', 'witness_gaps_m', 'original_activations', 'original_witness_ids')}
         report['candidate_outputs'] = seal_selected(out, bank, src, result)
@@ -199,6 +248,7 @@ def run_episode(episode, out, ledger, b_binding, torch, layer_state):
         report['status'] = result['status']
     except Exception as exc:
         report.update(error_type=type(exc).__name__, error=str(exc)[:400], no_C_fabricated=True)
+        if hasattr(exc,'diagnostics'): report['failure_diagnostics'] = exc.diagnostics
     finally:
         report['elapsed_seconds'] = time.monotonic()-started
         report_pin = real.seal_json(out/'report.json', report)
