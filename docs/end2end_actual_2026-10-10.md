@@ -69,3 +69,11 @@ DirectpublicRGB/textAzure02→01 transport nowdispatched, no laptop media.
 Publishedfulltimelinepreviewreceipt3124B
 SHA256865c5b4e92f3cb8adfaacb828a6afc8c33e1ed981e4481145c241fde314a58d3.
 Userloopbackondemandvieweropened49933 TTL3600, noautoplay/preloadmedia.
+
+### Direct Azure public transport
+
+VM02 publish1c9ffee completeexit0, publicmanifest4465B
+SHA2563151519bc11e602060c92bfad3750c68c824f155d8934ad8bb98a4ba8d479459.
+VM01fetch0077f73 dispatched. Remote source references never transferred.
+Externalpredictionproducer806300d (493frozenruntimefiles), own per-sequence
+one-shotVertexauth preparedinRAM pipeline; pendingactualcohortresults.
