@@ -1,0 +1,31 @@
+{
+  "schema": "world_reward.sam31_late_anchor_run.v1",
+  "episodes": [1, 7],
+  "original_cohort": [9, 1, 14, 7],
+  "saved_forward_producer": "b658881079871508c6b3ec14d001dc1299956996",
+  "saved_forward_native_report": {
+    "bytes": 23225,
+    "sha256": "6d1dea3a41e004d17bf6134bb74e78a2710f70607d130fdec5f051ed265c7813"
+  },
+  "model": "gemini-3.5-flash",
+  "project": "gen-lang-client-0484082658",
+  "location": "global",
+  "cpu_image": "sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7",
+  "anchor_policy": "one_last_saved_forward_visible_frame",
+  "reference_frame": 0,
+  "frames_decoded_per_clip": 2,
+  "concurrency": 2,
+  "budget_seconds": 300,
+  "attempt_timeout_seconds": 60,
+  "anchor_gates": {
+    "object_bbox_iou": 0.5,
+    "person_bbox_iou": 0.5,
+    "provenance": "external:manufactured-contracts-not-accuracy"
+  },
+  "ground_truth_used": false,
+  "manual_labels": false,
+  "quality_verified": false,
+  "baseline_modified": false,
+  "training_overlap_verified": false,
+  "challenge_overlap_verified": false
+}
