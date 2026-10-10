@@ -106,3 +106,49 @@ Report actual objective decrease, each exact gate, QP/restoration status, decode
 count, runtime and geometry checks. If there is no feasible local descent under
 these constraints, preserve dynamic A and expose the local constraint/dual
 diagnostic; do not claim global impossibility or a verified CARI4D win.
+
+## Implemented core / authored DEV only
+
+`native_pose_sqp.py` uses a **positive diagonal proximal metric**, not a full
+Gauss–Newton Hessian: the full-frame objective gradient may contain temporal
+terms, but each QP has only 133 local tangent/translation variables and <=4
+linearized witness rows (two-sided at an unsigned zero-gap cusp). Its <=4 dual
+variables are solved with box clipping and an active-system polish, followed by
+explicit primal/duality checks. No dense clip-state matrix or all-triangle
+pair matrix. Closest-face queries still examine the complete surface through
+the existing exact conservative broadphase.
+
+Native callback ABI is `[T,2,3,127]` anatomical camera-space Jacobians for
+23 right-SO3 blocks plus 58 SO2 angles; human/object translation contributes
+6 further variables. Full native V/J/KP/136/68 geometry remains callback-only.
+Callbacks are checked before and after budget consumption; returned over-budget
+proposals are discarded. A caller still needs an external wall-clock kill to
+interrupt a callback that never returns. Frozen shape/hands/global rotation,
+internal translations, IDs, activations and chronology are rechecked.
+
+The QP aims **inside**, never beyond, the unchanged exact contact bound using a
+half-ULP FP32 witness-coordinate reserve capped by the existing numerical slack.
+This prevents restoration from endlessly rounding onto the wrong side of a
+boundary. It tightens a proposal target; it does not increase the accepted gap
+or learn a threshold from the videos. Exact full native decode remains decisive.
+
+Independent authored seeds `60261010/60261011`, 96 moving frames with explicit
+inactive/release frames: the uncorrected target's hand span exceeds object width
+plus both baseline gap radii, proving translation-only infeasibility for that
+state. Pose SQP reduced its known angular objective **2.45926→0.11767 (95.22%)**
+and **2.46826→0.13095 (94.69%)**, respectively; six accepted steps / eleven
+synthetic full-geometry callbacks each, about 1.3 s on the local tiny assay.
+Every original active witness satisfies the original exact bound, root-Y motion
+increments remain intact, and frozen fields are preserved.
+
+The first DEV attempted a cap on total human-centroid path; this rejected useful
+added articulation, illustrating why a motion magnitude cap is not a truth
+metric. The authored test instead checks its independently known root-Y motion
+increments. **No real/challenge gates were changed.** The actual full RGB/contact/
+acceleration gates remain separately required during future native integration.
+Two seeds share one authored mechanism, not a held-out real HOI benchmark.
+`14` tiny tests pass, including native tangent finite differences, an incompatible
+local QP, unsigned cusp, invalid callbacks, QA fallback and budget exhaustion.
+There has been **no actual MHR/SQP GPU run, external accuracy validation, adoption
+or submission**. The synthetic direct controls are schema fixtures, not a claimed
+native MHR export. Curved/sliding real contacts remain to be tested.
