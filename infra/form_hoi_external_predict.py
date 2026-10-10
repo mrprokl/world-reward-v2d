@@ -891,8 +891,89 @@ def direct_geometry(p, out, layer, params, poses, vertices, faces_array):
     return maximum
 
 
+def _fit_cost_gated_class(native_class, torch, report, *, fit_started, budget_seconds):
+    """Observe three *completed* real updates without replacing the native run.
+
+    The next loss entry occurs after native backward, Adam, scheduler and any
+    native diagnostics/reporting. Synchronisation makes that interval honest.
+    No extra loss/decoder/model call, coefficient, parameter or optimizer change
+    occurs. An early time pass is not a quality/PEN-cost guarantee; three first
+    naturally scheduled PEN updates are measured again later. The existing
+    inclusive stage alarm remains the hard deadline.
+    """
+    require(np.isfinite(fit_started) and 0 < budget_seconds <= 2400,
+            'Finite inclusive native fit clock/budget required')
+    reserve_seconds = 240.  # Ten percent of frozen2400 for result/decode/sealing.
+    state = dict(schema='world_reward.native_fit_cost_gate.v1', status='awaiting_actual_updates',
+        probe_updates=3, native_run_replaced=False, extra_loss_calls=0,
+        objective_modified=False, geometry_modified=False, quality_verified=False,
+        budget_seconds=float(budget_seconds), result_reserve_seconds=reserve_seconds,
+        maximum_VRAM_fraction=.8, phases=[])
+    report['fit_cost_gate'] = state
+
+    class TimedNativeFit(native_class):
+        def loss(self, indices, step, *, include_diagnostics=True):
+            torch.cuda.synchronize()
+            now = time.monotonic()
+            require(type(step) is int and np.array_equal(self.frame_indices,np.arange(96))
+                    and self.cfg.num_steps == 300 and self.cfg.batch_size == 0
+                    and self.start_step == 0 and len(indices) == 96
+                    and torch.equal(indices,torch.arange(96,device=indices.device)),
+                    'Unchanged ordered native full96/301-update execution required')
+            if not hasattr(self, '_wr_cost_last_entry'):
+                require(step == 0, 'Native cost observation must begin at original update0')
+                self._wr_cost_last_entry = now
+                self._wr_cost_last_step = 0
+                self._wr_cost_intervals = []
+                state['initialization_seconds'] = now-fit_started
+            else:
+                require(step == self._wr_cost_last_step+1 and now >= self._wr_cost_last_entry,
+                        'One actual native loss per consecutive update required')
+                self._wr_cost_intervals.append(now-self._wr_cost_last_entry)
+                self._wr_cost_last_entry = now
+                self._wr_cost_last_step = step
+            total_memory = int(torch.cuda.get_device_properties(torch.cuda.current_device()).total_memory)
+            peak_reserved = int(torch.cuda.max_memory_reserved())
+            peak_allocated = int(torch.cuda.max_memory_allocated())
+            require(total_memory > 0, 'Actual GPU memory capacity required')
+            state.update(completed_actual_updates=step, peak_reserved_bytes=peak_reserved,
+                peak_allocated_bytes=peak_allocated, total_VRAM_bytes=total_memory)
+            if peak_reserved > .8*total_memory or peak_allocated > .8*total_memory:
+                state.update(status='rejected_VRAM', rejected_before_update=step)
+                raise ValueError('Native fit rejected by frozen VRAM cost gate')
+            pen_start = int(np.floor(self.cfg.penetration_start_fraction*self.cfg.num_steps))+1
+            if step in (3,pen_start+3):
+                first = 0 if step == 3 else pen_start
+                intervals = self._wr_cost_intervals[first:first+3]
+                require(len(intervals) == 3 and all(np.isfinite(x) and x >= 0 for x in intervals),
+                        'Three actual complete native update timings required')
+                remaining = 301-step
+                elapsed = now-fit_started
+                projected = elapsed+remaining*max(intervals)+reserve_seconds
+                phase = dict(name='initial_three_updates' if step == 3 else 'first_three_native_PEN_updates',
+                    measured_update_indices=list(range(first,first+3)), seconds=intervals,
+                    elapsed_fit_seconds=elapsed, remaining_native_updates=remaining,
+                    projected_inclusive_seconds=projected, budget_seconds=float(budget_seconds),
+                    pass_cost=bool(projected < budget_seconds),
+                    late_penetration_cost_measured=(step != 3))
+                state['phases'].append(phase)
+                if not phase['pass_cost']:
+                    state.update(status='rejected_projected_time', rejected_before_update=step)
+                    raise ValueError('Native fit rejected by frozen projected-time cost gate')
+                state['status'] = 'early_cost_pass_PEN_unmeasured' if step == 3 else 'cost_pass_not_quality'
+            return super().loss(indices,step,include_diagnostics=include_diagnostics)
+
+    return TimedNativeFit
+
+
 def fit(p, c, base, out, report, enabled):
+    fit_started = time.monotonic()
+    # Read the active alarm only; never reset the inclusive worker deadline.
+    remaining_alarm = signal.getitimer(signal.ITIMER_REAL)[0]
+    budget_seconds = min(float(c['budgets']['fit_B' if enabled else 'fit_A']),
+                         remaining_alarm) if remaining_alarm > 0 else float(c['budgets']['fit_B' if enabled else 'fit_A'])
     import torch
+    torch.cuda.synchronize(); torch.cuda.reset_peak_memory_stats()
     import cari_full_refine as full
     from world_reward.native_joint_refinement import JointImageEvidence, NativeJointConfig, native_joint_optimizer_class
     from cari_converter import validate_native_bundle
@@ -918,6 +999,7 @@ def fit(p, c, base, out, report, enabled):
     torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False
     torch.manual_seed(0);torch.cuda.manual_seed_all(0);np.random.seed(0)
     before=full.fingerprint(source_bundle); cls=native_joint_optimizer_class(optimizer,evidence,extension,enabled=enabled)
+    cls=_fit_cost_gated_class(cls,torch,report,fit_started=fit_started,budget_seconds=budget_seconds)
     instance=cls(source_bundle,vertices,faces_array,cfg,mhr_layer=layer)
     started=time.monotonic(); result=instance.run(); report['solver_seconds']=time.monotonic()-started
     require(full.fingerprint(source_bundle)==before, 'Original raw bundle was changed')
