@@ -130,3 +130,47 @@ all IDs, full original triangles, window, objective and strict final verificatio
 unchanged. This is a numerical consistency fix, not a looser contact criterion
 or challenge-based weight sweep. Re-run the same two clips only after the new
 edge/vertex numerical regression tests pass. No repair gain claimed yet.
+
+### Actual repaired constrained run
+
+Producer `53f32845b6f142a7578ee50c8e088fd8e347a0c0` completed the identical
+optional contact-projection experiment in **39.140375 seconds**: two full clips,
+zero unexpected failures, source rehash complete, process exit 0, owned container
+absence verified. Latest local targeted regression suite: 79 passed in 3.85 s.
+The numerical repair changes neither the original final contact bound nor SG
+window, objective, witness IDs, geometry, scale, or scientific quality gates.
+
+| Prediction-only diagnostic | Episode 9 A → constrained SG | Episode 14 A → constrained SG |
+|---|---:|---:|
+| Object acceleration p95, m/s² | 21.3894 → 14.4193 | 50.4179 → 26.8227 |
+| Object angular acceleration p95, rad/s² | 125.5210 → 37.8538 | 1370.2568 → 713.1653 |
+| Same anatomical witness gap mean, m | .005596 → .004246 | .000829 → .000698 |
+| Same anatomical witness gap p95, m | .016746 → .013438 | .003156 → .002449 |
+| Object reprojection mean, px | 8.7592 → 8.7501 | No material tracks; no score invented |
+| Full-mesh displacement objective | .051358 → .004785 | .223033 → .055562 |
+
+Both accepted 16 whole-clip steps. Human geometry, reserved human reprojection
+and human acceleration stay unchanged. Virtual object floor deviation does not
+worsen, although episode 9's existing ~.41 m deviation remains a serious problem.
+Net centroid displacement remains .165573 → .166081 m and .290753 → .291655 m:
+these are moving predictions, not static substitutions. Lower path length is
+consistent with denoising but is not independently verified motion accuracy.
+
+The original exact-surface optimizer contact bounds (A + predeclared 1e-7 m)
+all pass. The separate stricter zero-increase QA still fails on maximum distance
+increases ~1.0085e-7 / 1.0037e-7 m, including distinct historical FP32 surface
+arithmetic. **Do not silently weaken that gate or declare overall adoption.**
+Native aggregate metric QA passes, but motion retention, official PEN, external
+GT accuracy and new visual replay remain unverified. This is substantive cached
+pose/contact diagnostic improvement, not end-to-end leaderboard victory.
+
+Aggregate report: 80023 bytes, SHA256
+`cfb46a6d1c92895160095570a68daf573c3d9f8a982cb16a4360a33e46387858`.
+Episode 9: 27050 bytes, SHA256
+`73bff0cb18e2e0ead1d2f323dbb3d06c5be4c3ee40f0b1f1a62bdf8d6faa03f6`.
+Episode 14: 26454 bytes, SHA256
+`62ae389f9d2418e8ed701c0471719c2ced9228d862f65f864fed80c1e48126a1`.
+Host cleanup: 143 bytes, SHA256
+`1a1d473456f0915311149d24b0af62808831dbb9eba21ec9af3a2ae1b69c9270`.
+Reports and complete sealed geometries remain on Azure; no media/model/data
+download to the tethered laptop.
