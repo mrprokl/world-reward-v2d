@@ -19,6 +19,7 @@ from world_reward.data import sha256
 from world_reward.artifact_paths import episode_output
 from world_reward.metric_alignment import fit_shared_depth_scale
 from world_reward.pointmap import validate_camera_pointmap
+from world_reward.mask_observation import alignment_masks
 
 
 def _argument_parser() -> argparse.ArgumentParser:
@@ -97,10 +98,10 @@ def main() -> None:
         for path in (human_path, object_path):
             with Image.open(path) as image:
                 array = np.asarray(image)
-            if array.ndim != 2 or not np.isin(array, [0, 255]).all() or not (array > 0).any():
-                raise RuntimeError("Automatic mask must be binary, nonempty and original-resolution")
-            masks_image.append(array > 0)
-        human_mask, object_mask = masks_image
+            masks_image.append(array)
+        # Object visibility does not determine whether the human anchors scale.
+        # Preserve literal absence; no invented mask or negative existence label.
+        human_mask, object_mask = alignment_masks(*masks_image)
         if object_mask.shape != human_mask.shape:
             raise RuntimeError("Automatic mask resolution mismatch")
         h, w = human_mask.shape
@@ -117,6 +118,7 @@ def main() -> None:
         human_depths.append(depth)
         masks.append(visible)
         evidence.append({"frame_index": index, "silhouette_iou": silhouette_iou(silhouette, human_mask),
+                         "object_observation_present": bool(object_mask.any()),
                          "alignment_pixels": int(visible.sum()), "pointmap_camera_checks": consistency,
                          "estimated_body_K": camera.tolist(),
                          "decoded_rgb_sha256": body_frames[index]["decoded_rgb_sha256"],
