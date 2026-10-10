@@ -54,7 +54,8 @@ HELPERS = ('infra/form_hoi_external_predict.py', 'infra/run_form_hoi_external_pr
     'src/world_reward/pointmap.py', 'src/world_reward/rigid_alignment.py',
     'src/world_reward/pose_selection.py', 'src/world_reward/native_joint_refinement.py',
     'src/world_reward/joint_point_objective.py', 'src/world_reward/root_refit.py',
-    'src/world_reward/point_surface_queries.py', 'src/world_reward/raster_capacity.py')
+    'src/world_reward/point_surface_queries.py', 'src/world_reward/raster_capacity.py',
+    'src/world_reward/exact_mesh_dedup.py')
 
 
 def config(code):
@@ -479,11 +480,13 @@ def pose_initializer(vertices, faces, scale, R0, t0, p, base, K):
     import trimesh
     from scipy.spatial.transform import Rotation
     from world_reward.rigid_alignment import align_observed_points
+    from world_reward.exact_mesh_dedup import deduplicate_meshes
     from camera_render import raster_camera_mesh_batch, silhouette_iou
     from object_pose_smoke import _finite_pose_candidate, _select_latent_pose_path
     mesh = trimesh.Trimesh(vertices, faces, process=False)
     sampled, _ = trimesh.sample.sample_surface(mesh, 8192, seed=0)
     hypotheses = Rotation.create_group('O').as_matrix(); records = []; previous = R0.copy()
+    efficiency = dict(original_meshes=0, unique_meshes=0, reused_meshes=0, observed_frames=0)
     for i in range(96):
         m = mask(base, 1, i, p)
         with np.load(base / 'body_depth/depth' / f'{i:06d}.npz', allow_pickle=False) as z:
@@ -504,14 +507,23 @@ def pose_initializer(vertices, faces, scale, R0, t0, p, base, K):
                 initial.append(a); fitted.append(b); fits.append((r, t, fit)); slots.append(slot)
             except ValueError: continue
         require(initial, 'No finite RGB/depth pose hypothesis at observed frame')
-        # Batch is mathematically identical to existing raster kernels; bound
-        # to four meshes at once, not 50*full-resolution raster memory.
-        ious = []
+        # ONE frame only: reuse byte-identical complete raster inputs, never
+        # remove hypotheses or alter masks/topology/precision. Keep original
+        # initial/fitted ordering, then restore every score before selection.
+        original_batch_order = []
         for start in range(0, len(initial), 2):
-            batch = np.stack(initial[start:start+2] + fitted[start:start+2])
-            rendered, _ = raster_camera_mesh_batch(batch, faces, K, p['width'], p['height'])
-            a = [silhouette_iou(x.cpu().numpy(), m) for x in rendered]; mid = len(batch)//2
-            ious.extend(zip(a[:mid], a[mid:]))
+            original_batch_order.extend(initial[start:start+2] + fitted[start:start+2])
+        plan = deduplicate_meshes(original_batch_order); unique_scores = []
+        for batch in plan.batches(4):
+            rendered, _ = raster_camera_mesh_batch(np.stack(batch), faces, K, p['width'], p['height'])
+            unique_scores.extend(silhouette_iou(x.cpu().numpy(), m) for x in rendered)
+        restored = plan.restore(unique_scores); ious = []; offset = 0
+        for start in range(0, len(initial), 2):
+            count = min(2, len(initial)-start)
+            ious.extend(zip(restored[offset:offset+count], restored[offset+count:offset+2*count]))
+            offset += 2*count
+        for key, value in plan.counts.items(): efficiency[key] += value
+        efficiency['observed_frames'] += 1
         candidates = []
         for slot, (r, t, fit), (a, b) in zip(slots, fits, ious):
             accepted = b >= a and fit.final_residual <= fit.initial_residual
@@ -525,6 +537,7 @@ def pose_initializer(vertices, faces, scale, R0, t0, p, base, K):
         best = max(candidates, key=lambda q: (q['selected_silhouette_iou'], -q['selected_depth_residual_m'], -q['hypothesis_index']))
         previous = np.asarray(best['rotation']); records.append(dict(frame_index=i, candidates=candidates, pose_observed=True))
     r, t, observed, details = _select_latent_pose_path(records, list(range(96)), 25, np.asarray(mesh.centroid))
+    details['exact_raster_reuse'] = dict(efficiency, scope='byte_exact_same_frame_same_fixed_mesh_and_RGB_mask')
     return r.astype(np.float32), t.astype(np.float32), observed, details
 
 
