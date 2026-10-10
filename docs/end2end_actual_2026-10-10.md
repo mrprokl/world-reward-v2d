@@ -57,3 +57,15 @@ awaits sealed tiny receipt. DEVv2 failed due to absent host ffprobe; decoder
 installed remotely, fresh v3 producer2250970 dispatched. No truth values decoded.
 CPU02 existing image imports NumPy/Torch/Trimesh/SciPy; optional Numba absent,
 not yet a qualified full evaluator execution.
+
+### Acquired actual four-DEV PASS
+
+Producer225097082dad29ebbbacb82daa09c71a3ea83bdb,167.933s completeexit0:
+all4 native30fps1536x1152, lengths764/616/396/409, eligiblefirst96exact
+aliasguardPASS (notproofnearaliases). No GTarrays/masks/calibration decoded.
+Report7322B SHA25690694c8d032f4b3b8eedcd422304cb51510820087d6add4be10e4e20671055dd.
+Rawotherarchivesremoved; firstretainedauthenticatedarchive reuseno1GBrefetch.
+DirectpublicRGB/textAzure02→01 transport nowdispatched, no laptop media.
+Publishedfulltimelinepreviewreceipt3124B
+SHA256865c5b4e92f3cb8adfaacb828a6afc8c33e1ed981e4481145c241fde314a58d3.
+Userloopbackondemandvieweropened49933 TTL3600, noautoplay/preloadmedia.
