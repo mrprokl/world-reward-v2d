@@ -71,7 +71,8 @@ def dispatch(rows, stage, invoke):
         if failure is not None: raise failure
 
 
-def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_from=None):
+def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_from=None,
+        reuse_stages_from=None, raster_gate=None):
     predictor.require(stage in ('localize','all'), 'Explicit cohort stage required')
     binding = predictor.source(predictor.ROOT, code, revision, predictor.ENTRY, predictor.HELPERS)
     rows, transfer = discover(predictor, code, dev_revision)
@@ -96,7 +97,15 @@ def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_f
         CPU_localizer_concurrency=4 if stage=='localize' else 1, GPU_clip_concurrency=0 if stage=='localize' else 1,
         sequence_order=[r['sequence_id'] for r in rows], sequences=[], full_4D_accuracy_verified=False)
     outcomes = {}
-    if reuse_localizations_from is not None:
+    predictor.require(not (reuse_stages_from and reuse_localizations_from), 'One explicit technical reuse producer required')
+    if reuse_stages_from is not None:
+        predictor.require(stage == 'all' and raster_gate is not None,
+            'Successful-prefix resume requires explicit same-source raster qualification')
+        from form_stage_reuse import reuse
+        report['stage_reuse'] = reuse(predictor, code, revision, reuse_stages_from, rows,
+            allow_body_depth_camera_change=True)
+        report['localization_reuse'] = report['stage_reuse']['original_localization_proof']
+    elif reuse_localizations_from is not None:
         from form_prediction_reuse import reuse
         report['localization_reuse']=reuse(predictor,code,revision,reuse_localizations_from,rows)
     # Check all fresh one-shot pairs before any CPU API call, not halfway
@@ -113,7 +122,10 @@ def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_f
     def invoke(row):
         sid = row['sequence_id']; base = predictor.ROOT/'results'/('form-hoi-external-predict-'+revision)/sid
         args = SimpleNamespace(stage=stage, input=row['input'], input_bytes=row['pin']['bytes'],
-            input_sha256=row['pin']['sha256'], out=base)
+            input_sha256=row['pin']['sha256'], out=base,
+            raster_gate_report=raster_gate['path'] if raster_gate else None,
+            raster_gate_bytes=raster_gate['bytes'] if raster_gate else None,
+            raster_gate_sha256=raster_gate['sha256'] if raster_gate else None)
         record = dict(sequence_id=sid, input=dict(path=str(row['input']), pin=row['pin']), status='fail')
         outcomes[sid] = record
         try:

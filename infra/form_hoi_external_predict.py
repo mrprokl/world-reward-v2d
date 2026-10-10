@@ -37,7 +37,7 @@ CONFIG = 'configs/form_hoi_external_predict_v1.json'
 STAGES = ('localize', 'track', 'body_depth', 'object', 'prepare', 'forward', 'fit_A', 'fit_B')
 HELPERS = ('infra/form_hoi_external_predict.py', 'infra/run_form_hoi_external_predict.sh', CONFIG,
     'infra/form_hoi_external_cohort.py', 'infra/run_form_hoi_external_cohort.sh',
-    'infra/form_prediction_reuse.py',
+    'infra/form_prediction_reuse.py', 'infra/form_stage_reuse.py',
     'infra/form_hoi_external_dev.py', 'infra/form_hoi_external_acquire.py',
     'infra/mediapipe_cpu_runtime_verify.py', 'configs/form_hoi_external_dev_v1.json',
     'configs/form_hoi_insight_v1.json', 'configs/sam31_runtime_v1.json',
@@ -53,7 +53,7 @@ HELPERS = ('infra/form_hoi_external_predict.py', 'infra/run_form_hoi_external_pr
     'src/world_reward/pointmap.py', 'src/world_reward/rigid_alignment.py',
     'src/world_reward/pose_selection.py', 'src/world_reward/native_joint_refinement.py',
     'src/world_reward/joint_point_objective.py', 'src/world_reward/root_refit.py',
-    'src/world_reward/point_surface_queries.py')
+    'src/world_reward/point_surface_queries.py', 'src/world_reward/raster_capacity.py')
 
 
 def config(code):
@@ -941,6 +941,10 @@ def worker(args):
         if stage!='localize':
             from form_prediction_reuse import localization_lineage
             report['localization_source']=localization_lineage(sys.modules[__name__],base,revision)
+            from form_stage_reuse import original_stage_lineage
+            report['consumed_intermediate_sources'] = {name: original_stage_lineage(
+                sys.modules[__name__], base, name, revision) for name in ('track', 'body_depth', 'object')
+                if STAGES.index(name) < STAGES.index(stage)}
             require({p.name for p in Path('/sys/class/net').iterdir()}=={'lo'},'Offline GPU inference required')
             import torch
             require(torch.cuda.is_available(),'GPU required; never use laptop/CPU model fallback')
@@ -1019,6 +1023,20 @@ def driver(args):
     require(base==ROOT/'results'/('form-hoi-external-predict-'+revision)/p['sequence_id'], 'Own exact output namespace required')
     if not base.exists():base.mkdir(mode=0o755,parents=True)
     chosen=STAGES if args.stage=='all' else (args.stage,)
+    gate_path = getattr(args, 'raster_gate_report', None)
+    gate_pin = None
+    if gate_path is not None:
+        gate_path = canonical(Path(gate_path))
+        gate_pin = dict(bytes=args.raster_gate_bytes, sha256=args.raster_gate_sha256)
+        require(gate_path.is_relative_to(ROOT / 'results') and artifact(gate_path) == gate_pin
+            and gate_pin['bytes'] <= 131072, 'Explicit bounded sealed raster qualification receipt required')
+        gate = strict(gate_path.read_bytes())
+        from camera_render import _raster_source_pins
+        require(gate.get('status') == 'pass' and gate.get('schema') == 'world_reward.raster_capacity_gate.v1'
+            and gate.get('source_pins') == _raster_source_pins()
+            and gate.get('image_id') == c['body_image']
+            and gate.get('gates', {}).get('all_exact_masks_and_depth_tolerance') is True,
+            'Actual same-source full-geometry CUDA raster qualification required')
     with (ROOT/'jobs/.world-reward-h100.lock').open('r') as lease:
         if any(s!='localize' for s in chosen):fcntl.flock(lease,fcntl.LOCK_EX|fcntl.LOCK_NB)
         for stage in chosen:
@@ -1039,6 +1057,8 @@ def driver(args):
             else:cmd+=['--gpus','all']
             for src,readonly in mount_sources(stage,c,code,args.input.parent,base):
                 canonical(src);cmd+=['--mount',f'type=bind,src={src},dst={src}'+(',readonly' if readonly else '')]
+            if gate_path is not None and stage != 'localize':
+                cmd += ['--mount', f'type=bind,src={gate_path},dst={gate_path},readonly']
             path='/usr/local/bin:/opt/conda/bin:/usr/bin:/bin' if stage=='track' else '/opt/conda/bin:/usr/local/bin:/usr/bin:/bin'
             python='/usr/local/bin/python' if stage=='track' else '/opt/conda/bin/python'
             pythonpath=('/opt/sam3:' if stage=='track' else '')+str(code/'src')+':'+str(code/'infra')+':/workspace/v2d_sam3d_body/lib'
@@ -1049,6 +1069,10 @@ def driver(args):
                 'XDG_CACHE_HOME=/tmp/cache','TORCH_HOME='+str(ROOT/('weights/sam3d/torch_home' if stage=='object' else 'weights/cari4d/sam3d_body/torch_home')),
                 'HF_HOME='+str(ROOT/('weights/sam3d/hf_home' if stage=='object' else 'weights/cari4d/hf_home'))]
             if stage=='object':env+=['LIDRA_SKIP_INIT=1','CUDA_HOME=/usr/local/cuda']
+            if gate_path is not None and stage != 'localize':
+                env += ['WR_RASTER_CAPACITY_GATE=' + str(gate_path),
+                    'WR_RASTER_CAPACITY_GATE_BYTES=' + str(gate_pin['bytes']),
+                    'WR_RASTER_CAPACITY_GATE_SHA256=' + gate_pin['sha256']]
             if stage=='localize':env.append('CUDA_VISIBLE_DEVICES=')
             env += ['CUBLAS_WORKSPACE_CONFIG=:4096:8']
             cmd+=['--entrypoint','/usr/bin/env',image,'-i',*env,python,'-B',str(code/'infra/form_hoi_external_predict.py'),
@@ -1091,7 +1115,16 @@ def main():
     parser.add_argument('--input-bytes',type=int);parser.add_argument('--out',type=Path)
     parser.add_argument('--cohort-stage',choices=('localize','all'));parser.add_argument('--dev-revision')
     parser.add_argument('--reuse-localizations-from')
+    parser.add_argument('--reuse-stages-from')
+    parser.add_argument('--raster-gate-report', type=Path)
+    parser.add_argument('--raster-gate-bytes', type=int)
+    parser.add_argument('--raster-gate-sha256')
     args=parser.parse_args()
+    require((args.raster_gate_report is None and args.raster_gate_bytes is None and args.raster_gate_sha256 is None)
+        or (args.raster_gate_report is not None and type(args.raster_gate_bytes) is int and args.raster_gate_bytes > 0
+        and type(args.raster_gate_sha256) is str and re.fullmatch('[0-9a-f]{64}', args.raster_gate_sha256)),
+        'All three explicit raster gate identity fields or none required')
+    require(not (args.reuse_localizations_from and args.reuse_stages_from), 'Choose one exact technical reuse producer')
     if args.cohort_stage is not None:
         require(not args.native and args.stage=='all' and args.dev_revision is not None and
             all(getattr(args,k) is None for k in ('input','input_sha256','input_bytes','out')),
@@ -1101,8 +1134,10 @@ def main():
             'Azure VM01 root cohort dispatcher only')
         from form_hoi_external_cohort import run
         run(sys.modules[__name__],code,revision,stage=args.cohort_stage,dev_revision=args.dev_revision,
-            reuse_localizations_from=args.reuse_localizations_from);return
-    require(args.dev_revision is None and args.reuse_localizations_from is None and args.input is not None and args.out is not None and
+            reuse_localizations_from=args.reuse_localizations_from, reuse_stages_from=args.reuse_stages_from,
+            raster_gate=dict(path=args.raster_gate_report, bytes=args.raster_gate_bytes, sha256=args.raster_gate_sha256)
+                if args.raster_gate_report is not None else None);return
+    require(args.dev_revision is None and args.reuse_localizations_from is None and args.reuse_stages_from is None and args.input is not None and args.out is not None and
         type(args.input_sha256) is str and re.fullmatch('[0-9a-f]{64}',args.input_sha256) and
         type(args.input_bytes) is int and args.input_bytes>0,'Explicit public artifact input/output SHA/bytes required')
     if args.native:
