@@ -1298,6 +1298,9 @@ def main():
     parser.add_argument('--cohort-stage',choices=('localize','all'));parser.add_argument('--dev-revision')
     parser.add_argument('--reuse-localizations-from')
     parser.add_argument('--reuse-stages-from')
+    parser.add_argument('--reuse-terminal-stop-report', type=Path)
+    parser.add_argument('--reuse-terminal-stop-bytes', type=int)
+    parser.add_argument('--reuse-terminal-stop-sha256')
     parser.add_argument('--reuse-prepare-prefix-report', type=Path)
     parser.add_argument('--reuse-prepare-prefix-bytes', type=int)
     parser.add_argument('--reuse-prepare-prefix-sha256')
@@ -1316,6 +1319,13 @@ def main():
         or (args.raster_prefix_report is not None and type(args.raster_prefix_bytes) is int and 0 < args.raster_prefix_bytes <= 131072
         and type(args.raster_prefix_sha256) is str and re.fullmatch('[0-9a-f]{64}', args.raster_prefix_sha256)
         and args.raster_gate_report is not None), 'Explicit complete prefix activation pin and capacity gate required')
+    stop_fields = (args.reuse_terminal_stop_report, args.reuse_terminal_stop_bytes, args.reuse_terminal_stop_sha256)
+    require(all(v is None for v in stop_fields) or
+        (args.reuse_terminal_stop_report is not None and type(args.reuse_terminal_stop_bytes) is int
+        and 0 < args.reuse_terminal_stop_bytes <= 65536 and type(args.reuse_terminal_stop_sha256) is str
+        and re.fullmatch('[0-9a-f]{64}', args.reuse_terminal_stop_sha256)
+        and args.cohort_stage == 'all' and args.reuse_stages_from is not None and not args.native),
+        'Complete independent terminal-stop pin requires explicit all-cohort stage resume')
     prefix_fields = (args.reuse_prepare_prefix_report, args.reuse_prepare_prefix_bytes, args.reuse_prepare_prefix_sha256)
     require(all(v is None for v in prefix_fields) or
         (args.reuse_prepare_prefix_report is not None and type(args.reuse_prepare_prefix_bytes) is int
@@ -1334,6 +1344,8 @@ def main():
         from form_hoi_external_cohort import run
         run(sys.modules[__name__],code,revision,stage=args.cohort_stage,dev_revision=args.dev_revision,
             reuse_localizations_from=args.reuse_localizations_from, reuse_stages_from=args.reuse_stages_from,
+            terminal_stop=dict(path=args.reuse_terminal_stop_report, pin=dict(bytes=args.reuse_terminal_stop_bytes,
+                sha256=args.reuse_terminal_stop_sha256)) if args.reuse_terminal_stop_report is not None else None,
             prepare_prefix=dict(path=args.reuse_prepare_prefix_report, bytes=args.reuse_prepare_prefix_bytes,
                 sha256=args.reuse_prepare_prefix_sha256) if args.reuse_prepare_prefix_report is not None else None,
             raster_gate=dict(path=args.raster_gate_report, bytes=args.raster_gate_bytes, sha256=args.raster_gate_sha256)

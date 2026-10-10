@@ -72,7 +72,7 @@ def dispatch(rows, stage, invoke):
 
 
 def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_from=None,
-        reuse_stages_from=None, raster_gate=None, raster_prefix=None, prepare_prefix=None):
+        reuse_stages_from=None, raster_gate=None, raster_prefix=None, prepare_prefix=None, terminal_stop=None):
     predictor.require(stage in ('localize','all'), 'Explicit cohort stage required')
     binding = predictor.source(predictor.ROOT, code, revision, predictor.ENTRY, predictor.HELPERS)
     rows, transfer = discover(predictor, code, dev_revision)
@@ -98,37 +98,7 @@ def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_f
         sequence_order=[r['sequence_id'] for r in rows], sequences=[], full_4D_accuracy_verified=False)
     report['raster_runtime_controls'] = dict(capacity=raster_gate, prefix=raster_prefix,
         original_intermediate_outputs_preserved=True, native_fit_operators_unchanged=True)
-    if raster_prefix is not None:
-        predictor.require(stage == 'all' and raster_gate is not None,
-            'Prefix runtime is only an explicit capacity-qualified inference control')
-        from raster_prefix_activation import activation
-        activation(raster_prefix['path'], {k: raster_prefix[k] for k in ('bytes', 'sha256')},
-            current_image=predictor.config(code)['body_image'])
     outcomes = {}
-    predictor.require(not (reuse_stages_from and reuse_localizations_from), 'One explicit technical reuse producer required')
-    predictor.require(prepare_prefix is None or stage == 'all' and reuse_stages_from is not None,
-        'Initializer prefix requires explicit stopped all-cohort stage resume')
-    if reuse_stages_from is not None:
-        predictor.require(stage == 'all' and raster_gate is not None,
-            'Successful-prefix resume requires explicit same-source raster qualification')
-        from form_stage_reuse import reuse
-        report['stage_reuse'] = reuse(predictor, code, revision, reuse_stages_from, rows,
-            allow_body_depth_camera_change=True, prepare_prefix=prepare_prefix)
-        report['localization_reuse'] = report['stage_reuse']['original_localization_proof']
-    elif reuse_localizations_from is not None:
-        from form_prediction_reuse import reuse
-        report['localization_reuse']=reuse(predictor,code,revision,reuse_localizations_from,rows)
-    # Check all fresh one-shot pairs before any CPU API call, not halfway
-    # through localization after the other workers have consumed their tokens.
-    for row in rows:
-        sid=row['sequence_id']; base=predictor.ROOT/'results'/('form-hoi-external-predict-'+revision)/sid
-        if (base/'localize/report.json').is_file():
-            predictor.read_stage(base,'localize');continue
-        for path in predictor.credential_paths(revision,sid):
-            predictor.canonical(path); info=path.lstat()
-            predictor.require(stat.S_ISREG(info.st_mode) and info.st_nlink==1 and
-                not info.st_mode&0o077 and 0<info.st_size<16384,
-                'Every fresh sequence requires its own private one-shot credential pair')
     def invoke(row):
         sid = row['sequence_id']; base = predictor.ROOT/'results'/('form-hoi-external-predict-'+revision)/sid
         args = SimpleNamespace(stage=stage, input=row['input'], input_bytes=row['pin']['bytes'],
@@ -150,6 +120,38 @@ def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_f
         except Exception as error:
             record['error_type'] = type(error).__name__; raise
     try:
+        if raster_prefix is not None:
+            predictor.require(stage == 'all' and raster_gate is not None,
+                'Prefix runtime is only an explicit capacity-qualified inference control')
+            from raster_prefix_activation import activation
+            activation(raster_prefix['path'], {k: raster_prefix[k] for k in ('bytes', 'sha256')},
+                current_image=predictor.config(code)['body_image'])
+        predictor.require(not (reuse_stages_from and reuse_localizations_from), 'One explicit technical reuse producer required')
+        predictor.require(terminal_stop is None or stage == 'all' and reuse_stages_from is not None,
+            'Terminal stop requires explicit stopped all-cohort stage resume')
+        predictor.require(prepare_prefix is None or stage == 'all' and reuse_stages_from is not None,
+            'Initializer prefix requires explicit stopped all-cohort stage resume')
+        if reuse_stages_from is not None:
+            predictor.require(stage == 'all' and raster_gate is not None,
+                'Successful-prefix resume requires explicit same-source raster qualification')
+            from form_stage_reuse import reuse
+            report['stage_reuse'] = reuse(predictor, code, revision, reuse_stages_from, rows,
+                allow_body_depth_camera_change=True, prepare_prefix=prepare_prefix, stop=terminal_stop)
+            report['localization_reuse'] = report['stage_reuse']['original_localization_proof']
+        elif reuse_localizations_from is not None:
+            from form_prediction_reuse import reuse
+            report['localization_reuse']=reuse(predictor,code,revision,reuse_localizations_from,rows)
+        # Check all fresh one-shot pairs before any CPU API call, not halfway
+        # through localization after the other workers have consumed their tokens.
+        for row in rows:
+            sid=row['sequence_id']; base=predictor.ROOT/'results'/('form-hoi-external-predict-'+revision)/sid
+            if (base/'localize/report.json').is_file():
+                predictor.read_stage(base,'localize');continue
+            for path in predictor.credential_paths(revision,sid):
+                predictor.canonical(path); info=path.lstat()
+                predictor.require(stat.S_ISREG(info.st_mode) and info.st_nlink==1 and
+                    not info.st_mode&0o077 and 0<info.st_size<16384,
+                    'Every fresh sequence requires its own private one-shot credential pair')
         dispatch(rows,stage,invoke)
         repeated, after = discover(predictor,code,dev_revision)
         predictor.require(repeated == rows and after == transfer and
@@ -157,7 +159,9 @@ def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_f
             'Frozen public inputs/source changed during cohort execution')
         report['status'] = 'complete'
     except Exception as error:
-        report['error_type'] = type(error).__name__; raise
+        report['error_type'] = type(error).__name__
+        report['failure_phase'] = 'preflight' if not outcomes else 'native_dispatch'
+        report['predictions_started'] = bool(outcomes); raise
     finally:
         report['sequences'] = [outcomes.get(r['sequence_id'],dict(sequence_id=r['sequence_id'],status='not_started')) for r in rows]
         predictor.save_json(result,report)

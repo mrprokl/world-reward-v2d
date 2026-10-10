@@ -115,3 +115,25 @@ def test_wrappers_use_original_predictor_ENTRY_without_parent_GPU_lease():
     assert 'run_form_hoi_external_predict/code' in text and '--cohort-stage' in text
     assert '62000s' in text and 'flock' not in text and 'docker run' not in text
     assert 'infra/form_hoi_external_cohort.py' in predictor.HELPERS
+
+
+def test_resume_preflight_failure_is_sealed_with_all_four_not_started(tmp_path,monkeypatch):
+    code,dev,_,seqs=prepared(tmp_path,monkeypatch); revision='c'*40
+    monkeypatch.setattr(predictor,'ROOT',tmp_path);(tmp_path/'results').mkdir()
+    monkeypatch.setattr(predictor,'source',lambda *_a:dict(producer_revision=revision))
+    import form_stage_reuse
+    seen=[]
+    def broken(*_a,**kwargs):
+        seen.append(kwargs['stop']);raise FileNotFoundError('missing terminal receipt')
+    monkeypatch.setattr(form_stage_reuse,'reuse',broken)
+    monkeypatch.setattr(predictor,'driver',lambda *_a:pytest.fail('No inference before admission'))
+    stop=dict(path=tmp_path/'results/stop.json',pin=dict(bytes=123,sha256='f'*64))
+    with pytest.raises(FileNotFoundError):
+        cohort.run(predictor,code,revision,stage='all',dev_revision=dev,reuse_stages_from='d'*40,
+            raster_gate=dict(path='unused',bytes=1,sha256='a'*64),terminal_stop=stop)
+    value=json.loads((tmp_path/'results'/f'form-hoi-external-cohort-{revision}-all.json').read_text())
+    assert seen==[stop] and value['status']=='fail' and value['error_type']=='FileNotFoundError'
+    assert value['failure_phase']=='preflight' and value['predictions_started'] is False
+    assert value['sequence_order']==seqs and all(r['status']=='not_started' for r in value['sequences'])
+    assert value['ground_truth_used'] is False and value['private_truth_read'] is False
+    assert not (tmp_path/'results'/('form-hoi-external-predict-'+revision)).exists()

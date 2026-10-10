@@ -278,3 +278,12 @@ def test_actual_prepare_and_forward_use_native_tools_without_signature_workaroun
     def native(video,mask_h5,object_mesh,intrinsics_file,output_root,*,redo=False):
         seen.append((video,mask_h5,object_mesh,intrinsics_file,output_root,redo));return output_root
     assert native(*range(5)) == 4 and seen[0][-1] is False
+
+
+@pytest.mark.parametrize('fields',[
+    ['--reuse-terminal-stop-report','/tmp/stopped.json'],
+    ['--reuse-terminal-stop-report','/tmp/stopped.json','--reuse-terminal-stop-bytes','123','--reuse-terminal-stop-sha256','a'*64],
+])
+def test_terminal_stop_cli_cannot_be_partial_or_bypass_cohort_admission(monkeypatch,fields):
+    monkeypatch.setattr(sys,'argv',['predictor',*fields])
+    with pytest.raises(ValueError,match='terminal-stop'):p.main()
