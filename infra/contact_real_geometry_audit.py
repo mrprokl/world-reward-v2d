@@ -119,7 +119,9 @@ def factor_costs(bank,r,t,pool,cfg,fit_cfg,variant):
     surface=_ContactTriangleSurface(v,bank['faces']);evidence=bank['evidence'] if variant=='J1' else pool
     distances=[];nearest=[]
     for frame,side in zip(*np.nonzero(evidence.activations&(np.arange(n)[:,None]>0))):
-        local=(evidence.hand_points_camera[frame,side,evidence.hand_visible[frame,side]]-t[frame])@r[frame]
+        indices=(np.array([0]) if variant=='J1' else np.arange(evidence.hand_points_camera.shape[2]))
+        indices=indices[evidence.hand_visible[frame,side,indices]]
+        local=(evidence.hand_points_camera[frame,side,indices]-t[frame])@r[frame]
         d=surface.distances(local,batch_size=32);nearest.append(float(d.min()))
         if variant=='soft_pool':
             from world_reward.contact_patch import smooth_patch_distances

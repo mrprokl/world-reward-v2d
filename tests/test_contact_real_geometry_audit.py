@@ -58,13 +58,17 @@ def test_distance_gradient_ray_alignment_is_not_claimed_surface_normal():
     assert 'not_oriented_surface_normal' in row['scope']
 
 
-def test_factor_costs_match_unchanged_fitter_initial_objective():
+@pytest.mark.parametrize('variant',['J1','hard_pool','soft_pool'])
+def test_factor_costs_match_unchanged_fitter_initial_and_final_objective(variant):
     bank=tiny_bank();pool,_=audit.real.bounded_pool(bank,protocol())
+    bank['xy']=bank['xy']+np.random.default_rng(31).normal(0,.3,bank['xy'].shape)
     cfg=replace(config(),max_nfev=300)
-    measured=audit.factor_costs(bank,bank['rotations'],bank['translations'],pool,protocol(),cfg,'J1')
-    fitted=audit.real.fit_worker(('J1',bank,bank['evidence'],protocol(),cfg))
+    measured=audit.factor_costs(bank,bank['rotations'],bank['translations'],pool,protocol(),cfg,variant)
+    fitted=audit.real.fit_worker((variant,bank,bank['evidence'] if variant=='J1' else pool,protocol(),cfg))
     assert fitted['status']=='complete'
     assert measured['total_cost']==pytest.approx(fitted['fit']['initial_cost'],abs=1e-10)
+    final=audit.factor_costs(bank,fitted['rotations'],fitted['translations'],pool,protocol(),cfg,variant)
+    assert final['total_cost']==pytest.approx(fitted['fit']['final_cost'],abs=1e-10)
     assert measured['blocks']['RGB']['count']>measured['blocks']['contact']['count']
     assert measured['contact_scale_m']>0
 
