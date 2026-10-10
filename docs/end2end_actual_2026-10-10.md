@@ -5,7 +5,7 @@
 Baseline `052ba1554e9a573d566713a99a61d89a5f27681c` preserved.
 Candidate `ebcee73cc76e036b3c2ec9c32e9a72abc951ad78`: same raw native bundle,
 300 steps /301 updates, full original frames, automatic RGB evidence, no GT.
-Random cohort seed20261008: [9,1,14,7]; 1/7 remain upstream-pose unsupported,
+Random cohort seed20261008: [9,1,14,7]; 1/7 remain unsupported in this frozen ablation (midclip scale mask failure),
 never replaced or counted as reconstructed successes.
 
 | Diagnostic (not reference accuracy) | Episode9 A→B | Episode14 A→B |
@@ -36,109 +36,119 @@ Producer d8061c9f6f0a649e17e545af40e9da483fa59366, EP9 all415,
 so it cannot solve joint relative placement. This is an actual completed failed
 hypothesis, not a claim that contacts are impossible.
 
-## External evaluation execution
+## External evaluation state
 
-Four frozen FORM DEV, first96 original contiguous frames, RGB+native public
-prompt/action only. References opaque in separate VM02 evaluator quarantine;
-all4×A/B and external sampling sealed before any truth read. Reserved unopened.
-Exact all30 Track1 RGB byte/first96-pixel alias bank frozen200330B, SHA256
-`e43f5b5f3b2adcf14e8791ef86c2733e43e46f6368f3bf10ae881a3e72a8b5ed`.
-Exact-ID/content checks do not prove near/reencoded alias absence or pretrained
-checkpoint independence. FORM truth is reconstructed multiview pseudo-GT.
+Four frozen, unmatched FORM DEV clips; all first96 contiguous original frames.
+FORM reconstructed multiview pseudo-GT is quarantined on VM02. All4×A/B and
+external sampling must seal before any truth read; reserved4 remain unopened.
+Exact-ID and all30 Track1 RGB alias guards pass, but near/reencoded aliases and
+pretrained-checkpoint independence are NOT proven.
 
-DEV extraction9b32d28 bootstrap failed before output allocation (HTTP403,
-VM02 managed identity lacked private-container permission). Narrow container-scoped
-Blob Data Contributor granted, with no public access/ACL/account-key changes;
-retry uses a fresh producer, original archive retained. Acknowledged dispatches
-are not completion. Prediction/evaluation code is tested, not yet an actual
-reference score. Full three-column Azure previews completed exit0, EP9=415frames151200B;
-EP14=442frames91777B, both QA failures shown. Publication dispatched; playback
-awaits sealed tiny receipt. DEVv2 failed due to absent host ffprobe; decoder
-installed remotely, fresh v3 producer2250970 dispatched. No truth values decoded.
-CPU02 existing image imports NumPy/Torch/Trimesh/SciPy; optional Numba absent,
-not yet a qualified full evaluator execution.
+DEV acquisition225097082dad29ebbbacb82daa09c71a3ea83bdb completed167.933s;
+7322B SHA90694c8d032f4b3b8eedcd422304cb51510820087d6add4be10e4e20671055dd.
+Public RGB/text only transported directly Azure02→01; no laptop media.
+All4 localizations806300da64a238c889f76bfeb4d0992d85c8a654 complete;
+9645B SHA2f04c671fb0623f01bbb11f432323f3e4215683548835cc71762a73cfafdadbf.
 
-### Acquired actual four-DEV PASS
+First FORM clip125aab2: SAM42.528s, body/depth94.543s, Objects45.973s sealed;
+prepare stopped with verified owned-container absence because full743576-face
+raster costs were excessive. Byte-exact successful-prefix reuse implemented;
+failed preparation never reused. Eight final4D predictions remain incomplete:
+**no external reference metrics yet, no verified victory**.
 
-Producer225097082dad29ebbbacb82daa09c71a3ea83bdb,167.933s completeexit0:
-all4 native30fps1536x1152, lengths764/616/396/409, eligiblefirst96exact
-aliasguardPASS (notproofnearaliases). No GTarrays/masks/calibration decoded.
-Report7322B SHA25690694c8d032f4b3b8eedcd422304cb51510820087d6add4be10e4e20671055dd.
-Rawotherarchivesremoved; firstretainedauthenticatedarchive reuseno1GBrefetch.
-DirectpublicRGB/textAzure02→01 transport nowdispatched, no laptop media.
-Publishedfulltimelinepreviewreceipt3124B
-SHA256865c5b4e92f3cb8adfaacb828a6afc8c33e1ed981e4481145c241fde314a58d3.
-Userloopbackondemandvieweropened49933 TTL3600, noautoplay/preloadmedia.
+CPU02 isolated Numba runtimef4d379bd8c7cf0ef23364b7f2e3b1bce215ceea6:
+actual55.228sPASS, untouched public metric operator matched NumPy, reversed/
+degenerate topology, analytic geometry, and all96 frames of shared Sim3 CD/ACC/PEN
+qualification. This is numerical evaluator parity, NOT reconstructed-data accuracy.
+Childsha256:d24051da178c12ce3f3f3193a5e0c8ca90e1e7a1c765077ec3e22fdfc3752004;
+report10889B SHAdba8aace26df84ff250c67a083ed631241803bfbd27764164d96a74fc595a68e.
 
-### Direct Azure public transport
+Full RGB/052/B previews published privately: EP9=415frames151200B;
+EP14=442frames91777B. Both QA failures visible, 1/7 scale-mask failures retained.
+Publication07944fe633f1b523529f24231b5347bec951e884 receipt3124B
+SHA865c5b4e92f3cb8adfaacb828a6afc8c33e1ed981e4481145c241fde314a58d3.
+On-demand memory-only viewer; no autoplay/preloading/download to laptop.
 
-VM02 publish1c9ffee completeexit0, publicmanifest4465B
-SHA2563151519bc11e602060c92bfad3750c68c824f155d8934ad8bb98a4ba8d479459.
-VM01fetch0077f73 dispatched. Remote source references never transferred.
-Externalpredictionproducer806300d (493frozenruntimefiles), own per-sequence
-one-shotVertexauth preparedinRAM pipeline; pendingactualcohortresults.
+## Contact feasibility: completed alternatives
 
-## Next structural hypothesis (not tested/adopted)
+Translation-only nearest/original multibranch candidates841094d/4e24cf2 failed
+on full EP9/frame99 and EP14/frame231: a common relative translation cannot
+repair altered bimanual separation. No candidate geometry was fabricated.
 
-Nativecontact gradient reachesnewhumantranslation; it is notmissing. The
-originalfactor trades 200×squared nearest distance (all2318handvertices,
-initialnetworkgate) against normalized RGB/pose priors. TrainCOCO ignores
-wrists, hands/rotationsfixed; rootRGB canbuyseparation. Samewitness gap is not
-wholehandminimum: recordboth beforeclaiming allcontactworse. Native diagnostic
-contact_distance_mean includes inactivehands; only activehandstatisticcomparable.
+Native articulation continuationc25f0df completed **96.371s**, all frozen records
+retained: EP9=27.968s, EP14=64.127s. Nine whole-clip dyadic proposals each rejected
+by placement/contact checks; both returned **full moving A, no improvement**.
+Replayed native A reference uses the exact original IDs/activations/parameters;
+saved A and original comparison gates unchanged. Native-vs-saved witness gap
+roundoff max.463µm/.119µm was sealed before proposals, no tolerance relaxation.
+A scalar direction can be infeasible at one contact at every positive step;
+next distinct hypothesis is native articulated feasible-start SQP (separate doc),
+not another weight/interpolation sweep. No actual SQP gain yet.
 
-C, after FORM A/B: image optimization subject to contact-feasibility rather
-than strongerarbitraryweight. Automaticcurrentanatomicalpatch normalconstraints
-with tangent sliding/releasefree; minimumchange proximalprojection, not
-sharedcoordinate reparameterization (equivalentobjective), nofreezes/scalechanges.
-SameA/Bhands+rotations remainfixed toisolatethecause. Infeasible/ill-conditioned
-constraints mustabstain explicitly. This is ouruntestedproposal, inspiredby
-https://arxiv.org/html/2605.20992v4#S4.SS3 and https://arxiv.org/abs/2012.09856 ,
-not a reproduction or evidence of generalization. Gates: trueactive wholehand
-continuoussurface and unchangedwitness, held-outRGBproxy, PEN, actualreference
-CD/ACC and unchangedfulltimelines. Complete existing externalpredictions first.
+Private RGB/052/B videos remain available as diagnostics. The C viewer adapter
+now separates136/shape/scale controls from the strict seven-field display ABI;
+no geometry repair or checker relaxation. C rendering80eef93 completed, full415/442 original frames, with
+fallback explicitly labeled no gain. Publicationf03dcf24 completed: receipt3366B
+SHAe70c7bc3669772fa5924e3da12a5d53760b296bc4a93601f0c1d64bfeb6ba150.
+EP9/14 MP4=151736/91818B. Playback only on demand; no laptop media.
+The historical unsupported-reason text in this sealed receipt is stale; the
+actual cause is the scale-mask failure documented below, not MHR absence.
 
-### Localization technical retry
+### Exact prefix raster runtime — actual PASS
 
-First806300d hostdriver failedbeforecohort/models/API: hostNumPyabsent.
-Installed host control-only numerical packages (NumPy1.21.5/SciPy1.8.0),
-no host model fallback. Same immutable source/input/credential namespace reused
-in a new unitname since no prediction output/credential consumption existed.
-Wrapperfuturepreflight fixed. Originalfailedunit/log preserved; not response
-shopping, hyperparameter selection, or scientific rerun.
+Native fine-kernel empty-prefix termination qualifiede27604c:96.477s including
+isolated four-unit compilation. No global package/binary overwrite, no Pulsar
+registration, no change in valid-face processing, resolution, geometry or models.
+Procedural and actual743576-face object B1/B4: exact masks AND depth bits.
+Actual B1 AABB1.409663→.545676s (2.58×); B4 5.817943→2.153679s (2.70×).
+Against original full-capacity8.536546s, actual B4~3.96×; single-trial implementation
+speed only, no reconstruction/leaderboard gain. Full4800-raster pose search is
+still substantial; native contact cost is measured separately below, not inferred from complexity.
 
-### Actual four-DEV localization complete
+Runtime report4810B SHAacf983bc2fcc545542dcd06446fa3e5a3f856b017af0591bf4ad43a7b9be77da;
+qualification5420B SHA5a2e84f576756f9e79c85b030b475089c7dc768cd0a591a99d648f847aa18bd0.
+CPU-only export822B SHA4d1a7e0f60cd7811e227dfdb957820d5cedace5d01563bf0163b25b8bda5b01a;
+binary878448B SHAf80eca190ea59532876cd4bea416e505d2600ba7eca3c72fbf89d5e3eb7329f7.
+Explicit activation keeps original native base image/backward/other operators.
 
-806300d nativecohortlocalize completeexit0,9645B
-SHA2562f04c671fb0623f01bbb11f432323f3e4215683548835cc71762a73cfafdadbf.
-All4 independentlocalizers3.95–6.18s (12Gemini seedframes parallel, nofailure
-omission), authentic sameRGBA inputs, perseqRSAkeys/envelopes deletedbyowner.
-Full4×96 A/B GPU chain dispatchedsameproducer, reuseexactlocalizeseals.
-Externalreference evaluation remains pending actual eight final predictions.
+### Actual native contact backend qualification
 
-### Actual contact constraint and raster qualification
+Six actual full2318-hand ×743576-face CUDA probes0319c8c finished7.327s;
+14195B SHA660803625e7edf9fd66dadca7f981b7f3762ccb022fbef202ffffb8917896b8a.
+All original faces below native.005area threshold. All six selected-pair
+values and Adam point updates are byte-identical; five of six human gradients
+are byte-identical (six satisfy the declared numerical threshold),
+but native face IDs differ and CPU witnesses tie: **replacement rejected**.
+Native exhaustive reference costs about.0233s/hand; CPU BVH about.023–.192s/query.
+The previous complexity-based assumption that CUDA contact must dominate was
+wrong for these probes. Keep the unchanged native CUDA operator; no more backend
+engineering until actual fit timing identifies a bottleneck.
 
-Contact producer841094d remeasured both complete A/B clips identically; the
-nearest-branch projection failed at EP9/frame99 (2.991mm local violation) and
-EP14/frame231 (0.311mm). No C trajectory fabricated. A bounded original/current
-surface-branch alternative4e24cf2 is tested locally and dispatched separately;
-all numerical caps, original activity and full geometry unchanged.
+FORM resumed producer80eef93 uses exact successful-stage reuse, qualified raster
+prefix/capacity and frame-local byte-identical mesh dedup. Full25hypotheses and
+full96 timeline preserved; actual duplicate gain remains unmeasured. Native fit
+now observes three complete real updates and stops before update4 if projected
+inclusive2400s/VRAM80% gates fail; native run/loss/objective/update count unchanged.
+Scheduled PEN timing is rechecked after its first three actual updates.
+The actual all-four producer80eef93 was dispatched and remains active in first
+clip preparation at2026-10-10T15:04Z; no sealed prepare/fit result yet.
 
-FORM125aab2 first96: SAM42.528s, body+depth94.543s, Objects45.973s, all sealed.
-Preparation stopped with verified owned-container absence before its5400s cap;
-complete original cohort failure receipt18182B
-SHA256288e2c63802bf2759c112debce35ea7c31536fb643029ae5a0f0eea88e0da814.
-Reuse only the successful byte-exact stages, never failed preparation/model
-responses. All eight external final predictions and truth evaluation still pending.
+Sparse SQP core on two independent authored seeds reduces its known synthetic
+objective95.22%/94.69% with unchanged witness bounds and root-motion increments.
+This is NOT native MHR or real HOI accuracy. Native callback/launcher integration
+and actual all-frame EP9/14 test remain required before adoption.
 
-Raster gate9a68cfa actualPASS19.711s,7951B
-SHA2562921703b78f32efda142c6035b1232cbe08357127959a2defbcc3c16d2a05439.
-Procedural plus unchanged743576-face real object, full1536×1152, batches1/4:
-exact mask and zero depth difference. Native B4 one-trial8.537→5.816s (1.47×),
-peak allocation1.998→1.425GB. This is implementation parity/speed, not HOI gain;
-large occupied-bin cost remains. More aggressive exact prefix-kernel optimization
-requires its own pinned runtime and parity qualification before adoption.
+### Coverage correction
 
-Private three-column previews renewed at localhost51865,1h TTL, user-demand
-playback only243KB total. CPU02 public operator SHA checks and Python3.11.10,
-NumPy1.26.3/Torch2.5.1 qualified; isolated Numba child build dispatchedf4d379b.
+Original052 EP1/7 failures were **scale_smoke midpoint object mask empty** (244/
+128 empty masks), not MHR inference failure. Human-visible-only scale anchoring
+already handles the cause. Further full-T occlusion initializer/consumer routing
+must preserve missing evidence and rerun native pose fitting; no copied/static
+edge predictions or replacement clips. Actual recovery is not completed yet.
+
+Official challenge reread2026-10-10: monocular RGB only, full metric shared-frame
+HOI; website describes accuracy/physics axes50/50, while official FAQ says
+aggregate sum-of-metric-ranks (lowest wins). Keep all five raw metrics and flag
+this scoring ambiguity before a ranking claim.
+The screenshot is sorted CD-H, not proof of aggregate first place. Smaller
+self-motion acceleration alone does not establish acceleration error improvement.
