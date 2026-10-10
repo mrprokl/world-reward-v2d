@@ -943,7 +943,11 @@ def worker(args):
             import torch
             require(torch.cuda.is_available(),'GPU required; never use laptop/CPU model fallback')
         if stage=='localize':localize(p,c,base,out,report)
-        elif stage=='track':track(p,c,base,out,report)
+        elif stage=='track':
+            # Match the already qualified singleton-PVS runner. Native init
+            # creates inference tensors; subsequent backbone/prompt calls must
+            # remain in the same inference context rather than build autograd.
+            with torch.inference_mode():track(p,c,base,out,report)
         elif stage=='body_depth':body_depth(p,c,base,out,report)
         elif stage=='object':object_mesh(p,c,base,out,report)
         elif stage=='prepare':prepare(p,c,base,out,report)

@@ -120,3 +120,9 @@ def test_track_PYTHONPATH_matches_actual_qualified_native_runtime():
     text=(REPO/'infra/form_hoi_external_predict.py').read_text()
     assert "('/opt/sam3:' if stage=='track' else '')"in text
     assert '--reuse-localizations-from'in text and 'localization_lineage'in text
+    tree=ast.parse(text)
+    branch=next(node for node in ast.walk(tree) if isinstance(node,ast.If) and
+        ast.unparse(node.test)=="stage == 'track'" and any(isinstance(child,ast.With) for child in node.body))
+    context=branch.body[-1]
+    assert ast.unparse(context.items[0].context_expr)=='torch.inference_mode()'
+    assert ast.unparse(context.body[0].value).startswith('track(')
