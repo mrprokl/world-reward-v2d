@@ -27,9 +27,6 @@ from sam31_runtime import control, decode_original, verify_runtime_source, verif
 from gemini_sam31_track import prepared, prompt_parity, preview
 from qwen4d_masks import _inventory
 from world_reward.seeded_tracking import corner_prompt, temporal_summary
-from world_reward.occlusion_recovery import (
-    RecoveryPolicy, RgbIdentityEvidence, fuse_frame, native_candidate, saved_native_candidate,
-)
 
 ENTRY = 'run_sam31_recovery'
 CONFIG = 'configs/sam31_recovery_v1.json'
@@ -64,7 +61,15 @@ def settings(code):
             and runtime['model_revision'] == 'daa63191845a41281374e725f4c9e51c7a824460'
             and runtime['use_fa3'] is False and runtime['compile'] is False,
             'Frozen saved-forward one-reverse-pass contract required')
-    RecoveryPolicy(**c['recovery_gates'])
+    # Host dispatch is stdlib-only; numerical policy construction belongs in
+    # the pinned native image, not the Azure system Python without NumPy.
+    gates = c['recovery_gates']
+    require(set(gates) == {'agreement_iou', 'geometry_iou', 'identity_confidence',
+                          'identity_support', 'calibration_source'}
+            and all(type(gates[k]) in (int, float) and 0 < gates[k] <= 1
+                    for k in ('agreement_iou', 'geometry_iou', 'identity_confidence', 'identity_support'))
+            and type(gates['calibration_source']) is str and gates['calibration_source'].startswith('external:'),
+            'Explicit external global recovery gates required')
     r = c['rgb_witness']
     require(r['anchor_candidates'] == 1 and r['qualification'] == 'manufactured_contracts_only_not_accuracy'
             and r['seed_patch_radius_pixels'] == 16
@@ -105,6 +110,7 @@ def mask_box(mask):
 
 def native_singleton(output, index, height, width, rgb_hash):
     import numpy as np
+    from world_reward.occlusion_recovery import native_candidate
     require(type(output) in (list, tuple) and len(output) == 5 and output[0] == index and output[1] == [1],
             'Native reverse must preserve original frame and fixed singleton ID1')
     logits = output[3].detach().float().cpu().numpy()
@@ -256,6 +262,7 @@ class RgbWitness:
         return [(i, kp[j].pt) for i, j in sorted(f.items()) if b.get(j) == i]
 
     def evidence(self, index):
+        from world_reward.occlusion_recovery import RgbIdentityEvidence
         affine = self.affines[index]
         geometry = None if affine is None else self.cv2.warpAffine(self.seed_mask.astype('uint8'), affine,
             (self.seed_mask.shape[1], self.seed_mask.shape[0]), flags=self.cv2.INTER_NEAREST,
@@ -278,6 +285,7 @@ class RgbWitness:
 
 def select_preserving_forward(forward, reverse, evidence, policy):
     """Only rescue actual old empty frames; never erase/replace old visibility."""
+    from world_reward.occlusion_recovery import fuse_frame
     fused = fuse_frame(forward, reverse, evidence, policy)
     if forward.mask.any():
         return forward.mask, 'saved_forward_native', fused
@@ -287,6 +295,7 @@ def select_preserving_forward(forward, reverse, evidence, policy):
 
 
 def reverse_anchor(areas, load, evidence, rgb_hashes, tracking_sha, policy):
+    from world_reward.occlusion_recovery import fuse_frame, saved_native_candidate
     visible = [i for i, value in enumerate(areas) if value > 0]
     if not visible: return None
     index = visible[-1]  # One predeclared proposal; no picking around failed identity.
@@ -300,6 +309,7 @@ def reverse_anchor(areas, load, evidence, rgb_hashes, tracking_sha, policy):
 
 def native(code, out):
     import numpy as np
+    from world_reward.occlusion_recovery import RecoveryPolicy, saved_native_candidate
     from PIL import Image
     import torch
     from sam3.model_builder import build_sam3_multiplex_video_predictor
