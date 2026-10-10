@@ -286,8 +286,42 @@ def test_runtime_sources_must_match_pins_before_network(tmp_path,monkeypatch):
     with pytest.raises(ValueError):t.runtime_source_files()
 
 
+def test_only_fixed_anatomy_source_may_be_owner_writable(tmp_path,monkeypatch):
+    root,m,p,blobs,pp,bind=manifests(tmp_path,monkeypatch)
+    for filename,record in t.RUNTIME_ASSETS.items():
+        path=root/record['path'];path.parent.mkdir(parents=True,exist_ok=True)
+        t.seal_bytes(path,blobs[t.prefix(PRED,DEV)+'/runtime/'+filename])
+    hand=root/t.RUNTIME_ASSETS['hand_spec.npz']['path'];hand.chmod(0o644)
+    before=hand.stat();files=t.runtime_source_files()
+    t.rehash([(r['path'],r['pin']) for r in files])
+    assert len(files)==4 and hand.stat().st_mode&0o777==0o644
+    assert hand.stat().st_mtime_ns==before.st_mtime_ns
+    prediction=root/'results/prediction.npz';prediction.write_bytes(b'fake');prediction.chmod(0o644)
+    with pytest.raises(ValueError):t.rehash([(prediction,digest(b'fake'))])
+    for mode in (0o664,0o646):
+        hand.chmod(mode)
+        with pytest.raises(ValueError,match='group/world'):t.runtime_source_files()
+
+
+def test_owner_writable_anatomy_wrong_bytes_rejected_without_chmod(tmp_path,monkeypatch):
+    root,m,p,blobs,pp,bind=manifests(tmp_path,monkeypatch)
+    hand=root/t.RUNTIME_ASSETS['hand_spec.npz']['path'];hand.parent.mkdir(parents=True)
+    hand.write_bytes(b'wrong');hand.chmod(0o644)
+    with pytest.raises(ValueError,match='authentic anatomy'):t.runtime_source_identity(hand,t.MAX_METADATA)
+    assert hand.read_bytes()==b'wrong' and hand.stat().st_mode&0o777==0o644
+
+
+def test_existing_destination_runtime_still_requires_sealed_bytes(tmp_path,monkeypatch):
+    root,m,p,blobs,pp,bind=manifests(tmp_path,monkeypatch);client=Client(blobs)
+    installed=t.install_runtime_files(client,p['runtime_files'])
+    hand=installed[0][0];hand.chmod(0o644)
+    with pytest.raises(ValueError):t.install_runtime_files(client,p['runtime_files'])
+    assert hand.stat().st_mode&0o777==0o644
+
+
 def test_eval_wrapper_uses_only_each_host_existing_qualified_image():
     wrapper=(Path(__file__).resolve().parents[1]/'infra/run_form_hoi_external_eval.sh').read_text()
-    assert 'world-reward-ncc-h100-02) IMAGE=sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3' in wrapper
+    assert 'world-reward-ncc-h100-02) IMAGE=sha256:d24051da178c12ce3f3f3193a5e0c8ca90e1e7a1c765077ec3e22fdfc3752004' in wrapper
     assert 'scenesmith-ncc-h100-01) IMAGE=sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7' in wrapper
+    assert 'compiled_public_kernels_active' in wrapper and 'qualification.json' in wrapper
     assert 'docker image inspect' in wrapper and 'docker pull' not in wrapper and 'docker tag' not in wrapper

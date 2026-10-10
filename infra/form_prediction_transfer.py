@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import re
 import signal
+import stat
 import sys
 import time
 import urllib.request
@@ -175,15 +176,38 @@ def assemble(code,predrev,devrev):
     return manifest,files,tracked,dict(native_source_binding=native,public_transfer_receipt=public_pin)
 
 
+def runtime_source_identity(path, maximum):
+    """Hash-controlled admission of ONE owner-writable upstream anatomy asset.
+
+    Acquired hand weights are 0644 on Azure01. Their exact independently pinned
+    bytes may be read for transport without chmod/mutation. All prediction,
+    public input, report and operator-code files remain strictly sealed. The
+    same pin/stat admission is repeated after upload; CPU02 installs new bytes
+    sealed0444 and never silently replaces an existing artifact.
+    """
+    path=canonical(path)
+    asset=RUNTIME_ASSETS['hand_spec.npz']; hand_path=ROOT/asset['path']
+    if path != hand_path:return identity(path,maximum)
+    before=path.lstat()
+    require(stat.S_ISREG(before.st_mode) and before.st_nlink==1 and not before.st_mode&0o022,
+            'Authentic anatomy source must be single-link regular, not group/world writable')
+    actual=identity(path,maximum,readonly=False);after=path.lstat()
+    expected={k:asset[k] for k in ('bytes','sha256')}
+    require(actual==expected and all(getattr(before,k)==getattr(after,k) for k in
+        ('st_dev','st_ino','st_mode','st_size','st_mtime_ns','st_ctime_ns','st_nlink','st_uid','st_gid')),
+        'Independently pinned authentic anatomy source changed during hashing')
+    return actual
+
+
 def rehash(tracked):
-    for path,expected in tracked:require(identity(path,MAX_GEOMETRY)==expected,'Authoritative sealed prediction/input source changed')
+    for path,expected in tracked:require(runtime_source_identity(path,MAX_GEOMETRY)==expected,'Authoritative sealed prediction/input source changed')
 
 
 def runtime_source_files():
     files=[]
     for filename,record in RUNTIME_ASSETS.items():
         path=canonical(ROOT/record['path']);expected={k:record[k] for k in ('bytes','sha256')}
-        require(identity(path,MAX_METADATA)==expected,'Independently pinned tiny public runtime source differs')
+        require(runtime_source_identity(path,MAX_METADATA)==expected,'Independently pinned tiny public runtime source differs')
         files.append(dict(file=filename,path=path,pin=expected,mime='application/octet-stream' if filename.endswith('.npz') else 'text/x-python'))
     return files
 
