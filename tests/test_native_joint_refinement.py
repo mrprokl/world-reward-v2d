@@ -181,6 +181,26 @@ def test_wrapper_is_offline_exact_image_GPU_singlelease_and_frozen_timeout():
     assert 'easydict' not in text and 'VDA' not in text
 
 
+def test_audited_native_ORT_prefix_can_map_binary_on_executable_tmpfs_only():
+    import inspect, shlex, dwpose_smoke as dw
+    root = Path(__file__).resolve().parents[1]
+    text = (root / 'infra/run_native_joint_real.sh').read_text()
+    tokens = shlex.split(text, comments=True)
+    mounts = [tokens[index + 1] for index, token in enumerate(tokens) if token == '--tmpfs']
+    assert mounts == ['/tmp:rw,nosuid,exec,size=1g']
+    assert 'private_prefix' in inspect.getsource(dw.perform)
+    assert 'import_runtime(prefix)' in inspect.getsource(dw.perform)
+    # Historical verified DWPose smoke used an ordinary executable /tmp, not
+    # Docker's default-noexec tmpfs. Only this mount permission is corrected.
+    previous = (root / 'infra/run_dwpose_smoke.sh').read_text()
+    assert '--tmpfs' not in previous and '--network none' in previous
+    assert '--network none --read-only' in text and '--cap-drop ALL' in text
+    assert 'SOURCE=052ba1554e9a573d566713a99a61d89a5f27681c' in text
+    assert '"$ROOT/experiments/full4d-v1-$SOURCE"' in text
+    assert 'type=bind,src=$path,dst=$path,readonly' in text
+    assert 'own_feed_cast' in inspect.getsource(dw.main)
+
+
 def test_same_producer_has_distinct_episode_CIDs_and_never_overwrites_outputs():
     import inspect, native_joint_real as runner
     path=Path(__file__).resolve().parents[1]/'infra/run_native_joint_real.sh'

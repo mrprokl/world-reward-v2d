@@ -82,10 +82,13 @@ trap cleanup EXIT
 trap 'exit 143' TERM
 trap 'exit 130' INT
 [[ -z "$(docker ps -aq --no-trunc --filter "name=^/$NAME$")" ]] || exit 2
+# The audited native ORT wheel is unpacked into a disposable /tmp prefix.
+# Its .so needs executable mmap; noexec tmpfs prevents import before inference.
+# Keep the image/assets RO and network disabled; this does not change ABI/feeds.
 timeout --signal=TERM --kill-after=10s 1803s docker run --rm --cidfile "$CIDFILE" \
  --name "$NAME" --label "world_reward.native_joint.owner=$REV" --gpus all \
  --network none --read-only --user 0:0 --cap-drop ALL --security-opt no-new-privileges \
- --memory 64g --cpus 4 --tmpfs /tmp:rw,nosuid,size=1g \
+ --memory 64g --cpus 4 --tmpfs /tmp:rw,nosuid,exec,size=1g \
  "${MOUNTS[@]}" --mount "type=bind,src=$OUT,dst=$OUT" \
  --entrypoint /usr/bin/env "$IMAGE" -i PATH=/opt/conda/bin:/usr/bin:/bin HOME=/tmp \
  PYTHONDONTWRITEBYTECODE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 WANDB_MODE=disabled \
