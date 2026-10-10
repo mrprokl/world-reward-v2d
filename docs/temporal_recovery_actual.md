@@ -47,6 +47,21 @@ temporally correlated depth errors/occlusion outliers, then reliability-aware
 depth factors; never tune against these challenge outputs or smooth away true z
 motion. The ideal 3 mm independent depth noise fixtures were insufficient.
 
+Alternative contact-coupled RGB candidate is implemented separately; inferred
+depth is disabled. Automatic native contact logits plus initial anatomical
+proximity may activate fixed hand-to-object factors. A single predicted hand
+surface witness is selected by one global algorithm before fitting; contact
+cannot deactivate itself by moving away. The continuous triangle surface is
+unchanged, with conservative spatial broadphase and full fallback for unsafe
+bounds. Absent contact leaves the prior RGB/RGBD algorithms unchanged.
+
+Before this alternative's challenge run, declare diagnostic rejection gates:
+RGB reprojection must improve; centroid acceleration median/p95 and angular
+acceleration median/p95 must not worsen; fixed active anatomical contact mean
+must not worsen. Fresh manufactured moving/absent-contact cases must retain
+motion. These gates are conservative QA, not a hidden truth score. No coefficient
+selection or per-episode manual intervention is permitted from their results.
+
 ## Mask recovery / decisions
 
 First reverse policy producer `f0530c76d575dba10fa076bf99b25f571f0726b9`
