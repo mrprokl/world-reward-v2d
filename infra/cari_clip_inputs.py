@@ -86,8 +86,8 @@ def relative_paths(spec):
 
 
 def _object_source(value):
-    if type(value) is not str or value not in {"default", "solid", "surface"}:
-        raise ValueError("Only the fixed default, solid or surface object source is permitted")
+    if type(value) is not str or value not in {"default", "solid", "surface", "surface_latent"}:
+        raise ValueError("Only explicit default, solid, surface or surface_latent sources are permitted")
     return value
 
 
@@ -106,7 +106,12 @@ def source_profile(pins):
             and pins.get("schema") == "world-reward-cari-clip-input-pins-v3"
             and type(pins["object_source"]) is str and pins["object_source"] == "surface"):
         return "surface"
-    raise ValueError("Exact v1 legacy, v2 solid-only or v3 surface-only public input pin schema required")
+    if (set(pins) == keys | {'object_source', 'allow_unobserved_poses'}
+            and pins.get('schema') == 'world-reward-cari-clip-input-pins-v4'
+            and type(pins.get('object_source')) is str and pins['object_source'] == 'surface_latent'
+            and pins.get('allow_unobserved_poses') is True):
+        return 'surface_latent'
+    raise ValueError("Exact v1/v2/v3 or explicit v4 surface-latent public input pins required")
 
 
 def dependency_paths(spec, *, object_source="default"):
@@ -174,6 +179,58 @@ def _record_identity(record, spec, *, legacy, dataset_required=False):
         raise ValueError("Report input dataset revision differs or is missing")
 
 
+def _latent_flags(value, total):
+    if (type(value) is not list or len(value) != total or any(type(v) is not bool for v in value)
+            or not value[0] or not value[-1]):
+        raise ValueError('Original full-T boolean observations and supported RGB edges required')
+    return value
+
+
+def _latent_metadata(flags):
+    return dict(pose_observed=flags, pose_observed_frame_index=list(range(len(flags))),
+        latent_pose_initializer=True, latent_poses_measured=False,
+        requires_native_refinement=True, final_prediction=False)
+
+
+def _latent_sources(prepared, original, total):
+    """Verify the sealed initializer's observation status, not prediction accuracy."""
+    flags = _latent_flags(original.get('pose_observed'), total)
+    wanted = dict(allow_unobserved_poses=True, latent_pose_initializer=True, latent_poses_measured=False,
+        observed_pose_frames=sum(flags), latent_pose_frames=total-sum(flags))
+    if any(type(original.get(k)) is not type(v) or original[k] != v for k, v in wanted.items()):
+        raise ValueError('Exact native latent initializer producer receipt required')
+    for row, flag in zip(original['frames'], flags):
+        if (type(row.get('pose_observed')) is not bool or row['pose_observed'] != flag
+                or type(row.get('candidates')) is not list
+                or (flag and (not row['candidates'] or type(row.get('selected')) is not dict
+                    or row.get('observation_status') != 'automatic_mask_and_inferred_depth'))
+                or (not flag and (row['candidates'] or row.get('selected') is not None
+                    or row.get('observation_status') not in {'empty_automatic_mask',
+                        'insufficient_inferred_visible_points', 'no_finite_supported_numerical_hypothesis'}))):
+            raise ValueError('Missing evidence cannot be labeled as a measured pose')
+    temporal = original.get('temporal_selection', {})
+    expected = dict(method='observed_frame_Viterbi_then_bilateral_SO3_centroid_latent_initialization',
+        pose_observed=flags, observed_frame_indices=[i for i, flag in enumerate(flags) if flag],
+        latent_frame_indices=[i for i, flag in enumerate(flags) if not flag],
+        latent_pose_status='initializer_not_measured_or_final_truth', edge_extrapolation=False,
+        zero_velocity_prior=False, mask_interpolation=False, geometry_scale_camera_unchanged=True,
+        time_units='original_frame_indices', quality_verified=False)
+    if type(temporal) is not dict or any(type(temporal.get(k)) is not type(v) or temporal[k] != v for k, v in expected.items()):
+        raise ValueError('Original bilateral initializer provenance and full observation flags required')
+    slots = temporal.get('candidate_indices')
+    if (type(slots) is not list or len(slots) != total
+            or any(type(slot) is not int or (slot < 0 if flag else slot != -1) for slot, flag in zip(slots, flags))):
+        raise ValueError('Original latent candidate sentinels must remain explicit')
+    metadata = prepared.get('object_pose_observations')
+    if (prepared.get('allow_unobserved_poses') is not True or type(metadata) is not dict
+            or set(metadata) != set(_latent_metadata(flags))
+            or any(type(metadata[k]) is not type(v) or metadata[k] != v for k, v in _latent_metadata(flags).items())
+            or any(type(v) is not bool for v in metadata['pose_observed'])
+            or any(type(v) is not int for v in metadata['pose_observed_frame_index'])):
+        raise ValueError('Prepared latent flags must remain explicit initializer-only, requiring native refinement')
+    return flags
+
+
 def validate_reports(root, spec, pins):
     validate_pins(spec, pins)
     object_source = source_profile(pins)
@@ -237,9 +294,10 @@ def validate_reports(root, spec, pins):
                 or set(report["object_pose_source"]) != set(expected_source)
                 or records["object"].get("mesh_source") != "solid"):
             raise ValueError("Pinned solid source/report/pose SHA must agree with the preparation")
-    elif object_source == "surface":
+    elif object_source in {"surface", "surface_latent"}:
+        directory = 'object_pose_full_surface_latent' if object_source == 'surface_latent' else 'object_pose_full_surface'
         expected_source=dict(report=deps['object'],
-            geometry_and_poses=episode_relative(spec.episode_index)+'/object_pose_full_surface/geometry_and_poses.npz',
+            geometry_and_poses=episode_relative(spec.episode_index)+'/'+directory+'/geometry_and_poses.npz',
             geometry_and_poses_sha256=source_pose)
         if (report.get('object_source')!='surface' or type(report.get('object_pose_source')) is not dict
                 or report['object_pose_source']!=expected_source or records['object'].get('mesh_source')!='surface'):
@@ -267,6 +325,8 @@ def validate_reports(root, spec, pins):
                 or type(scale) not in (int,float) or not math.isfinite(scale) or scale<=0
                 or any(type(native.get(k)) is not type(proof[k]) or native[k]!=proof[k] for k in keys)):
             raise ValueError('Native surface geometry must retain the original metric gauge without operations')
+        if object_source == 'surface_latent':
+            _latent_sources(report, records['object'], spec.total_frames)
     elif report.get("object_source", "default") != "default" or "object_pose_source" in report:
         raise ValueError("Legacy pins cannot select a different object source")
     validation = report.get("depth_validation", {})
@@ -326,7 +386,7 @@ def _rigid(value):
     return a
 
 
-def validate_poses(poses, wild, spec):
+def validate_poses(poses, wild, spec, *, pose_observed=None):
     import numpy as np
     if (type(poses) is not dict or set(poses) != {"frames", "obj_pose_world", "metadata"}
             or poses["frames"] != [f"{index:06d}" for index in range(spec.total_frames)]):
@@ -338,6 +398,13 @@ def validate_poses(poses, wild, spec):
     transform = _rigid(wild.get("source_object_mesh_to_aligned_transform"))
     if transform.shape != (4, 4) or not np.array_equal(transform, poses["metadata"].get("mesh_frame_change")):
         raise ValueError("Same original mesh/pose rigid frame change required")
+    if pose_observed is not None:
+        expected = _latent_metadata(_latent_flags(pose_observed, spec.total_frames))
+        if (any(type(poses['metadata'].get(k)) is not type(v) or poses['metadata'][k] != v
+                for k, v in expected.items())
+                or any(type(v) is not bool for v in poses['metadata']['pose_observed'])
+                or any(type(v) is not int for v in poses['metadata']['pose_observed_frame_index'])):
+            raise ValueError('Native solver initialization must preserve exact all-frame observation flags')
 
 
 def validate_wild(wild, edex, root, spec):
@@ -394,7 +461,10 @@ def verify_public_inputs(root, spec, pins):
     initializer = joblib.load(paths["initializer"])
     validate_initializer(initializer, spec)
     poses = joblib.load(paths["object_poses"])
-    validate_poses(poses, wild, spec)
+    if source_profile(pinned) == 'surface_latent':
+        validate_poses(poses, wild, spec, pose_observed=records['object']['pose_observed'])
+    else:
+        validate_poses(poses, wild, spec)
     if poses["metadata"].get("source_pose_sha256") != records["object"].get("geometry_and_poses_sha256"):
         raise ValueError("Original object pose artifact/producer chain differs")
     if (pins != pinned or {name: identity(root / name) for name in observed} != observed):
