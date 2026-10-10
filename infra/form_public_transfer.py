@@ -5,6 +5,7 @@ retain their independently sealed identities and absolute input routes. Media
 never traverses the local host. This is acquisition, never inference or scoring.
 """
 import argparse
+from email.utils import formatdate
 import hashlib
 import json
 import os
@@ -46,7 +47,8 @@ class PrivatePublicPackages(PrivatePreviews):
         require(method in {'PUT','HEAD','GET'} and allowed_blob(name),'Only exact public RGB/text routes')
         try:
             req=urllib.request.Request(ENDPOINT+'/'+name,data=data,method=method,
-                headers={'x-ms-version':'2023-11-03',**self.authorization(),**(headers or {})})
+                headers={'x-ms-version':'2023-11-03','x-ms-date':formatdate(usegmt=True),
+                         **self.authorization(),**(headers or {})})
             return self.opener.open(req,timeout=120)
         except Exception:raise RuntimeError('Private Azure public-package transport failed') from None
 
