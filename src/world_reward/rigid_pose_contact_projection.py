@@ -17,6 +17,9 @@ from .contact_feasible_placement import _NearestSurface
 from .native_pose_sqp import PoseSQPConfig, QPProjectionFailure, project_diagonal_qp, STATE_DIM
 
 
+QP_TOLERANCE = PoseSQPConfig().qp_tolerance
+
+
 @dataclass(frozen=True)
 class RigidContactProjectionConfig:
     max_steps: int = 20
@@ -116,9 +119,25 @@ def _contacts(surface, hands, active, r, t, check):
     return gaps, anchors, faces
 
 
+def _inner_contact_target(gap_bound, hand, centroid, rotation, vertices):
+    """Strict inner approximation absorbs the unchanged QP arithmetic tolerance.
+
+    QP acceptance permits 1e-10 linearized violation; the exact nonlinear
+    verifier permits ZERO additional violation. Aim inside by twice that same
+    tolerance plus a conservative FP64 coordinate-arithmetic guard. Never aim
+    below A's original gap or enlarge the final A+1e-7 bound. This is derived
+    numerical conditioning, not a video-selected contact weight/tolerance.
+    """
+    magnitude = max(1., float(np.abs(hand).max()), float(np.abs(centroid).max()), float(np.abs(vertices).max()))
+    guard = 128 * np.finfo(np.float64).eps * magnitude * max(1., float(np.linalg.norm(rotation, 2)))
+    reserve = min(1e-7, 2 * QP_TOLERANCE + guard)
+    return max(gap_bound - 1e-7, gap_bound - reserve), reserve
+
+
 def _rows(surface, hands, active, r, t, centre, gaps, anchors, faces, radii):
     rows = [[] for _ in r]; bounds = [[] for _ in r]
     c = np.einsum('tij,j->ti', r, centre) + t
+    vertex_magnitude = float(np.abs(surface.triangles).max())
     for f, side in zip(*np.nonzero(active)):
         local = (hands[f, side] - t[f]) @ r[f]
         gap = gaps[f, side]
@@ -136,7 +155,8 @@ def _rows(surface, hands, active, r, t, centre, gaps, anchors, faces, radii):
             # Left rotations preserve the original near-SO3 Gram matrix exactly
             # in real arithmetic; do not independently normalize old predictions.
             rows[f].append(np.r_[np.cross(camera_n, hands[f, side] - c[f]), -camera_n])
-            bounds[f].append(radii[f, side] - gap)
+            target, _ = _inner_contact_target(radii[f, side], hands[f, side], c[f], r[f], vertex_magnitude)
+            bounds[f].append(target - gap)
     return [np.asarray(a, np.float64).reshape(-1, 6) for a in rows], [np.asarray(b, np.float64) for b in bounds]
 
 
@@ -249,6 +269,9 @@ def project_rigid_pose_to_contacts(vertices, faces, R_A, t_A, R_target, t_target
         exact_full_surface_witness_bounds_preserved=True, original_near_SO3_not_repaired=True,
         first_pose_exactly_preserved=True, witness_selection='caller_frozen_automatic_A_IDs_not_reselected',
         first_full_reference_seconds=first_reference_seconds, surface_passes_completed=surface_passes,
+        strict_inner_linearization_reserve=dict(formula='min(original_numerical_slack,2*unchanged_QP_tolerance+128*FP64_eps*coordinate_magnitude*rotation_norm)',
+            QP_tolerance_m=QP_TOLERANCE, final_exact_contact_bounds_changed=False,
+            target_never_below_original_A_gap=True, reserve_cap_m=config.numerical_slack_m),
         elapsed_seconds=time.monotonic() - started, budget_exhausted=exhausted, config=asdict(config),
         human_fixed=True, native_fits=0, model_calls=0, GPU_used=False,
         all_original_object_vertices_positive_camera_depth=True,

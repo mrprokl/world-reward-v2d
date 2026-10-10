@@ -63,7 +63,8 @@ def test_contact_rotation_and_translation_normal_gradient_matches_full_surface_F
             plus = surface.closest((h[frame, side] - pt[frame]) @ pr[frame])[0]
             minus = surface.closest((h[frame, side] - mt[frame]) @ mr[frame])[0]
             assert (plus - minus) / 2e-6 == pytest.approx(rows[frame][side, axis], abs=2e-10)
-    assert np.allclose(bounds[frame], 1e-7)
+    assert np.all(np.asarray(bounds[frame]) < 1e-7)
+    assert np.all(np.asarray(bounds[frame]) > 1e-7 - 3e-10)
 
 
 def test_zero_gap_cusp_gets_two_unsigned_rows_and_never_invents_signed_penetration():
@@ -176,3 +177,31 @@ def test_policy_not_replaced_with_video_weight_or_loosened_contact_slack():
     for change in (dict(max_steps=21), dict(rotation_trust_rad=.06), dict(translation_trust_m=.02),
             dict(numerical_slack_m=1e-6), dict(max_restorations=5), dict(budget_seconds=121)):
         with pytest.raises(ValueError): replace(cfg, **change)
+
+
+def test_inner_approximation_absorbs_allowed_QP_error_without_enlarging_exact_bound():
+    radii = .002 + 1e-7
+    target, reserve = core._inner_contact_target(radii, np.array([.1, .2, 2.]), np.array([0., 0., 2.]), np.eye(3), np.ones((3, 3)))
+    assert reserve >= 2 * core.QP_TOLERANCE and reserve < 3 * core.QP_TOLERANCE
+    # Previously an accepted +QPtol boundary residual was an exact violation.
+    assert radii + core.QP_TOLERANCE > radii
+    assert target + core.QP_TOLERANCE < radii
+    assert target >= .002 and radii == .002 + 1e-7
+
+
+def test_independent_moving_vertex_contact_numerical_margin_recovers_steps_with_same_final_bounds(monkeypatch):
+    inputs = list(tiny()); phase = inputs[-1]
+    inputs[6] = np.einsum('tij,pj->tpi', inputs[2], np.array([[-.501, -.081, -.151], [.501, .081, .151]])) + inputs[3][:, None]
+    inputs[6][~inputs[7]] = np.nan
+    inputs[4] = Rotation.from_rotvec(np.tile([0., 0., .08], (len(phase), 1))).as_matrix() @ inputs[2]
+    inputs[5] = inputs[3] + [.002, .004, 0.]; inputs[4][0], inputs[5][0] = inputs[2][0], inputs[3][0]
+    corrected = core.project_rigid_pose_to_contacts(*inputs)
+    with monkeypatch.context() as old:
+        old.setattr(core, '_inner_contact_target', lambda bound, *_: (bound, 0.))
+        previous = core.project_rigid_pose_to_contacts(*inputs)
+    assert corrected.diagnostics['accepted_whole_clip_steps'] > previous.diagnostics['accepted_whole_clip_steps']
+    assert corrected.diagnostics['objective_after'] < previous.diagnostics['objective_after']
+    np.testing.assert_array_equal(corrected.baseline_gaps_m, previous.baseline_gaps_m)
+    active = inputs[7]
+    assert np.all(corrected.gaps_m[active] <= corrected.baseline_gaps_m[active] + 1e-7)
+    assert corrected.diagnostics['strict_inner_linearization_reserve']['final_exact_contact_bounds_changed'] is False
