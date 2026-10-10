@@ -51,5 +51,9 @@ VM02 managed identity lacked private-container permission). Narrow container-sco
 Blob Data Contributor granted, with no public access/ACL/account-key changes;
 retry uses a fresh producer, original archive retained. Acknowledged dispatches
 are not completion. Prediction/evaluation code is tested, not yet an actual
-reference score. Full three-column Azure preview rendering launched; publication
-and playback remain pending actual completion.
+reference score. Full three-column Azure previews completed exit0, EP9=415frames151200B;
+EP14=442frames91777B, both QA failures shown. Publication dispatched; playback
+awaits sealed tiny receipt. DEVv2 failed due to absent host ffprobe; decoder
+installed remotely, fresh v3 producer2250970 dispatched. No truth values decoded.
+CPU02 existing image imports NumPy/Torch/Trimesh/SciPy; optional Numba absent,
+not yet a qualified full evaluator execution.
