@@ -31,9 +31,10 @@ def score_depth(depth,valid,truth,dt,sensor_frames):
         mask=support[i]&support[i-1]
         if mask.any():temporal.append(float(np.mean(np.abs((depth[i]-depth[i-1])[mask]-(truth[i]-truth[i-1])[mask]))/dt[i-1]))
     if not errors or not temporal:raise ValueError('No synchronized sensor support')
+    perframe=[float(support[i].sum()/sensor[i].sum()) for i in range(len(depth)) if sensor[i].any()]
     return dict(absrel=float(np.mean(errors)),temporal_eulerian_error_m_s=float(np.mean(temporal)),
         temporal_definition='same sensor pixel temporal depth-change error including camera/occlusion motion, not material flow',
-        coverage=coverage,scored_frames=len(errors),temporal_pairs=len(temporal))
+        coverage=coverage,minimum_frame_coverage=min(perframe),scored_frames=len(errors),temporal_pairs=len(temporal))
 
 
 def infer(code,cfg,base,out,report):
@@ -121,7 +122,8 @@ def evaluate(code,cfg,base,out,report):
         worst_absrel_nonregression=min(r['absrel_gain'] for r in rows)>=-limits['worst_sequence_absrel_regression_max'],
         median_temporal_gain=float(np.median([r['temporal_gain'] for r in rows]))>=limits['median_temporal_error_gain_min'],
         worst_temporal_nonregression=min(r['temporal_gain'] for r in rows)>=-limits['worst_sequence_temporal_error_regression_max'],
-        support=all(r['metrics']['vda']['native_sensor_coverage']>=limits['candidate_sensor_valid_coverage_min'] for r in rows),
+        support=all(min(r['metrics']['vda']['native_sensor_coverage'],r['metrics']['vda']['coverage'],
+            r['metrics']['vda']['minimum_frame_coverage'])>=limits['candidate_sensor_valid_coverage_min'] for r in rows),
         synchronization=all(r['synchronized_fraction']>=limits['synchronized_rgb_fraction_min'] for r in rows))
     report.update(status='completed_sensor_evaluation',rows=rows,gates=gates,passed=all(gates.values()),
         private_values_read=True,private_values_used_for_prediction=False,
