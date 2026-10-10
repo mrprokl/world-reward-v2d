@@ -14,8 +14,9 @@ CONTACT=40183b3a83ba59080c192c3cdf2db9e1d76ef021
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_native_joint_real/code" \
  && "$(hostname)" == scenesmith-ncc-h100-01 && "$(id -u)" == 0 ]] || exit 2
-OUT="$ROOT/results/native-joint-real-$REV"
-[[ ! -e "$OUT" ]] || exit 2
+BASE="$ROOT/results/native-joint-real-$REV"
+OUT="$BASE/episode_$PADDED"
+[[ ! -e "$OUT" && ! -L "$OUT" ]] || exit 2
 export DOCKER_HOST="unix://$ROOT/docker.sock"
 # Reuse existing shared GPU lease read-only; never truncate lock contents.
 exec 8<"$ROOT/jobs/.world-reward-h100.lock"
@@ -36,8 +37,22 @@ for path in \
  [[ -e "$path" && ! -L "$path" ]] || exit 2
  MOUNTS+=(--mount "type=bind,src=$path,dst=$path,readonly")
 done
-mkdir -m 755 "$OUT"
-NAME="wr-native-joint-$REV"; CIDFILE="$OUT/.container.cid"
+# Base may hold a different sealed episode from THIS producer, never arbitrary files.
+/usr/bin/python3 -I -B - "$BASE" "$OUT" <<'PYOWN'
+import os,pathlib,stat,sys
+base,out=map(pathlib.Path,sys.argv[1:])
+if any(p.resolve()!=p or any(q.is_symlink() for q in(p,*p.parents)) for p in(base,out)):raise SystemExit(2)
+if base.exists():
+ s=base.stat()
+ if not stat.S_ISDIR(s.st_mode) or s.st_uid!=0 or stat.S_IMODE(s.st_mode)!=0o755:raise SystemExit(2)
+ for p in base.iterdir():
+  if p.name not in {'episode_000001','episode_000009','episode_000014'} or p.is_symlink() or not p.is_dir():raise SystemExit(2)
+  done=p/'host-exit.json'
+  if not done.is_file() or done.is_symlink() or done.stat().st_mode&0o222:raise SystemExit(2)
+else:base.mkdir(mode=0o755)
+out.mkdir(mode=0o755)
+PYOWN
+NAME="wr-native-joint-$REV-$PADDED"; CIDFILE="$OUT/.container.cid"
 cleanup() {
  local status=$? cid='' ids='' found='' absent=false
  trap - EXIT TERM INT

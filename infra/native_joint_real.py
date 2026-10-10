@@ -264,7 +264,7 @@ def decode_and_seal(torch, layer, params, poses, bank, src, out):
             t = {k: torch.tensor(v[sl].copy(), device='cuda', dtype=torch.float32) for k, v in params.items()}
             decoded = layer.mhr_forward(t)
             arrays = [a.cpu().numpy().copy() for a in (decoded.vertices, decoded.joints, decoded.keypoints)]
-            if any(not np.isfinite(a).all() for a in arrays) or (arrays[0][..., 2] <= 0).any():
+            if any(not np.isfinite(a).all() for a in arrays) or any((a[..., 2] <= 0).any() for a in arrays):
                 raise ValueError('Every full native candidate geometry frame must be finite positive-Z')
             target[sl], joints[sl], keypoints[sl] = arrays
             faces = decoded.faces.cpu().numpy().copy()
@@ -355,12 +355,28 @@ def quality_decision(cfg, baseline, candidate):
         heldout_4D_accuracy_verified=False, scope=cfg['gates']['scope'])
 
 
+def reserved_output(out, revision, episode):
+    """Consume only this wrapper's exclusive per-episode CID-reserved directory."""
+    import re, stat
+    from mediapipe_cpu_runtime_verify import canonical
+    out = canonical(out)
+    if (out != ROOT / 'results' / ('native-joint-real-' + revision) / f'episode_{episode:06d}'
+            or not out.is_dir() or out.stat().st_uid != 0
+            or stat.S_IMODE(out.stat().st_mode) != 0o755
+            or {p.name for p in out.iterdir()} != {'.container.cid'}):
+        raise ValueError('Exact wrapper-owned exclusive episode output required')
+    cid = out / '.container.cid'
+    if cid.is_symlink() or not cid.is_file() or not re.fullmatch(b'[0-9a-f]{64}\n?', cid.read_bytes()):
+        raise ValueError('Own original Docker CID must precede native run')
+    return out
+
+
 def run(episode):
     revision = os.environ['WR_CODE_REVISION']; code = Path(os.environ['WR_CODE'])
     if Path(os.environ['WR_ROOT']) != ROOT or code != ROOT / 'jobs' / revision / ENTRY / 'code':
         raise ValueError('Exact Azure immutable native-joint source namespace required')
     out = ROOT / 'results' / ('native-joint-real-' + revision) / f'episode_{episode:06d}'
-    out.mkdir(parents=True, exist_ok=False)
+    reserved_output(out, revision, episode)
     report = dict(status='fail', episode=episode, producer_revision=revision, ground_truth_used=False,
         production_adopted=False, private_truth_read=False, baseline_modified=False,
         depth_used=False, full_4D_quality_verified=False, coefficient_calibration_verified=False)

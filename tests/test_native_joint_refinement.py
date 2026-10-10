@@ -179,3 +179,14 @@ def test_wrapper_is_offline_exact_image_GPU_singlelease_and_frozen_timeout():
     assert '--network none --read-only' in text and 'flock -n 8' in text
     assert '1803s docker run' in text and '--cidfile' in text and 'docker rm -f' in text
     assert 'easydict' not in text and 'VDA' not in text
+
+
+def test_same_producer_has_distinct_episode_CIDs_and_never_overwrites_outputs():
+    import inspect, native_joint_real as runner
+    path=Path(__file__).resolve().parents[1]/'infra/run_native_joint_real.sh'
+    text=path.read_text()
+    assert 'OUT="$BASE/episode_$PADDED"' in text
+    assert 'NAME="wr-native-joint-$REV-$PADDED"' in text
+    assert "out.mkdir(mode=0o755)" in text and "done=p/'host-exit.json'" in text
+    assert "reserved_output(out, revision, episode)" in inspect.getsource(runner.run)
+    assert "{'.container.cid'}" in inspect.getsource(runner.reserved_output)
