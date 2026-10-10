@@ -156,6 +156,26 @@ def test_two_active_orthogonal_surface_constraints_jointly_feasible():
     assert np.all(result['witness_gap_after_m'] <= result['frozen_gap_bound_m'])
 
 
+def test_current_nearest_face_can_change_during_joint_projection_without_stale_anchor():
+    from world_reward.contact_feasible_placement import _relative_projection
+    args = inputs(count=1, joints=1)
+    extra = np.array([[0., -10, -10], [0, 10, -10], [0, 10, 10], [0, -10, 10]])
+    vertices = np.r_[args[4], extra]
+    faces = np.r_[args[5], np.array([[4, 5, 6], [4, 6, 7]])]
+    surface = _NearestSurface(vertices, faces)
+    # Manufactured structural case: joint placement makes a different triangle
+    # nearest for one hand. No previous face may remain a cached oracle.
+    points = np.array([[-.30476447537309603, -.3643313368070161, -.2326975362345296],
+                       [.3882588248464812, .08057519972646188, .4332738707868993]])
+    bound = np.full(2, .01+config().numerical_slack_m)
+    correction, before, after, cycles, updates = _relative_projection(points, bound, surface, config(), 0)
+    assert updates == 2 and cycles > 2
+    assert np.all(after <= bound)
+    independently_verified = np.sqrt(numpy_reference_distance_squared(points+correction, vertices[faces]))
+    np.testing.assert_allclose(after, independently_verified, atol=1e-15)
+    assert np.any(before > bound)
+
+
 def test_conflicting_fixed_articulation_rejects_full_proposal_without_dropping_hand():
     args = inputs(count=1, joints=1)
     yz = np.array([[-10., -10], [10, -10], [10, 10], [-10, 10]])
