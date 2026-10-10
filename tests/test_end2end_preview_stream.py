@@ -38,6 +38,38 @@ def receipt():
     return value, rev
 
 
+def continuation_receipt():
+    value, rev = receipt(); value.update(schema=stream.CONTINUATION_SCHEMA, candidate_kind='continuation')
+    value['states'][0]['candidate_status'] = 'accepted_native_continuation'
+    value['states'][2]['candidate_status'] = 'dynamic_A_fallback_no_improvement'
+    return value, rev
+
+
+def test_strict_v2_native_continuation_and_fallback_labels_preserve_legacy_v1():
+    value, rev = continuation_receipt()
+    states, allowed = stream.records(value, rev, candidate_kind='continuation')
+    assert len(allowed) == 4 and len(states) == 4
+    page = stream.index_html(states).decode()
+    assert 'C contact-continuation' in page and 'Baseline fallback / no gain' in page and 'Native joint' not in page
+    assert 'non vérifiés' in page
+    with pytest.raises(ValueError): stream.records(value, rev, candidate_kind='joint')
+    old, _ = receipt()
+    stream.records(old, rev, candidate_kind='joint')
+    with pytest.raises(ValueError): stream.records(old, rev, candidate_kind='continuation')
+
+
+@pytest.mark.parametrize('bad', ['kind', 'missing_kind', 'extra', 'missing_status', 'false_status', 'legacy_inject'])
+def test_v2_continuation_fields_are_not_arbitrary_optional_metadata(bad):
+    value, rev = continuation_receipt()
+    if bad == 'kind': value['candidate_kind'] = 'oracle'
+    elif bad == 'missing_kind': del value['candidate_kind']
+    elif bad == 'extra': value['gain_verified'] = True
+    elif bad == 'missing_status': del value['states'][0]['candidate_status']
+    elif bad == 'false_status': value['states'][0]['candidate_status'] = 'complete'
+    elif bad == 'legacy_inject': value['schema'] = stream.SCHEMA
+    with pytest.raises(ValueError): stream.records(value, rev)
+
+
 @pytest.mark.parametrize('mutation', ['schema', 'producer', 'render', 'candidate', 'baseline', 'endpoint',
     'private', 'public', 'keys', 'quality', 'heavy', 'extra_field', 'cohort', 'order', 'missing_state',
     'filter_failure', 'complete_extra', 'qa_not_bool', 'unknown_status', 'reason_unbounded',

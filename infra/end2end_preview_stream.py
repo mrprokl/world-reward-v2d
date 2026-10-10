@@ -18,6 +18,8 @@ import time
 import full4d_stream as base
 
 SCHEMA = 'world_reward.end2end_preview_publication.v1'
+CONTINUATION_SCHEMA = 'world_reward.end2end_preview_publication.v2'
+CONTINUATION_STATUSES = {'accepted_native_continuation', 'dynamic_A_fallback_no_improvement'}
 BASELINE = '052ba1554e9a573d566713a99a61d89a5f27681c'
 COHORT, COMPLETE = [9, 1, 14, 7], [9, 14]
 MAX_RECEIPT = 64 << 10
@@ -39,14 +41,21 @@ def pin(value, maximum):
             'Bounded original byte/SHA identity required')
 
 
-def records(receipt, producer_revision, *, render_revision=None, candidate_revision=None):
+def records(receipt, producer_revision, *, render_revision=None, candidate_revision=None, candidate_kind=None):
     """Accept exactly the frozen cohort and two actual, unfiltered candidates."""
     revision(producer_revision)
     fields = {'schema', 'status', 'producer_revision', 'render_revision', 'candidate_revision',
               'baseline_revision', 'render_report_pin', 'cohort', 'states', 'files', 'source_binding',
               'endpoint', 'private_container_verified', 'public_access_changed', 'account_keys_used',
               'quality_verified', 'heavy_data_uploaded'}
-    require(type(receipt) is dict and set(receipt) == fields and receipt['schema'] == SCHEMA
+    continuation = type(receipt) is dict and receipt.get('schema') == CONTINUATION_SCHEMA
+    if continuation: fields.add('candidate_kind')
+    kind = 'continuation' if continuation else 'joint'
+    require(candidate_kind is None or candidate_kind in ('joint', 'continuation'), 'Explicit valid candidate kind required')
+    require(candidate_kind is None or kind == candidate_kind, 'Pinned preview method differs')
+    require(type(receipt) is dict and set(receipt) == fields
+            and receipt['schema'] == (CONTINUATION_SCHEMA if continuation else SCHEMA)
+            and (not continuation or receipt['candidate_kind'] == 'continuation')
             and receipt['status'] == 'pass' and receipt['producer_revision'] == producer_revision
             and receipt['baseline_revision'] == BASELINE and receipt['endpoint'] == base.ENDPOINT
             and receipt['private_container_verified'] is True and receipt['public_access_changed'] is False
@@ -76,7 +85,9 @@ def records(receipt, producer_revision, *, render_revision=None, candidate_revis
         require(type(row) is dict and type(row.get('episode')) is int and row['episode'] == ep,
                 'Original cohort order required')
         if ep in COMPLETE:
-            require(set(row) == {'episode', 'status', 'QA_passed'} and row['status'] == 'complete'
+            require(set(row) == ({'episode', 'status', 'QA_passed', 'candidate_status'} if continuation else
+                                {'episode', 'status', 'QA_passed'}) and row['status'] == 'complete'
+                    and (not continuation or row['candidate_status'] in CONTINUATION_STATUSES)
                     and type(row['QA_passed']) is bool, 'Both completed candidates, including QA failures, required')
         else:
             require(row.get('status') in {'failed', 'not_reconstructed_in_this_ablation'}
@@ -131,8 +142,11 @@ def index_html(states):
         ep = row['episode']
         if row['status'] == 'complete':
             qa = 'QA PASS — GT pending' if row['QA_passed'] else 'QA FAIL — not adopted'
+            title = ('Baseline fallback / no gain' if row.get('candidate_status') == 'dynamic_A_fallback_no_improvement'
+                else 'C contact-continuation — '+qa if row.get('candidate_status') == 'accepted_native_continuation'
+                else 'Native joint — '+qa)
             content = ('<div class="columns"><span>Original RGB</span><span>Baseline complete (052)</span>'
-                       f'<span>Native joint — {html.escape(qa)}</span></div>'
+                       f'<span>{html.escape(title)}</span></div>'
                        f'<video controls playsinline preload="none" aria-label="Épisode {ep}: original, baseline 052, candidat natif">'
                        f'<source src="/episode-{ep}.mp4" type="video/mp4"></video>'
                        f'<p><a href="/episode-{ep}.jpg" target="_blank" rel="noopener noreferrer">'
@@ -183,11 +197,12 @@ def main():
     parser.add_argument('--revision', required=True)
     parser.add_argument('--render-revision', required=True)
     parser.add_argument('--candidate-revision', required=True)
+    parser.add_argument('--candidate-kind', choices=('joint', 'continuation'), default='joint')
     parser.add_argument('--ttl', type=int, default=base.MAX_TTL)
     args = parser.parse_args()
     require(60 <= args.ttl <= base.MAX_TTL, 'Viewer TTL must be between60and3600seconds')
     states, allowed, _ = load_receipt(args.receipt, args.revision,
-        render_revision=args.render_revision, candidate_revision=args.candidate_revision)
+        render_revision=args.render_revision, candidate_revision=args.candidate_revision, candidate_kind=args.candidate_kind)
     server = make_server(states, allowed); server.deadline = time.monotonic() + args.ttl
     timer = threading.Timer(args.ttl, server.shutdown); timer.daemon = True; timer.start()
     print(f'END2END_STREAM_URL http://127.0.0.1:{server.server_port}/', flush=True)
