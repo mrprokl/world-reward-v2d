@@ -1,0 +1,33 @@
+{
+  "schema": "world_reward.video_depth_pose_real.v1",
+  "episode": 9,
+  "frames": 415,
+  "fps": 30.0,
+  "variants": [
+    "VDA_RGBD",
+    "VDA_RGBD_soft_pool"
+  ],
+  "anchor_frames": [
+    0,
+    207,
+    414
+  ],
+  "max_nfev": 300,
+  "max_candidates": 8,
+  "contact_sigma_diameter": 0.02,
+  "temperature_diameter": 0.01,
+  "max_point_triangle_pairs": 1000000000,
+  "depth_sigma_diameter": 0.02,
+  "development_reference": "sequence_evidence_stress_v1_owned_DEV_frozen_no_challenge_tuning",
+  "production_adopted": false,
+  "external_validation_approval": {
+    "passed": true,
+    "report_pin": {
+      "bytes": 4504,
+      "sha256": "e7c16df2d488115539f4f3dd2455dcbf9c21fb9e23dca1a2dedb0fa122f2e3af"
+    },
+    "producer_revision": "9bd3c8c3b92168ff58c8c87399248f9f3e8549ab",
+    "scope": "TUM96frames3scenes_depth_only_not4D",
+    "source_path": "/srv/scenesmith/world-reward/validation/video_depth_real_output_v2/evaluation/report.json"
+  }
+}

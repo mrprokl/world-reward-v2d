@@ -61,6 +61,51 @@ is green. Local files are code/tests and concise receipts, not heavy outputs.
 
 ## Explicit limitations / next transition
 
+### Completed contact and external sensor results
+
+Contact producer `4ef9a1b5290d656f6c20f9d4aa6a781b4bfba019` completed
+in **1,146.46 s**, all three fits converged (J1 65, hard 72, soft 67 evaluations).
+J1 / hard / soft fit times: 143.36 / 1,096.83 / 996.51 s; no model calls.
+The larger cap removes the prior non-convergence excuse; it is not the remaining
+contact failure. Hard/soft pass every frozen gate except anatomical contact
+distance. Their similar outcomes weaken the hypothesis that hard switching alone
+explains the remaining separation. All full trajectories are saved.
+
+| Route | RGB mean px | Linear acceleration p95 m/s² | Same original anatomical gap mean m |
+|---|---:|---:|---:|
+| Original | 8.7317 | 21.3894 | 0.007087 |
+| Fair J1 | 3.8118 | 34.4416 | 0.075971 |
+| Hard pool | 3.7947 | 11.3330 | 0.086674 |
+| Soft pool | 3.7931 | 11.7292 | ~0.0866 |
+
+Original bounded full-pool gap mean 0.00960 m becomes 0.04085/0.04141 m
+(hard/soft), so this is not only a change of the selected finger witness.
+Whole-anatomy coverage and factor-cost audit now runs on these sealed results,
+without another fit. This will distinguish missing pool coverage from genuinely
+misplaced predicted human/object geometry. Next structural alternatives are
+contact memory or joint relative ray-depth correction, not arbitrary weights.
+Report pin: 26,482 B,
+`af0874f8debf7979cc2c873c74901a6b6013b8c3e74e5016964df891df37ba52`.
+
+VDA/MoGe blind predictions completed **59.37 s**; sensor evaluation **6.32 s**.
+All frozen sensor gates **pass**, same paired coverage 100%.
+
+| TUM sequence | MoGe / VDA AbsRel | AbsRel gain | Eulerian temporal-error gain |
+|---|---:|---:|---:|
+| Freiburg1 desk | 0.48625 / 0.16291 | 66.50% | 17.96% |
+| Freiburg2 xyz | 0.62105 / 0.11389 | 81.66% | 7.33% |
+| Freiburg3 office | 0.26383 / 0.14635 | 44.53% | 40.98% |
+
+VDA forward times 3.48/3.00/2.97 s versus MoGe 13.70/13.19/13.04 s.
+These are measured H100 forwards, not control latency or complete pipeline time.
+Median AbsRel gain **66.50%**, temporal gain **17.96%**, no sequence regression.
+Sealed prediction report SHA256
+`117dcd936408158ec3e4b9d3d823535c4d98be294d2b798ac73f6140d8629da1`;
+evaluation report 4,504 B SHA256
+`e7c16df2d488115539f4f3dd2455dcbf9c21fb9e23dca1a2dedb0fa122f2e3af`.
+Owned containers absent, exit 0. Retain VDA as a depth candidate and advance to
+the full-T pose/contact stage; no automatic production adoption.
+
 The frozen protocol's `moge_fov` prose says "native inferred" incorrectly.
 Actual implementation retains the earlier RGB-diagonal focal prior (800px at
 640x480), fixed across the clip. This is disclosed in prediction reports; no
