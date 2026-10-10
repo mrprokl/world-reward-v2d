@@ -15,6 +15,7 @@ code,revision=Path(sys.argv[1]),sys.argv[2]
 sys.path.insert(0,str(code/'infra'))
 import form_hoi_external_dev as h
 rt=h.runtime(code);cfg,_,source,_=h.source_binding(rt,code,revision)
+h.acquire_alias_bank(rt,cfg)
 base=h.canonical(h.DATA)
 if not base.exists():base.mkdir(mode=0o755)
 h.require(shutil.disk_usage(base).free>=cfg['minimum_free_bytes'],'Azure disk below6GiB')

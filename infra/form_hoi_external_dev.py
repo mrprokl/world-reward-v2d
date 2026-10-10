@@ -32,6 +32,31 @@ require, check, canonical, identity, seal = (acquisition.require, acquisition.ch
     acquisition.canonical, acquisition.identity, acquisition.seal)
 
 
+def acquire_alias_bank(rt, cfg):
+    """Metadata-only private Azure transfer; never any RGB or credential output."""
+    pin = cfg['alias_guard']['actual_bank_identity']
+    if pin is None: return
+    producer=cfg['alias_guard']['producer_revision']
+    require(type(producer) is str and re.fullmatch('[0-9a-f]{40}',producer),'Exact RGB bank producer required')
+    path = canonical(cfg['alias_guard']['path'])
+    if path.exists():
+        require(rt.identity(path,512<<10)==pin,'Existing frozen alias bank differs');return
+    # Same fixed private metadata route as the CPU bank's authenticated publisher.
+    from form_track1_alias_bank import PrivateBank
+    client=PrivateBank();client.require_private()
+    name=f'research-audit-{producer}/track1-rgb-alias-bank.json'
+    with client.request('GET',name) as response:
+        require(response.status==200 and int(response.headers.get('Content-Length','-1'))==pin['bytes']
+            and response.headers.get('x-ms-meta-sha256')==pin['sha256'],'Pinned metadata bank required')
+        raw=response.read((512<<10)+1)
+    require(len(raw)==pin['bytes'] and hashlib.sha256(raw).hexdigest()==pin['sha256'],
+            'Private alias bank transport differs')
+    path.parent.mkdir(mode=0o755,parents=True,exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(raw);stream.flush();os.fsync(stream.fileno());os.fchmod(stream.fileno(),0o444)
+    require(rt.identity(path,512<<10)==pin,'Sealed private metadata bank differs')
+
+
 def runtime(code):
     rt = acquisition.runtime(code)
     require(Path(acquisition.__file__).resolve() == Path(code)/'infra/form_hoi_external_acquire.py',

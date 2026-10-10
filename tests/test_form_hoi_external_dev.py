@@ -93,6 +93,29 @@ def test_missing_alias_bank_never_ready(tmp_path):
     assert result['qualified'] is False and result['exact_content_duplicate_check_passed'] is False
 
 
+def test_private_bank_metadata_transfer_is_exact_and_sealed(tmp_path,monkeypatch):
+    import form_track1_alias_bank as b
+    cfg=config();cfg['alias_guard']['path']=str(tmp_path/'bank.json')
+    raw=json.dumps(bank(cfg)).encode();pin={'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}
+    cfg['alias_guard']['actual_bank_identity']=pin
+    class Response(io.BytesIO):
+        status=200
+        headers={'Content-Length':str(len(raw)),'x-ms-meta-sha256':pin['sha256']}
+    calls=[]
+    class Client:
+        def require_private(self): calls.append('private')
+        def request(self,method,name):
+            calls.append((method,name));return Response(raw)
+    monkeypatch.setattr(b,'PrivateBank',Client)
+    from mediapipe_cpu_runtime_verify import identity
+    rt=type('RT',(),{'identity':staticmethod(identity)})
+    d.acquire_alias_bank(rt,cfg)
+    assert identity(tmp_path/'bank.json',512<<10)==pin
+    assert calls==['private',('GET',f"research-audit-{cfg['alias_guard']['producer_revision']}/track1-rgb-alias-bank.json")]
+    d.acquire_alias_bank(rt,cfg)
+    assert len(calls)==2
+
+
 def test_actual_alias_bank_all30_exact_byte_or_frame_guard(tmp_path):
     cfg=config();p=tmp_path/'bank.json';cfg['alias_guard'].update(path=str(p),actual_bank_identity=dict(bytes=1,sha256='a'*64))
     value=bank(cfg);p.write_text(json.dumps(value))
