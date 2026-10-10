@@ -175,3 +175,42 @@ def test_wrapper_offline_CPU_only_bound_inputs_no_GPU_lease_and_source_closure()
     run_source = inspect.getsource(runner.run)
     assert run_source.index("report['authored_DEV'] = authored_DEV()") < run_source.index('for episode in saved.COHORT')
 
+
+def test_contact_projection_receives_original_fixed_IDs_not_smoothed_or_B_human(monkeypatch, tmp_path):
+    bank, src, active, _ = tiny()
+    active[3, 1] = False
+    src['QA_witness_ids'][3, 1] = -1
+    _, proposals = runner.proposals(bank, src)
+    target = proposals['object_only']
+    captured = {}
+    def project(v, faces, r, t, rt, tt, points, support, indices):
+        assert r is bank['rotations'] and t is bank['translations']
+        assert rt is target['rotation'] and tt is target['translation']
+        assert np.isnan(points[~support]).all()
+        f, side = np.nonzero(support)
+        np.testing.assert_array_equal(points[f, side], src['human'][f, src['QA_witness_ids'][f, side]])
+        captured['called'] = True
+        gaps = np.full(support.shape, np.nan); gaps[support] = .01
+        return SimpleNamespace(rotation=r.copy(), translation=t.copy(),
+            baseline_gaps_m=gaps.copy(), gaps_m=gaps.copy(),
+            diagnostics=dict(accepted_steps=0, baseline_retained=True))
+    monkeypatch.setitem(sys.modules, 'world_reward.rigid_pose_contact_projection',
+        SimpleNamespace(project_rigid_pose_to_contacts=project))
+    result = runner.contact_projection_proposal(bank, src, active, target)
+    assert captured['called'] and result['human'] is src['human']
+    pins = runner.seal_proposal(tmp_path, bank, result)
+    assert 'frozen_contact_bounds' in pins
+    with np.load(tmp_path / 'frozen_contact_bounds.npz', allow_pickle=False) as data:
+        np.testing.assert_array_equal(data['hand_vertex_ids'], src['QA_witness_ids'])
+        np.testing.assert_array_equal(data['activations'], active)
+        np.testing.assert_array_equal(data['frame_index'], bank['frame_index'])
+
+
+def test_optional_projection_mode_no_argument_stays_original_CPU_only():
+    import inspect
+    text = inspect.getsource(runner.run)
+    assert text.index("report['projection_authored_DEV'] = projection_DEV()") < text.index('for episode in saved.COHORT')
+    assert 'contact_projection=False' in inspect.signature(runner.run).__str__()
+    wrapper = (Path(__file__).parents[1] / 'infra/run_pose_smoothing_real.sh').read_text()
+    assert '"$1" == --contact-projection' in wrapper and '"${ARGS[@]}"' in wrapper
+

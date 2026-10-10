@@ -25,7 +25,8 @@ ENTRY = 'run_pose_smoothing_real'
 BUDGET = 300
 VARIANTS = ('object_only', 'common_SE3_diagnostic')
 HELPERS = tuple(dict.fromkeys(('infra/pose_smoothing_real.py',
-    'infra/run_pose_smoothing_real.sh', 'src/world_reward/pose_smoothing.py', *saved.HELPERS)))
+    'infra/run_pose_smoothing_real.sh', 'src/world_reward/pose_smoothing.py',
+    'src/world_reward/rigid_pose_contact_projection.py', *saved.HELPERS)))
 
 
 def authored_DEV():
@@ -93,6 +94,22 @@ def contact_gaps(bank, src, human, r, t, active):
     return dict(frame_index=f.astype(np.int64), hand=s.astype(np.int64), hand_vertex_ids=ids.copy(), gap_m=gaps)
 
 
+def contact_projection_proposal(bank, src, active, target):
+    """Same moving SG target, fixed original human and fixed anatomical IDs."""
+    from world_reward.rigid_pose_contact_projection import project_rigid_pose_to_contacts
+    points = np.full((*active.shape, 3), np.nan, np.float64)
+    f, side = np.nonzero(active)
+    points[f, side] = src['human'][f, src['QA_witness_ids'][f, side]]
+    result = project_rigid_pose_to_contacts(bank['vertices'], bank['faces'],
+        bank['rotations'], bank['translations'], target['rotation'], target['translation'],
+        points, active, bank['frame_index'])
+    return dict(rotation=result.rotation, translation=result.translation,
+        human=src['human'], joints=src['native']['mhr_joints'],
+        keypoints=src['native']['mhr_keypoints'], projection=result.diagnostics,
+        baseline_gaps_m=result.baseline_gaps_m, projected_gaps_m=result.gaps_m,
+        activations=active.copy(), hand_vertex_ids=src['QA_witness_ids'].copy())
+
+
 def motion_and_floor(bank, human, r, t, floor):
     centre = np.einsum('tij,j->ti', r, bank['vertices'].astype(np.float64).mean(0)) + t
     increments = np.linalg.norm(np.diff(centre, axis=0), axis=1)
@@ -127,10 +144,15 @@ def seal_proposal(out, bank, proposal):
         pins['target'] = real.seal_file(out / 'target.npy', lambda stream: np.save(stream, proposal['human'], allow_pickle=False))
         pins['human_geometry'] = real.seal_file(out / 'human_geometry.npz', lambda stream: np.savez_compressed(stream,
             mhr_joints=proposal['joints'], mhr_keypoints=proposal['keypoints'], frame_index=bank['frame_index']))
+    if 'projection' in proposal:
+        pins['frozen_contact_bounds'] = real.seal_file(out / 'frozen_contact_bounds.npz',
+            lambda stream: np.savez_compressed(stream, baseline_gaps_m=proposal['baseline_gaps_m'],
+                projected_gaps_m=proposal['projected_gaps_m'], activations=proposal['activations'],
+                hand_vertex_ids=proposal['hand_vertex_ids'], frame_index=bank['frame_index']))
     return pins
 
 
-def run_episode(episode, out, ledger, binding, deadline):
+def run_episode(episode, out, ledger, binding, deadline, *, contact_projection=False):
     started = time.monotonic(); out.mkdir(mode=0o755)
     report = dict(episode=episode, status='fail', producer_revision=os.environ['WR_CODE_REVISION'],
         baseline_revision=real.old.SOURCE, ground_truth_used=False, private_truth_read=False,
@@ -162,13 +184,19 @@ def run_episode(episode, out, ledger, binding, deadline):
         report['A_B_QA_pin'] = real.seal_json(out / 'A_B_QA.json', dict(metrics={saved.A_NAME: qa_a, saved.B_NAME: qa_b},
             original_motion=original_motion))
         check(); method, proposed = proposals(bank, src); report['method'] = method
-        # Both proposals are frozen before ANY proposal QA, never selected by score.
+        if contact_projection:
+            check()
+            proposed['contact_constrained_SE3'] = contact_projection_proposal(
+                bank, src, b['activation'], proposed['object_only'])
+        # Every declared proposal is frozen before ANY proposal QA.
         for name, value in proposed.items():
             check(); folder = out / name; folder.mkdir(mode=0o755)
             report['variants'][name] = dict(status='geometry_sealed_QA_pending', candidate_outputs=seal_proposal(folder, bank, value),
-                human_source=(report['baseline_binding'] if name == 'object_only' else 'same_rigid_full_saved_A_geometry_transform'),
+                human_source=(report['baseline_binding'] if 'common_rotation' not in value else 'same_rigid_full_saved_A_geometry_transform'),
                 source_topology_unchanged=True, shape_scale_unchanged=True, native_controls_emitted=False,
                 all_original_frame_indices_preserved=True, per_frame_evaluation_alignment=False)
+            if 'projection' in value:
+                report['variants'][name]['projection'] = value['projection']
             real.seal_json(folder / 'geometry.json', report['variants'][name])
         for name, value in proposed.items():
             check(); row = report['variants'][name]
@@ -202,7 +230,9 @@ def run_episode(episode, out, ledger, binding, deadline):
     return report
 
 
-def run():
+def run(*, contact_projection=False):
+    if type(contact_projection) is not bool:
+        raise ValueError('Explicit contact-projection mode required')
     started = time.monotonic(); revision = os.environ['WR_CODE_REVISION']; code = Path(os.environ['WR_CODE'])
     if (Path(os.environ['WR_ROOT']) != ROOT or code != ROOT / 'jobs' / revision / ENTRY / 'code'
             or os.environ.get('WR_IMAGE_ID') != native.IMAGE or os.environ.get('CUDA_VISIBLE_DEVICES') != '-1'):
@@ -217,10 +247,17 @@ def run():
     try:
         report['source_binding'] = source(ROOT, code, revision, ENTRY, HELPERS)
         report['authored_DEV'] = authored_DEV()
+        if contact_projection:
+            from world_reward.rigid_pose_contact_projection import authored_DEV as projection_DEV
+            report['projection_authored_DEV'] = projection_DEV()
+            if report['projection_authored_DEV'].get('passed') is not True:
+                raise ValueError('Contact-projection authored DEV failed before challenge reads')
+            report['contact_projection_enabled'] = True
         binding = source(ROOT, ROOT / 'jobs' / saved.B_REVISION / native.ENTRY / 'code', saved.B_REVISION, native.ENTRY, native.HELPERS)
         report['B_source_binding'] = binding
         for episode in saved.COHORT:
-            row = (run_episode(episode, out / f'episode_{episode:06d}', ledger, binding, started + BUDGET)
+            row = (run_episode(episode, out / f'episode_{episode:06d}', ledger, binding, started + BUDGET,
+                contact_projection=contact_projection)
                 if episode in saved.FRAMES else saved.unsupported(episode))
             report['episodes'].append(row)
         if time.monotonic() >= started + BUDGET:
@@ -241,5 +278,7 @@ def run():
 
 
 if __name__ == '__main__':
-    if len(os.sys.argv) != 1: raise SystemExit('No arbitrary inputs, models or labels supported')
-    run()
+    arguments = os.sys.argv[1:]
+    if arguments not in ([], ['--contact-projection']):
+        raise SystemExit('Only the explicit frozen contact-projection mode is supported')
+    run(contact_projection=bool(arguments))

@@ -3,7 +3,8 @@
 set +x
 set -euo pipefail
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
-[[ $# -eq 0 ]] || exit 2
+[[ $# -eq 0 || ( $# -eq 1 && "$1" == --contact-projection ) ]] || exit 2
+ARGS=("$@")
 TRACK_SOURCE=09f516d9085f0d64d725b46b0ad6aa52fe7c0d84
 SOURCE=052ba1554e9a573d566713a99a61d89a5f27681c
 CONTACT_SOURCE=40183b3a83ba59080c192c3cdf2db9e1d76ef021
@@ -86,4 +87,4 @@ timeout --signal=TERM --kill-after=10s 303s docker run --rm --cidfile "$CIDFILE"
  -i PATH=/opt/conda/bin:/usr/bin:/bin HOME=/tmp PYTHONDONTWRITEBYTECODE=1 \
  OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 CUDA_VISIBLE_DEVICES=-1 \
  WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" WR_IMAGE_ID="$IMAGE" PYTHONPATH="$CODE/src:$CODE/infra" \
- /opt/conda/bin/python -B "$CODE/infra/pose_smoothing_real.py"
+ /opt/conda/bin/python -B "$CODE/infra/pose_smoothing_real.py" "${ARGS[@]}"
