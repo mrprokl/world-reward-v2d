@@ -1,7 +1,9 @@
 """Bounded read-only wait for an entire explicitly named owned service.
 
 Success is not a GPU lease, a quality gate, or permission to read references.
-Failed, missing and malformed units fail immediately; nothing is restarted.
+By default failed, missing and malformed units fail immediately. An explicit
+terminal-only observation can release independent work after a coherent failure;
+it never declares predecessor success. Nothing is restarted.
 """
 import argparse
 import json
@@ -75,13 +77,47 @@ def wait_success_unit(unit, *, timeout=MAX_WAIT, expected_command=()):
         time.sleep(min(30, remaining))
 
 
+def unit_terminal(state):
+    if type(state) is not dict or state.get('ActiveState') != 'failed':
+        return unit_ready(state)
+    require(set(state) == set(PROPERTIES) and state['LoadState'] == 'loaded' and
+        state['SubState'] == 'failed' and state['MainPID'] == '0' and
+        type(state['ExecMainStatus']) is str and
+        re.fullmatch(r'(?:0|[1-9][0-9]{0,2})', state['ExecMainStatus']) and
+        int(state['ExecMainStatus']) <= 255, 'Coherent failed service with no live main process required')
+    result = state['Result']
+    require(result in ('exit-code', 'signal', 'core-dump') and int(state['ExecMainStatus']) > 0 or
+        result in ('timeout', 'watchdog', 'oom-kill', 'resources', 'protocol', 'start-limit-hit'),
+        'Explicit coherent terminal failure required; never claim success')
+    return True
+
+
+def wait_terminal_unit(unit, *, timeout=MAX_WAIT, expected_command=()):
+    """Observe termination only, for scientifically independent successor work."""
+    unit = owned_unit(unit)
+    require(type(timeout) is int and 0 < timeout <= MAX_WAIT, 'Bounded scheduling budget required')
+    deadline = time.monotonic() + timeout
+    while True:
+        state = snapshot(unit, expected_command)
+        if unit_terminal(state):
+            return dict(unit=unit, **state)
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError('Entire predecessor scheduling budget exhausted')
+        time.sleep(min(30, remaining))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument('unit', type=owned_unit)
     parser.add_argument('--timeout-seconds', type=int, default=MAX_WAIT)
+    parser.add_argument('--allow-failed-terminal', action='store_true',
+        help='Observe coherent termination only; not predecessor success or quality')
     args = parser.parse_args()
-    state = wait_success_unit(args.unit, timeout=args.timeout_seconds)
-    print(json.dumps(dict(status='terminal_success', **state)), flush=True)
+    observe = wait_terminal_unit if args.allow_failed_terminal else wait_success_unit
+    state = observe(args.unit, timeout=args.timeout_seconds)
+    print(json.dumps(dict(status='terminal_observed' if args.allow_failed_terminal else 'terminal_success',
+        **state)), flush=True)
 
 
 if __name__ == '__main__':

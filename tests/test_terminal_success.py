@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import subprocess
 import sys
 from types import SimpleNamespace
@@ -93,3 +94,47 @@ def test_cli_redacts_systemctl_stderr_and_source_is_cpu_only():
     text = script.read_text()
     assert 'restart' not in text[text.index('def snapshot'):]
     assert 'docker' not in text and 'nvidia' not in text and 'import torch' not in text
+
+
+@pytest.mark.parametrize('result,status', [('exit-code', '1'), ('signal', '15'), ('core-dump', '11'),
+    ('timeout', '0'), ('watchdog', '6'), ('oom-kill', '9'), ('resources', '0'),
+    ('protocol', '0'), ('start-limit-hit', '0')])
+def test_explicit_terminal_observation_accepts_coherent_failure_only(monkeypatch, result, status):
+    failed = state(ActiveState='failed', SubState='failed', Result=result, ExecMainStatus=status)
+    monkeypatch.setattr(wait, 'snapshot', lambda *a: failed)
+    monkeypatch.setattr(wait.time, 'sleep', lambda _: pytest.fail('Terminal failure must not wait'))
+    assert wait.wait_terminal_unit(UNIT)['Result'] == result
+    with pytest.raises(ValueError):
+        wait.wait_success_unit(UNIT)
+
+
+@pytest.mark.parametrize('changes', [dict(Result='success'), dict(Result='exit-code', ExecMainStatus='0'),
+    dict(Result='signal', ExecMainStatus='0'), dict(Result='core-dump', ExecMainStatus='0'),
+    dict(Result='unknown'), dict(SubState='running'), dict(MainPID='123'), dict(LoadState='not-found'),
+    dict(ExecMainStatus='256'), dict(ExecMainStatus='00'), dict(ExecMainStatus=1)])
+def test_terminal_observation_rejects_incoherent_failed_or_live_state(changes):
+    failed = state(ActiveState='failed', SubState='failed', Result='exit-code', ExecMainStatus='1') | changes
+    with pytest.raises(ValueError):
+        wait.unit_terminal(failed)
+
+
+def test_terminal_observation_preserves_success_running_and_budget(monkeypatch):
+    assert wait.unit_terminal(state())
+    active = state(ActiveState='active', SubState='running', MainPID='123')
+    assert not wait.unit_terminal(active)
+    monkeypatch.setattr(wait, 'snapshot', lambda *a: active)
+    times = iter([0., 31.]); monkeypatch.setattr(wait.time, 'monotonic', lambda: next(times))
+    with pytest.raises(TimeoutError):
+        wait.wait_terminal_unit(UNIT, timeout=30)
+
+
+def test_optional_cli_never_labels_failure_as_success(monkeypatch, capsys):
+    failed = state(ActiveState='failed', SubState='failed', Result='exit-code', ExecMainStatus='1')
+    monkeypatch.setattr(wait, 'snapshot', lambda *a: failed)
+    monkeypatch.setattr(sys, 'argv', ['terminal_success.py', UNIT, '--allow-failed-terminal'])
+    wait.main()
+    report = json.loads(capsys.readouterr().out)
+    assert report['status'] == 'terminal_observed' and report['Result'] == 'exit-code'
+    monkeypatch.setattr(sys, 'argv', ['terminal_success.py', UNIT])
+    with pytest.raises(ValueError):
+        wait.main()
