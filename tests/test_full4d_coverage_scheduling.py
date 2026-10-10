@@ -7,10 +7,10 @@ import pytest
 ROOT=Path(__file__).parents[1]
 
 
-def test_coverage_waits_entire_successful_preview_before_unchanged_compute_budget():
+def test_independent_coverage_waits_entire_terminal_preview_before_unchanged_compute_budget():
     wrapper=(ROOT/'infra/run_full4d_coverage.sh').read_text()
     assert '"$5" == --after-terminal' in wrapper
-    assert '"$CODE/infra/terminal_success.py" "$WAIT_FOR"' in wrapper
+    assert '"$CODE/infra/terminal_success.py" "$WAIT_FOR" --allow-failed-terminal' in wrapper
     assert wrapper.index('"$CODE/infra/terminal_success.py" "$WAIT_FOR"')<wrapper.index('28920s')
     assert '"$(source_identity)" == "$BEFORE"' in wrapper
     assert '! -e "$ROOT/experiments/full4d-v1-$REV"' in wrapper
@@ -27,3 +27,13 @@ def test_coverage_parser_retains_original_exact_baseline_pins(extra,ok):
     r=subprocess.run(['bash','-c',wrapper+'\nprintf "%s" "$#"','wrapper',*args],capture_output=True,text=True)
     assert (r.returncode==0)==ok
     if ok:assert r.stdout=='4'
+
+
+def test_coverage_failure_tolerant_wait_does_not_weaken_render_or_reference_success_gates():
+    coverage=(ROOT/'infra/run_full4d_coverage.sh').read_text()
+    preview=(ROOT/'infra/run_end2end_preview.sh').read_text()
+    assert coverage.count('--allow-failed-terminal')==1
+    assert '--allow-failed-terminal' not in preview
+    assert 'Coverage is an independent experiment' in coverage
+    assert 'prior preview technical failure' in coverage
+    assert '--baseline-report-bytes' in coverage and '--baseline-report-sha256' in coverage

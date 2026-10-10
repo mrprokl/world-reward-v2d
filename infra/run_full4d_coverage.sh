@@ -25,7 +25,10 @@ print(value['closure_sha256'])
 PYSOURCE
  }
  BEFORE="$(source_identity)"
- env PYTHONDONTWRITEBYTECODE=1 python3 -B "$CODE/infra/terminal_success.py" "$WAIT_FOR"
+ # Coverage is an independent experiment: prior preview technical failure
+ # is NOT a scientific rejection. Wait for the ENTIRE producer to be terminal
+ # (success OR explicitly coherent failure), never an inter-clip lease release.
+ env PYTHONDONTWRITEBYTECODE=1 python3 -B "$CODE/infra/terminal_success.py" "$WAIT_FOR" --allow-failed-terminal
  [[ "$(source_identity)" == "$BEFORE" && ! -e "$ROOT/experiments/full4d-v1-$REV" \
   && ! -L "$ROOT/experiments/full4d-v1-$REV" ]] || exit 2
 fi
