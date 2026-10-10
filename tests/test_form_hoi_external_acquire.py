@@ -32,6 +32,19 @@ def test_pinned_existing_cohort_reserved_never_selected():
     with pytest.raises(ValueError): f.cohort(p, 'reserved')
 
 
+def test_code_only_runtime_closure_contains_all_actual_helpers():
+    import azure_job
+    root = Path(__file__).resolve().parents[1]
+    files = {str(p.relative_to(root)): p.read_bytes()
+             for folder in ('infra', 'src', 'configs') for p in (root/folder).rglob('*')
+             if p.is_file() and '__pycache__' not in p.parts}
+    files['pyproject.toml'] = (root/'pyproject.toml').read_bytes()
+    selected = azure_job.runtime_bundle_paths(files, 'infra/run_form_hoi_external_acquire.sh')
+    assert set(f.HELPERS) <= set(selected)
+    assert all(p.startswith(('infra/', 'src/', 'configs/')) or p == 'pyproject.toml' for p in selected)
+    assert not any(p.startswith('results/') for p in f.HELPERS)
+
+
 @pytest.mark.parametrize('name', ['../pose.npy', '/absolute.mp4', './videos/file', 'videos//file',
                                  'foo\\bar', 'x/../../bad', 'bad\nfile'])
 def test_tar_names_fail_closed(name):

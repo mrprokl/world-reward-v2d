@@ -26,8 +26,7 @@ ENTRY = 'run_form_hoi_external_acquire'
 PROTOCOL = 'configs/form_hoi_insight_v1.json'
 PROTOCOL_PIN = dict(bytes=10048, sha256='2de3774a16bb9cdf2ad79555d7f3371dc3bab981230a429944ed7b41481a65b6')
 HELPERS = ('infra/form_hoi_external_acquire.py', 'infra/run_form_hoi_external_acquire.sh',
-           'infra/mediapipe_cpu_runtime_verify.py', 'src/world_reward/form_hoi_protocol.py', PROTOCOL,
-           'results/audits/form_hoi_insight_v1_metadata.json')
+           'infra/mediapipe_cpu_runtime_verify.py', 'src/world_reward/form_hoi_protocol.py', PROTOCOL)
 PROFILES = {'inventory_first': (1, 600), 'acquire_dev': (4, 1200)}
 BLOCK = 1 << 20
 MAX_META = 256 << 10
@@ -83,6 +82,18 @@ def source_binding(rt, code, revision):
     p = rt.pinned(code/PROTOCOL, PROTOCOL_PIN, 16 << 10)
     require(p['dataset'] == 'nvidia/form-hoi' and p['dataset_revision'] == 'c63db107e84c7f74bb4929ef643b67b5c8bcc00e'
             and p['inference_ready'] is False, 'Exact metadata-only frozen cohort required')
+    # The local metadata-audit result is historical evidence, not a runtime input.
+    # Its frozen source identities/cohort are in the independently pinned config;
+    # the code-only dispatcher intentionally excludes results/. Do not require an
+    # unused non-bundled file, and do not turn acquisition into inference admission.
+    require(p['scope'] == 'metadata_only_external_insight_admission' and
+            p['challenge_track1_revision'] == '5f68335f3acc802033d1e80728c1633197521de8' and
+            p['sources']['challenge_track1_metadata']['sha256'] ==
+            'cce105292e2b670f32b49e0504b0ece67b8aa860ea69dc9e728fce97531b53fe' and
+            p['sources']['form_archive_manifest']['sha256'] ==
+            '856e297f6c4f70a2c9b6041f327598c94c1bd935a1745cdb5056dc2973bd36ef' and
+            all(v is False for v in p['qualification_gates'].values()),
+            'Frozen exclusion sources and pending inference gates required')
     return p, own
 
 
