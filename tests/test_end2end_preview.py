@@ -225,3 +225,47 @@ def test_SQP_root_source_binding_requires_actual_native_entry_and_all_original_s
     assert p.native_cohort(ArtifactLedger(),tmp_path,rev,'sqp')==r
     assert called[0][3]=='run_native_pose_sqp_real'
     assert str(called[0][1]).endswith('/run_native_pose_sqp_real/code')
+
+
+def test_preview_terminal_success_wait_precedes_lease_and_auto_publish_verifies_cleanup():
+    wrapper=(Path(__file__).parents[1]/'infra/run_end2end_preview.sh').read_text()
+    assert '"$1" == --after-terminal' not in wrapper # parsed in closed case instead
+    assert '--after-terminal)' in wrapper and '/infra/terminal_success.py' in wrapper
+    assert wrapper.index('"$CODE/infra/terminal_success.py" "$WAIT_FOR"')<wrapper.index('exec 8<')
+    assert '"$(source_identity)" == "$BEFORE"' in wrapper
+    assert 'render-and-publish' in wrapper and '1200s docker run' in wrapper
+    assert wrapper.index('bash "$CODE/infra/run_end2end_preview.sh" render')<wrapper.index('host-exit.json')
+    assert "{'process_exit_code':0,'owned_container_absent':True}" in wrapper
+    assert 'exec bash "$CODE/infra/run_end2end_preview.sh" publish "$REV"' in wrapper
+    assert 'ARGS=("$MODE" "$TARGET" --candidate-kind "$KIND")' in wrapper
+    assert '--after-gpu-lock' not in wrapper and 'systemctl restart' not in wrapper
+
+
+@pytest.mark.parametrize('args,ok',[(['render','a'*40],True),(['publish','a'*40,'--candidate-kind','sqp'],True),
+    (['render-and-publish','a'*40,'--after-terminal','world-reward-sqp.service','--candidate-kind','sqp'],True),
+    (['render','a'*40,'--candidate-kind','sqp','--after-terminal','world-reward-sqp'],True),
+    (['render','a'*40,'--after-terminal','missing.service'],False),
+    (['render','a'*40,'--after-terminal','world-reward-ok','--after-terminal','world-reward-other'],False),
+    (['render','a'*40,'--candidate-kind','sqp','--candidate-kind','joint'],False),
+    (['render','a'*40,'--after-gpu-lock'],False)])
+def test_preview_closed_scheduler_argument_parser_preserves_original_modes(args,ok):
+    import subprocess
+    wrapper=(Path(__file__).parents[1]/'infra/run_end2end_preview.sh').read_text()
+    code=wrapper.split('ROOT="${WR_ROOT',1)[0]
+    r=subprocess.run(['bash','-c',code+'\nprintf "%s|%s|%s|%s" "$MODE" "$TARGET" "$KIND" "$WAIT_FOR"','wrapper',*args],capture_output=True,text=True)
+    assert (r.returncode==0)==ok
+
+
+def test_render_and_publish_requires_sealed_true_successful_owned_host_exit(tmp_path):
+    import json,subprocess
+    wrapper=(Path(__file__).parents[1]/'infra/run_end2end_preview.sh').read_text()
+    code=wrapper.split("<<'PYEXIT'\n",1)[1].split('\nPYEXIT',1)[0]
+    path=tmp_path/'host-exit.json'
+    for value,ok in [(dict(process_exit_code=0,owned_container_absent=True),True),
+                     (dict(process_exit_code=1,owned_container_absent=True),False),
+                     (dict(process_exit_code=0,owned_container_absent=False),False),
+                     (dict(process_exit_code=False,owned_container_absent=True),False)]:
+        if path.exists():path.chmod(0o644)
+        path.write_text(json.dumps(value));path.chmod(0o444)
+        r=subprocess.run([sys.executable,'-I','-B','-',str(path)],input=code,text=True,capture_output=True)
+        assert (r.returncode==0)==ok
