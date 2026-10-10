@@ -1,0 +1,46 @@
+{
+  "schema": "world_reward.sam31_recovery.v1",
+  "episodes": [9, 1, 14, 7],
+  "saved_forward_producer": "b658881079871508c6b3ec14d001dc1299956996",
+  "saved_forward_native_report": {
+    "bytes": 23225,
+    "sha256": "6d1dea3a41e004d17bf6134bb74e78a2710f70607d130fdec5f051ed265c7813"
+  },
+  "sam_runtime_config": "configs/sam31_runtime_v1.json",
+  "runtime_image": "sha256:bb605dfee347a046f84ee89a82d760ce637f644e33243625fdfa61d45efb582b",
+  "sam_capacity": 2,
+  "sam_multiplex_count": 16,
+  "frames": [0, 14, 29],
+  "anchor_policy": "last_saved_forward_visible_seed_rgb_qualified",
+  "native_state_policy": "one_fresh_object_singleton_shared_backbone",
+  "fusion_policy": "preserve_forward_recover_empty_only_with_rgb_and_geometry",
+  "additional_reverse_passes_per_clip": 1,
+  "sam_episode_budget_seconds": 1200,
+  "sam_budget_seconds": 5400,
+  "max_jpeg_bytes": 180000,
+  "seed": 20261008,
+  "rgb_witness": {
+    "seed_features": 128,
+    "seed_patch_radius_pixels": 16,
+    "orb_features": 1536,
+    "orb_ratio": 0.75,
+    "fb_error_pixels": 1.5,
+    "ransac_error_pixels": 3.0,
+    "minimum_affine_inliers": 6,
+    "anchor_candidates": 1,
+    "qualification": "manufactured_contracts_only_not_accuracy"
+  },
+  "recovery_gates": {
+    "agreement_iou": 0.5,
+    "geometry_iou": 0.5,
+    "identity_confidence": 0.95,
+    "identity_support": 0.5,
+    "calibration_source": "external:manufactured-unit-contracts-not-accuracy"
+  },
+  "ground_truth_used": false,
+  "manual_labels": false,
+  "baseline_modified": false,
+  "quality_verified": false,
+  "training_overlap_verified": false,
+  "challenge_overlap_verified": false
+}
