@@ -236,11 +236,12 @@ def test_scientific_absence_continues_frozen_cohort_but_wiring_failure_stops(sta
     assert graph.scout_can_continue(status) is wanted
 
 
-def test_absence_contract_preserves_denominator_and_does_not_patch_solver():
+def test_absence_contract_preserves_denominator_and_does_not_enable_latent_solver():
     raw=(REPO/'infra/gemini_full4d.py').read_text()
     assert "except EmptyObservationUnsupported" in raw and 'cohort_denominator=len(selected)' in raw
     assert 'failed_clip_replaced=False' in raw and 'full4d_produced=False, model_calls=0' in raw
     assert hashlib.sha256((REPO/'infra/object_pose_smoke.py').read_bytes()).hexdigest()==graph.POSE_SOURCE_SHA
+    assert '--allow-unobserved-poses' not in raw
 
 
 @pytest.mark.parametrize('mutation', [None, 'writable_receipt', 'writable_model', 'receipt_during_read', 'callback_other_path', 'outside', 'absolute', 'wrong_digest', 'parent_alias', 'blob_alias', 'contents', 'hardlink', 'acquisition_revision', 'acquisition_cache'])

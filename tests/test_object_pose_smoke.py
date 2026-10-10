@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 
 import pytest
+from test_object_pose_latent import _default_projection
 
 
 @pytest.fixture
@@ -158,8 +159,9 @@ def test_solid_payload_is_same_array_tuple_scale_once_and_copy_byte_exact(pose,t
 
 def test_original_default_volume_conditioned_and_native_tracker_ast_unchanged(pose):
     import subprocess
-    before=subprocess.check_output(['git','show','56ed6fabe4235fe87f356b19a2ce9d65d61b2560:infra/object_pose_smoke.py'],cwd=Path(pose.__file__).resolve().parents[1],text=True)
-    old=ast.parse(before); new=ast.parse(Path(pose.__file__).read_text())
+    before=subprocess.check_output(['rtk','git','show','56ed6fabe4235fe87f356b19a2ce9d65d61b2560:infra/object_pose_smoke.py'],cwd=Path(pose.__file__).resolve().parents[1],text=True)
+    before_latent=subprocess.check_output(['rtk','git','show','5aecc543f03d0f13a6c8c1efa3de6fd50fc8d9be:infra/object_pose_smoke.py'],cwd=Path(pose.__file__).resolve().parents[1],text=True)
+    old=ast.parse(before); new=_default_projection(ast.parse(Path(pose.__file__).read_text()))
     def main(tree):return next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='main')
     def branch(tree,value):
         return next(n for n in ast.walk(main(tree)) if isinstance(n,ast.If) and isinstance(n.test,ast.Compare)
@@ -177,9 +179,11 @@ def test_original_default_volume_conditioned_and_native_tracker_ast_unchanged(po
         nodes=main(tree).body; start=next(i for i,n in enumerate(nodes) if isinstance(n,ast.Assign) and
             any(isinstance(t,ast.Tuple) and any(isinstance(e,ast.Name) and e.id=='sampled' for e in t.elts) for t in n.targets))
         return ast.Module(nodes[start:],type_ignores=[])
-    assert ast.dump(tracker(old))==ast.dump(tracker(new))
+    # Frozen pre-latent source includes the already-existing query option;
+    # compare the ENTIRE native tracker tail, without skipping any statements.
+    assert ast.dump(tracker(ast.parse(before_latent)))==ast.dump(tracker(new))
     text=Path(pose.__file__).read_text()
     assert "if args.mesh_source in ('volume','conditioned','solid'):" in text
-    for source in ('conditioned','solid'):
-        assert f"if args.mesh_source=='{source}' and np.any(faces[inactive] != 0):" in text
+    assert "if args.mesh_source=='conditioned' and np.any(faces[inactive] != 0):" in text
+    assert "if args.mesh_source in ('solid','surface') and np.any(faces[inactive] != 0):" in text
     assert "process=False" in text and "sample_surface(mesh, 8192, seed=0)" in text

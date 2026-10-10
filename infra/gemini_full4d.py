@@ -43,14 +43,17 @@ HELPERS = ('infra/gemini_full4d.py', 'infra/run_gemini_full4d.sh', CONFIG,
 DATASET = '5f68335f3acc802033d1e80728c1633197521de8'
 OLD = 'de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba'
 DEPTH_MODEL = 'b135031bae30b5ac2ae141a0e68717795ce38340'
-POSE_SOURCE_SHA = 'f0dec3546caa39d8928ebf79907320c78465d540abfae8c3488933db70029f0d'
+# This causal runner never enables the separately namespaced latent initializer.
+# Its default solver remains exact (frozen AST tests); bind the current source,
+# including that unused opt-in, without rewriting historical producer receipts.
+POSE_SOURCE_SHA = '70f32effa8aaa0c368f2c6c60f496e07f514bc66434ee1e1d61ae2750640904a'
 ABSENCE_STATUS = 'fail_upstream_pose_unsupported_native_absence'
 DEPTH_FIELDS = {'depth_smoke': ('monocular_moge2_three_frame', False),
                 'depth_full': ('monocular_moge2_full_video', True)}
 
 
 class EmptyObservationUnsupported(ValueError):
-    """Proven zero observations unsupported by the unchanged per-frame solver."""
+    """Proven zero observations unsupported by the unchanged DEFAULT solver."""
     def __init__(self, evidence):
         self.evidence = evidence
         self.frame_indices = evidence['frame_indices']
@@ -217,7 +220,7 @@ def native_absence_preflight(code, item, directory, report, pins, mask_inventory
         summaries[role] = dict(frame_indices=missing, runs=runs)
     pose = identity(code/'infra/object_pose_smoke.py', 2 << 20)
     require(pose['sha256'] == POSE_SOURCE_SHA,
-            'Absence gate applies only to the unchanged SHA-bound visible-point solver')
+            'Absence gate applies only to the SHA-bound unchanged default visible-point solver')
     return dict(stage='native_absence_pose_support_preflight', episode_index=item['episode'],
                 original_frames=total, frame_indices=summaries['1']['frame_indices'],
                 empty_runs=summaries['1']['runs'], tracking=tracking_pin,

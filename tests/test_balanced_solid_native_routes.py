@@ -13,7 +13,7 @@ import pytest
 
 from test_cari_prepare_solid import prepare, source_case
 from test_object_pose_conditioned import pose
-from test_object_pose_solid_wrapper import runtime, pin
+from test_object_pose_solid_wrapper import runtime, runtime_factory, pin
 
 REPO=Path(__file__).resolve().parents[1]
 
@@ -198,8 +198,16 @@ def test_all_numeric_helpers_and_saved_pose_literals_unchanged():
         after={n.name:ast.dump(n,include_attributes=False) for n in ast.parse((REPO/path).read_bytes()).body if isinstance(n,ast.FunctionDef)}
         assert all(before[f]==after[f] for f in functions)
     for name in ('object_pose_smoke','cari_prepare'):
-        path='infra/'+name+'.py';old=ast.parse(subprocess.check_output(['rtk','git','show','HEAD:'+path],cwd=REPO));new=ast.parse((REPO/path).read_bytes())
+        path='infra/'+name+'.py'
+        base='5aecc543f03d0f13a6c8c1efa3de6fd50fc8d9be' if name=='object_pose_smoke' else 'HEAD'
+        old=ast.parse(subprocess.check_output(['rtk','git','show',base+':'+path],cwd=REPO));new=ast.parse((REPO/path).read_bytes())
         def numerical(tree):
+            if name == 'object_pose_smoke':
+                from test_object_pose_latent import _default_projection
+                tree = _default_projection(tree)
+                # The separately tested latent initializer is opt-in. Freeze
+                # EVERY native-default main call, not unrelated new helpers.
+                tree = next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='main')
             return [ast.dump(n,include_attributes=False) for n in ast.walk(tree) if isinstance(n,ast.Call) and
                 isinstance(n.func,ast.Name) and n.func.id in ('select_pose_path','align_observed_points','prepare_mhr_wild_export')]
         assert numerical(old)==numerical(new)

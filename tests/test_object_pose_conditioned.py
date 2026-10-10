@@ -6,6 +6,7 @@ import sys
 
 import numpy as np
 import pytest
+from test_object_pose_latent import _default_projection
 
 INFRA=Path(__file__).resolve().parents[1]/'infra'
 
@@ -41,7 +42,7 @@ def test_conditioned_selected_episode_reaches_same_public_input_gate(pose,monkey
 
 
 def conditioned_branch():
-    tree=ast.parse((INFRA/'object_pose_smoke.py').read_text())
+    tree=_default_projection(ast.parse((INFRA/'object_pose_smoke.py').read_text()))
     return next(n for n in ast.walk(tree) if isinstance(n,ast.If)
                 and ast.unparse(n.test)=="args.mesh_source == 'conditioned'"
                 and any(isinstance(x,ast.ImportFrom) and x.module=='conditioned_geometry_loader' for x in n.body))
@@ -94,7 +95,7 @@ def test_default_volume_and_pose_loop_ast_are_unchanged():
     # Independent archived original source is the last committed parent version.
     # git is not invoked by tests; expected AST digests freeze the known blocks.
     import hashlib
-    tree=ast.parse((INFRA/'object_pose_smoke.py').read_text())
+    tree=_default_projection(ast.parse((INFRA/'object_pose_smoke.py').read_text()))
     volume=next(n for n in ast.walk(tree) if isinstance(n,ast.If) and ast.unparse(n.test)=="args.mesh_source == 'volume'"
                 and any(isinstance(x,ast.ImportFrom) and x.module=='volume_geometry_loader' for x in n.body))
     default=volume

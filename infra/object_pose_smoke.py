@@ -34,9 +34,102 @@ def _argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
     parser.add_argument("--full-video", action="store_true")
+    parser.add_argument("--allow-unobserved-poses", action="store_true", default=False,
+                        help="Opt-in bounded latent-gap initializer; requires --full-video")
     parser.add_argument("--mesh-source", choices=('default','volume','conditioned','solid','surface'), default='default')
     parser.add_argument('--query-requalification', action=_QueryFlag, nargs=0, default=False)
     return parser
+
+
+def _missing_pose_report(index, visible_pixels, mask_sha256, reason, *, sampled=0, rejected=()):
+    """Missing image/depth evidence, not a static measured pose or fake mask."""
+    return dict(frame_index=index, visible_point_pixels=visible_pixels,
+                sampled_observations=sampled, selected=None, candidates=[],
+                rejected_candidates=list(rejected), object_mask_sha256=mask_sha256,
+                pose_observed=False, observation_status=reason)
+
+
+def _missing_pose_progress(index, started):
+    """Full-T progress counts observed and explicitly missing frames alike."""
+    if (index + 1) % 50 == 0:
+        print(json.dumps(dict(stage='object_pose_full_progress', frames_complete=index+1,
+                              elapsed_seconds=time.perf_counter()-started)), flush=True)
+
+
+def _finite_pose_candidate(candidate):
+    """Opt-in numerical hypothesis admission; malformed source errors propagate."""
+    import numpy as np
+    r, t = np.asarray(candidate['rotation']), np.asarray(candidate['translation'])
+    values = [candidate[k] for k in ('initial_silhouette_iou', 'fitted_silhouette_iou',
+                                   'selected_silhouette_iou', 'selected_depth_residual_m')]
+    return bool(r.shape == (3, 3) and t.shape == (3,) and np.isfinite(r).all()
+                and np.isfinite(t).all() and np.isfinite(values).all()
+                and all(0 <= x <= 1 for x in values[:3]) and values[3] >= 0
+                and np.allclose(r @ r.T, np.eye(3), atol=1e-5, rtol=0)
+                and np.isclose(np.linalg.det(r), 1, atol=1e-5, rtol=0))
+
+
+def _select_latent_pose_path(frame_reports, indices, hypothesis_count, mesh_centroid):
+    """Original-weight Viterbi on observations, bilateral full-T latent start.
+
+    Gap timestamps remain actual original indices during path selection. Missing
+    poses are initialized by SO(3) SLERP and linear CENTROID motion in the same
+    camera gauge, not mesh-origin-dependent translation or frozen edge poses.
+    This is only an initializer for a later evidence-constrained sequence fit.
+    """
+    import numpy as np
+    from world_reward.sequence_pose import initialize_missing_poses
+    ids = np.asarray(indices)
+    if (ids.dtype.kind not in 'iu' or ids.ndim != 1 or len(ids) < 3
+            or not np.array_equal(ids, np.arange(len(ids)))
+            or len(frame_reports) != len(ids)
+            or [r['frame_index'] for r in frame_reports] != ids.tolist()):
+        raise ValueError('Latent initializer requires every original contiguous frame')
+    centre = np.asarray(mesh_centroid)
+    if centre.shape != (3,) or centre.dtype.kind != 'f' or not np.isfinite(centre).all():
+        raise ValueError('One finite fixed canonical mesh centroid required')
+    observed = np.array([bool(r['candidates']) for r in frame_reports], dtype=bool)
+    if any(type(r.get('pose_observed')) is not bool or r['pose_observed'] != bool(flag)
+           for r, flag in zip(frame_reports, observed)):
+        raise ValueError('Every original frame requires honest explicit pose-observed flags')
+    if not observed[0] or not observed[-1]:
+        raise ValueError('Leading/trailing unknown poses require an RGB recovery anchor')
+    positions = np.flatnonzero(observed)
+    rotations = np.broadcast_to(np.eye(3), (len(positions), hypothesis_count, 3, 3)).copy()
+    translations = np.zeros((len(positions), hypothesis_count, 3))
+    costs = np.zeros((len(positions), hypothesis_count))
+    valid = np.zeros((len(positions), hypothesis_count), dtype=bool)
+    for row, position in enumerate(positions):
+        for candidate in frame_reports[position]['candidates']:
+            if not _finite_pose_candidate(candidate):
+                raise ValueError('Only finite admitted original hypotheses can become observed poses')
+            slot = candidate['hypothesis_index']
+            if type(slot) is not int or not 0 <= slot < hypothesis_count or valid[row, slot]:
+                raise ValueError('Unique original hypothesis slots required')
+            rotations[row, slot] = candidate['rotation']; translations[row, slot] = candidate['translation']
+            costs[row, slot] = 1 - candidate['selected_silhouette_iou']; valid[row, slot] = True
+    path = select_pose_path(rotations, translations, costs, valid_candidates=valid,
+                            translation_weight=1., rotation_weight=.1, frame_times=ids[observed])
+    all_r = np.full((len(ids), 3, 3), np.nan); all_t = np.full((len(ids), 3), np.nan)
+    all_r[observed] = path.rotations; all_t[observed] = path.translations
+    if np.any(~observed):
+        centroids = all_t.copy()
+        centroids[observed] += np.einsum('tij,j->ti', all_r[observed], centre)
+        all_r, centroids = initialize_missing_poses(all_r, centroids, observed)
+        all_t = centroids - np.einsum('tij,j->ti', all_r, centre)
+        # Supported observations must retain the exact selected native arrays.
+        all_r[observed] = path.rotations; all_t[observed] = path.translations
+    chosen = np.full(len(ids), -1, dtype=np.int64); chosen[observed] = path.candidate_indices
+    report = dict(method='observed_frame_Viterbi_then_bilateral_SO3_centroid_latent_initialization',
+        image_cost='1 - automatic_mask_IoU; missing observations contribute no image cost',
+        translation_weight=1., rotation_weight=.1, time_units='original_frame_indices',
+        candidate_indices=chosen.tolist(), observed_frame_indices=ids[observed].tolist(),
+        latent_frame_indices=ids[~observed].tolist(), pose_observed=observed.tolist(),
+        unary_cost=path.unary_cost, transition_cost=path.transition_cost, total_cost=path.total_cost,
+        latent_pose_status='initializer_not_measured_or_final_truth', edge_extrapolation=False,
+        zero_velocity_prior=False, mask_interpolation=False, geometry_scale_camera_unchanged=True,
+        quality_verified=False)
+    return all_r, all_t, observed, report
 
 
 def _load_solid_mesh(root, episode, input_sha, object_report_path, alignment_path, scale, output, fixed_mesh_path, *, query_requalification=False):
@@ -107,6 +200,8 @@ def main() -> None:
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux GPU container with network none")
     args = _argument_parser().parse_args()
+    if args.allow_unobserved_poses and not args.full_video:
+        raise ValueError('Latent unobserved poses require --full-video')
     if args.query_requalification and args.mesh_source != 'solid':
         raise ValueError('Query requalification is solid-only')
     if args.mesh_source in ('solid','surface') and not args.full_video:
@@ -123,6 +218,8 @@ def main() -> None:
         output = output.with_name(output.name+'_conditioned')
     elif args.mesh_source in ('solid','surface'):
         output = output.with_name(output.name+'_'+args.mesh_source)
+    if args.allow_unobserved_poses:
+        output = output.with_name(output.name+'_latent')
     if os.environ.get('WR_POSE_OUTPUT_RESERVED') is not None and args.mesh_source not in ('solid','surface'):
         raise ValueError('Output reservation requires a qualified representation')
     reserved=_solid_output_reserved(output) if args.mesh_source in ('solid','surface') else False
@@ -328,6 +425,12 @@ def main() -> None:
         visible = mask & np.isfinite(points).all(-1) & (points[..., 2] > 0)
         observed = points[visible]
         if len(observed) < 40:
+            if args.allow_unobserved_poses:
+                candidate_reports.append(_missing_pose_report(index, int(visible.sum()), sha256(mask_path),
+                    'empty_automatic_mask' if not mask.any() else 'insufficient_inferred_visible_points',
+                    sampled=len(observed)))
+                _missing_pose_progress(index, started)
+                continue
             raise RuntimeError("Insufficient inferred visible object points")
         rng = np.random.default_rng(0)
         if len(observed) > 2048:
@@ -361,7 +464,22 @@ def main() -> None:
                 # permission to bypass global input provenance or CUDA errors.
                 rejected.append({"hypothesis_index": number, "reason": str(exc)})
         if not candidates:
+            if args.allow_unobserved_poses:
+                candidate_reports.append(_missing_pose_report(index, int(visible.sum()), sha256(mask_path),
+                    'no_finite_supported_numerical_hypothesis', sampled=len(observed), rejected=rejected))
+                _missing_pose_progress(index, started)
+                continue
             raise RuntimeError(f"No finite supported pose hypothesis at original frame {index}: {rejected}")
+        if args.allow_unobserved_poses:
+            finite = [c for c in candidates if _finite_pose_candidate(c)]
+            rejected.extend(dict(hypothesis_index=c['hypothesis_index'], reason='nonfinite_or_nonrigid_numerical_hypothesis')
+                            for c in candidates if not _finite_pose_candidate(c))
+            candidates = finite
+            if not candidates:
+                candidate_reports.append(_missing_pose_report(index, int(visible.sum()), sha256(mask_path),
+                    'no_finite_supported_numerical_hypothesis', sampled=len(observed), rejected=rejected))
+                _missing_pose_progress(index, started)
+                continue
         best = max(candidates, key=lambda c: (c["selected_silhouette_iou"], -c["selected_depth_residual_m"], -c["hypothesis_index"]))
         poses_R.append(best["rotation"])
         poses_t.append(best["translation"])
@@ -369,11 +487,13 @@ def main() -> None:
         candidate_reports.append({"frame_index": index, "visible_point_pixels": int(visible.sum()),
                                   "sampled_observations": len(observed), "selected": best, "candidates": candidates,
                                   "rejected_candidates": rejected, "object_mask_sha256": sha256(mask_path)})
+        if args.allow_unobserved_poses:
+            candidate_reports[-1].update(pose_observed=True, observation_status='automatic_mask_and_inferred_depth')
         if args.full_video and (index + 1) % 50 == 0:
             print(json.dumps({"stage": "object_pose_full_progress", "frames_complete": index + 1,
                               "elapsed_seconds": time.perf_counter() - started}), flush=True)
     temporal_report = None
-    if args.full_video:
+    if args.full_video and not args.allow_unobserved_poses:
         hypothesis_count = len(orientation_hypotheses) + 1
         rotations = np.broadcast_to(np.eye(3), (len(indices), hypothesis_count, 3, 3)).copy()
         translations = np.zeros((len(indices), hypothesis_count, 3))
@@ -391,9 +511,17 @@ def main() -> None:
                            "time_units": "original_frame_indices", "candidate_indices": path.candidate_indices.tolist(),
                            "unary_cost": path.unary_cost, "transition_cost": path.transition_cost,
                            "total_cost": path.total_cost, "quality_verified": False}
+    if args.allow_unobserved_poses:
+        poses_R, poses_t, pose_observed, temporal_report = _select_latent_pose_path(
+            candidate_reports, indices, len(orientation_hypotheses)+1, np.asarray(mesh.centroid))
     with (output / "geometry_and_poses.npz").open("xb") as handle:
-        np.savez_compressed(handle, vertices=vertices, faces=faces, frame_index=np.asarray(indices),
-                            rotation=np.asarray(poses_R), translation=np.asarray(poses_t), object_scale=np.array(1.))
+        if args.allow_unobserved_poses:
+            np.savez_compressed(handle, vertices=vertices, faces=faces, frame_index=np.asarray(indices),
+                                rotation=np.asarray(poses_R), translation=np.asarray(poses_t), object_scale=np.array(1.),
+                                pose_observed=pose_observed)
+        else:
+            np.savez_compressed(handle, vertices=vertices, faces=faces, frame_index=np.asarray(indices),
+                                rotation=np.asarray(poses_R), translation=np.asarray(poses_t), object_scale=np.array(1.))
     result = {"stage": "fixed_scale_full_object_pose_initializer" if args.full_video else "fixed_scale_sparse_object_pose_consistency",
               "status": "pass", "episode_index": args.episode, "execution_verified": True, "original_frame_coverage_verified": args.full_video,
               "candidate_accuracy_validated": False, "full_trajectory_accuracy_verified": False,
@@ -416,9 +544,13 @@ def main() -> None:
               "geometry_library_versions": {name: importlib.metadata.version(name) for name in ("trimesh", "fast-simplification")},
               "elapsed_seconds": time.perf_counter() - started, "script_sha256": sha256(Path(__file__))}
     if args.query_requalification: result['query_requalification'] = topology_budget['query_requalification']
+    if args.allow_unobserved_poses:
+        result.update(allow_unobserved_poses=True, pose_observed=pose_observed.tolist(),
+                      latent_pose_initializer=True, latent_poses_measured=False,
+                      observed_pose_frames=int(pose_observed.sum()), latent_pose_frames=int((~pose_observed).sum()))
     (output / "report.json").write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({"stage": result["stage"], "status": "pass", "extent": mesh.extents.tolist(),
-                      "frames": len(indices), "greedy_silhouette_iou_median": float(np.median([frame["selected"]["selected_silhouette_iou"] for frame in candidate_reports])),
+                      "frames": len(indices), "greedy_silhouette_iou_median": (float(np.median([frame["selected"]["selected_silhouette_iou"] for frame in candidate_reports if frame['selected'] is not None])) if args.allow_unobserved_poses else float(np.median([frame["selected"]["selected_silhouette_iou"] for frame in candidate_reports]))),
                       "elapsed_seconds": result["elapsed_seconds"], "challenge_performance_verified": False}))
 
 
