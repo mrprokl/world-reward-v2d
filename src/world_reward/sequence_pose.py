@@ -13,6 +13,8 @@ from scipy.optimize import least_squares
 from scipy.spatial import cKDTree
 from scipy.sparse import lil_matrix
 from scipy.spatial.transform import Rotation, Slerp
+from .depth_covariance import CommonModeDepthConfig, FrameDepthWhitening
+from .contact_patch import ContactPatchConfig, smooth_patch_distances
 
 
 @dataclass(frozen=True)
@@ -205,14 +207,21 @@ class _ContactTriangleSurface:
         return result
 
 
-def _contact_rows(evidence, config, vertices, count):
+def _contact_rows(evidence, config, vertices, count, patch_config=None):
     if type(evidence) is not SequenceContactEvidence or type(config) is not SequenceContactConfig:
         raise ValueError('Explicit frozen SequenceContactEvidence and SequenceContactConfig required')
     if evidence.activations.shape != (count, 2):
         raise ValueError('Anatomical contact must preserve the full original timeline')
     surface = _ContactTriangleSurface(vertices, evidence.object_faces)
-    samples = np.linspace(0, evidence.hand_points_camera.shape[2]-1,
-        min(config.max_points_per_hand, evidence.hand_points_camera.shape[2]), dtype=np.int64)
+    if patch_config is None:
+        samples = np.linspace(0, evidence.hand_points_camera.shape[2]-1,
+            min(config.max_points_per_hand, evidence.hand_points_camera.shape[2]), dtype=np.int64)
+    else:
+        # Do not silently discard preselected candidates with legacy sampling.
+        size = evidence.hand_points_camera.shape[2]
+        if size > min(config.max_points_per_hand, patch_config.max_candidates):
+            raise ValueError('Full frozen candidate pool exceeds explicit contact work cap')
+        samples = np.arange(size, dtype=np.int64)
     frames, sides = np.nonzero(evidence.activations & (np.arange(count)[:, None] > 0))
     points, point_frames, groups = [], [], []
     for group, (frame, side) in enumerate(zip(frames, sides)):
@@ -280,8 +289,10 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
                     rotations, translations, pose_observed, K, frame_index, fps,
                     config: SequencePoseConfig, *, tracks_depth_m=None,
                     depth_visible=None, depth_config: RGBDepthConfig | None = None,
+                    depth_covariance_config: CommonModeDepthConfig | None = None,
                     contact_evidence: SequenceContactEvidence | None = None,
-                    contact_config: SequenceContactConfig | None = None):
+                    contact_config: SequenceContactConfig | None = None,
+                    contact_patch_config: ContactPatchConfig | None = None):
     """One sparse full-T robust SE(3) fit; time-zero gauge stays exact.
 
     Canonical material points must be attached once, before tracking. Visibility
@@ -296,11 +307,15 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
     finite and positive; every unknown is NaN. Depth support is a subset of RGB
     support. Only R/T are fitted; depth cannot change shape, scale, K or gauge.
     Without all three explicit depth arguments, the RGB-only route is unchanged.
+    Optional covariance changes within-frame measurement weighting only, not
+    observed depths or a per-frame camera/scale. Zero preserves the legacy route.
 
     Optional anatomical contact adds distance to the complete original triangle
     surface for caller-frozen active hand/frame entries only. Each active hand
     uses the closest of a fixed regular anatomical subset, not attraction of
     every hand vertex. Activation never depends on an optimized candidate pose.
+    Optional soft patch aggregation uses a caller-frozen candidate pool without
+    requiring all candidates to touch or fixing tangential motion.
     """
     if type(config) is not SequencePoseConfig:
         raise ValueError('Explicit externally frozen config required')
@@ -324,6 +339,9 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
     if np.any(visible[1:].sum(0) == 0):
         raise ValueError('Every retained witness needs post-anchor RGB evidence')
     use_depth = any(value is not None for value in (tracks_depth_m, depth_visible, depth_config))
+    if depth_covariance_config is not None and (not use_depth
+            or type(depth_covariance_config) is not CommonModeDepthConfig):
+        raise ValueError('Depth covariance requires explicit inferred depth and frozen config')
     if use_depth:
         if tracks_depth_m is None or depth_visible is None or type(depth_config) is not RGBDepthConfig:
             raise ValueError('Explicit depth values, support and externally frozen RGBDepthConfig required')
@@ -349,10 +367,18 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
     if not np.isfinite(diameter) or diameter <= 0:
         raise ValueError('Nondegenerate fixed geometry required')
     contact_supplied = contact_evidence is not None or contact_config is not None
+    if contact_patch_config is not None:
+        if not contact_supplied or type(contact_patch_config) is not ContactPatchConfig:
+            raise ValueError('Contact patch requires explicit frozen anatomical evidence/config')
     if contact_supplied:
         contact_surface, contact_frames, contact_points, contact_point_frames, contact_groups, contact_samples, contact_pairs = _contact_rows(
-            contact_evidence, contact_config, v, n)
+            contact_evidence, contact_config, v, n, contact_patch_config)
     use_contact = contact_supplied and len(contact_frames) > 0
+    use_covariance = use_depth and depth_covariance_config is not None and depth_covariance_config.sigma_common_diameter > 0
+    if use_covariance:
+        depth_whitening = FrameDepthWhitening(depth_frames,
+            float(diameter*depth_config.depth_sigma_diameter),
+            float(diameter*depth_covariance_config.sigma_common_diameter))
     # Spatial support must constrain more than an arbitrary axis.
     singular = np.linalg.svd(p-p.mean(0), compute_uv=False)
     if singular[1] <= singular[0]*1e-8:
@@ -392,13 +418,19 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
             np.sqrt(config.temporal_weight)*acceleration_r.ravel())
         if use_depth:
             depth_xyz = np.einsum('nij,nj->ni', rr[depth_frames], p[depth_queries])+tt[depth_frames]
-            measured_z = (depth_xyz[:, 2]-depth[depth_frames, depth_queries])/(diameter*depth_config.depth_sigma_diameter)
+            depth_residual = depth_xyz[:, 2]-depth[depth_frames, depth_queries]
+            measured_z = (depth_whitening.apply(depth_residual) if use_covariance else
+                depth_residual/(diameter*depth_config.depth_sigma_diameter))
             residuals += (measured_z,)
         if use_contact:
             object_points = np.einsum('qi,qij->qj', contact_points-tt[contact_point_frames], rr[contact_point_frames])
             distances = contact_surface.distances(object_points)
-            hand_distances = np.full(len(contact_frames), np.inf)
-            np.minimum.at(hand_distances, contact_groups, distances)
+            if contact_patch_config is None:
+                hand_distances = np.full(len(contact_frames), np.inf)
+                np.minimum.at(hand_distances, contact_groups, distances)
+            else:
+                hand_distances = smooth_patch_distances(distances, contact_groups,
+                    len(contact_frames), float(diameter*contact_patch_config.temperature_diameter))
             residuals += (hand_distances/(diameter*contact_config.contact_sigma_diameter),)
         return np.concatenate(residuals)
 
@@ -455,6 +487,10 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
             depth_config=asdict(depth_config), depth_units='same_camera_axial_z_metres',
             depth_source_authenticated_by_module=False, depth_accuracy_verified=False,
             depth_weighting='one_scalar_soft_l1_per_measured_point_diameter_normalized')
+        if use_covariance:
+            diagnostics.update(depth_covariance_config=asdict(depth_covariance_config),
+                depth_weighting='symmetric_rank_one_withinframe_whitened_soft_l1',
+                depth_temporal_covariance_modeled=False, depth_noise_calibration_verified=False)
     if use_contact:
         diagnostics.update(method='fixed_shape_full_T_RGB'+('_depth' if use_depth else '')+'_contact_SE3_bundle_v1',
             contact_constraint=True, contact_active_entries=len(contact_frames),
@@ -466,4 +502,9 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
             contact_point_triangle_pairs_per_residual=contact_pairs,
             contact_mesh_faces=len(contact_evidence.object_faces), contact_degenerate_faces_retained=True)
         diagnostics['contact_broadphase'] = 'conservative_triangle_balls_referenced_vertex_upper_bound_full_fallback'
+        if contact_patch_config is not None:
+            diagnostics.update(contact_patch_config=asdict(contact_patch_config),
+                contact_distance='softmax_squared_distance_frozen_anatomical_pool_to_full_surface',
+                contact_candidate_pool_frozen=True, contact_tangential_lock=False,
+                contact_normals_used=False, contact_memory_model_used=False)
     return SequencePoseResult(rr, tt, ids.copy(), visible.any(1), diagnostics)

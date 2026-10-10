@@ -1,0 +1,40 @@
+{
+  "schema": "world_reward.sequence_evidence_stress.v1",
+  "scope": "manufactured_nonchallenge_stress_not_real_accuracy_validation",
+  "development_seed": 202610101,
+  "reserved_seed": 202610102,
+  "frames": 24,
+  "fps": 30,
+  "parallel_workers": 2,
+  "fit": {
+    "pixel_sigma": 1.5,
+    "prior_centroid_sigma_diameter": 0.05,
+    "prior_rotation_sigma_rad": 0.15,
+    "acceleration_sigma_diameter_s2": 20.0,
+    "angular_acceleration_sigma_rad_s2": 100.0,
+    "prior_weight": 0.1,
+    "temporal_weight": 0.2,
+    "max_nfev": 60,
+    "development_reference": "prior_frozen_v2_parameters_no_new_challenge_selection"
+  },
+  "depth_independent_sigma_diameter": 0.02,
+  "depth_common_sigma_diameter": 0.1,
+  "depth_ar1": 0.9,
+  "contact_temperature_diameter": 0.01,
+  "contact_sigma_diameter": 0.02,
+  "max_contact_candidates": 8,
+  "gates": {
+    "target_error_ratio_maximum": 0.9,
+    "control_error_ratio_maximum": 1.1,
+    "motion_retention_minimum": 0.9,
+    "motion_retention_maximum": 1.1,
+    "contact_gap_regression_tolerance_diameter": 0.005
+  },
+  "cases": {
+    "depth": ["common_static", "common_axial", "common_fast", "common_occlusion", "iid_control", "local_outlier"],
+    "contact": ["static_contact", "sliding_contact", "rolling_contact", "regrasp", "absent_contact", "candidate_outlier"]
+  },
+  "selection": "One structural comparison per bottleneck, no sweep. Covariance matches authored independent/common noise scales, not challenge residuals. Contact temperature is fixed relative to the authored sensor-noise scale. Reserved results cannot select parameters.",
+  "challenge_inputs_allowed": false,
+  "production_adopted": false
+}
