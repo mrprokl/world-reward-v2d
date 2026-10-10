@@ -148,8 +148,29 @@ VDA without contact has already converged: **23 evaluations / 3.37 s** fitting,
 linear acceleration p95 21.3894 -> 48.6669 m/s² and original anatomical gap mean
 0.00709 -> 0.33283 m. It cannot be adopted on its own. The shared human scale
 1.733574 achieves 4.01% median human-depth consistency, which does not establish
-object-depth accuracy or relative interaction geometry. The combined soft fit
-must complete before any conclusion about that second candidate.
+object-depth accuracy or relative interaction geometry.
+
+The combined soft fit subsequently completed: **25 evaluations / 599.06 s**,
+converged, versus 23 / 3.37 s without contact. Complete chain **630.71 s**,
+including native VDA **12.16 s** on all 415 frames. There are 10,382 total
+supported depth observations (10,349 post-anchor observations in the fitter).
+Soft-contact candidate RGB 5.4927 px, acceleration p95 **50.2173 m/s²**, same
+original anatomical gap mean **0.31480 m**, versus 48.6669 / 0.33283 without
+contact. Both fail the predeclared contact and linear-acceleration gates; all
+other gates pass. They are finished experiments, not pending or non-converged.
+Neither replaces the baseline. Owned GPU container absent, exit 0.
+
+**Next structural hypothesis:** the verified incomplete fixed contact pool needs
+changing-patch memory, and the object-only fitter needs actual joint human/object
+relative placement under retained image evidence. Existing native MHR parity
+optimizer already has articulation/contact/silhouette/penetration/temporal terms,
+but freezes human translation, hands and object rotation and has no independent
+2D body loss. An explicit extension can reuse this solver and differentiate
+human translation, rather than add another ad-hoc SE(3) solver. It requires
+automatic DWPose observations on the original timeline, a zero-extension parity
+control and external validation before a real comparison. Do not silently cap
+the existing 33 tracks to the legacy point adapter's 32-query contract, invent
+barycentric attachments or reuse the baseline validator that forbids new DOFs.
 
 Latest integration checks: **188 targeted tests passed in 6.30 s** using an
 isolated temporary directory. A previous concurrent local pytest attempt had
