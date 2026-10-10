@@ -312,10 +312,18 @@ def official_modules(root):
     for module,name in zip(modules,('mhr_metrics','mhr_submission','mesh_common')):
         require(Path(module.__file__).resolve()==kit/('v2dlb/'+name+'.py'),'Actual unchanged public metric import required')
     require(tuple(modules[0].MHR_TABLE3_BODY_JOINT_INDICES)==JOINTS, 'Published native22 joint order differs')
+    # The qualified child runtime exercised the unchanged compiled public
+    # operator. Reject its optional slow fallback here, before ANY reference
+    # values are opened; do not replace or recompile the metric kernels.
+    require(getattr(modules[1],'_PENETRATION_KERNELS',None) is not None,
+        'Qualified compiled public penetration kernels must be active before reference access')
     try:
         import numba
-        numba.set_num_threads(4)
-    except ImportError:pass
+    except ImportError:
+        raise ValueError('Qualified Numba runtime required before reference access') from None
+    numba.set_num_threads(4)
+    require(numba.get_num_threads()==4,
+        'Qualified public penetration runtime requires exactly four CPU threads')
     return modules
 
 

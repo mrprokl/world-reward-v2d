@@ -241,3 +241,56 @@ def test_actual_runtime_cid_marker_not_mistaken_for_prior_result(tmp_path):
     with pytest.raises(ValueError,match='Fresh output'):e.require_fresh_output(tmp_path)
     (tmp_path/'report.json').unlink();marker.write_text('notacontainer')
     with pytest.raises(ValueError,match='docker CID'):e.require_fresh_output(tmp_path)
+
+
+def official_runtime_fixture(tmp_path,monkeypatch,*,kernels=(object(),object())):
+    """Tiny verified-import contract only; no kit download, JIT or GT data."""
+    kit=tmp_path/'vendor/v2d_submission_kit/v2dlb';kit.mkdir(parents=True)
+    modules=[]
+    for name in ('mhr_metrics','mhr_submission','mesh_common'):
+        path=kit/(name+'.py');path.write_text('# tiny import contract fixture\n')
+        modules.append(SimpleNamespace(__file__=str(path)))
+    modules[0].MHR_TABLE3_BODY_JOINT_INDICES=e.JOINTS
+    modules[1]._PENETRATION_KERNELS=kernels
+    by_name=dict(zip(('v2dlb.mhr_metrics','v2dlb.mhr_submission','v2dlb.mesh_common'),modules))
+    monkeypatch.setattr(e,'identity',lambda path,maximum:e.OFFICIAL['v2dlb/'+Path(path).name])
+    monkeypatch.setattr(e.importlib,'import_module',lambda name:by_name[name])
+    monkeypatch.setitem(sys.modules,'v2dlb',SimpleNamespace(__path__=[str(kit)]))
+    state=dict(threads=1,requests=[])
+    def set_threads(count):state['threads']=count;state['requests'].append(count)
+    numba=SimpleNamespace(set_num_threads=set_threads,get_num_threads=lambda:state['threads'])
+    monkeypatch.setitem(sys.modules,'numba',numba)
+    return modules,state,numba
+
+
+def test_public_operator_runtime_uses_qualified_kernels_and_four_threads(tmp_path,monkeypatch):
+    modules,state,_=official_runtime_fixture(tmp_path,monkeypatch)
+    kernels=modules[1]._PENETRATION_KERNELS
+    assert e.official_modules(tmp_path)==modules
+    assert modules[1]._PENETRATION_KERNELS is kernels
+    assert state==dict(threads=4,requests=[4])
+
+
+@pytest.mark.parametrize('missing_attribute',[False,True])
+def test_public_operator_no_silent_unqualified_penetration_fallback(tmp_path,monkeypatch,missing_attribute):
+    modules,state,_=official_runtime_fixture(tmp_path,monkeypatch,kernels=None)
+    if missing_attribute:del modules[1]._PENETRATION_KERNELS
+    with pytest.raises(ValueError,match='kernels must be active before reference'):
+        e.official_modules(tmp_path)
+    assert state['requests']==[]
+
+
+def test_public_operator_missing_numba_fails_before_reference_access(tmp_path,monkeypatch):
+    _,state,_=official_runtime_fixture(tmp_path,monkeypatch)
+    monkeypatch.setitem(sys.modules,'numba',None)
+    with pytest.raises(ValueError,match='Numba runtime required before reference'):
+        e.official_modules(tmp_path)
+    assert state['requests']==[]
+
+
+def test_public_operator_thread_runtime_must_observe_requested_four(tmp_path,monkeypatch):
+    _,state,numba=official_runtime_fixture(tmp_path,monkeypatch)
+    numba.get_num_threads=lambda:1
+    with pytest.raises(ValueError,match='exactly four CPU threads'):
+        e.official_modules(tmp_path)
+    assert state['requests']==[4]
