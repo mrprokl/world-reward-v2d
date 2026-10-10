@@ -106,3 +106,12 @@ no host model fallback. Same immutable source/input/credential namespace reused
 in a new unitname since no prediction output/credential consumption existed.
 Wrapperfuturepreflight fixed. Originalfailedunit/log preserved; not response
 shopping, hyperparameter selection, or scientific rerun.
+
+### Actual four-DEV localization complete
+
+806300d nativecohortlocalize completeexit0,9645B
+SHA2562f04c671fb0623f01bbb11f432323f3e4215683548835cc71762a73cfafdadbf.
+All4 independentlocalizers3.95–6.18s (12Gemini seedframes parallel, nofailure
+omission), authentic sameRGBA inputs, perseqRSAkeys/envelopes deletedbyowner.
+Full4×96 A/B GPU chain dispatchedsameproducer, reuseexactlocalizeseals.
+Externalreference evaluation remains pending actual eight final predictions.
