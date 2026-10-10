@@ -8,6 +8,7 @@ ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
 [[ "$(uname -s)" == Linux && "$ROOT" == /srv/scenesmith/world-reward \
  && "$REV" =~ ^[0-9a-f]{40}$ && "$CODE" == "$ROOT/jobs/$REV/run_form_hoi_external_dev/code" \
  && "$(id -u)" == 0 ]] || exit 2
+command -v ffmpeg >/dev/null && command -v ffprobe >/dev/null || { echo '{ "status": "fail", "reason": "missing_ffmpeg_host_prerequisite" }'; exit 2; }
 LEASE="$(python3 -I -B - "$CODE" "$REV" <<'PYBOOTSTRAP'
 import json,os,pwd,shutil,sys
 from pathlib import Path
