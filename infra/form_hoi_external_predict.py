@@ -36,6 +36,7 @@ ENTRY = 'run_form_hoi_external_predict'
 CONFIG = 'configs/form_hoi_external_predict_v1.json'
 STAGES = ('localize', 'track', 'body_depth', 'object', 'prepare', 'forward', 'fit_A', 'fit_B')
 HELPERS = ('infra/form_hoi_external_predict.py', 'infra/run_form_hoi_external_predict.sh', CONFIG,
+    'infra/form_hoi_external_cohort.py', 'infra/run_form_hoi_external_cohort.sh',
     'infra/form_hoi_external_dev.py', 'infra/form_hoi_external_acquire.py',
     'infra/mediapipe_cpu_runtime_verify.py', 'configs/form_hoi_external_dev_v1.json',
     'configs/form_hoi_insight_v1.json', 'configs/sam31_runtime_v1.json',
@@ -991,6 +992,14 @@ def mount_sources(stage,c,code,public_dir,base):
     return list(dict.fromkeys(rows))
 
 
+def credential_paths(revision, sequence_id):
+    require(type(revision) is str and re.fullmatch('[0-9a-f]{40}',revision) and
+        type(sequence_id) is str and re.fullmatch('[A-Za-z0-9_-]{1,128}',sequence_id),
+        'Exact producer/sequence credential ownership required')
+    prefix=ROOT/'.secrets'/('form-hoi-external-'+revision+'-'+sequence_id)
+    return prefix.with_name(prefix.name+'-key.pem'),prefix.with_name(prefix.name+'-envelope.enc')
+
+
 def driver(args):
     import fcntl
     code=canonical(Path(os.environ['WR_CODE']));revision=os.environ['WR_CODE_REVISION'];c=config(code)
@@ -1038,8 +1047,7 @@ def driver(args):
             token=None;private=[]
             try:
                 if stage=='localize':
-                    prefix=ROOT/'.secrets'/('form-hoi-external-'+revision)
-                    key=prefix.with_name(prefix.name+'-key.pem');envelope=prefix.with_name(prefix.name+'-envelope.enc')
+                    key,envelope=credential_paths(revision,p['sequence_id'])
                     private=[key,envelope]
                     for f in private:
                         canonical(f);s=f.lstat();require(stat.S_ISREG(s.st_mode) and s.st_nlink==1 and not s.st_mode&0o077,
@@ -1069,9 +1077,22 @@ def driver(args):
 def main():
     parser=argparse.ArgumentParser(description=__doc__,allow_abbrev=False)
     parser.add_argument('--native',action='store_true');parser.add_argument('--stage',choices=(*STAGES,'all'),default='all')
-    parser.add_argument('--input',type=Path,required=True);parser.add_argument('--input-sha256',required=True)
-    parser.add_argument('--input-bytes',type=int,required=True);parser.add_argument('--out',type=Path,required=True)
-    args=parser.parse_args();require(re.fullmatch('[0-9a-f]{64}',args.input_sha256) and args.input_bytes>0,'Explicit public artifact SHA/bytes required')
+    parser.add_argument('--input',type=Path);parser.add_argument('--input-sha256')
+    parser.add_argument('--input-bytes',type=int);parser.add_argument('--out',type=Path)
+    parser.add_argument('--cohort-stage',choices=('localize','all'));parser.add_argument('--dev-revision')
+    args=parser.parse_args()
+    if args.cohort_stage is not None:
+        require(not args.native and args.stage=='all' and args.dev_revision is not None and
+            all(getattr(args,k) is None for k in ('input','input_sha256','input_bytes','out')),
+            'Cohort mode accepts only --cohort-stage and exact --dev-revision')
+        code=canonical(Path(os.environ['WR_CODE']));revision=os.environ['WR_CODE_REVISION']
+        require(sys.platform=='linux' and os.geteuid()==0 and os.uname().nodename=='scenesmith-ncc-h100-01',
+            'Azure VM01 root cohort dispatcher only')
+        from form_hoi_external_cohort import run
+        run(sys.modules[__name__],code,revision,stage=args.cohort_stage,dev_revision=args.dev_revision);return
+    require(args.dev_revision is None and args.input is not None and args.out is not None and
+        type(args.input_sha256) is str and re.fullmatch('[0-9a-f]{64}',args.input_sha256) and
+        type(args.input_bytes) is int and args.input_bytes>0,'Explicit public artifact input/output SHA/bytes required')
     if args.native:
         require(args.stage!='all','One isolated native stage per worker');worker(args)
     else:driver(args)
