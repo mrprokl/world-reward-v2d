@@ -311,7 +311,8 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
                     depth_covariance_config: CommonModeDepthConfig | None = None,
                     contact_evidence: SequenceContactEvidence | None = None,
                     contact_config: SequenceContactConfig | None = None,
-                    contact_patch_config: ContactPatchConfig | None = None):
+                    contact_patch_config: ContactPatchConfig | None = None,
+                    contact_distance_batch_size: int = 1):
     """One sparse full-T robust SE(3) fit; time-zero gauge stays exact.
 
     Canonical material points must be attached once, before tracking. Visibility
@@ -335,9 +336,13 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
     every hand vertex. Activation never depends on an optimized candidate pose.
     Optional soft patch aggregation uses a caller-frozen candidate pool without
     requiring all candidates to touch or fixing tangential motion.
+    ``contact_distance_batch_size`` only batches identical conservative face
+    sets for execution; no objective, support, precision or surface changes.
     """
     if type(config) is not SequencePoseConfig:
         raise ValueError('Explicit externally frozen config required')
+    if type(contact_distance_batch_size) is not int or not 1 <= contact_distance_batch_size <= 32:
+        raise ValueError('Exact contact execution batch size must be an integer in 1..32')
     v, p = np.asarray(vertices), np.asarray(canonical_points)
     if (v.ndim != 2 or v.shape[1:] != (3,) or len(v) < 3 or p.ndim != 2
             or p.shape[1:] != (3,) or len(p) < 4):
@@ -444,7 +449,7 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
         if use_contact:
             object_points = np.einsum('qi,qij->qj', contact_points-tt[contact_point_frames], rr[contact_point_frames])
             distances = contact_surface.distances(object_points,
-                batch_size=32 if contact_patch_config is not None else 1)
+                batch_size=32 if contact_patch_config is not None else contact_distance_batch_size)
             if contact_patch_config is None:
                 hand_distances = np.full(len(contact_frames), np.inf)
                 np.minimum.at(hand_distances, contact_groups, distances)

@@ -4,12 +4,13 @@ One original automatic activation bank; three identical-budget fits separate
 candidate pooling from a soft residual. No depth, model call, label, per-frame
 alignment, camera/shape change or static-trajectory substitution is allowed.
 """
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import asdict, replace
 import json
 import multiprocessing
 import os
 from pathlib import Path
+import tempfile
 import time
 
 import numpy as np
@@ -25,10 +26,10 @@ contact = provenance.contact
 saved = contact.saved
 old = saved.old
 ROOT = old.ROOT
-ENTRY = 'run_sequence_contact_patch_real'
+ENTRY = 'run_sequence_contact_patch_real_v2'
 CONFIG = 'configs/sequence_contact_patch_real_v1.json'
 HELPERS = tuple(dict.fromkeys(('infra/sequence_contact_patch_real.py',
-    'infra/run_sequence_contact_patch_real.sh', CONFIG,
+    'infra/run_sequence_contact_patch_real_v2.sh', CONFIG,
     'src/world_reward/contact_patch.py', 'src/world_reward/depth_covariance.py',
     *provenance.HELPERS)))
 
@@ -180,10 +181,77 @@ def decision(cfg,metrics,converged,name):
         scope=limits['scope'],heldout_accuracy_verified=False,production_adopted=False)
 
 
-def fit_worker(job):
-    name,bank,evidence,cfg,fit_cfg = job
-    started = time.monotonic()
+def owned_output(out,revision):
+    """Require the exact new run's CID-owned namespace, never an old output."""
+    out = Path(out)
+    if (out != ROOT/'results'/('sequence-contact-patch-real-v2-'+revision)
+            or out.resolve() != out or not out.is_dir()
+            or any(p.is_symlink() for p in (out,*out.parents))
+            or len(revision)!=40 or any(c not in '0123456789abcdef' for c in revision)
+            or os.environ.get('WR_CODE_REVISION') != revision):
+        raise ValueError('Exact current owned v2 output required')
+    cid = out/'.container.cid'
+    old.identity(cid,65,readonly=False)
+    import re
+    if re.fullmatch(b'[0-9a-f]{64}\n?',cid.read_bytes()) is None:
+        raise ValueError('Current run requires its exact owned container CID')
+    return out
+
+
+def output_arrays(bank,rotations,translations,activations,selected_ids):
+    return dict(rotation=rotations,translation=translations,frame_index=bank['frame_index'],
+        object_vertices=bank['vertices'],object_faces=bank['faces'],object_scale=bank['object_scale'],
+        camera_K=bank['original_K'],points=bank['points'],tracks_xy=bank['xy'],RGB_visible=bank['visible'],
+        contact_activations=activations,selected_anatomical_pool_ids=selected_ids)
+
+
+def validate_output(bank,fitted):
+    """Full frozen bank, including queries/support (same geometry alone is insufficient)."""
+    original=dict(object_translation=bank['translations'],object_vertices=bank['vertices'],
+        object_faces=bank['faces'],object_scale=bank['object_scale'],
+        camera_K=bank['original_K'],frame_index=bank['frame_index'])
+    reference=dict(points=bank['points'],tracks_xy=bank['xy'],RGB_visible=bank['visible'])
+    provenance.same_bank(original,fitted,reference)
+
+
+def seal_file(path,write):
+    """Atomic no-replace publish; only this call's temporary file is removed."""
+    if path.exists() or path.is_symlink():
+        raise FileExistsError('Refuse any existing sealed output')
+    fd,temporary = tempfile.mkstemp(prefix='.'+path.name+'.',suffix='.partial',dir=path.parent)
     try:
+        with os.fdopen(fd,'wb') as stream:
+            write(stream);stream.flush();os.fchmod(stream.fileno(),0o444);os.fsync(stream.fileno())
+        # link is atomic and refuses existing paths; unlink restores the
+        # required single-link artifact before any receipt advertises it.
+        os.link(temporary,path,follow_symlinks=False)
+        os.unlink(temporary);temporary=None
+        directory_fd=os.open(path.parent,os.O_RDONLY|os.O_DIRECTORY)
+        try:os.fsync(directory_fd)
+        finally:os.close(directory_fd)
+    finally:
+        if temporary is not None:os.unlink(temporary)
+    return old.identity(path,2<<30,readonly=True)
+
+
+def seal_json(path,value):
+    raw=(json.dumps(value,sort_keys=True,allow_nan=False)+'\n').encode()
+    return seal_file(path,lambda stream:stream.write(raw))
+
+
+def fit_worker(job):
+    name,bank,evidence,cfg,fit_cfg = job[:5]
+    sealing = job[5] if len(job)==6 else None  # Tiny unit fits need no remote output.
+    started = time.monotonic();out=None
+    try:
+        if name not in cfg['variants']:
+            raise ValueError('Only a frozen variant may own output files')
+        if sealing is not None:
+            out=owned_output(sealing['out'],sealing['revision'])
+            if any((out/('episode_000009_'+name+suffix)).exists()
+                   or (out/('episode_000009_'+name+suffix)).is_symlink()
+                   for suffix in ('.npz','_fit.json')):
+                raise FileExistsError('Refuse a previously published worker result before fitting')
         contact_cfg = SequenceContactConfig(cfg['contact_sigma_diameter'],
             1 if name=='J1' else cfg['max_candidates'],cfg['max_point_triangle_pairs'],cfg['development_reference'])
         extra = {} if name!='soft_pool' else dict(contact_patch_config=ContactPatchConfig(
@@ -191,12 +259,34 @@ def fit_worker(job):
         fit = refine_sequence(bank['vertices'],bank['points'],bank['xy'],bank['visible'],
             bank['rotations'],bank['translations'],np.ones(len(bank['frame_index']),bool),
             bank['K'],bank['frame_index'],bank['fps'],fit_cfg,
-            contact_evidence=evidence,contact_config=contact_cfg,**extra)
-        return dict(name=name,status='complete',rotations=fit.rotations,
-            translations=fit.translations,fit=fit.diagnostics,seconds=time.monotonic()-started)
+            contact_evidence=evidence,contact_config=contact_cfg,contact_distance_batch_size=32,**extra)
+        row=dict(name=name,status='complete',fit=fit.diagnostics,seconds=time.monotonic()-started,
+            execution_contact_batch_size=32)
+        if sealing is None:
+            return dict(row,rotations=fit.rotations,translations=fit.translations)
+        path=out/('episode_000009_'+name+'.npz')
+        row['file']=path.name
+        arrays=output_arrays(bank,fit.rotations,fit.translations,evidence.activations,sealing['selected_ids'])
+        row['output']=seal_file(path,lambda stream:np.savez_compressed(stream,**arrays))
+        receipt=dict(row,producer_revision=sealing['revision'],
+            full_4D_export_replaced=False,ground_truth_used=False,production_adopted=False,
+            quality_evaluation_complete=False)
+        receipt_path=out/('episode_000009_'+name+'_fit.json')
+        row['receipt']=seal_json(receipt_path,receipt)
+        row['receipt_file']=receipt_path.name
+        return row
     except Exception as exc:
-        return dict(name=name,status='fail',error_type=type(exc).__name__,
+        row=dict(name=name,status='fail',error_type=type(exc).__name__,
             error=str(exc)[:300],seconds=time.monotonic()-started)
+        if out is not None:
+            try:
+                receipt_path=out/('episode_000009_'+name+'_fit.json')
+                row['receipt']=seal_json(receipt_path,dict(row,producer_revision=sealing['revision'],
+                    ground_truth_used=False,production_adopted=False,quality_evaluation_complete=False))
+                row['receipt_file']=receipt_path.name
+            except Exception as error:
+                row['receipt_error_type']=type(error).__name__
+        return row
 
 
 def run():
@@ -204,7 +294,7 @@ def run():
     revision = os.environ['WR_CODE_REVISION']; code = Path(os.environ['WR_CODE'])
     if ROOT != Path(os.environ['WR_ROOT']) or code != ROOT/'jobs'/revision/ENTRY/'code':
         raise ValueError('Exact Azure immutable source required')
-    out = ROOT/'results'/('sequence-contact-patch-real-'+revision)
+    out = ROOT/'results'/('sequence-contact-patch-real-v2-'+revision)
     old.fresh_runtime_output(out); ledger = old.ArtifactLedger()
     report = dict(status='fail',producer_revision=revision,ground_truth_used=False,
         manual_labels=False,model_calls=0,depth_used=False,covariance_used=False,
@@ -215,7 +305,10 @@ def run():
         for name in HELPERS: ledger.record(code/name)
         cfg = settings(code); base_cfg,_ = old.profile_config(code,'v2')
         fit_cfg = replace(base_cfg,max_nfev=cfg['max_nfev'])
-        report.update(protocol=cfg,fit_config=asdict(fit_cfg))
+        report.update(protocol=cfg,fit_config=asdict(fit_cfg),execution_revision='v2',
+            quality_protocol_unchanged=True,execution_contact_batch_size=32,
+            sealed_worker_completion_before_QA=True)
+        report['metrics']={};report['fits']=[]
         bank = load_bank(ledger)
         pool,selected_ids = bounded_pool(bank,cfg)
         i,s = np.nonzero(pool.activations & (bank['frame_index'][:,None]>0))
@@ -232,24 +325,33 @@ def run():
         # Only bounded fitting inputs reach workers; full human/mesh source I/O is shared once.
         fit_bank = {k:v for k,v in bank.items() if k not in
             ('hands','ids','prior_j1_rotations','prior_j1_translations','contact_logits')}
-        jobs = [(name,fit_bank,bank['evidence'] if name=='J1' else pool,cfg,fit_cfg)
+        sealing=dict(out=str(out),revision=revision,selected_ids=selected_ids)
+        jobs = [(name,fit_bank,bank['evidence'] if name=='J1' else pool,cfg,fit_cfg,sealing)
             for name in cfg['variants']]
+        metrics = report['metrics'];converged = {}
         with ProcessPoolExecutor(max_workers=cfg['workers'],mp_context=multiprocessing.get_context('spawn')) as executor:
-            rows = list(executor.map(fit_worker,jobs))
-        metrics = {'original':measure(bank,bank['rotations'],bank['translations'],pool)}
-        converged = {}; report['fits'] = []
-        for row in rows:
-            if row['status']=='complete':
-                rr,tt = row.pop('rotations'),row.pop('translations')
-                metrics[row['name']] = measure(bank,rr,tt,pool)
-                converged[row['name']] = row['fit']['converged']
-                path = out/('episode_000009_'+row['name']+'.npz')
-                np.savez_compressed(path,rotation=rr,translation=tt,frame_index=bank['frame_index'],
-                    object_vertices=bank['vertices'],object_faces=bank['faces'],object_scale=bank['object_scale'],
-                    camera_K=bank['original_K'],points=bank['points'],tracks_xy=bank['xy'],RGB_visible=bank['visible'],
-                    contact_activations=pool.activations,selected_anatomical_pool_ids=selected_ids)
-                path.chmod(0o444); row['output'] = ledger.record(path)
-            report['fits'].append(row)
+            futures=[executor.submit(fit_worker,job) for job in jobs]
+            metrics['original']=measure(bank,bank['rotations'],bank['translations'],pool)
+            for future in as_completed(futures):
+                row=future.result()
+                print(json.dumps(dict(stage='fit_completed',name=row['name'],status=row['status'],
+                    seconds=row['seconds'],converged=row.get('fit',{}).get('converged'),
+                    prediction_sealed=row['status']=='complete'),allow_nan=False),flush=True)
+                if row['status']=='complete':
+                    receipt=strict(ledger.read(out/row['receipt_file'],row['receipt']))
+                    if (receipt['producer_revision']!=revision or receipt['name']!=row['name']
+                            or receipt['output']!=row['output'] or receipt['file']!=row['file']
+                            or receipt['fit']!=row['fit']):
+                        raise ValueError('Worker-sealed receipt/output identity differs')
+                    fitted=saved.load_npz(ledger,out/row['file'],row['output'])
+                    validate_output(bank,fitted)
+                    metrics[row['name']]=measure(bank,fitted['rotation'],fitted['translation'],pool)
+                    converged[row['name']]=row['fit']['converged']
+                    qa=dict(name=row['name'],fit_receipt=row['receipt'],metrics=metrics[row['name']],
+                        producer_revision=revision,heldout_accuracy_verified=False,production_adopted=False)
+                    row['qa']=seal_json(out/('episode_000009_'+row['name']+'_qa.json'),qa)
+                report['fits'].append(row)
+        report['fits'].sort(key=lambda row:cfg['variants'].index(row['name']))
         report['metrics'] = metrics
         report['decisions'] = [decision(cfg,metrics,converged,name) for name in ('hard_pool','soft_pool')]
         report['quality_decision'] = ('retain_candidate_for_visual_QA' if any(
@@ -261,7 +363,7 @@ def run():
     except Exception as exc:
         report.update(status='fail',error_type=type(exc).__name__,error=str(exc)[:400])
     report['elapsed_seconds'] = time.monotonic()-started
-    path = out/'report.json'; path.write_text(json.dumps(report,sort_keys=True,allow_nan=False)+'\n'); path.chmod(0o444)
+    seal_json(out/'report.json',report)
     print(json.dumps({k:report.get(k) for k in ('status','error_type','error','elapsed_seconds','decisions')},allow_nan=False))
     if report['status']=='fail': raise SystemExit(1)
 

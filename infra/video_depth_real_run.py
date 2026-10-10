@@ -41,6 +41,19 @@ def infer(code,cfg,base,out,report):
     if (base/'eval_private').exists():raise ValueError('Private sensor data must not be mounted into predictor')
     import torch
     import video_depth_assets as assets
+    if report['execution_version']==2:
+        from video_depth_dependencies import DIRECTORY, RECEIPT, MODULE_SHA256
+        dep=json.loads((ROOT/RECEIPT).read_text())
+        if dep['status']!='pass' or dep['wheel_sha256']!='6b787daf4dcaf6377b4ad9403a5cee5a86adbc0ca9a5bcf5410e9902002aeac2':
+            raise ValueError('Pinned pure-Python dependency overlay required')
+        for row in dep['files']:
+            if pin(ROOT/DIRECTORY/row['file'])!={k:row[k] for k in ['bytes','sha256']}:
+                raise ValueError('Dependency overlay byte identity differs')
+        import easydict
+        if (Path(easydict.__file__).resolve()!=ROOT/DIRECTORY/'easydict/__init__.py' or
+                pin(Path(easydict.__file__))['sha256']!=MODULE_SHA256):
+            raise ValueError('Expected isolated easydict module required')
+        report['runtime_dependency_receipt_pin']=pin(ROOT/RECEIPT)
     from world_reward.video_depth import load_metric_small,infer_metric_video
     from PIL import Image
     asset_report=json.loads((ROOT/'results/video-depth-assets-v2.json').read_text())
@@ -85,12 +98,13 @@ def infer(code,cfg,base,out,report):
         target.chmod(0o444);report['predictions'][target.name]=pin(target)
         report['timings'].append(dict(sequence=seq['name'],model='moge_original_fixed_RGB_fov',seconds=time.monotonic()-start))
     report.update(status='sealed_predictions',private_values_read=False,models=['metric_vda_small','moge_original'],
+        moge_fov_policy='original_fixed_RGB_diagonal_focal_prior_800px_not_native_inferred_or_sensor_calibrated',
         model_overlap_verified=False,production_adopted=False,full_original_frame_indices_preserved=True)
 
 
 def evaluate(code,cfg,base,out,report):
     from PIL import Image
-    predictions=ROOT/'validation/video_depth_real_output_v1/predictions';sealed=json.loads((predictions/'report.json').read_text())
+    predictions=out.parent/'predictions';sealed=json.loads((predictions/'report.json').read_text())
     if sealed['status']!='sealed_predictions' or sealed['config_pin']!=report['config_pin']:raise ValueError('Sealed inference before sensor decoding required')
     acquisition=json.loads((base/'acquisition-report.json').read_text())
     rows=[]
@@ -141,17 +155,19 @@ def evaluate(code,cfg,base,out,report):
 
 def run():
     mode=sys.argv[1];code=Path(os.environ['WR_CODE']);rev=os.environ['WR_CODE_REVISION'];start=time.monotonic()
-    if mode not in ['infer','evaluate'] or code!=ROOT/'jobs'/rev/('run_video_depth_real_'+mode)/'code':raise ValueError('Exact staged producer required')
+    if mode not in ['infer','evaluate','infer_v2','evaluate_v2'] or code!=ROOT/'jobs'/rev/('run_video_depth_real_'+mode)/'code':raise ValueError('Exact staged producer required')
+    version=2 if mode.endswith('_v2') else 1; operation=mode.removesuffix('_v2')
     cfg=json.loads((code/CONFIG).read_text());base=ROOT/cfg['namespace']
-    out=ROOT/'validation/video_depth_real_output_v1'/('predictions' if mode=='infer' else 'evaluation')
+    out=ROOT/'validation'/('video_depth_real_output_v'+str(version))/('predictions' if operation=='infer' else 'evaluation')
     out.mkdir(exist_ok=False)
     report=dict(status='fail',producer_revision=rev,config_pin=pin(code/CONFIG),private_values_read=False,
+        execution_version=version,
         challenge_inputs_used=False,production_adopted=False,timings=[],predictions={})
     try:
         from mediapipe_cpu_runtime_verify import source
         helpers=('infra/video_depth_real_run.py','infra/run_video_depth_real_'+mode+'.sh',CONFIG)
         binding=source(ROOT,code,rev,'run_video_depth_real_'+mode,helpers)
-        (infer if mode=='infer' else evaluate)(code,cfg,base,out,report)
+        (infer if operation=='infer' else evaluate)(code,cfg,base,out,report)
         if source(ROOT,code,rev,'run_video_depth_real_'+mode,helpers)!=binding:raise ValueError('Immutable staged source changed')
         report['source_binding']=binding
     except Exception as exc:report.update(error_type=type(exc).__name__,error=str(exc)[:300])
