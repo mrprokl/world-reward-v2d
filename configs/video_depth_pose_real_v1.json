@@ -29,5 +29,16 @@
     "producer_revision": "9bd3c8c3b92168ff58c8c87399248f9f3e8549ab",
     "scope": "TUM96frames3scenes_depth_only_not4D",
     "source_path": "/srv/scenesmith/world-reward/validation/video_depth_real_output_v2/evaluation/report.json"
+  },
+  "gates": {
+    "compare_against": [
+      "original"
+    ],
+    "convergence_required": true,
+    "reprojection_ratio_maximum": 1.00000001,
+    "contact_gap_ratio_maximum": 1.00000001,
+    "acceleration_tail_ratio_maximum": 1.00000001,
+    "RGB_motion_increment_ratio_maximum": 1.00000001,
+    "scope": "conservative_same_automatic_observation_QA_not_ground_truth_accuracy"
   }
 }
