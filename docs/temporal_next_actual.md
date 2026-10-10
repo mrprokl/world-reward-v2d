@@ -106,6 +106,56 @@ evaluation report 4,504 B SHA256
 Owned containers absent, exit 0. Retain VDA as a depth candidate and advance to
 the full-T pose/contact stage; no automatic production adoption.
 
+### Anatomy diagnostic: replace an expensive failed question, not its result
+
+Full-hand exhaustive minimum audit under
+`8fbbbca70c330adff4dd8fb6f3ebdb28dbd2e7e9` exceeded its **600 s** limit;
+no anatomical result is claimed. Failure receipt 359 B SHA256
+`7682e7f17a47f85456dabbc7ba8a9da409a730667a53cc39a3ee0a77f93501dd`.
+Owned CPU container removed, exit 1. Do not rerun with a larger arbitrary cap.
+
+Alternative `79f8a2032088b1219602c64abaa7f3ee47db885c` completed **11.86 s**:
+every active hand's 2,318 vertices participates in conservative lower/upper
+bounds, and one exact continuous-surface witness tightens the upper bound.
+**628,178 anatomical point bounds per variant**, original faces retained.
+Intervals overlap the original in all 271 hand/frame rows; no certified worsening
+or improvement of the *whole-hand minimum* can be claimed.
+
+However, the upper bound certifies a closer anatomical point outside the chosen
+eight-point pool on **232/271 hard-pool** and **233/271 soft-pool** rows
+(original 146/271, J1 215/271). This is positive evidence of limited fixed-pool
+coverage, not proof of physical contact or correct hand placement. Whole-hand
+upper mean is 0.00709 m original versus 0.02348/0.02344 m hard/soft; these are
+upper bounds, never labeled exact gaps. Prioritise changing-patch contact memory
+and independently test relative placement, rather than simply strengthening
+the same incomplete association.
+
+Receipt 16,390 B SHA256
+`06fbb21965ef264bd6a61a3d75c2fbe4000b50df1f4e366a8b88d24b798daa73`.
+Owned container absent, exit 0; no fit, model or heavy transfer.
+
+### Actual full-T depth-to-pose follow-through
+
+Producer `426a9cb74923af24389e2b7c118a4790908e088f` now runs the actual
+415-frame RGB sequence through VDA, the same predicted human's single positive
+clip scale, object-track depth, and two fixed-geometry R/T fits (without/with
+soft contact). It reuses upstream masks/human/object rather than rerunning all
+models. This is the full temporal fitting chain, not a complete new frontend
+or human-articulation optimization.
+
+VDA without contact has already converged: **23 evaluations / 3.37 s** fitting,
+10,349 depth observations across all 415 frames. RGB 8.7317 -> 5.4914 px, but
+linear acceleration p95 21.3894 -> 48.6669 m/s² and original anatomical gap mean
+0.00709 -> 0.33283 m. It cannot be adopted on its own. The shared human scale
+1.733574 achieves 4.01% median human-depth consistency, which does not establish
+object-depth accuracy or relative interaction geometry. The combined soft fit
+must complete before any conclusion about that second candidate.
+
+Latest integration checks: **188 targeted tests passed in 6.30 s** using an
+isolated temporary directory. A previous concurrent local pytest attempt had
+seven setup errors because its default shared temporary directory disappeared;
+the isolated rerun passed without modifying algorithm tests or thresholds.
+
 The frozen protocol's `moge_fov` prose says "native inferred" incorrectly.
 Actual implementation retains the earlier RGB-diagonal focal prior (800px at
 640x480), fixed across the clip. This is disclosed in prediction reports; no
