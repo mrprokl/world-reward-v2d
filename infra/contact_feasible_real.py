@@ -18,7 +18,7 @@ import numpy as np
 import native_joint_real as native
 from mediapipe_cpu_runtime_verify import canonical, source, strict
 from world_reward.contact_feasible_placement import (ContactPlacementConfig,
-    ContactFeasibilityFailure, freeze_contact_witnesses, project_joint_translations)
+    ContactFeasibilityFailure, freeze_contact_witnesses)
 from world_reward.native_joint_refinement import JointImageEvidence
 from world_reward.shared_identity import NATIVE_PARAMETER_DIMS, validate_native_parameters
 from world_reward.sequence_pose import _ContactTriangleSurface
@@ -42,6 +42,7 @@ PLACEMENT = ContactPlacementConfig(.05, 1e-7, 1e-10, 400, 8,
     'manufactured_numerical_unit_contract_before_real_C_not_HOI_quality_calibration')
 HELPERS = tuple(dict.fromkeys(('infra/contact_feasible_real.py',
     'infra/run_contact_feasible_real.sh', 'src/world_reward/contact_feasible_placement.py',
+    'src/world_reward/contact_placement_branches.py',
     'src/world_reward/shared_identity.py', *native.HELPERS)))
 
 
@@ -220,8 +221,11 @@ def project_saved(bank, src, saved):
         bank['translations'], bank['vertices'], bank['faces'], active, bank['frame_index'],
         config=PLACEMENT, source_reference='independently_pinned_A052_and_B' + B_REVISION,
         witness_selection_reference=WITNESS_DEFINITION, original_selection_is_whole_hand_minimum=False)
-    projection = project_joint_translations(frozen, np.asarray(saved['human'][:, src['QA_hand_ids']]),
-        saved['params']['mhr_trans'], saved['trajectory']['object_translation'])
+    from world_reward.contact_placement_branches import (freeze_original_branches,
+        project_joint_translations_branches)
+    branches = freeze_original_branches(frozen, original, bank['translations'])
+    projection = project_joint_translations_branches(frozen, np.asarray(saved['human'][:, src['QA_hand_ids']]),
+        saved['params']['mhr_trans'], saved['trajectory']['object_translation'], original_branches=branches)
     target, params, trajectory = corrected_geometry(saved['human'], saved['params'], saved['trajectory'], projection)
     verification = verify_emitted_witnesses(bank, src, target, trajectory, projection)
     return target, params, trajectory, projection, verification
@@ -299,6 +303,8 @@ def run_episode(episode, out, ledger, binding):
             error_type=type(exc).__name__, frame_index=exc.frame_index, reason=exc.reason,
             maximum_violation_m=exc.maximum_violation_m, physical_infeasibility_claimed=False),
             failed_C_predictions_not_substituted=True)
+        if hasattr(exc, 'branch_attempts'):
+            report['C_rejection']['branch_attempts'] = exc.branch_attempts
     except Exception as exc:
         report.update(error_type=type(exc).__name__, error=str(exc)[:400])
     finally:
