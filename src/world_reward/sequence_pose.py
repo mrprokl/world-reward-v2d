@@ -168,17 +168,36 @@ class _ContactTriangleSurface:
         except (ValueError, OverflowError):
             return self._all_faces
 
-    def distances(self, points, *, broadphase=True):
+    def distances(self, points, *, broadphase=True, batch_size=1):
         if points.ndim != 2 or points.shape[1:] != (3,) or not np.isfinite(points).all():
             raise ValueError('Finite supported object-frame contact points required')
+        if type(batch_size) is not int or not 1 <= batch_size <= 32:
+            raise ValueError('Exact surface execution batches must contain 1..32 points')
         result = np.full(len(points), np.inf)
-        if broadphase:
-            batches = ((index, points[index:index+1], self._candidate_faces(point))
+        if broadphase and batch_size == 1:
+            batches = ((slice(index,index+1), points[index:index+1], self._candidate_faces(point))
                        for index, point in enumerate(points))
+        elif broadphase:
+            # Batch ONLY identical conservative face sets: no approximate
+            # distance, reduced surface, union inflation or candidate reuse
+            # across optimizer calls. Preserve every original output row.
+            def prepared_batches():
+                # Bound temporary face-set storage independently of full T.
+                for window in range(0,len(points),batch_size):
+                    grouped = {}
+                    for index in range(window,min(window+batch_size,len(points))):
+                        candidates = self._candidate_faces(points[index])
+                        key = candidates.tobytes()
+                        if key not in grouped: grouped[key] = (candidates, [])
+                        grouped[key][1].append(index)
+                    for candidates, indices in grouped.values():
+                        selected_points = np.asarray(indices,np.int64)
+                        yield selected_points,points[selected_points],candidates
+            batches = prepared_batches()
         else:
-            batches = ((begin, points[begin:begin+32], self._all_faces)
+            batches = ((slice(begin,begin+32), points[begin:begin+32], self._all_faces)
                        for begin in range(0, len(points), 32))
-        for begin, p, candidates in batches:
+        for rows, p, candidates in batches:
             best = np.full(len(p), np.inf)
             for first in range(0, len(candidates), 2048):
                 selected = candidates[first:first+2048]
@@ -203,7 +222,7 @@ class _ContactTriangleSurface:
                 if not np.isfinite(squared).all() or np.any(squared < 0):
                     raise ValueError('Continuous contact distances exceed finite representable range')
                 best = np.minimum(best, squared.min(axis=1))
-            result[begin:begin+len(p)] = np.sqrt(best)
+            result[rows] = np.sqrt(best)
         return result
 
 
@@ -424,7 +443,8 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
             residuals += (measured_z,)
         if use_contact:
             object_points = np.einsum('qi,qij->qj', contact_points-tt[contact_point_frames], rr[contact_point_frames])
-            distances = contact_surface.distances(object_points)
+            distances = contact_surface.distances(object_points,
+                batch_size=32 if contact_patch_config is not None else 1)
             if contact_patch_config is None:
                 hand_distances = np.full(len(contact_frames), np.inf)
                 np.minimum.at(hand_distances, contact_groups, distances)

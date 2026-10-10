@@ -79,6 +79,45 @@ def test_surface_matches_independent_scalar_reference_and_chunking():
     np.testing.assert_array_equal(repeated.distances(points), repeated.distances(points, broadphase=False))
 
 
+@pytest.mark.parametrize('batch_size',[2,8,32])
+def test_identical_face_set_batching_is_bit_exact_without_changing_row_order(batch_size):
+    rng=np.random.default_rng(20261010)
+    triangles=rng.normal(size=(12,3,3))
+    triangles[1]=triangles[0,::-1]  # Closest-face ties remain represented.
+    triangles[2,:,1:]=0  # Degenerate faces retain edges and vertices.
+    surface=runtime._ContactTriangleSurface(triangles.reshape(-1,3),np.arange(36).reshape(-1,3))
+    points=rng.normal(size=(73,3))
+    original=points.copy()
+    expected=surface.distances(points)
+    np.testing.assert_array_equal(surface.distances(points,batch_size=batch_size),expected)
+    np.testing.assert_array_equal(surface.distances(points[::-1],batch_size=batch_size)[::-1],expected)
+    np.testing.assert_array_equal(points,original)
+    assert surface.distances(np.empty((0,3)),batch_size=batch_size).shape==(0,)
+
+
+def test_batched_broadphase_keeps_distinct_candidates_and_recomputes_each_call(monkeypatch):
+    triangles=np.array([[[x,0.,0.],[x+.01,0.,0.],[x,.01,0.]] for x in range(128)])
+    surface=runtime._ContactTriangleSurface(triangles.reshape(-1,3),np.arange(384).reshape(-1,3))
+    points=np.array([[0.003,0.003,.001],[40.003,.003,.001],[.004,.003,.002],
+                     [40.004,.003,.002],[80.003,.003,.001]])
+    calls=[];actual=surface._candidate_faces
+    def record(point):
+        result=actual(point);calls.append(result.copy());return result
+    monkeypatch.setattr(surface,'_candidate_faces',record)
+    expected=surface.distances(points,broadphase=False)
+    np.testing.assert_array_equal(surface.distances(points,batch_size=32),expected)
+    assert len(calls)==len(points) and len({x.tobytes() for x in calls})==3
+    surface.distances(points+.001,batch_size=32)
+    assert len(calls)==2*len(points)
+
+
+@pytest.mark.parametrize('batch_size',[0,33,True,2.5])
+def test_invalid_surface_execution_batch_is_rejected(batch_size):
+    surface=runtime._ContactTriangleSurface(np.array([[0.,0.,0.],[1.,0.,0.],[0.,1.,0.]]),np.array([[0,1,2]]))
+    with pytest.raises(ValueError,match='execution batches'):
+        surface.distances(np.array([[0.,0.,.1]]),batch_size=batch_size)
+
+
 def test_conservative_broadphase_prunes_work_without_dropping_surface():
     triangles = np.array([[[x, 0., 0.], [x+.01, 0., 0.], [x, .01, 0.]] for x in range(128)])
     vertices = triangles.reshape(-1, 3); faces = np.arange(len(vertices)).reshape(-1, 3)

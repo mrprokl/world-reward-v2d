@@ -2,10 +2,11 @@
 
 One frozen comparison per mechanism, DEV and separately seeded RESERVED. Owned
 analytic observations are not a substitute for real external generalization.
-Truth is kept in scoring variables, never passed into the fitter as a prior.
+Both methods receive the same noisy authored priors, known authored mesh/K,
+and exact authored first-frame gauge anchor. This deliberately controlled
+numeric assay is not truth-free RGB inference or physically rendered data.
 No per-case coefficient changes, content rerolls or stopping on a favorable case.
 """
-from dataclasses import asdict
 import json
 import multiprocessing
 import os
@@ -27,6 +28,26 @@ CONFIG = 'configs/sequence_evidence_stress_v1.json'
 HELPERS = ('infra/sequence_evidence_stress.py', 'infra/run_sequence_evidence_stress.sh',
     CONFIG, 'src/world_reward/sequence_pose.py', 'src/world_reward/depth_covariance.py',
     'src/world_reward/contact_patch.py', 'infra/mediapipe_cpu_runtime_verify.py')
+
+
+def protocol_disclosures():
+    """Honest scope of this immutable assay; never imply real-data validation.
+
+    The v1 numerical configuration/thresholds remain unchanged. These labels
+    clarify limitations found by independent review, not new acceptance gates.
+    """
+    return dict(challenge_ground_truth_used_for_inference=False,
+        authored_known_mesh_and_intrinsics_used=True,
+        authored_exact_first_frame_gauge_anchor_used=True,
+        authored_noisy_truth_derived_priors_used=True,
+        observation_points_are_visible_surface_samples=False,
+        rolling_case_is_two_axis_planar_slide=True,
+        regrasp_case_has_explicit_inactive_gap=True,
+        reduced_contact_pool_coverage_tested=False,
+        rotational_motion_retention_gated=False,
+        oscillation_amplitude_and_phase_gated=False,
+        independent_contact_gap_is_existential=True,
+        physically_rendered_observation_validation=False)
 
 
 def settings(code):
@@ -185,7 +206,9 @@ def gates(cfg,rows):
                 candidate=sum(r['metrics'][new]['point_error_m'] for r in target)
                 checks['aggregate_target_error_improves']=candidate<=limits['target_error_ratio_maximum']*baseline
                 checks['all_cases_error_nonworse']=all(r['metrics'][new]['point_error_m']<=limits['control_error_ratio_maximum']*r['metrics']['legacy']['point_error_m'] for r in selected)
-                checks['all_moving_amplitudes_retained']=all(limits['motion_retention_minimum']<=r['metrics'][new]['motion_displacement_retention']<=limits['motion_retention_maximum'] for r in selected if r['metrics'][new]['motion_displacement_retention'] is not None)
+                # Endpoint displacement cannot establish oscillation/rotation
+                # retention. Relabel only; keep the frozen v1 numeric gate.
+                checks['all_endpoint_displacements_retained']=all(limits['motion_retention_minimum']<=r['metrics'][new]['motion_displacement_retention']<=limits['motion_retention_maximum'] for r in selected if r['metrics'][new]['motion_displacement_retention'] is not None)
                 checks['all_candidates_converged']=all(r['converged'][new] for r in selected)
                 if mechanism=='contact':
                     checks['independent_contact_not_sacrificed']=all(r['metrics'][new]['independent_contact_gap_m']<=r['metrics']['legacy']['independent_contact_gap_m']+limits['contact_gap_regression_tolerance_diameter']*r['diameter_m'] for r in target)
@@ -199,7 +222,7 @@ def run():
     out=ROOT/'results'/('sequence-evidence-stress-'+revision)
     if not out.is_dir() or {p.name for p in out.iterdir()}!={'.container.cid'}:raise ValueError('Fresh owned diagnostic output required')
     report=dict(status='fail',producer_revision=revision,challenge_inputs_used=False,models_loaded=False,
-        GPU_requested=False,ground_truth_used_for_inference=False,production_adopted=False,
+        GPU_requested=False,protocol_disclosures=protocol_disclosures(),production_adopted=False,
         real_data_accuracy_verified=False,scope='authored_numeric_stress_not_real_validation')
     try:
         binding=source(ROOT,code,revision,ENTRY,HELPERS);cfg=settings(code)

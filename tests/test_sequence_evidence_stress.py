@@ -84,6 +84,35 @@ def test_stress_inputs_are_analytic_distinct_from_scoring_and_source_pinned():
     assert perfect['motion_path_retention']==1
 
 
+def test_assay_declares_exact_authored_anchor_and_nonphysical_observations():
+    disclosures=stress.protocol_disclosures()
+    assert disclosures['challenge_ground_truth_used_for_inference'] is False
+    for key in ('authored_known_mesh_and_intrinsics_used',
+                'authored_exact_first_frame_gauge_anchor_used',
+                'authored_noisy_truth_derived_priors_used',
+                'rolling_case_is_two_axis_planar_slide'):
+        assert disclosures[key] is True
+    assert disclosures['oscillation_amplitude_and_phase_gated'] is False
+    cfg=stress.settings(Path(__file__).resolve().parents[1])
+    v,_,p,_,r,t,_,_,prior_r,prior_t,_=stress.observations(cfg,np.random.default_rng(2),True,True)
+    np.testing.assert_array_equal(prior_r[0],r[0])
+    np.testing.assert_array_equal(prior_t[0],t[0])
+    assert np.all(np.abs(p)<np.max(np.abs(v),axis=0))
+
+
+def test_endpoint_gate_cannot_certify_preservation_of_fast_motion():
+    cfg=stress.settings(Path(__file__).resolve().parents[1])
+    v,_,p,_,r,t,truth,_,_,_,_=stress.observations(cfg,np.random.default_rng(2),True,True)
+    removed=t.copy()
+    removed[:,2]-=.035*np.sin(2*np.pi*3*np.arange(len(t))/cfg['fps'])
+    diagnostic=stress.scores(v,p,r,removed,truth,t,cfg['fps'])
+    # A counterexample, not an additional post-hoc acceptance criterion:
+    # deleting the real oscillation PASSES the frozen endpoint-only gate.
+    assert cfg['gates']['motion_retention_minimum']<diagnostic['motion_displacement_retention']<cfg['gates']['motion_retention_maximum']
+    assert diagnostic['motion_path_retention']<.7
+    assert diagnostic['temporal_error_m_s']>0
+
+
 def test_stress_failure_is_not_successful_gate():
     root=Path(__file__).resolve().parents[1];cfg=stress.settings(root)
     row=dict(status='fail',split='reserved',mechanism='depth')
