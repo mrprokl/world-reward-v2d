@@ -1,0 +1,136 @@
+{
+  "schema": "world_reward.video_depth_assets.v1",
+  "source_repository": "DepthAnything/Video-Depth-Anything",
+  "source_revision": "4f5ae23172ba60fd7bc11ef671cca678842c7072",
+  "source_files": [
+    {
+      "file": "LICENSE",
+      "bytes": 11356,
+      "git_blob_sha1": "f49a4e16e68b128803cc2dcea614603632b04eac",
+      "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1"
+    },
+    {
+      "file": "README.md",
+      "bytes": 9452,
+      "git_blob_sha1": "a3c2bb46aa428ba8b021ba9182710931f680524f",
+      "sha256": "cb786de4a6ef8f344cd8212dd9e51a6c08923fa5ccafc91dd6c96ee4f4af4d88"
+    },
+    {
+      "file": "utils/util.py",
+      "bytes": 2449,
+      "git_blob_sha1": "75ff80a841f2e30cb182a17c7a0e9e76ec062025",
+      "sha256": "f02cf85f5a9543ce0f832a4fde1492076026650c8eb25c6a8cc4315bf67a8ed2"
+    },
+    {
+      "file": "video_depth_anything/dinov2.py",
+      "bytes": 15178,
+      "git_blob_sha1": "83d250818c721c6df3b30d3f4352945527701615",
+      "sha256": "d22df8d0da44c8525ebed898fd9c33b3acfcda919a84d577cc2a08bfd3d50ac1"
+    },
+    {
+      "file": "video_depth_anything/dinov2_layers/__init__.py",
+      "bytes": 382,
+      "git_blob_sha1": "8120f4bc83066cb3f825ce32daa3b437f88486f1",
+      "sha256": "e3c28c7b775165b6844000eb69f44d104d6c3803ac7da5d59f6ac3ecfb46d9d8"
+    },
+    {
+      "file": "video_depth_anything/dinov2_layers/attention.py",
+      "bytes": 2343,
+      "git_blob_sha1": "815a2bf53dbec496f6a184ed7d03bcecb7124262",
+      "sha256": "0d2410ce8b8b4499a6b0cdab939ae2bceab8971efd8660d999b0f3088f28cbf7"
+    },
+    {
+      "file": "video_depth_anything/dinov2_layers/block.py",
+      "bytes": 9332,
+      "git_blob_sha1": "25488f57cc0ad3c692f86b62555f6668e2a66db1",
+      "sha256": "093266ea08084c7cce7b8ddd779ecfaaa13055735faa8a7d68b5924f385b395b"
+    },
+    {
+      "file": "video_depth_anything/dinov2_layers/drop_path.py",
+      "bytes": 1160,
+      "git_blob_sha1": "af05625984dd14682cc96a63bf0c97bab1f123b1",
+      "sha256": "949100aac4d9c19c9d65319dbd362886c5d46a72d7586ba4fd500e9f1d51570c"
+    },
+    {
+      "file": "video_depth_anything/dinov2_layers/layer_scale.py",
+      "bytes": 823,
+      "git_blob_sha1": "ca5daa52bd81d3581adeb2198ea5b7dba2a3aea1",
+      "sha256": "356817b5d1390737128cbcc03a5333fd3060b73beae478772282ccb851d0ef85"
+    },
+    {
+      "file": "video_depth_anything/dinov2_layers/mlp.py",
+      "bytes": 1272,
+      "git_blob_sha1": "5e4b315f972f9a9f54aef1e4ef4e81b52976f018",
+      "sha256": "c18c5b3f021408597a473bb710070ec3fb3b39f5a2e42e88ae83ced425a608b5"
+    },
+    {
+      "file": "video_depth_anything/dinov2_layers/patch_embed.py",
+      "bytes": 2832,
+      "git_blob_sha1": "574abe41175568d700a389b8b96d1ba554914779",
+      "sha256": "b3f82e19926c9cfb63f10136aca5e8a723bde1ad62dae1d04f90d405f9439baf"
+    },
+    {
+      "file": "video_depth_anything/dinov2_layers/swiglu_ffn.py",
+      "bytes": 1859,
+      "git_blob_sha1": "b3324b266fb0a50ccf8c3a0ede2ae10ac4dfa03e",
+      "sha256": "df81d9901240214edc1831ce1b77558dcd6227b29a2f000fc5f546df55d2d09a"
+    },
+    {
+      "file": "video_depth_anything/dpt.py",
+      "bytes": 5467,
+      "git_blob_sha1": "8c43a1447799cc3550e7e5bba71577f7c5aec9e6",
+      "sha256": "4751fac16206892889d74fd7f564f275e0efa3a903172c9350a1b55ed850c7d8"
+    },
+    {
+      "file": "video_depth_anything/dpt_temporal.py",
+      "bytes": 5909,
+      "git_blob_sha1": "d629a1127887ea561fadb5fc21aeae26313e24c6",
+      "sha256": "b80c448f4fe66d0ca7092be887c0ea3925a4ce7c03cffa0083480e7e2f55805d"
+    },
+    {
+      "file": "video_depth_anything/motion_module/attention.py",
+      "bytes": 16719,
+      "git_blob_sha1": "41f551ba17e95c008f3ad1db5475c342855dd2a4",
+      "sha256": "15e4049641f04f73027ea520ada3ba2c81196cea1339f0d6a6063d944df61c8b"
+    },
+    {
+      "file": "video_depth_anything/motion_module/motion_module.py",
+      "bytes": 12744,
+      "git_blob_sha1": "d4d81a3e00dbbeb071cbccbf3bc1603178132f5f",
+      "sha256": "73d6a9cee40681532ae2603dd426405e840dc5c592a313005fa367f6fe4c69e8"
+    },
+    {
+      "file": "video_depth_anything/util/blocks.py",
+      "bytes": 4064,
+      "git_blob_sha1": "0be16c053d8ae65bf33c5221351add16ecd6fb15",
+      "sha256": "8a9fde84bddbfa2498b5f5ef06895ddc941c1fc12c5919e9891fad481997b7dd"
+    },
+    {
+      "file": "video_depth_anything/util/transform.py",
+      "bytes": 6075,
+      "git_blob_sha1": "b14aacd44ea086b01725a9ca68bb49eadcf37d73",
+      "sha256": "a97df1dbb687457a40c387fdc3482edee7ddc5c142c7d2735ca6235a8ae2885f"
+    },
+    {
+      "file": "video_depth_anything/video_depth.py",
+      "bytes": 6712,
+      "git_blob_sha1": "5598d302afbefba2a6ed33bdaa1bce84260ef9c0",
+      "sha256": "208e882d60a41434b3a0d9935a7025b01cce0756c17b3d889c6db0c4c945eb29"
+    },
+    {
+      "file": "video_depth_anything/video_depth_stream.py",
+      "bytes": 6833,
+      "git_blob_sha1": "c56847a10cc07f04d1551b315ca74b83ee101635",
+      "sha256": "23ebab70525f318cf0bfeba38dfcac3f1c345ba50aaa1bb5c6dbae671b0caa6d"
+    }
+  ],
+  "model_repository": "depth-anything/Metric-Video-Depth-Anything-Small",
+  "model_revision": "273d090f2ce17df50c2872d82c8322c45da5b4dd",
+  "model_file": "metric_video_depth_anything_vits.pth",
+  "model_bytes": 116444063,
+  "model_sha256": "3c28432b4e1f0d7bb31cad5151b6313b49457db5aa58d82e85bfb0f8b1311b33",
+  "model_license": "apache-2.0",
+  "training_declaration": "Metric fine-tuning Virtual KITTI and IRS per official source README; pretrained VDA/DAv2/DINOv2 lineage exact training-frame overlap not attested.",
+  "challenge_overlap_verified": false,
+  "source_tree_sha1": "4f5ae23172ba60fd7bc11ef671cca678842c7072"
+}

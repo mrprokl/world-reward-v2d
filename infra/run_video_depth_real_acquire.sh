@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Source closure: /infra/video_depth_real_acquire.py /infra/tum_rgbd_depth_acquire.py
+set +x
+set -euo pipefail
+ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
+[[ $# == 0 && "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
+ && "$CODE" == "$ROOT/jobs/$REV/run_video_depth_real_acquire/code" \
+ && "$(hostname)" == world-reward-ncc-h100-02 ]] || exit 2
+timeout --signal=TERM --kill-after=5s 900s /usr/bin/env -i \
+ PATH=/usr/bin:/bin HOME=/tmp PYTHONDONTWRITEBYTECODE=1 \
+ WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" PYTHONPATH="$CODE/infra" \
+ /usr/bin/python3 -B "$CODE/infra/video_depth_real_acquire.py"
