@@ -375,7 +375,7 @@ def _latent_observations(report, flags, total, np):
 
 def _latent_surface_geometry_and_poses(path, expected_v, expected_f, report, total, budget, np):
     """Separate seven-field admission; the original six-field reader stays strict."""
-    from surface_pose_report_capacity import identity
+    from surface_pose_report_capacity import latent_identity as identity
     from world_reward.surface_pose_geometry import compact_surface
     before = identity(path)
     with np.load(path, allow_pickle=False) as data:
@@ -421,6 +421,8 @@ def _surface_preflight(root, episode, inputs, report, pose_path, np, *, allow_un
     """Authenticated surface and full poses, before reserving prepared inputs."""
     from surface_geometry_loader import load, strict_json, preflight_geometry_and_poses, SOURCE_HELPERS
     from surface_pose_report_capacity import identity, recheck
+    if allow_unobserved_poses:
+        from surface_pose_report_capacity import latent_identity as identity, latent_recheck as recheck
     code=Path(__file__).resolve().parent.parent
     base=episode_output(root, episode)
     pinpath=artifact_pin_path(code, episode, "surface_mesh")
@@ -587,6 +589,8 @@ def main():
     pose_observed = None
     if args.mesh_source == 'surface':
         from surface_pose_report_capacity import identity as surface_identity, recheck as surface_recheck
+        if args.allow_unobserved_poses:
+            from surface_pose_report_capacity import latent_identity as surface_identity, latent_recheck as surface_recheck
         vertices, faces, active, rotations, translations, surface_compact, surface_topology, surface_ledger = _surface_preflight(
             root,args.episode,inputs,reports['object'],pose_path,np,
             **(dict(allow_unobserved_poses=True) if args.allow_unobserved_poses else {}))

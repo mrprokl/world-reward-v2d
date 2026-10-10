@@ -28,12 +28,13 @@ def _loader():
     return surface_geometry_loader
 
 
-def _pose_report_role(path):
+def _pose_report_role(path, *, latent=False):
     path = Path(path)
     prefix = output_prefix()
     if re.fullmatch(r'experiments/full4d-v1-[0-9a-f]{40}/outputs', prefix) is None:
         return False
-    return (path.name == 'report.json' and path.parent.name == 'object_pose_full_surface'
+    name = 'object_pose_full_surface_latent' if latent else 'object_pose_full_surface'
+    return (path.name == 'report.json' and path.parent.name == name
             and re.fullmatch(r'episode_0000(?:0[0-9]|1[0-9]|2[0-9])', path.parent.parent.name) is not None
             and path.parent.parent.parent == ROOT / prefix)
 
@@ -67,6 +68,21 @@ def recheck(ledger):
     require(all((identity(path, readonly=False) if _pose_report_role(path)
                  else _loader()._source_identity(path)) == pin for path, pin in ledger.items()),
             'Original immutable inputs or source changed during surface consumption')
+
+
+def latent_identity(path, *, readonly=True):
+    """Explicit v4-only full report capacity; original default roles stay exact."""
+    if not _pose_report_role(path, latent=True):
+        return identity(path, readonly=readonly)
+    from mediapipe_cpu_runtime_verify import identity as bounded_identity
+    # A latent receipt is always sealed even when checking writable ancestry.
+    return bounded_identity(path, MAX_POSE_REPORT_BYTES, readonly=True)
+
+
+def latent_recheck(ledger):
+    require(all((latent_identity(path, readonly=False) if _pose_report_role(path, latent=True)
+                 else _loader()._source_identity(path)) == pin for path, pin in ledger.items()),
+            'Original immutable latent inputs or source changed during consumption')
 
 
 def verify_capacity_source(original, candidate):

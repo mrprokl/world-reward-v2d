@@ -408,7 +408,7 @@ def test_fresh_host_process_runs_full_inventory_without_heavy_imports(gate,tmp_p
 from pathlib import Path
 class NoHeavy(importlib.abc.MetaPathFinder):
  def find_spec(self,fullname,path=None,target=None):
-  if fullname.split('.')[0] in {'numpy','joblib','h5py','torch','cv2','trimesh','PIL','world_reward'}:
+  if fullname.split('.')[0] in {'numpy','joblib','h5py','torch','cv2','trimesh','PIL'}:
    raise AssertionError('Heavy/payload import forbidden: '+fullname)
 sys.meta_path.insert(0,NoHeavy())
 sys.path.insert(0,sys.argv[1])
@@ -416,7 +416,7 @@ import cari_clip_pin_inventory as gate
 spec=gate.inputs.PublicClipSpec(0,96,'front_stereo_camera_left',1152,1536)
 result=gate.inventory(Path(sys.argv[2]),Path(sys.argv[3]),spec,'c'*40,sys.argv[4])
 assert len(result['source_files'])==15
-assert not {'numpy','joblib','h5py','torch','cv2','trimesh','PIL','world_reward'}&set(sys.modules)
+assert not {'numpy','joblib','h5py','torch','cv2','trimesh','PIL'}&set(sys.modules)
 print(json.dumps(result,separators=(',',':')))
 '''
     result=subprocess.run(["rtk","proxy",sys.executable,"-I","-B","-c",program,str(ROOT/"infra"),

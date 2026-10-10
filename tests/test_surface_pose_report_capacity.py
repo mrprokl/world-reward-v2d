@@ -32,6 +32,31 @@ def test_only_named_readonly_pose_receipt_gets_capacity(monkeypatch, tmp_path):
     assert not capacity._pose_report_role(tmp_path/'outputs/episode_000001/object_pose_full_surface/report.json')
 
 
+def test_latent_capacity_is_explicit_sealed_and_does_not_change_default_role(monkeypatch, tmp_path):
+    original = case(monkeypatch, tmp_path)
+    path = original.parent.with_name('object_pose_full_surface_latent')/'report.json'
+    path.parent.mkdir(); path.write_bytes(b'bounded latent receipt'); path.chmod(0o444)
+    assert not capacity._pose_report_role(path) and capacity._pose_report_role(path, latent=True)
+    row = capacity.latent_identity(path)
+    assert row == dict(bytes=path.stat().st_size, sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+    capacity.latent_recheck({path:row})
+    path.chmod(0o644)
+    with pytest.raises(ValueError): capacity.latent_identity(path, readonly=False)
+    with pytest.raises(ValueError): capacity.latent_recheck({path:row})
+
+
+def test_latent_ledger_keeps_original_empty_source_identity(monkeypatch, tmp_path):
+    original = case(monkeypatch, tmp_path)
+    path = original.parent.with_name('object_pose_full_surface_latent')/'report.json'
+    path.parent.mkdir(); path.write_bytes(b'latent receipt'); path.chmod(0o444)
+    empty = tmp_path/'__init__.py'; empty.write_bytes(b'')
+    calls = []
+    monkeypatch.setattr(capacity, '_loader', lambda: SimpleNamespace(
+        _source_identity=lambda value: calls.append(value) or {'empty':True}))
+    capacity.latent_recheck({path:capacity.latent_identity(path), empty:{'empty':True}})
+    assert calls == [empty]
+
+
 def test_capacity_bound_with_stat_spy_not_large_fixture(monkeypatch, tmp_path):
     path = case(monkeypatch, tmp_path)
     original = Path.lstat

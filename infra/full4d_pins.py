@@ -95,7 +95,7 @@ def _context(root, code, revision, episode):
     require(root == ROOT and type(revision) is str and re.fullmatch('[0-9a-f]{40}', revision),
             'Fixed Azure runtime and immutable revision required')
     entry = code.parent.name
-    require(entry in {'run_full4d_sample', 'run_gemini_full4d'}
+    require(entry in {'run_full4d_sample', 'run_gemini_full4d', 'run_full4d_coverage'}
             and code == root / 'jobs' / revision / entry / 'code', 'Actual allowlisted full4D dispatcher source required')
     require(output_prefix() == f'experiments/full4d-v1-{revision}/outputs', 'Exact fresh revision-bound output namespace required')
     base = episode_output(root, episode)
@@ -250,7 +250,7 @@ def surface_pin(root, code, revision, episode):
     return _write(code, episode, 'surface_mesh', pin)
 
 
-def input_pin(root, code, revision, episode, total):
+def input_pin(root, code, revision, episode, total, *, allow_unobserved_poses=False):
     root, code, base = _context(root, code, revision, episode)
     spec = inputs.PublicClipSpec(episode, total, 'front_stereo_camera_left', 1152, 1536)
     paths = inputs.relative_paths(spec)
@@ -258,12 +258,17 @@ def input_pin(root, code, revision, episode, total):
     _producer(report, code, revision, episode, 'world_reward_native_cari_inputs', 'cari_prepare.py', total=total)
     require(report.get('object_source') == 'surface' and report.get('original_frame_coverage_verified') is True,
             'Full original generic surface input preparation required')
-    names = inputs.source_paths(spec, object_source='surface')
+    require(type(allow_unobserved_poses) is bool, 'Explicit latent input pin admission required')
+    profile = 'surface_latent' if allow_unobserved_poses else 'surface'
+    names = inputs.source_paths(spec, object_source=profile)
     require(len(names) == 15, 'Exact fifteen public source files required')
     rows = {name: identity(root / name, readonly=False) for name in sorted(names)}
     require(rows[paths['input_report']] == report_id, 'Input producer receipt changed')
     pin = dict(schema='world-reward-cari-clip-input-pins-v3', object_source='surface', clip_spec=asdict(spec),
                input_report=report_id | dict(producer_revision=revision, script_sha256=report['script_sha256']), source_files=rows)
+    if allow_unobserved_poses:
+        pin.update(schema='world-reward-cari-clip-input-pins-v4', object_source='surface_latent',
+                   allow_unobserved_poses=True)
     inputs.validate_pins(spec, pin)
     inputs.validate_reports(root, spec, pin)
     for name, row in rows.items():
@@ -304,14 +309,17 @@ def main():
     parser.add_argument('--role', choices=('surface', 'input', *SHARED), required=True)
     parser.add_argument('--episode', type=int, choices=range(30), required=True)
     parser.add_argument('--total', type=int)
+    parser.add_argument('--allow-unobserved-poses', action='store_true', default=False)
     args = parser.parse_args()
+    require(not args.allow_unobserved_poses or args.role == 'input', 'Latent admission applies only to input pins')
     root, code, revision = Path(os.environ['WR_ROOT']), Path(os.environ['WR_CODE']), os.environ['WR_CODE_REVISION']
     if args.role == 'surface':
         surface_pin(root, code, revision, args.episode)
     else:
         require(args.total is not None, 'Original total frames required')
         if args.role == 'input':
-            input_pin(root, code, revision, args.episode, args.total)
+            input_pin(root, code, revision, args.episode, args.total,
+                      **(dict(allow_unobserved_poses=True) if args.allow_unobserved_poses else {}))
         else:
             shared_pin(args.role, root, code, revision, args.episode, args.total)
     print(json.dumps(dict(stage='full4d_producer_pin', status='pass', episode_index=args.episode, role=args.role)))
