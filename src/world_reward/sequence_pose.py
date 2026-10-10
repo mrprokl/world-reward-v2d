@@ -1,4 +1,4 @@
-"""Fixed-shape RGB bundle adjustment with explicit missing observations.
+"""Fixed-shape RGB, or explicit same-gauge RGB/depth, bundle adjustment.
 
 No physics snapping, scale/camera/shape fitting, mask filling or zero-velocity
 prior. Pose estimates are correlated proposals, not calibrated measurements.
@@ -33,6 +33,24 @@ class SequencePoseConfig:
                 or type(self.max_nfev) is not int or not 1 <= self.max_nfev <= 300
                 or type(self.development_reference) is not str or not self.development_reference.strip()):
             raise ValueError('Positive externally frozen scales/weights/budget required')
+
+
+@dataclass(frozen=True)
+class RGBDepthConfig:
+    """Global depth scale frozen externally; not learned-depth calibration.
+
+    Depth is camera-axis z in the same metre gauge as the fixed mesh/poses.
+    A caller must authenticate its RGB-derived source and gauge. No source
+    calibration or reference trajectories may be supplied to challenge runs.
+    """
+    depth_sigma_diameter: float
+    development_reference: str
+
+    def __post_init__(self):
+        if (type(self.depth_sigma_diameter) not in (int, float)
+                or not np.isfinite(self.depth_sigma_diameter) or self.depth_sigma_diameter <= 0
+                or type(self.development_reference) is not str or not self.development_reference.strip()):
+            raise ValueError('Positive externally frozen depth scale and reference required')
 
 
 def _real(value, shape, name, finite=True):
@@ -85,7 +103,8 @@ class SequencePoseResult:
 
 def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
                     rotations, translations, pose_observed, K, frame_index, fps,
-                    config: SequencePoseConfig):
+                    config: SequencePoseConfig, *, tracks_depth_m=None,
+                    depth_visible=None, depth_config: RGBDepthConfig | None = None):
     """One sparse full-T robust SE(3) fit; time-zero gauge stays exact.
 
     Canonical material points must be attached once, before tracking. Visibility
@@ -94,6 +113,12 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
     Rotations use local SO(3) increments; angular acceleration compares adjacent
     spatial angular velocities, avoiding global axis-angle wraparound. Centroid
     acceleration is canonical-origin invariant. No zero-velocity loss is used.
+
+    Optional depth must measure these same fixed tracked material points, not
+    per-frame pose-projected locations or radial ranges. Supported scalar z is
+    finite and positive; every unknown is NaN. Depth support is a subset of RGB
+    support. Only R/T are fitted; depth cannot change shape, scale, K or gauge.
+    Without all three explicit depth arguments, the RGB-only route is unchanged.
     """
     if type(config) is not SequencePoseConfig:
         raise ValueError('Explicit externally frozen config required')
@@ -116,6 +141,21 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
         raise ValueError('Unsupported coordinates must be explicit NaN')
     if np.any(visible[1:].sum(0) == 0):
         raise ValueError('Every retained witness needs post-anchor RGB evidence')
+    use_depth = any(value is not None for value in (tracks_depth_m, depth_visible, depth_config))
+    if use_depth:
+        if tracks_depth_m is None or depth_visible is None or type(depth_config) is not RGBDepthConfig:
+            raise ValueError('Explicit depth values, support and externally frozen RGBDepthConfig required')
+        depth_flags = np.asarray(depth_visible)
+        if (np.ma.isMaskedArray(depth_visible) or depth_flags.dtype != np.bool_
+                or depth_flags.shape != (n, q) or np.any(depth_flags & ~visible)):
+            raise ValueError('Exact boolean depth support must be a subset of RGB support')
+        depth = _real(tracks_depth_m, (n, q), 'tracks_depth_m', False)
+        if (not np.isfinite(depth[depth_flags]).all() or np.any(depth[depth_flags] <= 0)
+                or not np.isnan(depth[~depth_flags]).all()):
+            raise ValueError('Supported depth must be positive finite axial z; unknowns must be NaN')
+        depth_frames, depth_queries = np.nonzero(depth_flags & (ids[:, None] > 0))
+        if not len(depth_frames):
+            raise ValueError('Explicit RGB/depth route needs post-anchor measured depth evidence')
     r0 = _real(rotations, (n, 3, 3), 'rotations')
     t0 = _real(translations, (n, 3), 'translations'); _rigid(r0, t0)
     camera = _real(K, (3, 3), 'K')
@@ -160,11 +200,17 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
         acceleration = np.diff(centres, n=2, axis=0)*fps**2/(diameter*config.acceleration_sigma_diameter_s2)
         velocity_r = Rotation.from_matrix(rr[1:] @ rr[:-1].swapaxes(-1, -2)).as_rotvec()*fps
         acceleration_r = np.diff(velocity_r, axis=0)*fps/config.angular_acceleration_sigma_rad_s2
-        return np.concatenate((rgb.ravel(), barrier, np.sqrt(config.prior_weight)*prior_c.ravel(),
+        residuals = (rgb.ravel(), barrier, np.sqrt(config.prior_weight)*prior_c.ravel(),
             np.sqrt(config.prior_weight)*prior_r.ravel(), np.sqrt(config.temporal_weight)*acceleration.ravel(),
-            np.sqrt(config.temporal_weight)*acceleration_r.ravel()))
+            np.sqrt(config.temporal_weight)*acceleration_r.ravel())
+        if use_depth:
+            depth_xyz = np.einsum('nij,nj->ni', rr[depth_frames], p[depth_queries])+tt[depth_frames]
+            measured_z = (depth_xyz[:, 2]-depth[depth_frames, depth_queries])/(diameter*depth_config.depth_sigma_diameter)
+            residuals += (measured_z,)
+        return np.concatenate(residuals)
 
     rows = 3*len(frame_rows)+6*len(pose_rows)+6*(n-2)
+    if use_depth: rows += len(depth_frames)
     pattern = lil_matrix((rows, (n-1)*6), dtype=np.int8)
     offset = 0
     for width in (2, 1):
@@ -178,6 +224,9 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
             for other in range(max(frame, 1), frame+3):
                 pattern[offset:offset+3, (other-1)*6:other*6] = 1
             offset += 3
+    if use_depth:
+        for frame in depth_frames:
+            pattern[offset, (frame-1)*6:frame*6] = 1; offset += 1
     start = np.zeros((n-1)*6)
     initial_residual = residual(start)
     result = least_squares(residual, start, jac_sparsity=pattern.tocsr(), loss='soft_l1',
@@ -203,4 +252,10 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
         time_zero_unchanged=True, static_constraint=False, contact_constraint=False,
         full_mesh_in_front_verified=True, RGB_weighting='quadratic_track_normalized_soft_l1',
         config=asdict(config), quality_verified=False)
+    if use_depth:
+        diagnostics.update(method='fixed_shape_full_T_RGB_depth_SE3_bundle_v1',
+            depth_observations=len(depth_frames), depth_supported_frames=int(depth_flags.any(1).sum()),
+            depth_config=asdict(depth_config), depth_units='same_camera_axial_z_metres',
+            depth_source_authenticated_by_module=False, depth_accuracy_verified=False,
+            depth_weighting='one_scalar_soft_l1_per_measured_point_diameter_normalized')
     return SequencePoseResult(rr, tt, ids.copy(), visible.any(1), diagnostics)
