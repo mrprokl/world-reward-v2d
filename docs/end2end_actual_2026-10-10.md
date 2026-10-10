@@ -115,3 +115,30 @@ All4 independentlocalizers3.95–6.18s (12Gemini seedframes parallel, nofailure
 omission), authentic sameRGBA inputs, perseqRSAkeys/envelopes deletedbyowner.
 Full4×96 A/B GPU chain dispatchedsameproducer, reuseexactlocalizeseals.
 Externalreference evaluation remains pending actual eight final predictions.
+
+### Actual contact constraint and raster qualification
+
+Contact producer841094d remeasured both complete A/B clips identically; the
+nearest-branch projection failed at EP9/frame99 (2.991mm local violation) and
+EP14/frame231 (0.311mm). No C trajectory fabricated. A bounded original/current
+surface-branch alternative4e24cf2 is tested locally and dispatched separately;
+all numerical caps, original activity and full geometry unchanged.
+
+FORM125aab2 first96: SAM42.528s, body+depth94.543s, Objects45.973s, all sealed.
+Preparation stopped with verified owned-container absence before its5400s cap;
+complete original cohort failure receipt18182B
+SHA256288e2c63802bf2759c112debce35ea7c31536fb643029ae5a0f0eea88e0da814.
+Reuse only the successful byte-exact stages, never failed preparation/model
+responses. All eight external final predictions and truth evaluation still pending.
+
+Raster gate9a68cfa actualPASS19.711s,7951B
+SHA2562921703b78f32efda142c6035b1232cbe08357127959a2defbcc3c16d2a05439.
+Procedural plus unchanged743576-face real object, full1536×1152, batches1/4:
+exact mask and zero depth difference. Native B4 one-trial8.537→5.816s (1.47×),
+peak allocation1.998→1.425GB. This is implementation parity/speed, not HOI gain;
+large occupied-bin cost remains. More aggressive exact prefix-kernel optimization
+requires its own pinned runtime and parity qualification before adoption.
+
+Private three-column previews renewed at localhost51865,1h TTL, user-demand
+playback only243KB total. CPU02 public operator SHA checks and Python3.11.10,
+NumPy1.26.3/Torch2.5.1 qualified; isolated Numba child build dispatchedf4d379b.
