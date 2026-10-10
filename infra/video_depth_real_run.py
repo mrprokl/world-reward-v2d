@@ -98,6 +98,10 @@ def evaluate(code,cfg,base,out,report):
         path=predictions/f'sequence_{sid:02d}.npz'
         if pin(path)!=sealed['predictions'][path.name]:raise ValueError('Sealed predictions changed')
         with np.load(path,allow_pickle=False) as a:arrays={k:a[k] for k in a.files}
+        original_stamps=np.array([float(Path(r['rgb']['path']).stem) for r in seq['frames']])
+        if (not np.array_equal(arrays['frame_index'],[r['rank'] for r in seq['frames']])
+                or not np.array_equal(arrays['timestamps'],original_stamps)):
+            raise ValueError('Sealed original RGB chronology differs')
         truth=np.zeros(arrays['moge'].shape,np.float32);names=[]
         for i,frame in enumerate(seq['frames']):
             record=frame['depth'];names.append(record['path'] if record else None)
@@ -107,6 +111,8 @@ def evaluate(code,cfg,base,out,report):
             with Image.open(file) as im:raw=np.asarray(im)
             if raw.shape!=(480,640) or raw.dtype.kind not in 'iu':raise ValueError('Original registered uint16 depth required')
             truth[i]=raw.astype(np.float32)/5000
+        # This scores changes on the original RGB timeline after nearest-sensor
+        # association, not exact sensor-time velocity or material-flow TAE.
         dt=np.diff(arrays['timestamps'])
         if (dt<=0).any():raise ValueError('Original monotonic timestamps required')
         candidate_valid=np.isfinite(arrays['vda'])&(arrays['vda']>0)
@@ -116,7 +122,9 @@ def evaluate(code,cfg,base,out,report):
         rows.append(dict(sequence=seq['name'],metrics=scores,
             absrel_gain=1-scores['vda']['absrel']/scores['moge']['absrel'],
             temporal_gain=1-scores['vda']['temporal_eulerian_error_m_s']/scores['moge']['temporal_eulerian_error_m_s'],
-            synchronized_fraction=sum(x is not None for x in names)/len(names)))
+            synchronized_fraction=sum(x is not None for x in names)/len(names),
+            temporal_timestamps='original_RGB_deltas_with_nearest_registered_sensor_offsets_max20ms',
+            unique_sensor_frames=len(set(x for x in names if x is not None))))
     limits=cfg['gates'];gates=dict(
         median_absrel_gain=float(np.median([r['absrel_gain'] for r in rows]))>=limits['median_absrel_gain_min'],
         worst_absrel_nonregression=min(r['absrel_gain'] for r in rows)>=-limits['worst_sequence_absrel_regression_max'],
