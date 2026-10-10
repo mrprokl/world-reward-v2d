@@ -153,3 +153,47 @@ def test_receipt_atomic_readonly_collision(tmp_path):
     path = tmp_path/'receipt.json'; pin = f.seal(path, dict(stage='inventory'))
     assert f.identity(path, 1000) == pin and not path.stat().st_mode & 0o222
     with pytest.raises(ValueError, match='collision'): f.seal(path, {})
+
+
+def test_actual_first_profile_keeps_authenticated_archive_no_reference_decode(tmp_path, monkeypatch, capsys):
+    root = Path(__file__).resolve().parents[1]
+    protocol = json.loads((root/f.PROTOCOL).read_bytes()); row = protocol['cohort'][0]
+    source = tmp_path/'publisher.tar'
+    small = make_tar(source, [('unknown/front_camera.mp4', b'rgb'),
+                             ('hoi_metadata.yaml', b'object:\n  prompt: can\naction: lift\n'),
+                             ('mhr_params_mv.pt', b'opaque')])
+    row.update(archive_size=small['archive_size'], member_count=small['member_count'],
+               archive_sha256=hashlib.sha256(source.read_bytes()).hexdigest())
+    base = tmp_path/'data'; base.mkdir(); monkeypatch.setattr(f, 'DATA', base)
+    binding = dict(closure_sha256='c'*64)
+    monkeypatch.setattr(f, 'source_binding', lambda *args: (protocol, binding))
+    class Runtime:
+        @staticmethod
+        def source(*args): return binding
+    revision = 'a'*40
+    report = f.acquire(Runtime(), tmp_path, revision, 'inventory_first',
+                       opener=Opener([(source.read_bytes(),200,{})]))
+    out = base/f'inventory_first-{revision}'
+    assert report['status'] == 'pass' and report['reserved_acquired'] == 0
+    assert report['verified_first_archive_retained_for_qualification'] is True
+    assert report['reference_arrays_decoded'] is False and report['inference_ready'] is False
+    assert (out/row['sequence_id']/'source.tar').read_bytes() == source.read_bytes()
+    assert (out/row['sequence_id']/'receipt.json').exists() and (out/'report.json').exists()
+    assert not tuple((out/row['sequence_id']/'inputs').iterdir())
+    assert 'acquired_DEV' in capsys.readouterr().out
+
+
+def test_actual_first_profile_failure_seals_report_and_cleans_owned_only(tmp_path, monkeypatch):
+    root = Path(__file__).resolve().parents[1]
+    protocol = json.loads((root/f.PROTOCOL).read_bytes()); row = protocol['cohort'][0]
+    source = tmp_path/'publisher.tar'; small = make_tar(source, [('../unsafe', b'x')])
+    row.update(archive_size=small['archive_size'], member_count=1,
+               archive_sha256=hashlib.sha256(source.read_bytes()).hexdigest())
+    base = tmp_path/'data'; base.mkdir(); sentinel = base/'foreign.txt'; sentinel.write_text('preserve')
+    monkeypatch.setattr(f, 'DATA', base)
+    monkeypatch.setattr(f, 'source_binding', lambda *args: (protocol, dict(closure_sha256='c'*64)))
+    report = f.acquire(None, tmp_path, 'a'*40, 'inventory_first', opener=Opener([(source.read_bytes(),200,{})]))
+    assert report['status'] == 'fail' and report['owned_raw_archives_removed'] is True
+    assert report['error_type'] == 'ValueError' and sentinel.read_text() == 'preserve'
+    assert (base/f"inventory_first-{'a'*40}/report.json").exists()
+    assert not (base/f"inventory_first-{'a'*40}"/row['sequence_id']).exists()

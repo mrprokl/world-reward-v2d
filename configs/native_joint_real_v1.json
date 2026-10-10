@@ -1,0 +1,54 @@
+{
+  "schema": "world_reward.native_joint_real.v1",
+  "cohort": {
+    "random_seed": 20261008,
+    "population": 30,
+    "episodes": [
+      9,
+      1,
+      14,
+      7
+    ]
+  },
+  "supported_saved_material_bank_episodes": [
+    9
+  ],
+  "variants": [
+    "A_saved_native_baseline",
+    "B_native_joint_RGB_translation"
+  ],
+  "budget_seconds": 1800,
+  "num_steps": 300,
+  "batch_size": 0,
+  "decode_chunk": 16,
+  "optimizer_source_revision": "7c0d3b94ce97b28deb571b4e7fdfeb5b2158df80",
+  "optimizer_sha256": "84e0e818a3bc0935bb30b75fcd82fd7c5e3730ed812864594cd759697ddb406b",
+  "extension": {
+    "image_sigma_px": 5.0,
+    "object_image_weight": 1.0,
+    "human_image_weight": 1.0,
+    "human_translation_prior_weight": 10.0,
+    "human_translation_temporal_weight": 0.1,
+    "human_translation_lr": 0.0001,
+    "development_reference": "published_native10_0.1_lr1e-4_and_root_RGB5px_proposal_frozen_tiny_factor_DEV_not_HOI_calibration"
+  },
+  "published_coefficients_not_new_external_calibration": true,
+  "production_adopted": false,
+  "private_truth_read": false,
+  "depth_used": false,
+  "freeze_object_rotation": true,
+  "freeze_human_root_rotation": true,
+  "freeze_hand_pose": true,
+  "gates": {
+    "RGB_reprojection_ratio_maximum": 1.00000001,
+    "RGB_motion_increment_ratio_maximum": 1.00000001,
+    "reserved_human_RGB_ratio_maximum": 1.00000001,
+    "contact_gap_ratio_maximum": 1.00000001,
+    "object_acceleration_p95_ratio_maximum": 1.00000001,
+    "human_acceleration_p95_ratio_maximum": 1.00000001,
+    "scope": "conservative_automatic_observation_QA_not_heldout_HOI_accuracy"
+  },
+  "fallback_native_silhouette_contact_no_material_tracks_episodes": [
+    14
+  ]
+}
