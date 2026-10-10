@@ -106,3 +106,27 @@ independent authored moving/contact examples before challenge reads, then seal
 predictions before the unchanged image/contact/motion QA. This is not a physics
 or penetration guarantee. On failure retain the complete moving baseline, not
 static poses, per-frame output selection, or a claim of improvement.
+
+### Actual first constrained run and numerical repair
+
+Producer `eade1f81dcbef81740175d284cfa8c6202f8d5b8` completed both full clips in
+37.719807 seconds, exit 0, owned container absent. Aggregate 76167 bytes, SHA256
+`2b2a11e778308cffe887450a4f6ef41da0c8d3ed7ab0cda9d6e040f59d2c20bb`.
+Episode 9 accepted no update; episode 14 accepted one insignificant step after
+global trust contraction. **No substantive reconstruction improvement.**
+
+Diagnosis is numerical, not a proof of physical infeasibility: the QP allows
+1e-10 linearized violation while the final exact-surface bound is strict. Its
+restoration aims exactly at that bound. Actual episode 14 then repeatedly fails
+with positive residuals around 1e-13 after four restorations, causing trust
+contraction even though a meaningful step was proposed. Independent authored
+edge/vertex cases reproduce the same failure; the original planar-face DEV did
+not cover it.
+
+Repair the **inner linearization target**, not the acceptance bound: subtract
+twice the unchanged QP tolerance plus a floating-point coordinate-roundoff guard,
+capped by the already declared numeric slack. Keep the original A gap bound,
+all IDs, full original triangles, window, objective and strict final verification
+unchanged. This is a numerical consistency fix, not a looser contact criterion
+or challenge-based weight sweep. Re-run the same two clips only after the new
+edge/vertex numerical regression tests pass. No repair gain claimed yet.
