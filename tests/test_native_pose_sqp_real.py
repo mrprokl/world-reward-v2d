@@ -79,3 +79,40 @@ def test_runtime_primes_lazy_native_before_any_inference_decode_and_retains_trac
     assert "failure_traceback" in text and "traceback.extract_tb" in text
     adapter=(Path(__file__).parents[1]/'src/world_reward/native_pose_sqp_adapter.py').read_text()
     assert 'with torch.inference_mode(False),torch.enable_grad()' in adapter
+
+
+def test_explicit_queued_GPU_wait_bounded_same_inode_and_immutable_source():
+    wrapper=(Path(__file__).parents[1]/'infra/run_native_pose_sqp_real.sh').read_text()
+    assert '"$1" == --after-gpu-lock' in wrapper and 'flock -w 43200 8' in wrapper
+    assert 'else\n exec 8<"$LOCK"\n flock -n 8' in wrapper # legacy mode unchanged
+    assert 'os.fstat(8)' in wrapper and 'value.st_nlink!=1' in wrapper
+    assert '$(lock_identity fd)' in wrapper and '$(source_identity)' in wrapper
+    assert wrapper.index('flock -w 43200 8')<wrapper.index('903s docker run')
+    assert '! -e "$OUT" && ! -L "$OUT"' in wrapper
+    assert not any(x in wrapper for x in ('truncate -','systemctl restart','ExecMainStatus','Result=success'))
+
+
+def test_queued_lock_exact_existing_regular_singlelink_canonical_guard(tmp_path):
+    import subprocess
+    wrapper=(Path(__file__).parents[1]/'infra/run_native_pose_sqp_real.sh').read_text()
+    code=wrapper.split("<<'PYLOCK'\n",1)[1].split('\nPYLOCK',1)[0]
+    lock=tmp_path/'lock';lock.touch()
+    def guard(path):return subprocess.run([sys.executable,'-I','-B','-',str(path),'path'],input=code,text=True,capture_output=True)
+    expected=lock.stat();valid=guard(lock)
+    assert valid.returncode==0 and valid.stdout.strip()==f'{expected.st_dev}:{expected.st_ino}'
+    alias=tmp_path/'alias';alias.symlink_to(lock)
+    assert guard(alias).returncode!=0
+    alias.unlink();alias.hardlink_to(lock)
+    assert guard(lock).returncode!=0
+    assert guard(tmp_path).returncode!=0
+
+
+def test_queue_fd_inode_must_equal_path_not_replaced_lock(tmp_path):
+    import subprocess
+    wrapper=(Path(__file__).parents[1]/'infra/run_native_pose_sqp_real.sh').read_text()
+    code=wrapper.split("<<'PYLOCK'\n",1)[1].split('\nPYLOCK',1)[0]
+    lock=tmp_path/'lock';other=tmp_path/'other';lock.touch();other.touch()
+    shell='exec 8<"$1"; exec "$2" -I -B - "$3" fd'
+    def guard(opened):return subprocess.run(['bash','-c',shell,'guard',str(opened),sys.executable,str(lock)],input=code,text=True,capture_output=True)
+    assert guard(lock).returncode==0
+    assert guard(other).returncode!=0

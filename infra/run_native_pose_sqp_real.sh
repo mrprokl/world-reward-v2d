@@ -3,7 +3,9 @@
 set +x
 set -euo pipefail
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
-[[ $# -eq 0 ]] || exit 2
+WAIT_GPU=0
+if [[ $# -eq 1 && "$1" == --after-gpu-lock ]]; then WAIT_GPU=1
+elif [[ $# -ne 0 ]]; then exit 2; fi
 TRACK_SOURCE=09f516d9085f0d64d725b46b0ad6aa52fe7c0d84
 SOURCE=052ba1554e9a573d566713a99a61d89a5f27681c
 CONTACT_SOURCE=40183b3a83ba59080c192c3cdf2db9e1d76ef021
@@ -16,8 +18,45 @@ IMAGE=sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7
 OUT="$ROOT/results/native-pose-sqp-real-$REV"
 [[ ! -e "$OUT" ]] || exit 2
 # Exclusive original GPU lease; never truncate/mutate its contents.
-exec 8<"$ROOT/jobs/.world-reward-h100.lock"
-flock -n 8
+LOCK="$ROOT/jobs/.world-reward-h100.lock"
+lock_identity() {
+ env PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "$LOCK" "${1:-path}" <<'PYLOCK'
+from pathlib import Path
+import os,stat,sys
+path=Path(sys.argv[1])
+if not path.is_absolute()or path.resolve()!=path or any(p.is_symlink()for p in(path,*path.parents)):raise ValueError('Canonical existing cooperative lock required')
+value=path.lstat()
+if not stat.S_ISREG(value.st_mode)or value.st_nlink!=1:raise ValueError('Original single-link regular cooperative lock required')
+if sys.argv[2]=='fd':
+ actual=os.fstat(8)
+ if(actual.st_dev,actual.st_ino)!=(value.st_dev,value.st_ino):raise ValueError('Opened lock differs from canonical original inode')
+print(str(value.st_dev)+':'+str(value.st_ino))
+PYLOCK
+}
+source_identity() {
+ env PYTHONDONTWRITEBYTECODE=1 PYTHONPATH="$CODE/infra" python3 -B - "$ROOT" "$CODE" "$REV" <<'PYSOURCE'
+from pathlib import Path
+import sys
+from mediapipe_cpu_runtime_verify import source
+r=source(Path(sys.argv[1]),Path(sys.argv[2]),sys.argv[3],'run_native_pose_sqp_real',
+ ('infra/native_pose_sqp_real.py','infra/run_native_pose_sqp_real.sh',
+  'src/world_reward/native_pose_sqp.py','src/world_reward/native_pose_sqp_adapter.py'))
+print(r['closure_sha256'])
+PYSOURCE
+}
+if (( WAIT_GPU )); then
+ SOURCE_BEFORE="$(source_identity)"; LOCK_BEFORE="$(lock_identity)"
+ exec 8<"$LOCK"
+ [[ "$(lock_identity fd)" == "$LOCK_BEFORE" ]] || exit 2
+ # Bounded kernel wait; this scheduling time is outside the unchanged903s
+ # compute clock. Acquiring a lease never means prior unit/quality PASS.
+ flock -w 43200 8
+ [[ "$(lock_identity fd)" == "$LOCK_BEFORE" && "$(source_identity)" == "$SOURCE_BEFORE" \
+  && ! -e "$OUT" && ! -L "$OUT" ]] || exit 2
+else
+ exec 8<"$LOCK"
+ flock -n 8
+fi
 [[ -z "$(nvidia-smi --query-compute-apps=pid --format=csv,noheader)" ]] || exit 2
 mkdir -m 755 "$OUT"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
