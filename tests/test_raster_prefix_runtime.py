@@ -1,9 +1,7 @@
 """No services/CUDA; exact patch, native-prefix proof and build isolation."""
 import importlib.util
-import io
 from pathlib import Path
 import sys
-import tarfile
 
 import numpy as np
 import pytest
@@ -62,28 +60,88 @@ def test_manifest_rejects_wrong_revision_or_unverified_closure():
     with pytest.raises(ValueError): module.source_manifest(dict(sha=module.REVISION, truncated=False, tree=[]))
 
 
-def archive_for(name, raw, *, symlink=False):
-    stream = io.BytesIO()
-    with tarfile.open(fileobj=stream, mode='w:gz') as tar:
-        item = tarfile.TarInfo('pytorch3d-'+module.REVISION+'/'+name)
-        if symlink: item.type = tarfile.SYMTYPE; item.linkname = '/etc/passwd'; tar.addfile(item)
-        else: item.size = len(raw); tar.addfile(item, io.BytesIO(raw))
-    return stream.getvalue()
-
-
-def test_exact_selected_gitblob_only_no_tar_extract(tmp_path):
+def blob_row(name, raw):
     import hashlib
-    raw = b'public source only'; name = 'setup.py'
-    rows = [dict(path=name, bytes=len(raw), git_blob_sha=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest())]
-    module.extract_selected(archive_for(name, raw), rows, tmp_path)
-    assert (tmp_path/name).read_bytes() == raw and not (tmp_path/name).stat().st_mode & 0o222
+    return dict(path=name, bytes=len(raw),
+        git_blob_sha=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest())
 
 
-@pytest.mark.parametrize('bad', ['symlink', 'hash', 'path'])
-def test_changed_or_unsafe_selected_archive_member_rejected(tmp_path, bad):
-    rows = [dict(path='setup.py', bytes=3, git_blob_sha='0'*40)]
-    raw = archive_for('../escape' if bad == 'path' else 'setup.py', b'abc', symlink=bad == 'symlink')
-    with pytest.raises(ValueError): module.extract_selected(raw, rows, tmp_path)
+def test_exact_concurrent_selected_gitblob_only_verified_before_write(monkeypatch, tmp_path):
+    import threading
+    calls = []; lock = threading.Lock()
+    sources = {'setup.py': b'public build', 'LICENSE': b'public BSD', 'pytorch3d/csrc/x.cu': b'public code'}
+    def fake(url, limit, *, deadline):
+        name = url.split(module.REVISION+'/')[1]
+        with lock: calls.append((name, limit, deadline))
+        return sources[name]
+    monkeypatch.setattr(module, 'acquire', fake)
+    rows = [blob_row(name, raw) for name, raw in sources.items()]
+    report = module.acquire_selected(rows, tmp_path)
+    assert report['files'] == 3 and report['concurrent_requests'] == 8
+    assert report['publisher_archive_downloaded'] is False
+    assert {c[0] for c in calls} == set(sources)
+    for name, raw in sources.items():
+        assert (tmp_path/name).read_bytes() == raw
+        assert not (tmp_path/name).stat().st_mode & 0o222
+
+
+@pytest.mark.parametrize('bad', ['hash', 'path', 'size', 'duplicate'])
+def test_changed_or_unsafe_raw_blob_rejected_before_write(monkeypatch, tmp_path, bad):
+    row = blob_row('setup.py', b'abc'); rows = [row]
+    if bad == 'hash': row['git_blob_sha'] = '0'*40
+    if bad == 'path': row['path'] = '../escape'
+    if bad == 'size': row['bytes'] = 2
+    if bad == 'duplicate': rows.append(dict(row))
+    monkeypatch.setattr(module, 'acquire', lambda *a, **kw: b'abc')
+    with pytest.raises(ValueError): module.acquire_selected(rows, tmp_path)
+    assert not (tmp_path/'setup.py').exists()
+
+
+@pytest.mark.parametrize('url', [
+    'https://codeload.github.com/facebookresearch/pytorch3d/tar.gz/'+module.REVISION,
+    'https://raw.githubusercontent.com/facebookresearch/pytorch3d/'+module.REVISION+'/tests/a.py',
+    'https://raw.githubusercontent.com/facebookresearch/pytorch3d/'+module.REVISION+'/pytorch3d/csrc/../data',
+    'https://example.org/setup.py',
+])
+def test_nonprimary_media_archive_or_path_traversal_rejected_without_network(url):
+    with pytest.raises(ValueError): module.acquire(url, 100)
+
+
+def test_only_transient_network_response_retried(monkeypatch):
+    import urllib.error
+    calls = []
+    class Response:
+        def __enter__(self): return self
+        def __exit__(self, *_): pass
+        def read(self, n): assert n == 4; return b'abc'
+    class Opener:
+        def open(self, request, timeout):
+            calls.append(timeout)
+            if len(calls) < 3: raise urllib.error.HTTPError(request.full_url, 503, 'busy', {}, None)
+            return Response()
+    monkeypatch.setattr(module.urllib.request, 'build_opener', lambda *_: Opener())
+    monkeypatch.setattr(module.time, 'sleep', lambda *_: None)
+    assert module.acquire('https://raw.githubusercontent.com/facebookresearch/pytorch3d/'+module.REVISION+'/setup.py', 3) == b'abc'
+    assert len(calls) == 3
+
+
+@pytest.mark.parametrize('mode', ['404', 'oversize'])
+def test_hard_http_or_wrong_bound_not_retried(monkeypatch, mode):
+    import urllib.error
+    calls = []
+    class Response:
+        def __enter__(self): return self
+        def __exit__(self, *_): pass
+        def read(self, n): return b'abcd'
+    class Opener:
+        def open(self, request, timeout):
+            calls.append(timeout)
+            if mode == '404': raise urllib.error.HTTPError(request.full_url, 404, 'absent', {}, None)
+            return Response()
+    monkeypatch.setattr(module.urllib.request, 'build_opener', lambda *_: Opener())
+    with pytest.raises((ValueError, urllib.error.HTTPError)):
+        module.acquire('https://raw.githubusercontent.com/facebookresearch/pytorch3d/'+module.REVISION+'/setup.py', 3)
+    assert len(calls) == 1
 
 
 def test_wrapper_has_shared_owned_gpu_lease_durable_budget_and_no_service_calls():

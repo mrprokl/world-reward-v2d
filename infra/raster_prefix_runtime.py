@@ -14,10 +14,13 @@ geometry, projected vertices, resolution, evidence or model outputs. Not adopted
 from __future__ import annotations
 
 import argparse
+import errno
+import ssl
 import hashlib
 import importlib
 import importlib.util
-import io
+import concurrent.futures
+import http.client
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -25,9 +28,10 @@ import re
 import shutil
 import subprocess
 import sys
-import tarfile
+import socket
 import time
 import types
+import urllib.error
 import urllib.request
 
 from mediapipe_cpu_runtime_verify import canonical, identity, require, source, strict
@@ -72,38 +76,78 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, *_a, **_kw): raise ValueError('Primary source redirect forbidden')
 
 
-def acquire(url, limit):
-    require(url in (f'https://api.github.com/repos/facebookresearch/pytorch3d/git/trees/{REVISION}?recursive=1',
-                     f'https://codeload.github.com/facebookresearch/pytorch3d/tar.gz/{REVISION}'),
-            'Exact primary pinned public source endpoints only')
-    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
-    with opener.open(urllib.request.Request(url, headers={'User-Agent': 'WorldReward-source-audit'}), timeout=120) as f:
-        raw = f.read(limit+1)
-    require(len(raw) <= limit, 'Pinned code acquisition exceeds bound')
-    return raw
+def acquire(url, limit, *, deadline=None):
+    """Bounded primary-source GET; retry only transient transport/server errors."""
+    tree_url = f'https://api.github.com/repos/facebookresearch/pytorch3d/git/trees/{REVISION}?recursive=1'
+    prefix = f'https://raw.githubusercontent.com/facebookresearch/pytorch3d/{REVISION}/'
+    suffix = url[len(prefix):] if url.startswith(prefix) else ''
+    require(url == tree_url or (re.fullmatch(r'[A-Za-z0-9_./-]+', suffix) and
+        '..' not in PurePosixPath(suffix).parts and not PurePosixPath(suffix).is_absolute() and
+        (suffix.startswith('pytorch3d/csrc/') or suffix in ('setup.py', 'LICENSE', 'pytorch3d/__init__.py'))),
+        'Exact primary pinned source-only endpoints required; no archives/data/redirects')
+    require(type(limit) is int and 0 < limit <= 2 << 20, 'Per-file source bound required')
+    deadline = time.monotonic()+60 if deadline is None else deadline
+    for attempt in range(3):
+        remaining = deadline-time.monotonic()
+        require(remaining > 0, 'Inclusive pinned source acquisition deadline exceeded')
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
+        try:
+            with opener.open(urllib.request.Request(url, headers={'User-Agent': 'WorldReward-source-audit'}),
+                             timeout=min(20., remaining)) as f:
+                raw = f.read(limit+1)
+            require(len(raw) <= limit, 'Pinned primary source exceeds exact per-file bound')
+            return raw
+        except urllib.error.HTTPError as error:
+            if error.code not in (408, 429, 500, 502, 503, 504): raise
+        except urllib.error.URLError as error:
+            reason = error.reason
+            transient = isinstance(reason, (TimeoutError, socket.timeout, ConnectionError, ssl.SSLEOFError)) or (
+                isinstance(reason, OSError) and reason.errno in (errno.ECONNRESET, errno.ECONNABORTED,
+                    errno.ETIMEDOUT, errno.EPIPE, errno.EHOSTUNREACH, socket.EAI_AGAIN))
+            if not transient: raise
+        except (TimeoutError, socket.timeout, ConnectionError, http.client.IncompleteRead):
+            pass
+        if attempt == 2: raise ValueError('Transient primary source acquisition exhausted three bounded attempts')
+        delay = min(float(attempt+1), max(0., deadline-time.monotonic()))
+        time.sleep(delay)
+    raise AssertionError('unreachable')
 
 
-def extract_selected(raw, rows, destination):
-    """No tar.extract: exact selected regular blobs only; verify git blob SHA1."""
-    expected = {x['path']: x for x in rows}; found = set()
-    prefix = 'pytorch3d-' + REVISION + '/'
-    with tarfile.open(fileobj=io.BytesIO(raw), mode='r:gz') as archive:
-        for item in archive:
-            if item.name == prefix[:-1] and item.isdir(): continue
-            require(item.name.startswith(prefix) and not PurePosixPath(item.name).is_absolute()
-                and '..' not in PurePosixPath(item.name).parts, 'Safe pinned publisher archive paths required')
-            name = item.name[len(prefix):]
-            if name not in expected: continue  # Never unpack tests, data, media or unrelated source.
-            row = expected[name]
-            require(item.isfile() and not item.issym() and not item.islnk() and name not in found
-                    and item.size == row['bytes'], 'Exact unique regular source blob required')
-            raw_file = archive.extractfile(item).read(item.size+1)
-            git_sha = hashlib.sha1(b'blob '+str(len(raw_file)).encode()+b'\0'+raw_file).hexdigest()
-            require(len(raw_file) == row['bytes'] and git_sha == row['git_blob_sha'], 'Exact publisher git blob differs')
-            path = destination/name; path.parent.mkdir(parents=True, exist_ok=True)
-            with path.open('xb') as f: f.write(raw_file); os.fchmod(f.fileno(), 0o400)
-            found.add(name)
-    require(found == set(expected), 'Complete native C++/CUDA header/source closure required')
+def acquire_selected(rows, destination, *, seconds=300):
+    """Eight parallel exact tiny blobs; verify git SHA before exclusive write."""
+    expected = {row['path']: row for row in rows}
+    require(len(expected) == len(rows) and sum(x['bytes'] for x in rows) <= 919588,
+        'Unique bounded source-only closure required')
+    for name, row in expected.items():
+        require(re.fullmatch(r'[A-Za-z0-9_./-]+', name) and '..' not in PurePosixPath(name).parts
+            and not PurePosixPath(name).is_absolute() and
+            (name.startswith('pytorch3d/csrc/') or name in ('setup.py', 'LICENSE', 'pytorch3d/__init__.py'))
+            and type(row['bytes']) is int and 0 < row['bytes'] <= 2 << 20
+            and re.fullmatch('[0-9a-f]{40}', row['git_blob_sha']), 'Safe exact publisher source blob required')
+    deadline = time.monotonic()+seconds
+    def fetch(row):
+        raw = acquire(f'https://raw.githubusercontent.com/facebookresearch/pytorch3d/{REVISION}/'+row['path'],
+                      row['bytes'], deadline=deadline)
+        git_sha = hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
+        require(len(raw) == row['bytes'] and git_sha == row['git_blob_sha'], 'Exact publisher git blob differs; never retry changed bytes')
+        return row['path'], raw
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+        pending = [pool.submit(fetch, row) for row in rows]
+        try:
+            for future in concurrent.futures.as_completed(pending, timeout=seconds):
+                name, raw = future.result()
+                require(time.monotonic() < deadline, 'Inclusive source acquisition deadline exceeded')
+                path = destination/name; path.parent.mkdir(parents=True, exist_ok=True)
+                require(canonical(path) == path, 'No symlink in owned source destination')
+                with path.open('xb') as f:
+                    f.write(raw); f.flush(); os.fsync(f.fileno()); os.fchmod(f.fileno(), 0o400)
+        except BaseException:
+            for future in pending: future.cancel()
+            raise
+    return dict(files=len(rows), bytes=sum(x['bytes'] for x in rows), concurrent_requests=8,
+        per_request_max_attempts=3, retry_scope='transient_transport_HTTP408_429_5xx_only',
+        source_blob_git_sha1_verified=True, publisher_archive_downloaded=False,
+        elapsed_seconds=time.monotonic()-(deadline-seconds))
 
 
 def seal(path, value):
@@ -306,8 +350,7 @@ def build(code, revision):
         report['preflight'] = strict(probe)
         context.mkdir(mode=0o700); src = context/'source'; src.mkdir(mode=0o700)
         rows = source_manifest(strict(acquire(f'https://api.github.com/repos/facebookresearch/pytorch3d/git/trees/{REVISION}?recursive=1', 2 << 20)))
-        raw = acquire(f'https://codeload.github.com/facebookresearch/pytorch3d/tar.gz/{REVISION}', 20 << 20)
-        extract_selected(raw, rows, src)
+        report['source_acquisition'] = acquire_selected(rows, src)
         patch = src/PATCH_PATH; changed = patch_source(patch.read_bytes())
         patch.chmod(0o600); patch.write_bytes(changed); patch.chmod(0o400)
         report['publisher_source'] = dict(revision=REVISION, manifest_sha256=MANIFEST_SHA256,
@@ -366,7 +409,7 @@ def build(code, revision):
         raise
     finally:
         # Retain concise source/license identities and Azure-only failure logs.
-        # Do not retain the discarded full publisher archive or build workspace.
+        # No publisher archive is fetched; remove the owned build workspace.
         if context.exists(): shutil.rmtree(context)
         report['elapsed_seconds'] = time.monotonic()-started
         seal(out/'report.json', report)
