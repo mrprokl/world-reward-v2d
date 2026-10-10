@@ -19,6 +19,8 @@ import full4d_stream as base
 
 SCHEMA = 'world_reward.end2end_preview_publication.v1'
 CONTINUATION_SCHEMA = 'world_reward.end2end_preview_publication.v2'
+SQP_SCHEMA = 'world_reward.end2end_preview_publication.v3'
+SQP_STATUSES = {'accepted_native_pose_sqp', 'dynamic_A_fallback_no_improvement'}
 CONTINUATION_STATUSES = {'accepted_native_continuation', 'dynamic_A_fallback_no_improvement'}
 BASELINE = '052ba1554e9a573d566713a99a61d89a5f27681c'
 COHORT, COMPLETE = [9, 1, 14, 7], [9, 14]
@@ -49,13 +51,15 @@ def records(receipt, producer_revision, *, render_revision=None, candidate_revis
               'endpoint', 'private_container_verified', 'public_access_changed', 'account_keys_used',
               'quality_verified', 'heavy_data_uploaded'}
     continuation = type(receipt) is dict and receipt.get('schema') == CONTINUATION_SCHEMA
-    if continuation: fields.add('candidate_kind')
-    kind = 'continuation' if continuation else 'joint'
-    require(candidate_kind is None or candidate_kind in ('joint', 'continuation'), 'Explicit valid candidate kind required')
+    sqp = type(receipt) is dict and receipt.get('schema') == SQP_SCHEMA
+    native = continuation or sqp
+    if native: fields.add('candidate_kind')
+    kind = 'sqp' if sqp else 'continuation' if continuation else 'joint'
+    require(candidate_kind is None or candidate_kind in ('joint', 'continuation', 'sqp'), 'Explicit valid candidate kind required')
     require(candidate_kind is None or kind == candidate_kind, 'Pinned preview method differs')
     require(type(receipt) is dict and set(receipt) == fields
-            and receipt['schema'] == (CONTINUATION_SCHEMA if continuation else SCHEMA)
-            and (not continuation or receipt['candidate_kind'] == 'continuation')
+            and receipt['schema'] == (SQP_SCHEMA if sqp else CONTINUATION_SCHEMA if continuation else SCHEMA)
+            and (not native or receipt['candidate_kind'] == kind)
             and receipt['status'] == 'pass' and receipt['producer_revision'] == producer_revision
             and receipt['baseline_revision'] == BASELINE and receipt['endpoint'] == base.ENDPOINT
             and receipt['private_container_verified'] is True and receipt['public_access_changed'] is False
@@ -85,9 +89,9 @@ def records(receipt, producer_revision, *, render_revision=None, candidate_revis
         require(type(row) is dict and type(row.get('episode')) is int and row['episode'] == ep,
                 'Original cohort order required')
         if ep in COMPLETE:
-            require(set(row) == ({'episode', 'status', 'QA_passed', 'candidate_status'} if continuation else
+            require(set(row) == ({'episode', 'status', 'QA_passed', 'candidate_status'} if native else
                                 {'episode', 'status', 'QA_passed'}) and row['status'] == 'complete'
-                    and (not continuation or row['candidate_status'] in CONTINUATION_STATUSES)
+                    and (not native or row['candidate_status'] in (SQP_STATUSES if sqp else CONTINUATION_STATUSES))
                     and type(row['QA_passed']) is bool, 'Both completed candidates, including QA failures, required')
         else:
             require(row.get('status') in {'failed', 'not_reconstructed_in_this_ablation'}
@@ -143,6 +147,7 @@ def index_html(states):
         if row['status'] == 'complete':
             qa = 'QA PASS — GT pending' if row['QA_passed'] else 'QA FAIL — not adopted'
             title = ('Baseline fallback / no gain' if row.get('candidate_status') == 'dynamic_A_fallback_no_improvement'
+                else 'C sparse pose-SQP — '+qa if row.get('candidate_status') == 'accepted_native_pose_sqp'
                 else 'C contact-continuation — '+qa if row.get('candidate_status') == 'accepted_native_continuation'
                 else 'Native joint — '+qa)
             content = ('<div class="columns"><span>Original RGB</span><span>Baseline complete (052)</span>'
@@ -197,7 +202,7 @@ def main():
     parser.add_argument('--revision', required=True)
     parser.add_argument('--render-revision', required=True)
     parser.add_argument('--candidate-revision', required=True)
-    parser.add_argument('--candidate-kind', choices=('joint', 'continuation'), default='joint')
+    parser.add_argument('--candidate-kind', choices=('joint', 'continuation', 'sqp'), default='joint')
     parser.add_argument('--ttl', type=int, default=base.MAX_TTL)
     args = parser.parse_args()
     require(60 <= args.ttl <= base.MAX_TTL, 'Viewer TTL must be between60and3600seconds')

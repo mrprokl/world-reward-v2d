@@ -25,9 +25,15 @@ HELPERS = ('infra/end2end_preview.py', 'infra/run_end2end_preview.sh',
     'infra/mediapipe_cpu_runtime_verify.py')
 FILES = {'target': 'target.npy', 'trajectory': 'trajectory.npz',
          'native_parameters': 'native_parameters.npz'}
-KINDS = {'joint': 'native-joint-real-', 'continuation': 'native-contact-continuation-real-'}
+KINDS = {'joint': 'native-joint-real-', 'continuation': 'native-contact-continuation-real-', 'sqp': 'native-pose-sqp-real-'}
 CONTINUATION_ENTRY = 'run_native_contact_continuation_real'
 CONTINUATION_STATUSES = {'accepted_native_continuation', 'dynamic_A_fallback_no_improvement'}
+SQP_STATUSES = {'accepted_native_pose_sqp', 'dynamic_A_fallback_no_improvement'}
+NATIVE_METHODS = {
+    'continuation': (CONTINUATION_ENTRY, 'world_reward.native_contact_continuation_real.v1',
+        'complete_native_continuation_diagnostic', CONTINUATION_STATUSES, 'native_contact_continuation'),
+    'sqp': ('run_native_pose_sqp_real', 'world_reward.native_pose_sqp_real.v1',
+        'complete_native_pose_sqp_diagnostic', SQP_STATUSES, 'native_pose_sqp')}
 FROZEN_NATIVE_KEYS = ('mhr_global_rot6d', 'mhr_shape', 'mhr_scale', 'mhr_hand', 'mhr_face')
 DISPLAY_TRAJECTORY_KEYS = ('object_vertices', 'object_faces', 'object_rotation',
     'object_translation', 'object_scale', 'camera_K', 'frame_index')
@@ -39,7 +45,7 @@ def revision(value):
 
 
 def candidate_kind(value):
-    require(type(value) is str and value in KINDS, 'Explicit joint or continuation candidate required')
+    require(type(value) is str and value in KINDS, 'Explicit joint, continuation or sqp candidate required')
     return value
 
 
@@ -57,43 +63,45 @@ def display_trajectory(trajectory):
 def labels(episode, accepted, kind='joint', status=None):
     candidate_kind(kind)
     title = 'Native joint — QA ' + ('PASS, GT pending' if accepted else 'FAIL / not adopted')
-    if kind == 'continuation':
-        require(status in CONTINUATION_STATUSES, 'Original native continuation outcome required')
+    if kind in NATIVE_METHODS:
+        require(status in NATIVE_METHODS[kind][3], 'Original native method outcome required')
         title = ('Baseline fallback / no gain' if status == 'dynamic_A_fallback_no_improvement' else
-                 'C contact-continuation — QA ' + ('PASS, GT pending' if accepted else 'FAIL / not adopted'))
+                 ('C sparse pose-SQP' if kind == 'sqp' else 'C contact-continuation') +
+                 ' — QA ' + ('PASS, GT pending' if accepted else 'FAIL / not adopted'))
     return ['Original RGB', 'Baseline complete (052)',
             title]
 
 
-def continuation_cohort(ledger, candidate_root, candidate_revision):
+def native_cohort(ledger, candidate_root, candidate_revision, kind):
     """Authenticate the complete native producer and all four retained statuses."""
+    entry, schema, status, outcomes, module = NATIVE_METHODS[kind]
     path = candidate_root/'report.json'; identity(path, 4<<20)
     r = strict(ledger.read(path, maximum=4<<20))
-    require(r.get('schema') == 'world_reward.native_contact_continuation_real.v1'
-        and r.get('status') == 'complete_native_continuation_diagnostic'
+    require(r.get('schema') == schema
+        and r.get('status') == status
         and r.get('producer_revision') == candidate_revision and r.get('source_inputs_rehashed') is True
         and r.get('unexpected_failures') == 0 and r.get('native_layers_loaded') == 1
         and r.get('ground_truth_used') is False and r.get('private_truth_read') is False
         and r.get('baseline_modified') is False and r.get('production_adopted') is False
         and r.get('cohort') == dict(random_seed=20261008, population=30, episodes=COHORT),
-        'Complete sealed no-GT native continuation cohort required')
+        'Complete sealed no-GT native cohort required')
     rows = r.get('episodes', [])
     require(type(rows) is list and all(type(v) is dict for v in rows)
         and [v.get('episode') for v in rows] == COHORT,
-        'All original continuation statuses required')
+        'All original native cohort statuses required')
     for row in rows:
-        require(row.get('status') in (CONTINUATION_STATUSES if row['episode'] in (9,14) else
-            {'unsupported_original_frontend_unchanged'}), 'No failed/sampled continuation records')
+        require(row.get('status') in (outcomes if row['episode'] in (9,14) else
+            {'unsupported_original_frontend_unchanged'}), 'No failed/sampled native cohort records')
         if row['episode'] in (1,7):
             require(row.get('baseline_retained') is True and row.get('rerolled') is False
                 and row.get('fabricated_predictions') is False and type(row.get('reason')) is str,
                 'Unsupported records retain original baseline without reroll')
-    oldcode = ROOT/'jobs'/candidate_revision/CONTINUATION_ENTRY/'code'
+    oldcode = ROOT/'jobs'/candidate_revision/entry/'code'
     binding = r['source_binding']; helpers = binding.get('helpers', {})
-    require({'infra/native_contact_continuation_real.py', 'infra/run_native_contact_continuation_real.sh',
-        'src/world_reward/native_contact_continuation.py'} <= set(helpers)
-        and source(ROOT, oldcode, candidate_revision, CONTINUATION_ENTRY, tuple(helpers)) == binding,
-        'Original immutable native continuation source binding required')
+    require({f'infra/{module}_real.py', f'infra/run_{module}_real.sh',
+        f'src/world_reward/{module}.py'} <= set(helpers)
+        and source(ROOT, oldcode, candidate_revision, entry, tuple(helpers)) == binding,
+        'Original immutable native method source binding required')
     host = candidate_root/'host-exit.json'; identity(host, 4096)
     exit_receipt = strict(ledger.read(host, maximum=4096))
     require(exit_receipt == dict(producer_revision=candidate_revision, container_absence_verified=True,
@@ -102,12 +110,17 @@ def continuation_cohort(ledger, candidate_root, candidate_revision):
     return r
 
 
+def continuation_cohort(ledger, candidate_root, candidate_revision):
+    return native_cohort(ledger, candidate_root, candidate_revision, 'continuation')
+
+
 def complete_candidate(r, kind, total):
     """Method-specific completion gates; historical joint ABI remains unchanged."""
     if kind == 'joint':
         require(r.get('native_effective_updates') == 301 and r.get('fitted_outputs_sealed_before_QA') is True
             and r.get('source_inputs_rehashed') is True, 'Complete sealed native candidate required')
         return r['decision']['passed']
+    if kind == 'sqp': return complete_sqp(r, total)
     require(r.get('status') in CONTINUATION_STATUSES
         and r.get('fitted_outputs_sealed_before_final_QA') is True
         and r.get('full_original_frames') == total and r.get('source_fps') == 30.
@@ -124,6 +137,39 @@ def complete_candidate(r, kind, total):
               and 0 < c['alpha'] <= 1)), 'Original truthful continuation/fallback outcome required')
     require(type(r.get('decision', {}).get('C_vs_A', {}).get('passed')) is bool,
         'Actual final C versus original A QA decision required')
+    return r['decision']['C_vs_A']['passed']
+
+
+def complete_sqp(r, total):
+    """Validate actual full-native result, never infer gain from QA or fallback."""
+    require(r.get('status') in SQP_STATUSES and r.get('fitted_outputs_sealed_before_final_QA') is True
+        and r.get('full_original_frames') == total and r.get('source_fps') == 30.
+        and r.get('native_direct136_generated') is True and r.get('stale_B_pose_used') is False
+        and r.get('whole_hand_minimum_claimed') is False and r.get('penetration_evaluated') is False
+        and r.get('physical_contact_verified') is False and r.get('hand_labeled_test') is False
+        and r.get('oracle_modes') == [] and r.get('original_raw_bundle_byte_fingerprint_unchanged') is True,
+        'Complete sealed no-GT full-native sparse SQP required')
+    c=r.get('SQP',{}); protocol=r.get('native_objective_protocol',{})
+    before,after=c.get('objective_before'),c.get('objective_after');steps=c.get('accepted_steps')
+    require(c.get('schema') == 'world_reward.native_pose_sqp.v1' and c.get('status') == r['status']
+        and c.get('full_original_frames') == total and c.get('ground_truth_used') is False
+        and c.get('private_truth_read') is False and c.get('heldout_accuracy_verified') is False
+        and c.get('whole_hand_minimum_claimed') is False and c.get('physical_contact_verified') is False
+        and c.get('production_adopted') is False and c.get('baseline_fallback_dynamic') is True
+        and type(steps) is int and 0 <= steps <= 20
+        and type(before) in (int,float) and type(after) in (int,float) and 0 <= after <= before
+        and ((r['status'] == 'accepted_native_pose_sqp' and steps > 0 and after < before) or
+             (r['status'] == 'dynamic_A_fallback_no_improvement' and steps == 0 and after == before))
+        and protocol.get('objective_stage') == 181 and protocol.get('scheduled_PEN_and_silhouette_retained') is True
+        and protocol.get('raw_priors_rebased_on_baseline_or_candidate') is False,
+        'Truthful original sparse native objective/fallback outcome required')
+    require(protocol.get('source_binding',{}).get('layer') == dict(bytes=20514,
+        sha256='a753ab8e730b6730fca275384fab629859311983292a407390d88c66ffe68c23')
+        and protocol.get('source_binding',{}).get('optimizer') == dict(bytes=92824,
+        sha256='84e0e818a3bc0935bb30b75fcd82fd7c5e3730ed812864594cd759697ddb406b'),
+        'Published original native decoder/objective source pins required')
+    require(type(r.get('decision',{}).get('C_vs_A',{}).get('passed')) is bool,
+        'Actual final SQP versus original A QA decision required')
     return r['decision']['C_vs_A']['passed']
 
 
@@ -153,12 +199,12 @@ def render(candidate_revision, kind='joint'):
     ledger = ArtifactLedger(); reports = []; states = []
     base = ROOT/'experiments'/('full4d-v1-'+BASELINE)
     candidate_root = ROOT/'results'/(KINDS[kind]+candidate_revision)
-    cohort = continuation_cohort(ledger, candidate_root, candidate_revision) if kind == 'continuation' else None
+    cohort = native_cohort(ledger, candidate_root, candidate_revision, kind) if kind in NATIVE_METHODS else None
     cohort_rows = {r['episode']: r for r in cohort['episodes']} if cohort else {}
     for ep in COHORT:
         candidate = candidate_root/f'episode_{ep:06d}'
         report_path = candidate/'report.json'
-        if kind == 'continuation' and ep in (1,7):
+        if cohort and ep in (1,7):
             states.append(dict(episode=ep, status='not_reconstructed_in_this_ablation',
                 reason=cohort_rows[ep]['reason']))
             continue
@@ -166,12 +212,12 @@ def render(candidate_revision, kind='joint'):
             states.append(dict(episode=ep, status='not_reconstructed_in_this_ablation',
                 reason='upstream full-pose unsupported' if ep in (1,7) else 'candidate missing'))
             continue
-        if kind == 'continuation': identity(report_path, 4<<20)
+        if cohort: identity(report_path, 4<<20)
         r = strict(ledger.read(report_path, cohort_rows[ep]['report'] if cohort else None, maximum=4<<20))
         require(r['producer_revision'] == candidate_revision and r['episode'] == ep
                 and r['ground_truth_used'] is False and r['private_truth_read'] is False
                 and r['baseline_modified'] is False, 'Automatic no-GT candidate provenance required')
-        if r.get('status') not in (CONTINUATION_STATUSES if cohort else {'complete_diagnostic_not_quality_pass'}):
+        if r.get('status') not in (NATIVE_METHODS[kind][3] if cohort else {'complete_diagnostic_not_quality_pass'}):
             states.append(dict(episode=ep, status='failed', phase=r.get('phase'),
                 reason=r.get('error', 'no complete candidate geometry')))
             continue
@@ -191,6 +237,15 @@ def render(candidate_revision, kind='joint'):
         require(r['baseline_binding']['outputs'] == pins['export_files'], 'Same frozen baseline required')
         if cohort:
             require(r['baseline_binding']['directory'] == str(directory), 'Same original baseline route required')
+            if kind == 'sqp':
+                geometry=candidate/'geometry.json'; identity(geometry,4<<20)
+                sealed=strict(ledger.read(geometry,maximum=4<<20))
+                require(sealed.get('candidate_outputs') == r['candidate_outputs']
+                    and sealed.get('producer_revision') == candidate_revision and sealed.get('episode') == ep
+                    and sealed.get('baseline_binding') == r['baseline_binding'] and sealed.get('SQP') == r['SQP']
+                    and sealed.get('ground_truth_used') is False and sealed.get('private_truth_read') is False
+                    and sealed.get('fitted_outputs_sealed_before_final_QA') is True,
+                    'Original SQP geometry receipt sealed before final QA required')
             witness = candidate/'QA_witnesses.npz'; identity(witness, 2<<20)
             ledger.record(witness, r['candidate_outputs']['frozen_witnesses'])
             with np.load(witness, allow_pickle=False) as qa:
@@ -305,7 +360,7 @@ def render(candidate_revision, kind='joint'):
         candidate_revision=candidate_revision,baseline_revision=BASELINE,cohort=COHORT,states=states,
         source_binding=binding,sources=ledger.records,reports=reports,quality_verified=False,
         source_rehashed_after=True,heavy_media_local=False,elapsed_seconds=time.monotonic()-started)
-    if cohort: result.update(schema='world_reward.end2end_preview.v2', candidate_kind=kind)
+    if cohort: result.update(schema='world_reward.end2end_preview.v3' if kind == 'sqp' else 'world_reward.end2end_preview.v2', candidate_kind=kind)
     path=output/'render.json'
     with path.open('xb') as stream: stream.write((json.dumps(result,sort_keys=True,allow_nan=False)+'\n').encode())
     path.chmod(0o444)
@@ -322,7 +377,8 @@ def publish(render_revision, kind='joint'):
         'Actual complete non-quality render required')
     require((kind == 'joint' and rendered.get('schema') == 'world_reward.end2end_preview.v1'
             and 'candidate_kind' not in rendered) or
-        (kind == 'continuation' and rendered.get('schema') == 'world_reward.end2end_preview.v2'
+        (kind in NATIVE_METHODS and rendered.get('schema') ==
+            ('world_reward.end2end_preview.v3' if kind == 'sqp' else 'world_reward.end2end_preview.v2')
             and rendered.get('candidate_kind') == kind), 'Explicit method matches original render receipt')
     client=PrivatePreviews();client.require_private();files=[]
     for row in rendered['reports']:
@@ -337,8 +393,8 @@ def publish(render_revision, kind='joint'):
         source_binding=binding,endpoint='https://stworldrewardresearch26.blob.core.windows.net/qa-previews',
         private_container_verified=True,public_access_changed=False,account_keys_used=False,
         quality_verified=False,heavy_data_uploaded=False)
-    if kind == 'continuation':
-        receipt.update(schema='world_reward.end2end_preview_publication.v2', candidate_kind=kind)
+    if kind in NATIVE_METHODS:
+        receipt.update(schema='world_reward.end2end_preview_publication.v3' if kind == 'sqp' else 'world_reward.end2end_preview_publication.v2', candidate_kind=kind)
     p=ROOT/'results'/('end2end-preview-publication-'+rev+'.json')
     with p.open('xb') as stream: stream.write((json.dumps(receipt,sort_keys=True)+'\n').encode())
     p.chmod(0o444);print(json.dumps(dict(status='published',receipt=str(p),bytes=p.stat().st_size,

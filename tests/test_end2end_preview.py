@@ -162,3 +162,66 @@ def test_continuation_root_ledger_completion_source_and_cleanup_are_mandatory(tm
         assert p.continuation_cohort(ArtifactLedger(),tmp_path,rev) == r
     else:
         with pytest.raises(ValueError): p.continuation_cohort(ArtifactLedger(),tmp_path,rev)
+
+
+def sqp_report(status='accepted_native_pose_sqp'):
+    fallback=status=='dynamic_A_fallback_no_improvement'
+    return dict(status=status,fitted_outputs_sealed_before_final_QA=True,full_original_frames=415,
+        source_fps=30.,native_direct136_generated=True,stale_B_pose_used=False,
+        whole_hand_minimum_claimed=False,penetration_evaluated=False,physical_contact_verified=False,
+        hand_labeled_test=False,oracle_modes=[],original_raw_bundle_byte_fingerprint_unchanged=True,
+        decision={'C_vs_A':{'passed':False}},
+        SQP=dict(schema='world_reward.native_pose_sqp.v1',status=status,full_original_frames=415,
+            ground_truth_used=False,private_truth_read=False,heldout_accuracy_verified=False,
+            whole_hand_minimum_claimed=False,physical_contact_verified=False,production_adopted=False,
+            baseline_fallback_dynamic=True,accepted_steps=0 if fallback else 2,
+            objective_before=10.,objective_after=10. if fallback else 9.),
+        native_objective_protocol=dict(objective_stage=181,scheduled_PEN_and_silhouette_retained=True,
+            raw_priors_rebased_on_baseline_or_candidate=False,source_binding=dict(
+            layer=dict(bytes=20514,sha256='a753ab8e730b6730fca275384fab629859311983292a407390d88c66ffe68c23'),
+            optimizer=dict(bytes=92824,sha256='84e0e818a3bc0935bb30b75fcd82fd7c5e3730ed812864594cd759697ddb406b'))))
+
+
+def test_sparse_native_SQP_completion_labels_and_legacy_semantics_preserved():
+    assert p.complete_candidate(sqp_report(),'sqp',415) is False # QA failure displayed, not filtered
+    assert p.complete_candidate(sqp_report('dynamic_A_fallback_no_improvement'),'sqp',415) is False
+    assert 'C sparse pose-SQP' in p.labels(9,False,'sqp','accepted_native_pose_sqp')[2]
+    assert p.labels(14,True,'sqp','dynamic_A_fallback_no_improvement')[2]=='Baseline fallback / no gain'
+    wrapper=(Path(__file__).parents[1]/'infra/run_end2end_preview.sh').read_text()
+    assert 'PREFIX=native-pose-sqp-real' in wrapper and 'run_native_pose_sqp_real,readonly' in wrapper
+
+
+@pytest.mark.parametrize('bad',['frames','direct','stale','GT','PEN','oracle','fingerprint','fallback_gain','stage','terms','rebase','steps'])
+def test_SQP_preview_requires_actual_native_completion_and_truthful_scope(bad):
+    r=sqp_report()
+    if bad=='frames':r['full_original_frames']=96
+    elif bad=='direct':r['native_direct136_generated']=False
+    elif bad=='stale':r['stale_B_pose_used']=True
+    elif bad=='GT':r['SQP']['ground_truth_used']=True
+    elif bad=='PEN':r['physical_contact_verified']=True
+    elif bad=='oracle':r['oracle_modes']=['GT']
+    elif bad=='fingerprint':r['original_raw_bundle_byte_fingerprint_unchanged']=False
+    elif bad=='fallback_gain':r=sqp_report('dynamic_A_fallback_no_improvement');r['SQP']['objective_after']=9.
+    elif bad=='stage':r['native_objective_protocol']['objective_stage']=0
+    elif bad=='terms':r['native_objective_protocol']['scheduled_PEN_and_silhouette_retained']=False
+    elif bad=='rebase':r['native_objective_protocol']['raw_priors_rebased_on_baseline_or_candidate']=True
+    elif bad=='steps':r['SQP']['accepted_steps']=True
+    with pytest.raises(ValueError):p.complete_candidate(r,'sqp',415)
+
+
+def test_SQP_root_source_binding_requires_actual_native_entry_and_all_original_statuses(tmp_path,monkeypatch):
+    import json
+    from sequence_pose_probe import ArtifactLedger
+    r,host,rev=cohort_report()
+    r.update(schema='world_reward.native_pose_sqp_real.v1',status='complete_native_pose_sqp_diagnostic')
+    r['source_binding']['helpers']={name:{'bytes':1,'sha256':'b'*64} for name in
+        ('infra/native_pose_sqp_real.py','infra/run_native_pose_sqp_real.sh','src/world_reward/native_pose_sqp.py')}
+    r['episodes'][0]['status']='accepted_native_pose_sqp';r['episodes'][2]['status']='dynamic_A_fallback_no_improvement'
+    for name,value in [('report.json',r),('host-exit.json',host)]:
+        path=tmp_path/name;path.write_text(json.dumps(value));path.chmod(0o444)
+    called=[]
+    def source(*args):called.append(args);return r['source_binding']
+    monkeypatch.setattr(p,'source',source)
+    assert p.native_cohort(ArtifactLedger(),tmp_path,rev,'sqp')==r
+    assert called[0][3]=='run_native_pose_sqp_real'
+    assert str(called[0][1]).endswith('/run_native_pose_sqp_real/code')

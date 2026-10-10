@@ -215,3 +215,32 @@ def test_foreign_origin_mutation_expired_viewer_and_bad_range_never_read_azure()
         assert reader.opens == reader.heads == []
     finally:
         server.shutdown(); server.server_close(); worker.join(timeout=5)
+
+
+def sqp_receipt():
+    value,rev=continuation_receipt();value.update(schema=stream.SQP_SCHEMA,candidate_kind='sqp')
+    value['states'][0]['candidate_status']='accepted_native_pose_sqp'
+    return value,rev
+
+
+def test_strict_v3_sparse_SQP_uses_same_tiny_media_routes_and_honest_labels():
+    v,rev=sqp_receipt();states,allowed=stream.records(v,rev,candidate_kind='sqp')
+    assert len(allowed)==4 and len(states)==4
+    page=stream.index_html(states).decode()
+    assert 'C sparse pose-SQP' in page and 'Baseline fallback / no gain' in page
+    assert 'C contact-continuation' not in page and 'Native joint' not in page
+    assert 'non vérifiés' in page and 'preload="none"' in page
+    for wrong in ['joint','continuation']:
+        with pytest.raises(ValueError):stream.records(v,rev,candidate_kind=wrong)
+
+
+@pytest.mark.parametrize('bad',['schema','kind','status','missing_kind','missing_status','claim'])
+def test_SQP_metadata_cannot_mislabel_continuation_or_claim_physical_gain(bad):
+    v,rev=sqp_receipt()
+    if bad=='schema':v['schema']=stream.CONTINUATION_SCHEMA
+    elif bad=='kind':v['candidate_kind']='continuation'
+    elif bad=='status':v['states'][0]['candidate_status']='accepted_native_continuation'
+    elif bad=='missing_kind':del v['candidate_kind']
+    elif bad=='missing_status':del v['states'][0]['candidate_status']
+    elif bad=='claim':v['quality_verified']=True
+    with pytest.raises(ValueError):stream.records(v,rev,candidate_kind='sqp')

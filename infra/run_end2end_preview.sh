@@ -2,10 +2,11 @@
 # Source closure: /infra/end2end_preview.py /infra/full4d_video.py /infra/full4d_publish.py
 set +x
 set -euo pipefail
-[[ ( $# == 2 || ( $# == 4 && "$3" == --candidate-kind && "$4" =~ ^(joint|continuation)$ ) ) \
+[[ ( $# == 2 || ( $# == 4 && "$3" == --candidate-kind && "$4" =~ ^(joint|continuation|sqp)$ ) ) \
  && "$2" =~ ^[0-9a-f]{40}$ && "$1" =~ ^(render|publish)$ ]] || exit 2
 KIND="${4:-joint}"; PREFIX=native-joint-real
 [[ "$KIND" != continuation ]] || PREFIX=native-contact-continuation-real
+[[ "$KIND" != sqp ]] || PREFIX=native-pose-sqp-real
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_end2end_preview/code" && "$(hostname)" == scenesmith-ncc-h100-01 ]] || exit 2
@@ -36,6 +37,8 @@ trap cleanup EXIT; trap 'exit 143' TERM; trap 'exit 130' INT
 SOURCE_MOUNTS=()
 if [[ "$KIND" == continuation ]]; then
  SOURCE_MOUNTS+=(--mount "type=bind,src=$ROOT/jobs/$2/run_native_contact_continuation_real,dst=$ROOT/jobs/$2/run_native_contact_continuation_real,readonly")
+elif [[ "$KIND" == sqp ]]; then
+ SOURCE_MOUNTS+=(--mount "type=bind,src=$ROOT/jobs/$2/run_native_pose_sqp_real,dst=$ROOT/jobs/$2/run_native_pose_sqp_real,readonly")
 fi
 timeout --signal=TERM --kill-after=10s 1200s docker run --rm --cidfile "$OUT/.container.cid" \
  --name "$NAME" --label "world_reward.preview.owner=$REV" --gpus all --network none --read-only \
