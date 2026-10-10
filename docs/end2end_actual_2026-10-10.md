@@ -77,3 +77,32 @@ SHA2563151519bc11e602060c92bfad3750c68c824f155d8934ad8bb98a4ba8d479459.
 VM01fetch0077f73 dispatched. Remote source references never transferred.
 Externalpredictionproducer806300d (493frozenruntimefiles), own per-sequence
 one-shotVertexauth preparedinRAM pipeline; pendingactualcohortresults.
+
+## Next structural hypothesis (not tested/adopted)
+
+Nativecontact gradient reachesnewhumantranslation; it is notmissing. The
+originalfactor trades 200×squared nearest distance (all2318handvertices,
+initialnetworkgate) against normalized RGB/pose priors. TrainCOCO ignores
+wrists, hands/rotationsfixed; rootRGB canbuyseparation. Samewitness gap is not
+wholehandminimum: recordboth beforeclaiming allcontactworse. Native diagnostic
+contact_distance_mean includes inactivehands; only activehandstatisticcomparable.
+
+C, after FORM A/B: image optimization subject to contact-feasibility rather
+than strongerarbitraryweight. Automaticcurrentanatomicalpatch normalconstraints
+with tangent sliding/releasefree; minimumchange proximalprojection, not
+sharedcoordinate reparameterization (equivalentobjective), nofreezes/scalechanges.
+SameA/Bhands+rotations remainfixed toisolatethecause. Infeasible/ill-conditioned
+constraints mustabstain explicitly. This is ouruntestedproposal, inspiredby
+https://arxiv.org/html/2605.20992v4#S4.SS3 and https://arxiv.org/abs/2012.09856 ,
+not a reproduction or evidence of generalization. Gates: trueactive wholehand
+continuoussurface and unchangedwitness, held-outRGBproxy, PEN, actualreference
+CD/ACC and unchangedfulltimelines. Complete existing externalpredictions first.
+
+### Localization technical retry
+
+First806300d hostdriver failedbeforecohort/models/API: hostNumPyabsent.
+Installed host control-only numerical packages (NumPy1.21.5/SciPy1.8.0),
+no host model fallback. Same immutable source/input/credential namespace reused
+in a new unitname since no prediction output/credential consumption existed.
+Wrapperfuturepreflight fixed. Originalfailedunit/log preserved; not response
+shopping, hyperparameter selection, or scientific rerun.
