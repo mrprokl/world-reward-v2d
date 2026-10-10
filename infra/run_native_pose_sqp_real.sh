@@ -3,8 +3,9 @@
 set +x
 set -euo pipefail
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
-WAIT_GPU=0
-if [[ $# -eq 1 && "$1" == --after-gpu-lock ]]; then WAIT_GPU=1
+WAIT_GPU=0; WAIT_FOR=''
+if [[ $# -eq 2 && "$1" == --after-terminal && "$2" =~ ^world-reward-[a-z0-9][a-z0-9-]{0,80}(\.service)?$ ]]; then
+ WAIT_GPU=1; WAIT_FOR="${2%.service}.service"
 elif [[ $# -ne 0 ]]; then exit 2; fi
 TRACK_SOURCE=09f516d9085f0d64d725b46b0ad6aa52fe7c0d84
 SOURCE=052ba1554e9a573d566713a99a61d89a5f27681c
@@ -44,15 +45,59 @@ r=source(Path(sys.argv[1]),Path(sys.argv[2]),sys.argv[3],'run_native_pose_sqp_re
 print(r['closure_sha256'])
 PYSOURCE
 }
+unit_state() {
+ local line key value load='' active='' result='' main='' pid='' count=0 state
+ state="$(systemctl show "$WAIT_FOR" --property=LoadState --property=ActiveState --property=Result --property=ExecMainStatus --property=MainPID)" || return 1
+ while IFS= read -r line; do
+  key="${line%%=*}"; value="${line#*=}"; [[ "$line" == *=* && -n "$value" ]] || return 1
+  case "$key" in
+   LoadState) [[ -z "$load" ]] || return 1; load="$value" ;;
+   ActiveState) [[ -z "$active" ]] || return 1; active="$value" ;;
+   Result) [[ -z "$result" ]] || return 1; result="$value" ;;
+   ExecMainStatus) [[ -z "$main" ]] || return 1; main="$value" ;;
+   MainPID) [[ -z "$pid" ]] || return 1; pid="$value" ;;
+   *) return 1 ;;
+  esac
+  count=$((count+1))
+ done <<< "$state"
+ [[ "$count" == 5 && "$load" == loaded && "$main" =~ ^(0|[1-9][0-9]{0,2})$ && "$pid" =~ ^(0|[1-9][0-9]{0,9})$ ]] || return 1
+ (( main<=255 )) || return 1
+ case "$active" in
+  inactive) [[ "$result" == success && "$main" == 0 && "$pid" == 0 ]] || return 1; UNIT_READY=1 ;;
+  failed)
+   [[ "$pid" == 0 ]] || return 1
+   case "$result" in
+    exit-code|signal|core-dump) (( main>0 )) || return 1 ;;
+    timeout|watchdog|oom-kill|resources|protocol|start-limit-hit) ;;
+    *) return 1 ;;
+   esac
+   UNIT_READY=1 ;;
+  active|activating|deactivating|reloading) UNIT_READY=0 ;;
+  *) return 1 ;;
+ esac
+}
 if (( WAIT_GPU )); then
- SOURCE_BEFORE="$(source_identity)"; LOCK_BEFORE="$(lock_identity)"
+ SOURCE_BEFORE="$(source_identity)"; LOCK_BEFORE="$(lock_identity)"; WAIT_STARTED=$SECONDS
+ # Do not steal a lease between clips from nonblocking cohort drivers.
+ # This explicit terminal wait is for the ENTIRE named producer, not a clip.
+ if [[ -n "$WAIT_FOR" ]]; then
+  while :; do
+   unit_state; (( UNIT_READY )) && break
+   REMAINING=$((43200-(SECONDS-WAIT_STARTED))); (( REMAINING>0 )) || exit 2
+   DELAY=15; (( REMAINING>=DELAY )) || DELAY=$REMAINING
+   sleep "$DELAY"
+  done
+ fi
+ [[ "$(source_identity)" == "$SOURCE_BEFORE" && "$(lock_identity)" == "$LOCK_BEFORE" ]] || exit 2
  exec 8<"$LOCK"
  [[ "$(lock_identity fd)" == "$LOCK_BEFORE" ]] || exit 2
  # Bounded kernel wait; this scheduling time is outside the unchanged903s
  # compute clock. Acquiring a lease never means prior unit/quality PASS.
- flock -w 43200 8
+ REMAINING=$((43200-(SECONDS-WAIT_STARTED))); (( REMAINING>0 )) || exit 2
+ flock -w "$REMAINING" 8
  [[ "$(lock_identity fd)" == "$LOCK_BEFORE" && "$(source_identity)" == "$SOURCE_BEFORE" \
   && ! -e "$OUT" && ! -L "$OUT" ]] || exit 2
+ if [[ -n "$WAIT_FOR" ]]; then unit_state; (( UNIT_READY )) || exit 2; fi
 else
  exec 8<"$LOCK"
  flock -n 8

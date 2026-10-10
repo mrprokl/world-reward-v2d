@@ -83,13 +83,13 @@ def test_runtime_primes_lazy_native_before_any_inference_decode_and_retains_trac
 
 def test_explicit_queued_GPU_wait_bounded_same_inode_and_immutable_source():
     wrapper=(Path(__file__).parents[1]/'infra/run_native_pose_sqp_real.sh').read_text()
-    assert '"$1" == --after-gpu-lock' in wrapper and 'flock -w 43200 8' in wrapper
+    assert '--after-gpu-lock' not in wrapper and '"$1" == --after-terminal' in wrapper and 'flock -w "$REMAINING" 8' in wrapper
     assert 'else\n exec 8<"$LOCK"\n flock -n 8' in wrapper # legacy mode unchanged
     assert 'os.fstat(8)' in wrapper and 'value.st_nlink!=1' in wrapper
     assert '$(lock_identity fd)' in wrapper and '$(source_identity)' in wrapper
-    assert wrapper.index('flock -w 43200 8')<wrapper.index('903s docker run')
+    assert wrapper.index('flock -w "$REMAINING" 8')<wrapper.index('903s docker run')
     assert '! -e "$OUT" && ! -L "$OUT"' in wrapper
-    assert not any(x in wrapper for x in ('truncate -','systemctl restart','ExecMainStatus','Result=success'))
+    assert not any(x in wrapper for x in ('truncate -','systemctl restart','Result=success'))
 
 
 def test_queued_lock_exact_existing_regular_singlelink_canonical_guard(tmp_path):
@@ -116,3 +116,21 @@ def test_queue_fd_inode_must_equal_path_not_replaced_lock(tmp_path):
     def guard(opened):return subprocess.run(['bash','-c',shell,'guard',str(opened),sys.executable,str(lock)],input=code,text=True,capture_output=True)
     assert guard(lock).returncode==0
     assert guard(other).returncode!=0
+
+
+def test_explicit_whole_unit_terminal_wait_precedes_GPU_lease_without_claiming_success():
+    import subprocess
+    wrapper=(Path(__file__).parents[1]/'infra/run_native_pose_sqp_real.sh').read_text()
+    assert '"$1" == --after-terminal' in wrapper
+    assert wrapper.index('unit_state; (( UNIT_READY )) && break')<wrapper.index('exec 8<"$LOCK"')
+    assert '43200-(SECONDS-WAIT_STARTED)' in wrapper
+    code=wrapper.split('unit_state() {',1)[1].split('\nif (( WAIT_GPU )); then',1)[0]
+    fn='unit_state() {'+code
+    def check(active,result,main,load='loaded',pid=0):
+        row=f'LoadState={load}\nActiveState={active}\nResult={result}\nExecMainStatus={main}\nMainPID={pid}'
+        shell='set -e; WAIT_FOR=world-reward-whole.service; systemctl(){ printf "%s\\n" "$STATE"; }; '+fn+'\nunit_state; printf "%s" "$UNIT_READY"'
+        return subprocess.run(['bash','-c',shell],env={'STATE':row},capture_output=True,text=True)
+    for args,ready in [(('inactive','success',0),'1'),(('failed','exit-code',1),'1'),(('active','success',0),'0'),(('failed','timeout',0),'1')]:
+        r=check(*args);assert r.returncode==0 and r.stdout==ready
+    for args in [('inactive','exit-code',1),('failed','success',0),('failed','exit-code',0),('inactive','success',0,'not-found'),('inactive','success',0,'loaded',123),('failed','exit-code',1,'loaded',123)]:
+        assert check(*args).returncode!=0
