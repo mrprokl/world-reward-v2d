@@ -48,8 +48,8 @@ def infer(code,cfg,base,out,report):
     source=ROOT/assets.SOURCE_DIR;weights=ROOT/assets.WEIGHTS_DIR
     for row in asset_cfg['source_files']:
         if pin(source/row['file'])!={k:row[k] for k in ['bytes','sha256']}:raise ValueError('Pinned source differs')
-    model_row=asset_cfg['checkpoint'];checkpoint=weights/model_row['file']
-    if pin(checkpoint)!={k:model_row[k] for k in ['bytes','sha256']}:raise ValueError('Pinned VDA checkpoint differs')
+    checkpoint=weights/asset_cfg['model_file']
+    if pin(checkpoint)!=dict(bytes=asset_cfg['model_bytes'],sha256=asset_cfg['model_sha256']):raise ValueError('Pinned VDA checkpoint differs')
     sequences=public_sequences(base,report['config_pin']);decoded=[]
     for seq in sequences:
         frames=[]
@@ -89,7 +89,7 @@ def infer(code,cfg,base,out,report):
 
 def evaluate(code,cfg,base,out,report):
     from PIL import Image
-    predictions=base/'predictions';sealed=json.loads((predictions/'report.json').read_text())
+    predictions=ROOT/'validation/video_depth_real_output_v1/predictions';sealed=json.loads((predictions/'report.json').read_text())
     if sealed['status']!='sealed_predictions' or sealed['config_pin']!=report['config_pin']:raise ValueError('Sealed inference before sensor decoding required')
     acquisition=json.loads((base/'acquisition-report.json').read_text())
     rows=[]
@@ -108,7 +108,10 @@ def evaluate(code,cfg,base,out,report):
             truth[i]=raw.astype(np.float32)/5000
         dt=np.diff(arrays['timestamps'])
         if (dt<=0).any():raise ValueError('Original monotonic timestamps required')
-        scores={name:score_depth(arrays[name],np.isfinite(arrays[name])&(arrays[name]>0) if name=='vda' else arrays['moge_valid'],truth,dt,names) for name in ['moge','vda']}
+        candidate_valid=np.isfinite(arrays['vda'])&(arrays['vda']>0)
+        paired=arrays['moge_valid']&candidate_valid
+        scores={name:score_depth(arrays[name],paired,truth,dt,names) for name in ['moge','vda']}
+        scores['vda']['native_sensor_coverage']=float((candidate_valid&(truth>0)).sum()/(truth>0).sum())
         rows.append(dict(sequence=seq['name'],metrics=scores,
             absrel_gain=1-scores['vda']['absrel']/scores['moge']['absrel'],
             temporal_gain=1-scores['vda']['temporal_eulerian_error_m_s']/scores['moge']['temporal_eulerian_error_m_s'],
@@ -118,7 +121,7 @@ def evaluate(code,cfg,base,out,report):
         worst_absrel_nonregression=min(r['absrel_gain'] for r in rows)>=-limits['worst_sequence_absrel_regression_max'],
         median_temporal_gain=float(np.median([r['temporal_gain'] for r in rows]))>=limits['median_temporal_error_gain_min'],
         worst_temporal_nonregression=min(r['temporal_gain'] for r in rows)>=-limits['worst_sequence_temporal_error_regression_max'],
-        support=all(r['metrics']['vda']['coverage']>=limits['candidate_sensor_valid_coverage_min'] for r in rows),
+        support=all(r['metrics']['vda']['native_sensor_coverage']>=limits['candidate_sensor_valid_coverage_min'] for r in rows),
         synchronization=all(r['synchronized_fraction']>=limits['synchronized_rgb_fraction_min'] for r in rows))
     report.update(status='completed_sensor_evaluation',rows=rows,gates=gates,passed=all(gates.values()),
         private_values_read=True,private_values_used_for_prediction=False,
@@ -129,11 +132,18 @@ def evaluate(code,cfg,base,out,report):
 def run():
     mode=sys.argv[1];code=Path(os.environ['WR_CODE']);rev=os.environ['WR_CODE_REVISION'];start=time.monotonic()
     if mode not in ['infer','evaluate'] or code!=ROOT/'jobs'/rev/('run_video_depth_real_'+mode)/'code':raise ValueError('Exact staged producer required')
-    cfg=json.loads((code/CONFIG).read_text());base=ROOT/cfg['namespace'];out=base/('predictions' if mode=='infer' else 'evaluation')
+    cfg=json.loads((code/CONFIG).read_text());base=ROOT/cfg['namespace']
+    out=ROOT/'validation/video_depth_real_output_v1'/('predictions' if mode=='infer' else 'evaluation')
     out.mkdir(exist_ok=False)
     report=dict(status='fail',producer_revision=rev,config_pin=pin(code/CONFIG),private_values_read=False,
         challenge_inputs_used=False,production_adopted=False,timings=[],predictions={})
-    try:(infer if mode=='infer' else evaluate)(code,cfg,base,out,report)
+    try:
+        from mediapipe_cpu_runtime_verify import source
+        helpers=('infra/video_depth_real_run.py','infra/run_video_depth_real_'+mode+'.sh',CONFIG)
+        binding=source(ROOT,code,rev,'run_video_depth_real_'+mode,helpers)
+        (infer if mode=='infer' else evaluate)(code,cfg,base,out,report)
+        if source(ROOT,code,rev,'run_video_depth_real_'+mode,helpers)!=binding:raise ValueError('Immutable staged source changed')
+        report['source_binding']=binding
     except Exception as exc:report.update(error_type=type(exc).__name__,error=str(exc)[:300])
     report['elapsed_seconds']=time.monotonic()-start
     (out/'report.json').write_text(json.dumps(report,sort_keys=True,allow_nan=False)+'\n');(out/'report.json').chmod(0o444)
