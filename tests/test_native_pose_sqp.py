@@ -169,3 +169,22 @@ def test_over_budget_linearization_return_is_discarded_before_new_native_decode(
     assert len(decodes)==1 and result['budget_exhausted']
     assert result['accepted_steps']==0 and result['status']=='dynamic_A_fallback_no_improvement'
     assert result['attempts'][0]['status']=='budget_exhausted_callback_result_discarded'
+
+
+def test_retraction_preserves_nonunit_native_encoding_gauge_and_every_zero_block():
+    p,obj,*_=authored();raw=p['mhr_body_pose_cont'][:,:138].reshape(96,23,6)
+    raw[:,:,:3]*=1.7;raw[:,:,3:]*=.8;raw[:,:,3:]+=raw[:,:,:3]*.3
+    p['mhr_body_pose_cont'][:,138:254]*=2.4
+    before=p['mhr_body_pose_cont'].copy();d=np.zeros((96,sqp.STATE_DIM));d[:,1]=.04;d[:,71]=.02
+    changed,_=sqp.retract_native(p,obj,d);after=changed['mhr_body_pose_cont']
+    assert before[:,6:138].tobytes()==after[:,6:138].tobytes()
+    for block in set(range(58))-{2}:
+        assert before[:,138+2*block:140+2*block].tobytes()==after[:,138+2*block:140+2*block].tobytes()
+    def gauge(x):
+        v=x[:,:138].astype(float).reshape(96,23,6);r=sqp._so3(v)
+        return (np.linalg.norm(v[...,:3],axis=-1),np.sum(v[...,3:]*r[..., :,0],axis=-1),
+            np.linalg.norm(v[...,3:]-np.sum(v[...,3:]*r[..., :,0],axis=-1)[...,None]*r[..., :,0],axis=-1),
+            np.linalg.norm(x[:,138:254].astype(float).reshape(96,58,2),axis=-1))
+    for a,b in zip(gauge(before),gauge(after)):np.testing.assert_allclose(a,b,rtol=1e-7,atol=2e-7)
+    zero,_=sqp.retract_native(p,obj,np.zeros_like(d))
+    assert all(zero[k].tobytes()==p[k].tobytes() for k in p)

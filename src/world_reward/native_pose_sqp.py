@@ -62,21 +62,34 @@ def _array(value, shape, name):
 
 
 def retract_native(parameters, object_translation, step):
-    """Right-SO3/SO2 native retraction; all other blocks stay byte-identical."""
+    """Gauge-preserving right-SO3/SO2 retraction; fixed blocks byte-identical.
+
+    Raw6D carries column norms/parallel component and rawSO2 its radius. Preserve
+    those gauges so tiny tangent updates do not jump the native raw-control prior.
+    Decode rotations move on SO3/SO2; zero-tangent blocks retain original bytes.
+    """
     n = len(parameters['mhr_trans']); validate_native_parameters(parameters,n,require_shared_identity=True)
     delta = _array(step,(n,STATE_DIM),'native tangent step')
     obj = contact._float_array(object_translation,(n,3),'object translation')
     out = {k:v.copy() for k,v in parameters.items()}; body = out['mhr_body_pose_cont']
-    rotations = _so3(body[:,:138].astype(float).reshape(n,23,6))
+    original = parameters['mhr_body_pose_cont']; raw=original[:,:138].astype(float).reshape(n,23,6)
+    rotations = _so3(raw); first_norm=np.linalg.norm(raw[...,:3],axis=-1)
+    parallel=np.sum(rotations[..., :,0]*raw[...,3:],axis=-1)
+    orthogonal=np.linalg.norm(raw[...,3:]-parallel[...,None]*rotations[..., :,0],axis=-1)
     rotations = rotations@Rotation.from_rotvec(delta[:,:69].reshape(-1,3)).as_matrix().reshape(n,23,3,3)
-    body[:,:138] = np.concatenate((rotations[..., :,0],rotations[..., :,1]),axis=-1).reshape(n,138)
-    sincos = body[:,138:254].astype(float).reshape(n,58,2)
-    if (np.linalg.norm(sincos,axis=-1) <= 1e-12).any(): raise ValueError('Degenerate native SO2 control')
+    updated=np.concatenate((first_norm[...,None]*rotations[..., :,0],
+        parallel[...,None]*rotations[..., :,0]+orthogonal[...,None]*rotations[..., :,1]),axis=-1).astype(np.float32)
+    zero3=np.all(delta[:,:69].reshape(n,23,3)==0,axis=-1)
+    updated[zero3]=original[:,:138].reshape(n,23,6)[zero3]
+    body[:,:138]=updated.reshape(n,138)
+    sincos = original[:,138:254].astype(float).reshape(n,58,2)
+    norm=np.linalg.norm(sincos,axis=-1)
+    if (norm<=1e-12).any(): raise ValueError('Degenerate native SO2 control')
     angles = np.arctan2(sincos[...,0],sincos[...,1])+delta[:,69:127]
-    body[:,138:254] = np.stack((np.sin(angles),np.cos(angles)),axis=-1).reshape(n,116)
-    # Preserve inactive zero-step frames byte-exact, including non-normalized6D.
-    unchanged = np.all(delta[:,:ROTATION_DIM] == 0,axis=1)
-    body[unchanged] = parameters['mhr_body_pose_cont'][unchanged]
+    updated=(norm[...,None]*np.stack((np.sin(angles),np.cos(angles)),axis=-1)).astype(np.float32)
+    zero2=delta[:,69:127]==0
+    updated[zero2]=original[:,138:254].reshape(n,58,2)[zero2]
+    body[:,138:254]=updated.reshape(n,116)
     out['mhr_trans'] = (parameters['mhr_trans'].astype(float)+delta[:,127:130]).astype(np.float32)
     validate_native_parameters(out,n,require_shared_identity=True)
     if (body[:,254:].tobytes() != parameters['mhr_body_pose_cont'][:,254:].tobytes()
