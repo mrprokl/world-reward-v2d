@@ -87,3 +87,16 @@ def test_absence_is_not_finite_fake_observation():
     v, k, r, t, xy = fixture(); flags = np.ones(xy.shape[:2], bool); flags[3] = False
     with pytest.raises(ValueError, match='NaN'): refine_sequence(v, v, xy, flags, r, t,
         np.ones(len(t), bool), k, np.arange(len(t)), 30, config())
+
+
+def test_unqueried_geometry_cannot_be_clipped_behind_camera():
+    v, k, r, t, xy = fixture()
+    mesh = np.concatenate((v, np.array([[0., 0., -4.]])))
+    with pytest.raises(ValueError, match='fixed mesh vertices'):
+        refine_sequence(mesh, v, xy, np.ones(xy.shape[:2], bool), r, t,
+                        np.ones(len(t), bool), k, np.arange(len(t)), 30, config())
+
+
+def test_development_reference_is_explicit_text():
+    from dataclasses import replace
+    with pytest.raises(ValueError): replace(config(), development_reference=None)

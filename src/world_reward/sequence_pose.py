@@ -31,7 +31,7 @@ class SequencePoseConfig:
                   ('max_nfev', 'development_reference')]
         if (any(type(v) not in (int, float) or not np.isfinite(v) or v <= 0 for v in values)
                 or type(self.max_nfev) is not int or not 1 <= self.max_nfev <= 300
-                or not self.development_reference.strip()):
+                or type(self.development_reference) is not str or not self.development_reference.strip()):
             raise ValueError('Positive externally frozen scales/weights/budget required')
 
 
@@ -134,7 +134,7 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
     pose_rows = np.flatnonzero(flags & (ids > 0))
     base_centres = np.einsum('tij,j->ti', r0, centre)+t0
     counts = visible[1:].sum(0)
-    # Track-balanced residual: long-lived tracks cannot silently dominate.
+    # Quadratic-regime track normalization, not calibrated robust track balance.
     track_weights = np.sqrt((n-1)/counts[query_rows])
     near = max(np.finfo(float).eps*diameter*64, np.finfo(float).tiny)
 
@@ -186,6 +186,12 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
     xyz = p[None] @ rr.swapaxes(-1, -2)+tt[:, None]
     if not np.isfinite(xyz).all() or (xyz[..., 2] <= near).any():
         raise ValueError('Result places canonical witnesses behind camera')
+    # Unqueried parts of the fixed mesh must remain renderable too. Chunk only
+    # the check, never clip/delete triangles or alter the reconstructed geometry.
+    for start in range(0, len(v), 4096):
+        full = v[None, start:start+4096] @ rr.swapaxes(-1, -2)+tt[:, None]
+        if not np.isfinite(full).all() or (full[..., 2] <= near).any():
+            raise ValueError('Result places fixed mesh vertices behind camera')
     final_residual = residual(result.x)
     cost = lambda a: float(np.sum(np.sqrt(1+a*a)-1))
     if cost(final_residual) > cost(initial_residual)*(1+1e-8):
@@ -195,5 +201,6 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
         final_cost=cost(final_residual), RGB_observations=len(frame_rows),
         latent_frames=int(np.count_nonzero(~visible.any(1))), geometry_camera_scale_unchanged=True,
         time_zero_unchanged=True, static_constraint=False, contact_constraint=False,
+        full_mesh_in_front_verified=True, RGB_weighting='quadratic_track_normalized_soft_l1',
         config=asdict(config), quality_verified=False)
     return SequencePoseResult(rr, tt, ids.copy(), visible.any(1), diagnostics)
