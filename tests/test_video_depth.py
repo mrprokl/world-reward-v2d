@@ -130,6 +130,13 @@ def test_asset_url_allowlist_rejects_untrusted_sources(url):
     assert not assets_module().approved_url(url)
 
 
+def test_exact_verified_regional_hf_cdn_only_for_downloads():
+    assets=assets_module()
+    assert assets.approved_url('https://us.aws.cdn.hf.co/checkpoint')
+    assert not assets.approved_url('https://us.aws.cdn.hf.co/checkpoint',metadata=True)
+    assert not assets.approved_url('https://us.aws.cdn.hf.co.evil.test/checkpoint')
+
+
 def test_successful_and_failed_acquisition_are_non_overwriting(tmp_path, monkeypatch):
     assets = assets_module(); config = {"source_revision": "a" * 40, "model_revision": "b" * 40,
         "source_repository": "official/source", "model_repository": "official/model", "model_file": "model.pth",

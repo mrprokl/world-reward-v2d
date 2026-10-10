@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import argparse
 import json
 import os
 from pathlib import Path
@@ -40,7 +41,7 @@ def approved_url(url, metadata=False):
     host = parsed.hostname or ""
     allowed = {"api.github.com", "raw.githubusercontent.com", "huggingface.co"}
     if not metadata:
-        allowed.update({"cdn-lfs.huggingface.co", "cdn-lfs.hf.co"})
+        allowed.update({"cdn-lfs.huggingface.co", "cdn-lfs.hf.co", "us.aws.cdn.hf.co"})
     return (parsed.scheme == "https" and not parsed.username and not parsed.password
             and (host in allowed or not metadata and host.endswith(".xethub.hf.co")))
 
@@ -103,13 +104,19 @@ def publisher_metadata(config):
         raise ValueError("Official checkpoint revision/license/LFS size/hash mismatch")
 
 
-def acquire(root, code, revision):
-    source, weights, receipt = root / SOURCE_DIR, root / WEIGHTS_DIR, root / REPORT
+def acquire(root, code, revision, *, publisher_cdn_v2=False):
+    source, weights = root / SOURCE_DIR, root / WEIGHTS_DIR
+    receipt=root/("results/video-depth-assets-v2.json" if publisher_cdn_v2 else REPORT)
     config = configuration(code / CONFIG)
     if any(path.exists() or path.is_symlink() for path in (source, weights, receipt)):
         raise ValueError("Acquisition destinations already exist; no overwrite/restart")
     if any(path.resolve() != path for path in (source, weights, receipt)):
         raise ValueError("Asset destination symlink ancestry is forbidden")
+    if publisher_cdn_v2:
+        failure=root/REPORT
+        old=json.loads(failure.read_text())
+        if old.get('status')!='fail' or old.get('failed_partial_assets_removed') is not True:
+            raise ValueError('Verified prior transport failure required')
     source.mkdir(parents=True); weights.mkdir(parents=True); receipt.parent.mkdir(parents=True, exist_ok=True)
     started = time.monotonic(); error = None; records = []
     report = dict(schema="world_reward.video_depth_assets_receipt.v1", status="fail", producer_revision=revision,
@@ -154,17 +161,18 @@ def acquire(root, code, revision):
 
 
 def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--publisher-cdn-v2',action='store_true');args=parser.parse_args()
     root, code, revision = Path(os.environ["WR_ROOT"]), Path(os.environ["WR_CODE"]), os.environ["WR_CODE_REVISION"]
     if (root != ROOT or platform.system() != "Linux" or root.resolve() != root
             or re.fullmatch(r"[0-9a-f]{40}", revision) is None
-            or code != root / "jobs" / revision / "run_video_depth_assets/code" or code.resolve() != code
+            or code != root / "jobs" / revision / ("run_video_depth_assets_v2/code" if args.publisher_cdn_v2 else "run_video_depth_assets/code") or code.resolve() != code
             or Path(__file__).resolve() != code / "infra/video_depth_assets.py"):
         raise ValueError("Immutable Azure acquisition namespace required")
     def expired(*_):
         raise TimeoutError("VDA acquisition budget expired")
     signal.signal(signal.SIGALRM, expired); signal.signal(signal.SIGTERM, expired); signal.alarm(590)
     try:
-        acquire(root, code, revision)
+        acquire(root, code, revision,publisher_cdn_v2=args.publisher_cdn_v2)
     finally:
         signal.alarm(0)
 

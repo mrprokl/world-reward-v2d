@@ -42,7 +42,7 @@ timeout --signal=TERM --kill-after=10s 1800s docker run --rm --name "$NAME" \
  --mount "type=bind,src=$ROOT/vendor/research/vda_metric_small_v1,dst=$ROOT/vendor/research/vda_metric_small_v1,readonly" \
  --mount "type=bind,src=$ROOT/weights/research/vda_metric_small_v1,dst=$ROOT/weights/research/vda_metric_small_v1,readonly" \
  --mount "type=bind,src=$ROOT/weights/cari4d/hf_home,dst=$ROOT/weights/cari4d/hf_home,readonly" \
- --mount "type=bind,src=$ROOT/results/video-depth-assets-v1.json,dst=$ROOT/results/video-depth-assets-v1.json,readonly" \
+ --mount "type=bind,src=$ROOT/results/video-depth-assets-v2.json,dst=$ROOT/results/video-depth-assets-v2.json,readonly" \
  --mount "type=bind,src=$ROOT/results/weights-acquisition.json,dst=$ROOT/results/weights-acquisition.json,readonly" \
  --entrypoint /usr/bin/env "$IMAGE" -i PATH=/opt/conda/bin:/usr/bin:/bin HOME=/tmp \
  PYTHONDONTWRITEBYTECODE=1 HF_HUB_OFFLINE=1 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=4 \

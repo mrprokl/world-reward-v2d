@@ -43,7 +43,7 @@ def infer(code,cfg,base,out,report):
     import video_depth_assets as assets
     from world_reward.video_depth import load_metric_small,infer_metric_video
     from PIL import Image
-    asset_report=json.loads((ROOT/assets.REPORT).read_text())
+    asset_report=json.loads((ROOT/'results/video-depth-assets-v2.json').read_text())
     if asset_report['status']!='pass':raise ValueError('Pinned VDA assets required')
     asset_cfg=json.loads((code/'configs/video_depth_assets_v1.json').read_text())
     source=ROOT/assets.SOURCE_DIR;weights=ROOT/assets.WEIGHTS_DIR
