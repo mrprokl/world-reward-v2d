@@ -116,7 +116,7 @@ def test_surface_preflight_checks_input_total_not_self_declared_payload_length()
     tree=ast.parse((ROOT/'infra/cari_prepare.py').read_text())
     preflight=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='_surface_preflight')
     source=ast.unparse(preflight)
-    assert source.count("inputs['total_frames']")==2
+    assert source.count("inputs['total_frames']")==3  # Two shape gates plus explicit latent admission.
     assert 'SOURCE_HELPERS' in source
 
 

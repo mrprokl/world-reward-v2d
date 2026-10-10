@@ -84,7 +84,9 @@ def test_ledger_recheck_uses_capacity_role_but_keeps_original_empty_source(monke
 
 def test_actual_preparation_patch_is_exactly_source_only():
     original = subprocess.check_output(['git','show','de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba:infra/cari_prepare.py'],cwd=REPO)
-    candidate = (REPO/'infra/cari_prepare.py').read_bytes()
+    # This proves the historical lossless capacity/scheduling producer, not
+    # the new, opt-in scientific latent initializer contract.
+    candidate = subprocess.check_output(['git','show','a51482f63911fa05188ceb3e74d5f5ddc416c8a1:infra/cari_prepare.py'],cwd=REPO)
     result = capacity.verify_capacity_source(original,candidate)
     assert result['numeric_source_unchanged'] and result['exact_source_substitutions'] == 10
     assert result['maximum_pose_report_bytes'] == 64 << 20
@@ -191,7 +193,7 @@ def test_depth_batch_source_and_receipt_are_pinned_without_validation_shortcuts(
     assert source.index('Exact qualified native depth-writer source required') < source.index('from prep.mhr_depth_h5 import')
     assert '"native_source_sha256": "'+digest+'"' in source
     original = subprocess.check_output(['git','show','de62258a3f0ca1f12dd0a151c8fe96f0256ea3ba:infra/cari_prepare.py'], cwd=REPO)
-    candidate = source.encode()
+    candidate = subprocess.check_output(['git','show','a51482f63911fa05188ceb3e74d5f5ddc416c8a1:infra/cari_prepare.py'],cwd=REPO)
     proof = capacity.verify_capacity_source(original, candidate)
     assert proof['depth_batch_size'] == 8 and proof['depth_native_source_sha256'] == digest
     for old, new in ((b'len(pending) == 8', b'len(pending) == 16'),

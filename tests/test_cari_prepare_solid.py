@@ -401,7 +401,9 @@ def test_authenticated_native_source_posthash_detects_later_mutation(prepare, na
 
 
 def test_default_numeric_statements_and_report_literal_preserved(prepare):
-    historical = ast.parse(subprocess.check_output(['git', 'show', '1a51c715a46c376d82650c595d008e83bf250554:infra/cari_prepare.py'], text=True))
+    # Compare to the actual capacity/batched-depth producer immediately before
+    # latent admission; older single-frame depth scheduling is separately tested.
+    historical = ast.parse(subprocess.check_output(['git', 'show', 'a51482f63911fa05188ceb3e74d5f5ddc416c8a1:infra/cari_prepare.py'], text=True))
     current = ast.parse(Path(prepare.__file__).read_text())
     old_main = next(n for n in historical.body if isinstance(n, ast.FunctionDef) and n.name == 'main')
     new_main = next(n for n in current.body if isinstance(n, ast.FunctionDef) and n.name == 'main')

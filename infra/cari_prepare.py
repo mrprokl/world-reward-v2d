@@ -51,6 +51,8 @@ def _argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--episode", type=int, choices=range(TRACK1_EPISODE_COUNT), default=EPISODE)
     parser.add_argument("--mesh-source", choices=("default", "solid", "surface"), default="default")
+    parser.add_argument('--allow-unobserved-poses', action='store_true', default=False,
+                        help='Admit explicit full-T latent surface initialization, not final predictions')
     parser.add_argument('--query-requalification', action=_QueryFlag, nargs=0, default=False)
     return parser
 
@@ -325,7 +327,97 @@ def _solid_camera_roundtrip(source, rotations, translations, saved_poses, native
     return error
 
 
-def _surface_preflight(root, episode, inputs, report, pose_path, np):
+def _latent_observations(report, flags, total, np):
+    """Authenticate missing evidence; never relabel an initializer as measured."""
+    if (type(total) is not int or total < 3 or np.ma.isMaskedArray(flags)
+            or not isinstance(flags, np.ndarray) or flags.dtype != np.bool_ or flags.shape != (total,)
+            or not flags[0] or not flags[-1]):
+        raise ValueError('Full-T boolean observations and automatic RGB anchors at both edges required')
+    wanted = dict(allow_unobserved_poses=True, latent_pose_initializer=True, latent_poses_measured=False,
+        observed_pose_frames=int(flags.sum()), latent_pose_frames=int((~flags).sum()),
+        ground_truth_used=False, hand_labeled_test=False, oracle_modes=[])
+    if (any(type(report.get(k)) is not type(v) or report[k] != v for k, v in wanted.items())
+            or type(report.get('pose_observed')) is not list
+            or any(type(v) is not bool for v in report['pose_observed'])
+            or report['pose_observed'] != flags.tolist()):
+        raise ValueError('Exact original latent observation receipt required')
+    rows = report.get('frames')
+    if (type(rows) is not list or len(rows) != total
+            or any(type(row) is not dict or type(row.get('frame_index')) is not int
+                   or row['frame_index'] != i or type(row.get('pose_observed')) is not bool
+                   or row['pose_observed'] != bool(flags[i]) for i, row in enumerate(rows))):
+        raise ValueError('Every original frame requires explicit consistent observation status')
+    for row, observed in zip(rows, flags):
+        if (type(row.get('candidates')) is not list
+                or (observed and (not row['candidates'] or type(row.get('selected')) is not dict
+                    or row.get('observation_status') != 'automatic_mask_and_inferred_depth'))
+                or (not observed and (row['candidates'] or row.get('selected') is not None
+                    or row.get('observation_status') not in {'empty_automatic_mask',
+                        'insufficient_inferred_visible_points', 'no_finite_supported_numerical_hypothesis'}))):
+            raise ValueError('Missing evidence must not contain a measured pose or invented candidates')
+    temporal = report.get('temporal_selection', {})
+    expected = dict(method='observed_frame_Viterbi_then_bilateral_SO3_centroid_latent_initialization',
+        pose_observed=flags.tolist(), observed_frame_indices=np.flatnonzero(flags).tolist(),
+        latent_frame_indices=np.flatnonzero(~flags).tolist(),
+        latent_pose_status='initializer_not_measured_or_final_truth', edge_extrapolation=False,
+        zero_velocity_prior=False, mask_interpolation=False, geometry_scale_camera_unchanged=True,
+        time_units='original_frame_indices', quality_verified=False)
+    if type(temporal) is not dict or any(type(temporal.get(k)) is not type(v) or temporal[k] != v
+                                       for k, v in expected.items()):
+        raise ValueError('Original bilateral initializer provenance required; no invented edge poses')
+    selected = temporal.get('candidate_indices')
+    if (type(selected) is not list or len(selected) != total
+            or any(type(slot) is not int or (slot < 0 if observed else slot != -1)
+                   for slot, observed in zip(selected, flags))):
+        raise ValueError('Every latent slot must retain the original unobserved sentinel')
+    return np.frombuffer(flags.tobytes(), dtype=np.bool_)
+
+
+def _latent_surface_geometry_and_poses(path, expected_v, expected_f, report, total, budget, np):
+    """Separate seven-field admission; the original six-field reader stays strict."""
+    from surface_pose_report_capacity import identity
+    from world_reward.surface_pose_geometry import compact_surface
+    before = identity(path)
+    with np.load(path, allow_pickle=False) as data:
+        if set(data.files) != {'vertices', 'faces', 'frame_index', 'rotation', 'translation',
+                              'object_scale', 'pose_observed'}:
+            raise ValueError('Exact latent surface payload with original observation flags required')
+        v, f, r, t, ids = (data[n].copy() for n in ('vertices', 'faces', 'rotation', 'translation', 'frame_index'))
+        if (v.dtype != np.float64 or f.dtype != np.int64 or v.shape != (4096, 3) or f.shape != (4096, 3)
+                or v.tobytes() != expected_v.tobytes() or f.tobytes() != expected_f.tobytes()
+                or ids.dtype != np.int64 or ids.shape != (total,) or not np.array_equal(ids, np.arange(total))
+                or data['object_scale'].dtype != np.float64 or data['object_scale'].shape != ()
+                or data['object_scale'].item() != 1.):
+            raise ValueError('Original complete canonical geometry, full timeline and once-baked scale required')
+        _latent_observations(report, data['pose_observed'], total, np)
+    if (r.dtype != np.float64 or t.dtype != np.float64 or r.shape != (total, 3, 3) or t.shape != (total, 3)
+            or not np.isfinite(r).all() or not np.isfinite(t).all()
+            or not np.allclose(r @ r.swapaxes(-1, -2), np.eye(3), atol=1e-5, rtol=0)
+            or not np.allclose(np.linalg.det(r), 1., atol=1e-5, rtol=0)):
+        raise ValueError('Finite full-T proper initializer poses required; no pose repair')
+    if (type(budget) is not dict or budget.get('source_domain') != 'surface'
+            or type(budget.get('metric_scale_baked_once')) is not float or budget['metric_scale_baked_once'] <= 0):
+        raise ValueError('Original independently authenticated surface budget required')
+    compact, faces, active, topology = compact_surface(v, f,
+        canonical_vertex_count=budget['canonical_vertices_count'], canonical_face_count=budget['canonical_faces_count'])
+    if identity(path) != before:
+        raise ValueError('Latent surface payload changed during read')
+    v, f, r, t = (np.frombuffer(a.tobytes(), dtype=a.dtype).reshape(a.shape) for a in (v, f, r, t))
+    return v, f, active, r, t, (compact, faces), topology, {Path(path): before}
+
+
+def _latent_pose_metadata(observed, np):
+    """Keep original observation flags in the native initializer, not predictions."""
+    if (np.ma.isMaskedArray(observed) or not isinstance(observed, np.ndarray)
+            or observed.dtype != np.bool_ or observed.ndim != 1
+            or len(observed) < 3 or not observed[0] or not observed[-1]):
+        raise ValueError('Explicit full-T initializer observation flags with supported edges required')
+    return dict(pose_observed=observed.tolist(), pose_observed_frame_index=np.arange(len(observed)).tolist(),
+        latent_pose_initializer=True, latent_poses_measured=False,
+        requires_native_refinement=True, final_prediction=False)
+
+
+def _surface_preflight(root, episode, inputs, report, pose_path, np, *, allow_unobserved_poses=False):
     """Authenticated surface and full poses, before reserving prepared inputs."""
     from surface_geometry_loader import load, strict_json, preflight_geometry_and_poses, SOURCE_HELPERS
     from surface_pose_report_capacity import identity, recheck
@@ -340,7 +432,10 @@ def _surface_preflight(root, episode, inputs, report, pose_path, np):
         raise ValueError('One original positive object scale is required; no averaging')
     v,f,active,_,canonical,receipt=load(root,episode,inputs['video_sha256'],sha256(objectpath),
         sha256(alignment),float(scale[0]),pins=pins)
-    if pose_path!=base/'object_pose_full_surface/geometry_and_poses.npz':
+    if type(allow_unobserved_poses) is not bool:
+        raise ValueError('Explicit latent surface admission flag required')
+    pose_directory = 'object_pose_full_surface_latent' if allow_unobserved_poses else 'object_pose_full_surface'
+    if pose_path!=base/pose_directory/'geometry_and_poses.npz':
         raise ValueError('Canonical surface full-trajectory path required')
     parent=pose_path.parent;copy=parent/'object_fixed_canonical.glb';reportpath=parent/'report.json'
     if parent.resolve()!=parent or parent.stat().st_mode&0o777!=0o555 or {p.name for p in parent.iterdir()}!={'report.json','geometry_and_poses.npz','object_fixed_canonical.glb'}:
@@ -358,8 +453,11 @@ def _surface_preflight(root, episode, inputs, report, pose_path, np):
             'geometry_operations_applied','canonical_vertices_count','canonical_faces_count'):
         if type(report['topology_budget'].get(key)) is not type(receipt[key]) or report['topology_budget'][key]!=receipt[key]:
             raise ValueError('Surface pose and inert CPU proposal differ')
-    values=preflight_geometry_and_poses(pose_path,expected_v=v,expected_f=f,expected_episode=episode,
-        expected_scale=1.,topology_budget=receipt)
+    if allow_unobserved_poses:
+        values = _latent_surface_geometry_and_poses(pose_path, v, f, report, inputs['total_frames'], receipt, np)
+    else:
+        values=preflight_geometry_and_poses(pose_path,expected_v=v,expected_f=f,expected_episode=episode,
+            expected_scale=1.,topology_budget=receipt)
     pv,pf,pa,r,t,compact,topology,_=values
     if (r.shape != (inputs['total_frames'],3,3) or t.shape != (inputs['total_frames'],3)
             or not np.array_equal(pa,active)):
@@ -390,11 +488,13 @@ def _surface_serialized_mesh(path, source, trimesh, np, native_load, transform=N
     return proof,(native_v,native_f)
 
 
-def _surface_saved_poses(saved, names, aligned_poses, pose_sha, matrix, np):
+def _surface_saved_poses(saved, names, aligned_poses, pose_sha, matrix, np, *, pose_observed=None):
     """Verify the actual serialized payload, not merely the pre-save array."""
     metadata={'source':'World_Reward_fixed_scale_depth_ICP_Viterbi_not_FoundationPose',
         'ground_truth_used':False,'hand_labeled_test':False,'oracle_modes':[],
         'source_pose_sha256':pose_sha,'mesh_frame_change':matrix.tolist()}
+    if pose_observed is not None:
+        metadata.update(_latent_pose_metadata(pose_observed, np))
     if (type(saved) is not dict or set(saved)!={'frames','obj_pose_world','metadata'}
             or saved['frames']!=names or type(saved['obj_pose_world']) is not np.ndarray
             or saved['obj_pose_world'].dtype!=np.float32
@@ -409,6 +509,8 @@ def main():
     if platform.system() != "Linux" or {p.name for p in Path("/sys/class/net").iterdir()} != {"lo"}:
         raise RuntimeError("Require Azure Linux container with network none")
     args = _argument_parser().parse_args()
+    if args.allow_unobserved_poses and args.mesh_source != 'surface':
+        raise ValueError('Latent pose admission is surface-only')
     if args.query_requalification and args.mesh_source != 'solid':
         raise ValueError('Query requalification is solid-only')
     root = Path(os.environ["WR_ROOT"])
@@ -439,6 +541,8 @@ def main():
                     "adapter": base / "body_full/cari_adapter/report.json"}
     if args.mesh_source in ('solid','surface'):
         report_paths['object'] = base / ('object_pose_full_'+args.mesh_source) / 'report.json'
+    if args.allow_unobserved_poses:
+        report_paths['object'] = base / 'object_pose_full_surface_latent/report.json'
     for key, path in report_paths.items():
         record = json.loads(path.read_text())
         if type(record.get("episode_index", args.episode)) is not int or record.get("episode_index", args.episode) != args.episode:
@@ -468,6 +572,8 @@ def main():
     pose_path = base / "object_pose_full/geometry_and_poses.npz"
     if args.mesh_source in ('solid','surface'):
         pose_path = base / ('object_pose_full_'+args.mesh_source) / 'geometry_and_poses.npz'
+    if args.allow_unobserved_poses:
+        pose_path = base / 'object_pose_full_surface_latent/geometry_and_poses.npz'
     if sha256(pose_path) != reports["object"]["geometry_and_poses_sha256"]:
         raise RuntimeError("Frozen object geometry/poses changed")
     count = inputs["total_frames"]
@@ -478,10 +584,15 @@ def main():
     for key, records in (("body", body_frames), ("depth", depth_frames), ("object", object_frames)):
         if len(records) != len(reports[key]["frames"]) or sorted(records) != list(range(count)):
             raise RuntimeError(f"{key} lacks exact full original-frame coverage")
+    pose_observed = None
     if args.mesh_source == 'surface':
         from surface_pose_report_capacity import identity as surface_identity, recheck as surface_recheck
         vertices, faces, active, rotations, translations, surface_compact, surface_topology, surface_ledger = _surface_preflight(
-            root,args.episode,inputs,reports['object'],pose_path,np)
+            root,args.episode,inputs,reports['object'],pose_path,np,
+            **(dict(allow_unobserved_poses=True) if args.allow_unobserved_poses else {}))
+        if args.allow_unobserved_poses:
+            with np.load(pose_path, allow_pickle=False) as data:
+                pose_observed = _latent_observations(reports['object'], data['pose_observed'], count, np)
         surface_native_load, native_source_ledger = _solid_native_sources(native_root,trimesh,np)
         surface_ledger.update(native_source_ledger)
         native_pins={'prep/prepare_mhr_wild_export.py':{'bytes':13145,'sha256':'b465516cc96a8c5472aec995cff12e32a9d033c7c5157a6a601b96e332e45f4f'},
@@ -614,10 +725,17 @@ def main():
         surface_aligned_proof,surface_native_aligned=_surface_serialized_mesh(
             aligned_path,surface_compact,trimesh,np,surface_native_load,A)
     object_poses_path = output / "own_object_poses.pkl"
-    joblib.dump({"frames": names, "obj_pose_world": aligned_poses.astype(np.float32),
-                 "metadata": {"source": "World_Reward_fixed_scale_depth_ICP_Viterbi_not_FoundationPose",
-                              "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": [],
-                              "source_pose_sha256": sha256(pose_path), "mesh_frame_change": A.tolist()}}, object_poses_path)
+    if args.allow_unobserved_poses:
+        pose_metadata = dict(source='World_Reward_fixed_scale_depth_ICP_Viterbi_not_FoundationPose',
+            ground_truth_used=False, hand_labeled_test=False, oracle_modes=[],
+            source_pose_sha256=sha256(pose_path), mesh_frame_change=A.tolist())
+        pose_metadata.update(_latent_pose_metadata(pose_observed, np))
+        joblib.dump(dict(frames=names, obj_pose_world=aligned_poses.astype(np.float32), metadata=pose_metadata), object_poses_path)
+    else:
+        joblib.dump({"frames": names, "obj_pose_world": aligned_poses.astype(np.float32),
+                     "metadata": {"source": "World_Reward_fixed_scale_depth_ICP_Viterbi_not_FoundationPose",
+                                  "ground_truth_used": False, "hand_labeled_test": False, "oracle_modes": [],
+                                  "source_pose_sha256": sha256(pose_path), "mesh_frame_change": A.tolist()}}, object_poses_path)
     if args.mesh_source == 'solid':
         saved_object_poses = joblib.load(object_poses_path)
         if (type(saved_object_poses) is not dict or set(saved_object_poses) != {'frames', 'obj_pose_world', 'metadata'}
@@ -632,7 +750,8 @@ def main():
     if args.mesh_source == 'surface':
         from world_reward.surface_pose_geometry import camera_roundtrip
         saved=joblib.load(object_poses_path)
-        _surface_saved_poses(saved,names,aligned_poses,sha256(pose_path),A,np)
+        _surface_saved_poses(saved,names,aligned_poses,sha256(pose_path),A,np,
+            **(dict(pose_observed=pose_observed) if args.allow_unobserved_poses else {}))
         surface_aligned_proof['represented_mesh_pose_frame_roundtrip_max_error_m']=camera_roundtrip(
             *surface_compact,rotations,translations,saved['obj_pose_world'],*surface_native_aligned)
     aligned_depth_path = output / "aligned_depth.h5"
@@ -751,6 +870,9 @@ def main():
         result['surface_geometry_validation']={k:reports['object']['topology_budget'][k] for k in fields}
         result['surface_geometry_validation'].update(metric_glb=surface_metric_proof,native_aligned_glb=surface_aligned_proof,
             source_rehashed_after=True,files={str(p):pin for p,pin in surface_ledger.items()})
+    if args.allow_unobserved_poses:
+        result['object_pose_observations'] = _latent_pose_metadata(pose_observed, np)
+        result['allow_unobserved_poses'] = True
     (output / "report.json").write_text(json.dumps(result, indent=2) + "\n")
     # Transient combined masks are redundant after verified native export.
     masks_path.unlink()
