@@ -1,6 +1,8 @@
 """Tiny manufactured recovery/runtime contracts, no models or external data."""
 import json
 from pathlib import Path
+import subprocess
+import sys
 from types import SimpleNamespace
 
 import numpy as np
@@ -11,6 +13,42 @@ from world_reward.occlusion_recovery import RecoveryPolicy, RgbIdentityEvidence,
 
 ROOT = Path(__file__).resolve().parents[1]
 SHA = 'a' * 64
+
+
+def test_host_import_and_settings_need_only_stdlib_without_site_packages():
+    """Fresh host-like interpreter, not pytest's already imported NumPy runtime.
+
+    -I -S excludes PYTHONPATH/user/system site packages. An import finder makes
+    even an attempted lazy numerical/model import an immediate contract error.
+    Explicit source roots contain code only; no Azure/model/data operation runs.
+    """
+    script = r'''
+import importlib.abc
+from pathlib import Path
+import sys
+root = Path(sys.argv[1])
+sys.path[:0] = [str(root / 'src'), str(root / 'infra')]
+blocked = {'numpy', 'scipy', 'torch', 'torchvision', 'cv2', 'PIL', 'sam3'}
+class HostImportFinder(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.', 1)[0] in blocked or fullname == 'world_reward.occlusion_recovery':
+            raise AssertionError('Host attempted numerical/model import: ' + fullname)
+sys.meta_path.insert(0, HostImportFinder())
+import sam31_recovery
+cfg, runtime = sam31_recovery.settings(root)
+assert cfg['episodes'] == [9, 1, 14, 7]
+assert runtime['model_repo'] == 'facebook/sam3.1'
+assert not blocked.intersection(sys.modules)
+assert 'world_reward.occlusion_recovery' not in sys.modules
+for module in tuple(sys.modules.values()):
+    origin = getattr(module, '__file__', '') or ''
+    assert 'site-packages' not in origin and 'dist-packages' not in origin, origin
+print('host-stdlib-only')
+'''
+    result = subprocess.run(['rtk', 'proxy', sys.executable, '-I', '-S', '-B', '-c', script, str(ROOT)],
+                            capture_output=True, text=True, timeout=15, check=False)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == 'host-stdlib-only'
 
 
 def policy():
