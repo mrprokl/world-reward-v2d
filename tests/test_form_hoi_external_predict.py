@@ -245,3 +245,36 @@ def test_candidate_may_not_silently_change_inputs_contact_or_full_T(fault):
     elif fault=='batch':result['postopt']['history'][1]['batch_size']=2.
     else:result['postopt']['final_diagnostics']['contact']=np.nan
     with pytest.raises(ValueError):p.validate_solver_result(source,result,NativeConfig(),3,enabled=True)
+
+
+def test_actual_native_tools_scopes_shadowed_package_and_restores_on_error(tmp_path, monkeypatch):
+    import types
+    native=tmp_path/'cari'; tools=native/'tools'; tools.mkdir(parents=True)
+    (tools/'__init__.py').write_text('# qualified test package\n')
+    (tools/'pipeline_timing.py').write_text('class PipelineTimer: pass\n')
+    for file in tools.iterdir(): file.chmod(0o444)
+    monkeypatch.setattr(p,'NATIVE_TOOLS_PINS',{str(f.relative_to(native)):p.identity(f,16384) for f in tools.iterdir()})
+    shadow=types.ModuleType('tools'); shadow.__path__=[str(tmp_path/'sam_body/tools')]
+    prior=types.ModuleType('tools.old'); monkeypatch.setitem(sys.modules,'tools',shadow); monkeypatch.setitem(sys.modules,'tools.old',prior)
+    previous=sys.path.copy()
+    with pytest.raises(RuntimeError):
+        with p.native_tools(native):
+            assert Path(sys.modules['tools.pipeline_timing'].__file__)==tools/'pipeline_timing.py'
+            assert sys.modules['tools'] is not shadow and 'tools.old' not in sys.modules
+            raise RuntimeError('test exception')
+    assert sys.modules['tools'] is shadow and sys.modules['tools.old'] is prior and sys.path == previous
+    assert 'tools.pipeline_timing' not in sys.modules
+
+
+def test_actual_prepare_and_forward_use_native_tools_without_signature_workaround():
+    tree=ast.parse((REPO/'infra/form_hoi_external_predict.py').read_bytes())
+    for name in ('prepare','forward'):
+        n=next(x for x in tree.body if isinstance(x,ast.FunctionDef) and x.name==name)
+        assert any(isinstance(x,ast.With) and 'native_tools(native)' in ast.unparse(x.items[0].context_expr) for x in ast.walk(n))
+    n=next(x for x in tree.body if isinstance(x,ast.FunctionDef) and x.name=='prepare')
+    call=next(x for x in ast.walk(n) if isinstance(x,ast.Call) and isinstance(x.func,ast.Name) and x.func.id=='prepare_mhr_wild_export')
+    assert len(call.args)==5  # Exact13145B7c0d native API; output_root is NOT keyword-only.
+    seen=[]
+    def native(video,mask_h5,object_mesh,intrinsics_file,output_root,*,redo=False):
+        seen.append((video,mask_h5,object_mesh,intrinsics_file,output_root,redo));return output_root
+    assert native(*range(5)) == 4 and seen[0][-1] is False

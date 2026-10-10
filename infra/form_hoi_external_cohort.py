@@ -72,7 +72,7 @@ def dispatch(rows, stage, invoke):
 
 
 def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_from=None,
-        reuse_stages_from=None, raster_gate=None, raster_prefix=None):
+        reuse_stages_from=None, raster_gate=None, raster_prefix=None, prepare_prefix=None):
     predictor.require(stage in ('localize','all'), 'Explicit cohort stage required')
     binding = predictor.source(predictor.ROOT, code, revision, predictor.ENTRY, predictor.HELPERS)
     rows, transfer = discover(predictor, code, dev_revision)
@@ -106,12 +106,14 @@ def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_f
             current_image=predictor.config(code)['body_image'])
     outcomes = {}
     predictor.require(not (reuse_stages_from and reuse_localizations_from), 'One explicit technical reuse producer required')
+    predictor.require(prepare_prefix is None or stage == 'all' and reuse_stages_from is not None,
+        'Initializer prefix requires explicit stopped all-cohort stage resume')
     if reuse_stages_from is not None:
         predictor.require(stage == 'all' and raster_gate is not None,
             'Successful-prefix resume requires explicit same-source raster qualification')
         from form_stage_reuse import reuse
         report['stage_reuse'] = reuse(predictor, code, revision, reuse_stages_from, rows,
-            allow_body_depth_camera_change=True)
+            allow_body_depth_camera_change=True, prepare_prefix=prepare_prefix)
         report['localization_reuse'] = report['stage_reuse']['original_localization_proof']
     elif reuse_localizations_from is not None:
         from form_prediction_reuse import reuse

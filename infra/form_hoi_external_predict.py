@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import ExitStack
+from contextlib import ExitStack, contextmanager
 from dataclasses import asdict
 import gc
 import hashlib
 from importlib import util
+import importlib
 import json
 import os
 from pathlib import Path
@@ -585,7 +586,35 @@ def lossless_prefix(p, path):
     require(not path.exists(), 'No native RGB overwrite'); tmp.rename(path); path.chmod(0o444)
 
 
-def prepare(p, c, base, out, report):
+NATIVE_TOOLS_PINS = {
+    'tools/__init__.py': dict(bytes=448, sha256='bc268f5f8908d88eb7b7203765f7ac8ff1fafbfcf92ee4818ead8ac018f17d07'),
+    'tools/pipeline_timing.py': dict(bytes=3047, sha256='a931ced10016acf5611d5ac4b1db288e126b9a19c7bdc5f1c1e912a778f23282'),
+}
+
+
+@contextmanager
+def native_tools(native):
+    """Resolve CARI tools, not the already imported SAM3DBody tools package."""
+    native = canonical(native)
+    require(all(identity(native/name, 16384, readonly=False) == pin for name, pin in NATIVE_TOOLS_PINS.items()),
+        'Exact pinned native tools package/timing source required')
+    saved = {k:v for k,v in sys.modules.items() if k == 'tools' or k.startswith('tools.')}
+    oldpath = sys.path.copy()
+    for name in saved: del sys.modules[name]
+    sys.path.insert(0, str(native))
+    try:
+        tools = importlib.import_module('tools')
+        timing = importlib.import_module('tools.pipeline_timing')
+        require(Path(tools.__file__).resolve() == native/'tools/__init__.py' and
+            Path(timing.__file__).resolve() == native/'tools/pipeline_timing.py', 'Native tools import origin differs')
+        yield
+    finally:
+        for name in tuple(sys.modules):
+            if name == 'tools' or name.startswith('tools.'): del sys.modules[name]
+        sys.modules.update(saved); sys.path[:] = oldpath
+
+
+def prepare_initialization(p, c, base, out, report):
     import torch
     import h5py
     import joblib
@@ -626,57 +655,89 @@ def prepare(p, c, base, out, report):
     save_npz(out / 'object_prior.npz', vertices=vertices.astype(np.float32), faces=faces_array,
         rotation=r, translation=t, observed=observed, frame_index=np.arange(96, dtype=np.int64))
     metric = out / 'object_metric.glb'; trimesh.Trimesh(vertices, faces_array, process=False).export(metric); metric.chmod(0o444)
-    from prep.prepare_mhr_wild_export import prepare_mhr_wild_export
-    from prep.mhr_depth_h5 import DepthFrameRecord, MHRDepthH5Writer, validate_depth_h5
-    from prep.mhr_depth_backend import MOGE2_MODEL_ID, MOGE2_MODEL_REVISION, MOGE2_SOURCE_COMMIT
-    from prep.mhr_export_utils import MHR_CAMERA_NAMES
-    sequence = p['sequence_id']; alias = out / (sequence + '.0.color.mp4'); lossless_prefix(p, alias)
-    calibration = dict(fx=K[0, 0], fy=K[1, 1], cx=K[0, 2], cy=K[1, 2], H=p['height'], W=p['width'],
-        depth_backend='moge2', model_id=MOGE2_MODEL_ID, model_revision=MOGE2_MODEL_REVISION,
-        source_commit=MOGE2_SOURCE_COMMIT, camera_policy='RGB_size_prior_K_no_reference_calibration')
-    joblib.dump(calibration, out / 'intrinsics.pkl'); (out / 'intrinsics.pkl').chmod(0o444)
-    with h5py.File(out / 'automatic_masks.h5', 'x') as h:
-        for i in range(96):
-            for role, suffix in ((0, 'person_mask.png'), (1, 'obj_rend_mask.png')):
-                h.create_dataset(f'{sequence}/{i:06d}-k0.{suffix}', data=mask(base, role, i, p).astype('uint8')*255, compression='lzf')
-    (out / 'automatic_masks.h5').chmod(0o444)
-    export = prepare_mhr_wild_export(alias, out / 'automatic_masks.h5', metric, out / 'intrinsics.pkl', out / 'export')
-    wild = strict((export / 'wild_export.json').read_bytes()); A = np.asarray(wild['source_object_mesh_to_aligned_transform'], float)
-    require(A.shape == (4, 4) and np.allclose(A[3], [0, 0, 0, 1]) and
-        np.allclose(A[:3, :3] @ A[:3, :3].T, np.eye(3), atol=1e-5) and np.isclose(np.linalg.det(A[:3, :3]), 1, atol=1e-5),
-        'Native template preparation must be only a proper rigid frame change')
-    from cari_refine import verify_aligned_geometry
-    aligned = trimesh.load(export / 'object_mesh/output_aligned.glb', force='mesh', process=False)
-    report['aligned_object_geometry'] = verify_aligned_geometry(vertices, faces_array,
-        np.asarray(aligned.vertices), np.asarray(aligned.faces), A)
-    poses = np.broadcast_to(np.eye(4), (96, 4, 4)).copy(); poses[:, :3, :3] = r; poses[:, :3, 3] = t
-    aligned_poses = poses @ np.linalg.inv(A)
-    joblib.dump(dict(frames=initializer['frames'], obj_pose_world=aligned_poses.astype(np.float32),
-        metadata=dict(source='automatic_RGB_predicted_depth_ICP_Viterbi', ground_truth_used=False,
-            private_truth_read=False, hand_labeled_test=False, oracle_modes=[])), out / 'own_object_poses.pkl')
-    (out / 'own_object_poses.pkl').chmod(0o444)
-    names = initializer['frames']; camera = MHR_CAMERA_NAMES[0]
-    depth_identity = dict(depth_backend='moge2', depth_model_id=MOGE2_MODEL_ID, depth_model_revision=MOGE2_MODEL_REVISION,
-        depth_source_commit=MOGE2_SOURCE_COMMIT, ground_truth_used=False,
-        alignment='one_predicted_human_anchored_clip_scalar_no_offset')
-    with MHRDepthH5Writer(out / 'aligned_depth.h5', {camera: names},
-            alignment_method='world_reward_shared_predicted_human_scale', alignment_input_identity=depth_identity, encoding_workers=4) as writer:
-        for start in range(0, 96, 8):
-            rows = []
-            for i in range(start, start+8):
-                with np.load(base / 'body_depth/depth' / f'{i:06d}.npz', allow_pickle=False) as z:
-                    raw = np.where(z['mask'], z['depth'], 0.); aligned = raw * scale
-                    require(np.isfinite(aligned).all() and (raw >= 0).all() and (aligned >= 0).all() and
-                        (raw <= 65.535).all() and (aligned <= 65.535).all(), 'Depth encoding saturation is forbidden')
-                    rows.append(DepthFrameRecord(i, raw, aligned, scale, 0., int(z['mask'].sum())))
-            writer.write_frames(camera, rows)
-        writer.mark_complete()
-    validate_depth_h5(out / 'aligned_depth.h5', expected_cameras=[camera], expected_alignment_input_identity=depth_identity, validation_workers=4)
-    for f in out.rglob('*'):
-        if f.is_file(): f.chmod(0o444)
-    report.update(native_export=str(export),
-        object_pose_path=path, public_sequence_id=sequence, source_object_transform=A.tolist(),
-        object_scale_baked_once=True, all_original_object_faces_preserved=True)
+    return initializer, vertices, faces_array, r, t, observed, path, native
+
+
+def prepare(p, c, base, out, report):
+    import h5py
+    import joblib
+    import trimesh
+    from form_stage_reuse import consume_prepare_prefix
+    native = ROOT / 'vendor/video_to_data/reconstruction/modules/v2d_cari4d/lib/cari4d'
+    sys.path.insert(0, str(native))
+    # Native ABI/import admission before any long full96 pose initialization.
+    with native_tools(native):
+        api = importlib.import_module('prep.prepare_mhr_wild_export')
+        depth_api = importlib.import_module('prep.mhr_depth_h5')
+        require(Path(api.__file__).resolve() == native/'prep/prepare_mhr_wild_export.py'
+            and identity(native/'prep/prepare_mhr_wild_export.py', 16384, readonly=False) ==
+                dict(bytes=13145,sha256='b465516cc96a8c5472aec995cff12e32a9d033c7c5157a6a601b96e332e45f4f')
+            and Path(depth_api.__file__).resolve() == native/'prep/mhr_depth_h5.py'
+            and sha(native/'prep/mhr_depth_h5.py') == '1429760952205d35c87157c05941defa20dc450f2b014441ca7cd5d39b45b0c5',
+            'Exact native preparation/export/depth source before expensive inference')
+    gauge = strict((base / 'body_depth/gauge.json').read_bytes()); K = np.asarray(gauge['K']); scale = gauge['alignment']['shared_scale']
+    cached = consume_prepare_prefix(sys.modules[__name__], base, out, report, p, os.environ['WR_CODE_REVISION'])
+    if cached is None:
+        initializer, vertices, faces_array, r, t, observed, path, native = prepare_initialization(p, c, base, out, report)
+    else:
+        initializer, vertices, faces_array, r, t, observed = cached
+        path = dict(original_completed_initializer_reused=True, observed_frames=int(observed.sum()),
+            latent_initialization_only=True, details_not_stored_by_original_failed_producer=True)
+        native = ROOT / 'vendor/video_to_data/reconstruction/modules/v2d_cari4d/lib/cari4d'
+    metric = out / 'object_metric.glb'
+    sys.path.insert(0, str(native))
+    with native_tools(native):
+        from prep.prepare_mhr_wild_export import prepare_mhr_wild_export
+        from prep.mhr_depth_h5 import DepthFrameRecord, MHRDepthH5Writer, validate_depth_h5
+        from prep.mhr_depth_backend import MOGE2_MODEL_ID, MOGE2_MODEL_REVISION, MOGE2_SOURCE_COMMIT
+        from prep.mhr_export_utils import MHR_CAMERA_NAMES
+        sequence = p['sequence_id']; alias = out / (sequence + '.0.color.mp4'); lossless_prefix(p, alias)
+        calibration = dict(fx=K[0, 0], fy=K[1, 1], cx=K[0, 2], cy=K[1, 2], H=p['height'], W=p['width'],
+            depth_backend='moge2', model_id=MOGE2_MODEL_ID, model_revision=MOGE2_MODEL_REVISION,
+            source_commit=MOGE2_SOURCE_COMMIT, camera_policy='RGB_size_prior_K_no_reference_calibration')
+        joblib.dump(calibration, out / 'intrinsics.pkl'); (out / 'intrinsics.pkl').chmod(0o444)
+        with h5py.File(out / 'automatic_masks.h5', 'x') as h:
+            for i in range(96):
+                for role, suffix in ((0, 'person_mask.png'), (1, 'obj_rend_mask.png')):
+                    h.create_dataset(f'{sequence}/{i:06d}-k0.{suffix}', data=mask(base, role, i, p).astype('uint8')*255, compression='lzf')
+        (out / 'automatic_masks.h5').chmod(0o444)
+        export = prepare_mhr_wild_export(alias, out / 'automatic_masks.h5', metric, out / 'intrinsics.pkl', out / 'export')
+        wild = strict((export / 'wild_export.json').read_bytes()); A = np.asarray(wild['source_object_mesh_to_aligned_transform'], float)
+        require(A.shape == (4, 4) and np.allclose(A[3], [0, 0, 0, 1]) and
+            np.allclose(A[:3, :3] @ A[:3, :3].T, np.eye(3), atol=1e-5) and np.isclose(np.linalg.det(A[:3, :3]), 1, atol=1e-5),
+            'Native template preparation must be only a proper rigid frame change')
+        from cari_refine import verify_aligned_geometry
+        aligned = trimesh.load(export / 'object_mesh/output_aligned.glb', force='mesh', process=False)
+        report['aligned_object_geometry'] = verify_aligned_geometry(vertices, faces_array,
+            np.asarray(aligned.vertices), np.asarray(aligned.faces), A)
+        poses = np.broadcast_to(np.eye(4), (96, 4, 4)).copy(); poses[:, :3, :3] = r; poses[:, :3, 3] = t
+        aligned_poses = poses @ np.linalg.inv(A)
+        joblib.dump(dict(frames=initializer['frames'], obj_pose_world=aligned_poses.astype(np.float32),
+            metadata=dict(source='automatic_RGB_predicted_depth_ICP_Viterbi', ground_truth_used=False,
+                private_truth_read=False, hand_labeled_test=False, oracle_modes=[])), out / 'own_object_poses.pkl')
+        (out / 'own_object_poses.pkl').chmod(0o444)
+        names = initializer['frames']; camera = MHR_CAMERA_NAMES[0]
+        depth_identity = dict(depth_backend='moge2', depth_model_id=MOGE2_MODEL_ID, depth_model_revision=MOGE2_MODEL_REVISION,
+            depth_source_commit=MOGE2_SOURCE_COMMIT, ground_truth_used=False,
+            alignment='one_predicted_human_anchored_clip_scalar_no_offset')
+        with MHRDepthH5Writer(out / 'aligned_depth.h5', {camera: names},
+                alignment_method='world_reward_shared_predicted_human_scale', alignment_input_identity=depth_identity, encoding_workers=4) as writer:
+            for start in range(0, 96, 8):
+                rows = []
+                for i in range(start, start+8):
+                    with np.load(base / 'body_depth/depth' / f'{i:06d}.npz', allow_pickle=False) as z:
+                        raw = np.where(z['mask'], z['depth'], 0.); aligned = raw * scale
+                        require(np.isfinite(aligned).all() and (raw >= 0).all() and (aligned >= 0).all() and
+                            (raw <= 65.535).all() and (aligned <= 65.535).all(), 'Depth encoding saturation is forbidden')
+                        rows.append(DepthFrameRecord(i, raw, aligned, scale, 0., int(z['mask'].sum())))
+                writer.write_frames(camera, rows)
+            writer.mark_complete()
+        validate_depth_h5(out / 'aligned_depth.h5', expected_cameras=[camera], expected_alignment_input_identity=depth_identity, validation_workers=4)
+        for f in out.rglob('*'):
+            if f.is_file(): f.chmod(0o444)
+        report.update(native_export=str(export),
+            object_pose_path=path, public_sequence_id=sequence, source_object_transform=A.tolist(),
+            object_scale_baked_once=True, all_original_object_faces_preserved=True)
 
 
 def RGB_evidence(p, c, base, out, bundle, vertices, faces_array, report):
@@ -770,15 +831,16 @@ def forward(p, c, base, out, report):
     report.update(hub_attempts=0, hub_returns=0)
     original = assets.local_dino_hub(torch, repository, report)
     try:
-        from tools import run_mhr_wild_inference as module
-        cloned = constrained.clone_native_forward(torch, module.run_mhr_wild_inference, report,
-            source_bytes=(native / constrained.NATIVE_RELATIVE_PATH).read_bytes())
-        export = Path(previous['native_export'])
-        result = cloned(export, prepared / 'aligned_depth.h5', prepared / 'shared_initializer.pkl',
-            prepared / 'own_object_poses.pkl', native / assets.CONFIG_RELATIVE_PATH, checkpoint, out / 'coconet.pth',
-            stride=96, render_batch_size=32, crop_workers=4, crop_buffer_count=2, input_cache=None,
-            use_input_cache=False, device_name='cuda', overwrite=False, wandb_run_path=None, offline_supervision_contract=True)
-        require(Path(result) == out / 'coconet.pth', 'Native return path differs')
+        with native_tools(native):
+            from tools import run_mhr_wild_inference as module
+            cloned = constrained.clone_native_forward(torch, module.run_mhr_wild_inference, report,
+                source_bytes=(native / constrained.NATIVE_RELATIVE_PATH).read_bytes())
+            export = Path(previous['native_export'])
+            result = cloned(export, prepared / 'aligned_depth.h5', prepared / 'shared_initializer.pkl',
+                prepared / 'own_object_poses.pkl', native / assets.CONFIG_RELATIVE_PATH, checkpoint, out / 'coconet.pth',
+                stride=96, render_batch_size=32, crop_workers=4, crop_buffer_count=2, input_cache=None,
+                use_input_cache=False, device_name='cuda', overwrite=False, wandb_run_path=None, offline_supervision_contract=True)
+            require(Path(result) == out / 'coconet.pth', 'Native return path differs')
     finally: torch.hub.load = original
     bundle = torch.load(result, map_location='cpu', weights_only=False)
     mesh = export / 'object_mesh/output_aligned.glb'; full.validate_source_bundle(bundle, mesh, 96)
@@ -1236,6 +1298,9 @@ def main():
     parser.add_argument('--cohort-stage',choices=('localize','all'));parser.add_argument('--dev-revision')
     parser.add_argument('--reuse-localizations-from')
     parser.add_argument('--reuse-stages-from')
+    parser.add_argument('--reuse-prepare-prefix-report', type=Path)
+    parser.add_argument('--reuse-prepare-prefix-bytes', type=int)
+    parser.add_argument('--reuse-prepare-prefix-sha256')
     parser.add_argument('--raster-gate-report', type=Path)
     parser.add_argument('--raster-gate-bytes', type=int)
     parser.add_argument('--raster-gate-sha256')
@@ -1251,6 +1316,13 @@ def main():
         or (args.raster_prefix_report is not None and type(args.raster_prefix_bytes) is int and 0 < args.raster_prefix_bytes <= 131072
         and type(args.raster_prefix_sha256) is str and re.fullmatch('[0-9a-f]{64}', args.raster_prefix_sha256)
         and args.raster_gate_report is not None), 'Explicit complete prefix activation pin and capacity gate required')
+    prefix_fields = (args.reuse_prepare_prefix_report, args.reuse_prepare_prefix_bytes, args.reuse_prepare_prefix_sha256)
+    require(all(v is None for v in prefix_fields) or
+        (args.reuse_prepare_prefix_report is not None and type(args.reuse_prepare_prefix_bytes) is int
+        and 0 < args.reuse_prepare_prefix_bytes <= 16384 and type(args.reuse_prepare_prefix_sha256) is str
+        and re.fullmatch('[0-9a-f]{64}', args.reuse_prepare_prefix_sha256)
+        and args.cohort_stage == 'all' and args.reuse_stages_from == '80eef93ad61c6a331e977092f99d50608cd72e9b'),
+        'Complete explicit diagnosed prepare prefix pin and original80 all-cohort resume required')
     require(not (args.reuse_localizations_from and args.reuse_stages_from), 'Choose one exact technical reuse producer')
     if args.cohort_stage is not None:
         require(not args.native and args.stage=='all' and args.dev_revision is not None and
@@ -1262,6 +1334,8 @@ def main():
         from form_hoi_external_cohort import run
         run(sys.modules[__name__],code,revision,stage=args.cohort_stage,dev_revision=args.dev_revision,
             reuse_localizations_from=args.reuse_localizations_from, reuse_stages_from=args.reuse_stages_from,
+            prepare_prefix=dict(path=args.reuse_prepare_prefix_report, bytes=args.reuse_prepare_prefix_bytes,
+                sha256=args.reuse_prepare_prefix_sha256) if args.reuse_prepare_prefix_report is not None else None,
             raster_gate=dict(path=args.raster_gate_report, bytes=args.raster_gate_bytes, sha256=args.raster_gate_sha256)
                 if args.raster_gate_report is not None else None,
             raster_prefix=dict(path=args.raster_prefix_report, bytes=args.raster_prefix_bytes, sha256=args.raster_prefix_sha256)
