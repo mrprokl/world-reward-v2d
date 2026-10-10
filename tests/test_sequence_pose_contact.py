@@ -76,6 +76,65 @@ def test_surface_matches_independent_scalar_reference_and_chunking():
     np.testing.assert_allclose(surface.distances(points), expected, atol=1e-14)
     repeated = runtime._ContactTriangleSurface(vertices, np.tile(faces, (301, 1)))
     np.testing.assert_allclose(repeated.distances(points), expected, atol=1e-14)
+    np.testing.assert_array_equal(repeated.distances(points), repeated.distances(points, broadphase=False))
+
+
+def test_conservative_broadphase_prunes_work_without_dropping_surface():
+    triangles = np.array([[[x, 0., 0.], [x+.01, 0., 0.], [x, .01, 0.]] for x in range(128)])
+    vertices = triangles.reshape(-1, 3); faces = np.arange(len(vertices)).reshape(-1, 3)
+    surface = runtime._ContactTriangleSurface(vertices, faces)
+    point = np.array([.003, .003, .001])
+    assert len(surface._candidate_faces(point)) == 1 and len(surface.starts) == 128
+    np.testing.assert_array_equal(surface.distances(point[None]), surface.distances(point[None], broadphase=False))
+
+
+def test_broadphase_catches_long_skinny_triangle_interior_and_tied_centres():
+    long = np.array([[-1000., -1e-3, 0.], [1000., -1e-3, 0.], [0., 1e-3, 0.]])
+    small = np.array([[900., 0., 1.], [900.01, 0., 1.], [900., .01, 1.]])
+    # Duplicate centres and degenerate faces must not collapse distinct faces.
+    degenerate = np.array([[900., 0., 0.], [900., 0., 0.], [900., 0., 0.]])
+    triangles = np.stack((long, long[::-1], small, degenerate))
+    surface = runtime._ContactTriangleSurface(triangles.reshape(-1, 3), np.arange(12).reshape(-1, 3))
+    points = np.array([[900., -8e-4, .01], [0., 0., 0.], [900., 0., 0.]])
+    np.testing.assert_array_equal(surface.distances(points), surface.distances(points, broadphase=False))
+    assert {0, 1} <= set(surface._candidate_faces(points[0]))
+
+
+def test_unreferenced_vertex_is_not_a_false_surface_upper_bound():
+    # An isolated vertex exactly at the query could incorrectly produce d=0,
+    # pruning a large face whose centre is farther than its enclosing radius.
+    vertices = np.array([[0., 0., 0.], [1., 0., 0.], [0., 1., 0.], [100., 100., 0.]])
+    surface = runtime._ContactTriangleSurface(vertices, np.array([[0, 1, 2]], np.int64))
+    point = vertices[-1:]
+    np.testing.assert_array_equal(surface.distances(point), surface.distances(point, broadphase=False))
+    assert surface.distances(point)[0] > 100.
+
+
+@pytest.mark.parametrize('scale,offset', [(1e-50, 0.), (1e50, 0.), (1., 1e10)])
+def test_broadphase_float_margin_is_conservative_across_scales(scale, offset):
+    triangles = np.array([[[x, 0., 0.], [x+1., 0., 0.], [x, 1., 0.]] for x in (0., 10., 20.)])
+    triangles = triangles*scale+offset
+    surface = runtime._ContactTriangleSurface(triangles.reshape(-1, 3), np.arange(9).reshape(-1, 3))
+    points = np.array([[.25, .25, .02], [10.5, .25, 1.], [21., 0., 0.]])*scale+offset
+    np.testing.assert_array_equal(surface.distances(points), surface.distances(points, broadphase=False))
+
+
+@pytest.mark.parametrize('invalid', ['missing', 'infinite_bound', 'empty_query', 'bad_tree'])
+def test_unsafe_broadphase_uses_all_faces_not_fake_distance(invalid):
+    vertices = np.array([[0., 0., 0.], [1., 0., 0.], [0., 1., 0.]])
+    surface = runtime._ContactTriangleSurface(vertices, np.array([[0, 1, 2]], np.int64))
+    point = np.array([[.2, .2, .1]])
+    expected = surface.distances(point, broadphase=False)
+    if invalid == 'missing': surface._centre_tree = None
+    if invalid == 'infinite_bound': surface._maximum_radius = np.inf
+    if invalid == 'empty_query':
+        from types import SimpleNamespace
+        surface._centre_tree = SimpleNamespace(query_ball_point=lambda *a, **k: [])
+    if invalid == 'bad_tree':
+        from types import SimpleNamespace
+        def fail(*args, **kwargs): raise ValueError('manufactured unsafe bound')
+        surface._vertex_tree = SimpleNamespace(query=fail)
+    np.testing.assert_array_equal(surface.distances(point), expected)
 
 
 def test_absent_contact_is_exact_RGB_and_RGBD_default_not_pseudo_attraction():

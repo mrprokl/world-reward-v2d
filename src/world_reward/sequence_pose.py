@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, asdict
 import numpy as np
 from scipy.optimize import least_squares
+from scipy.spatial import cKDTree
 from scipy.sparse import lil_matrix
 from scipy.spatial.transform import Rotation, Slerp
 
@@ -107,11 +108,14 @@ class SequenceContactEvidence:
 
 
 class _ContactTriangleSurface:
-    """Continuous unsigned point-to-all-triangle distance, bounded NumPy chunks.
+    """Continuous unsigned surface distance with conservative exact broadphase.
 
     Enumerates contained planar projections and every closed edge. Degenerate
     triangles contribute their segments/vertices, never disappear. Closest-face
     ties are nonsmooth; sparse numerical differentiation does not change that.
+    Triangle balls and a nearest referenced vertex bound prune only faces that
+    cannot beat the upper bound. All faces remain stored; unsafe bounds use the
+    complete surface. This is float64 geometry, not an exact-arithmetic proof.
     """
     def __init__(self, vertices, faces):
         if np.any(faces >= len(vertices)):
@@ -127,18 +131,58 @@ class _ContactTriangleSurface:
                 or not np.isfinite(self.normal2).all()
                 or np.any(np.any(self.normal != 0, axis=1) & (self.normal2 == 0))):
             raise ValueError('Fixed contact triangle arithmetic exceeds finite representable range')
+        self._all_faces = np.arange(len(triangles), dtype=np.int64)
+        self._centre_tree = self._vertex_tree = None
+        self._maximum_radius = np.inf
+        self._coordinate_magnitude = float(np.abs(triangles).max())
+        # Unreferenced vertices are NOT on the surface and cannot bound its
+        # distance. Index only vertices appearing in at least one original face.
+        with np.errstate(over='ignore', invalid='ignore', under='ignore'):
+            centres = (triangles/3).sum(axis=1)
+            radius = np.linalg.norm(triangles-centres[:, None], axis=2).max(axis=1)
+        if np.isfinite(centres).all() and np.isfinite(radius).all():
+            try:
+                self._centre_tree = cKDTree(centres, copy_data=True)
+                self._vertex_tree = cKDTree(vertices[np.unique(faces)], copy_data=True)
+                self._maximum_radius = float(radius.max())
+            except (ValueError, OverflowError):
+                self._centre_tree = self._vertex_tree = None
 
-    def distances(self, points):
+    def _candidate_faces(self, point):
+        """Every possibly winning face, or full mesh on any invalid bound."""
+        if self._centre_tree is None or self._vertex_tree is None:
+            return self._all_faces
+        try:
+            upper, _ = self._vertex_tree.query(point, k=1, eps=0)
+            magnitude = max(self._coordinate_magnitude, float(np.abs(point).max()),
+                            float(upper), self._maximum_radius, np.finfo(float).tiny)
+            guard = 128*np.finfo(float).eps*magnitude
+            bound = np.nextafter(float(upper)+self._maximum_radius+guard, np.inf)
+            if not np.isfinite(bound) or bound < 0:
+                return self._all_faces
+            candidates = self._centre_tree.query_ball_point(point, bound, eps=0)
+            if not candidates: return self._all_faces
+            return np.sort(np.asarray(candidates, dtype=np.int64))
+        except (ValueError, OverflowError):
+            return self._all_faces
+
+    def distances(self, points, *, broadphase=True):
         if points.ndim != 2 or points.shape[1:] != (3,) or not np.isfinite(points).all():
             raise ValueError('Finite supported object-frame contact points required')
         result = np.full(len(points), np.inf)
-        for begin in range(0, len(points), 32):
-            p = points[begin:begin+32]
+        if broadphase:
+            batches = ((index, points[index:index+1], self._candidate_faces(point))
+                       for index, point in enumerate(points))
+        else:
+            batches = ((begin, points[begin:begin+32], self._all_faces)
+                       for begin in range(0, len(points), 32))
+        for begin, p, candidates in batches:
             best = np.full(len(p), np.inf)
-            for first in range(0, len(self.starts), 2048):
-                starts = self.starts[first:first+2048]; edges = self.edges[first:first+2048]
-                edge2 = self.edge2[first:first+2048]
-                normal = self.normal[first:first+2048]; normal2 = self.normal2[first:first+2048]
+            for first in range(0, len(candidates), 2048):
+                selected = candidates[first:first+2048]
+                starts = self.starts[selected]; edges = self.edges[selected]
+                edge2 = self.edge2[selected]
+                normal = self.normal[selected]; normal2 = self.normal2[selected]
                 with np.errstate(over='ignore', invalid='ignore', divide='ignore'):
                     delta = p[:, None, None, :]-starts[None]
                     parameter = np.divide(np.einsum('pfki,fki->pfk', delta, edges), edge2[None],
@@ -421,4 +465,5 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
             contact_distance='minimum_anatomical_point_to_full_continuous_triangle_surface',
             contact_point_triangle_pairs_per_residual=contact_pairs,
             contact_mesh_faces=len(contact_evidence.object_faces), contact_degenerate_faces_retained=True)
+        diagnostics['contact_broadphase'] = 'conservative_triangle_balls_referenced_vertex_upper_bound_full_fallback'
     return SequencePoseResult(rr, tt, ids.copy(), visible.any(1), diagnostics)
