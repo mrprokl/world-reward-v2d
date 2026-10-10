@@ -172,12 +172,46 @@ def docker(arguments, *, seconds, log=None):
     return result.stdout
 
 
+
+def raster_binding():
+    # New binding has only the exact mesh-raster ABI; no duplicate native classes
+    # (full ext.cpp registers PulsarRenderer globally and cannot coexist with _C).
+    return b'''#include <torch/extension.h>
+#include "rasterize_meshes/rasterize_meshes.h"
+PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+  m.def("rasterize_meshes", &RasterizeMeshes);
+  m.def("rasterize_meshes_backward", &RasterizeMeshesBackward);
+  m.def("_rasterize_meshes_naive", &RasterizeMeshesNaive);
+  m.def("_rasterize_meshes_coarse", &RasterizeMeshesCoarse);
+  m.def("_rasterize_meshes_fine", &RasterizeMeshesFine);
+}
+'''
+
+
+def raster_setup():
+    # Same native compile defines/flags as pinned setup.py, four TUs only. The
+    # algorithms/headers are byte-verified upstream, apart from sentinel break.
+    return b'''from setuptools import setup
+import os
+from torch.utils.cpp_extension import BuildExtension, CUDAExtension
+sources = ["ext_raster.cpp", "pytorch3d/csrc/rasterize_meshes/rasterize_meshes_cpu.cpp",
+           "pytorch3d/csrc/rasterize_meshes/rasterize_meshes.cu",
+           "pytorch3d/csrc/rasterize_coarse/rasterize_coarse.cu"]
+setup(name="world_reward_raster_prefix", version="0.1", ext_modules=[CUDAExtension(
+    "pytorch3d._C", sources, include_dirs=[os.path.abspath("pytorch3d/csrc"), "/usr/local/cuda/include"],
+    define_macros=[("WITH_CUDA", None), ("THRUST_IGNORE_CUB_VERSION_CHECK", None)],
+    extra_compile_args={"cxx": ["-std=c++17"], "nvcc": ["-DCUDA_HAS_FP16=1",
+        "-D__CUDA_NO_HALF_OPERATORS__", "-D__CUDA_NO_HALF_CONVERSIONS__",
+        "-D__CUDA_NO_HALF2_OPERATORS__", "-std=c++17"]})],
+    cmdclass={"build_ext": BuildExtension})
+'''
+
 def recipe():
     return (f'FROM {BASE}\nCOPY source /tmp/pytorch3d-source\n'
         'RUN cd /tmp/pytorch3d-source && CUDA_VISIBLE_DEVICES=-1 FORCE_CUDA=1 '
         'CUDA_HOME=/usr/local/cuda CUB_HOME=/usr/local/cuda/include '
         'TORCH_CUDA_ARCH_LIST=9.0 MAX_JOBS=4 '
-        f'/opt/conda/bin/python setup.py build_ext --build-lib {SITE} --build-temp /tmp/p3d-build '
+        f'/opt/conda/bin/python setup_raster.py build_ext --build-lib {SITE} --build-temp /tmp/p3d-build '
         f'&& find {SITE} -type f -name "_C*.so" -exec chmod 444 {{}} \\; '
         '&& rm -rf /tmp/pytorch3d-source /tmp/p3d-build\n')
 
@@ -292,7 +326,10 @@ def qualify(code, revision, out):
     require({x.name for x in Path('/sys/class/net').iterdir()} == {'lo'} and torch.cuda.is_available(),
             'Offline Azure-only CUDA qualification required')
     raster_module = importlib.import_module('pytorch3d.renderer.mesh.rasterize_meshes')
-    original = raster_module._C; candidate, binary = _candidate_extension()
+    original = raster_module._C
+    binaries = list((Path(SITE)/'pytorch3d').glob('_C*.so'))
+    require(len(binaries) == 1, 'Exactly one isolated mesh-raster binary required')
+    binary = binaries[0]
     torch.backends.cuda.matmul.allow_tf32 = False; torch.backends.cudnn.allow_tf32 = False
     args = types.SimpleNamespace(root=ROOT, external_expected_faces=743576,
         external_object_report=FIRST/'object/report.json', external_object_report_bytes=9165,
@@ -306,6 +343,8 @@ def qualify(code, revision, out):
         geometry_deleted=False, grid_resized=False, model_or_RGB_loaded=False, truth_read=False, adopted=False)
     started = time.monotonic()
     try:
+        candidate, actual_binary = _candidate_extension()
+        require(actual_binary == binary, 'Candidate module path changed')
         report['prefix_invariant'] = prefix_invariant(torch, original)
         report['fixed_bin_kernel_gate'] = fixed_bin_kernel_gate(torch, original, candidate)
         posed, faces, K, provenance = renderer._load_external_capacity_geometry(args)
@@ -356,9 +395,14 @@ def build(code, revision):
         report['publisher_source'] = dict(revision=REVISION, manifest_sha256=MANIFEST_SHA256,
             files=152, bytes=919588, license_pin=identity(src/'LICENSE', 20000),
             original_fine_sha256=PATCH_SHA256, patched_fine_sha256=hashlib.sha256(changed).hexdigest())
+        for name, raw in (('ext_raster.cpp', raster_binding()), ('setup_raster.py', raster_setup())):
+            with (src/name).open('xb') as f: f.write(raw); os.fchmod(f.fileno(), 0o400)
+        report['authored_raster_binding'] = dict(binding_sha256=hashlib.sha256(raster_binding()).hexdigest(),
+            setup_sha256=hashlib.sha256(raster_setup()).hexdigest(), native_algorithm_changes='one_sentinel_line_only',
+            compiled_translation_units=4, native_class_registrations=0, original_global_extension_unchanged=True)
         (context/'Dockerfile').write_text(recipe())
         docker(['build', '--network=none', '--pull=false', '--label', LABEL+'='+revision, '-t', tag, str(context)],
-            seconds=1500, log=out/'build.log')
+            seconds=600, log=out/'build.log')
         child = strict(docker(['image', 'inspect', tag], seconds=20))[0]
         require(child['Id'] != BASE and child['Config']['Labels'][LABEL] == revision and
             child['RootFS']['Layers'][:len(base['RootFS']['Layers'])] == base['RootFS']['Layers'],

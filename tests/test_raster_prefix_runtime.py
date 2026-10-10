@@ -48,7 +48,7 @@ def test_duplicate_context_or_any_publisher_source_change_rejected(monkeypatch):
 def test_child_compiles_only_extension_offline_no_global_or_pip_mutation():
     recipe = module.recipe()
     assert recipe.startswith('FROM '+module.BASE+'\n')
-    assert 'setup.py build_ext --build-lib '+module.SITE in recipe
+    assert 'setup_raster.py build_ext --build-lib '+module.SITE in recipe
     assert 'TORCH_CUDA_ARCH_LIST=9.0' in recipe and 'FORCE_CUDA=1' in recipe
     assert 'CUDA_VISIBLE_DEVICES=-1' in recipe and 'MAX_JOBS=4' in recipe
     assert 'pip' not in recipe and 'apt' not in recipe and 'git ' not in recipe
@@ -149,3 +149,26 @@ def test_wrapper_has_shared_owned_gpu_lease_durable_budget_and_no_service_calls(
     assert 'exec 9<' in s and 'flock -n 9' in s and '2100s' in s
     assert 'run_raster_prefix_runtime/code' in s
     assert 'az ' not in s and 'ssh ' not in s and 'pip ' not in s
+
+
+def test_mesh_only_authored_binding_excludes_all_class_registrations():
+    raw = module.raster_binding().decode()
+    assert raw.count('m.def(') == 5
+    assert 'py::class_' not in raw and 'Pulsar' not in raw
+    for name in ('RasterizeMeshes', 'RasterizeMeshesBackward', 'RasterizeMeshesCoarse', 'RasterizeMeshesFine', 'RasterizeMeshesNaive'):
+        assert '&'+name in raw
+    assert '#include "rasterize_meshes/rasterize_meshes.h"' in raw
+
+
+def test_four_native_translation_units_only_preserve_published_compile_flags():
+    import ast
+    source = module.raster_setup().decode(); tree = ast.parse(source)
+    assignment = next(n for n in tree.body if isinstance(n, ast.Assign))
+    paths = ast.literal_eval(assignment.value)
+    assert paths == ['ext_raster.cpp', 'pytorch3d/csrc/rasterize_meshes/rasterize_meshes_cpu.cpp',
+                     'pytorch3d/csrc/rasterize_meshes/rasterize_meshes.cu', 'pytorch3d/csrc/rasterize_coarse/rasterize_coarse.cu']
+    assert 'ext.cpp' not in paths and 'Pulsar' not in source
+    for flag in ('WITH_CUDA', 'THRUST_IGNORE_CUB_VERSION_CHECK', '-std=c++17',
+                 '-D__CUDA_NO_HALF_OPERATORS__', '-D__CUDA_NO_HALF_CONVERSIONS__', '-D__CUDA_NO_HALF2_OPERATORS__'):
+        assert flag in source
+    assert 'fast_math' not in source and 'setup.py' not in module.recipe()
