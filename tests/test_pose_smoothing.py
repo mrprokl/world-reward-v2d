@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from scipy.spatial.transform import Rotation
 
-from world_reward.pose_smoothing import local_chart_sg_reference
+from world_reward.pose_smoothing import local_chart_sg_reference, NATIVE_SO3_ATOL
 
 
 def run(r, t, centroid=None, *, fps=30., indices=None, preserve=True):
@@ -85,6 +85,58 @@ def test_shared_world_gauge_rotation_and_translation_equivariance():
     changed = run(q@r, t@q.T+shift, centroid)
     np.testing.assert_allclose(changed.rotation, q@base.rotation, atol=2e-14)
     np.testing.assert_allclose(changed.translation, base.translation@q.T+shift, atol=3e-11)
+
+
+def test_noncommuting_noisy_rotation_path_and_canonical_world_gauge_equivariance():
+    r, t, centroid, c = path(91)
+    seconds = np.arange(len(t))/30
+    rx = Rotation.from_rotvec(np.column_stack([.25*seconds, seconds*0, seconds*0])).as_matrix()
+    ry = Rotation.from_rotvec(np.column_stack([seconds*0, .3*np.sin(seconds), seconds*0])).as_matrix()
+    rz = Rotation.from_rotvec(np.column_stack([seconds*0, seconds*0, -.2*seconds**2])).as_matrix()
+    clean_r = rx@ry@rz
+    assert not np.allclose(rx[30]@ry[30], ry[30]@rx[30])
+    noise = .012*np.sin(np.arange(len(t))*2*np.pi/3)
+    perturbation = np.column_stack([noise, noise*.4, -noise*.3])
+    r = Rotation.from_rotvec(perturbation).as_matrix() @ clean_r
+    t = c - np.einsum('tij,j->ti', r, centroid)
+    base = run(r, t, centroid)
+    q = Rotation.from_rotvec([.3, -.7, .2]).as_matrix(); shift = np.array([7., -3., 4.])
+    changed = run(q@r, t@q.T+shift, centroid)
+    np.testing.assert_allclose(changed.rotation, q@base.rotation, atol=3e-14)
+    np.testing.assert_allclose(changed.translation, base.translation@q.T+shift, atol=3e-11)
+    canonical_q = Rotation.from_rotvec([.1, .2, -.3]).as_matrix(); origin = np.array([3., -.2, .7])
+    renamed = run(r@canonical_q, t+np.einsum('tij,j->ti', r, origin), canonical_q.T@(centroid-origin))
+    np.testing.assert_allclose(renamed.rotation, base.rotation@canonical_q, atol=3e-14)
+    np.testing.assert_allclose(renamed.translation,
+        base.translation+np.einsum('tij,j->ti', base.rotation, origin), atol=3e-11)
+    selected = slice(4, -4)
+    before = Rotation.from_matrix(r[selected] @ clean_r[selected].transpose(0, 2, 1)).magnitude()
+    after = Rotation.from_matrix(base.rotation[selected] @ clean_r[selected].transpose(0, 2, 1)).magnitude()
+    assert np.mean(after**2) < .2*np.mean(before**2)
+    assert Rotation.from_matrix(base.rotation[-1] @ base.rotation[0].T).magnitude() > 1.
+
+
+def test_native_float_SO3_ABI_preserves_not_repairs_accepted_Gram_defects():
+    r, t, c, _ = path()
+    defect = np.diag([np.sqrt(1+9.9e-6), 1., 1.])
+    r = r@defect
+    result = run(r, t, c)
+    assert result.diagnostics['native_SO3_validation_atol'] == NATIVE_SO3_ATOL == 1e-5
+    assert 1e-6 < result.diagnostics['native_input_max_Gram_error'] < NATIVE_SO3_ATOL
+    assert result.diagnostics['rotation_projected'] is False
+    np.testing.assert_allclose(result.rotation.transpose(0, 2, 1)@result.rotation,
+        r.transpose(0, 2, 1)@r, atol=3e-14)
+    assert np.array_equal(result.rotation[0], r[0])
+    r = np.tile(np.diag([np.sqrt(1+1.01e-5), 1., 1.]), (len(t), 1, 1))
+    with pytest.raises(ValueError, match='proper SO'):
+        run(r, t, c)
+
+
+@pytest.mark.parametrize('fps,count', [(30., 8), (1e308, 61), (10., 61), (60., 18)])
+def test_short_clips_or_huge_low_fps_fail_without_adapting_window(fps, count):
+    r, t, c, _ = path(count)
+    with pytest.raises(ValueError):
+        run(r, t, c, fps=fps)
 
 
 def test_zero_mean_high_frequency_noise_reduces_without_freezing_moving_pose():

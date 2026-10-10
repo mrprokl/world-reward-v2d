@@ -19,6 +19,7 @@ from scipy.spatial.transform import Rotation
 WINDOW_SECONDS = 0.3
 POLYNOMIAL_DEGREE = 3
 CHART_LIMIT_RADIANS = np.pi - 1e-3
+NATIVE_SO3_ATOL = 1e-5  # Exact full-T sequence_pose._rigid floating-point ABI.
 
 
 @dataclass(frozen=True)
@@ -51,6 +52,11 @@ def local_chart_sg_reference(rotation, translation, *, frame_indices, fps,
     occlusion masks, interpolation or truth labels are accepted. Preserve the
     original first R/T by default; this is a boundary gauge constraint, not a
     per-frame evaluation alignment. Local angles approaching pi fail explicitly.
+    Native rotations are admitted at their existing 1e-5 floating SO(3) ABI,
+    not projected/repaired. SciPy obtains proper logarithms for the local chart;
+    proper left corrections multiply the ORIGINAL R, retaining its Gram defects.
+    Thus this filter does not promise exactly orthogonal output for noisy native
+    matrices, nor exact equivariance beyond floating-point approximation there.
     """
     if isinstance(fps, (bool, np.bool_)) or not isinstance(fps, Real) or not np.isfinite(fps) or fps <= 0:
         raise ValueError('fps: positive finite original frame rate required')
@@ -71,8 +77,10 @@ def local_chart_sg_reference(rotation, translation, *, frame_indices, fps,
     r = _finite(rotation, (count, 3, 3), 'rotation')
     t = _finite(translation, (count, 3), 'translation')
     centroid = _finite(canonical_centroid, (3,), 'canonical_centroid')
-    if not np.allclose(r.transpose(0, 2, 1) @ r, np.eye(3), atol=1e-6, rtol=0) or not np.allclose(
-            np.linalg.det(r), 1, atol=1e-6, rtol=0):
+    gram = r @ r.transpose(0, 2, 1)
+    determinant = np.linalg.det(r)
+    if not np.allclose(gram, np.eye(3), atol=NATIVE_SO3_ATOL, rtol=0) or not np.allclose(
+            determinant, 1, atol=NATIVE_SO3_ATOL, rtol=0):
         raise ValueError('rotation: proper SO(3) required, never repair/project invalid matrices')
     half = window // 2
     starts = np.clip(np.arange(count) - half, 0, count - window)
@@ -106,6 +114,9 @@ def local_chart_sg_reference(rotation, translation, *, frame_indices, fps,
         window_timestamp_span_seconds=(window-1)/float(fps),
         polynomial_degree=POLYNOMIAL_DEGREE, endpoints='one_sided_full_window_polynomial',
         time_zero_gauge_preserved=preserve_time_zero, canonical_centroid=centroid.tolist(),
+        native_SO3_validation_atol=NATIVE_SO3_ATOL, rotation_projected=False,
+        native_input_max_Gram_error=float(np.abs(gram-np.eye(3)).max()),
+        native_input_max_determinant_error=float(np.abs(determinant-1).max()),
         local_chart_limit_radians=float(CHART_LIMIT_RADIANS), maximum_local_angle_radians=maximum_angle,
         maximum_correction_radians=maximum_correction, shape_changed=False, scale_changed=False,
         global_unwrap=False, ground_truth_used=False, accuracy_validated=False, production_adopted=False))
