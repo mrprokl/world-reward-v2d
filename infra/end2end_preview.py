@@ -29,6 +29,8 @@ KINDS = {'joint': 'native-joint-real-', 'continuation': 'native-contact-continua
 CONTINUATION_ENTRY = 'run_native_contact_continuation_real'
 CONTINUATION_STATUSES = {'accepted_native_continuation', 'dynamic_A_fallback_no_improvement'}
 FROZEN_NATIVE_KEYS = ('mhr_global_rot6d', 'mhr_shape', 'mhr_scale', 'mhr_hand', 'mhr_face')
+DISPLAY_TRAJECTORY_KEYS = ('object_vertices', 'object_faces', 'object_rotation',
+    'object_translation', 'object_scale', 'camera_K', 'frame_index')
 
 
 def revision(value):
@@ -39,6 +41,17 @@ def revision(value):
 def candidate_kind(value):
     require(type(value) is str and value in KINDS, 'Explicit joint or continuation candidate required')
     return value
+
+
+def display_trajectory(trajectory):
+    """Project native export controls onto the strict saved-geometry viewer ABI.
+
+    Native pose/shape/scale controls remain available for the separate producer
+    checks. The viewer accepts exactly seven geometric fields; return the same
+    array objects without repairing, casting, retiming or rescaling anything.
+    """
+    require(set(DISPLAY_TRAJECTORY_KEYS) <= set(trajectory), 'Complete saved geometry fields required')
+    return {key: trajectory[key] for key in DISPLAY_TRAJECTORY_KEYS}
 
 
 def labels(episode, accepted, kind='joint', status=None):
@@ -222,8 +235,8 @@ def render(candidate_revision, kind='joint'):
                 'Direct full-native C controls and unchanged clip shape/scales/object rotations required')
         for key in ('object_vertices','object_faces','object_scale','camera_K','frame_index'):
             require(np.array_equal(a[key], b[key]), 'Clip-constant geometry, K, scale and original indices required')
-        viewer.checked_geometry(ah, faces, a, indices, total)
-        viewer.checked_geometry(bh, faces, b, indices, total)
+        viewer.checked_geometry(ah, faces, display_trajectory(a), indices, total)
+        viewer.checked_geometry(bh, faces, display_trajectory(b), indices, total)
         camera = viewer.display_intrinsics(a['camera_K'], 1536, 1152)
         floor = viewer.fixed_floor_height(ah)
         ra = viewer.SavedSceneRenderer(camera, faces, a['object_faces'], floor)

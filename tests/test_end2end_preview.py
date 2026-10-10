@@ -34,6 +34,48 @@ def test_render_source_has_no_modification_or_pixel_label_prompt():
     assert "str(video) in input_ledger" in text
 
 
+def saved_export_arrays():
+    """Tiny full eleven-field native export, not a challenge data fixture."""
+    vertices = np.array([[0., 0., 2.], [.1, 0., 2.], [0., .1, 2.]], np.float32)
+    faces = np.array([[0, 1, 2]], np.int64)
+    data = dict(pose=np.zeros((3, 136), np.float32), scales=np.ones(68, np.float32),
+        shape=np.zeros(45, np.float32), expression=np.zeros(72, np.float32),
+        object_vertices=vertices.copy(), object_faces=faces.copy(),
+        object_rotation=np.broadcast_to(np.eye(3, dtype=np.float32), (3, 3, 3)).copy(),
+        object_translation=np.zeros((3, 3), np.float32), object_scale=np.asarray(1., np.float32),
+        camera_K=np.array([[100., 0., 8.], [0., 100., 6.], [0., 0., 1.]], np.float64),
+        frame_index=np.arange(3, dtype=np.int64))
+    return np.repeat(vertices[None], 3, axis=0), faces, data
+
+
+@pytest.mark.parametrize('full_native_export', [False, True])
+def test_actual_viewer_geometry_contract_accepts_projected_original_and_native_exports(full_native_export):
+    import full4d_video as viewer
+    target, faces, data = saved_export_arrays()
+    if not full_native_export:
+        data = {key: data[key] for key in p.DISPLAY_TRAJECTORY_KEYS}
+    else:
+        # Reproduce the actual failure: producer control fields are not the
+        # strict viewer's seven-field geometry API.
+        with pytest.raises(ValueError, match='Exact safe trajectory fields'):
+            viewer.checked_geometry(target, faces, data, data['frame_index'], 3)
+    projected = p.display_trajectory(data)
+    assert set(projected) == set(p.DISPLAY_TRAJECTORY_KEYS)
+    assert all(projected[key] is data[key] for key in projected)
+    viewer.checked_geometry(target, faces, projected, data['frame_index'], 3)
+
+
+def test_display_projection_preserves_strict_missing_and_bad_geometry_rejections():
+    import full4d_video as viewer
+    target, faces, data = saved_export_arrays()
+    missing = {key: value for key, value in data.items() if key != 'object_translation'}
+    with pytest.raises(ValueError, match='Complete saved geometry fields'):
+        p.display_trajectory(missing)
+    data['object_scale'] = np.asarray(.5, np.float32)
+    with pytest.raises(ValueError, match='no second scaling'):
+        viewer.checked_geometry(target, faces, p.display_trajectory(data), data['frame_index'], 3)
+
+
 def test_continuation_labels_and_kind_do_not_claim_fallback_gain():
     assert p.labels(9, True, 'continuation', 'accepted_native_continuation')[2].startswith('C contact-continuation')
     assert p.labels(14, True, 'continuation', 'dynamic_A_fallback_no_improvement')[2] == 'Baseline fallback / no gain'
