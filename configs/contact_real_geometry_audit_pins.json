@@ -1,0 +1,22 @@
+{
+  "schema": "world_reward.contact_real_geometry_audit_pins.v1",
+  "producer_revision": "4ef9a1b5290d656f6c20f9d4aa6a781b4bfba019",
+  "report": {
+    "bytes": 26482,
+    "sha256": "af0874f8debf7979cc2c873c74901a6b6013b8c3e74e5016964df891df37ba52"
+  },
+  "predictions": {
+    "J1": {
+      "bytes": 154392,
+      "sha256": "ae58e14e8d65680338f5648474aa838f50c335a8849aeca2eb366cb2859e21e1"
+    },
+    "hard_pool": {
+      "bytes": 154333,
+      "sha256": "de70727d8f4489829c715a3312bb829eea84c10f4d5cec4f246511a3350c72dd"
+    },
+    "soft_pool": {
+      "bytes": 154311,
+      "sha256": "cffc6038c3c575d93cc15159ce2b53d6e837ab0ab34dd2aaf4dd9788062a243a"
+    }
+  }
+}
