@@ -8,11 +8,27 @@ ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
 # Use each host's existing qualified image; never transfer/pull/retag multi-GB images.
 case "$(hostname)" in
  scenesmith-ncc-h100-01) IMAGE=sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7 ;;
- world-reward-ncc-h100-02) IMAGE=sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3 ;;
+ world-reward-ncc-h100-02) IMAGE=sha256:d24051da178c12ce3f3f3193a5e0c8ca90e1e7a1c765077ec3e22fdfc3752004 ;;
  *) exit 2 ;;
 esac
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_form_hoi_external_eval/code" && "$(id -u)" == 0 ]] || exit 2
+RUNTIME="$ROOT/results/form-eval-numba-runtime-f4d379bd8c7cf0ef23364b7f2e3b1bce215ceea6"
+[[ "$(hostname)" == world-reward-ncc-h100-02 ]] || exit 2
+/usr/bin/python3 -I -B - "$RUNTIME" "$IMAGE" <<'PYRUNTIME'
+import hashlib,json,sys
+from pathlib import Path
+root=Path(sys.argv[1]);image=sys.argv[2]
+pins={'report.json':(10889,'dba8aace26df84ff250c67a083ed631241803bfbd27764164d96a74fc595a68e'),
+ 'qualification.json':(2352,'c2baab794ed676ae11eb531f9149e1af0a78a7b3d056664c38070374f86490e8')}
+for name,(size,digest)in pins.items():
+ p=root/name
+ if p.resolve()!=p or any(q.is_symlink()for q in(p,*p.parents))or p.stat().st_mode&0o222:raise SystemExit(2)
+ raw=p.read_bytes()
+ if len(raw)!=size or hashlib.sha256(raw).hexdigest()!=digest:raise SystemExit(2)
+report=json.loads((root/'report.json').read_bytes());q=json.loads((root/'qualification.json').read_bytes())
+if report['status']!='pass' or report['qualified_image_id']!=image or q['status']!='pass' or q['compiled_public_kernels_active']is not True:raise SystemExit(2)
+PYRUNTIME
 read -r DEVREV PREDROOT < <(/usr/bin/python3 -I -B - "$CODE" "$ROOT" <<'PYBOOT'
 import json,re,sys
 from pathlib import Path
@@ -80,7 +96,8 @@ timeout --signal=TERM --kill-after=20s 1560s docker run --rm --cidfile "$CIDFILE
  --mount "type=bind,src=$ROOT/vendor/v2d_submission_kit/v2dlb,dst=$ROOT/vendor/v2d_submission_kit/v2dlb,readonly" \
  --mount "type=bind,src=$ROOT/weights/cari4d/refinement/mhr_hand_surface_spec.npz,dst=$ROOT/weights/cari4d/refinement/mhr_hand_surface_spec.npz,readonly" \
  --mount "type=bind,src=$OUT,dst=$OUT" \
+ --mount "type=bind,src=$RUNTIME,dst=$RUNTIME,readonly" \
  --entrypoint /usr/bin/env "$IMAGE" -i PATH=/opt/conda/bin:/usr/bin:/bin HOME=/tmp PYTHONDONTWRITEBYTECODE=1 \
  OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 CUDA_VISIBLE_DEVICES=-1 NUMBA_NUM_THREADS=4 \
- WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" PYTHONPATH="$CODE/src:$CODE/infra" \
+ WR_ROOT="$ROOT" WR_CODE="$CODE" WR_CODE_REVISION="$REV" PYTHONPATH="/opt/world-reward/form-eval-numba:$CODE/src:$CODE/infra" \
  /opt/conda/bin/python -B "$CODE/infra/form_hoi_external_eval.py"
