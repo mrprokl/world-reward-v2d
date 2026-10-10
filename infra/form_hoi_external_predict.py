@@ -446,8 +446,10 @@ def object_mesh(p, c, base, out, report):
         require(len(r) == 1 and sha(weights / 'torch_home/hub/checkpoints' / name) == r[0]['sha256'],
             'Exact independently acquired DINO register weights required')
     original = torch.hub.load
-    def local_hub(repo, *a, **kw):
-        require(repo in ('facebookresearch/dinov2', 'facebookresearch/dinov2:main'), 'Unexpected Objects hub source')
+    def local_hub(repo_or_dir, *a, **kw):
+        # Hydra's DINO embedder calls torch.hub.load(repo_or_dir=...), so
+        # preserve the native keyword ABI, not just positional calls.
+        require(repo_or_dir in ('facebookresearch/dinov2', 'facebookresearch/dinov2:main'), 'Unexpected Objects hub source')
         require(kw.get('model', a[0] if a else None) in ('dinov2_vitl14_reg', 'dinov2_vitb14_reg'),
             'Unexpected Objects backbone'); kw['source'] = 'local'; return original(str(repository), *a, **kw)
     torch.hub.load = local_hub

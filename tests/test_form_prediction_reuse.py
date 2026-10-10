@@ -126,3 +126,16 @@ def test_track_PYTHONPATH_matches_actual_qualified_native_runtime():
     context=branch.body[-1]
     assert ast.unparse(context.items[0].context_expr)=='torch.inference_mode()'
     assert ast.unparse(context.body[0].value).startswith('track(')
+
+
+def test_objects_offline_hub_preserves_native_keyword_call_ABI():
+    tree=ast.parse((REPO/'infra/form_hoi_external_predict.py').read_text())
+    function=next(node for node in ast.walk(tree) if isinstance(node,ast.FunctionDef) and node.name=='local_hub')
+    module=ast.Module(body=[function],type_ignores=[])
+    calls=[]
+    namespace={'require':p.require,'repository':Path('/qualified/local/dinov2'),
+        'original':lambda *a,**kw:calls.append((a,kw))}
+    exec(compile(ast.fix_missing_locations(module),'<literal_local_hub_test>','exec'),namespace)
+    namespace['local_hub'](repo_or_dir='facebookresearch/dinov2',model='dinov2_vitl14_reg',pretrained=True)
+    assert calls==[(('/qualified/local/dinov2',),{'model':'dinov2_vitl14_reg','pretrained':True,'source':'local'})]
+    with pytest.raises(ValueError):namespace['local_hub'](repo_or_dir='unapproved',model='dinov2_vitl14_reg')
