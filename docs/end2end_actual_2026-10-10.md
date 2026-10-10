@@ -126,17 +126,51 @@ engineering until actual fit timing identifies a bottleneck.
 
 FORM resumed producer80eef93 uses exact successful-stage reuse, qualified raster
 prefix/capacity and frame-local byte-identical mesh dedup. Full25hypotheses and
-full96 timeline preserved; actual duplicate gain remains unmeasured. Native fit
+full96 timeline preserved; actual first89 frames report24/4450 exact reuses (~0.54%), not the initially
+expected large duplicate reduction. No bank alteration to increase that rate. Native fit
 now observes three complete real updates and stops before update4 if projected
 inclusive2400s/VRAM80% gates fail; native run/loss/objective/update count unchanged.
 Scheduled PEN timing is rechecked after its first three actual updates.
-The actual all-four producer80eef93 was dispatched and remains active in first
-clip preparation at2026-10-10T15:04Z; no sealed prepare/fit result yet.
+The actual all-four producer80eef93 failed after completing the first96-frame
+pose initializer in3057.096s: SAM3DBody had cached a different Python `tools`
+package, preventing the native `tools.pipeline_timing` import. No fit was run.
+Recovery5b91aea isolates/restores the native import namespace and admits export
+imports before subsequent long initializers. Its first initializer is reused
+only after independent byte/SHA verification of the three completed artifacts;
+the failed stage is never relabeled PASS or treated as a final prediction.
+Approval865B SHA1d5dd02190fdb2c65f1531c2c39afdb89ee852a4895656f5d0e9a8d5484e3e99.
+Recovery5b91aea failed in preflight because the old80 cohort summary was absent;
+its original failure handler had attempted to serialize Path-valued controls.
+No new model job ran.25b4deb fixes explicit JSON control projection, seals failed
+preflights, and accepts a pinned actual stopped-driver/container attestation
+(7538B SHA58dbd8b26a685de3369dafc6aa4ee5f5d38f82c5abb7cbabf2df6be05594f6a1).
+All-four recovery25b4deb is actually active in first-clip preparation at15:51Z;
+no final fit or reference result is claimed. No original artifact was overwritten.
+Fifteen bounded actual py-spy stack samples:4 input geometry validations,6
+CPU triangle-AABB extrema/counting,5 raster output validation/synchronization.
+Object prior had not been produced, ruling out native OBB/export as that delay.
+Profiler0.4.1 official wheel SHA6a80ec05eb8a6883863a367c6a4d4f2d57de68466f7956b6367d4edd5c61bb29
+used remotely only and removed. CPU-only pointwise-extrema optimization6059dd4
+is implemented with91 root tests PASS; original active80 source remains untouched.
+Any use requires new actual CPU measurement and same-source GPU parity receipts.
 
 Sparse SQP core on two independent authored seeds reduces its known synthetic
 objective95.22%/94.69% with unchanged witness bounds and root-motion increments.
-This is NOT native MHR or real HOI accuracy. Native callback/launcher integration
-and actual all-frame EP9/14 test remain required before adoption.
+This is NOT native MHR or real HOI accuracy. Native callback/launcher integration53a53d7
+completed its actual EP9/14 diagnostic in36.913s but both clips failed before the
+first gradient: the lazy MHR head had been initialized under `inference_mode`,
+leaving buffers incompatible with autograd. Both full-native stage181 objectives
+did execute (EP9=20.708654, EP14=15.327906), not successful optimization.
+Report28176B SHA1dd411013e7fd99cced5d1f2bee71956162c2122e48b97d56864980e87452079.
+Fix08b8f9f primes the unchanged native model in a normal no-grad context, audits
+buffers, and explicitly exits inference mode for gradients/VJPs. Root31 tests
+PASS, one actual-Torch test skipped on the laptop; actual GPU rerun still required.
+Preview4a887ff adds an explicit SQP route to the same renderer: all original
+frames, baseline, camera/scale/floor and fallback labels preserved; root101
+tests PASS. It is not a rendered result or gain claim before actual SQP outputs.
+The original full native loss includes stage181 PEN/silhouette and unchanged
+RGB coefficients. Raw6D/SO2 encoding gauge is preserved by tangent retraction;
+otherwise a normalization jump would change the raw-control prior at zero step.
 
 ### Coverage correction
 
@@ -144,7 +178,12 @@ Original052 EP1/7 failures were **scale_smoke midpoint object mask empty** (244/
 128 empty masks), not MHR inference failure. Human-visible-only scale anchoring
 already handles the cause. Further full-T occlusion initializer/consumer routing
 must preserve missing evidence and rerun native pose fitting; no copied/static
-edge predictions or replacement clips. Actual recovery is not completed yet.
+edge predictions or replacement clips. Actual recovery is not completed yet. Explicit v4 launcher2401075 is committed
+(172 root tests PASS), with the original root receipt137229B/93a2b8c pinned.
+Automatic edge/actor checks passed on original saved SAM ledgers: EP1 start/end
+object4587/6204 pixels, minimum actor25338; EP7 object3244/3620, actor28012.
+Missing internal object masks remain literal missing observations, and only
+fresh full-T native refinement/export can count as a final prediction.
 
 Official challenge reread2026-10-10: monocular RGB only, full metric shared-frame
 HOI; website describes accuracy/physics axes50/50, while official FAQ says
