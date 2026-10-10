@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import ExitStack
 from dataclasses import asdict
 import gc
 import hashlib
@@ -37,7 +38,7 @@ CONFIG = 'configs/form_hoi_external_predict_v1.json'
 STAGES = ('localize', 'track', 'body_depth', 'object', 'prepare', 'forward', 'fit_A', 'fit_B')
 HELPERS = ('infra/form_hoi_external_predict.py', 'infra/run_form_hoi_external_predict.sh', CONFIG,
     'infra/form_hoi_external_cohort.py', 'infra/run_form_hoi_external_cohort.sh',
-    'infra/form_prediction_reuse.py', 'infra/form_stage_reuse.py',
+    'infra/form_prediction_reuse.py', 'infra/form_stage_reuse.py', 'infra/raster_prefix_activation.py',
     'infra/form_hoi_external_dev.py', 'infra/form_hoi_external_acquire.py',
     'infra/mediapipe_cpu_runtime_verify.py', 'configs/form_hoi_external_dev_v1.json',
     'configs/form_hoi_insight_v1.json', 'configs/sam31_runtime_v1.json',
@@ -934,7 +935,7 @@ def worker(args):
         ground_truth_used=False,private_truth_read=False,hand_labeled_test=False,oracle_modes=[],
         reference_inputs_mounted=False,training_overlap_verified=False,production_adopted=False,
         scope='first96_original_RGB_only_external_DEV_not_test_or_verified_CARI_victory')
-    started=time.monotonic()
+    started=time.monotonic(); runtime_context = ExitStack()
     def expired(*_):raise TimeoutError('Frozen inclusive stage budget exceeded')
     signal.signal(signal.SIGALRM,expired);signal.alarm(c['budgets'][stage])
     try:
@@ -948,6 +949,19 @@ def worker(args):
             require({p.name for p in Path('/sys/class/net').iterdir()}=={'lo'},'Offline GPU inference required')
             import torch
             require(torch.cuda.is_available(),'GPU required; never use laptop/CPU model fallback')
+        if stage in ('body_depth', 'prepare') and os.environ.get('WR_RASTER_PREFIX_ACTIVATION'):
+            from camera_render import _optimized_capacity
+            from raster_prefix_activation import scoped_raster
+            require(_optimized_capacity(None), 'Prefix kernel requires independently qualified nonoverflow capacity')
+            prefix_path = canonical(Path(os.environ['WR_RASTER_PREFIX_ACTIVATION']))
+            prefix_pin = dict(bytes=int(os.environ['WR_RASTER_PREFIX_ACTIVATION_BYTES']),
+                sha256=os.environ['WR_RASTER_PREFIX_ACTIVATION_SHA256'])
+            active = runtime_context.enter_context(scoped_raster(prefix_path, prefix_pin,
+                current_image=os.environ['WR_IMAGE_ID']))
+            require(active, 'Explicit qualified inference raster activation required')
+            report['inference_raster_runtime'] = dict(activation_path=str(prefix_path), activation_pin=prefix_pin,
+                base_image_unchanged=True, other_operators_and_backward_unchanged=True,
+                full_geometry_and_resolution_preserved=True)
         if stage=='localize':localize(p,c,base,out,report)
         elif stage=='track':
             # Match the already qualified singleton-PVS runner. Native init
@@ -977,7 +991,7 @@ def worker(args):
             seal(out/'technical_traceback.txt', lambda f: f.write(traceback.format_exc().encode()[-16384:]))
         raise
     finally:
-        signal.alarm(0);save_json(out/'report.json',report)
+        runtime_context.close(); signal.alarm(0);save_json(out/'report.json',report)
     print(json.dumps(dict(sequence_id=p['sequence_id'],stage=stage,status='complete',seconds=round(report['elapsed_seconds'],2))),flush=True)
 
 
@@ -1037,6 +1051,12 @@ def driver(args):
             and gate.get('image_id') == c['body_image']
             and gate.get('gates', {}).get('all_exact_masks_and_depth_tolerance') is True,
             'Actual same-source full-geometry CUDA raster qualification required')
+    prefix = None
+    if getattr(args, 'raster_prefix_report', None) is not None:
+        require(gate_path is not None, 'Prefix optimization requires independent nonoverflow raster gate')
+        from raster_prefix_activation import activation
+        prefix = activation(canonical(Path(args.raster_prefix_report)),
+            dict(bytes=args.raster_prefix_bytes, sha256=args.raster_prefix_sha256), current_image=c['body_image'])
     with (ROOT/'jobs/.world-reward-h100.lock').open('r') as lease:
         if any(s!='localize' for s in chosen):fcntl.flock(lease,fcntl.LOCK_EX|fcntl.LOCK_NB)
         for stage in chosen:
@@ -1059,6 +1079,9 @@ def driver(args):
                 canonical(src);cmd+=['--mount',f'type=bind,src={src},dst={src}'+(',readonly' if readonly else '')]
             if gate_path is not None and stage != 'localize':
                 cmd += ['--mount', f'type=bind,src={gate_path},dst={gate_path},readonly']
+            if prefix is not None and stage in ('body_depth', 'prepare'):
+                for path in prefix['readonly_mounts']:
+                    cmd += ['--mount', f'type=bind,src={path},dst={path},readonly']
             path='/usr/local/bin:/opt/conda/bin:/usr/bin:/bin' if stage=='track' else '/opt/conda/bin:/usr/local/bin:/usr/bin:/bin'
             python='/usr/local/bin/python' if stage=='track' else '/opt/conda/bin/python'
             pythonpath=('/opt/sam3:' if stage=='track' else '')+str(code/'src')+':'+str(code/'infra')+':/workspace/v2d_sam3d_body/lib'
@@ -1073,6 +1096,8 @@ def driver(args):
                 env += ['WR_RASTER_CAPACITY_GATE=' + str(gate_path),
                     'WR_RASTER_CAPACITY_GATE_BYTES=' + str(gate_pin['bytes']),
                     'WR_RASTER_CAPACITY_GATE_SHA256=' + gate_pin['sha256']]
+            if prefix is not None and stage in ('body_depth', 'prepare'):
+                env += [key + '=' + value for key, value in prefix['environment'].items()]
             if stage=='localize':env.append('CUDA_VISIBLE_DEVICES=')
             env += ['CUBLAS_WORKSPACE_CONFIG=:4096:8']
             cmd+=['--entrypoint','/usr/bin/env',image,'-i',*env,python,'-B',str(code/'infra/form_hoi_external_predict.py'),
@@ -1119,11 +1144,18 @@ def main():
     parser.add_argument('--raster-gate-report', type=Path)
     parser.add_argument('--raster-gate-bytes', type=int)
     parser.add_argument('--raster-gate-sha256')
+    parser.add_argument('--raster-prefix-report', type=Path)
+    parser.add_argument('--raster-prefix-bytes', type=int)
+    parser.add_argument('--raster-prefix-sha256')
     args=parser.parse_args()
     require((args.raster_gate_report is None and args.raster_gate_bytes is None and args.raster_gate_sha256 is None)
         or (args.raster_gate_report is not None and type(args.raster_gate_bytes) is int and args.raster_gate_bytes > 0
         and type(args.raster_gate_sha256) is str and re.fullmatch('[0-9a-f]{64}', args.raster_gate_sha256)),
         'All three explicit raster gate identity fields or none required')
+    require((args.raster_prefix_report is None and args.raster_prefix_bytes is None and args.raster_prefix_sha256 is None)
+        or (args.raster_prefix_report is not None and type(args.raster_prefix_bytes) is int and 0 < args.raster_prefix_bytes <= 131072
+        and type(args.raster_prefix_sha256) is str and re.fullmatch('[0-9a-f]{64}', args.raster_prefix_sha256)
+        and args.raster_gate_report is not None), 'Explicit complete prefix activation pin and capacity gate required')
     require(not (args.reuse_localizations_from and args.reuse_stages_from), 'Choose one exact technical reuse producer')
     if args.cohort_stage is not None:
         require(not args.native and args.stage=='all' and args.dev_revision is not None and
@@ -1136,7 +1168,9 @@ def main():
         run(sys.modules[__name__],code,revision,stage=args.cohort_stage,dev_revision=args.dev_revision,
             reuse_localizations_from=args.reuse_localizations_from, reuse_stages_from=args.reuse_stages_from,
             raster_gate=dict(path=args.raster_gate_report, bytes=args.raster_gate_bytes, sha256=args.raster_gate_sha256)
-                if args.raster_gate_report is not None else None);return
+                if args.raster_gate_report is not None else None,
+            raster_prefix=dict(path=args.raster_prefix_report, bytes=args.raster_prefix_bytes, sha256=args.raster_prefix_sha256)
+                if args.raster_prefix_report is not None else None);return
     require(args.dev_revision is None and args.reuse_localizations_from is None and args.reuse_stages_from is None and args.input is not None and args.out is not None and
         type(args.input_sha256) is str and re.fullmatch('[0-9a-f]{64}',args.input_sha256) and
         type(args.input_bytes) is int and args.input_bytes>0,'Explicit public artifact input/output SHA/bytes required')

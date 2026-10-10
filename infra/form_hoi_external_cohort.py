@@ -72,7 +72,7 @@ def dispatch(rows, stage, invoke):
 
 
 def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_from=None,
-        reuse_stages_from=None, raster_gate=None):
+        reuse_stages_from=None, raster_gate=None, raster_prefix=None):
     predictor.require(stage in ('localize','all'), 'Explicit cohort stage required')
     binding = predictor.source(predictor.ROOT, code, revision, predictor.ENTRY, predictor.HELPERS)
     rows, transfer = discover(predictor, code, dev_revision)
@@ -96,6 +96,14 @@ def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_f
         ground_truth_used=False, private_truth_read=False, reserved_acquired=0,
         CPU_localizer_concurrency=4 if stage=='localize' else 1, GPU_clip_concurrency=0 if stage=='localize' else 1,
         sequence_order=[r['sequence_id'] for r in rows], sequences=[], full_4D_accuracy_verified=False)
+    report['raster_runtime_controls'] = dict(capacity=raster_gate, prefix=raster_prefix,
+        original_intermediate_outputs_preserved=True, native_fit_operators_unchanged=True)
+    if raster_prefix is not None:
+        predictor.require(stage == 'all' and raster_gate is not None,
+            'Prefix runtime is only an explicit capacity-qualified inference control')
+        from raster_prefix_activation import activation
+        activation(raster_prefix['path'], {k: raster_prefix[k] for k in ('bytes', 'sha256')},
+            current_image=predictor.config(code)['body_image'])
     outcomes = {}
     predictor.require(not (reuse_stages_from and reuse_localizations_from), 'One explicit technical reuse producer required')
     if reuse_stages_from is not None:
@@ -125,7 +133,10 @@ def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_f
             input_sha256=row['pin']['sha256'], out=base,
             raster_gate_report=raster_gate['path'] if raster_gate else None,
             raster_gate_bytes=raster_gate['bytes'] if raster_gate else None,
-            raster_gate_sha256=raster_gate['sha256'] if raster_gate else None)
+            raster_gate_sha256=raster_gate['sha256'] if raster_gate else None,
+            raster_prefix_report=raster_prefix['path'] if raster_prefix else None,
+            raster_prefix_bytes=raster_prefix['bytes'] if raster_prefix else None,
+            raster_prefix_sha256=raster_prefix['sha256'] if raster_prefix else None)
         record = dict(sequence_id=sid, input=dict(path=str(row['input']), pin=row['pin']), status='fail')
         outcomes[sid] = record
         try:
