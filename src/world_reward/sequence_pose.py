@@ -53,6 +53,137 @@ class RGBDepthConfig:
             raise ValueError('Positive externally frozen depth scale and reference required')
 
 
+@dataclass(frozen=True)
+class SequenceContactConfig:
+    """Externally frozen anatomical contact scale and CPU work cap."""
+    contact_sigma_diameter: float
+    max_points_per_hand: int
+    max_point_triangle_pairs: int
+    development_reference: str
+
+    def __post_init__(self):
+        if (type(self.contact_sigma_diameter) not in (int, float)
+                or not np.isfinite(self.contact_sigma_diameter) or self.contact_sigma_diameter <= 0
+                or type(self.max_points_per_hand) is not int or not 1 <= self.max_points_per_hand <= 8
+                or type(self.max_point_triangle_pairs) is not int or self.max_point_triangle_pairs <= 0
+                or type(self.development_reference) is not str or not self.development_reference.strip()):
+            raise ValueError('Positive externally frozen contact scale, <=8 witnesses and work cap required')
+
+
+@dataclass(frozen=True)
+class SequenceContactEvidence:
+    """Caller-qualified automatic activations, frozen before pose optimization.
+
+    True means the caller qualified contact from independent automatic evidence
+    (for example positive native logit AND original anatomical proximity). False
+    is no active contact constraint, not proof of physical absence. Hand points
+    are predicted anatomical vertices in the same camera/metre frame as poses.
+    This module cannot authenticate the source or certify contact/gauge accuracy.
+    """
+    activations: np.ndarray
+    hand_points_camera: np.ndarray
+    hand_visible: np.ndarray
+    object_faces: np.ndarray
+    source_reference: str
+
+    def __post_init__(self):
+        activations, points, visible, faces = map(np.asarray,
+            (self.activations, self.hand_points_camera, self.hand_visible, self.object_faces))
+        if (any(np.ma.isMaskedArray(value) for value in
+                (self.activations, self.hand_points_camera, self.hand_visible, self.object_faces))
+                or activations.dtype != np.bool_ or activations.ndim != 2 or activations.shape[1:] != (2,)
+                or points.dtype.kind != 'f' or points.ndim != 4 or points.shape[:2] != activations.shape
+                or points.shape[-1] != 3 or points.shape[2] < 1
+                or visible.dtype != np.bool_ or visible.shape != points.shape[:-1]
+                or not np.isfinite(points[visible]).all() or not np.isnan(points[~visible]).all()
+                or faces.dtype.kind not in 'iu' or faces.ndim != 2 or faces.shape[1:] != (3,)
+                or not len(faces) or np.any(faces < 0)
+                or type(self.source_reference) is not str or not self.source_reference.strip()):
+            raise ValueError('Frozen boolean activations, exact supported anatomical points, faces and source required')
+        for name, value in (('activations', activations), ('hand_points_camera', points),
+                            ('hand_visible', visible), ('object_faces', faces)):
+            value = np.frombuffer(value.tobytes(order='C'), dtype=value.dtype).reshape(value.shape)
+            object.__setattr__(self, name, value)
+
+
+class _ContactTriangleSurface:
+    """Continuous unsigned point-to-all-triangle distance, bounded NumPy chunks.
+
+    Enumerates contained planar projections and every closed edge. Degenerate
+    triangles contribute their segments/vertices, never disappear. Closest-face
+    ties are nonsmooth; sparse numerical differentiation does not change that.
+    """
+    def __init__(self, vertices, faces):
+        if np.any(faces >= len(vertices)):
+            raise ValueError('Contact faces must index the same complete fixed mesh')
+        triangles = vertices[faces]
+        self.starts = triangles
+        self.edges = np.roll(triangles, -1, axis=1)-triangles
+        with np.errstate(over='ignore', invalid='ignore', under='ignore'):
+            self.edge2 = np.einsum('fki,fki->fk', self.edges, self.edges)
+            self.normal = np.cross(self.edges[:, 0], -self.edges[:, 2])
+            self.normal2 = np.einsum('fi,fi->f', self.normal, self.normal)
+        if (not np.isfinite(self.edges).all() or not np.isfinite(self.edge2).all()
+                or not np.isfinite(self.normal2).all()
+                or np.any(np.any(self.normal != 0, axis=1) & (self.normal2 == 0))):
+            raise ValueError('Fixed contact triangle arithmetic exceeds finite representable range')
+
+    def distances(self, points):
+        if points.ndim != 2 or points.shape[1:] != (3,) or not np.isfinite(points).all():
+            raise ValueError('Finite supported object-frame contact points required')
+        result = np.full(len(points), np.inf)
+        for begin in range(0, len(points), 32):
+            p = points[begin:begin+32]
+            best = np.full(len(p), np.inf)
+            for first in range(0, len(self.starts), 2048):
+                starts = self.starts[first:first+2048]; edges = self.edges[first:first+2048]
+                edge2 = self.edge2[first:first+2048]
+                normal = self.normal[first:first+2048]; normal2 = self.normal2[first:first+2048]
+                with np.errstate(over='ignore', invalid='ignore', divide='ignore'):
+                    delta = p[:, None, None, :]-starts[None]
+                    parameter = np.divide(np.einsum('pfki,fki->pfk', delta, edges), edge2[None],
+                        out=np.zeros(delta.shape[:-1]), where=edge2[None] > 0)
+                    segment_delta = delta-np.clip(parameter, 0., 1.)[..., None]*edges[None]
+                    squared = np.einsum('pfki,pfki->pfk', segment_delta, segment_delta).min(axis=2)
+                    height = np.einsum('pfi,fi->pf', p[:, None]-starts[None, :, 0], normal)
+                    ratio = np.divide(height, normal2[None], out=np.zeros_like(height), where=normal2[None] > 0)
+                    projection = p[:, None]-ratio[..., None]*normal[None]
+                    signs = np.einsum('pfki,fi->pfk',
+                        np.cross(edges[None], projection[:, :, None]-starts[None]), normal)
+                    inside = (signs >= 0).all(axis=2) & (normal2[None] > 0)
+                    planar_delta = p[:, None]-projection
+                    planar = np.einsum('pfi,pfi->pf', planar_delta, planar_delta)
+                    squared = np.minimum(squared, np.where(inside, planar, np.inf))
+                if not np.isfinite(squared).all() or np.any(squared < 0):
+                    raise ValueError('Continuous contact distances exceed finite representable range')
+                best = np.minimum(best, squared.min(axis=1))
+            result[begin:begin+len(p)] = np.sqrt(best)
+        return result
+
+
+def _contact_rows(evidence, config, vertices, count):
+    if type(evidence) is not SequenceContactEvidence or type(config) is not SequenceContactConfig:
+        raise ValueError('Explicit frozen SequenceContactEvidence and SequenceContactConfig required')
+    if evidence.activations.shape != (count, 2):
+        raise ValueError('Anatomical contact must preserve the full original timeline')
+    surface = _ContactTriangleSurface(vertices, evidence.object_faces)
+    samples = np.linspace(0, evidence.hand_points_camera.shape[2]-1,
+        min(config.max_points_per_hand, evidence.hand_points_camera.shape[2]), dtype=np.int64)
+    frames, sides = np.nonzero(evidence.activations & (np.arange(count)[:, None] > 0))
+    points, point_frames, groups = [], [], []
+    for group, (frame, side) in enumerate(zip(frames, sides)):
+        supported = samples[evidence.hand_visible[frame, side, samples]]
+        if not len(supported):
+            raise ValueError('Active contact lacks a supported fixed anatomical witness; do not self-disable')
+        points.extend(evidence.hand_points_camera[frame, side, supported])
+        point_frames.extend([frame]*len(supported)); groups.extend([group]*len(supported))
+    pairs = len(points)*len(evidence.object_faces)
+    if pairs > config.max_point_triangle_pairs:
+        raise ValueError('Exact contact point-triangle work cap exceeded before fitting')
+    return (surface, frames, np.asarray(points, float).reshape(-1, 3),
+            np.asarray(point_frames, np.int64), np.asarray(groups, np.int64), samples, pairs)
+
+
 def _real(value, shape, name, finite=True):
     x = np.asarray(value)
     if (np.ma.isMaskedArray(value) or x.dtype.kind != 'f' or x.shape != shape
@@ -104,7 +235,9 @@ class SequencePoseResult:
 def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
                     rotations, translations, pose_observed, K, frame_index, fps,
                     config: SequencePoseConfig, *, tracks_depth_m=None,
-                    depth_visible=None, depth_config: RGBDepthConfig | None = None):
+                    depth_visible=None, depth_config: RGBDepthConfig | None = None,
+                    contact_evidence: SequenceContactEvidence | None = None,
+                    contact_config: SequenceContactConfig | None = None):
     """One sparse full-T robust SE(3) fit; time-zero gauge stays exact.
 
     Canonical material points must be attached once, before tracking. Visibility
@@ -119,6 +252,11 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
     finite and positive; every unknown is NaN. Depth support is a subset of RGB
     support. Only R/T are fitted; depth cannot change shape, scale, K or gauge.
     Without all three explicit depth arguments, the RGB-only route is unchanged.
+
+    Optional anatomical contact adds distance to the complete original triangle
+    surface for caller-frozen active hand/frame entries only. Each active hand
+    uses the closest of a fixed regular anatomical subset, not attraction of
+    every hand vertex. Activation never depends on an optimized candidate pose.
     """
     if type(config) is not SequencePoseConfig:
         raise ValueError('Explicit externally frozen config required')
@@ -166,6 +304,11 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
     diameter = 2 * np.sqrt(np.mean(np.sum((v-centre)**2, axis=1)))
     if not np.isfinite(diameter) or diameter <= 0:
         raise ValueError('Nondegenerate fixed geometry required')
+    contact_supplied = contact_evidence is not None or contact_config is not None
+    if contact_supplied:
+        contact_surface, contact_frames, contact_points, contact_point_frames, contact_groups, contact_samples, contact_pairs = _contact_rows(
+            contact_evidence, contact_config, v, n)
+    use_contact = contact_supplied and len(contact_frames) > 0
     # Spatial support must constrain more than an arbitrary axis.
     singular = np.linalg.svd(p-p.mean(0), compute_uv=False)
     if singular[1] <= singular[0]*1e-8:
@@ -207,10 +350,17 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
             depth_xyz = np.einsum('nij,nj->ni', rr[depth_frames], p[depth_queries])+tt[depth_frames]
             measured_z = (depth_xyz[:, 2]-depth[depth_frames, depth_queries])/(diameter*depth_config.depth_sigma_diameter)
             residuals += (measured_z,)
+        if use_contact:
+            object_points = np.einsum('qi,qij->qj', contact_points-tt[contact_point_frames], rr[contact_point_frames])
+            distances = contact_surface.distances(object_points)
+            hand_distances = np.full(len(contact_frames), np.inf)
+            np.minimum.at(hand_distances, contact_groups, distances)
+            residuals += (hand_distances/(diameter*contact_config.contact_sigma_diameter),)
         return np.concatenate(residuals)
 
     rows = 3*len(frame_rows)+6*len(pose_rows)+6*(n-2)
     if use_depth: rows += len(depth_frames)
+    if use_contact: rows += len(contact_frames)
     pattern = lil_matrix((rows, (n-1)*6), dtype=np.int8)
     offset = 0
     for width in (2, 1):
@@ -226,6 +376,9 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
             offset += 3
     if use_depth:
         for frame in depth_frames:
+            pattern[offset, (frame-1)*6:frame*6] = 1; offset += 1
+    if use_contact:
+        for frame in contact_frames:
             pattern[offset, (frame-1)*6:frame*6] = 1; offset += 1
     start = np.zeros((n-1)*6)
     initial_residual = residual(start)
@@ -258,4 +411,14 @@ def refine_sequence(vertices, canonical_points, tracks_xy, track_visible,
             depth_config=asdict(depth_config), depth_units='same_camera_axial_z_metres',
             depth_source_authenticated_by_module=False, depth_accuracy_verified=False,
             depth_weighting='one_scalar_soft_l1_per_measured_point_diameter_normalized')
+    if use_contact:
+        diagnostics.update(method='fixed_shape_full_T_RGB'+('_depth' if use_depth else '')+'_contact_SE3_bundle_v1',
+            contact_constraint=True, contact_active_entries=len(contact_frames),
+            contact_selected_point_indices=contact_samples.tolist(), contact_config=asdict(contact_config),
+            contact_source_reference=contact_evidence.source_reference,
+            contact_activation_policy='caller_qualified_prefrozen_no_candidate_reactivation',
+            contact_activation_verified_by_module=False, contact_accuracy_verified=False,
+            contact_distance='minimum_anatomical_point_to_full_continuous_triangle_surface',
+            contact_point_triangle_pairs_per_residual=contact_pairs,
+            contact_mesh_faces=len(contact_evidence.object_faces), contact_degenerate_faces_retained=True)
     return SequencePoseResult(rr, tt, ids.copy(), visible.any(1), diagnostics)
