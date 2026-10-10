@@ -71,7 +71,7 @@ def dispatch(rows, stage, invoke):
         if failure is not None: raise failure
 
 
-def run(predictor, code, revision, *, stage, dev_revision):
+def run(predictor, code, revision, *, stage, dev_revision, reuse_localizations_from=None):
     predictor.require(stage in ('localize','all'), 'Explicit cohort stage required')
     binding = predictor.source(predictor.ROOT, code, revision, predictor.ENTRY, predictor.HELPERS)
     rows, transfer = discover(predictor, code, dev_revision)
@@ -82,6 +82,9 @@ def run(predictor, code, revision, *, stage, dev_revision):
             old.get('stage') == stage and old.get('dev_revision') == dev_revision and
             old.get('public_transfer') == transfer and old.get('source_binding') == binding,
             'Existing cohort result is immutable; failed cohorts require diagnosis, not reroll')
+        predictor.require(reuse_localizations_from is None or
+            old.get('localization_reuse',{}).get('original_localization_producer')==reuse_localizations_from,
+            'Existing cohort consumed a different original localization producer')
         for row in rows:
             base = predictor.ROOT/'results'/('form-hoi-external-predict-'+revision)/row['sequence_id']
             for target in (predictor.STAGES if stage == 'all' else ('localize',)):
@@ -93,6 +96,9 @@ def run(predictor, code, revision, *, stage, dev_revision):
         CPU_localizer_concurrency=4 if stage=='localize' else 1, GPU_clip_concurrency=0 if stage=='localize' else 1,
         sequence_order=[r['sequence_id'] for r in rows], sequences=[], full_4D_accuracy_verified=False)
     outcomes = {}
+    if reuse_localizations_from is not None:
+        from form_prediction_reuse import reuse
+        report['localization_reuse']=reuse(predictor,code,revision,reuse_localizations_from,rows)
     # Check all fresh one-shot pairs before any CPU API call, not halfway
     # through localization after the other workers have consumed their tokens.
     for row in rows:

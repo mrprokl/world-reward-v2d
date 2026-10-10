@@ -37,6 +37,7 @@ CONFIG = 'configs/form_hoi_external_predict_v1.json'
 STAGES = ('localize', 'track', 'body_depth', 'object', 'prepare', 'forward', 'fit_A', 'fit_B')
 HELPERS = ('infra/form_hoi_external_predict.py', 'infra/run_form_hoi_external_predict.sh', CONFIG,
     'infra/form_hoi_external_cohort.py', 'infra/run_form_hoi_external_cohort.sh',
+    'infra/form_prediction_reuse.py',
     'infra/form_hoi_external_dev.py', 'infra/form_hoi_external_acquire.py',
     'infra/mediapipe_cpu_runtime_verify.py', 'configs/form_hoi_external_dev_v1.json',
     'configs/form_hoi_insight_v1.json', 'configs/sam31_runtime_v1.json',
@@ -936,6 +937,8 @@ def worker(args):
     signal.signal(signal.SIGALRM,expired);signal.alarm(c['budgets'][stage])
     try:
         if stage!='localize':
+            from form_prediction_reuse import localization_lineage
+            report['localization_source']=localization_lineage(sys.modules[__name__],base,revision)
             require({p.name for p in Path('/sys/class/net').iterdir()}=={'lo'},'Offline GPU inference required')
             import torch
             require(torch.cuda.is_available(),'GPU required; never use laptop/CPU model fallback')
@@ -1032,8 +1035,9 @@ def driver(args):
                 canonical(src);cmd+=['--mount',f'type=bind,src={src},dst={src}'+(',readonly' if readonly else '')]
             path='/usr/local/bin:/opt/conda/bin:/usr/bin:/bin' if stage=='track' else '/opt/conda/bin:/usr/local/bin:/usr/bin:/bin'
             python='/usr/local/bin/python' if stage=='track' else '/opt/conda/bin/python'
+            pythonpath=('/opt/sam3:' if stage=='track' else '')+str(code/'src')+':'+str(code/'infra')+':/workspace/v2d_sam3d_body/lib'
             env=['PATH='+path,'HOME=/tmp','WR_ROOT='+str(ROOT),'WR_CODE='+str(code),'WR_CODE_REVISION='+revision,
-                'WR_IMAGE_ID='+image,'PYTHONPATH='+str(code/'src')+':'+str(code/'infra')+':/workspace/v2d_sam3d_body/lib',
+                'WR_IMAGE_ID='+image,'PYTHONPATH='+pythonpath,
                 'PYTHONDONTWRITEBYTECODE=1','HF_HUB_OFFLINE=1','TRANSFORMERS_OFFLINE=1','MOMENTUM_ENABLED=0',
                 'WANDB_MODE=disabled','OMP_NUM_THREADS=4','OPENBLAS_NUM_THREADS=1','MPLBACKEND=Agg',
                 'XDG_CACHE_HOME=/tmp/cache','TORCH_HOME='+str(ROOT/('weights/sam3d/torch_home' if stage=='object' else 'weights/cari4d/sam3d_body/torch_home')),
@@ -1080,6 +1084,7 @@ def main():
     parser.add_argument('--input',type=Path);parser.add_argument('--input-sha256')
     parser.add_argument('--input-bytes',type=int);parser.add_argument('--out',type=Path)
     parser.add_argument('--cohort-stage',choices=('localize','all'));parser.add_argument('--dev-revision')
+    parser.add_argument('--reuse-localizations-from')
     args=parser.parse_args()
     if args.cohort_stage is not None:
         require(not args.native and args.stage=='all' and args.dev_revision is not None and
@@ -1089,8 +1094,9 @@ def main():
         require(sys.platform=='linux' and os.geteuid()==0 and os.uname().nodename=='scenesmith-ncc-h100-01',
             'Azure VM01 root cohort dispatcher only')
         from form_hoi_external_cohort import run
-        run(sys.modules[__name__],code,revision,stage=args.cohort_stage,dev_revision=args.dev_revision);return
-    require(args.dev_revision is None and args.input is not None and args.out is not None and
+        run(sys.modules[__name__],code,revision,stage=args.cohort_stage,dev_revision=args.dev_revision,
+            reuse_localizations_from=args.reuse_localizations_from);return
+    require(args.dev_revision is None and args.reuse_localizations_from is None and args.input is not None and args.out is not None and
         type(args.input_sha256) is str and re.fullmatch('[0-9a-f]{64}',args.input_sha256) and
         type(args.input_bytes) is int and args.input_bytes>0,'Explicit public artifact input/output SHA/bytes required')
     if args.native:
