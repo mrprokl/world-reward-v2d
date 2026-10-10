@@ -44,8 +44,9 @@ def test_failed_native_constructor_keeps_A_B_and_actual_native_A_reference(tmp_p
     monkeypatch.setattr(run.real.contact,'hand_indices',lambda *_:src['QA_hand_ids'])
     monkeypatch.setattr(run.saved,'saved_B',lambda *_:b)
     monkeypatch.setattr(run.native,'quality',lambda *_:{})
-    monkeypatch.setattr(run.replay,'layer_factory',lambda *_:SimpleNamespace())
+    monkeypatch.setattr(run.replay,'layer_factory',lambda *_:SimpleNamespace(decoder_identity=lambda:src['forward']['decoder_identity']))
     monkeypatch.setattr(run.replay,'decode_geometry',lambda *_:dict(human_vertices=src['human'].copy()))
+    monkeypatch.setattr(run,'prime_native_autograd',lambda *_:dict(persistent_inference_tensors=0))
     def fail(*_):raise ValueError('Original native constructor activation mismatch')
     monkeypatch.setattr(run,'native_instance',fail)
     row=run.run_episode(9,tmp_path/'episode_000009',SimpleNamespace(),{},SimpleNamespace(cuda=SimpleNamespace(empty_cache=lambda:None)),dict(deadline=1e100),Path('.'))
@@ -69,3 +70,12 @@ def test_native_encoding_gauge_receipt_reports_only_numeric_not_quality():
     assert r['SO2_radius_max']==pytest.approx(3.,abs=3e-7)
     assert r['raw_encoding_gauge_preserved_under_retraction']
     assert not any('gain' in k or 'validated' in k for k in r)
+
+
+def test_runtime_primes_lazy_native_before_any_inference_decode_and_retains_tracebacks():
+    text=(Path(__file__).parents[1]/'infra/native_pose_sqp_real.py').read_text()
+    assert text.index("report['native_autograd_priming']=prime_native_autograd")<text.index('native_a=decode(a_parameters)')
+    assert "native_autograd_priming.json" in text
+    assert "failure_traceback" in text and "traceback.extract_tb" in text
+    adapter=(Path(__file__).parents[1]/'src/world_reward/native_pose_sqp_adapter.py').read_text()
+    assert 'with torch.inference_mode(False),torch.enable_grad()' in adapter

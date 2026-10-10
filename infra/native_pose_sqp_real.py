@@ -19,7 +19,7 @@ import numpy as np
 import native_contact_continuation_real as replay
 from mediapipe_cpu_runtime_verify import source
 from world_reward.native_pose_sqp import PoseSQPConfig, optimize_native_pose, _BudgetExhausted
-from world_reward.native_pose_sqp_adapter import NativeSQPCallbacks, LAYER_PIN, OPTIMIZER_PIN, OBJECTIVE_STAGE
+from world_reward.native_pose_sqp_adapter import NativeSQPCallbacks, LAYER_PIN, OPTIMIZER_PIN, OBJECTIVE_STAGE, prime_native_autograd
 from world_reward.native_joint_refinement import native_joint_optimizer_class
 from world_reward.shared_identity import NATIVE_PARAMETER_DIMS
 
@@ -119,7 +119,12 @@ def run_episode(episode,out,ledger,b_binding,torch,state,code):
             if time.monotonic()>=state['deadline']:raise _BudgetExhausted('Over-budget actual native geometry discarded')
             return result
         def observe(g,t):return native.quality(bank,src,g['human_vertices'],g['human_keypoints'],bank['rotations'],t,b['evidence'],b['activation'])
-        a_parameters={k:src['native'][k] for k in NATIVE_PARAMETER_DIMS};native_a=decode(a_parameters)
+        a_parameters={k:src['native'][k] for k in NATIVE_PARAMETER_DIMS}
+        report['native_autograd_priming']=prime_native_autograd(torch,state['layer'],a_parameters)
+        if state['layer'].decoder_identity()!=src['forward']['decoder_identity']:
+            raise ValueError('Autograd priming changed original native decoder identity')
+        report['native_autograd_priming_pin']=real.seal_json(out/'native_autograd_priming.json',report['native_autograd_priming'])
+        native_a=decode(a_parameters)
         evidence,_=replay.frozen_evidence(bank,src,b,native_a)
         report['baseline_witness_reference']=replay.witness_reference_receipt(out,src,original,evidence,native_a)
         report['native_A_encoding_gauge']=control_gauge_receipt(a_parameters)
@@ -164,6 +169,9 @@ def run_episode(episode,out,ledger,b_binding,torch,state,code):
         report['original_saved_A_final_QA_passed']=report['decision']['C_vs_A']['passed']
     except Exception as exc:
         report.update(error_type=type(exc).__name__,error=str(exc)[:400],no_C_fabricated=True)
+        import traceback
+        frames=traceback.extract_tb(exc.__traceback__)[-10:]
+        report['failure_traceback']=[dict(file=Path(f.filename).name,line=f.lineno,function=f.name) for f in frames]
         if hasattr(exc,'diagnostics'):report['failure_diagnostics']=exc.diagnostics
     finally:
         if callbacks is not None:report['actual_native_callback_calls']=callbacks.calls

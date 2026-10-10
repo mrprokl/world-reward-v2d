@@ -102,3 +102,82 @@ def test_nonunit_encoding_gauge_derivative_matches_same_native_raw_prior():
         minus,_=retract_native(p,p['mhr_trans'].astype(float),-d)
         finite=((plus['mhr_body_pose_cont'][:,:254].astype(float)-minus['mhr_body_pose_cont'][:,:254].astype(float))*g).sum(-1)/2e-3
         np.testing.assert_allclose(finite,actual[:,axis],atol=6e-4,rtol=0)
+
+
+class ModeMock:
+    """Models Torch inference lifetime, not neural/native numerical behavior."""
+    float32='float32'
+    def __init__(self):
+        from contextlib import contextmanager
+        self.inference=False;self.grad=True
+        self.jit=SimpleNamespace(optimized_execution=lambda *_:self.no_grad())
+    def inference_mode(self,enabled=True):
+        from contextlib import contextmanager
+        @contextmanager
+        def scope():
+            before=self.inference;self.inference=enabled
+            try:yield
+            finally:self.inference=before
+        return scope()
+    def no_grad(self):
+        from contextlib import nullcontext
+        return nullcontext()
+    def tensor(self,value,**_):return SimpleNamespace(value=value.copy(),inference=self.inference)
+    def is_inference(self,value):return value.inference
+    def isfinite(self,value):return np.isfinite(value.value)
+
+
+class LazyHeadMock:
+    def __init__(self,torch):self.torch=torch;self.backend=SimpleNamespace(head=None);self.calls=[]
+    def mhr_forward(self,p):
+        self.calls.append((self.torch.inference,len(p['mhr_trans'].value)))
+        if self.backend.head is None:
+            constant=self.torch.tensor(np.ones(3,np.float32))
+            self.backend.head=SimpleNamespace(named_parameters=lambda:[('p',constant)],named_buffers=lambda:[('b',constant)])
+        value=self.torch.tensor(np.ones((len(p['mhr_trans'].value),3),np.float32))
+        return SimpleNamespace(vertices=value,joints=value,keypoints=value)
+
+
+def test_lazy_native_initialization_cannot_run_first_under_inference_mode():
+    torch=ModeMock();layer=LazyHeadMock(torch);p=parameters(96)
+    with torch.inference_mode():
+        receipt=adapter.prime_native_autograd(torch,layer,p)
+        assert torch.inference # caller context restored, constants NOT inference
+    assert layer.calls==[(False,16)]
+    assert receipt['persistent_inference_tensors']==0
+    assert receipt['lazy_head_initialized_before_first_inference_decode']
+    assert not receipt['model_values_cloned_or_changed']
+    # Mirrors actual failure: first native call initializes persistent tensors
+    # inside inference; later enable_grad alone would not repair them.
+    layer=LazyHeadMock(torch)
+    with torch.inference_mode():layer.mhr_forward(dict(mhr_trans=torch.tensor(p['mhr_trans'][:16])))
+    with pytest.raises(ValueError,match='Persistent native head inference tensors'):
+        adapter.prime_native_autograd(torch,layer,p)
+
+
+def test_full_loss_leaf_creation_and_backward_boundary_overrides_inference():
+    torch=ModeMock();c,*_=callback();c.torch=torch;calls=[]
+    c._loss_normal=lambda *args:calls.append(torch.inference) or 'normal'
+    with torch.inference_mode():
+        assert c._loss({},None,True)=='normal'
+        assert torch.inference
+    assert calls==[False]
+
+
+def test_torch_actual_inference_buffer_failure_and_no_grad_prime_preserves_backward():
+    # Runs in qualified Torch runtimes (Azure); no dependency/model downloads.
+    torch=pytest.importorskip('torch')
+    class Lazy(torch.nn.Module):
+        def __init__(self):super().__init__();self.register_buffer('constant',None)
+        def forward(self,x):
+            if self.constant is None:self.constant=torch.ones_like(x)
+            return x*self.constant
+    poisoned=Lazy()
+    with torch.inference_mode():poisoned(torch.ones(3))
+    with pytest.raises(RuntimeError,match='Inference tensors cannot be saved for backward'):
+        poisoned(torch.ones(3,requires_grad=True)).sum().backward()
+    proper=Lazy()
+    with torch.inference_mode(False),torch.no_grad():proper(torch.ones(3))
+    assert not torch.is_inference(proper.constant)
+    x=torch.ones(3,requires_grad=True);proper(x).sum().backward()
+    torch.testing.assert_close(x.grad,torch.ones(3))

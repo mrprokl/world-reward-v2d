@@ -53,6 +53,33 @@ def body_gradient_to_tangent(body_controls, gradient):
     return result
 
 
+def prime_native_autograd(torch,layer,parameters):
+    """Load lazy native head/caches as normal tensors BEFORE inference decode.
+
+    Pinned MHRLayer.from_mhr_assets is lazy: first mhr_forward calls _ensure_head
+    and loads persistent model buffers. An inference_mode first decode poisons
+    those constants for later backward. Initialize with no_grad, NOT inference;
+    no tensor-value cloning/reweighting or source/model mutation is performed.
+    """
+    started=time.monotonic()
+    with torch.inference_mode(False),torch.no_grad(),torch.jit.optimized_execution(False):
+        p={k:torch.tensor(v[:16].copy(),device='cuda',dtype=torch.float32) for k,v in parameters.items()}
+        decoded=layer.mhr_forward(p)
+        values=(decoded.vertices,decoded.joints,decoded.keypoints)
+        if any(torch.is_inference(v) or not torch.isfinite(v).all() for v in values):
+            raise ValueError('Native autograd priming must generate finite normal tensors')
+        head=layer.backend.head
+        if head is None:raise ValueError('Native lazy head initialization absent')
+        constants=list(head.named_parameters())+list(head.named_buffers())
+        if any(torch.is_inference(v) for _,v in constants):
+            raise ValueError('Persistent native head inference tensors cannot enter autograd; fresh normal-mode initialization required')
+    return dict(schema='world_reward.native_autograd_priming.v1',seconds=time.monotonic()-started,
+        initialization_batch=min(16,len(parameters['mhr_trans'])),inference_mode_disabled=True,
+        no_grad_initialization=True,persistent_native_tensors_checked=len(constants),
+        persistent_inference_tensors=0,model_values_cloned_or_changed=False,
+        lazy_head_initialized_before_first_inference_decode=True)
+
+
 class NativeSQPCallbacks:
     """Live exact native loss + bounded-memory anatomical VJP callbacks."""
     def __init__(self,torch,layer,instance,decode_geometry,evidence,*,deadline,source_binding,chunk=16,on_completion=None):
@@ -89,6 +116,12 @@ class NativeSQPCallbacks:
         return {k:self.torch.tensor(v.copy(),dtype=self.torch.float32,device='cuda') for k,v in p.items()}
 
     def _loss(self,p,obj,gradient):
+        # Full leaf construction/forward/backward scope, not only enable_grad:
+        # enable_grad does not override a surrounding inference-mode scope.
+        with self.torch.inference_mode(False):
+            return self._loss_normal(p,obj,gradient)
+
+    def _loss_normal(self,p,obj,gradient):
         self.check();torch=self.torch;i=self.instance;t=self.tensors(p)
         body=t['mhr_body_pose_cont'][:,:254].detach().clone().requires_grad_(gradient)
         ht=t['mhr_trans'].detach().clone().requires_grad_(gradient)
@@ -126,7 +159,7 @@ class NativeSQPCallbacks:
         # not a claimed native Hessian or a new objective coefficient.
         metric=np.ones_like(gradient)
         jac=np.zeros((len(obj),2,3,ROTATION_DIM),float);torch=self.torch;maximum_error=0.
-        with torch.enable_grad(),torch.jit.optimized_execution(False):
+        with torch.inference_mode(False),torch.enable_grad(),torch.jit.optimized_execution(False):
             for start_frame in range(0,len(obj),self.chunk):
                 self.check();sl=slice(start_frame,min(start_frame+self.chunk,len(obj)));count=sl.stop-sl.start
                 t={k:torch.tensor(v[sl].copy(),dtype=torch.float32,device='cuda') for k,v in p.items()}
