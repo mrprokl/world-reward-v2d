@@ -36,7 +36,13 @@ def manifests(tmp_path,monkeypatch):
         dataset_revision=DATASET,sequences=SEQS,files=[],all_four_paired_predictions_sealed=True,ground_truth_read=False,
         reference_bytes_included=False,RGB_included=False,models_included=False,private_container_verified=True,
         provenance={'native_source_binding':bind})
-    blobs={}
+    blobs={};runtime={}
+    for filename,asset in t.RUNTIME_ASSETS.items():
+        raw=b'opaque-fixed-runtime-'+filename.encode();record=dict(path=asset['path'],**digest(raw))
+        runtime[filename]=record
+        name=t.prefix(PRED,DEV)+'/runtime/'+filename;blobs[name]=raw
+    monkeypatch.setattr(t,'RUNTIME_ASSETS',runtime)
+    package['runtime_files']=[dict(file=filename,name=t.prefix(PRED,DEV)+'/runtime/'+filename,etag='"etag"',**{k:asset[k] for k in ('bytes','sha256')}) for filename,asset in runtime.items()]
     for sid in SEQS:
         ip=digest(b'publicinput');row=dict(sequence_id=sid,input=dict(path=str(t.dev.DATA/DEV/sid/'inputs/input.json'),pin=ip),variants={})
         for variant,folder in t.STAGES.items():
@@ -132,7 +138,8 @@ def test_fetch_all16_original_pins_no_npz_decode_and_final_local_manifest(tmp_pa
     assert result['payload_pins_unchanged'] and result['input_routes_unchanged'] and not result['private_references_transferred']
     assert len(list(target.glob('*/fit_*/eval_geometry.npz')))==8
     assert all(not f.stat().st_mode&0o222 for f in target.rglob('*') if f.is_file())
-    assert len([x for x in client.calls if x[0]=='GET'])==18
+    assert len([x for x in client.calls if x[0]=='GET'])==22
+    assert result['runtime_files_count']==4 and not result['runtime_array_values_decoded']
     with pytest.raises(ValueError,match='overwrite'):t.fetch(root,PRED,DEV,pp,REV,bind,client=client)
 
 
@@ -215,11 +222,14 @@ def test_publish_package_commit_marker_last_and_source_rehashed(tmp_path,monkeyp
         path=tmp_path/'sealed'/row['sequence_id']/t.STAGES[row['variant']]/row['file'];path.parent.mkdir(parents=True,exist_ok=True)
         payload=blobs[row['name']];pin=t.seal_bytes(path,payload);tracked.append((path,pin))
         files.append(dict(sequence_id=row['sequence_id'],variant=row['variant'],file=row['file'],path=path,pin=pin,mime='application/octet-stream'))
+    for filename,asset in t.RUNTIME_ASSETS.items():
+        path=root/asset['path'];path.parent.mkdir(parents=True,exist_ok=True)
+        t.seal_bytes(path,blobs[t.prefix(PRED,DEV)+'/runtime/'+filename])
     monkeypatch.setattr(t,'assemble',lambda *args:(m,files,tracked,{'native_source_binding':bind}))
     monkeypatch.setattr(t,'source',lambda *args:bind);client=PublishClient({})
     package,receipt=t.publish(root,PRED,DEV,REV,bind,client=client)
     puts=[x[1] for x in client.calls if x[0]=='PUT']
-    assert len(puts)==18 and puts[-2:]==[t.prefix(PRED,DEV)+'/manifest.json',t.prefix(PRED,DEV)+'/package.json']
+    assert len(puts)==22 and puts[-2:]==[t.prefix(PRED,DEV)+'/manifest.json',t.prefix(PRED,DEV)+'/package.json']
     assert receipt['bytes']==len(client.blobs[puts[-1]])
     assert len(package['files'])==16 and package['all_four_paired_predictions_sealed']
     assert t.identity(root/'results'/('form-prediction-transfer-publish-'+REV+'.json'))['bytes']>0
@@ -227,6 +237,57 @@ def test_publish_package_commit_marker_last_and_source_rehashed(tmp_path,monkeyp
 
 def test_publish_source_modified_before_network_never_upload(tmp_path,monkeypatch):
     root,m,p,blobs,pp,bind=manifests(tmp_path,monkeypatch);f=tmp_path/'changed';t.seal_bytes(f,b'actual')
+    monkeypatch.setattr(t,'runtime_source_files',lambda:[])
     monkeypatch.setattr(t,'assemble',lambda *args:(m,[],[(f,digest(b'wrong'))],{}));client=PublishClient({})
     with pytest.raises(ValueError,match='source changed'):t.publish(root,PRED,DEV,REV,bind,client=client)
     assert not client.calls
+
+
+def test_exact_public_runtime_pins_match_evaluator_contract():
+    import form_hoi_external_eval as evaluator
+    for filename in ('mhr_metrics.py','mhr_submission.py','mesh_common.py'):
+        asset=t.RUNTIME_ASSETS[filename]
+        assert {k:asset[k] for k in ('bytes','sha256')}==evaluator.OFFICIAL['v2dlb/'+filename]
+    c=json.loads((Path(__file__).resolve().parents[1]/evaluator.CONFIG).read_bytes())
+    assert {k:t.RUNTIME_ASSETS['hand_spec.npz'][k] for k in ('bytes','sha256')}=={k:c['hand_spec'][k] for k in ('bytes','sha256')}
+    assert sum(a['bytes'] for a in t.RUNTIME_ASSETS.values())==99306
+
+
+@pytest.mark.parametrize('fault',['missing','wrongSHA','giant','unknown','duplicate','modelroute'])
+def test_runtime_contract_only_four_tiny_exact_public_files(tmp_path,monkeypatch,fault):
+    root,m,p,blobs,pp,bind=manifests(tmp_path,monkeypatch)
+    r=p['runtime_files']
+    if fault=='missing':r.pop()
+    elif fault=='wrongSHA':r[0]['sha256']='0'*64
+    elif fault=='giant':r[0]['bytes']=1 << 30
+    elif fault=='unknown':r[0]['file']='mhr_model.pt'
+    elif fault=='duplicate':r[1]=r[0]
+    else:r[0]['name']=t.prefix(PRED,DEV)+'/runtime/mhr_model.pt'
+    with pytest.raises(ValueError):t.package_contract(p,PRED,DEV,SEQS,DATASET)
+
+
+def test_runtime_install_can_reuse_exact_immutable_only(tmp_path,monkeypatch):
+    root,m,p,blobs,pp,bind=manifests(tmp_path,monkeypatch);client=Client(blobs)
+    first=t.install_runtime_files(client,p['runtime_files']);calls=len(client.calls)
+    second=t.install_runtime_files(client,p['runtime_files'])
+    assert first==second and len(client.calls)==calls
+    path=first[0][0];path.chmod(0o644);path.write_bytes(b'different');path.chmod(0o444)
+    with pytest.raises(ValueError,match='Existing public runtime'):t.install_runtime_files(client,p['runtime_files'])
+    assert path.read_bytes()==b'different'
+
+
+def test_runtime_sources_must_match_pins_before_network(tmp_path,monkeypatch):
+    root,m,p,blobs,pp,bind=manifests(tmp_path,monkeypatch)
+    for filename,record in t.RUNTIME_ASSETS.items():
+        path=root/record['path'];path.parent.mkdir(parents=True,exist_ok=True)
+        t.seal_bytes(path,blobs[t.prefix(PRED,DEV)+'/runtime/'+filename])
+    assert len(t.runtime_source_files())==4
+    path=root/t.RUNTIME_ASSETS['mhr_metrics.py']['path'];path.chmod(0o644)
+    with pytest.raises(ValueError):t.runtime_source_files()
+
+
+def test_eval_wrapper_uses_only_each_host_existing_qualified_image():
+    wrapper=(Path(__file__).resolve().parents[1]/'infra/run_form_hoi_external_eval.sh').read_text()
+    assert 'world-reward-ncc-h100-02) IMAGE=sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3' in wrapper
+    assert 'scenesmith-ncc-h100-01) IMAGE=sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7' in wrapper
+    assert 'docker image inspect' in wrapper and 'docker pull' not in wrapper and 'docker tag' not in wrapper

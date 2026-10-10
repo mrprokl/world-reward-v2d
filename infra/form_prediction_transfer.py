@@ -34,6 +34,12 @@ MAX_METADATA=128 << 10
 FILES=('eval_geometry.npz','report.json')
 STAGES={'A':'fit_A','B':'fit_B'}
 BUDGET=900
+RUNTIME_ASSETS={
+    'hand_spec.npz':dict(path='weights/cari4d/refinement/mhr_hand_surface_spec.npz',bytes=47140,sha256='65e467ae534281c8c5370b76d672c80cf99b95bc73af9c3ac64d5bea6c7f60c8'),
+    'mhr_metrics.py':dict(path='vendor/v2d_submission_kit/v2dlb/mhr_metrics.py',bytes=25647,sha256='73077b65b5c3e0204307feef784317aab8c733d7462b6b8e6f4f397f7b91d2e0'),
+    'mhr_submission.py':dict(path='vendor/v2d_submission_kit/v2dlb/mhr_submission.py',bytes=24344,sha256='06fbd58d07bae1c583a92598f879771a4805ccea3e8346605975bcf5007b1fa3'),
+    'mesh_common.py':dict(path='vendor/v2d_submission_kit/v2dlb/mesh_common.py',bytes=2175,sha256='aaeac13286c839a7d7e271888613875c934e46de094b2ac928ff2ff01c5a1f06'),
+}
 
 
 def revision(value):
@@ -54,7 +60,7 @@ def prefix(predrev,devrev):return 'form-prediction-'+revision(predrev)+'-'+revis
 
 def allowed_blob(name):
     return bool(type(name) is str and re.fullmatch(
-        r'form-prediction-[0-9a-f]{40}-[0-9a-f]{40}/(?:package.json|manifest.json|[A-Za-z0-9_-]{1,128}/fit_[AB]/(?:eval_geometry.npz|report.json))',name))
+        r'form-prediction-[0-9a-f]{40}-[0-9a-f]{40}/(?:package.json|manifest.json|runtime/(?:hand_spec.npz|mhr_metrics.py|mhr_submission.py|mesh_common.py)|[A-Za-z0-9_-]{1,128}/fit_[AB]/(?:eval_geometry.npz|report.json))',name))
 
 
 class PrivatePredictionPackages(PrivatePreviews):
@@ -173,6 +179,42 @@ def rehash(tracked):
     for path,expected in tracked:require(identity(path,MAX_GEOMETRY)==expected,'Authoritative sealed prediction/input source changed')
 
 
+def runtime_source_files():
+    files=[]
+    for filename,record in RUNTIME_ASSETS.items():
+        path=canonical(ROOT/record['path']);expected={k:record[k] for k in ('bytes','sha256')}
+        require(identity(path,MAX_METADATA)==expected,'Independently pinned tiny public runtime source differs')
+        files.append(dict(file=filename,path=path,pin=expected,mime='application/octet-stream' if filename.endswith('.npz') else 'text/x-python'))
+    return files
+
+
+def runtime_contract(rows,predrev,devrev):
+    require(type(rows) is list and len(rows)==len(RUNTIME_ASSETS), 'All four fixed tiny public runtime files required')
+    seen=set()
+    for row in rows:
+        filename=row.get('file');require(filename in RUNTIME_ASSETS and filename not in seen,'No unknown or duplicate public runtime assets')
+        expected=RUNTIME_ASSETS[filename]
+        require(row.get('name')==prefix(predrev,devrev)+'/runtime/'+filename and
+            all(row.get(k)==expected[k] for k in ('bytes','sha256')) and
+            re.fullmatch(r'"[A-Za-z0-9-]{1,100}"',str(row.get('etag'))), 'Exact authoritative public runtime source/ETag required')
+        seen.add(filename)
+
+
+def install_runtime_files(client,rows):
+    """Only fixed public operator code/anatomy bytes; reuse only verified immutable."""
+    tracked=[]
+    for row in rows:
+        path=canonical(ROOT/RUNTIME_ASSETS[row['file']]['path']);expected={k:row[k] for k in ('bytes','sha256')}
+        if path.exists():
+            require(identity(path,MAX_METADATA)==expected,'Existing public runtime asset differs; never replace')
+        else:
+            raw=read_blob(client,row['name'],expected,etag=row['etag'],maximum=MAX_METADATA)
+            path.parent.mkdir(mode=0o755,parents=True,exist_ok=True)
+            require(seal_bytes(path,raw)==expected,'Tiny public runtime asset transfer differs')
+        tracked.append((path,expected))
+    return tracked
+
+
 def package_contract(p,predrev,devrev,seqs,dataset_revision):
     require(p.get('schema')=='world_reward.form_prediction_transfer.v1' and p.get('prediction_revision')==predrev and
         p.get('dev_revision')==devrev and p.get('dataset_revision')==dataset_revision and p.get('sequences')==seqs and
@@ -189,6 +231,7 @@ def package_contract(p,predrev,devrev,seqs,dataset_revision):
         require(re.fullmatch(r'"[A-Za-z0-9-]{1,100}"',str(row.get('etag'))),'Literal immutable private blob ETag required')
         seen.add(key)
     require(seen==expected,'Missing paired prediction payload')
+    runtime_contract(p.get('runtime_files'),predrev,devrev)
     m=p.get('prediction_manifest');require(type(m) is dict and m.get('name')==prefix(predrev,devrev)+'/manifest.json' and
         re.fullmatch(r'"[A-Za-z0-9-]{1,100}"',str(m.get('etag'))), 'Exclusive source prediction manifest required')
     pin({k:m.get(k) for k in ('bytes','sha256')},MAX_METADATA)
@@ -196,8 +239,9 @@ def package_contract(p,predrev,devrev,seqs,dataset_revision):
 
 def publish(code,predrev,devrev,revision_,binding,*,client=None):
     manifest,files,tracked,provenance=assemble(code,predrev,devrev)
-    seqs,dataset_revision=cohorts(code);rehash(tracked)
-    client=client or PrivatePredictionPackages();client.require_private();uploaded=[]
+    seqs,dataset_revision=cohorts(code);runtime_files=runtime_source_files()
+    tracked += [(r['path'],r['pin']) for r in runtime_files];rehash(tracked)
+    client=client or PrivatePredictionPackages();client.require_private();uploaded=[];runtime_uploaded=[]
     for row in files:
         raw=row['path'].read_bytes();expected=row['pin']
         require(len(raw)==expected['bytes'] and hashlib.sha256(raw).hexdigest()==expected['sha256'],'Source payload differs before Azure upload')
@@ -205,6 +249,12 @@ def publish(code,predrev,devrev,revision_,binding,*,client=None):
         b=client.upload(name,raw,row['mime'],predrev);client.head(name,expected,b['etag'])
         require({k:b[k] for k in ('bytes','sha256')}==expected,'Published payload identity differs')
         uploaded.append(dict(b,sequence_id=row['sequence_id'],variant=row['variant'],file=row['file']))
+    for row in runtime_files:
+        raw=row['path'].read_bytes();expected=row['pin']
+        require(digest_bytes(raw)==expected,'Authoritative tiny runtime bytes changed')
+        name=prefix(predrev,devrev)+'/runtime/'+row['file']
+        b=client.upload(name,raw,row['mime'],predrev);client.head(name,expected,b['etag'])
+        runtime_uploaded.append(dict(b,file=row['file']))
     rehash(tracked)
     native=source(ROOT,ROOT/'jobs'/predrev/'run_form_hoi_external_predict/code',predrev,'run_form_hoi_external_predict',
         ('infra/form_hoi_external_predict.py','infra/run_form_hoi_external_predict.sh','configs/form_hoi_external_predict_v1.json'))
@@ -214,7 +264,7 @@ def publish(code,predrev,devrev,revision_,binding,*,client=None):
     require(len(raw)<=MAX_METADATA,'Bounded four-DEV manifest required')
     m=client.upload(prefix(predrev,devrev)+'/manifest.json',raw,'application/json',predrev);client.head(m['name'],m,m['etag'])
     p=dict(schema='world_reward.form_prediction_transfer.v1',prediction_revision=predrev,dev_revision=devrev,
-        dataset_revision=dataset_revision,sequences=seqs,files=uploaded,prediction_manifest=m,provenance=provenance,
+        dataset_revision=dataset_revision,sequences=seqs,files=uploaded,runtime_files=runtime_uploaded,prediction_manifest=m,provenance=provenance,
         all_four_paired_predictions_sealed=True,ground_truth_read=False,reference_bytes_included=False,
         RGB_included=False,models_included=False,private_container_verified=True,source_binding=binding,producer_revision=revision_)
     package_contract(p,predrev,devrev,seqs,dataset_revision);raw=(json.dumps(p,sort_keys=True,allow_nan=False)+'\n').encode()
@@ -223,6 +273,9 @@ def publish(code,predrev,devrev,revision_,binding,*,client=None):
     dest=ROOT/'results'/('form-prediction-transfer-publish-'+revision_+'.json');seal_json(dest,dict(status='pass',package={k:b[k] for k in ('bytes','sha256')},package_blob=b['name'],prediction_revision=predrev,dev_revision=devrev,source_binding=binding))
     print(json.dumps(dict(status='published',package={k:b[k] for k in ('bytes','sha256')},prediction_revision=predrev,DEV_sequences=4,variants=8)),flush=True)
     return p,b
+
+
+def digest_bytes(raw):return dict(bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
 
 
 def read_blob(client,name,expected,*,etag=None,maximum=MAX_GEOMETRY):
@@ -272,6 +325,7 @@ def fetch(code,predrev,devrev,package_pin,revision_,binding,*,client=None):
         for variant,data in row['variants'].items():
             report=strict(Path(data['report']['path']).read_bytes())
             stage_contract(report,predrev,row['sequence_id'],variant,row['input']['pin'],data['geometry']['pin'],package['provenance']['native_source_binding'])
+    runtime_tracked=install_runtime_files(client,package['runtime_files']);tracked+=runtime_tracked
     rehash(tracked);require(source(ROOT,code,revision_,ENTRY,HELPERS)==binding,'Actual fetch source changed')
     source_pin=seal_bytes(target/'source-manifest.json',original_raw);seal_bytes(target/'package.json',raw)
     manifest_pin=seal_json(target/'manifest.json',manifest)
@@ -279,7 +333,8 @@ def fetch(code,predrev,devrev,package_pin,revision_,binding,*,client=None):
         package_identity=package_pin,source_manifest_identity=source_pin,local_manifest=dict(path=str(target/'manifest.json'),pin=manifest_pin),
         source_binding=binding,all_four_paired_predictions_sealed=True,original_payloads_rehashed_after=True,
         input_routes_unchanged=True,payload_pins_unchanged=True,native_prediction_producer_unchanged=True,
-        private_references_transferred=False,RGB_transferred=False,models_transferred=False,heavy_data_local=False)
+        private_references_transferred=False,RGB_transferred=False,models_transferred=False,heavy_data_local=False,
+        tiny_public_runtime_files={str(p):pin for p,pin in runtime_tracked},runtime_files_count=4,runtime_array_values_decoded=False)
     seal_json(target/'transfer.json',receipt)
     print(json.dumps(dict(status='fetched',prediction_revision=predrev,local_manifest=receipt['local_manifest'],variants=8,private_references_transferred=False)),flush=True)
     return receipt

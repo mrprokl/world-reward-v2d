@@ -5,7 +5,12 @@ set +x
 set -euo pipefail
 [[ $# == 0 ]] || exit 2
 ROOT="${WR_ROOT:?}";CODE="${WR_CODE:?}";REV="${WR_CODE_REVISION:?}"
-IMAGE=sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7
+# Use each host's existing qualified image; never transfer/pull/retag multi-GB images.
+case "$(hostname)" in
+ scenesmith-ncc-h100-01) IMAGE=sha256:b47e4450b24219c2a746f4795e27bde8c436f5cc310b7f8c527316f55c9380a7 ;;
+ world-reward-ncc-h100-02) IMAGE=sha256:7ebfff18ba3b76dd919485c19115597d7531dfd3233f69461f1dce3f28a6c6d3 ;;
+ *) exit 2 ;;
+esac
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_form_hoi_external_eval/code" && "$(id -u)" == 0 ]] || exit 2
 read -r DEVREV PREDROOT < <(/usr/bin/python3 -I -B - "$CODE" "$ROOT" <<'PYBOOT'
@@ -38,6 +43,7 @@ PYLOCK
 exec 9<"$LOCK";flock -n 9
 mkdir -m 755 "$OUT"
 export DOCKER_HOST="unix://$ROOT/docker.sock"
+[[ "$(docker image inspect "$IMAGE" --format '{{.Id}}')" == "$IMAGE" ]] || exit 2
 NAME="wr-form-external-eval-$REV";CIDFILE="$OUT/.container.cid"
 cleanup() {
  local status=$? cid='' ids='' found='' verified=false
