@@ -62,6 +62,25 @@ must not worsen. Fresh manufactured moving/absent-contact cases must retain
 motion. These gates are conservative QA, not a hidden truth score. No coefficient
 selection or per-episode manual intervention is permitted from their results.
 
+Actual contact producer `40183b3a83ba59080c192c3cdf2db9e1d76ef021`:
+145.88 s CPU, 415 frames, 271 fixed automatically qualified hand/frame entries.
+RGB mean 8.7317 → 3.8116 px; centroid acceleration median 7.3158 → 0.6181 m/s²
+and angular median 27.8187 → 0.3306 rad/s², but centroid p95
+21.3894 → 35.6794 m/s² and selected anatomical contact distance mean
+0.00709 → 0.07599 m. **Rejected** by predeclared gates, with optimizer not
+converged at the frozen 60-evaluation cap. Coefficients/budget were not swept
+on challenge data. The RGB-only anatomical contact distance was 0.34261 m,
+so contact factors address depth ambiguity but do not yet preserve interaction
+or remove all discontinuities. Neither experimental fit replaces production.
+Next work must address reliability of initial pixel-to-surface attachment and
+joint visual/contact evidence, not stronger arbitrary smoothing or floor snap.
+
+Contact report: 18,236 bytes / SHA256
+`2f4c602e666fcea91914eb55530836f094343daba85b95a5e5ffb5e076d013c4`;
+NPZ: 176,637 bytes /
+`4e8060965215a120148109bcf392ed25462c9c48bc80a262b84528529570bdbc`.
+Owned container absent, GPU not requested; all code/data/render stays Azure.
+
 ## Mask recovery / decisions
 
 First reverse policy producer `f0530c76d575dba10fa076bf99b25f571f0726b9`
@@ -109,6 +128,6 @@ the principle, not the pretrained GoTrack model.
 recovery, human-subtracted silhouette comparison and contact-aware optimization.
 Our inverse SAM pass is an adaptation, not a claim to reproduce that algorithm.
 
-274 targeted local tests passed. Actual artifacts and rendering remain Azure;
+356 targeted local tests passed. Actual artifacts and rendering remain Azure;
 only concise decisions/results are stored here. No held-out accuracy, overall
 4D quality, leakage-free checkpoint or leaderboard improvement is claimed.
