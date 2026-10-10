@@ -101,7 +101,7 @@ def validate_dwpose(arrays, bank, spec):
             or arrays['original_xy'].shape != (count, 133, 2)
             or arrays['original_xy'].dtype.kind != 'f'
             or arrays['raw_scores'].shape != (count, 133) or arrays['raw_scores'].dtype != np.float32
-            or not np.isfinite(arrays['raw_scores']).all() or (arrays['raw_scores'] < 0).any()
+            or not np.isfinite(arrays['raw_scores']).all()
             or not np.isfinite(arrays['original_xy'][arrays['raw_scores'] > 0]).all()
             or arrays['boxes_original_xyxy'].shape != (count, 4)
             or arrays['actor_present'].dtype != bool or arrays['actor_present'].shape != (count,)

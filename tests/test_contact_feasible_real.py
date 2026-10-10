@@ -112,6 +112,10 @@ def test_saved_original_grid_dwpose_conversion_matches_native_operator_exactly()
     bank, src, _, _ = tiny(); obs = dwpose(bank)
     result = real.validate_dwpose(obs, bank, src['spec'])
     np.testing.assert_array_equal(result.human_xy, obs['original_xy']-.5)
+    obs['raw_scores'][0, 0] = -1.
+    obs['original_xy'][0, 0] = np.nan  # Preserve native nonpositive invalid sentinel.
+    invalid = real.validate_dwpose(obs, bank, src['spec'])
+    assert invalid.human_scores[0, 0] == -1. and np.isnan(invalid.human_xy[0, 0]).all()
     for fps in (24., 29., 31.):
         obs['fps'] = np.array(fps)
         with pytest.raises(ValueError): real.validate_dwpose(obs, bank, src['spec'])
