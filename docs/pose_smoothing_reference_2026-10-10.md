@@ -65,5 +65,44 @@ experiment, not substituted success. Baseline and source geometry stay sealed.
   through grasp optimization and contact-aware diffusion. Author code remains
   announced rather than released; this is not a runnable fast drop-in fix.
 
-Status at preregistration: primitive implemented and tiny numerical tests pass;
-real cached-pose ablation has not yet completed. No reconstruction gain claimed.
+## Actual cached-pose result
+
+Producer `a18230bf77ef79f2aeb0470dd87161e0a61a6d93` completed in **7.854834 s**,
+both complete trajectories, no GPU or model inference. Source inputs rehashed,
+owned container absent, process exit 0. Aggregate report: 44463 bytes, SHA256
+`d2199b56b762ec9d8152d5f5a7b0813f6ce2359ef99c62c2a7faa4d35ad359c1`.
+
+| Prediction-only diagnostic | Episode 9 A → object-only SG | Episode 14 A → object-only SG |
+|---|---:|---:|
+| Object acceleration p95, m/s² | 21.3894 → 8.6455 | 50.4179 → 15.1643 |
+| Object angular acceleration p95, rad/s² | 125.5210 → 25.9297 | 1370.2568 → 456.0609 |
+| Same anatomical witness gap mean, m | .005596 → .007827 | .000829 → .005537 |
+| Object reprojection mean, px | 8.7592 → 8.7354 | No material tracks; no score invented |
+
+Object-only filtering really reduces these jitter proxies, but worsens contact
+gaps. Common rigid filtering preserves the FP64 same-witness distances (maximum
+increase below 3e-15 m), yet worsens human acceleration p95: 20.0002 → 76.4041
+and 15.4047 → 371.9417 m/s². Reserved human reprojection also worsens. Neither is
+adopted; no GT acceleration/CD/PEN or leaderboard gain is implied.
+
+Episode 9 report: 9526 bytes, SHA256
+`19a5af6ba2dc36c1a5fc8305ac367349e3026453c731c099ba4f7846aa146bc7`.
+Episode 14 report: 9269 bytes, SHA256
+`907a305dc78eb4789d60fe75d7246a12dc7a3702a9ebbd061b379c54c7ace14a`.
+
+## Next distinct hypothesis, frozen before execution
+
+Project the same SG proposal with a **feasible-start 6DoF object-pose SQP** while
+keeping the original human fixed. Minimize displacement to that moving proposal
+over the complete original mesh, using its exact mean/covariance instead of a
+new rotation-versus-translation weight or mesh subsampling. Rotation is a local
+SO(3) update about the object centroid. Preserve every original anatomical
+witness's A gap bound; never recreate bounds/activations from candidate poses.
+
+Declare 20 steps, 120 seconds per clip, .05-radian/.01-metre numerical trust
+boxes inherited from the earlier authored SQP policy. Requery complete original
+triangles and authorize only whole-clip feasible updates. Validate gradients on
+independent authored moving/contact examples before challenge reads, then seal
+predictions before the unchanged image/contact/motion QA. This is not a physics
+or penetration guarantee. On failure retain the complete moving baseline, not
+static poses, per-frame output selection, or a claim of improvement.
