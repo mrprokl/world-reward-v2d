@@ -209,3 +209,10 @@ def test_surface_pins_authenticate_native_and_never_seal_historical_reports(monk
     assert historical.stat().st_mode & 0o777 == 0o644
     assert historical.read_bytes() == b'original failed host receipt'
     assert list(pinroot.iterdir()) == [pinroot / 'surface_mesh_000017.json']
+
+
+def test_new_random_entry_explicitly_supported_without_baseline_aliasing():
+    import inspect
+    text=inspect.getsource(pins._context)
+    assert "'run_full4d_random'" in text
+    assert "code == root / 'jobs' / revision / entry / 'code'" in text or "code == root/'jobs'/revision/entry/'code'" in text or "code == root / 'jobs' / revision" in text

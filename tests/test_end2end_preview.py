@@ -269,3 +269,51 @@ def test_render_and_publish_requires_sealed_true_successful_owned_host_exit(tmp_
         path.write_text(json.dumps(value));path.chmod(0o444)
         r=subprocess.run([sys.executable,'-I','-B','-',str(path)],input=code,text=True,capture_output=True)
         assert (r.returncode==0)==ok
+
+
+def test_smoothing_label_is_not_native_reconstruction_or_adoption():
+    assert p.candidate_kind('smoothing') == 'smoothing'
+    assert 'diagnostic' in p.labels(9,True,'smoothing','accepted_rigid_projection_pending_independent_QA')[2]
+    assert p.labels(9,True,'smoothing','dynamic_A_fallback_no_improvement')[2] == 'Baseline fallback / no gain'
+    with pytest.raises(ValueError): p.labels(9,True,'smoothing','accepted_native_pose_sqp')
+
+
+def test_smoothing_root_producer_contract_no_native_or_GT_relabel(tmp_path,monkeypatch):
+    import json
+    from sequence_pose_probe import ArtifactLedger
+    rev='a'*40
+    helpers={n:dict(bytes=1,sha256='b'*64) for n in ('infra/pose_smoothing_real.py','infra/run_pose_smoothing_real.sh',
+        'src/world_reward/pose_smoothing.py','src/world_reward/rigid_pose_contact_projection.py')}
+    r=dict(schema='world_reward.pose_smoothing_real.v1',status='complete_saved_pose_smoothing_ablation',producer_revision=rev,
+        cohort=p.COHORT,complete_episodes=2,unexpected_failures=0,contact_projection_enabled=True,source_inputs_rehashed=True,
+        ground_truth_used=False,private_truth_read=False,production_adopted=False,baseline_modified=False,GPU_requested=False,
+        model_calls=0,projection_authored_DEV=dict(passed=True),source_binding=dict(helpers=helpers),input_ledger=dict(rgb=dict(bytes=1,sha256='b'*64)),
+        episodes=[dict(episode=e,status='complete_saved_full_T_pose_smoothing_diagnostic' if e in (9,14)
+            else 'unsupported_original_frontend_unchanged') for e in p.COHORT])
+    host=dict(producer_revision=rev,container_absence_verified=True,process_exit_code=0,GPU_requested=False)
+    monkeypatch.setattr(p,'source',lambda *_:r['source_binding'])
+    for fault in (None,'gt','partial','cleanup','native','nosmoothing'):
+        from copy import deepcopy
+        value=deepcopy(r);h=host.copy()
+        if fault=='gt':value['ground_truth_used']=True
+        if fault=='partial':value['complete_episodes']=1
+        if fault=='cleanup':h['container_absence_verified']=False
+        if fault=='native':value['GPU_requested']=True
+        if fault=='nosmoothing':value['contact_projection_enabled']=False
+        for name,v in [('report.json',value),('host-exit.json',h)]:
+            path=tmp_path/name
+            if path.exists():path.chmod(0o644)
+            path.write_text(json.dumps(v));path.chmod(0o444)
+        if fault is None:assert p.smoothing_cohort(ArtifactLedger(),tmp_path,rev)==r
+        else:
+            with pytest.raises(ValueError):p.smoothing_cohort(ArtifactLedger(),tmp_path,rev)
+
+
+def test_smoothing_wrapper_keeps_offline_original_geometry_and_actual_cpu_source_mount():
+    wrapper=(Path(__file__).parents[1]/'infra/run_end2end_preview.sh').read_text()
+    assert 'PREFIX=pose-smoothing-real' in wrapper and 'run_pose_smoothing_real,readonly' in wrapper
+    assert '--network none' in wrapper and '--candidate-kind' in wrapper
+    import inspect
+    s=inspect.getsource(p.smoothing_arrays)
+    assert 'return ah,ah,a,b' in s and 'projected_gaps_m' in s and 'base[active]+1e-7' in s
+    assert 'overall_adoption_clearance' in s and 'native_controls_emitted' in s

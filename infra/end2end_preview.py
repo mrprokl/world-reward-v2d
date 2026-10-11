@@ -25,7 +25,8 @@ HELPERS = ('infra/end2end_preview.py', 'infra/run_end2end_preview.sh',
     'infra/mediapipe_cpu_runtime_verify.py')
 FILES = {'target': 'target.npy', 'trajectory': 'trajectory.npz',
          'native_parameters': 'native_parameters.npz'}
-KINDS = {'joint': 'native-joint-real-', 'continuation': 'native-contact-continuation-real-', 'sqp': 'native-pose-sqp-real-'}
+KINDS = {'joint': 'native-joint-real-', 'continuation': 'native-contact-continuation-real-', 'sqp': 'native-pose-sqp-real-', 'smoothing': 'pose-smoothing-real-'}
+SMOOTHING_STATUSES = {'accepted_rigid_projection_pending_independent_QA', 'dynamic_A_fallback_no_improvement'}
 CONTINUATION_ENTRY = 'run_native_contact_continuation_real'
 CONTINUATION_STATUSES = {'accepted_native_continuation', 'dynamic_A_fallback_no_improvement'}
 SQP_STATUSES = {'accepted_native_pose_sqp', 'dynamic_A_fallback_no_improvement'}
@@ -45,7 +46,7 @@ def revision(value):
 
 
 def candidate_kind(value):
-    require(type(value) is str and value in KINDS, 'Explicit joint, continuation or sqp candidate required')
+    require(type(value) is str and value in KINDS, 'Explicit known diagnostic candidate required')
     return value
 
 
@@ -63,6 +64,10 @@ def display_trajectory(trajectory):
 def labels(episode, accepted, kind='joint', status=None):
     candidate_kind(kind)
     title = 'Native joint — QA ' + ('PASS, GT pending' if accepted else 'FAIL / not adopted')
+    if kind == 'smoothing':
+        require(status in SMOOTHING_STATUSES, 'Actual rigid smoothing outcome required')
+        title = ('Baseline fallback / no gain' if status == 'dynamic_A_fallback_no_improvement'
+                 else 'Lissage + contacts — diagnostic / GT pending')
     if kind in NATIVE_METHODS:
         require(status in NATIVE_METHODS[kind][3], 'Original native method outcome required')
         title = ('Baseline fallback / no gain' if status == 'dynamic_A_fallback_no_improvement' else
@@ -70,6 +75,78 @@ def labels(episode, accepted, kind='joint', status=None):
                  ' — QA ' + ('PASS, GT pending' if accepted else 'FAIL / not adopted'))
     return ['Original RGB', 'Baseline complete (052)',
             title]
+
+
+def smoothing_cohort(ledger, candidate_root, candidate_revision):
+    """Validate the actual CPU producer, never relabel it as native joint fitting."""
+    r = strict(ledger.read(candidate_root/'report.json', maximum=4<<20))
+    require(r.get('schema') == 'world_reward.pose_smoothing_real.v1'
+        and r.get('status') == 'complete_saved_pose_smoothing_ablation'
+        and r.get('producer_revision') == candidate_revision and r.get('cohort') == COHORT
+        and r.get('complete_episodes') == 2 and r.get('unexpected_failures') == 0
+        and r.get('contact_projection_enabled') is True and r.get('source_inputs_rehashed') is True
+        and all(r.get(k) is False for k in ('ground_truth_used','private_truth_read','production_adopted','baseline_modified','GPU_requested'))
+        and r.get('model_calls') == 0 and r.get('projection_authored_DEV',{}).get('passed') is True,
+        'Complete sealed no-GT CPU smoothing source required')
+    rows = r.get('episodes',[])
+    require([v.get('episode') for v in rows] == COHORT
+        and all(v.get('status') == ('complete_saved_full_T_pose_smoothing_diagnostic' if v['episode'] in (9,14)
+            else 'unsupported_original_frontend_unchanged') for v in rows), 'Original four-record denominator required')
+    binding = r['source_binding']; helpers = binding.get('helpers',{})
+    require({'infra/pose_smoothing_real.py','infra/run_pose_smoothing_real.sh',
+        'src/world_reward/pose_smoothing.py','src/world_reward/rigid_pose_contact_projection.py'} <= set(helpers)
+        and source(ROOT,ROOT/'jobs'/candidate_revision/'run_pose_smoothing_real'/'code',candidate_revision,
+            'run_pose_smoothing_real',tuple(helpers)) == binding, 'Actual immutable smoothing source closure required')
+    host = strict(ledger.read(candidate_root/'host-exit.json',maximum=4096))
+    require(host == dict(producer_revision=candidate_revision,container_absence_verified=True,
+        process_exit_code=0,GPU_requested=False) and type(host['process_exit_code']) is int,
+        'Actual successful CPU producer cleanup required')
+    require(type(r.get('input_ledger')) is dict and r['input_ledger'], 'Smoothing original input ledger required')
+    return r
+
+
+def smoothing_arrays(ledger, candidate, r, directory, pins, total):
+    """Replay frozen object pose and ORIGINAL human; never refit/repair geometry."""
+    import numpy as np
+    v = r['variants']['contact_constrained_SE3']; c = v['projection']
+    require(r.get('full_original_frames') == total and r.get('source_fps') == 30.
+        and r.get('baseline_binding',{}).get('outputs') == pins['export_files']
+        and v.get('status') == 'complete_saved_pose_diagnostic'
+        and c.get('status') in SMOOTHING_STATUSES and c.get('full_original_frames') == total
+        and c.get('human_fixed') is True and c.get('exact_full_surface_witness_bounds_preserved') is True
+        and c.get('object_geometry_scale_changed') is False and c.get('first_pose_exactly_preserved') is True
+        and c.get('ground_truth_used') is False and c.get('production_adopted') is False
+        and v.get('production_adopted') is False and v.get('overall_adoption_clearance') is False
+        and v.get('shape_scale_unchanged') is True and v.get('native_controls_emitted') is False,
+        'Full frozen same-human pose diagnostic, not validated native control export')
+    folder=candidate/'contact_constrained_SE3'
+    geometry=strict(ledger.read(folder/'geometry.json'))
+    require(geometry.get('projection') == c and geometry.get('candidate_outputs') == v['candidate_outputs'],
+        'Candidate geometry was sealed before independent QA')
+    for name in FILES.values(): ledger.record(directory/name,pins['export_files'][name])
+    ah=np.load(directory/'target.npy',mmap_mode='r',allow_pickle=False)
+    with np.load(directory/'trajectory.npz',allow_pickle=False) as z:
+        a={k:z[k] for k in DISPLAY_TRAJECTORY_KEYS}
+    with np.load(directory/'native_parameters.npz',allow_pickle=False) as z:
+        faces=z['human_faces'];indices=z['frame_index']
+    ledger.record(folder/'object_pose.npz',v['candidate_outputs']['object_pose'])
+    with np.load(folder/'object_pose.npz',allow_pickle=False) as z:
+        require(set(z.files) == set(DISPLAY_TRAJECTORY_KEYS)|{'fps'} and float(z['fps']) == 30.,
+            'Exact complete rigid smoothing artifact required')
+        b={k:z[k] for k in DISPLAY_TRAJECTORY_KEYS}
+    for k in ('object_vertices','object_faces','object_scale','camera_K','frame_index'):
+        require(np.array_equal(a[k],b[k]), 'No geometry, scale, camera or chronology edits')
+    require(np.array_equal(a['object_rotation'][0],b['object_rotation'][0])
+        and np.array_equal(a['object_translation'][0],b['object_translation'][0]),'Original first pose preserved')
+    ledger.record(folder/'frozen_contact_bounds.npz',v['candidate_outputs']['frozen_contact_bounds'])
+    with np.load(folder/'frozen_contact_bounds.npz',allow_pickle=False) as z:
+        active=z['activations'];gap=z['projected_gaps_m'];base=z['baseline_gaps_m']
+        require(active.dtype == np.bool_ and active.shape == gap.shape == base.shape == (total,2)
+            and np.array_equal(z['frame_index'],np.arange(total)) and z['hand_vertex_ids'].shape == (total,2)
+            and np.isfinite(gap[active]).all() and np.all(gap[active] <= base[active]+1e-7),
+            'All original contact bounds, including occluded chronology, required')
+    require(type(v['decision_vs_A']['passed']) is bool,'Actual diagnostic QA required')
+    return ah,ah,a,b,faces,indices,v['decision_vs_A']['passed'],c['status']
 
 
 def native_cohort(ledger, candidate_root, candidate_revision, kind):
@@ -199,7 +276,8 @@ def render(candidate_revision, kind='joint'):
     ledger = ArtifactLedger(); reports = []; states = []
     base = ROOT/'experiments'/('full4d-v1-'+BASELINE)
     candidate_root = ROOT/'results'/(KINDS[kind]+candidate_revision)
-    cohort = native_cohort(ledger, candidate_root, candidate_revision, kind) if kind in NATIVE_METHODS else None
+    cohort = (smoothing_cohort(ledger, candidate_root, candidate_revision) if kind == 'smoothing' else
+        native_cohort(ledger, candidate_root, candidate_revision, kind) if kind in NATIVE_METHODS else None)
     cohort_rows = {r['episode']: r for r in cohort['episodes']} if cohort else {}
     for ep in COHORT:
         candidate = candidate_root/f'episode_{ep:06d}'
@@ -213,83 +291,88 @@ def render(candidate_revision, kind='joint'):
                 reason='upstream full-pose unsupported' if ep in (1,7) else 'candidate missing'))
             continue
         if cohort: identity(report_path, 4<<20)
-        r = strict(ledger.read(report_path, cohort_rows[ep]['report'] if cohort else None, maximum=4<<20))
+        r = strict(ledger.read(report_path, cohort_rows[ep]['report_pin' if kind == 'smoothing' else 'report'] if cohort else None, maximum=4<<20))
         require(r['producer_revision'] == candidate_revision and r['episode'] == ep
                 and r['ground_truth_used'] is False and r['private_truth_read'] is False
                 and r['baseline_modified'] is False, 'Automatic no-GT candidate provenance required')
-        if r.get('status') not in (NATIVE_METHODS[kind][3] if cohort else {'complete_diagnostic_not_quality_pass'}):
+        if r.get('status') not in ({'complete_saved_full_T_pose_smoothing_diagnostic'} if kind == 'smoothing'
+                else NATIVE_METHODS[kind][3] if cohort else {'complete_diagnostic_not_quality_pass'}):
             states.append(dict(episode=ep, status='failed', phase=r.get('phase'),
                 reason=r.get('error', 'no complete candidate geometry')))
             continue
         directory = base/'outputs'/f'episode_{ep:06d}'/'cari_shared_export_v1'
         pins = strict(ledger.read(base/'pins'/f'cari_clip_{ep:06d}_shared_export_pins.json'))
         spec = pins['clip_spec']; total = spec['total_frames']
-        accepted = complete_candidate(r, kind, total)
+        accepted = None if kind == 'smoothing' else complete_candidate(r, kind, total)
         if cohort:
             require(total == {9:415,14:442}[ep] and r['status'] == cohort_rows[ep]['status'],
                 'Exact full original continuation timeline/outcome required')
         require(spec == dict(episode_index=ep, total_frames=total, camera_name='front_stereo_camera_left',
             width=1536, height=1152), 'Original source grid required')
-        for name in FILES.values(): ledger.record(directory/name, pins['export_files'][name])
-        for key, name in FILES.items():
-            if cohort: identity(candidate/name, 2<<30)
-            ledger.record(candidate/name, r['candidate_outputs'][key])
-        require(r['baseline_binding']['outputs'] == pins['export_files'], 'Same frozen baseline required')
-        if cohort:
-            require(r['baseline_binding']['directory'] == str(directory), 'Same original baseline route required')
-            if kind == 'sqp':
-                geometry=candidate/'geometry.json'; identity(geometry,4<<20)
-                sealed=strict(ledger.read(geometry,maximum=4<<20))
-                require(sealed.get('candidate_outputs') == r['candidate_outputs']
-                    and sealed.get('producer_revision') == candidate_revision and sealed.get('episode') == ep
-                    and sealed.get('baseline_binding') == r['baseline_binding'] and sealed.get('SQP') == r['SQP']
-                    and sealed.get('ground_truth_used') is False and sealed.get('private_truth_read') is False
-                    and sealed.get('fitted_outputs_sealed_before_final_QA') is True,
-                    'Original SQP geometry receipt sealed before final QA required')
-            witness = candidate/'QA_witnesses.npz'; identity(witness, 2<<20)
-            ledger.record(witness, r['candidate_outputs']['frozen_witnesses'])
-            with np.load(witness, allow_pickle=False) as qa:
-                require(set(qa.files) == {'activations','hand_vertex_ids','frame_index','emitted_same_witness_gaps_m'}
-                    and qa['activations'].dtype == np.bool_ and qa['activations'].shape == (total,2)
-                    and qa['hand_vertex_ids'].dtype == np.int64 and qa['hand_vertex_ids'].shape == (total,2)
-                    and np.array_equal(qa['frame_index'], np.arange(total))
-                    and qa['emitted_same_witness_gaps_m'].shape == (total,2)
-                    and np.isfinite(qa['emitted_same_witness_gaps_m'][qa['activations']]).all(),
-                    'Sealed original all-frame automatic witness geometry required')
-        ah = np.load(directory/'target.npy', mmap_mode='r', allow_pickle=False)
-        bh = np.load(candidate/'target.npy', mmap_mode='r', allow_pickle=False)
-        with np.load(directory/'trajectory.npz', allow_pickle=False) as a:
-            keys = ('object_vertices','object_faces','object_rotation','object_translation',
-                    'object_scale','camera_K','frame_index') + (('pose','scales','shape') if cohort else ())
-            a = {k:a[k] for k in keys}
-        with np.load(candidate/'trajectory.npz', allow_pickle=False) as b:
-            b = {k:b[k] for k in a}
-        with np.load(directory/'native_parameters.npz', allow_pickle=False) as native:
-            faces = native['human_faces']; indices = native['frame_index']
-            fixed_keys = FROZEN_NATIVE_KEYS
-            frozen = {k:native[k] for k in fixed_keys} if cohort else {}
-            internal = native['mhr_body_pose_cont'][:,254:].copy() if cohort else None
-        with np.load(candidate/'native_parameters.npz', allow_pickle=False) as native:
-            require(np.array_equal(native['human_faces'], faces)
-                and np.array_equal(native['frame_index'], indices), 'No topology / timeline substitutions')
+        candidate_status = r['status']
+        if kind == 'smoothing':
+            ah,bh,a,b,faces,indices,accepted,candidate_status = smoothing_arrays(ledger,candidate,r,directory,pins,total)
+        else:
+            for name in FILES.values(): ledger.record(directory/name, pins['export_files'][name])
+            for key, name in FILES.items():
+                if cohort: identity(candidate/name, 2<<30)
+                ledger.record(candidate/name, r['candidate_outputs'][key])
+            require(r['baseline_binding']['outputs'] == pins['export_files'], 'Same frozen baseline required')
             if cohort:
-                require(all(native[k].dtype == frozen[k].dtype and native[k].shape == frozen[k].shape
-                    and native[k].tobytes() == frozen[k].tobytes() for k in fixed_keys)
-                    and native['mhr_body_pose_cont'][:,254:].tobytes() == internal.tobytes()
-                    and native['mhr_trans'].dtype == np.float32 and native['mhr_trans'].shape == (total,3)
-                    and native['mhr_joints'].dtype == np.float32 and native['mhr_joints'].shape == (total,127,3)
-                    and native['mhr_keypoints'].dtype == np.float32 and native['mhr_keypoints'].shape == (total,70,3),
-                    'Frozen native identity, hands, root rotation and complete native C geometry required')
-        require(ah.shape == bh.shape == (total,18439,3), 'Every original human vertex/frame required')
-        if cohort:
-            require(ah.dtype == bh.dtype == np.float32 and b['pose'].dtype == np.float32
-                and b['pose'].shape == (total,136) and np.isfinite(b['pose']).all()
-                and b['scales'].tobytes() == a['scales'].tobytes()
-                and b['shape'].tobytes() == a['shape'].tobytes()
-                and np.array_equal(a['object_rotation'], b['object_rotation']),
-                'Direct full-native C controls and unchanged clip shape/scales/object rotations required')
-        for key in ('object_vertices','object_faces','object_scale','camera_K','frame_index'):
-            require(np.array_equal(a[key], b[key]), 'Clip-constant geometry, K, scale and original indices required')
+                require(r['baseline_binding']['directory'] == str(directory), 'Same original baseline route required')
+                if kind == 'sqp':
+                    geometry=candidate/'geometry.json'; identity(geometry,4<<20)
+                    sealed=strict(ledger.read(geometry,maximum=4<<20))
+                    require(sealed.get('candidate_outputs') == r['candidate_outputs']
+                        and sealed.get('producer_revision') == candidate_revision and sealed.get('episode') == ep
+                        and sealed.get('baseline_binding') == r['baseline_binding'] and sealed.get('SQP') == r['SQP']
+                        and sealed.get('ground_truth_used') is False and sealed.get('private_truth_read') is False
+                        and sealed.get('fitted_outputs_sealed_before_final_QA') is True,
+                        'Original SQP geometry receipt sealed before final QA required')
+                witness = candidate/'QA_witnesses.npz'; identity(witness, 2<<20)
+                ledger.record(witness, r['candidate_outputs']['frozen_witnesses'])
+                with np.load(witness, allow_pickle=False) as qa:
+                    require(set(qa.files) == {'activations','hand_vertex_ids','frame_index','emitted_same_witness_gaps_m'}
+                        and qa['activations'].dtype == np.bool_ and qa['activations'].shape == (total,2)
+                        and qa['hand_vertex_ids'].dtype == np.int64 and qa['hand_vertex_ids'].shape == (total,2)
+                        and np.array_equal(qa['frame_index'], np.arange(total))
+                        and qa['emitted_same_witness_gaps_m'].shape == (total,2)
+                        and np.isfinite(qa['emitted_same_witness_gaps_m'][qa['activations']]).all(),
+                        'Sealed original all-frame automatic witness geometry required')
+            ah = np.load(directory/'target.npy', mmap_mode='r', allow_pickle=False)
+            bh = np.load(candidate/'target.npy', mmap_mode='r', allow_pickle=False)
+            with np.load(directory/'trajectory.npz', allow_pickle=False) as a:
+                keys = ('object_vertices','object_faces','object_rotation','object_translation',
+                        'object_scale','camera_K','frame_index') + (('pose','scales','shape') if cohort else ())
+                a = {k:a[k] for k in keys}
+            with np.load(candidate/'trajectory.npz', allow_pickle=False) as b:
+                b = {k:b[k] for k in a}
+            with np.load(directory/'native_parameters.npz', allow_pickle=False) as native:
+                faces = native['human_faces']; indices = native['frame_index']
+                fixed_keys = FROZEN_NATIVE_KEYS
+                frozen = {k:native[k] for k in fixed_keys} if cohort else {}
+                internal = native['mhr_body_pose_cont'][:,254:].copy() if cohort else None
+            with np.load(candidate/'native_parameters.npz', allow_pickle=False) as native:
+                require(np.array_equal(native['human_faces'], faces)
+                    and np.array_equal(native['frame_index'], indices), 'No topology / timeline substitutions')
+                if cohort:
+                    require(all(native[k].dtype == frozen[k].dtype and native[k].shape == frozen[k].shape
+                        and native[k].tobytes() == frozen[k].tobytes() for k in fixed_keys)
+                        and native['mhr_body_pose_cont'][:,254:].tobytes() == internal.tobytes()
+                        and native['mhr_trans'].dtype == np.float32 and native['mhr_trans'].shape == (total,3)
+                        and native['mhr_joints'].dtype == np.float32 and native['mhr_joints'].shape == (total,127,3)
+                        and native['mhr_keypoints'].dtype == np.float32 and native['mhr_keypoints'].shape == (total,70,3),
+                        'Frozen native identity, hands, root rotation and complete native C geometry required')
+            require(ah.shape == bh.shape == (total,18439,3), 'Every original human vertex/frame required')
+            if cohort:
+                require(ah.dtype == bh.dtype == np.float32 and b['pose'].dtype == np.float32
+                    and b['pose'].shape == (total,136) and np.isfinite(b['pose']).all()
+                    and b['scales'].tobytes() == a['scales'].tobytes()
+                    and b['shape'].tobytes() == a['shape'].tobytes()
+                    and np.array_equal(a['object_rotation'], b['object_rotation']),
+                    'Direct full-native C controls and unchanged clip shape/scales/object rotations required')
+            for key in ('object_vertices','object_faces','object_scale','camera_K','frame_index'):
+                require(np.array_equal(a[key], b[key]), 'Clip-constant geometry, K, scale and original indices required')
         viewer.checked_geometry(ah, faces, display_trajectory(a), indices, total)
         viewer.checked_geometry(bh, faces, display_trajectory(b), indices, total)
         camera = viewer.display_intrinsics(a['camera_K'], 1536, 1152)
@@ -306,7 +389,7 @@ def render(candidate_revision, kind='joint'):
         template = Image.new('RGB', (960,280), (24,27,33))
         font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 10)
         draw = ImageDraw.Draw(template)
-        for column, title in enumerate(labels(ep, accepted, kind, r['status'])):
+        for column, title in enumerate(labels(ep, accepted, kind, candidate_status)):
             draw.text((column*320+4,3), title, font=font, fill='white')
         draw.text((324,263), 'Same inferred scale / fixed virtual floor / grid 0.5m', font=font, fill='white')
         destination = output/f'episode_{ep:06d}.mp4'
@@ -352,7 +435,7 @@ def render(candidate_revision, kind='joint'):
             unchanged_baseline=True, one_fixed_camera=True, one_fixed_floor=True, per_frame_alignment=False)
         reports.append(report); states.append(dict(episode=ep,status='complete',QA_passed=accepted))
         if cohort:
-            report['candidate_status'] = r['status']; states[-1]['candidate_status'] = r['status']
+            report['candidate_status'] = candidate_status; states[-1]['candidate_status'] = candidate_status
         print(json.dumps(dict(stage='full_video_rendered',episode=ep,frames=total,QA_passed=accepted)),flush=True)
     require(reports, 'No completed candidate available for honest visual comparison')
     ledger.verify(); require(source(ROOT,code,rev,ENTRY,HELPERS)==binding, 'Immutable source changed')
@@ -360,7 +443,7 @@ def render(candidate_revision, kind='joint'):
         candidate_revision=candidate_revision,baseline_revision=BASELINE,cohort=COHORT,states=states,
         source_binding=binding,sources=ledger.records,reports=reports,quality_verified=False,
         source_rehashed_after=True,heavy_media_local=False,elapsed_seconds=time.monotonic()-started)
-    if cohort: result.update(schema='world_reward.end2end_preview.v3' if kind == 'sqp' else 'world_reward.end2end_preview.v2', candidate_kind=kind)
+    if cohort: result.update(schema='world_reward.end2end_preview.v4' if kind == 'smoothing' else 'world_reward.end2end_preview.v3' if kind == 'sqp' else 'world_reward.end2end_preview.v2', candidate_kind=kind)
     path=output/'render.json'
     with path.open('xb') as stream: stream.write((json.dumps(result,sort_keys=True,allow_nan=False)+'\n').encode())
     path.chmod(0o444)
@@ -377,8 +460,8 @@ def publish(render_revision, kind='joint'):
         'Actual complete non-quality render required')
     require((kind == 'joint' and rendered.get('schema') == 'world_reward.end2end_preview.v1'
             and 'candidate_kind' not in rendered) or
-        (kind in NATIVE_METHODS and rendered.get('schema') ==
-            ('world_reward.end2end_preview.v3' if kind == 'sqp' else 'world_reward.end2end_preview.v2')
+        (kind in (*NATIVE_METHODS, 'smoothing') and rendered.get('schema') ==
+            ('world_reward.end2end_preview.v4' if kind == 'smoothing' else 'world_reward.end2end_preview.v3' if kind == 'sqp' else 'world_reward.end2end_preview.v2')
             and rendered.get('candidate_kind') == kind), 'Explicit method matches original render receipt')
     client=PrivatePreviews();client.require_private();files=[]
     for row in rendered['reports']:
@@ -393,8 +476,8 @@ def publish(render_revision, kind='joint'):
         source_binding=binding,endpoint='https://stworldrewardresearch26.blob.core.windows.net/qa-previews',
         private_container_verified=True,public_access_changed=False,account_keys_used=False,
         quality_verified=False,heavy_data_uploaded=False)
-    if kind in NATIVE_METHODS:
-        receipt.update(schema='world_reward.end2end_preview_publication.v3' if kind == 'sqp' else 'world_reward.end2end_preview_publication.v2', candidate_kind=kind)
+    if kind in (*NATIVE_METHODS, 'smoothing'):
+        receipt.update(schema='world_reward.end2end_preview_publication.v4' if kind == 'smoothing' else 'world_reward.end2end_preview_publication.v3' if kind == 'sqp' else 'world_reward.end2end_preview_publication.v2', candidate_kind=kind)
     p=ROOT/'results'/('end2end-preview-publication-'+rev+'.json')
     with p.open('xb') as stream: stream.write((json.dumps(receipt,sort_keys=True)+'\n').encode())
     p.chmod(0o444);print(json.dumps(dict(status='published',receipt=str(p),bytes=p.stat().st_size,

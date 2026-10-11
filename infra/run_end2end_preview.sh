@@ -8,7 +8,7 @@ KIND=joint; KIND_SEEN=0; WAIT_FOR=''
 while (( $# )); do
  case "$1" in
   --candidate-kind)
-   [[ $# -ge 2 && "$KIND_SEEN" == 0 && "$2" =~ ^(joint|continuation|sqp)$ ]] || exit 2
+   [[ $# -ge 2 && "$KIND_SEEN" == 0 && "$2" =~ ^(joint|continuation|sqp|smoothing)$ ]] || exit 2
    KIND="$2"; KIND_SEEN=1; shift 2 ;;
   --after-terminal)
    [[ $# -ge 2 && -z "$WAIT_FOR" && "$2" =~ ^world-reward-[a-z0-9][a-z0-9-]{0,80}(\.service)?$ ]] || exit 2
@@ -19,6 +19,7 @@ done
 PREFIX=native-joint-real
 [[ "$KIND" != continuation ]] || PREFIX=native-contact-continuation-real
 [[ "$KIND" != sqp ]] || PREFIX=native-pose-sqp-real
+[[ "$KIND" != smoothing ]] || PREFIX=pose-smoothing-real
 ROOT="${WR_ROOT:?}"; CODE="${WR_CODE:?}"; REV="${WR_CODE_REVISION:?}"
 [[ "$ROOT" == /srv/scenesmith/world-reward && "$REV" =~ ^[0-9a-f]{40}$ \
  && "$CODE" == "$ROOT/jobs/$REV/run_end2end_preview/code" && "$(hostname)" == scenesmith-ncc-h100-01 ]] || exit 2
@@ -79,6 +80,8 @@ trap cleanup EXIT; trap 'exit 143' TERM; trap 'exit 130' INT
 SOURCE_MOUNTS=()
 if [[ "$KIND" == continuation ]]; then
  SOURCE_MOUNTS+=(--mount "type=bind,src=$ROOT/jobs/$TARGET/run_native_contact_continuation_real,dst=$ROOT/jobs/$TARGET/run_native_contact_continuation_real,readonly")
+elif [[ "$KIND" == smoothing ]]; then
+ SOURCE_MOUNTS+=(--mount "type=bind,src=$ROOT/jobs/$TARGET/run_pose_smoothing_real,dst=$ROOT/jobs/$TARGET/run_pose_smoothing_real,readonly")
 elif [[ "$KIND" == sqp ]]; then
  SOURCE_MOUNTS+=(--mount "type=bind,src=$ROOT/jobs/$TARGET/run_native_pose_sqp_real,dst=$ROOT/jobs/$TARGET/run_native_pose_sqp_real,readonly")
 fi

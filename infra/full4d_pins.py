@@ -95,7 +95,7 @@ def _context(root, code, revision, episode):
     require(root == ROOT and type(revision) is str and re.fullmatch('[0-9a-f]{40}', revision),
             'Fixed Azure runtime and immutable revision required')
     entry = code.parent.name
-    require(entry in {'run_full4d_sample', 'run_gemini_full4d', 'run_full4d_coverage'}
+    require(entry in {'run_full4d_sample', 'run_gemini_full4d', 'run_full4d_coverage', 'run_full4d_random'}
             and code == root / 'jobs' / revision / entry / 'code', 'Actual allowlisted full4D dispatcher source required')
     require(output_prefix() == f'experiments/full4d-v1-{revision}/outputs', 'Exact fresh revision-bound output namespace required')
     base = episode_output(root, episode)
