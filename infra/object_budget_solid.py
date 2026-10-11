@@ -555,7 +555,7 @@ def surface_source(code, revision, rt, *, control=False):
         require(not control and output_prefix() == 'experiments/full4d-v1-'+revision+'/outputs',
                 'Only the exact fresh full4D production namespace is supported')
         entry = code.parent.name
-        require(entry in {'run_full4d_sample', 'run_gemini_full4d', 'run_full4d_coverage'},
+        require(entry in {'run_full4d_sample', 'run_gemini_full4d', 'run_full4d_coverage', 'run_full4d_random'},
                 'Only actual allowlisted immutable full4D dispatcher entries are supported')
         names += ('src/world_reward/artifact_paths.py',)
     result = rt.source(ROOT, code, revision, entry, names)

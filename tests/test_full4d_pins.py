@@ -216,3 +216,9 @@ def test_new_random_entry_explicitly_supported_without_baseline_aliasing():
     text=inspect.getsource(pins._context)
     assert "'run_full4d_random'" in text
     assert "code == root / 'jobs' / revision / entry / 'code'" in text or "code == root/'jobs'/revision/entry/'code'" in text or "code == root / 'jobs' / revision" in text
+
+
+def test_random_namespace_surface_consumers_accept_real_entry_without_alias():
+    for name in ('surface_geometry_loader.py','object_budget_solid.py'):
+        text=(REPO/'infra'/name).read_text()
+        assert "'run_full4d_random'" in text

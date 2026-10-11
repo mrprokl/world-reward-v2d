@@ -201,10 +201,10 @@ def verify_pinned_artifacts(root,pins,episode,input_sha,object_sha,alignment_sha
     bound=host['source_binding']; require(bound['helpers'][PROCESSOR]['sha256'] == producer['script_sha256'],'Original script differs')
     entry = bound.get('source_entry', 'run_object_budget_solid')
     require(entry == ('run_object_budget_solid' if output_prefix() == 'outputs' else CODE.parent.name)
-        and (output_prefix() == 'outputs' or entry in {'run_full4d_sample', 'run_gemini_full4d', 'run_full4d_coverage'}),
+        and (output_prefix() == 'outputs' or entry in {'run_full4d_sample', 'run_gemini_full4d', 'run_full4d_coverage', 'run_full4d_random'}),
             'A new experiment may not relabel a legacy surface producer')
     if entry != 'run_object_budget_solid':
-        require(entry in {'run_full4d_sample', 'run_gemini_full4d', 'run_full4d_coverage'} and output_prefix() ==
+        require(entry in {'run_full4d_sample', 'run_gemini_full4d', 'run_full4d_coverage', 'run_full4d_random'} and output_prefix() ==
                 'experiments/full4d-v1-'+producer['producer_revision']+'/outputs',
                 'Exact experiment source entry and matching revision required')
     ledger.update(_snapshot(root,producer['producer_revision'],entry,bound))
