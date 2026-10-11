@@ -57,6 +57,28 @@ def _argument_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _validate_automatic_mask(array, mask_id, *, allow_unobserved_poses=False,
+                             pose_observed=None, np):
+    """Keep authenticated SAM pixels, including explicit object occlusion.
+
+    An all-zero binary object mask is missing image evidence, not an invalid
+    image. It is admissible only in the existing explicit full-T latent pose
+    profile and only where the independently validated pose ledger says the
+    pose was unobserved. Actor recovery and the default measured-pose profile
+    remain strict. This function never changes pixels or supplies a mask.
+    """
+    if (type(mask_id) is not int or mask_id not in (0, 1)
+            or type(allow_unobserved_poses) is not bool
+            or (pose_observed is not None and type(pose_observed) not in (bool, np.bool_))):
+        raise ValueError('Explicit automatic mask role and boolean pose observation required')
+    if (type(array) is not np.ndarray or array.dtype != np.uint8
+            or array.shape != (1152, 1536) or not np.isin(array, [0, 255]).all()):
+        raise RuntimeError('Automatic mask must retain original binary full-resolution observation')
+    if not (array > 0).any() and not (mask_id == 1 and allow_unobserved_poses
+                                     and pose_observed is not None and not pose_observed):
+        raise RuntimeError('Empty automatic mask requires an explicitly unobserved object initializer')
+
+
 def _solid_compact(vertices, faces, np):
     """Remove only official zero padding, never weld or repair a surface."""
     from exact_mesh_geometry import _exact_faces, exact_mesh_topology
@@ -691,8 +713,9 @@ def main():
                     raise RuntimeError("Automatic mask changed after body/object prediction")
                 with Image.open(path) as image:
                     array = np.asarray(image)
-                if array.shape != (1152, 1536) or not np.isin(array, [0, 255]).all() or not (array > 0).any():
-                    raise RuntimeError("Automatic mask must retain original binary full-resolution observation")
+                _validate_automatic_mask(array, mask_id,
+                    allow_unobserved_poses=args.allow_unobserved_poses,
+                    pose_observed=None if pose_observed is None else pose_observed[index], np=np)
                 handle.create_dataset(f"{sequence}/{name}-k0.{kind}", data=array, compression="lzf")
     export_seq = prepare_mhr_wild_export(video_link, masks_path, metric_path, intrinsic_path, output / "export")
     metadata_path = export_seq / "wild_export.json"
