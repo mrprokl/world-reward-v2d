@@ -170,16 +170,35 @@ def test_loopback_html_three_columns_all_statuses_and_no_background_reads(tmp_pa
         with urllib.request.urlopen(url + '/') as response:
             page = response.read().decode()
             assert response.headers['Content-Security-Policy'].startswith("default-src 'none'")
-        assert page.count('<section>') == 4 and page.count('<video ') == 2
-        assert page.count('preload="none"') == 2 and page.count('class="columns"') == 2
-        assert page.count('Baseline complete (052)') == 2 and 'Original RGB' in page
+        assert page.count('<section class="clip-summary">') == 4
+        assert '<video' not in page and '<source' not in page and '<img' not in page
+        assert 'Un clip par page' in page and 'ORIGINAL' in page and 'BASELINE' in page and 'CORRECTIF' in page
         assert 'QA PASS — GT pending' in page and 'QA FAIL — not adopted' in page
         assert '2/4' in page and 'non vérifiés' in page and 'Épisode 01' in page and 'Épisode 07' in page
         assert 'poster=' not in page and '<img' not in page and '<script' not in page and 'autoplay' not in page
         assert '/episode-1.mp4' not in page and '/episode-7.mp4' not in page
         assert 'blob.core' not in page and 'sig=' not in page and 'Authorization' not in page
         assert reader.heads == reader.opens == []
-        for path in ('/episode-1.mp4', '/episode-7.mp4', '/episode-9.mp4?sig=manufactured-secret'):
+        for ep in stream.COMPLETE:
+            for focus in (None, 'original', 'baseline', 'candidate'):
+                with urllib.request.urlopen(url + stream.view_path(ep, focus)) as response:
+                    clip = response.read().decode()
+                assert clip.count('<video ') == clip.count('preload="none"') == clip.count('<source ') == 1
+                assert f'/episode-{ep}.mp4' in clip
+                assert all(f'/episode-{other}.mp4' not in clip for other in stream.COHORT if other != ep)
+                assert '<script' not in clip and 'autoplay' not in clip and 'poster=' not in clip and '<img' not in clip
+                assert 'tremblements' in clip and 'contact main–objet' in clip and 'mouvement conservé' in clip
+                assert 'QA PASS — GT pending' in clip if ep == 9 else 'QA FAIL — not adopted' in clip
+                assert clip.count('aria-current="page"') == 1
+                assert reader.heads == reader.opens == []
+        for ep in (1, 7):
+            with urllib.request.urlopen(url + stream.view_path(ep)) as response:
+                incomplete = response.read().decode()
+            assert '<video' not in incomplete and '<source' not in incomplete
+            assert 'Cause enregistrée' in incomplete and 'sans clip remplacé' in incomplete
+        assert reader.heads == reader.opens == []
+        for path in ('/episode-1.mp4', '/episode-7.mp4', '/episode-9.mp4?sig=manufactured-secret',
+                     '/view-episode-1/original', '/view-episode-9/unknown', '/view-episode-9?x=1'):
             with pytest.raises(urllib.error.HTTPError): urllib.request.urlopen(url + path)
         assert reader.opens == []
         request = urllib.request.Request(url + '/episode-14.mp4', headers={'Range': 'bytes=4-8'})
@@ -229,7 +248,7 @@ def test_strict_v3_sparse_SQP_uses_same_tiny_media_routes_and_honest_labels():
     page=stream.index_html(states).decode()
     assert 'C sparse pose-SQP' in page and 'Baseline fallback / no gain' in page
     assert 'C contact-continuation' not in page and 'Native joint' not in page
-    assert 'non vérifiés' in page and 'preload="none"' in page
+    assert 'non vérifiés' in page and '<video' not in page
     for wrong in ['joint','continuation']:
         with pytest.raises(ValueError):stream.records(v,rev,candidate_kind=wrong)
 
@@ -244,3 +263,102 @@ def test_SQP_metadata_cannot_mislabel_continuation_or_claim_physical_gain(bad):
     elif bad=='missing_status':del v['states'][0]['candidate_status']
     elif bad=='claim':v['quality_verified']=True
     with pytest.raises(ValueError):stream.records(v,rev,candidate_kind='sqp')
+
+
+def smoothing_receipt():
+    value, rev = continuation_receipt()
+    value.update(schema=stream.SMOOTHING_SCHEMA, candidate_kind='smoothing')
+    value['states'][0]['candidate_status'] = 'accepted_rigid_projection_pending_independent_QA'
+    return value, rev
+
+
+def test_strict_v4_smoothing_is_a_diagnostic_not_native_articulation_or_physical_validation():
+    value, rev = smoothing_receipt()
+    states, allowed = stream.records(value, rev, candidate_kind='smoothing')
+    assert len(allowed) == 4 and len(states) == 4
+    page = stream.index_html(states).decode()
+    assert 'Lissage contraint — diagnostic, GT à vérifier' in page
+    assert 'Baseline fallback / no gain' in page and 'Native joint' not in page and 'sparse pose-SQP' not in page
+    assert 'Qualité 4D et gain face à CARI4D non vérifiés' in page
+    assert 'La couleur identifie la méthode, pas sa qualité' in page
+    for kind in ('joint', 'continuation', 'sqp'):
+        with pytest.raises(ValueError): stream.records(value, rev, candidate_kind=kind)
+    for kind, factory in [('joint', receipt), ('continuation', continuation_receipt), ('sqp', sqp_receipt)]:
+        other, rev = factory()
+        with pytest.raises(ValueError): stream.records(other, rev, candidate_kind='smoothing')
+        stream.records(other, rev, candidate_kind=kind)
+
+
+@pytest.mark.parametrize('bad', ['schema', 'kind', 'missing_kind', 'missing_status', 'false_status', 'qa', 'claim'])
+def test_v4_smoothing_has_exact_source_method_and_no_quality_claim(bad):
+    value, rev = smoothing_receipt()
+    if bad == 'schema': value['schema'] = stream.SQP_SCHEMA
+    elif bad == 'kind': value['candidate_kind'] = 'sqp'
+    elif bad == 'missing_kind': del value['candidate_kind']
+    elif bad == 'missing_status': del value['states'][0]['candidate_status']
+    elif bad == 'false_status': value['states'][0]['candidate_status'] = 'accepted_native_pose_sqp'
+    elif bad == 'qa': value['states'][0]['QA_passed'] = 'PASS'
+    elif bad == 'claim': value['quality_verified'] = True
+    with pytest.raises(ValueError): stream.records(value, rev, candidate_kind='smoothing')
+
+
+def test_focused_pages_use_exact_single_file_crop_without_retimming_or_geometry_changes():
+    value, rev = smoothing_receipt(); states, _ = stream.records(value, rev)
+    for focus, position in [('original', 'left center'), ('baseline', 'center center'), ('candidate', 'right center')]:
+        page = stream.episode_html(states, 9, focus=focus).decode()
+        assert f'class="focus-view focus-{focus}"' in page
+        assert f'.focus-{focus} video{{object-position:{position}}}' in page
+        assert 'aspect-ratio:8/7;object-fit:cover' in page
+        assert page.count('src="/episode-9.mp4"') == 1 and '/episode-14.mp4' not in page
+        assert 'sans nouvelle reconstruction ni retiming' in page and 'La couleur' not in page
+        assert 'Lissage contraint — diagnostic, GT à vérifier' in page and 'pas encore adopté' in page
+        assert '<script' not in page and 'autoplay' not in page and 'preload="none"' in page
+    with pytest.raises(ValueError): stream.episode_html(states, 9, focus='oracle')
+    with pytest.raises(ValueError): stream.episode_html(states, 29)
+
+
+def test_recorded_failure_reason_is_escaped_and_all_clips_remain_navigable():
+    value, rev = receipt()
+    value['states'][1]['reason'] = '<script>alert("not trusted")</script>'
+    states, _ = stream.records(value, rev)
+    page = stream.episode_html(states, 1).decode()
+    assert '<script' not in page and '&lt;script&gt;' in page and 'état est figé' in page
+    assert '/episode-1.mp4' not in page
+    page = stream.episode_html(states, 9).decode()
+    assert 'href="/view-episode-7"' in page and 'href="/view-episode-1"' in page
+
+
+def test_small_screen_legend_keeps_big_readable_labels_and_explicit_column_positions():
+    value, rev = receipt(); states, _ = stream.records(value, rev)
+    page = stream.episode_html(states, 9).decode()
+    assert '@media(max-width:700px)' in page
+    assert '.columns{grid-template-columns:1fr;gap:10px}' in page
+    assert '.column-label h2{font-size:20px;margin:0}' in page
+    assert '.column-label .position{display:inline}' in page
+    for position in ('gauche', 'centre', 'droite'):
+        assert f'<span class="position">· {position}</span>' in page
+    assert 'max-width:1600px' in page and 'min-height:44px' in page
+    assert '<nav class="view-nav" aria-label="Agrandir une vue">' in page
+
+
+def test_all_new_pages_enforce_foreign_origin_expiry_and_same_existing_CSP_without_reader():
+    value, rev = smoothing_receipt(); states, allowed = stream.records(value, rev)
+    reader = Reader(); server = stream.make_server(states, allowed, reader=reader)
+    worker = threading.Thread(target=server.serve_forever, daemon=True); worker.start()
+    url = f'http://127.0.0.1:{server.server_port}'
+    try:
+        for path in ('/view-episode-9', '/view-episode-14/candidate', '/view-episode-1'):
+            request = urllib.request.Request(url + path, method='HEAD')
+            with urllib.request.urlopen(request) as response:
+                assert response.read() == b''
+                assert response.headers['Cache-Control'] == 'no-store, private'
+                assert response.headers['Content-Security-Policy'] == (
+                    "default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; media-src 'self'; frame-ancestors 'none'")
+            request = urllib.request.Request(url + path, headers={'Origin': 'https://foreign.example'})
+            with pytest.raises(urllib.error.HTTPError): urllib.request.urlopen(request)
+        server.deadline = time.monotonic() - 1
+        for path in ('/view-episode-9', '/view-episode-14/candidate', '/view-episode-1'):
+            with pytest.raises(urllib.error.HTTPError): urllib.request.urlopen(url + path)
+        assert reader.opens == reader.heads == []
+    finally:
+        server.shutdown(); server.server_close(); worker.join(timeout=5)

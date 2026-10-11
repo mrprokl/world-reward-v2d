@@ -20,7 +20,9 @@ import full4d_stream as base
 SCHEMA = 'world_reward.end2end_preview_publication.v1'
 CONTINUATION_SCHEMA = 'world_reward.end2end_preview_publication.v2'
 SQP_SCHEMA = 'world_reward.end2end_preview_publication.v3'
+SMOOTHING_SCHEMA = 'world_reward.end2end_preview_publication.v4'
 SQP_STATUSES = {'accepted_native_pose_sqp', 'dynamic_A_fallback_no_improvement'}
+SMOOTHING_STATUSES = {'accepted_rigid_projection_pending_independent_QA', 'dynamic_A_fallback_no_improvement'}
 CONTINUATION_STATUSES = {'accepted_native_continuation', 'dynamic_A_fallback_no_improvement'}
 BASELINE = '052ba1554e9a573d566713a99a61d89a5f27681c'
 COHORT, COMPLETE = [9, 1, 14, 7], [9, 14]
@@ -52,14 +54,16 @@ def records(receipt, producer_revision, *, render_revision=None, candidate_revis
               'quality_verified', 'heavy_data_uploaded'}
     continuation = type(receipt) is dict and receipt.get('schema') == CONTINUATION_SCHEMA
     sqp = type(receipt) is dict and receipt.get('schema') == SQP_SCHEMA
-    native = continuation or sqp
-    if native: fields.add('candidate_kind')
-    kind = 'sqp' if sqp else 'continuation' if continuation else 'joint'
-    require(candidate_kind is None or candidate_kind in ('joint', 'continuation', 'sqp'), 'Explicit valid candidate kind required')
+    smoothing = type(receipt) is dict and receipt.get('schema') == SMOOTHING_SCHEMA
+    tagged = continuation or sqp or smoothing
+    if tagged: fields.add('candidate_kind')
+    kind = 'smoothing' if smoothing else 'sqp' if sqp else 'continuation' if continuation else 'joint'
+    outcomes = SMOOTHING_STATUSES if smoothing else SQP_STATUSES if sqp else CONTINUATION_STATUSES
+    require(candidate_kind is None or candidate_kind in ('joint', 'continuation', 'sqp', 'smoothing'), 'Explicit valid candidate kind required')
     require(candidate_kind is None or kind == candidate_kind, 'Pinned preview method differs')
     require(type(receipt) is dict and set(receipt) == fields
-            and receipt['schema'] == (SQP_SCHEMA if sqp else CONTINUATION_SCHEMA if continuation else SCHEMA)
-            and (not native or receipt['candidate_kind'] == kind)
+            and receipt['schema'] == (SMOOTHING_SCHEMA if smoothing else SQP_SCHEMA if sqp else CONTINUATION_SCHEMA if continuation else SCHEMA)
+            and (not tagged or receipt['candidate_kind'] == kind)
             and receipt['status'] == 'pass' and receipt['producer_revision'] == producer_revision
             and receipt['baseline_revision'] == BASELINE and receipt['endpoint'] == base.ENDPOINT
             and receipt['private_container_verified'] is True and receipt['public_access_changed'] is False
@@ -89,9 +93,9 @@ def records(receipt, producer_revision, *, render_revision=None, candidate_revis
         require(type(row) is dict and type(row.get('episode')) is int and row['episode'] == ep,
                 'Original cohort order required')
         if ep in COMPLETE:
-            require(set(row) == ({'episode', 'status', 'QA_passed', 'candidate_status'} if native else
+            require(set(row) == ({'episode', 'status', 'QA_passed', 'candidate_status'} if tagged else
                                 {'episode', 'status', 'QA_passed'}) and row['status'] == 'complete'
-                    and (not native or row['candidate_status'] in (SQP_STATUSES if sqp else CONTINUATION_STATUSES))
+                    and (not tagged or row['candidate_status'] in outcomes)
                     and type(row['QA_passed']) is bool, 'Both completed candidates, including QA failures, required')
         else:
             require(row.get('status') in {'failed', 'not_reconstructed_in_this_ablation'}
@@ -140,51 +144,180 @@ def load_receipt(path, producer_revision, **upstream):
     return states, allowed, hashlib.sha256(raw).hexdigest()
 
 
+def candidate_label(row):
+    """Method identity is separate from QA/adoption; green is never a pass."""
+    status = row.get('candidate_status')
+    if status == 'dynamic_A_fallback_no_improvement':
+        return 'Baseline fallback / no gain — référence dynamique conservée'
+    if status == 'accepted_native_pose_sqp':
+        return 'C sparse pose-SQP — diagnostic natif'
+    if status == 'accepted_native_continuation':
+        return 'C contact-continuation — diagnostic natif'
+    if status == 'accepted_rigid_projection_pending_independent_QA':
+        return 'Lissage contraint — diagnostic, GT à vérifier'
+    return 'Native joint — diagnostic natif'
+
+
+def qa_label(row):
+    return ('QA PASS — GT pending · qualité 4D non validée' if row['QA_passed'] else
+            'QA FAIL — not adopted · régression à examiner')
+
+
+def view_path(episode, focus=None):
+    return f'/view-episode-{episode}' + (f'/{focus}' if focus else '')
+
+
+STYLES = '''
+:root{color-scheme:light dark;--wr-bg:#f8fafc;--wr-fg:#172033;--wr-muted:#46546b;
+--wr-line:#ccd5e1;--wr-blue:#1257b3;--wr-amber:#865000;--wr-green:#096640;--wr-red:#ad2535}
+@media(prefers-color-scheme:dark){:root{--wr-bg:#101722;--wr-fg:#edf2f8;--wr-muted:#bac7d8;
+--wr-line:#40516a;--wr-blue:#86baff;--wr-amber:#ffd084;--wr-green:#80dfb0;--wr-red:#ffa7b2}}
+*{box-sizing:border-box}body{background:var(--wr-bg);color:var(--wr-fg);font:18px/1.55 system-ui;
+max-width:1600px;margin:32px auto;padding:0 24px}h1,h2,h3,p{margin:0 0 16px}
+h1{font-size:clamp(28px,3.6vw,46px);line-height:1.15;letter-spacing:-.03em}
+h2{font-size:clamp(23px,2.2vw,32px);line-height:1.2}h3{font-size:22px;line-height:1.25}
+a{color:inherit;text-underline-offset:4px}a:hover{text-decoration-thickness:3px}
+.eyebrow{color:var(--wr-muted);font-size:16px;letter-spacing:.07em;text-transform:uppercase}
+.subtitle,.fineprint{color:var(--wr-muted)}.fineprint{font-size:16px}
+.warning{border-left:5px solid var(--wr-amber);padding-left:16px;margin:24px 0}
+.qa{font-weight:650;margin:16px 0 24px}.qa-fail{color:var(--wr-red)}
+.clip-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin:32px 0}
+.clip-summary{border-top:2px solid var(--wr-line);padding-top:20px;min-width:0}
+.columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:24px 0 12px}
+.column-label{min-width:0;border-top:6px solid currentColor;padding-top:14px}
+.column-label h2{font-size:clamp(18px,2.1vw,32px);letter-spacing:.02em;margin-bottom:8px}
+.column-label p{font-size:16px;margin-bottom:6px}.original{color:var(--wr-blue)}
+.column-label .position{display:none}
+.baseline{color:var(--wr-amber)}.candidate{color:var(--wr-green)}
+.view-nav,.clip-nav{display:flex;flex-wrap:wrap;gap:12px 24px;margin:24px 0}
+.view-nav a,.clip-nav a,.clip-summary>a{padding:10px 0;display:inline-block;min-height:44px}
+.view-nav [aria-current=page]{font-weight:750;text-decoration-thickness:3px}
+video{width:100%;height:auto;aspect-ratio:24/7;display:block;background:var(--wr-bg)}
+.focus-view{max-width:960px;margin:24px auto}.focus-view video{aspect-ratio:8/7;object-fit:cover}
+.focus-original video{object-position:left center}.focus-baseline video{object-position:center center}
+.focus-candidate video{object-position:right center}.focus-heading{border-top:6px solid currentColor;padding-top:16px}
+.inspection{margin:24px 0}.inspection strong{display:block;margin-bottom:6px}
+details{margin:24px 0}summary{min-height:44px;padding:10px 0}
+@media(max-width:700px){body{margin:20px auto;padding:0 16px}.clip-list{grid-template-columns:1fr}
+.columns{grid-template-columns:1fr;gap:10px}.column-label{border-top:0;border-left:6px solid currentColor;
+padding:4px 0 4px 12px}.column-label h2{font-size:20px;margin:0}.column-label p{display:none}
+.column-label .position{display:inline}.view-nav,.clip-nav{gap:6px 18px}}
+'''
+
+
+def document(title, content):
+    return ('<!doctype html><html lang="fr"><head><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            f'<title>{html.escape(title)} — World Reward</title>'
+            '<style>' + STYLES + '</style></head><body>' + content + '</body></html>').encode()
+
+
 def index_html(states):
-    sections = []
+    """Metadata-only landing page: no media element or background Azure read."""
+    summaries = []
+    complete = sum(row['status'] == 'complete' for row in states)
     for row in states:
         ep = row['episode']
         if row['status'] == 'complete':
-            qa = 'QA PASS — GT pending' if row['QA_passed'] else 'QA FAIL — not adopted'
-            title = ('Baseline fallback / no gain' if row.get('candidate_status') == 'dynamic_A_fallback_no_improvement'
-                else 'C sparse pose-SQP — '+qa if row.get('candidate_status') == 'accepted_native_pose_sqp'
-                else 'C contact-continuation — '+qa if row.get('candidate_status') == 'accepted_native_continuation'
-                else 'Native joint — '+qa)
-            content = ('<div class="columns"><span>Original RGB</span><span>Baseline complete (052)</span>'
-                       f'<span>{html.escape(title)}</span></div>'
-                       f'<video controls playsinline preload="none" aria-label="Épisode {ep}: original, baseline 052, candidat natif">'
-                       f'<source src="/episode-{ep}.mp4" type="video/mp4"></video>'
-                       f'<p><a href="/episode-{ep}.jpg" target="_blank" rel="noopener noreferrer">'
-                       'Voir la planche fixe à la demande</a></p>')
+            detail = (f'<p>{html.escape(candidate_label(row))}</p>'
+                      f'<p class="qa {"qa-fail" if not row["QA_passed"] else ""}">{qa_label(row)}</p>')
+            action = 'Comparer original / avant / après'
         else:
-            content = '<p>Échec / non reconstruit dans cette ablation — conservé dans le bilan.</p>'
-        sections.append(f'<section><h2>Épisode {ep:02d}</h2>{content}</section>')
-    return ('<!doctype html><html lang="fr"><meta charset="utf-8">'
-            '<meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<title>World Reward — diagnostic end2end</title>'
-            '<style>:root{color-scheme:light dark}body{font:16px system-ui;max-width:1100px;margin:24px auto;padding:0 16px}'
-            'h1,h2{font-weight:500}h1{font-size:24px}h2{font-size:18px}section{margin:28px 0}'
-            '.columns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:14px}'
-            'video{width:100%;display:block}p{line-height:1.5}</style>'
-            '<h1>World Reward — comparaison end2end</h1>'
-            '<p>États figés : 2/4 reconstructions disponibles, y compris celles qui échouent à la QA. '
-            'Qualité 4D et gain face à CARI4D non vérifiés. Même échelle inférée, caméra et sol virtuel fixes.</p>'
-            '<p>Trois colonnes synchronisées : original RGB · baseline 052 intacte · candidat natif. '
-            'Lecture et planche uniquement à la demande, sans vidéo enregistrée localement. '
-            'La lecture consomme les petits aperçus sur votre connexion.</p>'
-            '<main>' + ''.join(sections) + '</main></html>').encode()
+            detail = '<p>Reconstruction absente de cette livraison — conservée dans le bilan.</p>'
+            action = 'Voir le blocage enregistré'
+        summaries.append(f'<section class="clip-summary"><h2>Épisode {ep:02d}</h2>{detail}'
+                         f'<a href="{view_path(ep)}">{action} →</a></section>')
+    return document('Comparaison 4D',
+        '<header><p class="eyebrow">World Reward · diagnostic end2end</p>'
+        '<h1>Le mouvement réel.<br>La reconstruction avant et après.</h1>'
+        '<p class="subtitle">Un clip par page. Trois vues synchronisées, avec agrandissement individuel.</p></header>'
+        f'<p class="warning"><strong>{complete}/{len(states)} reconstructions disponibles dans cette livraison figée.</strong> '
+        'Qualité 4D et gain face à CARI4D non vérifiés. Les régressions restent visibles.</p>'
+        '<main class="clip-list">' + ''.join(summaries) + '</main>'
+        '<p class="fineprint">Bleu : ORIGINAL · ambre : BASELINE · vert : CORRECTIF. '
+        'La couleur identifie la méthode, pas sa qualité.</p>'
+        '<p class="fineprint">Aucune vidéo chargée ici. Lecture et planche uniquement à votre demande, '
+        'sans vidéo enregistrée localement. La lecture consomme les petits aperçus sur votre connexion.</p>')
+
+
+def episode_html(states, episode, *, focus=None):
+    """One lazy, unchanged synchronized MP4 per page, optional CSS-only crop."""
+    require(focus in (None, 'original', 'baseline', 'candidate'), 'Only exact display crops allowed')
+    row = next((row for row in states if row['episode'] == episode), None)
+    require(row is not None, 'Episode must belong to the frozen cohort')
+    title = f'Épisode {episode:02d}'
+    header = ('<header><p class="eyebrow"><a href="/">← Tous les clips</a> · World Reward</p>'
+              f'<h1>{title} — regarder le mouvement, pas seulement le score</h1></header>')
+    if row['status'] != 'complete':
+        return document(title, header +
+            '<main><h2>Reconstruction absente de cette livraison</h2>'
+            '<p>Échec / non reconstruit dans cette ablation — conservé dans le bilan, sans clip remplacé.</p>'
+            f'<p><strong>Cause enregistrée :</strong> {html.escape(row["reason"])}</p>'
+            '<p class="fineprint">Cet état est figé au moment de la publication ; il ne décrit pas '
+            'nécessairement les travaux en cours.</p></main>')
+    labels = {'original': ('ORIGINAL', 'Ce qui se passe réellement dans la vidéo'),
+              'baseline': ('BASELINE', 'Avant · référence 052 intacte'),
+              'candidate': ('CORRECTIF', 'Après · candidat, pas encore adopté')}
+    nav = []
+    for key, label in [(None, 'Comparer les 3 vues'), ('original', 'Original agrandi'),
+                       ('baseline', 'Baseline agrandie'), ('candidate', 'Correctif agrandi')]:
+        current = ' aria-current="page"' if key == focus else ''
+        nav.append(f'<a href="{view_path(episode, key)}"{current}>{label}</a>')
+    context = (f'<p>{html.escape(candidate_label(row))}</p>'
+               '<p class="fineprint">Le correctif n’est pas encore adopté : vérification physique et GT restantes.</p>'
+               f'<p class="qa {"qa-fail" if not row["QA_passed"] else ""}">{qa_label(row)}</p>'
+               '<nav class="view-nav" aria-label="Agrandir une vue">' + ''.join(nav) + '</nav>')
+    video = (f'<video controls playsinline preload="none" aria-label="Épisode {episode}: '
+             + (f'{labels[focus][0]}, vue agrandie du même aperçu synchronisé' if focus else
+                'original RGB, baseline 052, correctif diagnostic synchronisés')
+             + f'"><source src="/episode-{episode}.mp4" type="video/mp4"></video>')
+    if focus is None:
+        positions = dict(original='gauche', baseline='centre', candidate='droite')
+        headings = ''.join(f'<div class="column-label {key}"><h2>{name} '
+                           f'<span class="position">· {positions[key]}</span></h2><p>{description}</p></div>'
+                           for key, (name, description) in labels.items())
+        media = '<div class="columns">' + headings + '</div>' + video
+    else:
+        name, description = labels[focus]
+        media = (f'<div class="focus-view focus-{focus}"><div class="focus-heading {focus}">'
+                 f'<h2>{name} — vue agrandie</h2><p>{description}</p></div>' + video + '</div>'
+                 '<p class="fineprint">Agrandissement d’une colonne du même fichier vidéo, sans nouvelle '
+                 'reconstruction ni retiming. Le plein écran natif peut montrer les trois colonnes.</p>')
+    position = next(i for i, item in enumerate(states) if item['episode'] == episode)
+    previous = states[(position - 1) % len(states)]['episode']
+    following = states[(position + 1) % len(states)]['episode']
+    footer = ('<div class="inspection"><strong>À examiner : tremblements · contact main–objet · '
+              'glissement au sol · mouvement conservé.</strong>'
+              'Même timeline complète, échelle inférée, caméra et sol virtuel fixes. '
+              'Ni vérité terrain ni qualité 4D vérifiées.</div>'
+              f'<p><a href="/episode-{episode}.jpg" target="_blank" rel="noopener noreferrer">'
+              'Ouvrir la planche fixe, uniquement à la demande</a></p>'
+              '<p class="fineprint">Bleu / ambre / vert identifient les vues, pas leur réussite. '
+              'Une seule vidéo à la demande, sans enregistrement local ni chargement anticipé.</p>'
+              '<nav class="clip-nav" aria-label="Changer de clip">'
+              f'<a href="{view_path(previous)}">← Épisode {previous:02d}</a>'
+              '<a href="/">Tous les clips</a>'
+              f'<a href="{view_path(following)}">Épisode {following:02d} →</a></nav>')
+    return document(title, header + '<main>' + context + media + footer + '</main>')
 
 
 def make_server(states, allowed, *, reader=None):
     """Reuse the existing same-origin range implementation without changing it."""
-    page = index_html(states)
+    pages = {'/': index_html(states)}
+    for row in states:
+        ep = row['episode']
+        pages[view_path(ep)] = episode_html(states, ep)
+        if row['status'] == 'complete':
+            for focus in ('original', 'baseline', 'candidate'):
+                pages[view_path(ep, focus)] = episode_html(states, ep, focus=focus)
     parent = base.handler_factory([], allowed, reader or base.AzureReader())
     class Handler(parent):
         def serve(self, head=False):
-            if self.path != '/':
+            if self.path not in pages:
                 return super().serve(head=head)
             try:
                 self.valid_local_request()
+                page = pages[self.path]
                 self.response_headers(200, 'text/html; charset=utf-8', len(page))
                 if not head: self.wfile.write(page)
             except (BrokenPipeError, ConnectionResetError):
@@ -202,7 +335,7 @@ def main():
     parser.add_argument('--revision', required=True)
     parser.add_argument('--render-revision', required=True)
     parser.add_argument('--candidate-revision', required=True)
-    parser.add_argument('--candidate-kind', choices=('joint', 'continuation', 'sqp'), default='joint')
+    parser.add_argument('--candidate-kind', choices=('joint', 'continuation', 'sqp', 'smoothing'), default='joint')
     parser.add_argument('--ttl', type=int, default=base.MAX_TTL)
     args = parser.parse_args()
     require(60 <= args.ttl <= base.MAX_TTL, 'Viewer TTL must be between60and3600seconds')
